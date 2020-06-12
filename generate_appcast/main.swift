@@ -41,11 +41,12 @@ struct GenerateAppcast: ParsableCommand {
             <private dsa key path> <directory with update files>
         e.g. \(commandName) dsa_priv.pem archives/
         """,
-        valueName: "archives folder"))
-    var updatesPathOrDSAKey: String
+        valueName: "archives folder"),
+              transform: { URL(fileURLWithPath: $0) })
+    var updatesURLOrDSAKey: URL
 
-    @Argument(help: .hidden)
-    var legacyUpdatesPath: String?
+    @Argument(help: .hidden, transform: { URL(fileURLWithPath: $0) })
+    var legacyUpdatesURL: URL?
 
     @Flag(help: .hidden)
     var verbose: Bool
@@ -128,20 +129,19 @@ struct GenerateAppcast: ParsableCommand {
 
         // deal with the remaining arguments
 
-        if legacyUpdatesPath != nil {
+        if legacyUpdatesURL != nil {
             // if there are two arguments left they are the private DSA key and the path to the archives directory (in this order)
             // first get the private DSA key
-            let privateKeyUrl = URL(fileURLWithPath: updatesPathOrDSAKey)
             do {
-                privateDSAKey = try loadPrivateDSAKey(at: privateKeyUrl)
+                privateDSAKey = try loadPrivateDSAKey(at: updatesURLOrDSAKey)
             } catch {
-                print("Unable to load DSA private key from", privateKeyUrl.path, "\n", error)
+                print("Unable to load DSA private key from", updatesURLOrDSAKey.path, "\n", error)
                 throw ExitCode(1)
             }
         }
 
         // now only the archives source dir is left
-        archivesSourceDir = URL(fileURLWithPath: legacyUpdatesPath ?? updatesPathOrDSAKey, isDirectory: true)
+        archivesSourceDir = legacyUpdatesURL ?? updatesURLOrDSAKey
 
         return (privateDSAKey, privateEdString, downloadUrlPrefix, archivesSourceDir)
     }
