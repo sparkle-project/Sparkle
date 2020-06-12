@@ -18,17 +18,17 @@ struct GenerateAppcast: ParsableCommand {
             """)
     }()
 
-    @Option(name: .customShort("f"), help: ArgumentHelp("The path to the private DSA key.", valueName: "dsa key"))
-    var privateDSAKeyPath: String?
+    @Option(name: .customShort("f"), help: ArgumentHelp("The path to the private DSA key.", valueName: "dsa key"), transform: { URL(fileURLWithPath: $0) })
+    var privateDSAKeyURL: URL?
 
     @Option(name: .customShort("n"), help: ArgumentHelp("The name of the private DSA key. This option must be used together with `-k`.", valueName: "dsa key name"))
     var privateDSAKeyName: String?
 
-    @Option(name: .customShort("k"), help: ArgumentHelp("The path to the keychain. This option must be used together with `-n`.", valueName: "keychain"))
-    var keychainPath: String?
+    @Option(name: .customShort("k"), help: ArgumentHelp("The path to the keychain. This option must be used together with `-n`.", valueName: "keychain"), transform: { URL(fileURLWithPath: $0) })
+    var keychainURL: URL?
 
     @Option(name: .customShort("s"), help: ArgumentHelp("The path to the private EdDSA key.", valueName: "eddsa key"))
-    var privateEdDSAKeyPath: String?
+    var privateEdDSAKey: String?
 
     @Option(help: ArgumentHelp("A static url that will be used as prefix for the url from where updates will be downloaded.", valueName: "url"), transform: { URL(string: $0) })
     var downloadURLPrefix: URL?
@@ -99,9 +99,7 @@ struct GenerateAppcast: ParsableCommand {
         var archivesSourceDir: URL
 
         // check if the private dsa key option is present
-        if let privateDSAKeyPath = privateDSAKeyPath {
-            // get the private DSA key
-            let privateKeyUrl = URL(fileURLWithPath: privateDSAKeyPath)
+        if let privateKeyUrl = privateDSAKeyURL {
             do {
                 privateDSAKey = try loadPrivateDSAKey(at: privateKeyUrl)
             } catch {
@@ -111,9 +109,7 @@ struct GenerateAppcast: ParsableCommand {
         }
 
         // check if the private dsa sould be loaded using the keyname and the name of the keychain
-        if let privateDSAKeyName = privateDSAKeyName, let keychainPath = keychainPath {
-            // get the keyname and the keychain url to load the private DSA key
-            let keychainUrl: URL = URL(fileURLWithPath: keychainPath)
+        if let privateDSAKeyName = privateDSAKeyName, let keychainUrl = keychainURL {
             do {
                 privateDSAKey = try loadPrivateDSAKey(named: privateDSAKeyName, fromKeychainAt: keychainUrl)
             } catch {
@@ -123,8 +119,8 @@ struct GenerateAppcast: ParsableCommand {
         }
 
         // check if the private EdDSA key string was given as an argument
-        if let privateEdDSAKeyPath = privateEdDSAKeyPath {
-            privateEdString = privateEdDSAKeyPath
+        if let privateEdDSAKey = privateEdDSAKey {
+            privateEdString = privateEdDSAKey
         }
 
         // check if a prefix for the download url of the archives was given
