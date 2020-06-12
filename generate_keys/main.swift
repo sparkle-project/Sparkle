@@ -112,34 +112,25 @@ struct GenerateKeys: ParsableCommand {
         throw ExitCode(1)
     }
 
-    func absolutePathForPath(_ path: String) -> String {
-        if path.hasPrefix("/") {
-            return path
-        }
-
-        let currentDirectory = FileManager.default.currentDirectoryPath
-        return currentDirectory.appendingFormat("/%@", path)
-    }
-
     func createNewKeychain(withKeyPair bothKeys: Data, named name: String = "sparkle_export") throws {
-        var keychainPath = absolutePathForPath(name)
         var finalName = name
 
-        let url = URL(fileURLWithPath: keychainPath)
-        if let values = try? url.resourceValues(forKeys: [.isDirectoryKey]) {
+        var keychainUrl = URL(fileURLWithPath: name)
+
+        if let values = try? keychainUrl.resourceValues(forKeys: [.isDirectoryKey]) {
             if values.isDirectory! {
                 finalName.append("/sparkle_export")
-                keychainPath.append("/sparkle_export")
+                keychainUrl.appendPathComponent("/sparkle_export")
             }
         }
 
-        if !keychainPath.hasSuffix(".keychain") && !keychainPath.hasSuffix(".keychain-db") {
+        if keychainUrl.pathExtension != ".keychain" && keychainUrl.pathExtension != ".keychain-db" {
             finalName.append(".keychain")
-            keychainPath.append(".keychain")
+            keychainUrl.appendPathExtension("keychain")
         }
 
         var keychain: SecKeychain?
-        let res = SecKeychainCreate(keychainPath, 0, nil, true, nil, &keychain)
+        let res = SecKeychainCreate(keychainUrl.path, 0, nil, true, nil, &keychain)
         if res != errSecSuccess {
             print("\nERROR: Couldn't create new keychain.")
 
