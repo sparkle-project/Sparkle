@@ -64,9 +64,7 @@ struct GenerateAppcast: ParsableCommand {
             } else {
                 print("Warning: Private key not found in the argument. Please provide a valid key.")
             }
-        }
-            // get keys from kechain instead
-        else {
+        } else { // get keys from kechain instead
             let res = SecItemCopyMatching([
                 kSecClass as String: kSecClassGenericPassword,
                 kSecAttrService as String: "https://sparkle-project.org",
