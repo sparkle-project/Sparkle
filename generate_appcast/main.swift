@@ -30,8 +30,8 @@ struct GenerateAppcast: ParsableCommand {
     @Option(name: .customShort("s"), help: ArgumentHelp("The path to the private EdDSA key.", valueName: "eddsa key"))
     var privateEdDSAKeyPath: String?
 
-    @Option(help: ArgumentHelp("A static url that will be used as prefix for the url from where updates will be downloaded.", valueName: "url"))
-    var downloadURLPrefix: String?
+    @Option(help: ArgumentHelp("A static url that will be used as prefix for the url from where updates will be downloaded.", valueName: "url"), transform: { URL(string: $0) })
+    var downloadURLPrefix: URL?
 
     @Argument(help: ArgumentHelp(
         """
@@ -128,9 +128,7 @@ struct GenerateAppcast: ParsableCommand {
         }
 
         // check if a prefix for the download url of the archives was given
-        if let downloadURLPrefix = downloadURLPrefix {
-            downloadUrlPrefix = URL(string: downloadURLPrefix)
-        }
+        downloadUrlPrefix = downloadURLPrefix
 
         // now that all command line options have been removed from the arguments array
         // there should only be the path to the private DSA key (if provided) path to the archives dir left
