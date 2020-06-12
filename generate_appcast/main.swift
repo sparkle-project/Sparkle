@@ -126,8 +126,7 @@ struct GenerateAppcast: ParsableCommand {
         // check if a prefix for the download url of the archives was given
         downloadUrlPrefix = downloadURLPrefix
 
-        // now that all command line options have been removed from the arguments array
-        // there should only be the path to the private DSA key (if provided) path to the archives dir left
+        // deal with the remaining arguments
 
         if legacyUpdatesPath != nil {
             // if there are two arguments left they are the private DSA key and the path to the archives directory (in this order)
