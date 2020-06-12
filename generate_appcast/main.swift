@@ -143,8 +143,6 @@ struct GenerateAppcast: ParsableCommand {
         // now only the archives source dir is left
         archivesSourceDir = URL(fileURLWithPath: legacyUpdatesPath ?? updatesPathOrDSAKey, isDirectory: true)
 
-        print(archivesSourceDir)
-
         return (privateDSAKey, privateEdString, downloadUrlPrefix, archivesSourceDir)
     }
 
