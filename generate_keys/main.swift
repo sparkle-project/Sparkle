@@ -16,7 +16,7 @@ struct GenerateKeys: ParsableCommand {
         return CommandConfiguration(commandName: commandName, abstract: "Generate, print, or export Ed25519 key pair for Sparkle update signing.")
     }()
 
-    @Option(name: [.short, .customLong("export")], help: ArgumentHelp(#"Export saved key pair to a stand-alone keychain, with ".keychain" appended.\#nIf the value is a directory, a default name of "sparkle_export" will be used."#, valueName: "file"))
+    @Option(name: [.short, .customLong("export")], help: ArgumentHelp(#"Export saved key pair to a stand-alone keychain, with ".keychain" appended.\#nIf <file> is a directory, a default name of "sparkle_export" will be used."#, valueName: "file"))
     var exportFile: String?
 
     func messageForSecError(_ err: OSStatus) -> String {
