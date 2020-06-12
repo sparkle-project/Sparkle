@@ -22,7 +22,11 @@ static NSData *decode(NSString *str) {
     }
 
     NSString *stripped = [str stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
-    return [[NSData alloc] initWithBase64EncodedString:stripped options:0];
+    NSData *result = [[NSData alloc] initWithBase64EncodedString:stripped options:0];
+    if (!result) {
+        return [NSData data]; // Distinguish an absent string from a present-but-invalid one.
+    }
+    return result;
 }
 
 - (instancetype)initWithDsa:(NSString * _Nullable)maybeDsa ed:(NSString * _Nullable)maybeEd25519
@@ -33,9 +37,15 @@ static NSData *decode(NSString *str) {
             _dsaSignature = decode(maybeDsa);
         }
         if (maybeEd25519 != nil) {
+            self->has_ed25519_signature = true;
             NSData *data = decode(maybeEd25519);
             assert(64 == sizeof(self->ed25519_signature));
-            [data getBytes:self->ed25519_signature length:sizeof(self->ed25519_signature)];
+            if ([data length] == sizeof(self->ed25519_signature)) {
+                [data getBytes:self->ed25519_signature length:sizeof(self->ed25519_signature)];
+            } else {
+                // A valid Ed25519 signature never has the top bits set in the final byte.
+                memset(self->ed25519_signature, -1, sizeof(self->ed25519_signature));
+            }
         }
     }
     return self;
@@ -45,10 +55,8 @@ static NSData *decode(NSString *str) {
 // Xcode may enable this in pedantic mode
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdirect-ivar-access"
-    for(size_t i=0; i < sizeof(self->ed25519_signature); i++) {
-        if (self->ed25519_signature[i] != 0) {
-            return self->ed25519_signature;
-        }
+    if (self->has_ed25519_signature) {
+        return self->ed25519_signature;
     }
     return NULL;
 #pragma clang diagnostic pop
@@ -69,6 +77,7 @@ static NSData *decode(NSString *str) {
                 return nil;
             }
             [edSignature getBytes:self->ed25519_signature];
+            self->has_ed25519_signature = true;
         }
     }
     return self;
@@ -104,9 +113,17 @@ static NSData *decode(NSString *str) {
     if (self) {
         _dsaPubKey = maybeDsa;
         if (maybeEd25519 != nil) {
+            self->has_ed25519_public_key = true;
             NSData *ed = decode(maybeEd25519);
             assert(32 == sizeof(self->ed25519_public_key));
-            [ed getBytes:self->ed25519_public_key length:sizeof(self->ed25519_public_key)];
+            if ([ed length] == sizeof(self->ed25519_public_key)) {
+                [ed getBytes:self->ed25519_public_key length:sizeof(self->ed25519_public_key)];
+            } else {
+                // The stored value will be all zeros.
+                // If that /is/ someone's public key, validation will succeed even though they put in an invalid value.
+                // This is not a security vulnerability since the public key is embedded in the app,
+                // rather than being controlled by a remote attacker.
+            }
         }
     }
     return self;
@@ -117,10 +134,8 @@ static NSData *decode(NSString *str) {
 // Xcode may enable this in pedantic mode
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdirect-ivar-access"
-    for(size_t i=0; i < sizeof(self->ed25519_public_key); i++) {
-        if (self->ed25519_public_key[i] != 0) {
-            return self->ed25519_public_key;
-        }
+    if (self->has_ed25519_public_key) {
+        return self->ed25519_public_key;
     }
     return NULL;
 #pragma clang diagnostic pop

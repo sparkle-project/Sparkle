@@ -137,7 +137,7 @@
 
     XCTAssertTrue([v verifyFileAtPath:self.testFile
                            signatures:[[SUSignatures alloc] initWithDsa:dsaSig ed:nil]],
-                   @"Allow just a DSA signature if that's all that's available");
+                  @"Allow just a DSA signature if that's all that's available");
     XCTAssertFalse([v verifyFileAtPath:self.testFile
                             signatures:[[SUSignatures alloc] initWithDsa:nil ed:edSig]],
                    @"Require the DSA signature to match because there's a DSA public key");
@@ -149,9 +149,16 @@
                             signatures:[[SUSignatures alloc] initWithDsa:wrongDSASig ed:edSig]],
                    @"Fail on a bad DSA signature if provided");
 
+    XCTAssertFalse([v verifyFileAtPath:self.testFile
+                            signatures:[[SUSignatures alloc] initWithDsa:dsaSig ed:@"lol"]],
+                   @"Fail if the Ed25519 signature is invalid.");
+    XCTAssertFalse([v verifyFileAtPath:self.testFile
+                           signatures:[[SUSignatures alloc] initWithDsa:@"lol" ed:edSig]],
+                   @"Fail if the DSA signature is invalid.");
+
     XCTAssertTrue([v verifyFileAtPath:self.testFile
                            signatures:[[SUSignatures alloc] initWithDsa:dsaSig ed:edSig]],
-                   @"Pass if both are valid");
+                  @"Pass if both are valid");
 }
 
 - (void)testVerifyFileWithWrongKey
