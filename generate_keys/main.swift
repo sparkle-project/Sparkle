@@ -16,8 +16,9 @@ struct GenerateKeys: ParsableCommand {
         return CommandConfiguration(commandName: commandName, abstract: "Generate, print, or export Ed25519 key pair for Sparkle update signing.")
     }()
 
-    @Option(name: [.short, .customLong("export")], help: ArgumentHelp(#"Export saved key pair to a stand-alone keychain, with ".keychain" appended.\#nIf <file> is a directory, a default name of "sparkle_export" will be used."#, valueName: "file"))
-    var exportFile: String?
+    @Option(name: [.short, .customLong("export")], help: ArgumentHelp(#"Export saved key pair to a stand-alone keychain, with ".keychain" appended.\#nIf <file> is a directory, a default name of "sparkle_export" will be used."#, valueName: "file"),
+    transform: { URL(fileURLWithPath: $0) })
+    var exportFile: URL?
 
     func messageForSecError(_ err: OSStatus) -> String {
         return SecCopyErrorMessageString(err, nil) as String? ?? "\(err) (you can look it up at osstatus.com)"
@@ -112,30 +113,26 @@ struct GenerateKeys: ParsableCommand {
         throw ExitCode(1)
     }
 
-    func createNewKeychain(withKeyPair bothKeys: Data, named name: String = "sparkle_export") throws {
-        var finalName = name
+    func createNewKeychain(withKeyPair bothKeys: Data, at keychainURL: URL) throws {
+        var url = keychainURL
 
-        var keychainUrl = URL(fileURLWithPath: name)
-
-        if let values = try? keychainUrl.resourceValues(forKeys: [.isDirectoryKey]) {
+        if let values = try? url.resourceValues(forKeys: [.isDirectoryKey]) {
             if values.isDirectory! {
-                finalName.append("/sparkle_export")
-                keychainUrl.appendPathComponent("/sparkle_export")
+                url.appendPathComponent("sparkle_export")
             }
         }
 
-        if keychainUrl.pathExtension != ".keychain" && keychainUrl.pathExtension != ".keychain-db" {
-            finalName.append(".keychain")
-            keychainUrl.appendPathExtension("keychain")
+        if url.pathExtension != ".keychain" && url.pathExtension != ".keychain-db" {
+            url.appendPathExtension("keychain")
         }
 
         var keychain: SecKeychain?
-        let res = SecKeychainCreate(keychainUrl.path, 0, nil, true, nil, &keychain)
+        let res = SecKeychainCreate(url.path, 0, nil, true, nil, &keychain)
         if res != errSecSuccess {
             print("\nERROR: Couldn't create new keychain.")
 
             if res == errSecDuplicateKeychain {
-                print("       File already exists at \(finalName)")
+                print("       File already exists at \(url.relativePath)")
             } else {
                 print("       \(messageForSecError(res))")
             }
@@ -165,7 +162,7 @@ struct GenerateKeys: ParsableCommand {
             throw ExitCode(1)
         }
 
-        print("Copied key to \(finalName).")
+        print("Copied key to \(url.relativePath).")
     }
 
     func run() throws {
@@ -174,7 +171,7 @@ struct GenerateKeys: ParsableCommand {
 
         if let exportFile = exportFile {
             if let keyPair = try findKeyPair() {
-                try createNewKeychain(withKeyPair: keyPair, named: exportFile)
+                try createNewKeychain(withKeyPair: keyPair, at: exportFile)
             }
         } else {
 
