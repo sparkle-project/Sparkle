@@ -24,7 +24,7 @@ func findKeys() -> (Data, Data) {
         kSecAttrService as String: "https://sparkle-project.org",
         kSecAttrAccount as String: "ed25519",
         kSecAttrProtocol as String: kSecAttrProtocolSSH,
-        kSecReturnData as String: kCFBooleanTrue,
+        kSecReturnData as String: true,
         ] as CFDictionary, &item)
     if res == errSecSuccess, let encoded = item as? Data, let keys = Data(base64Encoded: encoded) {
         return (keys[0..<64], keys[64..<(64+32)])
@@ -46,13 +46,17 @@ func findKeys() -> (Data, Data) {
 func edSignature(data: Data, publicEdKey: Data, privateEdKey: Data) -> String {
     assert(publicEdKey.count == 32)
     assert(privateEdKey.count == 64)
-    let len = data.count
     var output = Data(count: 64)
-    output.withUnsafeMutableBytes({ (output: UnsafeMutablePointer<UInt8>) in
-        data.withUnsafeBytes({ (data: UnsafePointer<UInt8>) in
-            publicEdKey.withUnsafeBytes({ (publicEdKey: UnsafePointer<UInt8>) in
-                privateEdKey.withUnsafeBytes({ (privateEdKey: UnsafePointer<UInt8>) in
-                    ed25519_sign(output, data, len, publicEdKey, privateEdKey)
+    output.withUnsafeMutableBytes({ (output: UnsafeMutableRawBufferPointer) in
+        data.withUnsafeBytes({ (data: UnsafeRawBufferPointer) in
+            publicEdKey.withUnsafeBytes({ (publicEdKey: UnsafeRawBufferPointer) in
+                privateEdKey.withUnsafeBytes({ (privateEdKey: UnsafeRawBufferPointer) in
+                    let output = output.bindMemory(to: UInt8.self)
+                    let data = data.bindMemory(to: UInt8.self)
+                    let publicEdKey = publicEdKey.bindMemory(to: UInt8.self)
+                    let privateEdKey = privateEdKey.bindMemory(to: UInt8.self)
+
+                    ed25519_sign(output.baseAddress, data.baseAddress, data.count, publicEdKey.baseAddress, privateEdKey.baseAddress)
                 })
             })
         })
