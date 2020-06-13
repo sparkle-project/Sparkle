@@ -1,5 +1,5 @@
 //
-//  SUDSAVerifierTest.m
+//  SUSignatureVerifierTest.m
 //  Sparkle
 //
 //  Created by Kornel on 25/07/2014.
@@ -11,11 +11,11 @@
 #import "SUSignatureVerifier.h"
 #import "SUSignatures.h"
 
-@interface SUDSAVerifierTest : XCTestCase
+@interface SUSignatureVerifierTest : XCTestCase
 @property NSString *testFile, *pubDSAKeyFile, *pubEdKey;
 @end
 
-@implementation SUDSAVerifierTest
+@implementation SUSignatureVerifierTest
 @synthesize testFile, pubDSAKeyFile, pubEdKey;
 
 - (void)setUp
