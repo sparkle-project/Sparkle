@@ -76,9 +76,10 @@ class SPUDownloaderTest: XCTestCase
     {
         var digestData = Data(count: Int(CC_SHA256_DIGEST_LENGTH))
 
-        _ = digestData.withUnsafeMutableBytes {digestBytes in
-            data.withUnsafeBytes {messageBytes in
-                CC_SHA256(messageBytes, CC_LONG(data.count), digestBytes)
+        _ = digestData.withUnsafeMutableBytes { digestBytes in
+            data.withUnsafeBytes { messageBytes in
+                let digestBytes = digestBytes.bindMemory(to: UInt8.self)
+                CC_SHA256(messageBytes.baseAddress, CC_LONG(data.count), digestBytes.baseAddress)
             }
         }
         return digestData
