@@ -11,6 +11,8 @@
 @class SUHost;
 @class SUSignatures;
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface SUUpdateValidator : NSObject
 
 - (instancetype)initWithDownloadPath:(NSString *)downloadPath signatures:(SUSignatures *)signatures host:(SUHost *)host;
@@ -22,3 +24,5 @@
 - (BOOL)validateWithUpdateDirectory:(NSString *)updateDirectory;
 
 @end
+
+NS_ASSUME_NONNULL_END
