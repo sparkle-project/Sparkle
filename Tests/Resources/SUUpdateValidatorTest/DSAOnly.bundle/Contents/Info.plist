@@ -2,8 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>CFBundleDevelopmentRegion</key>
-	<string>English</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundlePackageType</key>
@@ -14,5 +12,7 @@
 	<string>1.0</string>
 	<key>SUPublicDSAKeyFile</key>
 	<string>test-pubkey.pem</string>
+	<key>CFBundleIdentifier</key>
+	<string>org.sparkle-project.Sparkle.SUUpdateValidatorTestBundle.DSAOnly</string>
 </dict>
 </plist>
