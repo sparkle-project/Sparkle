@@ -30,7 +30,6 @@ struct GenerateKeys: ParsableCommand {
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: "https://sparkle-project.org",
             kSecAttrAccount as String: "ed25519",
-            kSecAttrProtocol as String: kSecAttrProtocolSSH,
             kSecReturnData as String: true,
             ] as CFDictionary, &item)
 
@@ -56,6 +55,27 @@ struct GenerateKeys: ParsableCommand {
     func findPublicKey() throws -> Data? {
         guard let keyPair = try findKeyPair() else { return nil }
         return keyPair[64...]
+    }
+
+    func keychainItemQueryDictionary(for bothKeys: Data) -> [String: Any] {
+        precondition(bothKeys.count == 96)
+
+        let publicEdKey = bothKeys[64...]
+
+        return [
+            // macOS doesn't support ed25519 keys, so we're forced to save the key as a "password"
+            // and add some made-up service data for it to prevent it clashing with other passwords.
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: "https://sparkle-project.org",
+            kSecAttrAccount as String: "ed25519",
+
+            kSecValueData as String: bothKeys.base64EncodedData(), // it's base64-encoded, because user may request to show it
+            kSecAttrIsSensitive as String: true,
+            kSecAttrIsPermanent as String: true,
+            kSecAttrLabel as String: "Private key for signing Sparkle updates",
+            kSecAttrComment as String: "Public key (SUPublicEDKey value) for this key is:\n\n\(publicEdKey.base64EncodedString())",
+            kSecAttrDescription as String: "private key",
+        ]
     }
 
     func generateKeyPair() throws -> Data {
@@ -84,20 +104,7 @@ struct GenerateKeys: ParsableCommand {
         })
 
         let bothKeys = privateEdKey + publicEdKey; // public key can't be derived from the private one
-        let query = [
-            // macOS doesn't support ed25519 keys, so we're forced to save the key as a "password"
-            // and add some made-up service data for it to prevent it clashing with other passwords.
-            kSecClass as String: kSecClassGenericPassword,
-            kSecAttrService as String: "https://sparkle-project.org",
-            kSecAttrAccount as String: "ed25519",
-
-            kSecValueData as String: bothKeys.base64EncodedData() as CFData, // it's base64-encoded, because user may request to show it
-            kSecAttrIsSensitive as String: true,
-            kSecAttrIsPermanent as String: true,
-            kSecAttrLabel as String: "Private key for signing Sparkle updates",
-            kSecAttrComment as String: "Public key (SUPublicEDKey value) for this key is:\n\n\(publicEdKey.base64EncodedString())",
-            kSecAttrDescription as String: "private key",
-            ] as CFDictionary
+        let query = keychainItemQueryDictionary(for: bothKeys) as CFDictionary
         let res = SecItemAdd(query, nil)
 
         if res == errSecSuccess {
@@ -140,24 +147,10 @@ struct GenerateKeys: ParsableCommand {
             throw ExitCode(1)
         }
 
-        let query = [
-            // macOS doesn't support ed25519 keys, so we're forced to save the key as a "password"
-            // and add some made-up service data for it to prevent it clashing with other passwords.
-            kSecClass as String: kSecClassGenericPassword,
-            kSecAttrService as String: "https://sparkle-project.org",
-            kSecAttrAccount as String: "ed25519",
+        var query = keychainItemQueryDictionary(for: bothKeys)
+        query[kSecUseKeychain as String] = keychain
 
-            kSecValueData as String: bothKeys.base64EncodedData() as CFData, // it's base64-encoded, because user may request to show it
-            kSecAttrIsSensitive as String: true,
-            kSecAttrIsPermanent as String: true,
-            kSecAttrLabel as String: "Private key for signing Sparkle updates",
-            kSecAttrComment as String: "Public key (SUPublicEDKey value) for this key is:\n\n\(bothKeys[64...].base64EncodedString())",
-            kSecAttrDescription as String: "private key",
-
-            kSecUseKeychain as String: keychain!
-            ] as CFDictionary
-
-        guard SecItemAdd(query, nil) == errSecSuccess else {
+        guard SecItemAdd(query as CFDictionary, nil) == errSecSuccess else {
             print("Couldn't add keychain item to new keychain.")
             throw ExitCode(1)
         }
@@ -174,7 +167,6 @@ struct GenerateKeys: ParsableCommand {
                 try createNewKeychain(withKeyPair: keyPair, at: exportFile)
             }
         } else {
-
             let pubKey = try findPublicKey() ?? generateKeyPair()
             print("\nIn your app's Info.plist set SUPublicEDKey to:\n\(pubKey.base64EncodedString())\n")
         }
