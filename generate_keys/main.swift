@@ -16,9 +16,11 @@ struct GenerateKeys: ParsableCommand {
         return CommandConfiguration(commandName: commandName, abstract: "Generate, print, or export Ed25519 key pair for Sparkle update signing.")
     }()
 
-    @Option(name: [.short, .customLong("export")], help: ArgumentHelp(#"Export saved key pair to a stand-alone keychain, with ".keychain" appended.\#nIf <file> is a directory, a default name of "sparkle_export" will be used."#, valueName: "file"),
-    transform: { URL(fileURLWithPath: $0) })
-    var exportFile: URL?
+    @Flag(name: [.short, .customLong("export")], help: ArgumentHelp(#"Export saved key pair from the default keychain to a stand-alone keychain, with ".keychain" appended.\#nIf <keychain-file> is a directory, a default name of "sparkle_export" will be used."#, valueName: "file"))
+    var export: Bool
+
+    @Argument(help: ArgumentHelp(#"The keychain file to search, add, or export to.\#nIf no keychain at exists at <keychain-file> and --export is not specified, one will be created."#), transform: { URL(fileURLWithPath: $0) })
+    var keychainFile: URL?
 
     func messageForSecError(_ err: OSStatus) -> String {
         return SecCopyErrorMessageString(err, nil) as String? ?? "\(err) (you can look it up at osstatus.com)"
@@ -57,9 +59,24 @@ struct GenerateKeys: ParsableCommand {
         ]) { $1 }
     }
 
-    func findKeyPair() throws -> Data? {
+    func findKeyPair(in keychainURL: URL? = nil) throws -> Data? {
         var item: CFTypeRef?
-        let res = SecItemCopyMatching(keychainItemDictionaryForSearching as CFDictionary, &item)
+
+        var query = keychainItemDictionaryForSearching
+
+        if let keychainURL = keychainURL {
+            var keychain: SecKeychain?
+            let res = SecKeychainOpen(keychainURL.path, &keychain)
+
+            if res != errSecSuccess {
+                print("Couldn't open keychain at \(keychainURL.relativePath): \(messageForSecError(res)).")
+                throw ExitCode(1)
+            }
+
+            query[kSecMatchSearchList as String] = [keychain]
+        }
+
+        let res = SecItemCopyMatching(query as CFDictionary, &item)
 
         if res == errSecSuccess, let encoded = item as? Data, let keys = Data(base64Encoded: encoded) {
             print("OK! Read the existing key saved in the Keychain.")
@@ -80,12 +97,12 @@ struct GenerateKeys: ParsableCommand {
         throw ExitCode(1)
     }
 
-    func findPublicKey() throws -> Data? {
-        guard let keyPair = try findKeyPair() else { return nil }
+    func findPublicKey(in keychainURL: URL? = nil) throws -> Data? {
+        guard let keyPair = try findKeyPair(in: keychainURL) else { return nil }
         return keyPair[64...]
     }
 
-    func generateKeyPair() throws -> Data {
+    func generateKeyPair(in keychainURL: URL? = nil) throws -> Data {
         var seed = Data(count: 32)
         var publicEdKey = Data(count: 32)
         var privateEdKey = Data(count: 64)
@@ -111,8 +128,15 @@ struct GenerateKeys: ParsableCommand {
         })
 
         let bothKeys = privateEdKey + publicEdKey; // public key can't be derived from the private one
-        let query = try keychainItemQueryDictionary(forAddingKeys: bothKeys) as CFDictionary
-        let res = SecItemAdd(query, nil)
+        var query = try keychainItemQueryDictionary(forAddingKeys: bothKeys)
+
+        if let keychainURL = keychainURL {
+            let (keychain, _) = try createNewKeychain(at: keychainURL)
+
+            query[kSecUseKeychain as String] = keychain
+        }
+
+        let res = SecItemAdd(query as CFDictionary, nil)
 
         if res == errSecSuccess {
             print("OK! A new key has been generated and saved in the Keychain.")
@@ -127,8 +151,8 @@ struct GenerateKeys: ParsableCommand {
         throw ExitCode(1)
     }
 
-    func createNewKeychain(withKeyPair bothKeys: Data, at keychainURL: URL) throws {
-        var url = keychainURL
+    func createNewKeychain(at keychainURL: URL? = nil) throws -> (keychain: SecKeychain, resolvedURL: URL) {
+        var url = keychainURL ?? URL(fileURLWithPath: ".")
 
         if let values = try? url.resourceValues(forKeys: [.isDirectoryKey]) {
             if values.isDirectory! {
@@ -136,12 +160,13 @@ struct GenerateKeys: ParsableCommand {
             }
         }
 
-        if url.pathExtension != ".keychain" && url.pathExtension != ".keychain-db" {
+        if url.pathExtension != "keychain" && url.pathExtension != "keychain-db" {
             url.appendPathExtension("keychain")
         }
 
         var keychain: SecKeychain?
         let res = SecKeychainCreate(url.path, 0, nil, true, nil, &keychain)
+
         if res != errSecSuccess {
             print("\nERROR: Couldn't create new keychain.")
 
@@ -154,6 +179,11 @@ struct GenerateKeys: ParsableCommand {
             throw ExitCode(1)
         }
 
+        return (keychain!, url)
+    }
+
+    func createNewKeychain(withKeyPair bothKeys: Data, at keychainURL: URL?) throws {
+        let (keychain, url) = try createNewKeychain(at: keychainURL)
         var query = try keychainItemQueryDictionary(forAddingKeys: bothKeys)
         query[kSecUseKeychain as String] = keychain
 
@@ -169,12 +199,12 @@ struct GenerateKeys: ParsableCommand {
         print("This tool uses macOS Keychain to store the Sparkle private key.")
         print("If the Keychain prompts you for permission, please allow it.")
 
-        if let exportFile = exportFile {
+        if export {
             if let keyPair = try findKeyPair() {
-                try createNewKeychain(withKeyPair: keyPair, at: exportFile)
+                try createNewKeychain(withKeyPair: keyPair, at: keychainFile)
             }
         } else {
-            let pubKey = try findPublicKey() ?? generateKeyPair()
+            let pubKey = try findPublicKey(in: keychainFile) ?? generateKeyPair(in: keychainFile)
             print("\nIn your app's Info.plist set SUPublicEDKey to:\n\(pubKey.base64EncodedString())\n")
         }
     }
