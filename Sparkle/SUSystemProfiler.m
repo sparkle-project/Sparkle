@@ -36,7 +36,7 @@ static NSString *const SUSystemProfilerPreferredLanguageKey = @"lang";
     return [[NSDictionary alloc] initWithContentsOfFile:path];
 }
 
-+ (NSArray<NSDictionary<NSString *, NSString *> *> *)systemProfileArrayForHost:(SUHost *)host
++ (NSArray<NSDictionary<NSString *, id> *> *)systemProfileArrayForHost:(SUHost *)host
 {
     NSDictionary<NSString *, NSString *> *modelTranslation = [self modelTranslationTable];
 

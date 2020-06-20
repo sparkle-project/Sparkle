@@ -773,6 +773,10 @@ static NSString *escapeURLComponent(NSString *str) {
     return parameterizedFeedURL;
 }
 
+- (NSArray<NSDictionary<NSString *, id> *> *)systemProfileArray {
+    return [SUSystemProfiler systemProfileArrayForHost:self.host];
+}
+
 - (void)setUpdateCheckInterval:(NSTimeInterval)updateCheckInterval
 {
     [self.host setObject:@(updateCheckInterval) forUserDefaultsKey:SUScheduledCheckIntervalKey];
