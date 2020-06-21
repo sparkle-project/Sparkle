@@ -56,6 +56,7 @@
 		5A5DD401249585E70045EB3E /* SUUpdateValidatorTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A5DD400249585E70045EB3E /* SUUpdateValidatorTest.swift */; };
 		5A5DD402249586840045EB3E /* SUUpdateValidator.m in Sources */ = {isa = PBXBuildFile; fileRef = 729924931DF4A45000DBCDF5 /* SUUpdateValidator.m */; };
 		5A5DD40424958B000045EB3E /* SUUpdateValidatorTest in Resources */ = {isa = PBXBuildFile; fileRef = 5A5DD40324958AFF0045EB3E /* SUUpdateValidatorTest */; };
+		5A5DD41D249F116E0045EB3E /* test-relative-urls.xml in Resources */ = {isa = PBXBuildFile; fileRef = 5A5DD41B249F0F4B0045EB3E /* test-relative-urls.xml */; };
 		5A6DD17123FE1FFC000AEF33 /* SUSignatures.m in Sources */ = {isa = PBXBuildFile; fileRef = EA1E286D22B665E8004AA304 /* SUSignatures.m */; };
 		5AA89BA523FE27660094DAB8 /* SUSignatures.m in Sources */ = {isa = PBXBuildFile; fileRef = EA1E286D22B665E8004AA304 /* SUSignatures.m */; };
 		5AA89BA623FE276A0094DAB8 /* SUSignatures.m in Sources */ = {isa = PBXBuildFile; fileRef = EA1E286D22B665E8004AA304 /* SUSignatures.m */; };
@@ -966,6 +967,7 @@
 		55E6F33219EC9F6C00005E76 /* SUErrors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUErrors.h; sourceTree = "<group>"; };
 		5A5DD400249585E70045EB3E /* SUUpdateValidatorTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SUUpdateValidatorTest.swift; sourceTree = "<group>"; };
 		5A5DD40324958AFF0045EB3E /* SUUpdateValidatorTest */ = {isa = PBXFileReference; lastKnownFileType = folder; path = SUUpdateValidatorTest; sourceTree = "<group>"; };
+		5A5DD41B249F0F4B0045EB3E /* test-relative-urls.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "test-relative-urls.xml"; sourceTree = "<group>"; };
 		5AA4DCD01C73E5510078F128 /* SUAppcastTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SUAppcastTest.swift; sourceTree = "<group>"; };
 		5AD0FA7E1C73F2E2004BCEFF /* testappcast.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = testappcast.xml; sourceTree = "<group>"; };
 		5AEF45D9189D1CC90030D7DC /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/Sparkle.strings; sourceTree = "<group>"; };
@@ -1714,6 +1716,7 @@
 				5AF6C74E1AEA46D10014A3AB /* test.pkg */,
 				5AD0FA7E1C73F2E2004BCEFF /* testappcast.xml */,
 				5F1510A11C96E591006E1629 /* testnamespaces.xml */,
+				5A5DD41B249F0F4B0045EB3E /* test-relative-urls.xml */,
 				5A5DD40324958AFF0045EB3E /* SUUpdateValidatorTest */,
 			);
 			path = Resources;
@@ -2976,6 +2979,7 @@
 				72AC6B2A1B9AAF3A00F62325 /* SparkleTestCodeSignApp.tar.bz2 in Resources */,
 				72AC6B261B9AAC8800F62325 /* SparkleTestCodeSignApp.tar.gz in Resources */,
 				72AC6B2C1B9AB0EE00F62325 /* SparkleTestCodeSignApp.tar.xz in Resources */,
+				5A5DD41D249F116E0045EB3E /* test-relative-urls.xml in Resources */,
 				F8761EB31ADC50EB000C9034 /* SparkleTestCodeSignApp.zip in Resources */,
 				5A5DD40424958B000045EB3E /* SUUpdateValidatorTest in Resources */,
 				14958C6F19AEBC980061B14F /* test-pubkey.pem in Resources */,

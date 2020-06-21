@@ -12,12 +12,14 @@
 #include "AppKitPrevention.h"
 
 static NSString *SPUDownloadDataKey = @"SPUDownloadData";
+static NSString *SPUDownloadURLKey = @"SPUDownloadURL";
 static NSString *SPUDownloadTextEncodingKey = @"SPUDownloadTextEncoding";
 static NSString *SPUDownloadMIMETypeKey = @"SPUDownloadMIMEType";
 
 @implementation SPUDownloadData
 
 @synthesize data = _data;
+@synthesize URL = _URL;
 @synthesize textEncodingName = _textEncodingName;
 @synthesize MIMEType = _MIMEType;
 
@@ -26,11 +28,12 @@ static NSString *SPUDownloadMIMETypeKey = @"SPUDownloadMIMEType";
     return YES;
 }
 
-- (instancetype)initWithData:(NSData *)data textEncodingName:(NSString * _Nullable)textEncodingName MIMEType:(NSString *)MIMEType
+- (instancetype)initWithData:(NSData *)data URL:(NSURL *)URL textEncodingName:(NSString * _Nullable)textEncodingName MIMEType:(NSString *)MIMEType
 {
     self = [super init];
     if (self != nil) {
         _data = data;
+        _URL = URL;
         _textEncodingName = textEncodingName;
         _MIMEType = MIMEType;
     }
@@ -40,7 +43,8 @@ static NSString *SPUDownloadMIMETypeKey = @"SPUDownloadMIMEType";
 - (void)encodeWithCoder:(NSCoder *)coder
 {
     [coder encodeObject:self.data forKey:SPUDownloadDataKey];
-    
+    [coder encodeObject:self.URL forKey:SPUDownloadURLKey];
+
     if (self.textEncodingName != nil) {
         [coder encodeObject:self.textEncodingName forKey:SPUDownloadTextEncodingKey];
     }
@@ -56,12 +60,17 @@ static NSString *SPUDownloadMIMETypeKey = @"SPUDownloadMIMEType";
     if (data == nil) {
         return nil;
     }
-    
+
+    NSURL *URL = [decoder decodeObjectOfClass:[NSURL class] forKey:SPUDownloadURLKey];
+    if (URL == nil) {
+        return nil;
+    }
+
     NSString *textEncodingName = [decoder decodeObjectOfClass:[NSString class] forKey:SPUDownloadTextEncodingKey];
     
     NSString *MIMEType = [decoder decodeObjectOfClass:[NSString class] forKey:SPUDownloadMIMETypeKey];
     
-    return [self initWithData:data textEncodingName:textEncodingName MIMEType:MIMEType];
+    return [self initWithData:data URL:URL textEncodingName:textEncodingName MIMEType:MIMEType];
 }
 
 @end

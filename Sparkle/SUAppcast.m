@@ -85,7 +85,7 @@
     SPUDownloadURLWithRequest(request, ^(SPUDownloadData * _Nullable downloadData, NSError * _Nullable error) {
         if (downloadData != nil) {
             NSError *parseError = nil;
-            NSArray *appcastItems = [self parseAppcastItemsFromXMLData:downloadData.data error:&parseError];
+            NSArray *appcastItems = [self parseAppcastItemsFromXMLData:downloadData.data relativeToURL:downloadData.URL error:&parseError];
             
             if (appcastItems != nil) {
                 self.items = appcastItems;
@@ -151,7 +151,7 @@
     }
 }
 
--(NSArray *)parseAppcastItemsFromXMLData:(NSData *)appcastData error:(NSError *__autoreleasing*)errorp {
+-(NSArray *)parseAppcastItemsFromXMLData:(NSData *)appcastData relativeToURL:(NSURL *)appcastURL error:(NSError *__autoreleasing*)errorp {
     if (errorp) {
         *errorp = nil;
     }
@@ -243,7 +243,7 @@
         }
 
         NSString *errString;
-        SUAppcastItem *anItem = [[SUAppcastItem alloc] initWithDictionary:dict failureReason:&errString];
+        SUAppcastItem *anItem = [[SUAppcastItem alloc] initWithDictionary:dict relativeToURL:appcastURL failureReason:&errString];
         if (anItem) {
             [appcastItems addObject:anItem];
 		}

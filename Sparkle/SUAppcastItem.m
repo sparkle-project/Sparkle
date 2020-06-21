@@ -165,10 +165,15 @@ static NSString *SUAppcastItemInstallationTypeKey = @"SUAppcastItemInstallationT
 
 - (instancetype)initWithDictionary:(NSDictionary *)dict
 {
-    return [self initWithDictionary:dict failureReason:nil];
+    return [self initWithDictionary:dict relativeToURL:nil failureReason:nil];
 }
 
 - (instancetype)initWithDictionary:(NSDictionary *)dict failureReason:(NSString *__autoreleasing *)error
+{
+    return [self initWithDictionary:dict relativeToURL:nil failureReason:error];
+}
+
+- (instancetype)initWithDictionary:(NSDictionary *)dict relativeToURL:(NSURL *)appcastURL failureReason:(NSString *__autoreleasing *)error
 {
     self = [super init];
     if (self) {
@@ -215,7 +220,7 @@ static NSString *SUAppcastItemInstallationTypeKey = @"SUAppcastItemInstallationT
             if (![theInfoURL isKindOfClass:[NSString class]]) {
                 SULog(SULogLevelError, @"%@ -%@ Info URL is not of valid type.", NSStringFromClass([self class]), NSStringFromSelector(_cmd));
             } else {
-                _infoURL = [NSURL URLWithString:theInfoURL];
+                _infoURL = [NSURL URLWithString:theInfoURL relativeToURL:appcastURL];
             }
         }
 
@@ -248,7 +253,7 @@ static NSString *SUAppcastItemInstallationTypeKey = @"SUAppcastItemInstallationT
         if (enclosureURLString) {
             // Sparkle used to always URL-encode, so for backwards compatibility spaces in URLs must be forgiven.
             NSString *fileURLString = [enclosureURLString stringByReplacingOccurrencesOfString:@" " withString:@"%20"];
-            _fileURL = [NSURL URLWithString:fileURLString];
+            _fileURL = [NSURL URLWithString:fileURLString relativeToURL:appcastURL];
         }
         if (enclosure) {
             _signatures = [[SUSignatures alloc] initWithDsa:[enclosure objectForKey:SUAppcastAttributeDSASignature] ed:[enclosure objectForKey:SUAppcastAttributeEDSignature]];
@@ -284,7 +289,7 @@ static NSString *SUAppcastItemInstallationTypeKey = @"SUAppcastItemInstallationT
         // Find the appropriate release notes URL.
         NSString *releaseNotesString = [dict objectForKey:SUAppcastElementReleaseNotesLink];
         if (releaseNotesString) {
-            NSURL *url = [NSURL URLWithString:releaseNotesString];
+            NSURL *url = [NSURL URLWithString:releaseNotesString relativeToURL:appcastURL];
             if ([url isFileURL]) {
                 SULog(SULogLevelError, @"Release notes with file:// URLs are not supported");
             } else {
