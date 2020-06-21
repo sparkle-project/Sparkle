@@ -17,7 +17,7 @@ class SUAppcastTest: XCTestCase {
         let testData = NSData(contentsOfFile: testFile)!
 
         do {
-            let items = try appcast.parseAppcastItems(fromXMLData: testData as Data) as! [SUAppcastItem]
+            let items = try appcast.parseAppcastItems(fromXMLData: testData as Data, relativeTo: nil) as! [SUAppcastItem]
 
             XCTAssertEqual(4, items.count)
 
@@ -72,7 +72,7 @@ class SUAppcastTest: XCTestCase {
         let testData = NSData(contentsOfFile: testFile)!
 
         do {
-            let items = try appcast.parseAppcastItems(fromXMLData: testData as Data) as! [SUAppcastItem]
+            let items = try appcast.parseAppcastItems(fromXMLData: testData as Data, relativeTo: nil) as! [SUAppcastItem]
 
             XCTAssertEqual(2, items.count)
 
@@ -80,6 +80,28 @@ class SUAppcastTest: XCTestCase {
             XCTAssertEqual("desc", items[1].itemDescription)
             XCTAssertNotNil(items[0].releaseNotesURL)
             XCTAssertEqual("https://sparkle-project.org/#works", items[0].releaseNotesURL!.absoluteString)
+        } catch let err as NSError {
+            NSLog("%@", err)
+            XCTFail(err.localizedDescription)
+        }
+    }
+
+    func testRelativeURLs() {
+        let appcast = SUAppcast()
+        let testFile = Bundle(for: SUAppcastTest.self).path(forResource: "test-relative-urls", ofType: "xml")!
+        let testData = NSData(contentsOfFile: testFile)!
+
+        do {
+            let baseURL = URL(string: "https://fake.sparkle-project.org/updates/index.xml")!
+            let items = try appcast.parseAppcastItems(fromXMLData: testData as Data, relativeTo: baseURL) as! [SUAppcastItem]
+
+            XCTAssertEqual(2, items.count)
+
+            XCTAssertEqual("https://fake.sparkle-project.org/updates/release-3.0.zip", items[0].fileURL?.absoluteString)
+            XCTAssertEqual("https://fake.sparkle-project.org/updates/notes/relnote-3.0.txt", items[0].releaseNotesURL?.absoluteString)
+
+            XCTAssertEqual("https://fake.sparkle-project.org/info/info-2.0.txt", items[1].infoURL?.absoluteString)
+
         } catch let err as NSError {
             NSLog("%@", err)
             XCTFail(err.localizedDescription)
