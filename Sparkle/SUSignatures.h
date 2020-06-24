@@ -16,12 +16,26 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+typedef NS_ENUM(uint8_t, SUSigningInputStatus) {
+    /// An input was not provided at all.
+    SUSigningInputStatusAbsent = 0,
+
+    /// An input was provided, but did not have the correct format.
+    SUSigningInputStatusInvalid,
+
+    /// An input was provided and can be used for verifying signing information.
+    SUSigningInputStatusPresent,
+    SUSigningInputStatusLastValidCase = SUSigningInputStatusPresent
+};
+
 @interface SUSignatures : NSObject <NSSecureCoding> {
     unsigned char ed25519_signature[64];
-    bool has_ed25519_signature;
 }
 @property (strong, readonly, nullable) NSData *dsaSignature;
+@property (readonly) SUSigningInputStatus dsaSignatureStatus;
+
 @property (readonly, nullable, nonatomic) const unsigned char *ed25519Signature;
+@property (readonly) SUSigningInputStatus ed25519SignatureStatus;
 
 - (instancetype)initWithDsa:(NSString * _Nullable)dsa ed:(NSString * _Nullable)ed;
 @end
@@ -29,10 +43,15 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface SUPublicKeys : NSObject {
     unsigned char ed25519_public_key[32];
-    bool has_ed25519_public_key;
 }
 @property (strong, readonly, nullable) NSString *dsaPubKey;
+@property (readonly) SUSigningInputStatus dsaPubKeyStatus;
+
 @property (readonly, nullable, nonatomic) const unsigned char *ed25519PubKey;
+@property (readonly) SUSigningInputStatus ed25519PubKeyStatus;
+
+/// Returns YES if either key is present (though they may be invalid).
+@property (readonly) BOOL hasAnyKeys;
 
 - (instancetype)initWithDsa:(NSString * _Nullable)dsa ed:(NSString * _Nullable)ed;
 

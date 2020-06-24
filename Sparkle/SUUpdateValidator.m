@@ -47,7 +47,7 @@
     SUPublicKeys *publicKeys = self.host.publicKeys;
     SUSignatures *signatures = self.signatures;
 
-    if (publicKeys.dsaPubKey == nil && publicKeys.ed25519PubKey == nil) {
+    if (!publicKeys.hasAnyKeys) {
         SULog(SULogLevelError, @"Failed to validate update before unarchiving because no (Ed)DSA public key was found in the old app");
     } else {
         if ([SUSignatureVerifier validatePath:self.downloadPath withSignatures:signatures withPublicKeys:publicKeys]) {
@@ -128,11 +128,11 @@
 
     SUHost *newHost = [[SUHost alloc] initWithBundle:newBundle];
     SUPublicKeys *newPublicKeys = newHost.publicKeys;
-    BOOL oldHasLegacyDSAKey = publicKeys.dsaPubKey != nil;
-    BOOL oldHasEdDSAKey = publicKeys.ed25519PubKey != nil;
+    BOOL oldHasLegacyDSAKey = publicKeys.dsaPubKeyStatus != SUSigningInputStatusAbsent;
+    BOOL oldHasEdDSAKey = publicKeys.ed25519PubKeyStatus != SUSigningInputStatusAbsent;
     BOOL oldHasAnyDSAKey = oldHasLegacyDSAKey || oldHasEdDSAKey;
-    BOOL newHasLegacyDSAKey = newPublicKeys.dsaPubKey != nil;
-    BOOL newHasEdDSAKey = newPublicKeys.ed25519PubKey != nil;
+    BOOL newHasLegacyDSAKey = newPublicKeys.dsaPubKeyStatus != SUSigningInputStatusAbsent;
+    BOOL newHasEdDSAKey = newPublicKeys.ed25519PubKeyStatus != SUSigningInputStatusAbsent;
     BOOL newHasAnyDSAKey = newHasLegacyDSAKey || newHasEdDSAKey;
     BOOL migratesDSAKeys = oldHasLegacyDSAKey && !oldHasEdDSAKey && newHasEdDSAKey && !newHasLegacyDSAKey;
     BOOL updateIsCodeSigned = [SUCodeSigningVerifier bundleAtURLIsCodeSigned:newHost.bundle.bundleURL];
