@@ -739,7 +739,7 @@ static NSString *escapeURLComponent(NSString *str) {
     const NSTimeInterval oneWeek = 60 * 60 * 24 * 7;
     sendingSystemProfile &= (-[lastSubmitDate timeIntervalSinceNow] >= oneWeek);
 
-    NSArray<NSDictionary<NSString *, NSString *> *> *parameters = @[];
+    NSArray<NSDictionary<NSString *, id> *> *parameters = @[];
     if ([self.delegate respondsToSelector:@selector((feedParametersForUpdater:sendingSystemProfile:))]) {
         NSArray *feedParameters = [self.delegate feedParametersForUpdater:self sendingSystemProfile:sendingSystemProfile];
         if (feedParameters != nil) {
@@ -748,7 +748,7 @@ static NSString *escapeURLComponent(NSString *str) {
     }
 	if (sendingSystemProfile)
 	{
-        parameters = [parameters arrayByAddingObjectsFromArray:[SUSystemProfiler systemProfileArrayForHost:self.host]];
+        parameters = [parameters arrayByAddingObjectsFromArray:self.systemProfileArray];
         [self.host setObject:[NSDate date] forUserDefaultsKey:SULastProfileSubmitDateKey];
     }
 	if ([parameters count] == 0) { return baseFeedURL; }
@@ -774,7 +774,19 @@ static NSString *escapeURLComponent(NSString *str) {
 }
 
 - (NSArray<NSDictionary<NSString *, id> *> *)systemProfileArray {
-    return [SUSystemProfiler systemProfileArrayForHost:self.host];
+    NSArray *systemProfile = [SUSystemProfiler systemProfileArrayForHost:self.host];
+    if ([self.delegate respondsToSelector:@selector(allowedSystemProfileKeysForUpdater:)]) {
+        NSArray * allowedKeys = [self.delegate allowedSystemProfileKeysForUpdater:self];
+        NSMutableArray *filteredProfile = [NSMutableArray array];
+        for (NSDictionary *profileElement in systemProfile) {
+            NSString *key = [profileElement objectForKey:@"key"];
+            if (key && [allowedKeys containsObject:key]) {
+                [filteredProfile addObject:profileElement];
+            }
+        }
+        systemProfile = [filteredProfile copy];
+    }
+    return systemProfile;
 }
 
 - (void)setUpdateCheckInterval:(NSTimeInterval)updateCheckInterval

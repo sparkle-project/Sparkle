@@ -11,21 +11,22 @@
 #import "SUHost.h"
 #import "SUOperatingSystem.h"
 #include <sys/sysctl.h>
+#import "SPUUpdaterDelegate.h"
 
 
 #include "AppKitPrevention.h"
 
-static NSString *const SUSystemProfilerApplicationNameKey = @"appName";
-static NSString *const SUSystemProfilerApplicationVersionKey = @"appVersion";
-static NSString *const SUSystemProfilerCPU64bitKey = @"cpu64bit";
-static NSString *const SUSystemProfilerCPUCountKey = @"ncpu";
-static NSString *const SUSystemProfilerCPUFrequencyKey = @"cpuFreqMHz";
-static NSString *const SUSystemProfilerCPUTypeKey = @"cputype";
-static NSString *const SUSystemProfilerCPUSubtypeKey = @"cpusubtype";
-static NSString *const SUSystemProfilerHardwareModelKey = @"model";
-static NSString *const SUSystemProfilerMemoryKey = @"ramMB";
-static NSString *const SUSystemProfilerOperatingSystemVersionKey = @"osVersion";
-static NSString *const SUSystemProfilerPreferredLanguageKey = @"lang";
+NSString *const SUSystemProfilerApplicationNameKey = @"appName";
+NSString *const SUSystemProfilerApplicationVersionKey = @"appVersion";
+NSString *const SUSystemProfilerCPU64bitKey = @"cpu64bit";
+NSString *const SUSystemProfilerCPUCountKey = @"ncpu";
+NSString *const SUSystemProfilerCPUFrequencyKey = @"cpuFreqMHz";
+NSString *const SUSystemProfilerCPUTypeKey = @"cputype";
+NSString *const SUSystemProfilerCPUSubtypeKey = @"cpusubtype";
+NSString *const SUSystemProfilerHardwareModelKey = @"model";
+NSString *const SUSystemProfilerMemoryKey = @"ramMB";
+NSString *const SUSystemProfilerOperatingSystemVersionKey = @"osVersion";
+NSString *const SUSystemProfilerPreferredLanguageKey = @"lang";
 
 @implementation SUSystemProfiler
 
