@@ -225,7 +225,7 @@
 	}
 	else
 	{
-        value = (BOOL)CFBooleanGetValue((CFBooleanRef)plr);
+        value = CFBooleanGetValue((CFBooleanRef)plr) != false;
         CFRelease(plr);
     }
     return value;
