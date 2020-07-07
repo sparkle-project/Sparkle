@@ -95,6 +95,8 @@ class ArchiveItem: CustomStringConvertible {
             var feedURL: URL?
             if let feedURLStr = infoPlist["SUFeedURL"] as? String {
                 feedURL = URL(string: feedURLStr)
+            } else if let envFeedURLStr = ProcessInfo.processInfo.environment["SUFeedURL"] {
+                feedURL = URL(string: envFeedURLStr);
             }
 
             try self.init(version: version,
