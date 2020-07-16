@@ -3082,9 +3082,13 @@
 			files = (
 			);
 			inputPaths = (
+				"$(SRCROOT)/.git/logs/HEAD",
+				"$(BUILT_PRODUCTS_DIR)/$(INFOPLIST_PATH)",
 			);
 			name = "Run Script: Set Git Version Info";
 			outputPaths = (
+				"$(BUILT_PRODUCTS_DIR)/$(INFOPLIST_PATH)",
+				"$(DERIVED_FILE_DIR)/set-git-version-info-stamp",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
