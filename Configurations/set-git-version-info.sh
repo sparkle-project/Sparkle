@@ -38,6 +38,3 @@ if [ "$version" != "$oldversion" ] ; then
     PlistBuddy -c "Set :CFBundleShortVersionString '$version'" \
         "$BUILT_PRODUCTS_DIR/$INFOPLIST_PATH"
 fi
-
-mkdir -p "$DERIVED_FILE_DIR"
-touch "$DERIVED_FILE_DIR/set-git-version-info-stamp"
