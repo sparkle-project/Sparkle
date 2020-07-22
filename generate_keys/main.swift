@@ -126,9 +126,7 @@ if let pubKey = findPublicKey() {
         A pre-existing signing key was found. This is how it should appear in your Info.plist:
 
             <key>SUPublicEDKey</key>
-            <data>
-            \(pubKey.base64EncodedString())
-            </data>
+            <string>\(pubKey.base64EncodedString())</string>
             
         """)
 } else {
@@ -157,9 +155,7 @@ if let pubKey = findPublicKey() {
         updates. It should appear like this:
         
             <key>SUPublicEDKey</key>
-            <data>
-            \(pubKey.base64EncodedString())
-            </data>
+            <string>\(pubKey.base64EncodedString())</string>
         
         """)
 }
