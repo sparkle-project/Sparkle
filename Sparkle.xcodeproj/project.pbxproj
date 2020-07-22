@@ -692,6 +692,20 @@
 			remoteGlobalIDString = 726E07EE1CAF37BD001A286B;
 			remoteInfo = SparkleUpdateDownloader;
 		};
+		FA344BA424C8699E00B2A401 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = EA1E287522B666EB004AA304;
+			remoteInfo = sign_update;
+		};
+		FA344BA624C869A300B2A401 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = EA1E285D22B66487004AA304;
+			remoteInfo = generate_keys;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -2436,6 +2450,8 @@
 				1454BA1619637EDB00344E57 /* PBXTargetDependency */,
 				14732BCF1960F73500593899 /* PBXTargetDependency */,
 				7205C46B1E13070300E370AE /* PBXTargetDependency */,
+				FA344BA724C869A300B2A401 /* PBXTargetDependency */,
+				FA344BA524C8699E00B2A401 /* PBXTargetDependency */,
 				1454BA1819637EE900344E57 /* PBXTargetDependency */,
 			);
 			name = Distribution;
@@ -3809,6 +3825,16 @@
 			isa = PBXTargetDependency;
 			target = 726E07EE1CAF37BD001A286B /* SparkleDownloader */;
 			targetProxy = 72F94F6C1CC4A0C8002DEE68 /* PBXContainerItemProxy */;
+		};
+		FA344BA524C8699E00B2A401 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = EA1E287522B666EB004AA304 /* sign_update */;
+			targetProxy = FA344BA424C8699E00B2A401 /* PBXContainerItemProxy */;
+		};
+		FA344BA724C869A300B2A401 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = EA1E285D22B66487004AA304 /* generate_keys */;
+			targetProxy = FA344BA624C869A300B2A401 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
