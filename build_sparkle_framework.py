@@ -31,6 +31,12 @@ def Main(args):
       print(e.output)
       raise e
 
+  command = ['xcodebuild', '-target', 'BinaryDelta', '-configuration', 'Release']
+  try:
+      subprocess.check_call(command, stdout=FNULL)
+  except subprocess.CalledProcessError as e:
+      print(e.output)
+      raise e
 
   return 0
 
