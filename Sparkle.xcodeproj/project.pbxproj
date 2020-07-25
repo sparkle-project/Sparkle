@@ -2834,7 +2834,7 @@
 			attributes = {
 				CLASSPREFIX = SU;
 				LastSwiftUpdateCheck = 1020;
-				LastUpgradeCheck = 0830;
+				LastUpgradeCheck = 1200;
 				ORGANIZATIONNAME = "Sparkle Project";
 				TargetAttributes = {
 					612279D80DB5470200AB99EA = {
@@ -2850,6 +2850,7 @@
 					};
 					7205C43D1E13049400E370AE = {
 						CreatedOnToolsVersion = 8.2.1;
+						LastSwiftMigration = 1200;
 						ProvisioningStyle = Automatic;
 					};
 					721C24441CB753E6005440CB = {
