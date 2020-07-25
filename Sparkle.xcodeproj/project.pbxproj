@@ -466,6 +466,7 @@
 		F8761EB11ADC5068000C9034 /* SUCodeSigningVerifierTest.m in Sources */ = {isa = PBXBuildFile; fileRef = F8761EB01ADC5068000C9034 /* SUCodeSigningVerifierTest.m */; };
 		F8761EB31ADC50EB000C9034 /* SparkleTestCodeSignApp.zip in Resources */ = {isa = PBXBuildFile; fileRef = F8761EB21ADC50EB000C9034 /* SparkleTestCodeSignApp.zip */; };
 		FA30773D24CBC295007BA37D /* testlocalizedreleasenotesappcast.xml in Resources */ = {isa = PBXBuildFile; fileRef = FA30773C24CBC295007BA37D /* testlocalizedreleasenotesappcast.xml */; };
+		FA30773F24CBC3E9007BA37D /* URL+Hashing.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA30773E24CBC3E9007BA37D /* URL+Hashing.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -1375,6 +1376,7 @@
 		FA1941D00D94A70100DD942E /* ConfigCommon.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ConfigCommon.xcconfig; sourceTree = "<group>"; };
 		FA1941D10D94A70100DD942E /* ConfigFramework.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ConfigFramework.xcconfig; sourceTree = "<group>"; };
 		FA30773C24CBC295007BA37D /* testlocalizedreleasenotesappcast.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = testlocalizedreleasenotesappcast.xml; sourceTree = "<group>"; };
+		FA30773E24CBC3E9007BA37D /* URL+Hashing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URL+Hashing.swift"; sourceTree = "<group>"; };
 		FA3AAF3B1050B273004B3130 /* ConfigUnitTest.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ConfigUnitTest.xcconfig; sourceTree = "<group>"; };
 		FE5536F517A2C6A7007CB333 /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/Sparkle.strings; sourceTree = "<group>"; };
 		FE5536F617A2C6AB007CB333 /* sk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sk; path = sk.lproj/Sparkle.strings; sourceTree = "<group>"; };
@@ -2000,6 +2002,7 @@
 				7205C4401E13049400E370AE /* main.swift */,
 				7205C4491E1304CE00E370AE /* Signatures.swift */,
 				7205C44B1E1304CE00E370AE /* Unarchive.swift */,
+				FA30773E24CBC3E9007BA37D /* URL+Hashing.swift */,
 			);
 			path = generate_appcast;
 			sourceTree = "<group>";
@@ -3345,6 +3348,7 @@
 				7205C4411E13049400E370AE /* main.swift in Sources */,
 				7205C45F1E13066F00E370AE /* SUBinaryDeltaApply.m in Sources */,
 				7205C4621E1306A600E370AE /* SUBinaryDeltaCommon.m in Sources */,
+				FA30773F24CBC3E9007BA37D /* URL+Hashing.swift in Sources */,
 				7205C4611E13069000E370AE /* SUBinaryDeltaCreate.m in Sources */,
 				7205C45B1E13064C00E370AE /* SUBinaryDeltaUnarchiver.m in Sources */,
 				7205C45D1E13065F00E370AE /* SUConstants.m in Sources */,
