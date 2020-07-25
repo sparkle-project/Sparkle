@@ -30,7 +30,7 @@ static void printUsage(NSString *programName)
     fprintf(stderr, "%s version [<patch-file>]\n", [programName UTF8String]);
 }
 
-static BOOL runCreateCommand(NSString *programName, NSArray *args)
+static BOOL runCreateCommand(NSString *programName, NSArray<NSString *> *args)
 {
     if (args.count < 3 || args.count > 5) {
         printUsage(programName);
@@ -62,7 +62,7 @@ static BOOL runCreateCommand(NSString *programName, NSArray *args)
     BOOL verbose = (verboseIndex != NSNotFound);
     NSString *versionField = (versionIndex != NSNotFound) ? args[versionIndex] : nil;
 
-    NSArray *versionComponents = nil;
+    NSArray<NSString *> *versionComponents = nil;
     if (versionField) {
         versionComponents = [versionField componentsSeparatedByString:@"="];
         if (versionComponents.count != 2) {
@@ -218,7 +218,7 @@ static BOOL runVersionCommand(NSString *programName, NSArray *args)
 int main(int __unused argc, char __unused *argv[])
 {
     @autoreleasepool {
-        NSArray *args = [[NSProcessInfo processInfo] arguments];
+        NSArray<NSString *> *args = [[NSProcessInfo processInfo] arguments];
         NSString *programName = [args[0] lastPathComponent];
 
         if (args.count < 2) {

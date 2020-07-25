@@ -168,7 +168,7 @@
 {
     self.downloadDriver = [[SPUDownloadDriver alloc] initWithUpdateItem:updateItem host:self.host userAgent:self.userAgent inBackground:background delegate:self];
     
-    if ([self.updaterDelegate respondsToSelector:@selector(updater:willDownloadUpdate:withRequest:)]) {
+    if ([self.updaterDelegate respondsToSelector:@selector((updater:willDownloadUpdate:withRequest:))]) {
         [self.updaterDelegate updater:self.updater
                                willDownloadUpdate:updateItem
                                       withRequest:self.downloadDriver.request];
@@ -240,7 +240,7 @@
 
 - (void)downloadDriverDidFailToDownloadUpdateWithError:(NSError *)error
 {
-    if ([self.updaterDelegate respondsToSelector:@selector(updater:failedToDownloadUpdate:error:)]) {
+    if ([self.updaterDelegate respondsToSelector:@selector((updater:failedToDownloadUpdate:error:))]) {
         NSError *errorToReport = [error.userInfo objectForKey:NSUnderlyingErrorKey];
         if (errorToReport == nil) {
             errorToReport = error;
@@ -290,13 +290,13 @@
 
 - (void)installerWillFinishInstallationAndRelaunch:(BOOL)relaunch
 {
-    if ([self.updaterDelegate respondsToSelector:@selector(updater:willInstallUpdate:)]) {
+    if ([self.updaterDelegate respondsToSelector:@selector((updater:willInstallUpdate:))]) {
         [self.updaterDelegate updater:self.updater willInstallUpdate:self.updateItem];
     }
     
     if (relaunch) {
         [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterWillRestartNotification object:self];
-        if ([self.updaterDelegate respondsToSelector:@selector(updaterWillRelaunchApplication:)]) {
+        if ([self.updaterDelegate respondsToSelector:@selector((updaterWillRelaunchApplication:))]) {
             [self.updaterDelegate updaterWillRelaunchApplication:self.updater];
         }
     }

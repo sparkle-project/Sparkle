@@ -53,7 +53,7 @@ class ArchiveItem: CustomStringConvertible {
         self.version = version
         self._shortVersion = shortVersion
         self.feedURL = feedURL
-        self.minimumSystemVersion = minimumSystemVersion ?? "10.7"
+        self.minimumSystemVersion = minimumSystemVersion ?? "10.9"
         self.archivePath = archivePath
         self.appPath = appPath
         self.supportsDSA = supportsDSA
@@ -86,7 +86,7 @@ class ArchiveItem: CustomStringConvertible {
             guard let infoPlist = NSDictionary(contentsOf: appPath.appendingPathComponent("Contents/Info.plist")) else {
                 throw makeError(code: .unarchivingError, "No plist \(appPath.path)")
             }
-            guard let version = infoPlist[kCFBundleVersionKey] as? String else {
+            guard let version = infoPlist[kCFBundleVersionKey!] as? String else {
                 throw makeError(code: .unarchivingError, "No Version \(kCFBundleVersionKey as String? ?? "missing kCFBundleVersionKey") \(appPath)")
             }
             let shortVersion = infoPlist["CFBundleShortVersionString"] as? String

@@ -140,7 +140,7 @@ static NSString * const UPDATED_VERSION = @"2.0";
 
             ed25519_sign(signature, archive.bytes, archive.length, public_key, self_sign_demo_only_insecure_hack);
 
-            NSString *signatureString = [[NSData dataWithBytes:signature length:64] base64Encoding];
+            NSString *signatureString = [[NSData dataWithBytes:signature length:64] base64EncodedStringWithOptions:0];
             
             // Obtain the file attributes to get the file size of our update later
             NSError *fileAttributesError = nil;

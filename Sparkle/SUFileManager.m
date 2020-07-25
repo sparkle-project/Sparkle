@@ -158,7 +158,7 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
     // Even if we fail removing the quarantine from the root item or any single item in the directory, we will continue trying to remove the quarantine.
     // This is because often it may not be a fatal error from the caller to not remove the quarantine of an item
     NSDictionary *rootAttributes = [_fileManager attributesOfItemAtPath:rootURLPath error:nil];
-    NSString *rootType = [rootAttributes objectForKey:NSFileType]; // 10.7 can't subscript this
+    NSString *rootType = rootAttributes[NSFileType];
     
     if ([rootType isEqualToString:NSFileTypeDirectory]) {
         // The NSDirectoryEnumerator will avoid recursing into any contained

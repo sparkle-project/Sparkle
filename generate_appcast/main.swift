@@ -59,8 +59,8 @@ func loadPrivateKeys(_ privateDSAKey: SecKey?, _ privateEdString: String?) -> Pr
             kSecAttrService as String: "https://sparkle-project.org",
             kSecAttrAccount as String: "ed25519",
             kSecAttrProtocol as String: kSecAttrProtocolSSH,
-            kSecReturnData as String: kCFBooleanTrue,
-            ] as CFDictionary, &item)
+            kSecReturnData as String: kCFBooleanTrue!,
+        ] as CFDictionary, &item)
         if res == errSecSuccess, let encoded = item as? Data, let data = Data(base64Encoded: encoded) {
             keys = data
         } else {
