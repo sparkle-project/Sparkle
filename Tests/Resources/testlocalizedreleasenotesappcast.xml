@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
+  <channel>
+    <title>For unit test only</title>
+    <!-- A release testing localized release notes -->
+    <item>
+        <title>Version 6.0</title>
+        <pubDate>Sat, 26 Jul 2019 15:20:13 +0000</pubDate>
+        <enclosure url="http://localhost:1337/Sparkle_Test_App.zip" sparkle:version="6.0" />
+        <sparkle:releaseNotesLink>https://sparkle-project.org/#works</sparkle:releaseNotesLink>
+        <sparkle:releaseNotesLink xml:lang='en'>
+            https://sparkle-project.org/#localized_notes_link_works
+        </sparkle:releaseNotesLink>
+        <sparkle:minimumSystemVersion>2.0.0</sparkle:minimumSystemVersion>
+    </item>
+  </channel>
+</rss>
