@@ -2023,7 +2023,7 @@
 				722194521D3BFEB7004C34FF /* SUInstallerAgentInitiationProtocol.h */,
 			);
 			name = "Installer Progress";
-			path = "../Installer Progress";
+			path = InstallerProgress;
 			sourceTree = "<group>";
 		};
 		721D8A891D4D273E0032E472 /* Internal */ = {
@@ -2091,7 +2091,8 @@
 				720B16431C66433D006985FB /* SUTestApplicationTest.swift */,
 				720B16421C66433D006985FB /* UITests-Info.plist */,
 			);
-			path = "UI Tests";
+			name = "UI Tests";
+			path = UITests;
 			sourceTree = "<group>";
 		};
 		726E07AE1CAF08D6001A286B /* InstallerLauncher */ = {
@@ -2120,7 +2121,7 @@
 				723B5DA51CF7AB0100365F95 /* SPUDownloaderProtocol.h */,
 			);
 			name = Downloader;
-			path = ../UpdateDownloader;
+			path = ../Downloader;
 			sourceTree = "<group>";
 		};
 		726E4A171C86C88F00C57C6A /* TestAppHelper */ = {
@@ -3174,7 +3175,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Configurations/set-ats-exceptions-test-app.sh\"";
+			shellScript = "\"${SRCROOT}/Configurations/set-ats-exceptions-test-app.sh\"\n";
 		};
 		729BB3D01D50354C007C4276 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
