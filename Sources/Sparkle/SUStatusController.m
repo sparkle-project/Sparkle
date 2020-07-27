@@ -36,7 +36,11 @@ static NSString *const SUStatusControllerTouchBarIndentifier = @"" SPARKLE_BUNDL
 
 - (instancetype)initWithHost:(SUHost *)aHost
 {
+#if SWIFT_PACKAGE
+    self = [super initWithWindowNibPath:[SWIFTPM_MODULE_BUNDLE pathForResource:@"SUStatus" ofType:@"nib"] owner:self];
+#else
     self = [super initWithWindowNibName:@"SUStatus"];
+#endif
 	if (self)
 	{
         self.host = aHost;

@@ -80,7 +80,11 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 
 - (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost completionBlock:(void (^)(SUUpdateAlertChoice))block
 {
+#if SWIFT_PACKAGE
+    self = [super initWithWindowNibPath:[SWIFTPM_MODULE_BUNDLE pathForResource:@"SUUpdateAlert" ofType:@"nib"] owner:self];
+#else
     self = [super initWithWindowNibName:@"SUUpdateAlert"];
+#endif
 	if (self)
 	{
         self.completionBlock = block;
