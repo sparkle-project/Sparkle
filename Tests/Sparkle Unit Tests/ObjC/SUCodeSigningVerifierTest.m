@@ -38,7 +38,11 @@
 {
     [super setUp];
 
+#if SWIFT_PACKAGE
+    NSBundle *unitTestBundle = SWIFTPM_MODULE_BUNDLE;
+#else
     NSBundle *unitTestBundle = [NSBundle bundleForClass:[self class]];
+#endif
     NSString *unitTestBundleIdentifier = unitTestBundle.bundleIdentifier;
     NSString *zippedAppURL = [unitTestBundle pathForResource:@"SparkleTestCodeSignApp" ofType:@"zip"];
 

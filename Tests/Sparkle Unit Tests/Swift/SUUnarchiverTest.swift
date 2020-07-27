@@ -7,12 +7,20 @@
 //
 
 import XCTest
+#if SWIFT_PACKAGE
+import Sparkle
+#endif
 
 class SUUnarchiverTest: XCTestCase
 {
     func unarchiveTestAppWithExtension(_ archiveExtension: String, password: String? = nil) {
         let appName = "SparkleTestCodeSignApp"
+        #if SWIFT_PACKAGE
+        let archiveResourceURL = Bundle.module.url(forResource: appName, withExtension: archiveExtension)!
+        print(archiveResourceURL)
+        #else
         let archiveResourceURL = Bundle(for: type(of: self)).url(forResource: appName, withExtension: archiveExtension)!
+        #endif
 
         let fileManager = FileManager.default
 

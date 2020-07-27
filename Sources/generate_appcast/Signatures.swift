@@ -4,6 +4,10 @@
 //
 
 import Foundation
+#if SWIFT_PACKAGE
+import Sparkle
+import ed25519
+#endif
 
 struct PrivateKeys {
     var privateDSAKey: SecKey?

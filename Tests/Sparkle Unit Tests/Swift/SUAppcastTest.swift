@@ -13,7 +13,11 @@ class SUAppcastTest: XCTestCase {
 
     func testParseAppcast() {
         let appcast = SUAppcast()
+        #if SWIFT_PACKAGE
+        let testFile = Bundle.module.path(forResource: "testappcast", ofType: "xml")!
+        #else
         let testFile = Bundle(for: SUAppcastTest.self).path(forResource: "testappcast", ofType: "xml")!
+        #endif
         let testFileUrl = URL(fileURLWithPath: testFile)
         XCTAssertNotNil(testFileUrl)
 
@@ -70,8 +74,13 @@ class SUAppcastTest: XCTestCase {
 
     func testParseAppcastWithLocalizedReleaseNotes() {
         let appcast = SUAppcast()
+        #if SWIFT_PACKAGE
+        let testFile = Bundle.module.path(forResource: "testlocalizedreleasenotesappcast",
+                                          ofType: "xml")!
+        #else
         let testFile = Bundle(for: SUAppcastTest.self).path(forResource: "testlocalizedreleasenotesappcast",
                                                             ofType: "xml")!
+        #endif
         let testFileUrl = URL(fileURLWithPath: testFile)
         XCTAssertNotNil(testFileUrl)
 
@@ -86,7 +95,11 @@ class SUAppcastTest: XCTestCase {
 
     func testNamespaces() {
         let appcast = SUAppcast()
+        #if SWIFT_PACKAGE
+        let testFile = Bundle.module.path(forResource: "testnamespaces", ofType: "xml")!
+        #else
         let testFile = Bundle(for: SUAppcastTest.self).path(forResource: "testnamespaces", ofType: "xml")!
+        #endif
         let testFileUrl = URL(fileURLWithPath: testFile)
         XCTAssertNotNil(testFileUrl)
 

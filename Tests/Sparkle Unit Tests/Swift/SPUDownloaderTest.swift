@@ -8,6 +8,9 @@
 
 import XCTest
 import Sparkle
+#if SWIFT_PACKAGE
+import CommonCrypto
+#endif
 
 class SPUDownloaderTestDelegate: NSObject, SPUDownloaderDelegate {
 

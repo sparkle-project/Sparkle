@@ -7,6 +7,9 @@
 //
 
 import XCTest
+#if SWIFT_PACKAGE
+import Sparkle
+#endif
 
 class SUFileManagerTest: XCTestCase
 {

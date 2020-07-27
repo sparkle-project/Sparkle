@@ -23,7 +23,11 @@
     [super setUp];
 
     self.testFile = [[NSBundle bundleForClass:[self class]] pathForResource:@"signed-test-file" ofType:@"txt"];
+#ifdef SWIFT_PACKAGE
+    self.pubKeyFile = [SWIFTPM_MODULE_BUNDLE pathForResource:@"test-pubkey" ofType:@"pem"];
+#else
     self.pubKeyFile = [[NSBundle bundleForClass:[self class]] pathForResource:@"test-pubkey" ofType:@"pem"];
+#endif
 }
 
 - (void)testVerifyFileAtPath

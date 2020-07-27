@@ -4,6 +4,9 @@
 //
 
 import Foundation
+#if SWIFT_PACKAGE
+import Sparkle
+#endif
 
 func unarchive(itemPath: URL, archiveDestDir: URL, callback: @escaping (Error?) -> Void) {
     let fileManager = FileManager.default

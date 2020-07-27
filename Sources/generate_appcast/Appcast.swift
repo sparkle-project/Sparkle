@@ -4,6 +4,9 @@
 //
 
 import Foundation
+#if SWIFT_PACKAGE
+import Sparkle
+#endif
 
 // Maximum number of delta updates (per OS).
 let maxDeltas = 5

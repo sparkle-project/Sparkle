@@ -4,6 +4,9 @@
 //
 
 import Foundation
+#if SWIFT_PACKAGE
+import Sparkle
+#endif
 
 let maxVersionsInFeed = 5
 

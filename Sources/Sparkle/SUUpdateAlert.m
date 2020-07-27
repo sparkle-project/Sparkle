@@ -179,7 +179,11 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
         [self.releaseNotesView.superview addSubview:darkBackgroundView positioned:NSWindowBelow relativeTo:self.releaseNotesView];
         self.releaseNotesView.drawsBackground = NO;
 
+#if SWIFT_PACKAGE
+        prefs.userStyleSheetLocation = [SWIFTPM_MODULE_BUNDLE URLForResource:@"DarkAqua" withExtension:@"css"];
+#else
         prefs.userStyleSheetLocation = [[NSBundle bundleForClass:[self class]] URLForResource:@"DarkAqua" withExtension:@"css"];
+#endif
         if (!self.observingAppearance) {
             [self.window addObserver:self forKeyPath:@"effectiveAppearance" options:NSKeyValueObservingOptionInitial context:nil];
             self.observingAppearance = YES;
