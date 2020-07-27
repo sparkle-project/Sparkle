@@ -70,7 +70,7 @@ let package = Package(
             cSettings: [.define("SWIFT_PACKAGE_TESTING")],
             swiftSettings: [
                 .unsafeFlags(["-import-objc-header",
-                              "/Users/jonaszaugg/Documents/Projects/Sparkle/Tests/Sparkle Unit Tests/Sparkle Unit Tests-Bridging-Header.h"])
+                              "./Tests/Sparkle Unit Tests/Sparkle Unit Tests-Bridging-Header.h"])
             ]
         ),
         .testTarget(
