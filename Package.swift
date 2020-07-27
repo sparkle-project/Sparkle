@@ -47,7 +47,6 @@ let package = Package(
             dependencies: ["bsdiff", "ed25519", "fileop"],
             exclude: ["CheckLocalizations.swift", "Sparkle-Info.plist"],
             resources: [.process("DarkAqua.css")],
-            publicHeadersPath: ".",
             cSettings: defines,
             linkerSettings: [.linkedLibrary("xar"), .linkedLibrary("bz2")]
         ),
@@ -57,7 +56,7 @@ let package = Package(
             path: "Tests/Sparkle Unit Tests",
             exclude: ["Swift", "SparkleTests-Info.plist"],
             resources: [.process("Resources")],
-            cSettings: defines + [.define("SWIFT_PACKAGE_TESTING")]
+            cSettings: defines + [.headerSearchPath("../../Sources/Sparkle")]
         ),
         .testTarget(
             name: "SparkleUnitTestsSwift",
@@ -67,7 +66,7 @@ let package = Package(
                       "SparkleTests-Info.plist"
             ],
             resources: [.process("Resources")],
-            cSettings: [.define("SWIFT_PACKAGE_TESTING")],
+            cSettings: [.headerSearchPath("../../Sources/Sparkle")],
             swiftSettings: [
                 .unsafeFlags(["-import-objc-header",
                               "./Tests/Sparkle Unit Tests/Sparkle Unit Tests-Bridging-Header.h"])

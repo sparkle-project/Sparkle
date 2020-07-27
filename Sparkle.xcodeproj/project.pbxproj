@@ -1232,6 +1232,7 @@
 		1495006D195FBBBD00BC5B5B /* Sparkle */ = {
 			isa = PBXGroup;
 			children = (
+				8921B07424CF099D00EEA861 /* include */,
 				61299B3909CB055000B7442F /* Appcast Support */,
 				34074B8B1FEABCE7001CB3A5 /* Downloader */,
 				089C1665FE841158C02AAC07 /* Framework Resources */,
@@ -1269,20 +1270,13 @@
 		34074B8B1FEABCE7001CB3A5 /* Downloader */ = {
 			isa = PBXGroup;
 			children = (
-				34074B9D1FEABD5A001CB3A5 /* SPUDownloadData.h */,
 				34074B9C1FEABD5A001CB3A5 /* SPUDownloadData.m */,
-				34074B8D1FEABD08001CB3A5 /* SPUDownloader.h */,
 				34074B8C1FEABD08001CB3A5 /* SPUDownloader.m */,
 				34074BA41FEAC0BC001CB3A5 /* SPUDownloader_Private.h */,
-				34074B8E1FEABD08001CB3A5 /* SPUDownloaderDelegate.h */,
-				34074BA51FEAC417001CB3A5 /* SPUDownloaderDeprecated.h */,
 				34074BA61FEAC417001CB3A5 /* SPUDownloaderDeprecated.m */,
-				34074B8F1FEABD08001CB3A5 /* SPUDownloaderProtocol.h */,
-				34074BA01FEABFD2001CB3A5 /* SPUDownloaderSession.h */,
 				34074BA11FEABFD2001CB3A5 /* SPUDownloaderSession.m */,
 				34074B941FEABD23001CB3A5 /* SPULocalCacheDirectory.h */,
 				34074B951FEABD23001CB3A5 /* SPULocalCacheDirectory.m */,
-				34074B991FEABD49001CB3A5 /* SPUURLRequest.h */,
 				34074B981FEABD48001CB3A5 /* SPUURLRequest.m */,
 			);
 			name = Downloader;
@@ -1413,16 +1407,11 @@
 		61299B3909CB055000B7442F /* Appcast Support */ = {
 			isa = PBXGroup;
 			children = (
-				61B5FB9409C4F04600B25A18 /* SUAppcast.h */,
 				61B5FB9509C4F04600B25A18 /* SUAppcast.m */,
-				61B5FC5309C5182000B25A18 /* SUAppcastItem.h */,
 				61B5FC5409C5182000B25A18 /* SUAppcastItem.m */,
-				61A225A20D1C4AC000430CCD /* SUStandardVersionComparator.h */,
 				61A225A30D1C4AC000430CCD /* SUStandardVersionComparator.m */,
 				61A2279A0D1CEE7600430CCD /* SUSystemProfiler.h */,
 				61A2279B0D1CEE7600430CCD /* SUSystemProfiler.m */,
-				61A2259C0D1C495D00430CCD /* SUVersionComparisonProtocol.h */,
-				3772FEA813DE0B6B00F79537 /* SUVersionDisplayProtocol.h */,
 			);
 			name = "Appcast Support";
 			sourceTree = "<group>";
@@ -1468,15 +1457,12 @@
 		61B5F8F309C4CE5900B25A18 /* Other Sources */ = {
 			isa = PBXGroup;
 			children = (
-				61299B3509CB04E000B7442F /* Sparkle.h */,
 				72316BDC1E0E17910039EFD9 /* SUApplicationInfo.h */,
 				72316BDD1E0E17910039EFD9 /* SUApplicationInfo.m */,
 				72316BD71E0E17180039EFD9 /* SUBundleIcon.h */,
 				72316BD81E0E17180039EFD9 /* SUBundleIcon.m */,
 				61299A5B09CA6D4500B7442F /* SUConstants.h */,
 				61299A5F09CA6EB100B7442F /* SUConstants.m */,
-				55E6F33219EC9F6C00005E76 /* SUErrors.h */,
-				14652F8319A9759F00959E44 /* SUExport.h */,
 				61EF67580E25C5B400F754E0 /* SUHost.h */,
 				61EF67550E25B58D00F754E0 /* SUHost.m */,
 				72316BD51E0DBF730039EFD9 /* SULocalizations.h */,
@@ -1514,7 +1500,6 @@
 		61CFB2C10E384958007A1735 /* Support */ = {
 			isa = PBXGroup;
 			children = (
-				61B078CC15A5FB6100600039 /* SUCodeSigningVerifier.h */,
 				61B078CD15A5FB6100600039 /* SUCodeSigningVerifier.m */,
 				61299A2D09CA2DAB00B7442F /* SUSignatureVerifier.h */,
 				61299A2E09CA2DAB00B7442F /* SUSignatureVerifier.m */,
@@ -1550,9 +1535,7 @@
 			children = (
 				61CFB2C20E38496B007A1735 /* Drivers */,
 				61CFB2C10E384958007A1735 /* Support */,
-				61B5F8E309C4CE3C00B25A18 /* SUUpdater.h */,
 				61B5F8E409C4CE3C00B25A18 /* SUUpdater.m */,
-				72316BE51E1087060039EFD9 /* SUUpdaterDelegate.h */,
 				6158A1C4137904B300487EC1 /* SUUpdaterPrivate.h */,
 			);
 			name = "Update Control";
@@ -1575,6 +1558,31 @@
 				720B16421C66433D006985FB /* UITests-Info.plist */,
 			);
 			path = UITests;
+			sourceTree = "<group>";
+		};
+		8921B07424CF099D00EEA861 /* include */ = {
+			isa = PBXGroup;
+			children = (
+				61299B3509CB04E000B7442F /* Sparkle.h */,
+				55E6F33219EC9F6C00005E76 /* SUErrors.h */,
+				14652F8319A9759F00959E44 /* SUExport.h */,
+				61B5FB9409C4F04600B25A18 /* SUAppcast.h */,
+				61B5FC5309C5182000B25A18 /* SUAppcastItem.h */,
+				61A225A20D1C4AC000430CCD /* SUStandardVersionComparator.h */,
+				61A2259C0D1C495D00430CCD /* SUVersionComparisonProtocol.h */,
+				34074B9D1FEABD5A001CB3A5 /* SPUDownloadData.h */,
+				61B078CC15A5FB6100600039 /* SUCodeSigningVerifier.h */,
+				34074B8D1FEABD08001CB3A5 /* SPUDownloader.h */,
+				34074B8E1FEABD08001CB3A5 /* SPUDownloaderDelegate.h */,
+				34074BA51FEAC417001CB3A5 /* SPUDownloaderDeprecated.h */,
+				34074B8F1FEABD08001CB3A5 /* SPUDownloaderProtocol.h */,
+				34074BA01FEABFD2001CB3A5 /* SPUDownloaderSession.h */,
+				61B5F8E309C4CE3C00B25A18 /* SUUpdater.h */,
+				72316BE51E1087060039EFD9 /* SUUpdaterDelegate.h */,
+				34074B991FEABD49001CB3A5 /* SPUURLRequest.h */,
+				3772FEA813DE0B6B00F79537 /* SUVersionDisplayProtocol.h */,
+			);
+			path = include;
 			sourceTree = "<group>";
 		};
 		89F5DBA924CE5141006ADE54 /* Sources */ = {

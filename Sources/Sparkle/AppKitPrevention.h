@@ -16,10 +16,5 @@
 // Even after trying to disable the setting, I've had targets able to link to AppKit without AppKit being specified in the list of linked libraries.
 
 #ifdef _APPKITDEFINES_H
-#ifdef SWIFT_PACKAGE_TESTING
-// FIXME: Test targets fail to compile here, warning is a workaround
-#warning This is a core or daemon-safe module and should NOT import AppKit
-#else
 #error This is a core or daemon-safe module and should NOT import AppKit
-#endif
 #endif
