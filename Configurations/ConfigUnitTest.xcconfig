@@ -2,7 +2,7 @@
 
 #include "ConfigSwift.xcconfig"
 
-INFOPLIST_FILE = Tests/SparkleTests-Info.plist
+INFOPLIST_FILE = Tests/Sparkle Unit Tests/SparkleTests-Info.plist
 WRAPPER_EXTENSION = xctest
 OTHER_CFLAGS = $(inherited) -iframework"$(DEVELOPER_FRAMEWORKS_DIR)" -iframework"$(PLATFORM_DIR)/Developer/Library/Frameworks"
 GCC_SYMBOLS_PRIVATE_EXTERN = NO
@@ -11,4 +11,4 @@ FRAMEWORK_SEARCH_PATHS = $(inherited) $(DEVELOPER_FRAMEWORKS_DIR)
 LD_RUNPATH_SEARCH_PATHS = @loader_path/../Frameworks
 MACOSX_DEPLOYMENT_TARGET = 10.9
 CLANG_ENABLE_MODULES = YES
-SWIFT_OBJC_BRIDGING_HEADER = Tests/Sparkle Unit Tests-Bridging-Header.h
+SWIFT_OBJC_BRIDGING_HEADER = Tests/Sparkle Unit Tests/Sparkle Unit Tests-Bridging-Header.h

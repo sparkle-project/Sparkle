@@ -2,7 +2,7 @@
 
 #include "ConfigSwift.xcconfig"
 
-INFOPLIST_FILE = UITests/UITests-Info.plist
+INFOPLIST_FILE = Tests/UITests/UITests-Info.plist
 WRAPPER_EXTENSION = xctest
 MACOSX_DEPLOYMENT_TARGET = 10.11
 
