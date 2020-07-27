@@ -45,7 +45,7 @@ let package = Package(
         .target(
             name: "Sparkle",
             dependencies: ["bsdiff", "ed25519", "fileop"],
-            exclude: ["CheckLocalizations.swift", "Sparkle-Info.plist"],
+            exclude: ["CheckLocalizations.swift", "Sparkle-Info.plist", "SUBinaryDeltaTool.m"],
             resources: [.process("DarkAqua.css")],
             cSettings: defines,
             linkerSettings: [.linkedLibrary("xar"), .linkedLibrary("bz2")]
