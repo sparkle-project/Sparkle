@@ -11,7 +11,7 @@
 
 #import "SUConstants.h"
 
-#if SWIFT_PACKAGE
+#ifdef SWIFT_PACKAGE
 #define SULocalizedString(key, comment) NSLocalizedStringFromTableInBundle(key, @"Sparkle", (NSBundle * _Nonnull)(SWIFTPM_MODULE_BUNDLE ? SWIFTPM_MODULE_BUNDLE : [NSBundle mainBundle]), comment)
 #else
 #define SULocalizedString(key, comment) NSLocalizedStringFromTableInBundle(key, @"Sparkle", (NSBundle * _Nonnull)([NSBundle bundleWithIdentifier:SUBundleIdentifier] ? [NSBundle bundleWithIdentifier:SUBundleIdentifier] : [NSBundle mainBundle]), comment)

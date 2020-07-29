@@ -22,7 +22,7 @@
 {
     [super setUp];
 
-#if SWIFT_PACKAGE
+#ifdef SWIFT_PACKAGE
     self.testFile = [SWIFTPM_MODULE_BUNDLE pathForResource:@"signed-test-file" ofType:@"txt"];
     self.pubKeyFile = [SWIFTPM_MODULE_BUNDLE pathForResource:@"test-pubkey" ofType:@"pem"];
 #else

@@ -57,7 +57,7 @@ static NSString *const SUUpdatePermissionPromptTouchBarIndentifier = @"" SPARKLE
 
 - (instancetype)initWithHost:(SUHost *)aHost systemProfile:(NSArray *)profile reply:(void (^)(SUUpdatePermissionResponse *))reply
 {
-#if SWIFT_PACKAGE
+#ifdef SWIFT_PACKAGE
     self = [super initWithWindowNibPath:[SWIFTPM_MODULE_BUNDLE pathForResource:@"SUUpdatePermissionPrompt" ofType:@"nib"] owner:self];
 #else
     self = [super initWithWindowNibName:@"SUUpdatePermissionPrompt"];

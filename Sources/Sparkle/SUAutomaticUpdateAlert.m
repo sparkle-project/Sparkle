@@ -36,7 +36,7 @@ static NSString *const SUAutomaticUpdateAlertTouchBarIndentifier = @"" SPARKLE_B
 
 - (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost completionBlock:(void (^)(SUAutomaticInstallationChoice))block
 {
-#if SWIFT_PACKAGE
+#ifdef SWIFT_PACKAGE
     self = [super initWithWindowNibPath:[SWIFTPM_MODULE_BUNDLE pathForResource:@"SUAutomaticUpdateAlert" ofType:@"nib"] owner:self];
 #else
     self = [super initWithWindowNibName:@"SUAutomaticUpdateAlert"];

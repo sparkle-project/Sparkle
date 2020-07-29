@@ -18,6 +18,9 @@ let package = Package(
         .library(
             name: "Sparkle",
             targets: ["Sparkle"]),
+//        .executable(
+//            name: "Autoupdate",
+//            targets: ["Autoupdate"]),
         .library(name: "bsdiff", targets: ["bsdiff"]),
         .library(name: "ed25519", targets: ["ed25519"]),
         // These could be included with some effort, not required to build
@@ -46,10 +49,17 @@ let package = Package(
             name: "Sparkle",
             dependencies: ["bsdiff", "ed25519", "fileop"],
             exclude: ["CheckLocalizations.swift", "Sparkle-Info.plist", "SUBinaryDeltaTool.m"],
-            resources: [.process("DarkAqua.css")],
+            resources: [
+                .process("DarkAqua.css"),
+                .process("SUModelTranslation.plist"),
+                .process("Autoupdate.app")
+            ],
             cSettings: defines,
             linkerSettings: [.linkedLibrary("xar"), .linkedLibrary("bz2")]
         ),
+//        .target(
+//            name: "Autoupdate"
+//        ),
         .testTarget(
             name: "SparkleUnitTestsObjC", // WARNING: The target name should not contain spaces or the resources can't be found
             dependencies: ["Sparkle"],

@@ -38,7 +38,7 @@
 {
     [super setUp];
 
-#if SWIFT_PACKAGE
+#ifdef SWIFT_PACKAGE
     NSBundle *unitTestBundle = SWIFTPM_MODULE_BUNDLE;
 #else
     NSBundle *unitTestBundle = [NSBundle bundleForClass:[self class]];

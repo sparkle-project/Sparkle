@@ -557,7 +557,12 @@
     // Copy the relauncher into a temporary directory so we can get to it after the new version's installed.
     // Only the paranoid survive: if there's already a stray copy of relaunch there, we would have problems.
     NSString *const relaunchToolSourceName = @"" SPARKLE_RELAUNCH_TOOL_NAME;
+#ifdef SWIFT_PACKAGE
+    // FIXME: It feels a bit hacky to go around the sparkleBundle when the correct bundle should probably be set correctly to begin with
+    NSString *const relaunchToolSourcePath = [SWIFTPM_MODULE_BUNDLE pathForResource:relaunchToolSourceName ofType:@"app"];
+#else
     NSString *const relaunchToolSourcePath = [sparkleBundle pathForResource:relaunchToolSourceName ofType:@"app"];
+#endif
     NSString *relaunchCopyTargetPath = nil;
     NSError *error = nil;
     BOOL copiedRelaunchPath = NO;

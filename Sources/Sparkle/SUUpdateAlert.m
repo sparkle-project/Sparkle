@@ -80,7 +80,7 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 
 - (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost completionBlock:(void (^)(SUUpdateAlertChoice))block
 {
-#if SWIFT_PACKAGE
+#ifdef SWIFT_PACKAGE
     self = [super initWithWindowNibPath:[SWIFTPM_MODULE_BUNDLE pathForResource:@"SUUpdateAlert" ofType:@"nib"] owner:self];
 #else
     self = [super initWithWindowNibName:@"SUUpdateAlert"];
@@ -183,7 +183,7 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
         [self.releaseNotesView.superview addSubview:darkBackgroundView positioned:NSWindowBelow relativeTo:self.releaseNotesView];
         self.releaseNotesView.drawsBackground = NO;
 
-#if SWIFT_PACKAGE
+#ifdef SWIFT_PACKAGE
         prefs.userStyleSheetLocation = [SWIFTPM_MODULE_BUNDLE URLForResource:@"DarkAqua" withExtension:@"css"];
 #else
         prefs.userStyleSheetLocation = [[NSBundle bundleForClass:[self class]] URLForResource:@"DarkAqua" withExtension:@"css"];

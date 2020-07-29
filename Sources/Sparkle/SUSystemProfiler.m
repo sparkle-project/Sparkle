@@ -32,8 +32,12 @@ static NSString *const SUSystemProfilerPreferredLanguageKey = @"lang";
 
 + (NSDictionary<NSString *, NSString *> *)modelTranslationTable
 {
+#ifdef SWIFT_PACKAGE
+    NSString *path = [SWIFTPM_MODULE_BUNDLE pathForResource:@"SUModelTranslation" ofType:@"plist"];
+#else
     // Use explicit class to use the correct bundle even when subclassed
     NSString *path = [[NSBundle bundleForClass:[SUSystemProfiler class]] pathForResource:@"SUModelTranslation" ofType:@"plist"];
+#endif
     return [[NSDictionary alloc] initWithContentsOfFile:path];
 }
 
