@@ -16,12 +16,14 @@ if [ "$ACTION" = "" ] ; then
 
     mkdir -p "$CONFIGURATION_BUILD_DIR/staging"
     cp "$SRCROOT/CHANGELOG" "$SRCROOT/LICENSE" "$SRCROOT/Resources/SampleAppcast.xml" "$CONFIGURATION_BUILD_DIR/staging"
+    cp "$SRCROOT/CHANGELOG" "$SRCROOT/LICENSE" "$SRCROOT/Resources/SampleAppcast.xml" "$CONFIGURATION_BUILD_DIR/Sparkle.xcframework"
     cp -R "$SRCROOT/bin" "$CONFIGURATION_BUILD_DIR/staging"
     cp "$CONFIGURATION_BUILD_DIR/BinaryDelta" "$CONFIGURATION_BUILD_DIR/staging/bin"
     cp "$CONFIGURATION_BUILD_DIR/generate_appcast" "$CONFIGURATION_BUILD_DIR/staging/bin"
     cp "$CONFIGURATION_BUILD_DIR/generate_keys" "$CONFIGURATION_BUILD_DIR/staging/bin"
     cp "$CONFIGURATION_BUILD_DIR/sign_update" "$CONFIGURATION_BUILD_DIR/staging/bin"
     cp -R "$CONFIGURATION_BUILD_DIR/Sparkle Test App.app" "$CONFIGURATION_BUILD_DIR/staging"
+    cp -R "$CONFIGURATION_BUILD_DIR/Sparkle Test App.app" "$CONFIGURATION_BUILD_DIR/Sparkle.xcframework"
     cp -R "$CONFIGURATION_BUILD_DIR/Sparkle.framework" "$CONFIGURATION_BUILD_DIR/staging"
 
     # Only copy dSYMs for Release builds, but don't check for the presence of the actual files
@@ -32,8 +34,11 @@ if [ "$ACTION" = "" ] ; then
         cp -R "$CONFIGURATION_BUILD_DIR/generate_keys.dSYM" "$CONFIGURATION_BUILD_DIR/staging/bin"
         cp -R "$CONFIGURATION_BUILD_DIR/sign_update.dSYM" "$CONFIGURATION_BUILD_DIR/staging/bin"
         cp -R "$CONFIGURATION_BUILD_DIR/Sparkle Test App.app.dSYM" "$CONFIGURATION_BUILD_DIR/staging"
+        cp -R "$CONFIGURATION_BUILD_DIR/Sparkle Test App.app.dSYM" "$CONFIGURATION_BUILD_DIR/Sparkle.xcframework"
         cp -R "$CONFIGURATION_BUILD_DIR/Sparkle.framework.dSYM" "$CONFIGURATION_BUILD_DIR/staging"
+        cp -R "$CONFIGURATION_BUILD_DIR/Sparkle.xcarchive/dSYMs/Sparkle.framework.dSYM" "$CONFIGURATION_BUILD_DIR/Sparkle.xcframework/macos-arm64_x86_64"
     fi
+    cp -R "$CONFIGURATION_BUILD_DIR/staging/bin" "$CONFIGURATION_BUILD_DIR/Sparkle.xcframework"
 
     cd "$CONFIGURATION_BUILD_DIR/staging"
     # Sorted file list groups similar files together, which improves tar compression
@@ -42,8 +47,8 @@ if [ "$ACTION" = "" ] ; then
     
     # Generate zip containing the xcframework for SPM
     cd "$CONFIGURATION_BUILD_DIR"
-    rm -rf "Sparkle.xcarchive"
-    zip -rqyX "Sparkle-SPM-$CURRENT_PROJECT_VERSION.zip" "Sparkle.xcframework"
+    #rm -rf "Sparkle.xcarchive"
+    zip -rqyX -9 "Sparkle-SPM-$CURRENT_PROJECT_VERSION.zip" "Sparkle.xcframework"
     # Generate new Package manifest
     cp "$SRCROOT/Package-template.swift" "$CONFIGURATION_BUILD_DIR"
     mv "Package-template.swift" "Package.swift"
