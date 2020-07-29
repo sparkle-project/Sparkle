@@ -12,19 +12,23 @@ if [ "$ACTION" = "" ] ; then
     fi
 
     rm -rf "$CONFIGURATION_BUILD_DIR/staging"
+    rm -rf "$CONFIGURATION_BUILD_DIR/staging-spm"
     rm -f "Sparkle-$CURRENT_PROJECT_VERSION.tar.xz"
+    rm -f "Sparkle-SPM-$CURRENT_PROJECT_VERSION.zip"
 
     mkdir -p "$CONFIGURATION_BUILD_DIR/staging"
+    mkdir -p "$CONFIGURATION_BUILD_DIR/staging-spm"
     cp "$SRCROOT/CHANGELOG" "$SRCROOT/LICENSE" "$SRCROOT/Resources/SampleAppcast.xml" "$CONFIGURATION_BUILD_DIR/staging"
-    cp "$SRCROOT/CHANGELOG" "$SRCROOT/LICENSE" "$SRCROOT/Resources/SampleAppcast.xml" "$CONFIGURATION_BUILD_DIR/Sparkle.xcframework"
+    cp "$SRCROOT/CHANGELOG" "$SRCROOT/LICENSE" "$SRCROOT/Resources/SampleAppcast.xml" "$CONFIGURATION_BUILD_DIR/staging-spm"
     cp -R "$SRCROOT/bin" "$CONFIGURATION_BUILD_DIR/staging"
     cp "$CONFIGURATION_BUILD_DIR/BinaryDelta" "$CONFIGURATION_BUILD_DIR/staging/bin"
     cp "$CONFIGURATION_BUILD_DIR/generate_appcast" "$CONFIGURATION_BUILD_DIR/staging/bin"
     cp "$CONFIGURATION_BUILD_DIR/generate_keys" "$CONFIGURATION_BUILD_DIR/staging/bin"
     cp "$CONFIGURATION_BUILD_DIR/sign_update" "$CONFIGURATION_BUILD_DIR/staging/bin"
     cp -R "$CONFIGURATION_BUILD_DIR/Sparkle Test App.app" "$CONFIGURATION_BUILD_DIR/staging"
-    cp -R "$CONFIGURATION_BUILD_DIR/Sparkle Test App.app" "$CONFIGURATION_BUILD_DIR/Sparkle.xcframework"
+    cp -R "$CONFIGURATION_BUILD_DIR/Sparkle Test App.app" "$CONFIGURATION_BUILD_DIR/staging-spm"
     cp -R "$CONFIGURATION_BUILD_DIR/Sparkle.framework" "$CONFIGURATION_BUILD_DIR/staging"
+    cp -R "$CONFIGURATION_BUILD_DIR/Sparkle.xcframework" "$CONFIGURATION_BUILD_DIR/staging-spm"
 
     # Only copy dSYMs for Release builds, but don't check for the presence of the actual files
     # because missing dSYMs in a release build SHOULD trigger a build failure
@@ -34,11 +38,10 @@ if [ "$ACTION" = "" ] ; then
         cp -R "$CONFIGURATION_BUILD_DIR/generate_keys.dSYM" "$CONFIGURATION_BUILD_DIR/staging/bin"
         cp -R "$CONFIGURATION_BUILD_DIR/sign_update.dSYM" "$CONFIGURATION_BUILD_DIR/staging/bin"
         cp -R "$CONFIGURATION_BUILD_DIR/Sparkle Test App.app.dSYM" "$CONFIGURATION_BUILD_DIR/staging"
-        cp -R "$CONFIGURATION_BUILD_DIR/Sparkle Test App.app.dSYM" "$CONFIGURATION_BUILD_DIR/Sparkle.xcframework"
+        cp -R "$CONFIGURATION_BUILD_DIR/Sparkle Test App.app.dSYM" "$CONFIGURATION_BUILD_DIR/staging-spm"
         cp -R "$CONFIGURATION_BUILD_DIR/Sparkle.framework.dSYM" "$CONFIGURATION_BUILD_DIR/staging"
-        cp -R "$CONFIGURATION_BUILD_DIR/Sparkle.xcarchive/dSYMs/Sparkle.framework.dSYM" "$CONFIGURATION_BUILD_DIR/Sparkle.xcframework/macos-arm64_x86_64"
     fi
-    cp -R "$CONFIGURATION_BUILD_DIR/staging/bin" "$CONFIGURATION_BUILD_DIR/Sparkle.xcframework"
+    cp -R "$CONFIGURATION_BUILD_DIR/staging/bin" "$CONFIGURATION_BUILD_DIR/staging-spm"
 
     cd "$CONFIGURATION_BUILD_DIR/staging"
     # Sorted file list groups similar files together, which improves tar compression
@@ -46,10 +49,11 @@ if [ "$ACTION" = "" ] ; then
     rm -rf "$CONFIGURATION_BUILD_DIR/staging"
     
     # Generate zip containing the xcframework for SPM
-    cd "$CONFIGURATION_BUILD_DIR"
-    #rm -rf "Sparkle.xcarchive"
-    zip -rqyX -9 "Sparkle-SPM-$CURRENT_PROJECT_VERSION.zip" "Sparkle.xcframework"
+    cd "$CONFIGURATION_BUILD_DIR/staging-spm"
+    #rm -rf "$CONFIGURATION_BUILD_DIR/Sparkle.xcarchive"
+    zip -rqyX -9 "../Sparkle-SPM-$CURRENT_PROJECT_VERSION.zip" *
     # Generate new Package manifest
+    cd "$CONFIGURATION_BUILD_DIR"
     cp "$SRCROOT/Package-template.swift" "$CONFIGURATION_BUILD_DIR"
     mv "Package-template.swift" "Package.swift"
     # is equivalent to shasum -a 256 FILE
@@ -61,4 +65,5 @@ if [ "$ACTION" = "" ] ; then
     echo "Package.swift updated with the following values:"
     echo "Version: $CURRENT_PROJECT_VERSION"
     echo "Checksum: $spm_checksum"
+    rm -rf "$CONFIGURATION_BUILD_DIR/staging-spm"
 fi
