@@ -43,7 +43,7 @@ if [ "$ACTION" = "" ] ; then
     # Generate zip containing the xcframework for SPM
     cd "$CONFIGURATION_BUILD_DIR"
     rm -rf "Sparkle.xcarchive"
-    zip -rqy "Sparkle-SPM-$CURRENT_PROJECT_VERSION.zip" "Sparkle.xcframework"
+    zip -rqyX "Sparkle-SPM-$CURRENT_PROJECT_VERSION.zip" "Sparkle.xcframework"
     # Generate new Package manifest
     cp "$SRCROOT/Package-template.swift" "$CONFIGURATION_BUILD_DIR"
     mv "Package-template.swift" "Package.swift"

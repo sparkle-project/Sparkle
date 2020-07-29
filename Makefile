@@ -13,16 +13,12 @@ localizable-strings:
 	rm Sparkle/en.lproj/Localizable.strings
 
 release:
-	xcodebuild -scheme Distribution -configuration Release -derivedDataPath "$(BUILDDIR)" build
-	open -R "$(BUILDDIR)/Build/Products/Release/Sparkle-"*.tar.xz
-	cat Sparkle.podspec
-	@echo "Don't forget to update CocoaPods! pod trunk push"
-
-release-spm:
 	xcodebuild -scheme Sparkle -configuration Release -derivedDataPath "$(BUILDDIR)" -archivePath "$(BUILDDIR)/Build/Products/Release/Sparkle.xcarchive" BUILD_LIBRARY_FOR_DISTRIBUTION=YES SKIP_INSTALL=NO archive
 	xcodebuild -create-xcframework -framework "$(BUILDDIR)/Build/Products/Release/Sparkle.xcarchive/Products/Library/Frameworks/Sparkle.framework" -output "$(BUILDDIR)/Build/Products/Release/Sparkle.xcframework"
 	xcodebuild -scheme Distribution -configuration Release -derivedDataPath "$(BUILDDIR)" build
 	open "$(BUILDDIR)/Build/Products/Release/"
+	cat Sparkle.podspec
+	@echo "Don't forget to update CocoaPods! pod trunk push"
 	@echo "Don't forget to commit the updated Package manifest before releasing!"
 
 build:
