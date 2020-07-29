@@ -57,4 +57,21 @@ if [ "$ACTION" = "" ] ; then
     # Sorted file list groups similar files together, which improves tar compression
     find . \! -type d | rev | sort | rev | tar cv --files-from=- | xz -9 > "../Sparkle-$CURRENT_PROJECT_VERSION.tar.xz"
     rm -rf "$CONFIGURATION_BUILD_DIR/staging"
+    
+    # Generate zip containing the xcframework for SPM
+    cd "$CONFIGURATION_BUILD_DIR"
+    rm -rf "Sparkle.xcarchive"
+    zip -rqyX "Sparkle-SPM-$CURRENT_PROJECT_VERSION.zip" "Sparkle.xcframework"
+    # Generate new Package manifest
+    cp "$SRCROOT/Package-template.swift" "$CONFIGURATION_BUILD_DIR"
+    mv "Package-template.swift" "Package.swift"
+    # is equivalent to shasum -a 256 FILE
+    spm_checksum=$(swift package compute-checksum "Sparkle-SPM-$CURRENT_PROJECT_VERSION.zip")
+    rm -rf ".build"
+    sed -i '' -e "s/VERSION_PLACEHOLDER/$CURRENT_PROJECT_VERSION/g" "Package.swift"
+    sed -i '' -e "s/CHECKSUM_PLACEHOLDER/$spm_checksum/g" "Package.swift"
+    cp "Package.swift" "$SRCROOT"
+    echo "Package.swift updated with the following values:"
+    echo "Version: $CURRENT_PROJECT_VERSION"
+    echo "Checksum: $spm_checksum"
 fi

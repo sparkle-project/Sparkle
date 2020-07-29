@@ -41,3 +41,7 @@ Carthage/Build
 Network Trash Folder
 Temporary Items
 .apdisk
+
+# Swift Package Manager
+/.build
+.swiftpm
