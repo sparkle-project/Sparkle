@@ -54,13 +54,11 @@ if [ "$ACTION" = "" ] ; then
     zip -rqyX -9 "../Sparkle-SPM-$CURRENT_PROJECT_VERSION.zip" *
     # Generate new Package manifest
     cd "$CONFIGURATION_BUILD_DIR"
-    cp "$SRCROOT/Package-template.swift" "$CONFIGURATION_BUILD_DIR"
-    mv "Package-template.swift" "Package.swift"
+    cp "$SRCROOT/Package.swift" "$CONFIGURATION_BUILD_DIR"
     # is equivalent to shasum -a 256 FILE
     spm_checksum=$(swift package compute-checksum "Sparkle-SPM-$CURRENT_PROJECT_VERSION.zip")
     rm -rf ".build"
-    sed -i '' -e "s/VERSION_PLACEHOLDER/$CURRENT_PROJECT_VERSION/g" "Package.swift"
-    sed -i '' -e "s/CHECKSUM_PLACEHOLDER/$spm_checksum/g" "Package.swift"
+    sed -E -i '' -e "/let version/ s/[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+/$CURRENT_PROJECT_VERSION/" -e "/let checksum/ s/[[:xdigit:]]{64}/$spm_checksum/" "Package.swift"
     cp "Package.swift" "$SRCROOT"
     echo "Package.swift updated with the following values:"
     echo "Version: $CURRENT_PROJECT_VERSION"
