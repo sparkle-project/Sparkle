@@ -1,7 +1,9 @@
 os: osx
 language: objective-c
 osx_image:
-  - xcode10.3
   - xcode11.4
+  - xcode12u
 script:
+  - set -o pipefail && xcodebuild -scheme Sparkle -configuration Release -derivedDataPath build -archivePath build/Build/Products/Release/Sparkle.xcarchive BUILD_LIBRARY_FOR_DISTRIBUTION=YES SKIP_INSTALL=NO archive | xcpretty
+  - set -o pipefail && xcodebuild -create-xcframework -framework build/Build/Products/Release/Sparkle.xcarchive/Products/Library/Frameworks/Sparkle.framework -output build/Build/Products/Release/Sparkle.xcframework | xcpretty
   - set -o pipefail && xcodebuild test -project Sparkle.xcodeproj -scheme Distribution -derivedDataPath build -enableCodeCoverage YES | xcpretty
