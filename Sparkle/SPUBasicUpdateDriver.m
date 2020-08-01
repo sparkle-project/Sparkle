@@ -131,7 +131,7 @@
 - (void)didFinishLoadingAppcast:(SUAppcast *)appcast
 {
     if (!self.aborted) {
-        if ([self.updaterDelegate respondsToSelector:@selector(updater:didFinishLoadingAppcast:)]) {
+        if ([self.updaterDelegate respondsToSelector:@selector((updater:didFinishLoadingAppcast:))]) {
             [self.updaterDelegate updater:self.updater didFinishLoadingAppcast:appcast];
         }
         
@@ -146,7 +146,7 @@
                                                             object:self.updater
                                                           userInfo:@{ SUUpdaterAppcastItemNotificationKey: updateItem }];
         
-        if ([self.updaterDelegate respondsToSelector:@selector(updater:didFindValidUpdate:)]) {
+        if ([self.updaterDelegate respondsToSelector:@selector((updater:didFindValidUpdate:))]) {
             [self.updaterDelegate updater:self.updater didFindValidUpdate:updateItem];
         }
         
@@ -157,7 +157,7 @@
 - (void)didNotFindUpdate
 {
     if (!self.aborted) {
-        if ([self.updaterDelegate respondsToSelector:@selector(updaterDidNotFindUpdate:)]) {
+        if ([self.updaterDelegate respondsToSelector:@selector((updaterDidNotFindUpdate:))]) {
             [self.updaterDelegate updaterDidNotFindUpdate:self.updater];
         }
         [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidNotFindUpdateNotification object:self.updater];
@@ -189,7 +189,7 @@
         }
         
         // Notify host app that updater has aborted
-        if ([self.updaterDelegate respondsToSelector:@selector(updater:didAbortWithError:)]) {
+        if ([self.updaterDelegate respondsToSelector:@selector((updater:didAbortWithError:))]) {
             [self.updaterDelegate updater:self.updater didAbortWithError:(NSError * _Nonnull)error];
         }
     }

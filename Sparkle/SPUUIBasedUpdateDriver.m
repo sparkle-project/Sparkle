@@ -189,7 +189,7 @@
                 break;
             case SPUDownloadUpdateCanceled:
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    if ([self.updaterDelegate respondsToSelector:@selector(userDidCancelDownload:)]) {
+                    if ([self.updaterDelegate respondsToSelector:@selector((userDidCancelDownload:))]) {
                         [self.updaterDelegate userDidCancelDownload:self.updater];
                     }
                     

@@ -446,7 +446,7 @@
 
 - (BOOL)mayUpdateAndRestart
 {
-    return (!self.updaterDelegate || ![self.updaterDelegate respondsToSelector:@selector(updaterShouldRelaunchApplication:)] || [self.updaterDelegate updaterShouldRelaunchApplication:self.updater]);
+    return (!self.updaterDelegate || ![self.updaterDelegate respondsToSelector:@selector((updaterShouldRelaunchApplication:))] || [self.updaterDelegate updaterShouldRelaunchApplication:self.updater]);
 }
 
 // Only implemented due to backwards compability reasons; see -installWithToolAndRelaunch:displayingUserInterface: below

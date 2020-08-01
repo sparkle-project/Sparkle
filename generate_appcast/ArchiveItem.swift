@@ -47,12 +47,13 @@ class ArchiveItem: CustomStringConvertible {
 
     var dsaSignature: String?
     var edSignature: String?
+    var downloadUrlPrefix: URL?
 
     init(version: String, shortVersion: String?, feedURL: URL?, minimumSystemVersion: String?, publicEdKey: String?, supportsDSA: Bool, appPath: URL, archivePath: URL) throws {
         self.version = version
         self._shortVersion = shortVersion
         self.feedURL = feedURL
-        self.minimumSystemVersion = minimumSystemVersion ?? "10.7"
+        self.minimumSystemVersion = minimumSystemVersion ?? "10.9"
         self.archivePath = archivePath
         self.appPath = appPath
         self.supportsDSA = supportsDSA
@@ -85,7 +86,7 @@ class ArchiveItem: CustomStringConvertible {
             guard let infoPlist = NSDictionary(contentsOf: appPath.appendingPathComponent("Contents/Info.plist")) else {
                 throw makeError(code: .unarchivingError, "No plist \(appPath.path)")
             }
-            guard let version = infoPlist[kCFBundleVersionKey] as? String else {
+            guard let version = infoPlist[kCFBundleVersionKey!] as? String else {
                 throw makeError(code: .unarchivingError, "No Version \(kCFBundleVersionKey as String? ?? "missing kCFBundleVersionKey") \(appPath)")
             }
             let shortVersion = infoPlist["CFBundleShortVersionString"] as? String
@@ -95,6 +96,10 @@ class ArchiveItem: CustomStringConvertible {
             var feedURL: URL?
             if let feedURLStr = infoPlist["SUFeedURL"] as? String {
                 feedURL = URL(string: feedURLStr)
+                if feedURL?.pathExtension == "php" {
+                    feedURL = feedURL!.deletingLastPathComponent()
+                    feedURL = feedURL!.appendingPathComponent("appcast.xml")
+                }
             }
 
             try self.init(version: version,
@@ -122,8 +127,11 @@ class ArchiveItem: CustomStringConvertible {
         guard let escapedFilename = self.archivePath.lastPathComponent.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) else {
             return nil
         }
-        if let relative = self.feedURL {
-            return URL(string: escapedFilename, relativeTo: relative)
+        if let downloadUrlPrefix = self.downloadUrlPrefix {
+            // if a download url prefix was given use this one
+            return URL(string: escapedFilename, relativeTo: downloadUrlPrefix)
+        } else if let relativeFeedUrl = self.feedURL {
+            return URL(string: escapedFilename, relativeTo: relativeFeedUrl)
         }
         return URL(string: escapedFilename)
     }
@@ -184,6 +192,24 @@ class ArchiveItem: CustomStringConvertible {
             return URL(string: escapedFilename, relativeTo: relative)
         }
         return URL(string: escapedFilename)
+    }
+
+    func localizedReleaseNotes() -> [(String, URL)] {
+        let fileManager = FileManager.default
+        var basename = archivePath.deletingPathExtension()
+        if basename.pathExtension == "tar" {
+            basename = basename.deletingPathExtension()
+        }
+        var localizedReleaseNotes = [(String, URL)]()
+        for languageCode in Locale.isoLanguageCodes {
+            let localizedReleaseNoteURL = basename
+                .appendingPathExtension(languageCode)
+                .appendingPathExtension("html")
+            if fileManager.fileExists(atPath: localizedReleaseNoteURL.path) {
+                localizedReleaseNotes.append((languageCode, localizedReleaseNoteURL))
+            }
+        }
+        return localizedReleaseNotes
     }
 
     let mimeType = "application/octet-stream"
