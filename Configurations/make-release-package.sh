@@ -1,5 +1,6 @@
 #!/bin/bash
 set -e
+pwd
 
 if [ "$ACTION" = "" ] ; then
     # If using cocoapods, sanity check that the Podspec version matches the Sparkle version
@@ -50,6 +51,8 @@ if [ "$ACTION" = "" ] ; then
     
     # Generate zip containing the xcframework for SPM
     cd "$CONFIGURATION_BUILD_DIR/staging-spm"
+    pwd
+    ls ../..
     #rm -rf "$CONFIGURATION_BUILD_DIR/Sparkle.xcarchive"
     zip -rqyX -9 "../Sparkle-SPM-$CURRENT_PROJECT_VERSION.zip" *
     # Generate new Package manifest
