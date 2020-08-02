@@ -2,7 +2,7 @@
 import PackageDescription
 
 let version = "1.24.0"
-let checksum = "099ae1e045e254fbf803f98ff74607123bbd288c4f17725e19be5704b8039ef4"
+let checksum = "2b6fec0cad2bb643ed222b708f37bf9e98f5ed84d77c9ba69e66dd2b82b0fffa"
 let url = "https://github.com/sparkle-project/Sparkle/releases/download/\(version)/Sparkle-SPM-\(version).zip"
 
 let package = Package(
