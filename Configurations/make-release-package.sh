@@ -1,6 +1,5 @@
 #!/bin/bash
 set -e
-pwd
 
 if [ "$ACTION" = "" ] ; then
     # If using cocoapods, sanity check that the Podspec version matches the Sparkle version
@@ -51,20 +50,22 @@ if [ "$ACTION" = "" ] ; then
     
     # Generate zip containing the xcframework for SPM
     cd "$CONFIGURATION_BUILD_DIR/staging-spm"
-    pwd
-    ls ../..
     #rm -rf "$CONFIGURATION_BUILD_DIR/Sparkle.xcarchive"
     zip -rqyX -9 "../Sparkle-SPM-$CURRENT_PROJECT_VERSION.zip" *
     # Generate new Package manifest
     cd "$CONFIGURATION_BUILD_DIR"
     cp "$SRCROOT/Package.swift" "$CONFIGURATION_BUILD_DIR"
-    # is equivalent to shasum -a 256 FILE
-    spm_checksum=$(swift package compute-checksum "Sparkle-SPM-$CURRENT_PROJECT_VERSION.zip")
-    rm -rf ".build"
-    sed -E -i '' -e "/let version/ s/[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+/$CURRENT_PROJECT_VERSION/" -e "/let checksum/ s/[[:xdigit:]]{64}/$spm_checksum/" "Package.swift"
-    cp "Package.swift" "$SRCROOT"
-    echo "Package.swift updated with the following values:"
-    echo "Version: $CURRENT_PROJECT_VERSION"
-    echo "Checksum: $spm_checksum"
+    if [ "$XCODE_VERSION_MAJOR" -ge "1200" ]; then
+        # is equivalent to shasum -a 256 FILE
+        spm_checksum=$(swift package compute-checksum "Sparkle-SPM-$CURRENT_PROJECT_VERSION.zip")
+        rm -rf ".build"
+        sed -E -i '' -e "/let version/ s/[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+/$CURRENT_PROJECT_VERSION/" -e "/let checksum/ s/[[:xdigit:]]{64}/$spm_checksum/" "Package.swift"
+        cp "Package.swift" "$SRCROOT"
+        echo "Package.swift updated with the following values:"
+        echo "Version: $CURRENT_PROJECT_VERSION"
+        echo "Checksum: $spm_checksum"
+    else
+        echo "Xcode version $XCODE_VERSION_ACTUAL does not support computing checksums for Swift Packages. Please update the Package manifest manually."
+    fi
     rm -rf "$CONFIGURATION_BUILD_DIR/staging-spm"
 fi
