@@ -25,15 +25,15 @@
 			name = All;
 			productName = All;
 		};
-		895C5DB924D75F370058A82D /* Sparkle.xcframework */ = {
+		895C5DB924D75F370058A82D /* XCFramework */ = {
 			isa = PBXAggregateTarget;
-			buildConfigurationList = 895C5DBC24D75F370058A82D /* Build configuration list for PBXAggregateTarget "Sparkle.xcframework" */;
+			buildConfigurationList = 895C5DBC24D75F370058A82D /* Build configuration list for PBXAggregateTarget "XCFramework" */;
 			buildPhases = (
 				895C5DBD24D75F590058A82D /* ShellScript */,
 			);
 			dependencies = (
 			);
-			name = Sparkle.xcframework;
+			name = XCFramework;
 			productName = Sparkle.xcframework;
 		};
 /* End PBXAggregateTarget section */
@@ -2102,7 +2102,7 @@
 				14732BC51960F69300593899 /* Distribution */,
 				1420DF491962329200203BB0 /* Documentation */,
 				1495005F195FB89400BC5B5B /* All */,
-				895C5DB924D75F370058A82D /* Sparkle.xcframework */,
+				895C5DB924D75F370058A82D /* XCFramework */,
 				726B2B5C1C645FC900388755 /* UI Tests */,
 				722954B31D04ADAF00ECF9CA /* fileop */,
 				5AA96C541E0AE0DB00CA4346 /* generate_appcast */,
@@ -2602,7 +2602,7 @@
 		};
 		895C5DBF24D764DD0058A82D /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 895C5DB924D75F370058A82D /* Sparkle.xcframework */;
+			target = 895C5DB924D75F370058A82D /* XCFramework */;
 			targetProxy = 895C5DBE24D764DD0058A82D /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -3198,7 +3198,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		895C5DBC24D75F370058A82D /* Build configuration list for PBXAggregateTarget "Sparkle.xcframework" */ = {
+		895C5DBC24D75F370058A82D /* Build configuration list for PBXAggregateTarget "XCFramework" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				895C5DBA24D75F370058A82D /* Debug */,

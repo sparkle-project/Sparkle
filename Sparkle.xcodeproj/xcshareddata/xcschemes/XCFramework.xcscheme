@@ -15,8 +15,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "895C5DB924D75F370058A82D"
-               BuildableName = "Sparkle.xcframework"
-               BlueprintName = "Sparkle.xcframework"
+               BuildableName = "XCFramework"
+               BlueprintName = "XCFramework"
                ReferencedContainer = "container:Sparkle.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -51,8 +51,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "895C5DB924D75F370058A82D"
-            BuildableName = "Sparkle.xcframework"
-            BlueprintName = "Sparkle.xcframework"
+            BuildableName = "XCFramework"
+            BlueprintName = "XCFramework"
             ReferencedContainer = "container:Sparkle.xcodeproj">
          </BuildableReference>
       </MacroExpansion>

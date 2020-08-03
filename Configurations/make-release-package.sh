@@ -65,7 +65,7 @@ if [ "$ACTION" = "" ] ; then
         echo "Version: $CURRENT_PROJECT_VERSION"
         echo "Checksum: $spm_checksum"
     else
-        echo "Xcode version $XCODE_VERSION_ACTUAL does not support computing checksums for Swift Packages. Please update the Package manifest manually."
+        echo "warning: Xcode version $XCODE_VERSION_ACTUAL does not support computing checksums for Swift Packages. Please update the Package manifest manually."
     fi
     rm -rf "$CONFIGURATION_BUILD_DIR/staging-spm"
 fi
