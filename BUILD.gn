@@ -19,6 +19,9 @@ bundle_data("sparkle_resources_bundle_data") {
 action("build_sparkle_framework") {
   script="build_sparkle_framework.py"
 
-  outputs = [ "$root_out_dir/Sparkle.framework" ]
+  outputs = [
+    "$root_out_dir/Sparkle.framework",
+    "$root_out_dir/BinaryDelta"
+  ]
 }
 
