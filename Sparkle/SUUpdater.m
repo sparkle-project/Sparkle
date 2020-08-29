@@ -482,7 +482,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
     }
 
     // Otherwise, automatically downloading updates is allowed. Does the user want it?
-    return [self.host boolForUserDefaultsKey:SUAutomaticallyUpdateKey];
+    return [self.host boolForKey:SUAutomaticallyUpdateKey];
 }
 
 - (void)setFeedURL:(NSURL *)feedURL
