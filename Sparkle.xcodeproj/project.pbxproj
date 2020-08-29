@@ -25,6 +25,17 @@
 			name = All;
 			productName = All;
 		};
+		895C5DB924D75F370058A82D /* XCFramework */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 895C5DBC24D75F370058A82D /* Build configuration list for PBXAggregateTarget "XCFramework" */;
+			buildPhases = (
+				895C5DBD24D75F590058A82D /* ShellScript */,
+			);
+			dependencies = (
+			);
+			name = XCFramework;
+			productName = Sparkle.xcframework;
+		};
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
@@ -467,6 +478,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = 61B5F90109C4CEE200B25A18;
 			remoteInfo = "Sparkle Test App";
+		};
+		895C5DBE24D764DD0058A82D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 895C5DB924D75F370058A82D;
+			remoteInfo = Sparkle.xcframework;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -1749,6 +1767,7 @@
 				14732BCB1960F73500593899 /* PBXTargetDependency */,
 				1454BA1619637EDB00344E57 /* PBXTargetDependency */,
 				14732BCF1960F73500593899 /* PBXTargetDependency */,
+				895C5DBF24D764DD0058A82D /* PBXTargetDependency */,
 				1454BA1819637EE900344E57 /* PBXTargetDependency */,
 			);
 			name = Distribution;
@@ -2008,6 +2027,9 @@
 						LastSwiftMigration = 0800;
 						TestTargetID = 61B5F90109C4CEE200B25A18;
 					};
+					895C5DB924D75F370058A82D = {
+						CreatedOnToolsVersion = 12.0;
+					};
 					8DC2EF4F0486A6940098B216 = {
 						LastSwiftMigration = 0920;
 					};
@@ -2080,6 +2102,7 @@
 				14732BC51960F69300593899 /* Distribution */,
 				1420DF491962329200203BB0 /* Documentation */,
 				1495005F195FB89400BC5B5B /* All */,
+				895C5DB924D75F370058A82D /* XCFramework */,
 				726B2B5C1C645FC900388755 /* UI Tests */,
 				722954B31D04ADAF00ECF9CA /* fileop */,
 				5AA96C541E0AE0DB00CA4346 /* generate_appcast */,
@@ -2224,6 +2247,23 @@
 			shellPath = "/usr/bin/env sh";
 			shellScript = "ln -sfh \"pt_BR.lproj\" \"$BUILT_PRODUCTS_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/pt.lproj\"";
 			showEnvVarsInLog = 0;
+		};
+		895C5DBD24D75F590058A82D /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Deleting old products\nrm -rd \"$BUILT_PRODUCTS_DIR/Sparkle.xcarchive\"\nrm -rd \"$BUILT_PRODUCTS_DIR/Sparkle.xcframework\"\n\nxcodebuild archive -scheme Sparkle -archivePath \"$BUILT_PRODUCTS_DIR/Sparkle.xcarchive\" BUILD_LIBRARY_FOR_DISTRIBUTION=YES SKIP_INSTALL=NO\n\nif [ $XCODE_VERSION_MAJOR -ge \"1200\" ]; then\nxcodebuild -create-xcframework -framework \"$BUILT_PRODUCTS_DIR/Sparkle.xcarchive/Products/Library/Frameworks/Sparkle.framework\" -debug-symbols \"$BUILT_PRODUCTS_DIR/Sparkle.xcarchive/dSYMs/Sparkle.framework.dSYM\" -output \"$BUILT_PRODUCTS_DIR/Sparkle.xcframework\"\nelse\necho \"warning: Your Xcode version does not support bundling dSYMs in XCFrameworks directly. You should copy them manually into the XCFramework.\"\necho \"note: cp '$BUILT_PRODUCTS_DIR/Sparkle.xcarchive/dSYMs/Sparkle.framework.dSYM' '$BUILT_PRODUCTS_DIR/Sparkle.xcframework/your_architecture/dSYMs'\"\nxcodebuild -create-xcframework -framework \"$BUILT_PRODUCTS_DIR/Sparkle.xcarchive/Products/Library/Frameworks/Sparkle.framework\" -output \"$BUILT_PRODUCTS_DIR/Sparkle.xcframework\"\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -2559,6 +2599,11 @@
 			isa = PBXTargetDependency;
 			target = 61B5F90109C4CEE200B25A18 /* Sparkle Test App */;
 			targetProxy = 726B2B621C645FC900388755 /* PBXContainerItemProxy */;
+		};
+		895C5DBF24D764DD0058A82D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 895C5DB924D75F370058A82D /* XCFramework */;
+			targetProxy = 895C5DBE24D764DD0058A82D /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -2984,6 +3029,18 @@
 			};
 			name = Release;
 		};
+		895C5DBA24D75F370058A82D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = Debug;
+		};
+		895C5DBB24D75F370058A82D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = Release;
+		};
 		EA4311A2229D5FBC00A5503D /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = EA4311C9229D614300A5503D /* ed25519-Debug.xcconfig */;
@@ -3137,6 +3194,15 @@
 			buildConfigurations = (
 				726B2B641C645FC900388755 /* Debug */,
 				726B2B661C645FC900388755 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		895C5DBC24D75F370058A82D /* Build configuration list for PBXAggregateTarget "XCFramework" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				895C5DBA24D75F370058A82D /* Debug */,
+				895C5DBB24D75F370058A82D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

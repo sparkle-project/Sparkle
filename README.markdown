@@ -24,7 +24,7 @@ The upcoming Sparkle 2 (currently in beta) can be found in the [2.x branch](http
 ## Requirements
 
 * Runtime: macOS 10.7 or greater
-* Build: Xcode 9 and 10.11 SDK or greater
+* Build: Xcode 9 and 10.11 SDK or greater (Xcode 12 if using Swift Package Manager)
 * HTTPS server for serving updates (see [App Transport Security](http://sparkle-project.org/documentation/app-transport-security/))
 * No sandboxing. Sparkle 1.x can't update sandboxed apps. However, [Sparkle 2.x](https://github.com/sparkle-project/Sparkle/tree/2.x) can.
 
