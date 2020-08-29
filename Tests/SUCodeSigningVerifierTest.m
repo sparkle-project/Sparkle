@@ -9,10 +9,7 @@
 #import <Foundation/Foundation.h>
 #import <XCTest/XCTest.h>
 #import "SUCodeSigningVerifier.h"
-#import "SUAdHocCodeSigning.h"
 #import "SUFileManager.h"
-
-#define CALCULATOR_PATH @"/Applications/Calculator.app"
 
 @interface SUCodeSigningVerifierTest : XCTestCase
 
@@ -29,6 +26,13 @@
 @synthesize validSignedAppURL = _validSignedAppURL;
 @synthesize invalidSignedAppURL = _invalidSignedAppURL;
 @synthesize calculatorCopyURL = _calculatorCopyURL;
+
++ (NSString *)calculatorApplicationPath
+{
+    NSString *applicationsDirectory = [NSSearchPathForDirectoriesInDomains(NSApplicationDirectory, NSSystemDomainMask, NO) objectAtIndex:0];
+    NSString *calculatorPath = [applicationsDirectory stringByAppendingPathComponent:@"Calculator.app"];
+    return calculatorPath;
+}
 
 - (void)setUp
 {
@@ -87,8 +91,9 @@
     }
 
     self.validSignedAppURL = signedAndValid;
-    if (![SUAdHocCodeSigning codeSignApplicationAtPath:self.validSignedAppURL.path]) {
-        NSLog(@"Failed to codesign %@", self.validSignedAppURL);
+
+    if (![self codesignAppURL:self.validSignedAppURL]) {
+        XCTFail(@"Failed to codesign %@", self.validSignedAppURL);
     }
 }
 
@@ -99,14 +104,15 @@
 
     [[NSFileManager defaultManager] removeItemAtURL:calculatorCopy error:NULL];
 
+    NSString *calculatorPath = [SUCodeSigningVerifierTest calculatorApplicationPath];
     // Make a copy of the signed calculator app so we can match signatures later
     // Matching signatures on ad-hoc signed apps does *not* work
     NSError *copyError = nil;
     // Don't check the return value of this operation - seems like on 10.11 the API can say it fails even though the operation really succeeds,
     // which sounds like some kind of (SIP / attribute?) bug
-    [[NSFileManager defaultManager] copyItemAtURL:[NSURL fileURLWithPath:CALCULATOR_PATH] toURL:calculatorCopy error:&copyError];
+    [[NSFileManager defaultManager] copyItemAtURL:[NSURL fileURLWithPath:calculatorPath] toURL:calculatorCopy error:&copyError];
 
-    if (![calculatorCopy checkResourceIsReachableAndReturnError:NULL]) {
+    if (![calculatorCopy checkResourceIsReachableAndReturnError:nil]) {
         XCTFail(@"Copied calculator application does not exist");
     }
 
@@ -131,7 +137,7 @@
     [[NSFileManager defaultManager] removeItemAtURL:signedAndInvalid error:NULL];
     if ([[NSFileManager defaultManager] copyItemAtURL:self.notSignedAppURL toURL:signedAndInvalid error:&error]) {
         self.invalidSignedAppURL = signedAndInvalid;
-        if ([SUAdHocCodeSigning codeSignApplicationAtPath:self.invalidSignedAppURL.path]) {
+        if ([self codesignAppURL:self.invalidSignedAppURL]) {
             NSURL *fileInAppBundleToRemove = [self.invalidSignedAppURL URLByAppendingPathComponent:@"Contents/Resources/test_app_only_dsa_pub.pem"];
             if (![[NSFileManager defaultManager] removeItemAtURL:fileInAppBundleToRemove error:&error]) {
                 NSLog(@"Failed to remove %@ with error %@", fileInAppBundleToRemove, error);
@@ -167,6 +173,25 @@
     return success;
 }
 
+- (BOOL)codesignAppURL:(NSURL *)appURL
+{
+    BOOL success = NO;
+    @try
+    {
+        // ad-hoc signing with the dash
+        NSString *appPath = [appURL path];
+        NSArray<NSString *> *arguments = @[ @"--force", @"--deep", @"--sign", @"-", appPath ];
+        NSTask *task = [NSTask launchedTaskWithLaunchPath:@"/usr/bin/codesign" arguments:arguments];
+        [task waitUntilExit];
+        success = (task.terminationStatus == 0);
+    }
+    @catch (NSException *exception)
+    {
+        NSLog(@"exception: %@", exception);
+    }
+    return success;
+}
+
 - (void)testUnsignedApp
 {
     XCTAssertFalse([SUCodeSigningVerifier bundleAtURLIsCodeSigned:self.notSignedAppURL], @"App not expected to be code signed");
@@ -187,7 +212,8 @@
 
 - (void)testValidSignedCalculatorApp
 {
-    NSURL *appPath = [NSURL fileURLWithPath:CALCULATOR_PATH];
+    NSString *calculatorPath = [SUCodeSigningVerifierTest calculatorApplicationPath];
+    NSURL *appPath = [NSURL fileURLWithPath:calculatorPath];
     XCTAssertTrue([SUCodeSigningVerifier bundleAtURLIsCodeSigned:appPath], @"App expected to be code signed");
 
     NSError *error = nil;
@@ -197,23 +223,26 @@
 
 - (void)testValidMatchingSelf
 {
+    NSString *calculatorPath = [SUCodeSigningVerifierTest calculatorApplicationPath];
     NSError *error = nil;
-    NSURL *appPath = [NSURL fileURLWithPath:CALCULATOR_PATH];
+    NSURL *appPath = [NSURL fileURLWithPath:calculatorPath];
 
     XCTAssertTrue([SUCodeSigningVerifier codeSignatureAtBundleURL:appPath matchesSignatureAtBundleURL:appPath error:&error], @"Our valid signed app expected to having matching signature to itself");
 }
 
 - (void)testValidMatching
 {
+    NSString *calculatorPath = [SUCodeSigningVerifierTest calculatorApplicationPath];
     // We can't test our own app because matching with ad-hoc signed apps understandably does not succeed
     NSError *error = nil;
-    NSURL *appPath = [NSURL fileURLWithPath:CALCULATOR_PATH];
+    NSURL *appPath = [NSURL fileURLWithPath:calculatorPath];
     XCTAssertTrue([SUCodeSigningVerifier codeSignatureAtBundleURL:appPath matchesSignatureAtBundleURL:self.calculatorCopyURL error:&error], @"The calculator app is expected to have matching identity signature to its altered copy");
 }
 
 - (void)testInvalidMatching
 {
-    NSURL *appPath = [NSURL fileURLWithPath:CALCULATOR_PATH];
+    NSString *calculatorPath = [SUCodeSigningVerifierTest calculatorApplicationPath];
+    NSURL *appPath = [NSURL fileURLWithPath:calculatorPath];
     NSError *error = nil;
     XCTAssertFalse([SUCodeSigningVerifier codeSignatureAtBundleURL:appPath matchesSignatureAtBundleURL:self.validSignedAppURL error:&error], @"Calculator app bundle expected to have different signature than our valid signed app");
 }

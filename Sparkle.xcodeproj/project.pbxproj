@@ -96,7 +96,7 @@
 		7205C4411E13049400E370AE /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7205C4401E13049400E370AE /* main.swift */; };
 		7205C44C1E1304CE00E370AE /* Appcast.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7205C4471E1304CE00E370AE /* Appcast.swift */; };
 		7205C44D1E1304CE00E370AE /* ArchiveItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7205C4481E1304CE00E370AE /* ArchiveItem.swift */; };
-		7205C44E1E1304CE00E370AE /* DSASignature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7205C4491E1304CE00E370AE /* DSASignature.swift */; };
+		7205C44E1E1304CE00E370AE /* Signatures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7205C4491E1304CE00E370AE /* Signatures.swift */; };
 		7205C44F1E1304CE00E370AE /* FeedXML.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7205C44A1E1304CE00E370AE /* FeedXML.swift */; };
 		7205C4501E1304CE00E370AE /* Unarchive.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7205C44B1E1304CE00E370AE /* Unarchive.swift */; };
 		7205C4561E13060D00E370AE /* SUStandardVersionComparator.m in Sources */ = {isa = PBXBuildFile; fileRef = 61A225A30D1C4AC000430CCD /* SUStandardVersionComparator.m */; };
@@ -431,6 +431,32 @@
 		EA1E282622B64693004AA304 /* bscommon.h in Copy Headers */ = {isa = PBXBuildFile; fileRef = 72B09CEA1CEA18900052EF9E /* bscommon.h */; };
 		EA1E282722B64694004AA304 /* bspatch.h in Copy Headers */ = {isa = PBXBuildFile; fileRef = 611142E810FB1BE5009810AA /* bspatch.h */; };
 		EA1E282822B64694004AA304 /* sais.h in Copy Headers */ = {isa = PBXBuildFile; fileRef = 7223E7621AD1AEFF008E3161 /* sais.h */; };
+		EA1E284522B660ED004AA304 /* seed.c in Sources */ = {isa = PBXBuildFile; fileRef = EA1E283522B660ED004AA304 /* seed.c */; };
+		EA1E284622B660ED004AA304 /* fe.c in Sources */ = {isa = PBXBuildFile; fileRef = EA1E283622B660ED004AA304 /* fe.c */; };
+		EA1E284722B660ED004AA304 /* verify.c in Sources */ = {isa = PBXBuildFile; fileRef = EA1E283722B660ED004AA304 /* verify.c */; };
+		EA1E284822B660ED004AA304 /* ge.c in Sources */ = {isa = PBXBuildFile; fileRef = EA1E283822B660ED004AA304 /* ge.c */; };
+		EA1E284922B660ED004AA304 /* sc.c in Sources */ = {isa = PBXBuildFile; fileRef = EA1E283922B660ED004AA304 /* sc.c */; };
+		EA1E284A22B660ED004AA304 /* sign.c in Sources */ = {isa = PBXBuildFile; fileRef = EA1E283A22B660ED004AA304 /* sign.c */; };
+		EA1E284B22B660ED004AA304 /* key_exchange.c in Sources */ = {isa = PBXBuildFile; fileRef = EA1E283C22B660ED004AA304 /* key_exchange.c */; };
+		EA1E284C22B660ED004AA304 /* add_scalar.c in Sources */ = {isa = PBXBuildFile; fileRef = EA1E283D22B660ED004AA304 /* add_scalar.c */; };
+		EA1E284D22B660ED004AA304 /* keypair.c in Sources */ = {isa = PBXBuildFile; fileRef = EA1E284022B660ED004AA304 /* keypair.c */; };
+		EA1E284E22B660ED004AA304 /* sha512.c in Sources */ = {isa = PBXBuildFile; fileRef = EA1E284222B660ED004AA304 /* sha512.c */; };
+		EA1E284F22B66115004AA304 /* precomp_data.h in Copy Headers */ = {isa = PBXBuildFile; fileRef = EA1E283422B660ED004AA304 /* precomp_data.h */; };
+		EA1E285022B66115004AA304 /* sha512.h in Copy Headers */ = {isa = PBXBuildFile; fileRef = EA1E283B22B660ED004AA304 /* sha512.h */; };
+		EA1E285122B66115004AA304 /* ed25519.h in Copy Headers */ = {isa = PBXBuildFile; fileRef = EA1E283E22B660ED004AA304 /* ed25519.h */; };
+		EA1E285222B66115004AA304 /* fe.h in Copy Headers */ = {isa = PBXBuildFile; fileRef = EA1E283F22B660ED004AA304 /* fe.h */; };
+		EA1E285322B66115004AA304 /* fixedint.h in Copy Headers */ = {isa = PBXBuildFile; fileRef = EA1E284122B660ED004AA304 /* fixedint.h */; };
+		EA1E285422B66115004AA304 /* sc.h in Copy Headers */ = {isa = PBXBuildFile; fileRef = EA1E284322B660ED004AA304 /* sc.h */; };
+		EA1E285522B66115004AA304 /* ge.h in Copy Headers */ = {isa = PBXBuildFile; fileRef = EA1E284422B660ED004AA304 /* ge.h */; };
+		EA1E285622B6619B004AA304 /* libed25519.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EA1E282D22B660BE004AA304 /* libed25519.a */; };
+		EA1E286122B66487004AA304 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA1E286022B66487004AA304 /* main.swift */; };
+		EA1E286A22B6653D004AA304 /* libed25519.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EA1E282D22B660BE004AA304 /* libed25519.a */; };
+		EA1E286E22B665F0004AA304 /* SUSignatures.h in Headers */ = {isa = PBXBuildFile; fileRef = EA1E286C22B665E8004AA304 /* SUSignatures.h */; };
+		EA1E286F22B6661D004AA304 /* SUSignatures.h in Headers */ = {isa = PBXBuildFile; fileRef = EA1E286C22B665E8004AA304 /* SUSignatures.h */; };
+		EA1E287022B66621004AA304 /* SUSignatures.m in Sources */ = {isa = PBXBuildFile; fileRef = EA1E286D22B665E8004AA304 /* SUSignatures.m */; };
+		EA1E287122B66622004AA304 /* SUSignatures.m in Sources */ = {isa = PBXBuildFile; fileRef = EA1E286D22B665E8004AA304 /* SUSignatures.m */; };
+		EA1E287922B666EB004AA304 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA1E287822B666EB004AA304 /* main.swift */; };
+		EA1E287E22B66705004AA304 /* libed25519.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EA1E282D22B660BE004AA304 /* libed25519.a */; };
 		F8761EB11ADC5068000C9034 /* SUCodeSigningVerifierTest.m in Sources */ = {isa = PBXBuildFile; fileRef = F8761EB01ADC5068000C9034 /* SUCodeSigningVerifierTest.m */; };
 		F8761EB31ADC50EB000C9034 /* SparkleTestCodeSignApp.zip in Resources */ = {isa = PBXBuildFile; fileRef = F8761EB21ADC50EB000C9034 /* SparkleTestCodeSignApp.zip */; };
 /* End PBXBuildFile section */
@@ -769,6 +795,41 @@
 			name = "Copy Headers";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		EA1E283222B660C6004AA304 /* Copy Headers */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "include/$(PRODUCT_NAME)";
+			dstSubfolderSpec = 16;
+			files = (
+				EA1E284F22B66115004AA304 /* precomp_data.h in Copy Headers */,
+				EA1E285022B66115004AA304 /* sha512.h in Copy Headers */,
+				EA1E285122B66115004AA304 /* ed25519.h in Copy Headers */,
+				EA1E285222B66115004AA304 /* fe.h in Copy Headers */,
+				EA1E285322B66115004AA304 /* fixedint.h in Copy Headers */,
+				EA1E285422B66115004AA304 /* sc.h in Copy Headers */,
+				EA1E285522B66115004AA304 /* ge.h in Copy Headers */,
+			);
+			name = "Copy Headers";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EA1E285C22B66487004AA304 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+		EA1E287422B666EB004AA304 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
@@ -975,14 +1036,11 @@
 		7205C4461E1304C300E370AE /* Appcast-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "Appcast-Bridging-Header.h"; sourceTree = "<group>"; };
 		7205C4471E1304CE00E370AE /* Appcast.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Appcast.swift; sourceTree = "<group>"; };
 		7205C4481E1304CE00E370AE /* ArchiveItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ArchiveItem.swift; sourceTree = "<group>"; };
-		7205C4491E1304CE00E370AE /* DSASignature.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DSASignature.swift; sourceTree = "<group>"; };
+		7205C4491E1304CE00E370AE /* Signatures.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Signatures.swift; sourceTree = "<group>"; };
 		7205C44A1E1304CE00E370AE /* FeedXML.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FeedXML.swift; sourceTree = "<group>"; };
 		7205C44B1E1304CE00E370AE /* Unarchive.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Unarchive.swift; sourceTree = "<group>"; };
 		7205C4511E13053500E370AE /* ConfigSwiftDebug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigSwiftDebug.xcconfig; sourceTree = "<group>"; };
 		7205C4521E13053500E370AE /* ConfigSwiftRelease.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigSwiftRelease.xcconfig; sourceTree = "<group>"; };
-		7205C4531E13054900E370AE /* ConfigGenerateAppcast.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigGenerateAppcast.xcconfig; sourceTree = "<group>"; };
-		7205C4541E13054900E370AE /* ConfigGenerateAppcastDebug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigGenerateAppcastDebug.xcconfig; sourceTree = "<group>"; };
-		7205C4551E13054900E370AE /* ConfigGenerateAppcastRelease.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigGenerateAppcastRelease.xcconfig; sourceTree = "<group>"; };
 		7205C46C1E13244800E370AE /* ConfigUnitTestDebug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigUnitTestDebug.xcconfig; sourceTree = "<group>"; };
 		7205C46D1E13245600E370AE /* ConfigUnitTestRelease.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigUnitTestRelease.xcconfig; sourceTree = "<group>"; };
 		7205C46E1E13254500E370AE /* ConfigUITestDebug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigUITestDebug.xcconfig; sourceTree = "<group>"; };
@@ -1246,6 +1304,38 @@
 		EA1E281422B64548004AA304 /* bsdiff-Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "bsdiff-Debug.xcconfig"; sourceTree = "<group>"; };
 		EA1E281522B64549004AA304 /* bsdiff-Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "bsdiff-Release.xcconfig"; sourceTree = "<group>"; };
 		EA1E281622B64549004AA304 /* bsdiff-Shared.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "bsdiff-Shared.xcconfig"; sourceTree = "<group>"; };
+		EA1E282D22B660BE004AA304 /* libed25519.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libed25519.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		EA1E283422B660ED004AA304 /* precomp_data.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = precomp_data.h; sourceTree = "<group>"; };
+		EA1E283522B660ED004AA304 /* seed.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = seed.c; sourceTree = "<group>"; };
+		EA1E283622B660ED004AA304 /* fe.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = fe.c; sourceTree = "<group>"; };
+		EA1E283722B660ED004AA304 /* verify.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = verify.c; sourceTree = "<group>"; };
+		EA1E283822B660ED004AA304 /* ge.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ge.c; sourceTree = "<group>"; };
+		EA1E283922B660ED004AA304 /* sc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sc.c; sourceTree = "<group>"; };
+		EA1E283A22B660ED004AA304 /* sign.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sign.c; sourceTree = "<group>"; };
+		EA1E283B22B660ED004AA304 /* sha512.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sha512.h; sourceTree = "<group>"; };
+		EA1E283C22B660ED004AA304 /* key_exchange.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = key_exchange.c; sourceTree = "<group>"; };
+		EA1E283D22B660ED004AA304 /* add_scalar.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = add_scalar.c; sourceTree = "<group>"; };
+		EA1E283E22B660ED004AA304 /* ed25519.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ed25519.h; sourceTree = "<group>"; };
+		EA1E283F22B660ED004AA304 /* fe.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fe.h; sourceTree = "<group>"; };
+		EA1E284022B660ED004AA304 /* keypair.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = keypair.c; sourceTree = "<group>"; };
+		EA1E284122B660ED004AA304 /* fixedint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fixedint.h; sourceTree = "<group>"; };
+		EA1E284222B660ED004AA304 /* sha512.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sha512.c; sourceTree = "<group>"; };
+		EA1E284322B660ED004AA304 /* sc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sc.h; sourceTree = "<group>"; };
+		EA1E284422B660ED004AA304 /* ge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ge.h; sourceTree = "<group>"; };
+		EA1E285722B6622E004AA304 /* ed25519-Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "ed25519-Release.xcconfig"; sourceTree = "<group>"; };
+		EA1E285822B6622E004AA304 /* ed25519-Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "ed25519-Debug.xcconfig"; sourceTree = "<group>"; };
+		EA1E285922B6622E004AA304 /* ed25519-Shared.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "ed25519-Shared.xcconfig"; sourceTree = "<group>"; };
+		EA1E285E22B66487004AA304 /* generate_keys */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = generate_keys; sourceTree = BUILT_PRODUCTS_DIR; };
+		EA1E286022B66487004AA304 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
+		EA1E286622B664A5004AA304 /* Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Bridging-Header.h"; sourceTree = "<group>"; };
+		EA1E286722B664FD004AA304 /* CommandLineTool-Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "CommandLineTool-Release.xcconfig"; sourceTree = "<group>"; };
+		EA1E286822B664FD004AA304 /* CommandLineTool-Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "CommandLineTool-Debug.xcconfig"; sourceTree = "<group>"; };
+		EA1E286922B664FD004AA304 /* CommandLineTool-Shared.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "CommandLineTool-Shared.xcconfig"; sourceTree = "<group>"; };
+		EA1E286C22B665E8004AA304 /* SUSignatures.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SUSignatures.h; sourceTree = "<group>"; };
+		EA1E286D22B665E8004AA304 /* SUSignatures.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SUSignatures.m; sourceTree = "<group>"; };
+		EA1E287622B666EB004AA304 /* sign_update */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = sign_update; sourceTree = BUILT_PRODUCTS_DIR; };
+		EA1E287822B666EB004AA304 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
+		EA1E287F22B667D8004AA304 /* Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Bridging-Header.h"; sourceTree = "<group>"; };
 		F8761EB01ADC5068000C9034 /* SUCodeSigningVerifierTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUCodeSigningVerifierTest.m; sourceTree = "<group>"; };
 		F8761EB21ADC50EB000C9034 /* SparkleTestCodeSignApp.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = SparkleTestCodeSignApp.zip; sourceTree = "<group>"; };
 		FA1941CA0D94A70100DD942E /* ConfigFrameworkDebug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ConfigFrameworkDebug.xcconfig; sourceTree = "<group>"; };
@@ -1303,6 +1393,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EA1E285622B6619B004AA304 /* libed25519.a in Frameworks */,
 				EA1E281A22B645F4004AA304 /* libbsdiff.a in Frameworks */,
 				7205C4641E1306BE00E370AE /* libbz2.tbd in Frameworks */,
 				7205C4631E1306B500E370AE /* libxar.tbd in Frameworks */,
@@ -1401,6 +1492,29 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		EA1E282B22B660BE004AA304 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EA1E285B22B66487004AA304 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EA1E286A22B6653D004AA304 /* libed25519.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EA1E287322B666EB004AA304 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EA1E287E22B66705004AA304 /* libed25519.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -1423,6 +1537,9 @@
 				726B2B5D1C645FC900388755 /* UI Tests.xctest */,
 				721C24451CB753E6005440CB /* Updater.app */,
 				EA1E280F22B64522004AA304 /* libbsdiff.a */,
+				EA1E282D22B660BE004AA304 /* libed25519.a */,
+				EA1E285E22B66487004AA304 /* generate_keys */,
+				EA1E287622B666EB004AA304 /* sign_update */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1430,8 +1547,8 @@
 		0867D691FE84028FC02AAC07 /* Sparkle */ = {
 			isa = PBXGroup;
 			children = (
-				7205C43F1E13049400E370AE /* generate_appcast */,
 				1495006D195FBBBD00BC5B5B /* Sparkle */,
+				EA1E288122B6688A004AA304 /* Command Line Tools */,
 				14732BB81960EEB600593899 /* Resources */,
 				61227A100DB5484000AB99EA /* Tests */,
 				61B5F91D09C4CF7F00B25A18 /* Test Application */,
@@ -1439,7 +1556,6 @@
 				1420DE391962322200203BB0 /* Documentation */,
 				FA1941C40D94A6EA00DD942E /* Configurations */,
 				726B2B5E1C645FC900388755 /* UI Tests */,
-				72D9549F1CBB415C006F28BD /* sparkle-cli */,
 				0867D69AFE84028FC02AAC07 /* Frameworks */,
 				034768DFFF38A50411DB9C8B /* Products */,
 			);
@@ -1499,6 +1615,7 @@
 			isa = PBXGroup;
 			children = (
 				14732BB61960ECE800593899 /* bsdiff */,
+				EA1E283322B660ED004AA304 /* ed25519 */,
 			);
 			path = Vendor;
 			sourceTree = "<group>";
@@ -1555,6 +1672,7 @@
 				721C24461CB753E6005440CB /* Installer Progress */,
 				729746481C91483B00FC134E /* IPC */,
 				61B5F8F309C4CE5900B25A18 /* Other Sources */,
+				EA1E286B22B665DB004AA304 /* Signatures */,
 				61F83F6E0DBFE07A006FDD30 /* Update Control */,
 				61299B3A09CB056100B7442F /* User Interface */,
 				72F94F551CC43D99002DEE68 /* XPC Services */,
@@ -1841,9 +1959,9 @@
 				7205C4461E1304C300E370AE /* Appcast-Bridging-Header.h */,
 				7205C4471E1304CE00E370AE /* Appcast.swift */,
 				7205C4481E1304CE00E370AE /* ArchiveItem.swift */,
-				7205C4491E1304CE00E370AE /* DSASignature.swift */,
 				7205C44A1E1304CE00E370AE /* FeedXML.swift */,
 				7205C4401E13049400E370AE /* main.swift */,
+				7205C4491E1304CE00E370AE /* Signatures.swift */,
 				7205C44B1E1304CE00E370AE /* Unarchive.swift */,
 			);
 			path = generate_appcast;
@@ -2046,6 +2164,69 @@
 			name = Deprecated;
 			sourceTree = "<group>";
 		};
+		EA1E283322B660ED004AA304 /* ed25519 */ = {
+			isa = PBXGroup;
+			children = (
+				EA1E283422B660ED004AA304 /* precomp_data.h */,
+				EA1E283522B660ED004AA304 /* seed.c */,
+				EA1E283622B660ED004AA304 /* fe.c */,
+				EA1E283722B660ED004AA304 /* verify.c */,
+				EA1E283822B660ED004AA304 /* ge.c */,
+				EA1E283922B660ED004AA304 /* sc.c */,
+				EA1E283A22B660ED004AA304 /* sign.c */,
+				EA1E283B22B660ED004AA304 /* sha512.h */,
+				EA1E283C22B660ED004AA304 /* key_exchange.c */,
+				EA1E283D22B660ED004AA304 /* add_scalar.c */,
+				EA1E283E22B660ED004AA304 /* ed25519.h */,
+				EA1E283F22B660ED004AA304 /* fe.h */,
+				EA1E284022B660ED004AA304 /* keypair.c */,
+				EA1E284122B660ED004AA304 /* fixedint.h */,
+				EA1E284222B660ED004AA304 /* sha512.c */,
+				EA1E284322B660ED004AA304 /* sc.h */,
+				EA1E284422B660ED004AA304 /* ge.h */,
+			);
+			name = ed25519;
+			path = ed25519/src;
+			sourceTree = "<group>";
+		};
+		EA1E285F22B66487004AA304 /* generate_keys */ = {
+			isa = PBXGroup;
+			children = (
+				EA1E286622B664A5004AA304 /* Bridging-Header.h */,
+				EA1E286022B66487004AA304 /* main.swift */,
+			);
+			path = generate_keys;
+			sourceTree = "<group>";
+		};
+		EA1E286B22B665DB004AA304 /* Signatures */ = {
+			isa = PBXGroup;
+			children = (
+				EA1E286C22B665E8004AA304 /* SUSignatures.h */,
+				EA1E286D22B665E8004AA304 /* SUSignatures.m */,
+			);
+			name = Signatures;
+			sourceTree = "<group>";
+		};
+		EA1E287722B666EB004AA304 /* sign_update */ = {
+			isa = PBXGroup;
+			children = (
+				EA1E287F22B667D8004AA304 /* Bridging-Header.h */,
+				EA1E287822B666EB004AA304 /* main.swift */,
+			);
+			path = sign_update;
+			sourceTree = "<group>";
+		};
+		EA1E288122B6688A004AA304 /* Command Line Tools */ = {
+			isa = PBXGroup;
+			children = (
+				7205C43F1E13049400E370AE /* generate_appcast */,
+				EA1E285F22B66487004AA304 /* generate_keys */,
+				EA1E287722B666EB004AA304 /* sign_update */,
+				72D9549F1CBB415C006F28BD /* sparkle-cli */,
+			);
+			name = "Command Line Tools";
+			sourceTree = "<group>";
+		};
 		FA1941C40D94A6EA00DD942E /* Configurations */ = {
 			isa = PBXGroup;
 			children = (
@@ -2053,6 +2234,9 @@
 				EA1E281422B64548004AA304 /* bsdiff-Debug.xcconfig */,
 				EA1E281522B64549004AA304 /* bsdiff-Release.xcconfig */,
 				EA1E281622B64549004AA304 /* bsdiff-Shared.xcconfig */,
+				EA1E286822B664FD004AA304 /* CommandLineTool-Debug.xcconfig */,
+				EA1E286722B664FD004AA304 /* CommandLineTool-Release.xcconfig */,
+				EA1E286922B664FD004AA304 /* CommandLineTool-Shared.xcconfig */,
 				5D06E8F10FD68D21005AE3F6 /* ConfigBinaryDelta.xcconfig */,
 				FA1941D00D94A70100DD942E /* ConfigCommon.xcconfig */,
 				149B78631B7D3A0C00D7D62C /* ConfigCommonCoverage.xcconfig */,
@@ -2062,9 +2246,6 @@
 				72F94ED61CC344A7002DEE68 /* ConfigDownloaderDebug.xcconfig */,
 				FA1941D10D94A70100DD942E /* ConfigFramework.xcconfig */,
 				FA1941CA0D94A70100DD942E /* ConfigFrameworkDebug.xcconfig */,
-				7205C4531E13054900E370AE /* ConfigGenerateAppcast.xcconfig */,
-				7205C4541E13054900E370AE /* ConfigGenerateAppcastDebug.xcconfig */,
-				7205C4551E13054900E370AE /* ConfigGenerateAppcastRelease.xcconfig */,
 				724BB37E1D31D1EA005D534A /* ConfigInstallerConnection.xcconfig */,
 				724BB37F1D31D1EA005D534A /* ConfigInstallerConnectionDebug.xcconfig */,
 				726E07C11CAF1E79001A286B /* ConfigInstallerLauncher.xcconfig */,
@@ -2089,6 +2270,9 @@
 				149B78641B7D3A4800D7D62C /* ConfigUnitTestCoverage.xcconfig */,
 				7205C46C1E13244800E370AE /* ConfigUnitTestDebug.xcconfig */,
 				7205C46D1E13245600E370AE /* ConfigUnitTestRelease.xcconfig */,
+				EA1E285822B6622E004AA304 /* ed25519-Debug.xcconfig */,
+				EA1E285722B6622E004AA304 /* ed25519-Release.xcconfig */,
+				EA1E285922B6622E004AA304 /* ed25519-Shared.xcconfig */,
 				14732BC91960F70A00593899 /* make-release-package.sh */,
 				721D8A831D498F1D0032E472 /* set-agent-signing.sh */,
 				729BB3CE1D50344A007C4276 /* set-ats-exceptions-downloader-service.sh */,
@@ -2111,6 +2295,7 @@
 				72A5D5EB1D692BD40009E5AC /* SPUDownloadData.h in Headers */,
 				72A5D5F91D692F4C0009E5AC /* SPUStatusCompletionResults.h in Headers */,
 				72A5D5E71D692BB00009E5AC /* SPUUpdatePermissionRequest.h in Headers */,
+				EA1E286F22B6661D004AA304 /* SUSignatures.h in Headers */,
 				72A5D5E21D692B770009E5AC /* SPUUpdater.h in Headers */,
 				72A5D5E41D692B770009E5AC /* SPUUpdaterDelegate.h in Headers */,
 				72A5D5E31D692B770009E5AC /* SPUUpdaterSettings.h in Headers */,
@@ -2179,6 +2364,7 @@
 				61EF67590E25C5B400F754E0 /* SUHost.h in Headers */,
 				72162B081C82C9600013C1C5 /* SULocalizations.h in Headers */,
 				55C14F06136EF6DB00649790 /* SULog.h in Headers */,
+				EA1E286E22B665F0004AA304 /* SUSignatures.h in Headers */,
 				72B3DECD1E23479000457642 /* SPUInformationalUpdate.h in Headers */,
 				726F2CE51BC9C33D001971A4 /* SUOperatingSystem.h in Headers */,
 				61A225A40D1C4AC000430CCD /* SUStandardVersionComparator.h in Headers */,
@@ -2546,6 +2732,57 @@
 			productReference = EA1E280F22B64522004AA304 /* libbsdiff.a */;
 			productType = "com.apple.product-type.library.static";
 		};
+		EA1E282C22B660BE004AA304 /* ed25519 */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = EA1E282E22B660BE004AA304 /* Build configuration list for PBXNativeTarget "ed25519" */;
+			buildPhases = (
+				EA1E282A22B660BE004AA304 /* Sources */,
+				EA1E282B22B660BE004AA304 /* Frameworks */,
+				EA1E283222B660C6004AA304 /* Copy Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ed25519;
+			productName = ed25519;
+			productReference = EA1E282D22B660BE004AA304 /* libed25519.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+		EA1E285D22B66487004AA304 /* generate_keys */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = EA1E286222B66487004AA304 /* Build configuration list for PBXNativeTarget "generate_keys" */;
+			buildPhases = (
+				EA1E285A22B66487004AA304 /* Sources */,
+				EA1E285B22B66487004AA304 /* Frameworks */,
+				EA1E285C22B66487004AA304 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = generate_keys;
+			productName = generate_keys;
+			productReference = EA1E285E22B66487004AA304 /* generate_keys */;
+			productType = "com.apple.product-type.tool";
+		};
+		EA1E287522B666EB004AA304 /* sign_update */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = EA1E287D22B666EB004AA304 /* Build configuration list for PBXNativeTarget "sign_update" */;
+			buildPhases = (
+				EA1E287222B666EB004AA304 /* Sources */,
+				EA1E287322B666EB004AA304 /* Frameworks */,
+				EA1E287422B666EB004AA304 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = sign_update;
+			productName = sign_update;
+			productReference = EA1E287622B666EB004AA304 /* sign_update */;
+			productType = "com.apple.product-type.tool";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -2553,7 +2790,7 @@
 			isa = PBXProject;
 			attributes = {
 				CLASSPREFIX = SU;
-				LastSwiftUpdateCheck = 0820;
+				LastSwiftUpdateCheck = 1020;
 				LastUpgradeCheck = 0830;
 				ORGANIZATIONNAME = "Sparkle Project";
 				TargetAttributes = {
@@ -2615,6 +2852,15 @@
 						CreatedOnToolsVersion = 7.3;
 					};
 					EA1E280E22B64522004AA304 = {
+						CreatedOnToolsVersion = 10.2.1;
+					};
+					EA1E282C22B660BE004AA304 = {
+						CreatedOnToolsVersion = 10.2.1;
+					};
+					EA1E285D22B66487004AA304 = {
+						CreatedOnToolsVersion = 10.2.1;
+					};
+					EA1E287522B666EB004AA304 = {
 						CreatedOnToolsVersion = 10.2.1;
 					};
 				};
@@ -2690,7 +2936,10 @@
 				1495005F195FB89400BC5B5B /* All */,
 				726B2B5C1C645FC900388755 /* UI Tests */,
 				7205C43D1E13049400E370AE /* generate_appcast */,
+				EA1E285D22B66487004AA304 /* generate_keys */,
+				EA1E287522B666EB004AA304 /* sign_update */,
 				EA1E280E22B64522004AA304 /* bsdiff */,
+				EA1E282C22B660BE004AA304 /* ed25519 */,
 			);
 		};
 /* End PBXProject section */
@@ -2975,7 +3224,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "ln -sfh \"pt_BR.lproj\" \"$BUILT_PRODUCTS_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/pt.lproj\"";
+			shellScript = "ln -sfh \"pt_BR.lproj\" \"$BUILT_PRODUCTS_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/pt.lproj\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -3050,7 +3299,7 @@
 				72464F7C1E2097F600FB341C /* SUOperatingSystem.m in Sources */,
 				7205C44C1E1304CE00E370AE /* Appcast.swift in Sources */,
 				7205C44D1E1304CE00E370AE /* ArchiveItem.swift in Sources */,
-				7205C44E1E1304CE00E370AE /* DSASignature.swift in Sources */,
+				7205C44E1E1304CE00E370AE /* Signatures.swift in Sources */,
 				7205C44F1E1304CE00E370AE /* FeedXML.swift in Sources */,
 				7205C4411E13049400E370AE /* main.swift in Sources */,
 				7205C45F1E13066F00E370AE /* SUBinaryDeltaApply.m in Sources */,
@@ -3174,6 +3423,7 @@
 				72A5D5CD1D6929F80009E5AC /* SPUCoreBasedUpdateDriver.m in Sources */,
 				72A5D5BD1D6929F80009E5AC /* SPUDownloadData.m in Sources */,
 				72A5D5D01D6929F80009E5AC /* SPUDownloadDriver.m in Sources */,
+				EA1E287122B66622004AA304 /* SUSignatures.m in Sources */,
 				72A5D5AF1D6929F80009E5AC /* SPUDownloader.m in Sources */,
 				72A5D5B71D6929F80009E5AC /* SPUInstallationInfo.m in Sources */,
 				72A5D5B41D6929F80009E5AC /* SPUInstallationInputData.m in Sources */,
@@ -3316,6 +3566,7 @@
 				55C14F07136EF6DB00649790 /* SULog.m in Sources */,
 				726F2CE61BC9C33D001971A4 /* SUOperatingSystem.m in Sources */,
 				61A225A50D1C4AC000430CCD /* SUStandardVersionComparator.m in Sources */,
+				EA1E287022B66621004AA304 /* SUSignatures.m in Sources */,
 				6196CFFA09C72149000DC222 /* SUStatusController.m in Sources */,
 				72B3DECA1E23472200457642 /* SPUDownloadedUpdate.m in Sources */,
 				61A2279D0D1CEE7600430CCD /* SUSystemProfiler.m in Sources */,
@@ -3336,6 +3587,39 @@
 				EA1E282222B64677004AA304 /* bsdiff.c in Sources */,
 				EA1E282322B64677004AA304 /* bspatch.c in Sources */,
 				EA1E282422B64677004AA304 /* sais.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EA1E282A22B660BE004AA304 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EA1E284622B660ED004AA304 /* fe.c in Sources */,
+				EA1E284822B660ED004AA304 /* ge.c in Sources */,
+				EA1E284722B660ED004AA304 /* verify.c in Sources */,
+				EA1E284C22B660ED004AA304 /* add_scalar.c in Sources */,
+				EA1E284D22B660ED004AA304 /* keypair.c in Sources */,
+				EA1E284522B660ED004AA304 /* seed.c in Sources */,
+				EA1E284B22B660ED004AA304 /* key_exchange.c in Sources */,
+				EA1E284A22B660ED004AA304 /* sign.c in Sources */,
+				EA1E284922B660ED004AA304 /* sc.c in Sources */,
+				EA1E284E22B660ED004AA304 /* sha512.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EA1E285A22B66487004AA304 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EA1E286122B66487004AA304 /* main.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EA1E287222B666EB004AA304 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EA1E287922B666EB004AA304 /* main.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3819,27 +4103,24 @@
 		};
 		7205C4421E13049400E370AE /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 7205C4541E13054900E370AE /* ConfigGenerateAppcastDebug.xcconfig */;
+			baseConfigurationReference = EA1E286822B664FD004AA304 /* CommandLineTool-Debug.xcconfig */;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
 				CODE_SIGN_IDENTITY = "-";
 			};
 			name = Debug;
 		};
 		7205C4431E13049400E370AE /* Coverage */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 7205C4541E13054900E370AE /* ConfigGenerateAppcastDebug.xcconfig */;
+			baseConfigurationReference = EA1E286722B664FD004AA304 /* CommandLineTool-Release.xcconfig */;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
 				CODE_SIGN_IDENTITY = "-";
 			};
 			name = Coverage;
 		};
 		7205C4441E13049400E370AE /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 7205C4551E13054900E370AE /* ConfigGenerateAppcastRelease.xcconfig */;
+			baseConfigurationReference = EA1E286722B664FD004AA304 /* CommandLineTool-Release.xcconfig */;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
 				CODE_SIGN_IDENTITY = "-";
 			};
 			name = Release;
@@ -4084,6 +4365,69 @@
 			};
 			name = Release;
 		};
+		EA1E282F22B660BE004AA304 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = EA1E285822B6622E004AA304 /* ed25519-Debug.xcconfig */;
+			buildSettings = {
+			};
+			name = Debug;
+		};
+		EA1E283022B660BE004AA304 /* Coverage */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = EA1E285722B6622E004AA304 /* ed25519-Release.xcconfig */;
+			buildSettings = {
+			};
+			name = Coverage;
+		};
+		EA1E283122B660BE004AA304 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = EA1E285722B6622E004AA304 /* ed25519-Release.xcconfig */;
+			buildSettings = {
+			};
+			name = Release;
+		};
+		EA1E286322B66487004AA304 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = EA1E286822B664FD004AA304 /* CommandLineTool-Debug.xcconfig */;
+			buildSettings = {
+			};
+			name = Debug;
+		};
+		EA1E286422B66487004AA304 /* Coverage */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = EA1E286722B664FD004AA304 /* CommandLineTool-Release.xcconfig */;
+			buildSettings = {
+			};
+			name = Coverage;
+		};
+		EA1E286522B66487004AA304 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = EA1E286722B664FD004AA304 /* CommandLineTool-Release.xcconfig */;
+			buildSettings = {
+			};
+			name = Release;
+		};
+		EA1E287A22B666EB004AA304 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = EA1E286822B664FD004AA304 /* CommandLineTool-Debug.xcconfig */;
+			buildSettings = {
+			};
+			name = Debug;
+		};
+		EA1E287B22B666EB004AA304 /* Coverage */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = EA1E286722B664FD004AA304 /* CommandLineTool-Release.xcconfig */;
+			buildSettings = {
+			};
+			name = Coverage;
+		};
+		EA1E287C22B666EB004AA304 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = EA1E286722B664FD004AA304 /* CommandLineTool-Release.xcconfig */;
+			buildSettings = {
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -4283,6 +4627,36 @@
 				EA1E281022B64522004AA304 /* Debug */,
 				EA1E281122B64522004AA304 /* Coverage */,
 				EA1E281222B64522004AA304 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		EA1E282E22B660BE004AA304 /* Build configuration list for PBXNativeTarget "ed25519" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EA1E282F22B660BE004AA304 /* Debug */,
+				EA1E283022B660BE004AA304 /* Coverage */,
+				EA1E283122B660BE004AA304 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		EA1E286222B66487004AA304 /* Build configuration list for PBXNativeTarget "generate_keys" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EA1E286322B66487004AA304 /* Debug */,
+				EA1E286422B66487004AA304 /* Coverage */,
+				EA1E286522B66487004AA304 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		EA1E287D22B666EB004AA304 /* Build configuration list for PBXNativeTarget "sign_update" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EA1E287A22B666EB004AA304 /* Debug */,
+				EA1E287B22B666EB004AA304 /* Coverage */,
+				EA1E287C22B666EB004AA304 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
