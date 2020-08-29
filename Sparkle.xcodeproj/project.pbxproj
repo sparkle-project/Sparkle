@@ -22,6 +22,17 @@
 			name = All;
 			productName = All;
 		};
+		895C5DC024D78E210058A82D /* XCFrameworks */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 895C5DC424D78E210058A82D /* Build configuration list for PBXAggregateTarget "XCFrameworks" */;
+			buildPhases = (
+				895C5DC524D78E460058A82D /* ShellScript */,
+			);
+			dependencies = (
+			);
+			name = XCFrameworks;
+			productName = Sparkle.xcframework;
+		};
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
@@ -693,6 +704,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = 726E07EE1CAF37BD001A286B;
 			remoteInfo = SparkleUpdateDownloader;
+		};
+		895C5DC624D78F700058A82D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 895C5DC024D78E210058A82D;
+			remoteInfo = XCFrameworks;
 		};
 		FA344BA424C8699E00B2A401 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -2460,6 +2478,7 @@
 				FA344BA724C869A300B2A401 /* PBXTargetDependency */,
 				FA344BA524C8699E00B2A401 /* PBXTargetDependency */,
 				1454BA1819637EE900344E57 /* PBXTargetDependency */,
+				895C5DC724D78F700058A82D /* PBXTargetDependency */,
 			);
 			name = Distribution;
 			passBuildSettingsInEnvironment = 1;
@@ -2896,6 +2915,9 @@
 					72D9549D1CBB415B006F28BD = {
 						CreatedOnToolsVersion = 7.3;
 					};
+					895C5DC024D78E210058A82D = {
+						CreatedOnToolsVersion = 12.0;
+					};
 					EA1E280E22B64522004AA304 = {
 						CreatedOnToolsVersion = 10.2.1;
 					};
@@ -2979,6 +3001,7 @@
 				14732BC51960F69300593899 /* Distribution */,
 				1420DF491962329200203BB0 /* Documentation */,
 				1495005F195FB89400BC5B5B /* All */,
+				895C5DC024D78E210058A82D /* XCFrameworks */,
 				726B2B5C1C645FC900388755 /* UI Tests */,
 				7205C43D1E13049400E370AE /* generate_appcast */,
 				EA1E285D22B66487004AA304 /* generate_keys */,
@@ -3272,6 +3295,23 @@
 			shellPath = /bin/sh;
 			shellScript = "ln -sfh \"pt_BR.lproj\" \"$BUILT_PRODUCTS_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/pt.lproj\"\n";
 			showEnvVarsInLog = 0;
+		};
+		895C5DC524D78E460058A82D /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Deleting old products\nrm -rd \"$BUILT_PRODUCTS_DIR/Sparkle.xcarchive\"\nrm -rd \"$BUILT_PRODUCTS_DIR/Sparkle.xcframework\"\nrm -rd \"$BUILT_PRODUCTS_DIR/SparkleCore.xcarchive\"\nrm -rd \"$BUILT_PRODUCTS_DIR/SparkleCore.xcframework\"\n\nxcodebuild archive -scheme Sparkle -archivePath \"$BUILT_PRODUCTS_DIR/Sparkle.xcarchive\" BUILD_LIBRARY_FOR_DISTRIBUTION=YES SKIP_INSTALL=NO\nxcodebuild archive -scheme SparkleCore -archivePath \"$BUILT_PRODUCTS_DIR/SparkleCore.xcarchive\" BUILD_LIBRARY_FOR_DISTRIBUTION=YES SKIP_INSTALL=NO\n\nif [ $XCODE_VERSION_MAJOR -ge \"1200\" ]; then\nxcodebuild -create-xcframework -framework \"$BUILT_PRODUCTS_DIR/Sparkle.xcarchive/Products/Library/Frameworks/Sparkle.framework\" -debug-symbols \"$BUILT_PRODUCTS_DIR/Sparkle.xcarchive/dSYMs/Sparkle.framework.dSYM\" -output \"$BUILT_PRODUCTS_DIR/Sparkle.xcframework\"\nxcodebuild -create-xcframework -framework \"$BUILT_PRODUCTS_DIR/SparkleCore.xcarchive/Products/Library/Frameworks/SparkleCore.framework\" -debug-symbols \"$BUILT_PRODUCTS_DIR/SparkleCore.xcarchive/dSYMs/SparkleCore.framework.dSYM\" -output \"$BUILT_PRODUCTS_DIR/SparkleCore.xcframework\"\nelse\necho \"warning: Your Xcode version does not support bundling dSYMs in XCFrameworks directly. You should copy them manually into the XCFramework.\"\necho \"note: cp '$BUILT_PRODUCTS_DIR/Sparkle.xcarchive/dSYMs/Sparkle.framework.dSYM' '$BUILT_PRODUCTS_DIR/Sparkle.xcframework/your_architecture/dSYMs'\"\nxcodebuild -create-xcframework -framework \"$BUILT_PRODUCTS_DIR/Sparkle.xcarchive/Products/Library/Frameworks/Sparkle.framework\" -output \"$BUILT_PRODUCTS_DIR/Sparkle.xcframework\"\nxcodebuild -create-xcframework -framework \"$BUILT_PRODUCTS_DIR/SparkleCore.xcarchive/Products/Library/Frameworks/SparkleCore.framework\" -output \"$BUILT_PRODUCTS_DIR/SparkleCore.xcframework\"\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -3835,6 +3875,11 @@
 			isa = PBXTargetDependency;
 			target = 726E07EE1CAF37BD001A286B /* SparkleDownloader */;
 			targetProxy = 72F94F6C1CC4A0C8002DEE68 /* PBXContainerItemProxy */;
+		};
+		895C5DC724D78F700058A82D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 895C5DC024D78E210058A82D /* XCFrameworks */;
+			targetProxy = 895C5DC624D78F700058A82D /* PBXContainerItemProxy */;
 		};
 		FA344BA524C8699E00B2A401 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -4409,6 +4454,24 @@
 			};
 			name = Release;
 		};
+		895C5DC124D78E210058A82D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = Debug;
+		};
+		895C5DC224D78E210058A82D /* Coverage */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = Coverage;
+		};
+		895C5DC324D78E210058A82D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = Release;
+		};
 		EA1E281022B64522004AA304 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = EA1E281422B64548004AA304 /* bsdiff-Debug.xcconfig */;
@@ -4682,6 +4745,16 @@
 				72D954AC1CBB415C006F28BD /* Debug */,
 				72D954AD1CBB415C006F28BD /* Coverage */,
 				72D954AE1CBB415C006F28BD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		895C5DC424D78E210058A82D /* Build configuration list for PBXAggregateTarget "XCFrameworks" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				895C5DC124D78E210058A82D /* Debug */,
+				895C5DC224D78E210058A82D /* Coverage */,
+				895C5DC324D78E210058A82D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
