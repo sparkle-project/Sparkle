@@ -11,8 +11,8 @@
 #else
 #import <Foundation/Foundation.h>
 #endif
-#import "SPUDownloader.h"
-#import "SPUDownloaderProtocol.h"
+#import <Sparkle/SPUDownloader.h>
+#import <Sparkle/SPUDownloaderProtocol.h>
 
 NS_CLASS_AVAILABLE(NSURLSESSION_AVAILABLE, 7_0)
 @interface SPUDownloaderSession : SPUDownloader <SPUDownloaderProtocol>

@@ -12,22 +12,22 @@
 // This list should include the shared headers. It doesn't matter if some of them aren't shared (unless
 // there are name-space collisions) so we can list all of them to start with:
 
-#import "SUAppcast.h"
-#import "SUAppcastItem.h"
-#import "SUStandardVersionComparator.h"
-#import "SUUpdater.h"
-#import "SUUpdaterDelegate.h"
-#import "SUVersionComparisonProtocol.h"
-#import "SUVersionDisplayProtocol.h"
-#import "SUErrors.h"
+#import <Sparkle/SUAppcast.h>
+#import <Sparkle/SUAppcastItem.h>
+#import <Sparkle/SUStandardVersionComparator.h>
+#import <Sparkle/SUUpdater.h>
+#import <Sparkle/SUUpdaterDelegate.h>
+#import <Sparkle/SUVersionComparisonProtocol.h>
+#import <Sparkle/SUVersionDisplayProtocol.h>
+#import <Sparkle/SUErrors.h>
 
-#import "SPUDownloader.h"
-#import "SPUDownloaderDelegate.h"
-#import "SPUDownloaderDeprecated.h"
-#import "SPUDownloadData.h"
-#import "SPUDownloaderProtocol.h"
-#import "SPUDownloaderSession.h"
-#import "SPUURLRequest.h"
-#import "SUCodeSigningVerifier.h"
+#import <Sparkle/SPUDownloader.h>
+#import <Sparkle/SPUDownloaderDelegate.h>
+#import <Sparkle/SPUDownloaderDeprecated.h>
+#import <Sparkle/SPUDownloadData.h>
+#import <Sparkle/SPUDownloaderProtocol.h>
+#import <Sparkle/SPUDownloaderSession.h>
+#import <Sparkle/SPUURLRequest.h>
+#import <Sparkle/SUCodeSigningVerifier.h>
 
 #endif

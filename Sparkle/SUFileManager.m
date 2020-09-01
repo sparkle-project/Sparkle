@@ -7,9 +7,10 @@
 //
 
 #import "SUFileManager.h"
-#import "SUErrors.h"
 #import "SUOperatingSystem.h"
 #import "SUFileOperationConstants.h"
+
+#import <Sparkle/SUErrors.h>
 
 #include <sys/xattr.h>
 #include <sys/errno.h>

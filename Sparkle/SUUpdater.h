@@ -14,9 +14,9 @@
 #else
 #import <Cocoa/Cocoa.h>
 #endif
-#import "SUExport.h"
-#import "SUVersionComparisonProtocol.h"
-#import "SUVersionDisplayProtocol.h"
+#import <Sparkle/SUExport.h>
+#import <Sparkle/SUVersionComparisonProtocol.h>
+#import <Sparkle/SUVersionDisplayProtocol.h>
 
 @class SUAppcastItem, SUAppcast;
 
