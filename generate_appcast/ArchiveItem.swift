@@ -48,6 +48,7 @@ class ArchiveItem: CustomStringConvertible {
     var dsaSignature: String?
     var edSignature: String?
     var downloadUrlPrefix: URL?
+    var releaseNotesURLPrefix: URL?
 
     init(version: String, shortVersion: String?, feedURL: URL?, minimumSystemVersion: String?, publicEdKey: String?, supportsDSA: Bool, appPath: URL, archivePath: URL) throws {
         self.version = version
@@ -188,7 +189,11 @@ class ArchiveItem: CustomStringConvertible {
         guard let escapedFilename = path.lastPathComponent.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) else {
             return nil
         }
-        if let relative = self.feedURL {
+        
+        if let releaseNotesURLPrefix = self.releaseNotesURLPrefix {
+            // If a URL prefix for release notes was passed on the command-line, use it
+            return URL(string: escapedFilename, relativeTo: releaseNotesURLPrefix)
+        } else if let relative = self.feedURL {
             return URL(string: escapedFilename, relativeTo: relative)
         }
         return URL(string: escapedFilename)

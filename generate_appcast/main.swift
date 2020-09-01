@@ -34,7 +34,8 @@ func printHelp() {
         "\t-n: provide the name of the private DSA key. This option has to be used together with `-k`\n",
         "\t-k: provide the name of the keychain. This option has to be used together with `-n`\n",
         "\t-s: provide the path to the private EdDSA key\n",
-        "\t--download-url-prefix: provide a static url that will be used as prefix for the url from where updates will be downloaded\n"
+        "\t--download-url-prefix: provide a prefix used to construct URLs for update downloads\n",
+        "\t--release-notes-url-prefix: provide a prefix used to construct URLs for release notes\n"
     )
 }
 
@@ -78,7 +79,7 @@ func loadPrivateKeys(_ privateDSAKey: SecKey?, _ privateEdString: String?) -> Pr
 /**
  * Parses all possible command line options and returns the values in a tuple.
  */
-func parseCommandLineOptions(argumentList: [String]) -> (privateDSAKey: SecKey?, privateEdString: String?, downloadUrlPrefix: URL?, archivesSourceDir: URL) {
+func parseCommandLineOptions(argumentList: [String]) -> (privateDSAKey: SecKey?, privateEdString: String?, downloadUrlPrefix: URL?, releaseNotesURLPrefix: URL?, archivesSourceDir: URL) {
     // if the option `-h` is in the argument list print the help dialog
     if argumentList.contains("-h") {
         printHelp()
@@ -94,6 +95,7 @@ func parseCommandLineOptions(argumentList: [String]) -> (privateDSAKey: SecKey?,
     var privateDSAKey: SecKey?
     var privateEdString: String?
     var downloadUrlPrefix: URL?
+    var releaseNotesURLPrefix: URL?
     var archivesSourceDir: URL
 
     // check if the private dsa key option is present
@@ -174,6 +176,21 @@ func parseCommandLineOptions(argumentList: [String]) -> (privateDSAKey: SecKey?,
         arguments.remove(at: downloadUrlPrefixOptionIndex + 1)
         arguments.remove(at: downloadUrlPrefixOptionIndex)
     }
+    
+    // Check if a URL prefix was specified for the release notes
+    if let releaseNotesURLPrefixOptionIndex = arguments.firstIndex(of: "--release-notes-url-prefix") {
+        if releaseNotesURLPrefixOptionIndex + 1 >= arguments.count {
+            print("Foo few arguments were given")
+            exit(1)
+        }
+        
+        // Get the URL prefix for the release notes
+        releaseNotesURLPrefix = URL(string: arguments[releaseNotesURLPrefixOptionIndex + 1])
+        
+        // Remove the parsed argument
+        arguments.remove(at: releaseNotesURLPrefixOptionIndex + 1)
+        arguments.remove(at: releaseNotesURLPrefixOptionIndex)
+    }
 
     // now that all command line options have been removed from the arguments array
     // there should only be the path to the private DSA key (if provided) path to the archives dir left
@@ -195,7 +212,7 @@ func parseCommandLineOptions(argumentList: [String]) -> (privateDSAKey: SecKey?,
     // now only the archives source dir is left
     archivesSourceDir = URL(fileURLWithPath: arguments[0], isDirectory: true)
 
-    return (privateDSAKey, privateEdString, downloadUrlPrefix, archivesSourceDir)
+    return (privateDSAKey, privateEdString, downloadUrlPrefix, releaseNotesURLPrefix, archivesSourceDir)
 }
 
 func main() {
@@ -208,20 +225,26 @@ func main() {
     var privateDSAKey: SecKey?
     var privateEdString: String?
     var downloadUrlPrefix: URL?
+    var releaseNotesURLPrefix: URL?
     var archivesSourceDir: URL
 
-    (privateDSAKey, privateEdString, downloadUrlPrefix, archivesSourceDir) = parseCommandLineOptions(argumentList: args)
+    (privateDSAKey, privateEdString, downloadUrlPrefix, releaseNotesURLPrefix, archivesSourceDir) = parseCommandLineOptions(argumentList: args)
 
     let keys = loadPrivateKeys(privateDSAKey, privateEdString)
 
     do {
         let allUpdates = try makeAppcast(archivesSourceDir: archivesSourceDir, keys: keys, verbose: verbose)
 
-        // if a download url prefix was provided set it for each archive item
-        if downloadUrlPrefix != nil {
+        // If a URL prefix was provided, set on the archive items
+        if downloadUrlPrefix != nil || releaseNotesURLPrefix != nil {
             for (_, archiveItems) in allUpdates {
                 for archiveItem in archiveItems {
-                    archiveItem.downloadUrlPrefix = downloadUrlPrefix
+                    if downloadUrlPrefix != nil {
+                        archiveItem.downloadUrlPrefix = downloadUrlPrefix
+                    }
+                    if releaseNotesURLPrefix != nil {
+                        archiveItem.releaseNotesURLPrefix = releaseNotesURLPrefix
+                    }
                 }
             }
         }
