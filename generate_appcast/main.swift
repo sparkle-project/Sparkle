@@ -35,7 +35,8 @@ func printHelp() {
         "\t-k: provide the name of the keychain. This option has to be used together with `-n`\n",
         "\t-s: provide the path to the private EdDSA key\n",
         "\t--download-url-prefix: provide a prefix used to construct URLs for update downloads\n",
-        "\t--release-notes-url-prefix: provide a prefix used to construct URLs for release notes\n"
+        "\t--release-notes-url-prefix: provide a prefix used to construct URLs for release notes\n",
+        "\t-o: provide a filename for the generated appcast (allowed when only one will be created)\n"
     )
 }
 
@@ -79,7 +80,7 @@ func loadPrivateKeys(_ privateDSAKey: SecKey?, _ privateEdString: String?) -> Pr
 /**
  * Parses all possible command line options and returns the values in a tuple.
  */
-func parseCommandLineOptions(argumentList: [String]) -> (privateDSAKey: SecKey?, privateEdString: String?, downloadUrlPrefix: URL?, releaseNotesURLPrefix: URL?, archivesSourceDir: URL) {
+func parseCommandLineOptions(argumentList: [String]) -> (privateDSAKey: SecKey?, privateEdString: String?, downloadUrlPrefix: URL?, releaseNotesURLPrefix: URL?, outputFilename: String?, archivesSourceDir: URL) {
     // if the option `-h` is in the argument list print the help dialog
     if argumentList.contains("-h") {
         printHelp()
@@ -96,6 +97,7 @@ func parseCommandLineOptions(argumentList: [String]) -> (privateDSAKey: SecKey?,
     var privateEdString: String?
     var downloadUrlPrefix: URL?
     var releaseNotesURLPrefix: URL?
+    var outputFilename: String?
     var archivesSourceDir: URL
 
     // check if the private dsa key option is present
@@ -180,7 +182,7 @@ func parseCommandLineOptions(argumentList: [String]) -> (privateDSAKey: SecKey?,
     // Check if a URL prefix was specified for the release notes
     if let releaseNotesURLPrefixOptionIndex = arguments.firstIndex(of: "--release-notes-url-prefix") {
         if releaseNotesURLPrefixOptionIndex + 1 >= arguments.count {
-            print("Foo few arguments were given")
+            print("Too few arguments were given")
             exit(1)
         }
         
@@ -190,6 +192,22 @@ func parseCommandLineOptions(argumentList: [String]) -> (privateDSAKey: SecKey?,
         // Remove the parsed argument
         arguments.remove(at: releaseNotesURLPrefixOptionIndex + 1)
         arguments.remove(at: releaseNotesURLPrefixOptionIndex)
+    }
+    
+    // Check if an output filename was specified
+    if let outputFilenameOptionIndex = arguments.firstIndex(of: "-o") {
+        // check that when accessing the value of the option we don't get out of bounds
+        if outputFilenameOptionIndex + 1 >= arguments.count {
+            print("Too few arguments were given")
+            exit(1)
+        }
+        
+        // Get the URL prefix for the release notes
+        outputFilename = arguments[outputFilenameOptionIndex + 1]
+        
+        // Remove the parsed argument
+        arguments.remove(at: outputFilenameOptionIndex + 1)
+        arguments.remove(at: outputFilenameOptionIndex)
     }
 
     // now that all command line options have been removed from the arguments array
@@ -212,7 +230,7 @@ func parseCommandLineOptions(argumentList: [String]) -> (privateDSAKey: SecKey?,
     // now only the archives source dir is left
     archivesSourceDir = URL(fileURLWithPath: arguments[0], isDirectory: true)
 
-    return (privateDSAKey, privateEdString, downloadUrlPrefix, releaseNotesURLPrefix, archivesSourceDir)
+    return (privateDSAKey, privateEdString, downloadUrlPrefix, releaseNotesURLPrefix, outputFilename, archivesSourceDir)
 }
 
 func main() {
@@ -226,9 +244,10 @@ func main() {
     var privateEdString: String?
     var downloadUrlPrefix: URL?
     var releaseNotesURLPrefix: URL?
+    var outputFilename: String?
     var archivesSourceDir: URL
 
-    (privateDSAKey, privateEdString, downloadUrlPrefix, releaseNotesURLPrefix, archivesSourceDir) = parseCommandLineOptions(argumentList: args)
+    (privateDSAKey, privateEdString, downloadUrlPrefix, releaseNotesURLPrefix, outputFilename, archivesSourceDir) = parseCommandLineOptions(argumentList: args)
 
     let keys = loadPrivateKeys(privateDSAKey, privateEdString)
 
@@ -249,10 +268,31 @@ func main() {
             }
         }
 
+        // If a (single) output filename was specified on the command-line, but more than one
+        // appcast file was found in the archives, then it's an error.
+        if let filename = outputFilename,
+            allUpdates.count > 1 {
+            print("Cannot write to \(filename): multiple appcasts found")
+            exit(1);
+        }
+        
         for (appcastFile, updates) in allUpdates {
-            let appcastDestPath = URL(fileURLWithPath: appcastFile, relativeTo: archivesSourceDir)
+            // Determine the appcast's destination
+            var appcastDestPath : URL
+            if let filename = outputFilename {
+                // An output filename was specified, use it
+                appcastDestPath = URL(fileURLWithPath: filename)
+            } else {
+                // Use the name of the appcast file found in the archive
+                appcastDestPath = URL(fileURLWithPath: appcastFile, relativeTo: archivesSourceDir)
+            }
+            
+            // Write the appcast
             try writeAppcast(appcastDestPath: appcastDestPath, updates: updates)
-            print("Written", appcastDestPath.path, "based on", updates.count, "updates")
+            
+            // Inform the user, pluralizing "update" if necessary
+            let updateString = (updates.count == 1) ? "update" : "updates"
+            print("Wrote \(updates.count) \(updateString) to: \(appcastDestPath.path)")
         }
     } catch {
         print("Error generating appcast from directory", archivesSourceDir.path, "\n", error)
