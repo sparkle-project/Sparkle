@@ -353,7 +353,7 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
     NSURL *requestURL = request.URL;
     NSString *scheme = requestURL.scheme;
     BOOL isAboutBlank = [requestURL.absoluteString isEqualToString:@"about:blank"];
-    BOOL whitelistedSafe = [scheme isEqualToString:@"http"] || [scheme isEqualToString:@"https"] || isAboutBlank;
+    BOOL whitelistedSafe = isAboutBlank || [@[@"http", @"https", @"macappstore", @"macappstores", @"itms-apps", @"itms-appss"] containsObject:scheme];
 
     // Do not allow redirects to dangerous protocols such as file://
     if (!whitelistedSafe) {
