@@ -89,7 +89,7 @@ func loadPrivateKeys(_ privateDSAKey: SecKey?, _ privateEdString: String?) -> Pr
 }
 
 /**
- * Parses all possible command line options and returns a dictionary that contains them
+ * Parses all possible command line options and returns a struct that contains them
  */
 func parseCommandLineOptions() -> CommandLineArguments {
     var arguments = CommandLine.arguments
