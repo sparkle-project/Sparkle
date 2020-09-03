@@ -108,16 +108,24 @@ func writeAppcast(appcastDestPath: URL, updates: [ArchiveItem]) throws {
         }
         minVer?.setChildren([text(update.minimumSystemVersion)])
 
+        // Look for an existing release notes element
         let releaseNotesXpath = "\(SUAppcastElementReleaseNotesLink)"
         let results = ((try? item.nodes(forXPath: releaseNotesXpath)) as? [XMLElement])?
             .filter { !($0.attributes ?? [])
             .contains(where: { $0.name == SUXMLLanguage }) }
         let relElement = results?.first
+        
         if let url = update.releaseNotesURL {
-            if nil == relElement {
+            // The update includes a valid release notes URL
+            if let existingReleaseNotesElement = relElement {
+                // The existing item includes a release notes element. Update it.
+                existingReleaseNotesElement.stringValue = url.absoluteString
+            } else {
+                // The existing item doesn't have a release notes element. Add one.
                 item.addChild(XMLElement.element(withName: SUAppcastElementReleaseNotesLink, stringValue: url.absoluteString) as! XMLElement)
             }
         } else if let childIndex = relElement?.index {
+            // The update doesn't include a release notes URL. Remove it.
             item.removeChild(at: childIndex)
         }
 
