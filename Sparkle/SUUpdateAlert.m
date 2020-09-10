@@ -352,7 +352,8 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 {
     NSURL *requestURL = request.URL;
     NSString *scheme = requestURL.scheme;
-    BOOL whitelistedSafe = [scheme isEqualToString:@"http"] || [scheme isEqualToString:@"https"] || [requestURL.absoluteString isEqualToString:@"about:blank"];
+    BOOL isAboutBlank = [requestURL.absoluteString isEqualToString:@"about:blank"];
+    BOOL whitelistedSafe = isAboutBlank || [@[@"http", @"https", @"macappstore", @"macappstores", @"itms-apps", @"itms-appss"] containsObject:scheme];
 
     // Do not allow redirects to dangerous protocols such as file://
     if (!whitelistedSafe) {
@@ -362,7 +363,7 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
     }
 
     if (self.webViewFinishedLoading) {
-        if (requestURL) {
+        if (requestURL && !isAboutBlank) {
             [[NSWorkspace sharedWorkspace] openURL:requestURL];
         }
 
@@ -374,9 +375,9 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 }
 
 // Clean up the contextual menu.
-- (NSArray *)webView:(WebView *)__unused sender contextMenuItemsForElement:(NSDictionary *)__unused element defaultMenuItems:(NSArray *)defaultMenuItems
+- (NSArray<NSMenuItem *> *)webView:(WebView *)__unused sender contextMenuItemsForElement:(NSDictionary *)__unused element defaultMenuItems:(NSArray<NSMenuItem *> *)defaultMenuItems
 {
-    NSMutableArray *webViewMenuItems = [defaultMenuItems mutableCopy];
+    NSMutableArray<NSMenuItem *> *webViewMenuItems = [defaultMenuItems mutableCopy];
 
 	if (webViewMenuItems)
 	{

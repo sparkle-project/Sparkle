@@ -2,7 +2,7 @@
 name: Other issues
 about: Found a bug? Want to implement a new feature?
 title: ''
-labels: ''
+labels: '1.x'
 assignees: ''
 
 ---

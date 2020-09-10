@@ -53,7 +53,7 @@ typedef NS_ENUM(NSInteger, SUCharacterType) {
     }
 }
 
-- (NSArray *)splitVersionString:(NSString *)version
+- (NSArray<NSString *> *)splitVersionString:(NSString *)version
 {
     NSString *character;
     NSMutableString *s;
@@ -92,8 +92,8 @@ typedef NS_ENUM(NSInteger, SUCharacterType) {
 
 - (NSComparisonResult)compareVersion:(NSString *)versionA toVersion:(NSString *)versionB
 {
-    NSArray *partsA = [self splitVersionString:versionA];
-    NSArray *partsB = [self splitVersionString:versionB];
+    NSArray<NSString *> *partsA = [self splitVersionString:versionA];
+    NSArray<NSString *> *partsB = [self splitVersionString:versionB];
 
     NSString *partA, *partB;
     NSUInteger i, n;

@@ -55,7 +55,7 @@ static NSString *SUOpenUtilityPath = @"/usr/bin/open";
     // -W = wait until the app has quit.
     // -n = Open another instance if already open.
     // -b = app bundle identifier
-    NSArray *args = @[@"-W", @"-n", @"-b", @"com.apple.installer", self.packagePath];
+    NSArray<NSString *> *args = @[@"-W", @"-n", @"-b", @"com.apple.installer", self.packagePath];
     
     // Known bug: if the installation fails or is canceled, Sparkle goes ahead and restarts, thinking everything is fine.
     @try {

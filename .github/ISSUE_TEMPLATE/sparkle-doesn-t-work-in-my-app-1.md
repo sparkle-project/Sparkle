@@ -1,8 +1,8 @@
 ---
-name: Sparkle doesn't work in my app
+name: Sparkle 1.x doesn't work in my app
 about: Problems with integration, unexpected errors
 title: ''
-labels: ''
+labels: '1.x'
 assignees: ''
 
 ---

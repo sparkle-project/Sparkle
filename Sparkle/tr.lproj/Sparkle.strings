@@ -4,7 +4,9 @@
 
 /* de_DE v0.1 - No comment provided by engineer. */
 
-"%1$@ can't be updated, because it was opened from a read-only or a temporary location. Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "%1$@ uygulaması geçici veya salt okunur bir konumdan açıldığı için güncellenemedi. Lütfen %1$@ uygulamasını Uygulamalar dizinine kopyalayıp yeniden başlatınız.";
+"%1$@ can't be updated, because it was opened from a read-only or a temporary location." = "%1$@ uygulaması geçici veya salt okunur bir konumdan açıldığı için güncellenemedi.";
+
+"Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "Lütfen %1$@ uygulamasını Uygulamalar dizinine kopyalayıp yeniden başlatınız.";
 
 /* de_DE v0.1 - No comment provided by engineer. */
 

@@ -32,7 +32,7 @@
                     <button verticalHuggingPriority="750" misplaced="YES" tag="1" id="13">
                         <rect key="frame" x="247" y="12" width="177" height="32"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES"/>
-                        <buttonCell key="cell" type="push" title="Provjeravaj automatski" bezelStyle="rounded" alignment="center" state="on" borderStyle="border" tag="1" inset="2" id="176">
+                        <buttonCell key="cell" type="push" title="Provjeri automatski" bezelStyle="rounded" alignment="center" state="on" borderStyle="border" tag="1" inset="2" id="176">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
                             <string key="keyEquivalent" base64-UTF8="YES">
@@ -46,7 +46,7 @@ DQ
                     <textField verticalHuggingPriority="750" misplaced="YES" id="32">
                         <rect key="frame" x="104" y="114" width="289" height="34"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
-                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Provjeravaj nadogradnje automatski?" id="178">
+                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Automatski provjeriti nadogradnje?" id="178">
                             <font key="font" metaFont="systemBold"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -112,7 +112,7 @@ DQ
                     <button verticalHuggingPriority="750" misplaced="YES" id="14">
                         <rect key="frame" x="100" y="12" width="127" height="32"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES"/>
-                        <buttonCell key="cell" type="push" title="Ne provjeravaj" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="177">
+                        <buttonCell key="cell" type="push" title="Nemoj provjeravati" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="177">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
                             <string key="keyEquivalent" base64-UTF8="YES">
@@ -146,9 +146,9 @@ Gw
                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" id="183">
                         <font key="font" metaFont="smallSystem"/>
-                        <string key="title">Anonymous system profile information is used to help us plan future development work. Please contact us if you have any questions about this.
+                        <string key="title">Anonimizirani podaci profila susatava pomažu nam planirati budući razvoj. Kontaktiraj nas, ako imaš pitanja o tome.
 
-This is the information that would be sent:</string>
+Šalju se sljedeći podaci:</string>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>

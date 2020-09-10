@@ -11,7 +11,12 @@
 #import "SUCodeSigningVerifier.h"
 #import "SUFileManager.h"
 
+#if defined(__MAC_10_15)
+// In macOS 10.15 and later, pre-installed apps are installed under the System folder
+#define CALCULATOR_PATH @"/System/Applications/Calculator.app"
+#else
 #define CALCULATOR_PATH @"/Applications/Calculator.app"
+#endif
 
 @interface SUCodeSigningVerifierTest : XCTestCase
 
@@ -167,13 +172,14 @@
     return success;
 }
 
-- (BOOL)codesignAppURL:(NSURL *)appPath
+- (BOOL)codesignAppURL:(NSURL *)appURL
 {
     BOOL success = NO;
     @try
     {
         // ad-hoc signing with the dash
-        NSArray *arguments = @[ @"--force", @"--deep", @"--sign", @"-", appPath ];
+        NSString *appPath = [appURL path];
+        NSArray<NSString *> *arguments = @[ @"--force", @"--deep", @"--sign", @"-", appPath ];
         NSTask *task = [NSTask launchedTaskWithLaunchPath:@"/usr/bin/codesign" arguments:arguments];
         [task waitUntilExit];
         success = (task.terminationStatus == 0);

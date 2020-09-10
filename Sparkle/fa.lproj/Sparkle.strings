@@ -1,0 +1,97 @@
+"%1$@ %2$@ has been downloaded and is ready to use! This is an important update; would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ بارگیری شده و آمادهٔ استفاده است! این به‌روزرسانی مهمی است، آیا اکنون مایل به نصب و بازکردن دوبارهٔ %1$@ هستید؟";
+
+"%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ بارگیری شده و آمادهٔ استفاده است! آیا اکنون مایل به نصب و بازکردن دوبارهٔ %1$@ هستید؟";
+
+"%1$@ can't be updated, because it was opened from a read-only or a temporary location." = "%1$@ نمی‌تواند به‌روزرسانی شود، زیرا از محلی با سطح دسترسی فقط-خواندن یا موقت باز شده است";
+
+"Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "از Finder برای کپی کردن %1$@ به پوشهٔ برنامه استفاده کنید، سپس %1$@ را دوباره باز کرده و مجدداً امتحان کنید.";
+
+"Quit %1$@, move it into your Applications folder, relaunch it from there and try again." = "از %1$@  خارج شوید آن را به پوشهٔ برنامه انتقال دهید سپس آن را دوباره باز کرده و دوباره امتحان کنید.";
+
+"%1$@ can’t be updated if it’s running from the location it was downloaded to." = "%1$@ نمی‌تواند به‌روزرسانی شود، اگر از محلی که در آن بارگیری شده باز شود";
+
+"%@ %@ is currently the newest version available." = "%1$@ %2$@ در حال حاضر جدیدترین نسخهٔ موجود است";
+
+"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%1$@ %2$@ در حال حاضر جدیدترین نسخه است.\n(شما در حال اجرای نسخهٔ %3$@ هستید.)";
+
+/* Description text for SUUpdateAlert when the update is downloadable. */
+"%@ %@ is now available--you have %@. Would you like to download it now?" = "%1$@ %2$@ اکنون در دسترس است-- نسخهٔ شما: %3$@. اکنون می‌خواهید آن را دریافت کنید؟";
+
+/* Description text for SUUpdateAlert when the update informational with no download. */
+"%@ %@ is now available--you have %@. Would you like to learn more about this update on the web?" = "%1$@ %2$@ اکنون در دسترس است-- نسخهٔ شما: %3$@. می‌خواهید در مورد آن بیشتر یاد بگیرید؟";
+
+"%@ downloaded" = "دانلود شده است %@";
+
+"%@ of %@" = "%1$@ از %2$@";
+
+"A new version of %@ is available!" = "نسخه‌ای جدید از %@ در دسترس است";
+
+"A new version of %@ is ready to install!" = "نسخه‌ای جدید از %@ برای نصب آماده است!";
+
+"An error occurred in retrieving update information. Please try again later." = "خطایی هنگام دستیابی به اطلاعات به‌روزرسانی رخ داد. لطفاً دوباره امتحان کنید.";
+
+"An error occurred while downloading the update. Please try again later." = "خطایی در هنگام بارگیری به‌روزرسانی رخ داد. لطفاً دوباره امتحان کنید.";
+
+"An error occurred while extracting the archive. Please try again later." = "خطایی در بازکردن آرشیو رخ داد. لطفاً دوباره امتحان کنید. ";
+
+"An error occurred while installing the update. Please try again later." = "خطایی در هنگام نصب به‌روزرسانی رخ داد. لطفاً دوباره امتحان کنید.";
+
+"An error occurred while parsing the update feed." = "خطایی در بررسی به‌روزرسانی رخ داد";
+
+"An error occurred while relaunching %1$@, but the new version will be available next time you run %1$@." = "خطایی در حین باز کردن دوبارهٔ %1$@ رخ داد، اما نسخهٔ جدید در هنگام اجرای بعدی %1$@ در دسترس خواهد بود.";
+
+"An important update to %@ is ready to install" = "یک به‌روزرسانی مهم آمادهٔ نصب است";
+
+/* the unit for bytes */
+"B" = "بایت";
+
+"Cancel" = "لغو";
+
+"Cancel Update" = "لغو به‌روزرسانی";
+
+"Checking for updates..." = "بررسی وجود به‌روزرسانی";
+
+/* Take care not to overflow the status window. */
+"Downloading update..." = "در حال بارگیری به‌روزرسانی";
+
+/* Take care not to overflow the status window. */
+"Extracting update..." = "در حال بازکردن بستهٔ به‌روزرسانی";
+
+/* the unit for gigabytes */
+"GB" = "گیگابایت";
+
+"Install and Relaunch" = "نصب و بازکردن دوباره";
+
+/* Take care not to overflow the status window. */
+"Installing update..." = "در حال نصب به‌روزرسانی";
+
+/* the unit for kilobytes */
+"KB" = "کیلوبایت";
+
+/* Alternative name for "Install" button if we have a paid update or other update
+	without a download but with a URL. */
+"Learn More..." = "یادگیری بیشتر...";
+
+/* the unit for megabytes */
+"MB" = "مگابایت";
+
+/* OK button. */
+"OK" = "پذیرفتن";
+
+/* Status message on progress window once download has finished. */
+"Ready to Install" = "آماده برای نصب";
+
+/* Message that is optionally shown at startup to allow users to turn on/off update checks. */
+"Should %1$@ automatically check for updates? You can always check for updates manually from the %1$@ menu." = "آیا می‌خواهید بررسی به‌روزرسانی‌ها %1$@  به صورت خودکار انجام شود؟ همیشه می‌توانید به‌روزرسانی‌های %1$@ را به صورت دستی بررسی کنید.";
+
+"The update is improperly signed." = "این به‌روزرسانی به‌درستی امضا نشده است";
+
+"Update Error!" = "خطای به‌روزرسانی!";
+
+"Updating %@" = "%@ در حال به‌روزرسانی";
+
+/* 'Error' message when the user checks for updates but is already current or the feed doesn't contain any updates. (not necessarily shown in UI) */
+"You already have the newest version of %@." = "شما در حال استفاده از جدیدترین نسخهٔ %@ هستید.";
+
+/* Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates. */
+"You're up-to-date!" = "برنامهٔ شما به‌روز است";
