@@ -286,6 +286,8 @@
 		767B61AC1972D488004E0C3C /* SUGuidedPackageInstaller.h in Headers */ = {isa = PBXBuildFile; fileRef = 767B61AA1972D488004E0C3C /* SUGuidedPackageInstaller.h */; };
 		767B61AD1972D488004E0C3C /* SUGuidedPackageInstaller.m in Sources */ = {isa = PBXBuildFile; fileRef = 767B61AB1972D488004E0C3C /* SUGuidedPackageInstaller.m */; };
 		767B61AE1972D488004E0C3C /* SUGuidedPackageInstaller.m in Sources */ = {isa = PBXBuildFile; fileRef = 767B61AB1972D488004E0C3C /* SUGuidedPackageInstaller.m */; };
+		A3AD648C24D283F400058938 /* SUGlobalUpdateLock.m in Sources */ = {isa = PBXBuildFile; fileRef = A3AD648A24D283F400058938 /* SUGlobalUpdateLock.m */; };
+		A3AD648D24D283F400058938 /* SUGlobalUpdateLock.h in Headers */ = {isa = PBXBuildFile; fileRef = A3AD648B24D283F400058938 /* SUGlobalUpdateLock.h */; };
 		A5BF4F1D1BC7668B007A052A /* SUTestWebServer.m in Sources */ = {isa = PBXBuildFile; fileRef = A5BF4F1C1BC7668B007A052A /* SUTestWebServer.m */; };
 		B2D3F865245CEA24009BA78C /* URL+Hashing.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2D3F864245CEA24009BA78C /* URL+Hashing.swift */; };
 		C23E885B1BE7B24F0050BB73 /* SparkleTestCodeSignApp.enc.dmg in Resources */ = {isa = PBXBuildFile; fileRef = C23E88591BE7AF890050BB73 /* SparkleTestCodeSignApp.enc.dmg */; };
@@ -962,6 +964,8 @@
 		767B61AB1972D488004E0C3C /* SUGuidedPackageInstaller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUGuidedPackageInstaller.m; sourceTree = "<group>"; };
 		8DC2EF5A0486A6940098B216 /* Sparkle-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Sparkle-Info.plist"; sourceTree = "<group>"; };
 		8DC2EF5B0486A6940098B216 /* Sparkle.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Sparkle.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		A3AD648A24D283F400058938 /* SUGlobalUpdateLock.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUGlobalUpdateLock.m; sourceTree = "<group>"; };
+		A3AD648B24D283F400058938 /* SUGlobalUpdateLock.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUGlobalUpdateLock.h; sourceTree = "<group>"; };
 		A5BF4F1B1BC7668B007A052A /* SUTestWebServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUTestWebServer.h; sourceTree = "<group>"; };
 		A5BF4F1C1BC7668B007A052A /* SUTestWebServer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUTestWebServer.m; sourceTree = "<group>"; };
 		B2D3F864245CEA24009BA78C /* URL+Hashing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URL+Hashing.swift"; sourceTree = "<group>"; };
@@ -1553,6 +1557,8 @@
 				61299A2E09CA2DAB00B7442F /* SUSignatureVerifier.m */,
 				729924711DF3478A00DBCDF5 /* SUUpdateValidator.h */,
 				729924721DF3478A00DBCDF5 /* SUUpdateValidator.m */,
+				A3AD648B24D283F400058938 /* SUGlobalUpdateLock.h */,
+				A3AD648A24D283F400058938 /* SUGlobalUpdateLock.m */,
 			);
 			name = Support;
 			sourceTree = "<group>";
@@ -1670,6 +1676,7 @@
 				611142E910FB1BE5009810AA /* bspatch.h in Headers */,
 				5AB8F185214D564C00A1187F /* ed25519.h in Headers */,
 				5AB8F184214D564C00A1187F /* fe.h in Headers */,
+				A3AD648D24D283F400058938 /* SUGlobalUpdateLock.h in Headers */,
 				5AB8F18A214D564C00A1187F /* fixedint.h in Headers */,
 				5AB8F18B214D564C00A1187F /* ge.h in Headers */,
 				5AB8F187214D564C00A1187F /* precomp_data.h in Headers */,
@@ -2450,6 +2457,7 @@
 				6196CFFA09C72149000DC222 /* SUStatusController.m in Sources */,
 				61A2279D0D1CEE7600430CCD /* SUSystemProfiler.m in Sources */,
 				72316BE41E0E1C7F0039EFD9 /* SUSystemUpdateInfo.m in Sources */,
+				A3AD648C24D283F400058938 /* SUGlobalUpdateLock.m in Sources */,
 				E1545EC61E1D7E0200FAECE8 /* SUTouchBarButtonGroup.m in Sources */,
 				61B93A3D0DD02D7000DCD2F8 /* SUUIBasedUpdateDriver.m in Sources */,
 				61299A8E09CA790200B7442F /* SUUnarchiver.m in Sources */,
