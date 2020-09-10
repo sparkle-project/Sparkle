@@ -63,7 +63,8 @@ class ArchiveItem: CustomStringConvertible {
         } else {
             self.publicEdKey = nil
         }
-        self.archiveFileAttributes = try FileManager.default.attributesOfItem(atPath: self.archivePath.path)
+        let path = (self.archivePath.path as NSString).resolvingSymlinksInPath
+        self.archiveFileAttributes = try FileManager.default.attributesOfItem(atPath: path)
         self.deltas = []
     }
 
