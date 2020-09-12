@@ -94,4 +94,4 @@
 "You already have the newest version of %@." = "You already have the newest version of %@.";
 
 /* Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates. */
-"You're up-to-date!" = "You’re up-to-date!";
+"You're up-to-date!" = "You’re up to date!";
