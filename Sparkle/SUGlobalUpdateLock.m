@@ -59,7 +59,7 @@
 
 - (NSString *)fileLockPath
 {
-    return [NSString stringWithFormat:@"/private/var/tmp/%@.Sparkle.pid",  [self identifier]];
+    return [NSString stringWithFormat:@"/private/tmp/%@.Sparkle.pid",  [self identifier]];
 }
 
 @end
