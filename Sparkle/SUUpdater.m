@@ -27,6 +27,7 @@
 #import "SUSystemUpdateInfo.h"
 #import "SUSignatures.h"
 #import "SUOperatingSystem.h"
+#import "SUGlobalUpdateLock.h"
 
 NSString *const SUUpdaterDidFinishLoadingAppCastNotification = @"SUUpdaterDidFinishLoadingAppCastNotification";
 NSString *const SUUpdaterDidFindValidUpdateNotification = @"SUUpdaterDidFindValidUpdateNotification";
@@ -222,6 +223,8 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
         [self.host setBool:NO forUserDefaultsKey:SUUpdateRelaunchingMarkerKey];
     }
 
+    [[SUGlobalUpdateLock sharedLock] unlock];  // For safety, remove active lock if present in any case and not just when relaunching from an app update
+    
     if (shouldPrompt) {
         NSArray<NSDictionary<NSString *, NSString *> *> *profileInfo = [SUSystemProfiler systemProfileArrayForHost:self.host];
         // Always say we're sending the system profile here so that the delegate displays the parameters it would send.

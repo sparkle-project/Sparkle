@@ -208,7 +208,7 @@
     if (progress) {
         progress(9/10.0);
     }
-    
+
     // Try to preserve Finder tags. Failure can be accepted without complaint as previous Sparkle versions did not do this at all
     if (SUAVAILABLE(10, 9)) {
         NSArray *resourceTags;
