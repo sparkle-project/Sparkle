@@ -74,7 +74,8 @@ class SUAppcastTest: XCTestCase {
         XCTAssertNotNil(testFileUrl)
 
          do {
-            let items = try appcast.parseAppcastItems(fromXMLFile: testFileUrl) as! [SUAppcastItem];
+            let testFileData = try Data(contentsOf: testFileUrl)
+            let items = try appcast.parseAppcastItems(fromXMLData: testFileData, relativeTo: testFileUrl) as! [SUAppcastItem];
             XCTAssertEqual("https://sparkle-project.org/#localized_notes_link_works", items[0].releaseNotesURL.absoluteString)
         } catch let err as NSError {
             NSLog("%@", err)
