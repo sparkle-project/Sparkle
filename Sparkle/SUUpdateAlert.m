@@ -271,8 +271,6 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
         self.laterButton.enabled = NO;
         self.laterButton.hidden = YES;
     }
-    // GS added
-    self.window.movableByWindowBackground = YES;
     [self.window center];
 }
 
