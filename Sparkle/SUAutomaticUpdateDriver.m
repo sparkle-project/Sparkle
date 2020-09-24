@@ -179,8 +179,8 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 - (void)automaticUpdateAlertFinishedWithChoice:(SUAutomaticInstallationChoice)choice
 {
     self.alert = nil;
-	switch (choice)
-	{
+    switch (choice)
+    {
         case SUInstallNowChoice:
             [self stopUpdatingOnTermination];
             [self installWithToolAndRelaunch:YES];

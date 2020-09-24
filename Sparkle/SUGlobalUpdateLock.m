@@ -39,7 +39,7 @@
     NSString *fileLockPath = [self fileLockPath];
     
     if ([fileManager fileExistsAtPath:fileLockPath]) {
-	    NSError *error = nil;
+        NSError *error = nil;
         [fileManager removeItemAtPath:fileLockPath error:&error];
         if (error != nil) {
             SULog(SULogLevelError, @"Couldn't remove lockfile at: %@ [%@]", fileLockPath, [error localizedDescription]);

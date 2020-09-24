@@ -64,8 +64,8 @@
 - (void)checkForUpdatesAtURL:(NSURL *)URL host:(SUHost *)aHost
 {
     [super checkForUpdatesAtURL:URL host:aHost];
-	if ([aHost isRunningOnReadOnlyVolume])
-	{
+    if ([aHost isRunningOnReadOnlyVolume])
+    {
         NSString *hostName = [aHost name];
         if ([aHost isRunningTranslocated])
         {
@@ -149,7 +149,7 @@
 - (BOOL)hostSupportsItem:(SUAppcastItem *)ui
 {
     BOOL osOK = [ui isMacOsUpdate];
-	if (([ui minimumSystemVersion] == nil || [[ui minimumSystemVersion] isEqualToString:@""]) &&
+    if (([ui minimumSystemVersion] == nil || [[ui minimumSystemVersion] isEqualToString:@""]) &&
         ([ui maximumSystemVersion] == nil || [[ui maximumSystemVersion] isEqualToString:@""])) {
         return osOK;
     }
@@ -178,7 +178,7 @@
 - (BOOL)itemContainsSkippedVersion:(SUAppcastItem *)ui
 {
     NSString *skippedVersion = [self.host objectForUserDefaultsKey:SUSkippedVersionKey];
-	if (skippedVersion == nil) { return NO; }
+    if (skippedVersion == nil) { return NO; }
     return [[self versionComparator] compareVersion:[ui versionString] toVersion:skippedVersion] != NSOrderedDescending;
 }
 

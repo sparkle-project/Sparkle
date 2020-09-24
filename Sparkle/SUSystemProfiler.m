@@ -62,9 +62,9 @@ static NSString *const SUSystemProfilerPreferredLanguageKey = @"lang";
         NSString *visibleCPUType;
         switch (value) {
             case CPU_TYPE_ARM:      visibleCPUType = @"ARM";        break;
-			case CPU_TYPE_X86:		visibleCPUType = @"Intel";		break;
-			case CPU_TYPE_POWERPC:	visibleCPUType = @"PowerPC";	break;
-			default:				visibleCPUType = @"Unknown";	break;
+            case CPU_TYPE_X86:      visibleCPUType = @"Intel";      break;
+            case CPU_TYPE_POWERPC:  visibleCPUType = @"PowerPC";    break;
+            default:                visibleCPUType = @"Unknown";    break;
         }
         [profileArray addObject:[NSDictionary dictionaryWithObjects:@[SUSystemProfilerCPUTypeKey, @"CPU Type", @(value), visibleCPUType] forKeys:profileDictKeys]];
     }
@@ -92,10 +92,10 @@ static NSString *const SUSystemProfilerPreferredLanguageKey = @"lang";
         } else if (cpuType == 18) {
             // PowerPC
             switch (value) {
-				case 9:					visibleCPUSubType=@"G3";	break;
-				case 10:	case 11:	visibleCPUSubType=@"G4";	break;
-				case 100:				visibleCPUSubType=@"G5";	break;
-				default:				visibleCPUSubType=@"Other";	break;
+                case 9:                 visibleCPUSubType=@"G3";    break;
+                case 10:    case 11:    visibleCPUSubType=@"G4";    break;
+                case 100:               visibleCPUSubType=@"G5";    break;
+                default:                visibleCPUSubType=@"Other"; break;
             }
         } else {
             visibleCPUSubType = @"Other";

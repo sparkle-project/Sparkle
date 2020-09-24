@@ -37,8 +37,8 @@ static NSString *const SUStatusControllerTouchBarIndentifier = @"" SPARKLE_BUNDL
 - (instancetype)initWithHost:(SUHost *)aHost
 {
     self = [super initWithWindowNibName:@"SUStatus"];
-	if (self)
-	{
+    if (self)
+    {
         self.host = aHost;
         [self setShouldCascadeWindows:NO];
     }
@@ -125,7 +125,7 @@ static NSString *const SUStatusControllerTouchBarIndentifier = @"" SPARKLE_BUNDL
 
 - (void)setMaxProgressValue:(double)value
 {
-	if (value < 0.0) value = 0.0;
+    if (value < 0.0) value = 0.0;
     maxProgressValue = value;
     [self setProgressValue:0.0];
     [self.progressBar setIndeterminate:(value == 0.0)];

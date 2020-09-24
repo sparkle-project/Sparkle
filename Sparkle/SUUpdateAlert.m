@@ -7,7 +7,7 @@
 //
 
 // -----------------------------------------------------------------------------
-//	Headers:
+// Headers:
 // -----------------------------------------------------------------------------
 
 #import "SUUpdateAlert.h"
@@ -81,8 +81,8 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 - (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost completionBlock:(void (^)(SUUpdateAlertChoice))block
 {
     self = [super initWithWindowNibName:@"SUUpdateAlert"];
-	if (self)
-	{
+    if (self)
+    {
         self.completionBlock = block;
         host = aHost;
         updateItem = item;
@@ -195,12 +195,12 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
     [[self.releaseNotesView superview] addSubview:self.releaseNotesSpinner];
 
     // If there's a release notes URL, load it; otherwise, just stick the contents of the description into the web view.
-	if ([self.updateItem releaseNotesURL])
-	{
+    if ([self.updateItem releaseNotesURL])
+    {
         [[self.releaseNotesView mainFrame] loadRequest:[NSURLRequest requestWithURL:[self.updateItem releaseNotesURL] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30]];
-	}
-	else
-	{
+    }
+    else
+    {
         [[self.releaseNotesView mainFrame] loadHTMLString:[self.updateItem itemDescription] baseURL:nil];
     }
 }
@@ -208,14 +208,14 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 - (BOOL)showsReleaseNotes
 {
     NSNumber *shouldShowReleaseNotes = [self.host objectForInfoDictionaryKey:SUShowReleaseNotesKey];
-	if (shouldShowReleaseNotes == nil)
-	{
+    if (shouldShowReleaseNotes == nil)
+    {
         // Don't show release notes if RSS item contains no description and no release notes URL:
         return (([self.updateItem itemDescription] != nil
                  && [[[self.updateItem itemDescription] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] length] > 0)
                 || [self.updateItem releaseNotesURL] != nil);
-	}
-	else
+    }
+    else
         return [shouldShowReleaseNotes boolValue];
 }
 
@@ -271,7 +271,8 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
         self.laterButton.enabled = NO;
         self.laterButton.hidden = YES;
     }
-    
+    // GS added
+    self.window.movableByWindowBackground = YES;
     [self.window center];
 }
 
@@ -287,8 +288,8 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 
 - (BOOL)windowShouldClose:(NSNotification *) __unused note
 {
-	[self endWithSelection:SURemindMeLaterChoice];
-	return YES;
+    [self endWithSelection:SURemindMeLaterChoice];
+    return YES;
 }
 
 - (NSImage *)applicationIcon
@@ -379,14 +380,14 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 {
     NSMutableArray<NSMenuItem *> *webViewMenuItems = [defaultMenuItems mutableCopy];
 
-	if (webViewMenuItems)
-	{
-		for (NSMenuItem *menuItem in defaultMenuItems)
-		{
+    if (webViewMenuItems)
+    {
+        for (NSMenuItem *menuItem in defaultMenuItems)
+        {
             NSInteger tag = [menuItem tag];
 
-			switch (tag)
-			{
+            switch (tag)
+            {
                 case WebMenuItemTagOpenLinkInNewWindow:
                 case WebMenuItemTagDownloadLinkToDisk:
                 case WebMenuItemTagOpenImageInNewWindow:

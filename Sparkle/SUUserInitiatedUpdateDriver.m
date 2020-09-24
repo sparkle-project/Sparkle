@@ -33,8 +33,8 @@
         });
         return;
     }
-	if (self.checkingController)
-	{
+    if (self.checkingController)
+    {
         [[self.checkingController window] close];
         self.checkingController = nil;
     }
@@ -57,16 +57,16 @@
 
     // For background applications, obtain focus.
     // Useful if the update check is requested from another app like System Preferences.
-	if ([SUApplicationInfo isBackgroundApplication:[NSApplication sharedApplication]])
-	{
+    if ([SUApplicationInfo isBackgroundApplication:[NSApplication sharedApplication]])
+    {
         [NSApp activateIgnoringOtherApps:YES];
     }
 }
 
 - (void)appcastDidFinishLoading:(SUAppcast *)ac
 {
-	if (self.isCanceled)
-	{
+    if (self.isCanceled)
+    {
         [self abortUpdate];
         return;
     }

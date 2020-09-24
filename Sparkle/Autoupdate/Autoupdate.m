@@ -89,14 +89,14 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
             SULog(SULogLevelError, @"Failed to listen for application termination");
             // Continue on with the installation anyway?
         }
-		
+
         if (self.shouldShowUI) {
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(SUInstallationTimeLimit * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-				if (!self.isTerminating) {
-					// Show app icon in the dock
-					ProcessSerialNumber psn = { 0, kCurrentProcess };
-					TransformProcessType(&psn, kProcessTransformToForegroundApplication);
-				}
+                if (!self.isTerminating) {
+                    // Show app icon in the dock
+                    ProcessSerialNumber psn = { 0, kCurrentProcess };
+                    TransformProcessType(&psn, kProcessTransformToForegroundApplication);
+                }
             });
         }
         

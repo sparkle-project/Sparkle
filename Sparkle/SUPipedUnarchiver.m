@@ -92,7 +92,7 @@
 - (void)extractArchivePipingDataToCommand:(NSString *)command arguments:(NSArray*)args notifier:(SUUnarchiverNotifier *)notifier
 {
     // *** GETS CALLED ON NON-MAIN THREAD!!!
-	@autoreleasepool {
+    @autoreleasepool {
         NSError *error = nil;
         NSString *destination = [self.archivePath stringByDeletingLastPathComponent];
         

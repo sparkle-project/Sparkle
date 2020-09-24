@@ -139,7 +139,7 @@
         }
 
         // Need an info URL or an enclosure URL. Former to show "More Info"
-        //	page, latter to download & install:
+        // page, latter to download & install:
         if (!enclosure && !theInfoURL) {
             if (error) {
                 *error = @"No enclosure in feed item";

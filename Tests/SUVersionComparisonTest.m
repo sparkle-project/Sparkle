@@ -79,11 +79,11 @@
 {
     // SUStandardVersionComparator *comparator = [[SUStandardVersionComparator alloc] init];
     
-    //	SUAssertAscending(comparator, @"1.0 beta", @"1.0");
-    //	SUAssertAscending(comparator, @"1.0  - beta", @"1.0");
-    //	SUAssertAscending(comparator, @"1.0 alpha", @"1.0 beta");
-    //	SUAssertEqual(comparator, @"1.0  - beta", @"1.0beta");
-    //	SUAssertEqual(comparator, @"1.0  - beta", @"1.0 beta");
+    // SUAssertAscending(comparator, @"1.0 beta", @"1.0");
+    // SUAssertAscending(comparator, @"1.0  - beta", @"1.0");
+    // SUAssertAscending(comparator, @"1.0 alpha", @"1.0 beta");
+    // SUAssertEqual(comparator, @"1.0  - beta", @"1.0beta");
+    // SUAssertEqual(comparator, @"1.0  - beta", @"1.0 beta");
 }
 
 - (void)testVersionsWithReverseDateBasedNumbers
