@@ -41,8 +41,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithBundle:(NSBundle *)aBundle
 {
-	if ((self = [super init]))
-	{
+    if ((self = [super init]))
+    {
         NSParameterAssert(aBundle);
         self.bundle = aBundle;
         if (![self.bundle bundleIdentifier]) {
@@ -80,10 +80,10 @@ NS_ASSUME_NONNULL_BEGIN
     if (name && name.length > 0) return name;
 
     name = [self objectForInfoDictionaryKey:@"CFBundleDisplayName"];
-	if (name && name.length > 0) return name;
+    if (name && name.length > 0) return name;
 
     name = [self objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleNameKey];
-	if (name && name.length > 0) return name;
+    if (name && name.length > 0) return name;
 
     return [[[NSFileManager defaultManager] displayNameAtPath:[self bundlePath]] stringByDeletingPathExtension];
 }
@@ -128,13 +128,13 @@ NS_ASSUME_NONNULL_BEGIN
 {
     // Maybe the key is just a string in the Info.plist.
     NSString *key = [self objectForInfoDictionaryKey:SUPublicDSAKeyKey];
-	if (key) {
+    if (key) {
         return key;
     }
 
     // More likely, we've got a reference to a Resources file by filename:
     NSString *keyFilename = [self publicDSAKeyFileKey];
-	if (!keyFilename) {
+    if (!keyFilename) {
         return nil;
     }
 
@@ -204,12 +204,12 @@ NS_ASSUME_NONNULL_BEGIN
 // Note this handles nil being passed for defaultName, in which case the user default will be removed
 - (void)setObject:(nullable id)value forUserDefaultsKey:(NSString *)defaultName
 {
-	if (self.usesStandardUserDefaults)
-	{
+    if (self.usesStandardUserDefaults)
+    {
         [[NSUserDefaults standardUserDefaults] setObject:value forKey:defaultName];
-	}
-	else
-	{
+    }
+    else
+    {
         CFPreferencesSetValue((__bridge CFStringRef)defaultName, (__bridge CFPropertyListRef)(value), (__bridge CFStringRef)self.defaultsDomain, kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
         CFPreferencesSynchronize((__bridge CFStringRef)self.defaultsDomain, kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
     }
@@ -225,9 +225,9 @@ NS_ASSUME_NONNULL_BEGIN
     CFPropertyListRef plr = CFPreferencesCopyAppValue((__bridge CFStringRef)defaultName, (__bridge CFStringRef)self.defaultsDomain);
     if (plr == NULL) {
         value = NO;
-	}
-	else
-	{
+    }
+    else
+    {
         value = CFBooleanGetValue((CFBooleanRef)plr) ? YES : NO;
         CFRelease(plr);
     }
@@ -236,12 +236,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)setBool:(BOOL)value forUserDefaultsKey:(NSString *)defaultName
 {
-	if (self.usesStandardUserDefaults)
-	{
+    if (self.usesStandardUserDefaults)
+    {
         [[NSUserDefaults standardUserDefaults] setBool:value forKey:defaultName];
-	}
-	else
-	{
+    }
+    else
+    {
         CFPreferencesSetValue((__bridge CFStringRef)defaultName, (__bridge CFBooleanRef) @(value), (__bridge CFStringRef)self.defaultsDomain, kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
         CFPreferencesSynchronize((__bridge CFStringRef)self.defaultsDomain, kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
     }

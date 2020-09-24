@@ -138,7 +138,7 @@
             alert.informativeText = SULocalizedString(@"No valid update information could be loaded.", nil);
             [alert addButtonWithTitle:SULocalizedString(@"Cancel Update", nil)];
         }
-	    
+
         [self showAlert:alert];
     }
     
@@ -373,8 +373,8 @@
 
 - (void)abortUpdate
 {
-	if (self.statusController)
-	{
+    if (self.statusController)
+    {
         [self.statusController close];
         self.statusController = nil;
     }

@@ -159,13 +159,13 @@
     __block CFErrorRef error = NULL;
 
     BOOL (^cleanup)(void) = ^{
-		if (group) CFRelease(group);
-		if (dataReadTransform) CFRelease(dataReadTransform);
-		if (dataDigestTransform) CFRelease(dataDigestTransform);
-		if (dataVerifyTransform) CFRelease(dataVerifyTransform);
-		if (error) CFRelease(error);
+        if (group) CFRelease(group);
+        if (dataReadTransform) CFRelease(dataReadTransform);
+        if (dataDigestTransform) CFRelease(dataDigestTransform);
+        if (dataVerifyTransform) CFRelease(dataVerifyTransform);
+        if (error) CFRelease(error);
         if (dsaPubKeySecKey) CFRelease(dsaPubKeySecKey);
-		return NO;
+        return NO;
     };
 
     dataReadTransform = SecTransformCreateReadTransformWithReadStream((__bridge CFReadStreamRef)stream);

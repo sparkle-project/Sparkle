@@ -41,7 +41,7 @@ typedef NS_ENUM(uint8_t, SUFileOpError)
 
 int main(int argc, const char *argv[])
 {
-	@autoreleasepool {
+    @autoreleasepool {
         // Before we do anything, we should let the parent know our pid so they can wait() on us
         // We do this because AuthorizationExecuteWithPrivileges() has no way of reporting back the child pid,
         // but it does give us a communication pipe
@@ -152,5 +152,5 @@ int main(int argc, const char *argv[])
         }
         
         return EXIT_SUCCESS;
-	}
+    }
 }

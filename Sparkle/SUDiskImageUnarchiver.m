@@ -56,7 +56,7 @@
 // Called on a non-main thread.
 - (void)extractDMGWithNotifier:(SUUnarchiverNotifier *)notifier
 {
-	@autoreleasepool {
+    @autoreleasepool {
         BOOL mountedSuccessfully = NO;
         
         // get a unique mount point path
@@ -65,7 +65,7 @@
         NSError *error;
         NSArray *contents;
         do
-		{
+        {
             // Using NSUUID would make creating UUIDs be done in Cocoa,
             // and thus managed under ARC. Sadly, the class is in 10.8 and later.
             CFUUIDRef uuid = CFUUIDCreate(NULL);
@@ -135,8 +135,8 @@
         
         [notifier notifyProgress:0.5];
 
-		if (taskResult != 0)
-		{
+        if (taskResult != 0)
+        {
             NSString *resultStr = output ? [[NSString alloc] initWithData:output encoding:NSUTF8StringEncoding] : nil;
             SULog(SULogLevelError, @"hdiutil failed with code: %ld data: <<%@>>", (long)taskResult, resultStr);
             goto reportError;
@@ -155,8 +155,8 @@
         double itemsCopied = 0;
         double totalItems = [contents count];
 
-		for (NSString *item in contents)
-		{
+        for (NSString *item in contents)
+        {
             NSString *fromPath = [mountPoint stringByAppendingPathComponent:item];
             NSString *toPath = [[self.archivePath stringByDeletingLastPathComponent] stringByAppendingPathComponent:item];
             
@@ -169,8 +169,8 @@
             [notifier notifyProgress:0.5 + itemsCopied/(totalItems*2.0)];
             SULog(SULogLevelDefault, @"copyItemAtPath:%@ toPath:%@", fromPath, toPath);
 
-			if (![manager copyItemAtPath:fromPath toPath:toPath error:&error])
-			{
+            if (![manager copyItemAtPath:fromPath toPath:toPath error:&error])
+            {
                 goto reportError;
             }
         }

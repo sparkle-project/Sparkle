@@ -9,7 +9,7 @@ if [ -z "$SRCROOT" ] || \
    [ -z "$BUILT_PRODUCTS_DIR" ] || \
    [ -z "$INFOPLIST_PATH" ] || \
    [ -z "$CURRENT_PROJECT_VERSION" ]; then
-	echo "$0: Must be run from Xcode!" 1>&2
+    echo "$0: Must be run from Xcode!" 1>&2
     exit 1
 fi
 
