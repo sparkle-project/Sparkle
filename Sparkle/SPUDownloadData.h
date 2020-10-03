@@ -12,7 +12,7 @@
 #import <Foundation/Foundation.h>
 #endif
 
-#import <Sparkle/SUExport.h>
+#import "SUExport.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

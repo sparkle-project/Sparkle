@@ -11,7 +11,7 @@
 #else
 #import <Foundation/Foundation.h>
 #endif
-#import <Sparkle/SPUDownloaderProtocol.h>
+#import "SPUDownloaderProtocol.h"
 
 @protocol SPUDownloaderDelegate;
 
