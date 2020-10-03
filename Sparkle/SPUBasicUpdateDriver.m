@@ -8,8 +8,8 @@
 
 #import "SPUBasicUpdateDriver.h"
 #import "SUAppcastDriver.h"
-#import <Sparkle/SPUUpdaterDelegate.h>
-#import <Sparkle/SUErrors.h>
+#import "SPUUpdaterDelegate.h"
+#import "SUErrors.h"
 #import "SULog.h"
 #import "SULocalizations.h"
 #import "SUHost.h"

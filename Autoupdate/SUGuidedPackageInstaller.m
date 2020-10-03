@@ -8,7 +8,7 @@
 
 #import <sys/stat.h>
 #import "SUGuidedPackageInstaller.h"
-#import <Sparkle/SUErrors.h>
+#import "SUErrors.h"
 
 
 #include "AppKitPrevention.h"

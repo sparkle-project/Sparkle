@@ -21,7 +21,7 @@
 #import "SUFileManager.h"
 #import "SPUInstallationInfo.h"
 #import "SUAppcastItem.h"
-#import <Sparkle/SUErrors.h>
+#import "SUErrors.h"
 #import "SUInstallerCommunicationProtocol.h"
 #import "AgentConnection.h"
 #import "SPUInstallerAgentProtocol.h"

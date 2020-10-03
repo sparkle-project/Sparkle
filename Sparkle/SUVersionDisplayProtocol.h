@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <Sparkle/SUExport.h>
+#import "SUExport.h"
 
 /*!
     Applies special display formatting to version numbers.

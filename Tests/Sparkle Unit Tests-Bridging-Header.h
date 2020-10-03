@@ -8,12 +8,12 @@
 #import "SUPipedUnarchiver.h"
 #import "SUBinaryDeltaCommon.h"
 #import "SUFileManager.h"
-#import <Sparkle/SUExport.h>
+#import "SUExport.h"
 #import "SUAppcast.h"
-#import <Sparkle/SUAppcastItem.h>
+#import "SUAppcastItem.h"
 #import "SUAppcastDriver.h"
-#import <Sparkle/SUVersionComparisonProtocol.h>
-#import <Sparkle/SUStandardVersionComparator.h>
+#import "SUVersionComparisonProtocol.h"
+#import "SUStandardVersionComparator.h"
 #import "SUUpdateValidator.h"
 #import "SUHost.h"
 #import "SUSignatures.h"

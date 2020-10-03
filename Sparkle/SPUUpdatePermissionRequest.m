@@ -6,7 +6,7 @@
 //  Copyright © 2016 Sparkle Project. All rights reserved.
 //
 
-#import <Sparkle/SPUUpdatePermissionRequest.h>
+#import "SPUUpdatePermissionRequest.h"
 
 
 #include "AppKitPrevention.h"

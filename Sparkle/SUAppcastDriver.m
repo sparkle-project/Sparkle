@@ -7,12 +7,12 @@
 //
 
 #import "SUAppcastDriver.h"
-#import <Sparkle/SUAppcast.h>
+#import "SUAppcast.h"
 #import "SUAppcastItem.h"
-#import <Sparkle/SUVersionComparisonProtocol.h>
+#import "SUVersionComparisonProtocol.h"
 #import "SUStandardVersionComparator.h"
 #import "SUOperatingSystem.h"
-#import <Sparkle/SPUUpdaterDelegate.h>
+#import "SPUUpdaterDelegate.h"
 #import "SUHost.h"
 #import "SUConstants.h"
 
