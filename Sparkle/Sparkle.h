@@ -12,22 +12,28 @@
 // This list should include the shared headers. It doesn't matter if some of them aren't shared (unless
 // there are name-space collisions) so we can list all of them to start with:
 
-#import <Sparkle/SUAppcast.h>
-#import <Sparkle/SUAppcastItem.h>
-#import <Sparkle/SUStandardVersionComparator.h>
-#import <Sparkle/SUUpdater.h>
-#import <Sparkle/SUUpdaterDelegate.h>
-#import <Sparkle/SUVersionComparisonProtocol.h>
-#import <Sparkle/SUVersionDisplayProtocol.h>
-#import <Sparkle/SUErrors.h>
+#pragma clang diagnostic push
+// Do not use <> style includes since 2.x has two frameworks that need to work: Sparkle and SparkleCore
+#pragma clang diagnostic ignored "-Wquoted-include-in-framework-header"
 
-#import <Sparkle/SPUDownloader.h>
-#import <Sparkle/SPUDownloaderDelegate.h>
-#import <Sparkle/SPUDownloaderDeprecated.h>
-#import <Sparkle/SPUDownloadData.h>
-#import <Sparkle/SPUDownloaderProtocol.h>
-#import <Sparkle/SPUDownloaderSession.h>
-#import <Sparkle/SPUURLRequest.h>
-#import <Sparkle/SUCodeSigningVerifier.h>
+#import "SUAppcast.h"
+#import "SUAppcastItem.h"
+#import "SUStandardVersionComparator.h"
+#import "SUUpdater.h"
+#import "SUUpdaterDelegate.h"
+#import "SUVersionComparisonProtocol.h"
+#import "SUVersionDisplayProtocol.h"
+#import "SUErrors.h"
+
+#import "SPUDownloader.h"
+#import "SPUDownloaderDelegate.h"
+#import "SPUDownloaderDeprecated.h"
+#import "SPUDownloadData.h"
+#import "SPUDownloaderProtocol.h"
+#import "SPUDownloaderSession.h"
+#import "SPUURLRequest.h"
+#import "SUCodeSigningVerifier.h"
+
+#pragma clang diagnostic pop
 
 #endif

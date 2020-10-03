@@ -12,7 +12,7 @@
 #import <Foundation/Foundation.h>
 #endif
 
-#import <Sparkle/SUExport.h>
+#import "SUExport.h"
 
 @protocol SUVersionComparison, SUVersionDisplay;
 @class SUUpdater, SUAppcast, SUAppcastItem;

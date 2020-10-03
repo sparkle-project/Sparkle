@@ -11,7 +11,7 @@
 #else
 #import <Foundation/Foundation.h>
 #endif
-#import <Sparkle/SUExport.h>
+#import "SUExport.h"
 
 /*!
     Applies special display formatting to version numbers.
