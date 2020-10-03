@@ -6,11 +6,11 @@
 //  Copyright 2006 Andy Matuschak. All rights reserved.
 //
 
-#import <Sparkle/SUUpdater.h>
-#import <Sparkle/SPUUpdater.h>
-#import <Sparkle/SPUStandardUserDriver.h>
-#import <Sparkle/SPUStandardUserDriverDelegate.h>
-#import <Sparkle/SPUUpdaterDelegate.h>
+#import "SUUpdater.h"
+#import "SPUUpdater.h"
+#import "SPUStandardUserDriver.h"
+#import "SPUStandardUserDriverDelegate.h"
+#import "SPUUpdaterDelegate.h"
 #import "SULog.h"
 
 @interface SUUpdater () <SPUUpdaterDelegate, SPUStandardUserDriverDelegate>

@@ -6,11 +6,11 @@
 //  Copyright © 2016 Sparkle Project. All rights reserved.
 //
 
-#import <Sparkle/SPUStandardUserDriver.h>
-#import <Sparkle/SPUUserDriverCoreComponent.h>
-#import <Sparkle/SPUStandardUserDriverDelegate.h>
+#import "SPUStandardUserDriver.h"
+#import "SPUUserDriverCoreComponent.h"
+#import "SPUStandardUserDriverDelegate.h"
 #import "SUAppcastItem.h"
-#import <Sparkle/SUVersionDisplayProtocol.h>
+#import "SUVersionDisplayProtocol.h"
 #import "SUHost.h"
 #import "SUUpdatePermissionPrompt.h"
 #import "SUStatusController.h"

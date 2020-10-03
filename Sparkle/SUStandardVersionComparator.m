@@ -6,8 +6,8 @@
 //  Copyright 2007 Andy Matuschak. All rights reserved.
 //
 
-#import <Sparkle/SUVersionComparisonProtocol.h>
-#import <Sparkle/SUStandardVersionComparator.h>
+#import "SUVersionComparisonProtocol.h"
+#import "SUStandardVersionComparator.h"
 
 
 #include "AppKitPrevention.h"

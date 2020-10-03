@@ -6,7 +6,7 @@
 //  Copyright © 2016 Sparkle Project. All rights reserved.
 //
 
-#import <Sparkle/SPUDownloadData.h>
+#import "SPUDownloadData.h"
 
 
 #include "AppKitPrevention.h"
