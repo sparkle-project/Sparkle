@@ -62,7 +62,7 @@ CLANG_WARN_OBJC_IMPLICIT_ATOMIC_PROPERTIES = YES
 CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES
 CLANG_WARN_OBJC_MISSING_PROPERTY_SYNTHESIS = YES
 CLANG_WARN_OBJC_REPEATED_USE_OF_WEAK = YES
-CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES
+CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = NO
 CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION = YES
 CLANG_WARN_UNREACHABLE_CODE = YES
 GCC_TREAT_IMPLICIT_FUNCTION_DECLARATIONS_AS_ERRORS = YES
@@ -93,4 +93,4 @@ GCC_WARN_UNUSED_VARIABLE = YES
 WARNING_CFLAGS_EXTRA = -Wno-custom-atomic-properties -Wno-implicit-atomic-properties
 
 // Turn on all warnings, then disable a few which are almost impossible to avoid
-WARNING_CFLAGS = -Wall -Weverything -Wno-unused-macros -Wno-gnu-statement-expression -Wno-arc-repeated-use-of-weak -Wno-auto-import -Wno-gnu-zero-variadic-macro-arguments -Wno-format-non-iso -Wno-quoted-include-in-framework-header $(WARNING_CFLAGS_EXTRA)
+WARNING_CFLAGS = -Wall -Weverything -Wno-unused-macros -Wno-gnu-statement-expression -Wno-arc-repeated-use-of-weak -Wno-auto-import -Wno-gnu-zero-variadic-macro-arguments -Wno-format-non-iso $(WARNING_CFLAGS_EXTRA)
