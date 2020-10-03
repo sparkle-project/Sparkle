@@ -6,12 +6,12 @@
 //  Copyright 2006 Andy Matuschak. All rights reserved.
 //
 
-#import <Sparkle/SPUUpdater.h>
+#import "SPUUpdater.h"
 #import "SPUUpdaterDelegate.h"
 #import "SPUUpdaterSettings.h"
 #import "SUHost.h"
-#import <Sparkle/SPUUpdatePermissionRequest.h>
-#import <Sparkle/SUUpdatePermissionResponse.h>
+#import "SPUUpdatePermissionRequest.h"
+#import "SUUpdatePermissionResponse.h"
 #import "SPUUpdateDriver.h"
 #import "SUConstants.h"
 #import "SULog.h"
@@ -24,7 +24,7 @@
 #import "SPUProbeInstallStatus.h"
 #import "SUAppcastItem.h"
 #import "SPUInstallationInfo.h"
-#import <Sparkle/SUErrors.h>
+#import "SUErrors.h"
 #import "SPUXPCServiceInfo.h"
 #import "SPUUpdaterCycle.h"
 #import "SPUUpdaterTimer.h"

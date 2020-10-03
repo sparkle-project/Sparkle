@@ -13,7 +13,7 @@
 #import "SPUInstallerDriver.h"
 #import "SPUDownloadDriver.h"
 #import "SULog.h"
-#import <Sparkle/SUErrors.h>
+#import "SUErrors.h"
 #import "SPUResumableUpdate.h"
 #import "SPUDownloadedUpdate.h"
 #import "SPUInformationalUpdate.h"

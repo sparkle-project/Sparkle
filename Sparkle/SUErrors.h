@@ -17,7 +17,7 @@
 #else
 #import <Foundation/Foundation.h>
 #endif
-#import <Sparkle/SUExport.h>
+#import "SUExport.h"
 
 /**
  * Error domain used by Sparkle

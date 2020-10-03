@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <Sparkle/SPUStatusCompletionResults.h>
+#import "SPUStatusCompletionResults.h"
 #import "SPUUpdateDriver.h"
 
 NS_ASSUME_NONNULL_BEGIN

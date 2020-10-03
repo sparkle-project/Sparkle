@@ -14,8 +14,8 @@
 #else
 #import <Foundation/Foundation.h>
 #endif
-#import <Sparkle/SPUStatusCompletionResults.h>
-#import <Sparkle/SUExport.h>
+#import "SPUStatusCompletionResults.h"
+#import "SUExport.h"
 
 @protocol SPUStandardUserDriverDelegate;
 

@@ -6,8 +6,8 @@
 //  Copyright 2006 Andy Matuschak. All rights reserved.
 //
 
-#import <Sparkle/SUAppcastItem.h>
-#import <Sparkle/SUVersionComparisonProtocol.h>
+#import "SUAppcastItem.h"
+#import "SUVersionComparisonProtocol.h"
 #import "SULog.h"
 #import "SUConstants.h"
 #import "SUSignatures.h"

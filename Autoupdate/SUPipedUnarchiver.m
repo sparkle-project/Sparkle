@@ -9,7 +9,7 @@
 #import "SUPipedUnarchiver.h"
 #import "SUUnarchiverNotifier.h"
 #import "SULog.h"
-#import <Sparkle/SUErrors.h>
+#import "SUErrors.h"
 
 
 #include "AppKitPrevention.h"

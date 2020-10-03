@@ -17,8 +17,8 @@
 #else
 #import <Foundation/Foundation.h>
 #endif
-#import <Sparkle/SUExport.h>
-#import <Sparkle/SUVersionComparisonProtocol.h>
+#import "SUExport.h"
+#import "SUVersionComparisonProtocol.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

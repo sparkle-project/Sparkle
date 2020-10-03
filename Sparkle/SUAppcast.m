@@ -6,17 +6,17 @@
 //  Copyright 2006 Andy Matuschak. All rights reserved.
 //
 
-#import <Sparkle/SUExport.h>
-#import <Sparkle/SUAppcast.h>
-#import <Sparkle/SUAppcastItem.h>
-#import <Sparkle/SUVersionComparisonProtocol.h>
+#import "SUExport.h"
+#import "SUAppcast.h"
+#import "SUAppcastItem.h"
+#import "SUVersionComparisonProtocol.h"
 #import "SUConstants.h"
 #import "SULog.h"
-#import <Sparkle/SUErrors.h>
+#import "SUErrors.h"
 #import "SULocalizations.h"
 #import "SPUXPCServiceInfo.h"
 #import "SPUURLDownload.h"
-#import <Sparkle/SPUDownloadData.h>
+#import "SPUDownloadData.h"
 
 
 #include "AppKitPrevention.h"

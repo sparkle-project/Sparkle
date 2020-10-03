@@ -17,7 +17,7 @@
 #else
 #import <Foundation/Foundation.h>
 #endif
-#import <Sparkle/SUExport.h>
+#import "SUExport.h"
 @class SUSignatures;
 
 SU_EXPORT @interface SUAppcastItem : NSObject<NSSecureCoding>

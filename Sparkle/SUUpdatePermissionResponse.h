@@ -14,7 +14,7 @@
 #else
 #import <Foundation/Foundation.h>
 #endif
-#import <Sparkle/SUExport.h>
+#import "SUExport.h"
 
 /*!
  This class represents a response for permission to check updates.

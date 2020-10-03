@@ -6,7 +6,7 @@
 //  Copyright © 2016 Sparkle Project. All rights reserved.
 //
 
-#import <Sparkle/SPUUpdaterSettings.h>
+#import "SPUUpdaterSettings.h"
 #import "SUHost.h"
 #import "SUConstants.h"
 

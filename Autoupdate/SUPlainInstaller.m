@@ -11,8 +11,8 @@
 #import "SUConstants.h"
 #import "SUHost.h"
 #import "SULog.h"
-#import <Sparkle/SUErrors.h>
-#import <Sparkle/SUVersionComparisonProtocol.h>
+#import "SUErrors.h"
+#import "SUVersionComparisonProtocol.h"
 #import "SUStandardVersionComparator.h"
 
 

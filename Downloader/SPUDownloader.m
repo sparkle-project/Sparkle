@@ -10,8 +10,8 @@
 #import "SPUDownloaderDelegate.h"
 #import "SPULocalCacheDirectory.h"
 #import "SPUURLRequest.h"
-#import <Sparkle/SPUDownloadData.h>
-#import <Sparkle/SUErrors.h>
+#import "SPUDownloadData.h"
+#import "SUErrors.h"
 
 
 #include "AppKitPrevention.h"

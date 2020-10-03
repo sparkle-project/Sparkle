@@ -10,15 +10,15 @@
 #import "SPUDownloaderDelegate.h"
 #import "SPUDownloader.h"
 #import "SPUXPCServiceInfo.h"
-#import <Sparkle/SUAppcastItem.h>
+#import "SUAppcastItem.h"
 #import "SUFileManager.h"
 #import "SULocalizations.h"
 #import "SUHost.h"
 #import "SULog.h"
-#import <Sparkle/SUErrors.h>
+#import "SUErrors.h"
 #import "SPUURLRequest.h"
 #import "SPUDownloadedUpdate.h"
-#import <Sparkle/SPUDownloadData.h>
+#import "SPUDownloadData.h"
 
 
 #include "AppKitPrevention.h"
