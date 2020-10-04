@@ -6,7 +6,15 @@
 //  Copyright © 2016 Sparkle Project. All rights reserved.
 //
 
+#if __has_feature(modules)
+#if __has_warning("-Watimport-in-framework-header")
+#pragma clang diagnostic ignored "-Watimport-in-framework-header"
+#endif
+@import Foundation;
+#else
 #import <Foundation/Foundation.h>
+#endif
+
 #import "SPUStatusCompletionResults.h"
 #import "SUExport.h"
 
