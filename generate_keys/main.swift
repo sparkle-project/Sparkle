@@ -27,7 +27,7 @@ private func commonKeychainItemAttributes() -> [String: Any] {
 }
 
 private func failure(_ message: String) -> Never {
-    print("")
+    /// Checking for both `TERM` and `isatty()` correctly detects Xcode.
     if ProcessInfo.processInfo.environment["TERM"] != nil && isatty(STDOUT_FILENO) != 0 {
         print("\u{001b}[1;91mERROR:\u{001b}[0m ", terminator: "")
     } else {
@@ -86,7 +86,7 @@ func findPublicKey() -> Data? {
     exit(1)
 }
 
-func generateKeyPair(makeSyncable: Bool) -> Data {
+func generateKeyPair() -> Data {
     var seed = Array<UInt8>(repeating: 0, count: 32)
     var publicEdKey = Array<UInt8>(repeating: 0, count: 32)
     var privateEdKey = Array<UInt8>(repeating: 0, count: 64)
@@ -141,44 +141,58 @@ func generateKeyPair(makeSyncable: Bool) -> Data {
 /// Once it's safe to require Swift 5.3 and Xcode 12 for this code, rename this file to `generate_keys.swift` and
 /// replace this function with a class tagged with `@main`.
 func entryPoint() {
+    let isLookupMode = (CommandLine.arguments.dropFirst().first.map({ $0 == "-p" }) ?? false)
 
-    print("""
-        This tool uses the macOS Keychain to store a private key for signing app updates which
-        will be distributed via Sparkle. The key will be associated with your user account.
-        
-        Note: You only need one signing key, no matter how many apps you embed Sparkle in.
-        
-        The keychain may ask permission for this tool to access an existing key, if one
-        exists, or for permission to save the new key. You must allow access in order to
-        successfully proceed.
-        
-        """)
-
-    if let pubKey = findPublicKey() {
+    /// If not in lookup-only mode, give an intro blurb.
+    if !isLookupMode {
         print("""
-            A pre-existing signing key was found. This is how it should appear in your Info.plist:
-
-                <key>SUPublicEDKey</key>
-                <string>\(pubKey.base64EncodedString())</string>
-                
-            """)
-    } else {
-        print("Generating a new signing key. This may take a moment, depending on your machine.")
-        
-        let pubKey = generateKeyPair(makeSyncable: false)
-        
-        print("""
-            A key has been generated and saved in your keychain. Add the `SUPublicEDKey` key to
-            the Info.plist of each app for which you intend to use Sparkle for distributing
-            updates. It should appear like this:
+            This tool uses the macOS Keychain to store a private key for signing app updates which
+            will be distributed via Sparkle. The key will be associated with your user account.
             
-                <key>SUPublicEDKey</key>
-                <string>\(pubKey.base64EncodedString())</string>
+            Note: You only need one signing key, no matter how many apps you embed Sparkle in.
+            
+            The keychain may ask permission for this tool to access an existing key, if one
+            exists, or for permission to save the new key. You must allow access in order to
+            successfully proceed.
             
             """)
     }
+    
+    switch (findPublicKey(), isLookupMode) {
+        /// Existing key found, lookup mode - print just the pubkey and exit
+        case (.some(let pubKey), true):
+            print(pubKey.base64EncodedString())
+        
+        /// Existing key found, normal mode - print instructions blurb and pubkey
+        case (.some(let pubKey), false):
+            print("""
+                A pre-existing signing key was found. This is how it should appear in your Info.plist:
 
-    print("Done.")
+                    <key>SUPublicEDKey</key>
+                    <string>\(pubKey.base64EncodedString())</string>
+                    
+                """)
+        
+        /// No existing key, lookup mode - error out
+        case (.none, true):
+            failure("No existing signing key found!")
+        
+        /// No existing key, normal mode - generate a new one
+        case (.none, false):
+            print("Generating a new signing key. This may take a moment, depending on your machine.")
+            
+            let pubKey = generateKeyPair()
+            
+            print("""
+                A key has been generated and saved in your keychain. Add the `SUPublicEDKey` key to
+                the Info.plist of each app for which you intend to use Sparkle for distributing
+                updates. It should appear like this:
+                
+                    <key>SUPublicEDKey</key>
+                    <string>\(pubKey.base64EncodedString())</string>
+                
+                """)
+    }
 }
 
 // Dispatch to a function because `@main` isn't stable yet at the time of this writing and top-level code is finicky.
