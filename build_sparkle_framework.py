@@ -38,6 +38,20 @@ def Main(args):
       print(e.output)
       raise e
 
+  command = ['xcodebuild', '-target', 'generate_keys', '-configuration', 'Release', out_dir_config, 'build']
+  try:
+      subprocess.check_call(command, stdout=FNULL)
+  except subprocess.CalledProcessError as e:
+      print(e.output)
+      raise e
+
+  command = ['xcodebuild', '-target', 'sign_update', '-configuration', 'Release', out_dir_config, 'build']
+  try:
+      subprocess.check_call(command, stdout=FNULL)
+  except subprocess.CalledProcessError as e:
+      print(e.output)
+      raise e
+
   return 0
 
 

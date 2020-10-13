@@ -21,7 +21,8 @@ action("build_sparkle_framework") {
 
   outputs = [
     "$root_out_dir/Sparkle.framework",
-    "$root_out_dir/BinaryDelta"
+    "$root_out_dir/BinaryDelta",
+    "$root_out_dir/generate_keys",
+    "$root_out_dir/sign_update",
   ]
 }
-
