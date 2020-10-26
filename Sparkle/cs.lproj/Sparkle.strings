@@ -1,6 +1,6 @@
 "%1$@ %2$@ has been downloaded and is ready to use! This is an important update; would you like to install it and relaunch %1$@ now?" = "Aplikace %1$@ %2$@ byla stažena a je připravena k použití po příštím spuštění! Toto je důležitá aktualizace; přejete si aplikaci %1$@ nyní nainstalovat a znovu spustit?";
 
-"%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "Aplikace %1$@ %2$@ byla stažean a je připravena k použití po příštím spuštění! Přejete si aplikaci %1$@ nyní nainstalovat a znovu spustit?";
+"%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "Aplikace %1$@ %2$@ byla stažena a je připravena k použití po příštím spuštění! Přejete si aplikaci %1$@ nyní nainstalovat a znovu spustit?";
 
 "%1$@ can't be updated, because it was opened from a read-only or a temporary location." = "Aplikace %1$@ nemůže být aktualizována, protože je spuštěna z dočasného umístění nebo z umístění, na které nelze zapisovat.";
 
