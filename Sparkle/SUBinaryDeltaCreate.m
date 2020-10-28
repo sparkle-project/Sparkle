@@ -244,16 +244,22 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
 
     NSMutableDictionary *originalTreeState = [NSMutableDictionary dictionary];
 
+    // Fetch frameworkName such as "Brave Browser Nightly" or "Brave Browser Beta".
+    NSString* frameworkName = [[source lastPathComponent] stringByDeletingPathExtension];
+    NSString* versionPath = [NSString stringWithFormat:@"Contents/Frameworks/%s Framework.framework/Versions", [frameworkName fileSystemRepresentation]];
+    NSString* versionCurrentFullPath = [source stringByAppendingPathComponent:[versionPath stringByAppendingPathComponent:@"Current"]];
+
     char pathBuffer[PATH_MAX] = { 0 };
-    if (![source getFileSystemRepresentation:pathBuffer maxLength:sizeof(pathBuffer)]) {
+    if (![versionCurrentFullPath getFileSystemRepresentation:pathBuffer maxLength:sizeof(pathBuffer)]) {
         if (error != NULL) {
             *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to retrieve file system path representation from source %@", source] }];
         }
         return NO;
     }
 
+    // Gathering source files stored in framework/Versions/Current/.
     char *sourcePaths[] = { pathBuffer, 0 };
-    FTS *fts = fts_open(sourcePaths, FTS_PHYSICAL | FTS_NOCHDIR, compareFiles);
+    FTS *fts = fts_open(sourcePaths, FTS_COMFOLLOW | FTS_PHYSICAL | FTS_NOCHDIR, compareFiles);
     if (!fts) {
         if (error != NULL) {
             *error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"fts_open failed on source: %@", @(strerror(errno))] }];
@@ -311,6 +317,75 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
     }
     fts_close(fts);
 
+    // Gathering all source files from App bundle except files in framework/Versions.
+    // So, Gathered source file list doesn't include framework/Versions/Current symlink file and framework/Versions/XXX.xxx.xxx.xxx.
+    pathBuffer[0] = 0;
+    if (![source getFileSystemRepresentation:pathBuffer maxLength:sizeof(pathBuffer)]) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to retrieve file system path representation from source %@", source] }];
+        }
+        return NO;
+    }
+
+    sourcePaths[0] = pathBuffer;
+    fts = fts_open(sourcePaths, FTS_PHYSICAL | FTS_NOCHDIR, compareFiles);
+    if (!fts) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"fts_open failed on source: %@", @(strerror(errno))] }];
+        }
+        return NO;
+    }
+
+    while ((ent = fts_read(fts))) {
+        if (ent->fts_info != FTS_F && ent->fts_info != FTS_SL && ent->fts_info != FTS_D) {
+            continue;
+        }
+
+        NSString *key = pathRelativeToDirectory(source, stringWithFileSystemRepresentation(ent->fts_path));
+        if (![key length]) {
+            continue;
+        }
+
+        // Skip files stored in framework/Versions/...
+        if ([key rangeOfString:versionPath].location != NSNotFound) {
+            continue;
+        }
+
+        NSDictionary *info = infoForFile(ent);
+        if (!info) {
+            if (verbose) {
+                fprintf(stderr, "\n");
+            }
+            if (error != NULL) {
+                *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to retrieve info for file %@", @(ent->fts_path)] }];
+            }
+            return NO;
+        }
+        originalTreeState[key] = info;
+
+        if (aclExists(ent)) {
+            if (verbose) {
+                fprintf(stderr, "\n");
+            }
+            if (error != NULL) {
+                *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Diffing ACLs are not supported. Detected ACL in before-tree on file %@", @(ent->fts_path)] }];
+            }
+            return NO;
+        }
+
+        if (codeSignatureExtendedAttributeExists(ent)) {
+            if (verbose) {
+                fprintf(stderr, "\n");
+            }
+            if (error != NULL) {
+                *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Diffing code signed extended attributes are not supported. Detected extended attribute in before-tree on file %@", @(ent->fts_path)] }];
+            }
+            return NO;
+        }
+    }
+
+    fts_close(fts);
+
     NSString *beforeHash = hashOfTreeWithVersion(source, majorVersion);
 
     if (!beforeHash) {
@@ -332,6 +407,105 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
         fprintf(stderr, "\nProcessing destination, %s...", [destination fileSystemRepresentation]);
     }
 
+    // Gathering destination files stored in framework/Versions/Current/.
+    NSString* versionCurrentFullPathDestination = [destination stringByAppendingPathComponent:[versionPath stringByAppendingPathComponent:@"Current"]];
+    pathBuffer[0] = 0;
+    if (![versionCurrentFullPathDestination getFileSystemRepresentation:pathBuffer maxLength:sizeof(pathBuffer)]) {
+        if (verbose) {
+            fprintf(stderr, "\n");
+        }
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to retrieve file system path representation from destination %@", destination] }];
+        }
+        return NO;
+    }
+
+    sourcePaths[0] = pathBuffer;
+    fts = fts_open(sourcePaths, FTS_COMFOLLOW | FTS_PHYSICAL | FTS_NOCHDIR, compareFiles);
+    if (!fts) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"fts_open failed on destination: %@", @(strerror(errno))] }];
+        }
+        return NO;
+    }
+
+    while ((ent = fts_read(fts))) {
+        if (ent->fts_info != FTS_F && ent->fts_info != FTS_SL && ent->fts_info != FTS_D) {
+            continue;
+        }
+
+        NSString *key = pathRelativeToDirectory(destination, stringWithFileSystemRepresentation(ent->fts_path));
+        if (![key length]) {
+            continue;
+        }
+
+        NSDictionary *info = infoForFile(ent);
+        if (!info) {
+            if (verbose) {
+                fprintf(stderr, "\n");
+            }
+            if (error != NULL) {
+                *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to retrieve info from file %@", @(ent->fts_path)] }];
+            }
+            return NO;
+        }
+
+        // We should validate permissions and ACLs even if we don't store the info in the diff in the case of ACLs,
+        // or in the case of permissions if the patch version is 1
+
+        // We should also not allow files with code signed extended attributes since Apple doesn't recommend inserting these
+        // inside an application, and since we don't preserve extended attribitutes anyway
+
+        mode_t permissions = [info[INFO_PERMISSIONS_KEY] unsignedShortValue];
+        if (!isSymLink(ent) && !IS_VALID_PERMISSIONS(permissions)) {
+            permissions = 0755;
+            if (verbose) {
+                fprintf(stderr, "\nwarning: file permissions %o of '%s' won't be preserved in the delta update (only permissions with modes 0755 and 0644 are supported).\n", permissions & PERMISSION_FLAGS, ent->fts_path);
+            }
+        }
+
+        if (aclExists(ent)) {
+            if (verbose) {
+                fprintf(stderr, "\n");
+            }
+            if (error != NULL) {
+                *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Diffing ACLs are not supported. Detected ACL in after-tree on file %@", @(ent->fts_path)] }];
+            }
+            return NO;
+        }
+
+        if (codeSignatureExtendedAttributeExists(ent)) {
+            if (verbose) {
+                fprintf(stderr, "\n");
+            }
+            if (error != NULL) {
+                *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Diffing code signed extended attributes are not supported. Detected extended attribute in after-tree on file %@", @(ent->fts_path)] }];
+            }
+            return NO;
+        }
+
+        NSDictionary *oldInfo = originalTreeState[key];
+
+        if ([info isEqual:oldInfo]) {
+            [newTreeState removeObjectForKey:key];
+        } else {
+            newTreeState[key] = info;
+
+            if (oldInfo && [oldInfo[INFO_TYPE_KEY] unsignedShortValue] == FTS_D && [info[INFO_TYPE_KEY] unsignedShortValue] != FTS_D) {
+                NSArray *parentPathComponents = key.pathComponents;
+
+                for (NSString *childPath in originalTreeState) {
+                    NSArray *childPathComponents = childPath.pathComponents;
+                    if (childPathComponents.count > parentPathComponents.count &&
+                        [parentPathComponents isEqualToArray:[childPathComponents subarrayWithRange:NSMakeRange(0, parentPathComponents.count)]]) {
+                        [newTreeState removeObjectForKey:childPath];
+                    }
+                }
+            }
+        }
+    }
+    fts_close(fts);
+
     pathBuffer[0] = 0;
     if (![destination getFileSystemRepresentation:pathBuffer maxLength:sizeof(pathBuffer)]) {
         if (verbose) {
@@ -343,6 +517,8 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
         return NO;
     }
 
+    // Gathering all destination files from App bundle except files in framework/Versions.
+    // So, Gathered destination file list doesn't include framework/Versions/Current symlink file and framework/Versions/XXX.xxx.xxx.xxx.
     sourcePaths[0] = pathBuffer;
     fts = fts_open(sourcePaths, FTS_PHYSICAL | FTS_NOCHDIR, compareFiles);
     if (!fts) {
@@ -359,6 +535,11 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
 
         NSString *key = pathRelativeToDirectory(destination, stringWithFileSystemRepresentation(ent->fts_path));
         if (![key length]) {
+            continue;
+        }
+
+        // Skip files stored in framework/Versions/...
+        if ([key rangeOfString:versionPath].location != NSNotFound) {
             continue;
         }
 
@@ -465,6 +646,18 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
 
     xar_subdoc_prop_set(attributes, MAJOR_DIFF_VERSION_KEY, [[NSString stringWithFormat:@"%u", majorVersion] UTF8String]);
     xar_subdoc_prop_set(attributes, MINOR_DIFF_VERSION_KEY, [[NSString stringWithFormat:@"%u", minorVersion] UTF8String]);
+
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    NSString* source_version = [fileManager destinationOfSymbolicLinkAtPath:versionCurrentFullPath
+                                                                      error:nil];
+    NSString* destination_version = [fileManager destinationOfSymbolicLinkAtPath:versionCurrentFullPathDestination
+                                                                           error:nil];
+
+    if (verbose) {
+        fprintf(stderr, "\nSource version: %s, Destination version: %s\n", [source_version fileSystemRepresentation], [destination_version fileSystemRepresentation]);
+    }
+    xar_subdoc_prop_set(attributes, SOURCE_VERSION_KEY, [source_version UTF8String]);
+    xar_subdoc_prop_set(attributes, DESTINATION_VERSION_KEY, [destination_version UTF8String]);
 
     // Version 1 patches don't have a major or minor version field, so we need to differentiate between the hash keys
     const char *beforeHashKey = MAJOR_VERSION_IS_AT_LEAST(majorVersion, SUBeigeMajorVersion) ? BEFORE_TREE_SHA1_KEY : BEFORE_TREE_SHA1_OLD_KEY;
