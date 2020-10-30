@@ -244,10 +244,15 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
 
     NSMutableDictionary *originalTreeState = [NSMutableDictionary dictionary];
 
-    // Fetch frameworkName such as "Brave Browser Nightly" or "Brave Browser Beta".
-    NSString* frameworkName = [[source lastPathComponent] stringByDeletingPathExtension];
-    NSString* versionPath = [NSString stringWithFormat:@"Contents/Frameworks/%s Framework.framework/Versions", [frameworkName fileSystemRepresentation]];
+    // Fetch app name such as "Brave Browser Nightly" or "Brave Browser Beta".
+    NSBundle* bundle = [NSBundle bundleWithPath:source];
+    NSString* appName = [bundle objectForInfoDictionaryKey:@"CFBundleDisplayName"];
+    NSString* versionPath = [NSString stringWithFormat:@"Contents/Frameworks/%s Framework.framework/Versions", [appName fileSystemRepresentation]];
     NSString* versionCurrentFullPath = [source stringByAppendingPathComponent:[versionPath stringByAppendingPathComponent:@"Current"]];
+    if (verbose) {
+        fprintf(stderr, "appName: %s\n", [appName fileSystemRepresentation]);
+        fprintf(stderr, "versionPath: %s\n", [versionPath fileSystemRepresentation]);
+    }
 
     char pathBuffer[PATH_MAX] = { 0 };
     if (![versionCurrentFullPath getFileSystemRepresentation:pathBuffer maxLength:sizeof(pathBuffer)]) {

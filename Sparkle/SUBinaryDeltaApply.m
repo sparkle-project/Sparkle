@@ -274,13 +274,14 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
     }
     xar_close(x);
 
-    NSString* frameworkName = [[source lastPathComponent] stringByDeletingPathExtension];
-    NSString* versionPath = [NSString stringWithFormat:@"Contents/Frameworks/%s Framework.framework/Versions", [frameworkName fileSystemRepresentation]];
+    NSBundle* bundle = [NSBundle bundleWithPath:source];
+    NSString* appName = [bundle objectForInfoDictionaryKey:@"CFBundleDisplayName"];
+    NSString* versionPath = [NSString stringWithFormat:@"Contents/Frameworks/%s Framework.framework/Versions", [appName fileSystemRepresentation]];
     NSString* versionFullPathDestination = [destination stringByAppendingPathComponent:versionPath];
     NSString* versionCurrentFullPathDestination = [destination stringByAppendingPathComponent:[versionPath stringByAppendingPathComponent:@"Current"]];
 
     if (verbose) {
-        fprintf(stderr, "\nframeworkName:  %s", [frameworkName fileSystemRepresentation]);
+        fprintf(stderr, "\nappName:  %s", [appName fileSystemRepresentation]);
         fprintf(stderr, "\nversionPath:  %s", [versionPath fileSystemRepresentation]);
         fprintf(stderr, "\ndestination versionFullPath:  %s", [versionFullPathDestination fileSystemRepresentation]);
         fprintf(stderr, "\ndestination versionCurrentFullPath:  %s", [versionCurrentFullPathDestination fileSystemRepresentation]);
