@@ -11,11 +11,6 @@ bundle_data("sparkle_framework_bundle_data") {
   outputs = [ "{{bundle_contents_dir}}/Frameworks/{{source_file_part}}" ]
 }
 
-bundle_data("sparkle_resources_bundle_data") {
-  sources = [ "dsa_pub.pem" ]
-  outputs = [ "{{bundle_resources_dir}}/{{source_file_part}}" ]
-}
-
 action("build_sparkle_framework") {
   script="build_sparkle_framework.py"
 
