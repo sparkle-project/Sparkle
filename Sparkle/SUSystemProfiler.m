@@ -58,6 +58,8 @@ NSString *const SUSystemProfilerPreferredLanguageKey = @"lang";
     error = sysctlbyname("hw.cputype", &value, &length, NULL, 0);
     int cpuType = -1;
     if (error == 0) {
+        //hw.cputype is a bitmask that can contain multiple bits of info. We only want the last 2 bytes to get the architecture
+        value = (value & 0x000000ff);
         cpuType = value;
         NSString *visibleCPUType;
         switch (value) {
