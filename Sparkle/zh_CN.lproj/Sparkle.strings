@@ -1,6 +1,6 @@
-"%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ 已下载完毕并可以使用！您想要现在安装 %1$@ 吗？";
+"%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ 已下载完毕并可以使用。您想要现在安装 %1$@ 吗？";
 
-"%1$@ can't be updated, because it was opened from a read-only or a temporary location." = "无法更新 %1$@，因为它运行于一个只读宗卷如磁盘映像或光盘。";
+"%1$@ can't be updated, because it was opened from a read-only or a temporary location." = "无法更新 %1$@，因为它运行于一个只读或临时位置。";
 
 "Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "移动 %1$@ 到应用程序文件夹并再试一次。";
 
@@ -10,12 +10,12 @@
 
 "%@ %@ is currently the newest version available." = "%1$@ %2$@ 是当前的最新版本。";
 
-"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%1$@ %2$@ 是当前的最新版本。\n(You are currently running version %3$@.)";
+"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%1$@ %2$@ 是当前的最新版本（您正在运行 %3$@）。";
 
 "%@ %@ is now available--you have %@. Would you like to download it now?" = "%1$@ %2$@ 可供下载，您现在的版本是 %3$@。要现在下载吗？";
 
 /* Description text for SUUpdateAlert when the update informational with no download. */
-"%@ %@ is now available--you have %@. Would you like to learn more about this update on the web?" = "%1$@ %2$@ is now available--you have %3$@. Would you like to learn more about this update on the web?";
+"%@ %@ is now available--you have %@. Would you like to learn more about this update on the web?" = "%1$@ %2$@ 已经推出，您正在运行 %3$@。您要在网站上查看关于更新的更多信息吗？";
 
 "%@ downloaded" = "%@ 已下载";
 
@@ -35,7 +35,7 @@
 
 "An error occurred while parsing the update feed." = "解析更新信息时出现错误，请稍后再试。";
 
-"An error occurred while relaunching %1$@, but the new version will be available next time you run %1$@." = "重新启动 %1$@ 时出现错误，但在下次运行 %1$@ 时新版本将可使用。";
+"An error occurred while relaunching %1$@, but the new version will be available next time you run %1$@." = "重新启动 %1$@ 时出现错误，在下次运行 %1$@ 时将会使用新版本。";
 
 /* the unit for bytes */
 "B" = "B";
@@ -83,4 +83,4 @@
 /* Alternative name for "Install" button if we have a paid update or other update
 	without a download but with a URL. */
 
-"Learn More..." = "下载更新包";
+"Learn More..." = "查看更多…";
