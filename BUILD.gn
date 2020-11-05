@@ -21,3 +21,11 @@ action("build_sparkle_framework") {
     "$root_out_dir/sign_update",
   ]
 }
+
+copy("copy_old_sign_update") {
+  sources = [ "bin/old_dsa_scripts/sign_update" ]
+
+  outputs = [
+    "$root_out_dir/old_dsa_scripts/{{source_file_part}}",
+  ]
+}
