@@ -275,7 +275,7 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 }
 
 - (BOOL)automaticChecksEnabled {
-    NSNumber *automaticChecksEnabled = [self.host objectForInfoDictionaryKey:SUEnableAutomaticChecksKey];
+    NSNumber *automaticChecksEnabled = [self.host objectForKey:SUEnableAutomaticChecksKey];
     if (automaticChecksEnabled == nil)
     {
         return false;
