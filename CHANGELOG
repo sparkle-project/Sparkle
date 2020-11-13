@@ -1,13 +1,30 @@
-# 1.24.0-alpha
+# 1.24.0
 
+ * Prioritize UserDefaults when fetching value for EnableAutomaticChecks (Nicolas Bosi)
+ * Improve best appcast item selection handling (Ian Bytchek)
+ * Create lockfile for improved compatibility with 3rd party updaters (CoreCode)
+ * Enable SPM support via binary target (Jonas Zaugg)
+ * `generate_appcast` improvements:
+     * follow symbolic links (Denis Dzyubenko)
+     * update the release notes element’s URL when required (Brad Andalman)
+     * Added output filename option to generate_appcast (Brad Andalman)
+     * Added —release-notes-url-prefix to generate_appcast (Brad Andalman)
+     * Command line option to provide a download url prefix is now parsed and set on each archive item (Dominik H)
+     * Added help command line option (Dominik H)
+ * Locale updates:
+     * Update zh_CN localization (柳东原 · Dongyuan Liu)
+     * Update Sparkle.strings (Vojtěch Koňařík)
+     * Update Croatian (#1603) (milotype)
+     * Update SUUpdateAlert.xib (DanielFirlej)
+ * fix: read SUAutomaticallyUpdate from Info.plist (Trevor DeVore)
+ * Fix casting Boolean to BOOL on Apple Silicon (Kevin Wojniak)
+ * Use build matrix to test on multiple Xcode versions (Rajiv Shah)
+ * Set UpdateAlert and AutomaticUpdateAlert window's fullscreen collectionBehavior to NSWindowCollectionBehaviorFullScreenAuxiliary to allow them to present on top of the Main App's window if it's fullscreen. (Micah Moore)
  * Fixed error about "about:blank" release notes (Louis Pontoise)
+ * Support App Store URL scheme in release note webview (Bi11)
  * Use the SHA-256 hash of the archive as the cache path (Nate Weaver)
  * Don't return an optional from the FileHandle method (Nate Weaver)
  * Added URL+Hashing (Nate Weaver)
- * Update SUUpdateAlert.xib (DanielFirlej)
- * Added help command line option (Dominik H)
- * Added function that parses all command line options (Dominik H)
- * Command line option to provide a download url prefix is now parsed and set on each archive item (Dominik H)
 
 # 1.23.0
 
