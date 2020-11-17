@@ -206,7 +206,6 @@ DQ
                     </button>
                 </subviews>
                 <constraints>
-                    <constraint firstAttribute="width" constant="700" id="VNp-am-qKn"/>
                     <constraint firstItem="10" firstAttribute="leading" secondItem="7" secondAttribute="trailing" constant="22" id="2ef-4I-Il3"/>
                     <constraint firstAttribute="trailing" secondItem="fKC-QA-GZa" secondAttribute="trailing" constant="20" id="406-Cn-C5d"/>
                     <constraint firstItem="101" firstAttribute="leading" secondItem="10" secondAttribute="leading" id="7XS-9C-U6N"/>
