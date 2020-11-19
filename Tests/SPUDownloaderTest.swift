@@ -122,16 +122,6 @@ class SPUDownloaderTest: XCTestCase
         }
     }
 
-    func testDeprecatedDownloader()
-    {
-        let delegate = SPUDownloaderTestDelegate()
-        var downloader = SPUDownloaderDeprecated(delegate: delegate)
-
-        self.performTemporaryDownloadTest(withDownloader: downloader!, delegate: delegate)
-        downloader = SPUDownloaderDeprecated(delegate: delegate)
-        self.performPersistentDownloadTest(withDownloader: downloader!, delegate: delegate)
-    }
-
     func testSessionDownloader()
     {
         let delegate = SPUDownloaderTestDelegate()

@@ -323,13 +323,8 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
 - (void)checkForUpdatesInBackground
 {
     BOOL automatic = [self automaticallyDownloadsUpdates];
-
     if (!automatic) {
-        if (SUAVAILABLE(10, 9)) {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunguarded-availability"
             NSUserDefaults *defaults = [[NSUserDefaults alloc] initWithSuiteName:@"com.apple.notificationcenterui"];
-#pragma clang diagnostic pop
             BOOL dnd = [defaults boolForKey:@"doNotDisturb"];
             if (dnd) {
                 SULog(SULogLevelDefault, @"Delayed update, because Do Not Disturb is on");
@@ -337,7 +332,6 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
                 [self scheduleNextUpdateCheck];
                 return;
             }
-        }
     }
 
     // Do not use reachability for a preflight check. This can be deceptive and a bad idea. Apple does not recommend doing it.

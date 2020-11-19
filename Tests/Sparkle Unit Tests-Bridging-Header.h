@@ -15,7 +15,6 @@
 
 #import "SPUDownloader.h"
 #import "SPUDownloaderDelegate.h"
-#import "SPUDownloaderDeprecated.h"
 #import "SPUDownloadData.h"
 #import "SPUDownloaderProtocol.h"
 #import "SPUDownloaderSession.h"

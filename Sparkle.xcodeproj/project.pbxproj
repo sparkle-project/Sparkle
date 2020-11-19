@@ -72,8 +72,6 @@
 		34074B9F1FEABD5A001CB3A5 /* SPUDownloadData.h in Headers */ = {isa = PBXBuildFile; fileRef = 34074B9D1FEABD5A001CB3A5 /* SPUDownloadData.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		34074BA21FEABFD2001CB3A5 /* SPUDownloaderSession.h in Headers */ = {isa = PBXBuildFile; fileRef = 34074BA01FEABFD2001CB3A5 /* SPUDownloaderSession.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		34074BA31FEABFD2001CB3A5 /* SPUDownloaderSession.m in Sources */ = {isa = PBXBuildFile; fileRef = 34074BA11FEABFD2001CB3A5 /* SPUDownloaderSession.m */; };
-		34074BA71FEAC417001CB3A5 /* SPUDownloaderDeprecated.h in Headers */ = {isa = PBXBuildFile; fileRef = 34074BA51FEAC417001CB3A5 /* SPUDownloaderDeprecated.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		34074BA81FEAC417001CB3A5 /* SPUDownloaderDeprecated.m in Sources */ = {isa = PBXBuildFile; fileRef = 34074BA61FEAC417001CB3A5 /* SPUDownloaderDeprecated.m */; };
 		342731481FF58E5B00285FBD /* SPUDownloaderTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 342731461FF58E4F00285FBD /* SPUDownloaderTest.swift */; };
 		3772FEA913DE0B6B00F79537 /* SUVersionDisplayProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 3772FEA813DE0B6B00F79537 /* SUVersionDisplayProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4444E790237B057900CBB3CF /* testlocalizedreleasenotesappcast.xml in Resources */ = {isa = PBXBuildFile; fileRef = 4444E78E237B047B00CBB3CF /* testlocalizedreleasenotesappcast.xml */; };
@@ -654,8 +652,6 @@
 		34074BA01FEABFD2001CB3A5 /* SPUDownloaderSession.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SPUDownloaderSession.h; sourceTree = "<group>"; };
 		34074BA11FEABFD2001CB3A5 /* SPUDownloaderSession.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SPUDownloaderSession.m; sourceTree = "<group>"; };
 		34074BA41FEAC0BC001CB3A5 /* SPUDownloader_Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SPUDownloader_Private.h; sourceTree = "<group>"; };
-		34074BA51FEAC417001CB3A5 /* SPUDownloaderDeprecated.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SPUDownloaderDeprecated.h; sourceTree = "<group>"; };
-		34074BA61FEAC417001CB3A5 /* SPUDownloaderDeprecated.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SPUDownloaderDeprecated.m; sourceTree = "<group>"; };
 		342731461FF58E4F00285FBD /* SPUDownloaderTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SPUDownloaderTest.swift; sourceTree = "<group>"; };
 		3772FEA813DE0B6B00F79537 /* SUVersionDisplayProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUVersionDisplayProtocol.h; sourceTree = "<group>"; };
 		4444E78E237B047B00CBB3CF /* testlocalizedreleasenotesappcast.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = testlocalizedreleasenotesappcast.xml; sourceTree = "<group>"; };
@@ -1302,8 +1298,6 @@
 				34074B8C1FEABD08001CB3A5 /* SPUDownloader.m */,
 				34074BA41FEAC0BC001CB3A5 /* SPUDownloader_Private.h */,
 				34074B8E1FEABD08001CB3A5 /* SPUDownloaderDelegate.h */,
-				34074BA51FEAC417001CB3A5 /* SPUDownloaderDeprecated.h */,
-				34074BA61FEAC417001CB3A5 /* SPUDownloaderDeprecated.m */,
 				34074B8F1FEABD08001CB3A5 /* SPUDownloaderProtocol.h */,
 				34074BA01FEABFD2001CB3A5 /* SPUDownloaderSession.h */,
 				34074BA11FEABFD2001CB3A5 /* SPUDownloaderSession.m */,
@@ -1686,7 +1680,6 @@
 				34074B9F1FEABD5A001CB3A5 /* SPUDownloadData.h in Headers */,
 				34074B911FEABD08001CB3A5 /* SPUDownloader.h in Headers */,
 				34074B921FEABD08001CB3A5 /* SPUDownloaderDelegate.h in Headers */,
-				34074BA71FEAC417001CB3A5 /* SPUDownloaderDeprecated.h in Headers */,
 				34074B931FEABD08001CB3A5 /* SPUDownloaderProtocol.h in Headers */,
 				34074BA21FEABFD2001CB3A5 /* SPUDownloaderSession.h in Headers */,
 				34074B961FEABD24001CB3A5 /* SPULocalCacheDirectory.h in Headers */,
@@ -2007,7 +2000,7 @@
 			attributes = {
 				CLASSPREFIX = SU;
 				LastSwiftUpdateCheck = 1000;
-				LastUpgradeCheck = 0920;
+				LastUpgradeCheck = 1230;
 				ORGANIZATIONNAME = "Sparkle Project";
 				TargetAttributes = {
 					5A5ADED6214EDE4900DF0099 = {
@@ -2422,7 +2415,6 @@
 			files = (
 				34074B9E1FEABD5A001CB3A5 /* SPUDownloadData.m in Sources */,
 				34074B901FEABD08001CB3A5 /* SPUDownloader.m in Sources */,
-				34074BA81FEAC417001CB3A5 /* SPUDownloaderDeprecated.m in Sources */,
 				34074BA31FEABFD2001CB3A5 /* SPUDownloaderSession.m in Sources */,
 				34074B971FEABD24001CB3A5 /* SPULocalCacheDirectory.m in Sources */,
 				34074B9A1FEABD49001CB3A5 /* SPUURLRequest.m in Sources */,

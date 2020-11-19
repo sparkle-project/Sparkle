@@ -28,7 +28,6 @@
 #import "SUGlobalUpdateLock.h"
 
 #import "SPUURLRequest.h"
-#import "SPUDownloaderDeprecated.h"
 #import "SPUDownloaderSession.h"
 
 @interface SUBasicUpdateDriver ()
@@ -319,15 +318,8 @@
                              withRequest:request];
     }
 
-    if (SUAVAILABLE(10, 9)) {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunguarded-availability"
-        self.download = [[SPUDownloaderSession alloc] initWithDelegate:self];
-#pragma clang diagnostic pop
-    }
-    else {
-        self.download = [[SPUDownloaderDeprecated alloc] initWithDelegate:self];
-    }
+    self.download = [[SPUDownloaderSession alloc] initWithDelegate:self];
+
     SPUURLRequest *urlRequest = [SPUURLRequest URLRequestWithRequest:request];
     NSString *desiredFilename = [NSString stringWithFormat:@"%@ %@", [self.host name], [self.updateItem versionString]];
     [self.download startPersistentDownloadWithRequest:urlRequest bundleIdentifier:bundleIdentifier desiredFilename:desiredFilename];

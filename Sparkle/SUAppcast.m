@@ -16,7 +16,6 @@
 #import "SUOperatingSystem.h"
 #import "SPUDownloadData.h"
 #import "SPUDownloaderDelegate.h"
-#import "SPUDownloaderDeprecated.h"
 #import "SPUDownloaderSession.h"
 
 #include "AppKitPrevention.h"
@@ -84,17 +83,8 @@
     }
 
     [request setValue:@"application/rss+xml,*/*;q=0.1" forHTTPHeaderField:@"Accept"];
-
     
-    if (SUAVAILABLE(10, 9)) {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunguarded-availability"
-        self.download = [[SPUDownloaderSession alloc] initWithDelegate:self];
-#pragma clang diagnostic pop
-    }
-    else {
-        self.download = [[SPUDownloaderDeprecated alloc] initWithDelegate:self];
-    }
+    self.download = [[SPUDownloaderSession alloc] initWithDelegate:self];
     
     SPUURLRequest *urlRequest = [SPUURLRequest URLRequestWithRequest:request];
     [self.download startTemporaryDownloadWithRequest:urlRequest];
