@@ -63,8 +63,14 @@
 - (void)didFindValidUpdate
 {
     id<SUUpdaterPrivate> updater = self.updater;
+    SUAppcastItem *updateItem = self.updateItem;
     if ([[updater delegate] respondsToSelector:@selector(updater:didFindValidUpdate:)]) {
-        [[updater delegate] updater:self.updater didFindValidUpdate:self.updateItem];
+        [[updater delegate] updater:self.updater didFindValidUpdate:updateItem];
+    }
+
+    // Handle the case where the update indicates that it should not be installed automatically (e.g. because it is a paid update)
+    if ([updateItem doNotAutomaticallyUpdate]) {
+        self.automaticallyInstallUpdates = NO;
     }
 
     if (self.automaticallyInstallUpdates) {
@@ -72,7 +78,6 @@
         return;
     }
 
-    SUAppcastItem *updateItem = self.updateItem;
     if (![self shouldShowUpdateAlertForItem:updateItem]) {
         [self abortUpdate];
         return;

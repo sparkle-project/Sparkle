@@ -72,6 +72,7 @@ extern NSString *const SUAppcastAttributeShortVersionString;
 extern NSString *const SUAppcastAttributeVersion;
 extern NSString *const SUAppcastAttributeOsType;
 extern NSString *const SUAppcastAttributePhasedRolloutInterval;
+extern NSString *const SUAppcastAttributeDoNotAutomaticallyUpdate;
 
 extern NSString *const SUAppcastElementCriticalUpdate;
 extern NSString *const SUAppcastElementDeltas;

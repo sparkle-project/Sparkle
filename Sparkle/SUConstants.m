@@ -62,6 +62,7 @@ NSString *const SUAppcastAttributeShortVersionString = @"sparkle:shortVersionStr
 NSString *const SUAppcastAttributeVersion = @"sparkle:version";
 NSString *const SUAppcastAttributeOsType = @"sparkle:os";
 NSString *const SUAppcastAttributePhasedRolloutInterval = @"sparkle:phasedRolloutInterval";
+NSString *const SUAppcastAttributeDoNotAutomaticallyUpdate = @"sparkle:doNotAutomaticallyUpdate";
 
 NSString *const SUAppcastElementCriticalUpdate = @"sparkle:criticalUpdate";
 NSString *const SUAppcastElementDeltas = @"sparkle:deltas";

@@ -48,6 +48,7 @@
 @synthesize osString;
 @synthesize propertiesDictionary;
 @synthesize phasedRolloutInterval;
+@synthesize doNotAutomaticallyUpdate = _doNotAutomaticallyUpdate;
 
 - (BOOL)isDeltaUpdate
 {
@@ -224,6 +225,13 @@
                 [deltas setObject:deltaItem forKey:deltaFrom];
             }
             self.deltaUpdates = deltas;
+        }
+
+        NSString *doNotAutomaticallyUpdateString = [dict objectForKey:SUAppcastAttributeDoNotAutomaticallyUpdate];
+        if (doNotAutomaticallyUpdateString) {
+            _doNotAutomaticallyUpdate = [doNotAutomaticallyUpdateString boolValue];
+        } else {
+            _doNotAutomaticallyUpdate = NO;
         }
     }
     return self;
