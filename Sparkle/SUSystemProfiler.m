@@ -102,6 +102,7 @@ static NSString *const SUSystemProfilerPreferredLanguageKey = @"lang";
             switch (value) {
                 case CPU_SUBTYPE_ARM64E:    visibleCPUSubType=@"ARM64E";  break;
                 default:                    visibleCPUSubType = @"Other"; break;
+            }
         } else {
             visibleCPUSubType = @"Other";
         }
