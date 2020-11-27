@@ -58,13 +58,14 @@ static NSString *const SUSystemProfilerPreferredLanguageKey = @"lang";
     error = sysctlbyname("hw.cputype", &value, &length, NULL, 0);
     int cpuType = -1;
     if (error == 0) {
-        cpuType = value;
+        // Only the lower 24 bits of sysctl hw.cputype values contain the CPU type. On Macs with ARM processor, one of the top eight bits may be set.
+        cpuType = value & (int)~CPU_ARCH_MASK;
         NSString *visibleCPUType;
-        switch (value) {
+        switch (cpuType) {
             case CPU_TYPE_ARM:      visibleCPUType = @"ARM";        break;
             case CPU_TYPE_X86:      visibleCPUType = @"Intel";      break;
             case CPU_TYPE_POWERPC:  visibleCPUType = @"PowerPC";    break;
-            default:                visibleCPUType = @"Unknown";    break;
+            default:                visibleCPUType = @"Other";      break;
         }
         [profileArray addObject:[NSDictionary dictionaryWithObjects:@[SUSystemProfilerCPUTypeKey, @"CPU Type", @(value), visibleCPUType] forKeys:profileDictKeys]];
     }
@@ -85,18 +86,22 @@ static NSString *const SUSystemProfilerPreferredLanguageKey = @"lang";
     error = sysctlbyname("hw.cpusubtype", &value, &length, NULL, 0);
     if (error == 0) {
         NSString *visibleCPUSubType;
-        if (cpuType == 7) {
+        if (cpuType == CPU_TYPE_X86) {
             // Intel
             // TODO: other Intel processors, like Core i7, i5, i3, Xeon?
             visibleCPUSubType = is64bit ? @"Intel Core 2" : @"Intel Core"; // If anyone knows how to tell a Core Duo from a Core Solo, please email tph@atomicbird.com
-        } else if (cpuType == 18) {
+        } else if (cpuType == CPU_TYPE_POWERPC) {
             // PowerPC
             switch (value) {
-                case 9:                 visibleCPUSubType=@"G3";    break;
-                case 10:    case 11:    visibleCPUSubType=@"G4";    break;
-                case 100:               visibleCPUSubType=@"G5";    break;
-                default:                visibleCPUSubType=@"Other"; break;
+                case CPU_SUBTYPE_POWERPC_750:                                       visibleCPUSubType=@"G3";    break;
+                case CPU_SUBTYPE_POWERPC_7400:    case CPU_SUBTYPE_POWERPC_7450:    visibleCPUSubType=@"G4";    break;
+                case CPU_SUBTYPE_POWERPC_970:                                       visibleCPUSubType=@"G5";    break;
+                default:                                                            visibleCPUSubType=@"Other"; break;
             }
+        } else if (cpuType == CPU_TYPE_ARM) {
+            switch (value) {
+                case CPU_SUBTYPE_ARM64E:    visibleCPUSubType=@"ARM64E";  break;
+                default:                    visibleCPUSubType = @"Other"; break;
         } else {
             visibleCPUSubType = @"Other";
         }
