@@ -170,6 +170,11 @@ SU_EXPORT @interface SUUpdater : NSObject
 @property BOOL sendsSystemProfile;
 
 /*!
+ The user's system profile information that will be sent when checking for updates if sendsSystemProfile is true.
+ */
+@property (copy, nullable) NSArray<NSDictionary<NSString *, NSString *> *> *systemProfileInformationArray;
+
+/*!
  A property indicating the decryption password used for extracting updates shipped as Apple Disk Images (dmg)
  */
 @property (nonatomic, copy) NSString *decryptionPassword;
