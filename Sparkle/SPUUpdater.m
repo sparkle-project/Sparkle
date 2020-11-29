@@ -281,7 +281,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     }
 
     if (shouldPrompt) {
-        NSArray<NSDictionary<NSString *, NSString *> *> *profileInfo = [SUSystemProfiler systemProfileArrayForHost:self.host];
+        NSArray<NSDictionary<NSString *, id> *> *profileInfo = self.systemProfileArray;
         // Always say we're sending the system profile here so that the delegate displays the parameters it would send.
         if ([self.delegate respondsToSelector:@selector((feedParametersForUpdater:sendingSystemProfile:))]) {
             NSArray *feedParameters = [self.delegate feedParametersForUpdater:self sendingSystemProfile:YES];
