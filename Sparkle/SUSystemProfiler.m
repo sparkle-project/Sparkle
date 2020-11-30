@@ -37,7 +37,7 @@ NSString *const SUSystemProfilerPreferredLanguageKey = @"lang";
     return [[NSDictionary alloc] initWithContentsOfFile:path];
 }
 
-+ (NSArray<NSDictionary<NSString *, id> *> *)systemProfileArrayForHost:(SUHost *)host
++ (NSArray<NSDictionary<NSString *, NSString *> *> *)systemProfileArrayForHost:(SUHost *)host
 {
     NSDictionary<NSString *, NSString *> *modelTranslation = [self modelTranslationTable];
 
@@ -58,7 +58,7 @@ NSString *const SUSystemProfilerPreferredLanguageKey = @"lang";
     error = sysctlbyname("hw.cputype", &value, &length, NULL, 0);
     int cpuType = -1;
     if (error == 0) {
-        //hw.cputype is a bitmask that can contain multiple bits of info. We only want the last 2 bytes to get the architecture
+        //hw.cputype is a bitmask that can contain multiple bits of info. We only want the last byte to get the architecture
         value = (value & 0x000000ff);
         cpuType = value;
         NSString *visibleCPUType;
@@ -68,7 +68,7 @@ NSString *const SUSystemProfilerPreferredLanguageKey = @"lang";
 			case CPU_TYPE_POWERPC:	visibleCPUType = @"PowerPC";	break;
 			default:				visibleCPUType = @"Unknown";	break;
         }
-        [profileArray addObject:[NSDictionary dictionaryWithObjects:@[SUSystemProfilerCPUTypeKey, @"CPU Type", @(value), visibleCPUType] forKeys:profileDictKeys]];
+        [profileArray addObject:[NSDictionary dictionaryWithObjects:@[SUSystemProfilerCPUTypeKey, @"CPU Type", [NSString stringWithFormat:@"%d", value], visibleCPUType] forKeys:profileDictKeys]];
     }
     error = sysctlbyname("hw.cpu64bit_capable", &value, &length, NULL, 0);
     if (error != 0) {
@@ -82,7 +82,7 @@ NSString *const SUSystemProfilerPreferredLanguageKey = @"lang";
 
     if (error == 0) {
         is64bit = value == 1;
-        [profileArray addObject:[NSDictionary dictionaryWithObjects:@[SUSystemProfilerCPU64bitKey, @"CPU is 64-Bit?", @(is64bit), is64bit ? @"Yes" : @"No"] forKeys:profileDictKeys]];
+        [profileArray addObject:[NSDictionary dictionaryWithObjects:@[SUSystemProfilerCPU64bitKey, @"CPU is 64-Bit?", [NSString stringWithFormat:@"%d", is64bit], is64bit ? @"Yes" : @"No"] forKeys:profileDictKeys]];
     }
     error = sysctlbyname("hw.cpusubtype", &value, &length, NULL, 0);
     if (error == 0) {
@@ -102,7 +102,7 @@ NSString *const SUSystemProfilerPreferredLanguageKey = @"lang";
         } else {
             visibleCPUSubType = @"Other";
         }
-        [profileArray addObject:[NSDictionary dictionaryWithObjects:@[SUSystemProfilerCPUSubtypeKey, @"CPU Subtype", @(value), visibleCPUSubType] forKeys:profileDictKeys]];
+        [profileArray addObject:[NSDictionary dictionaryWithObjects:@[SUSystemProfilerCPUSubtypeKey, @"CPU Subtype", [NSString stringWithFormat:@"%d", value], visibleCPUSubType] forKeys:profileDictKeys]];
     }
     error = sysctlbyname("hw.model", NULL, &length, NULL, 0);
     if (error == 0) {
@@ -124,7 +124,8 @@ NSString *const SUSystemProfilerPreferredLanguageKey = @"lang";
     // Number of CPUs
     error = sysctlbyname("hw.ncpu", &value, &length, NULL, 0);
     if (error == 0) {
-        [profileArray addObject:[NSDictionary dictionaryWithObjects:@[SUSystemProfilerCPUCountKey, @"Number of CPUs", @(value), @(value)] forKeys:profileDictKeys]];
+        NSString *stringValue = [NSString stringWithFormat:@"%d", value];
+        [profileArray addObject:[NSDictionary dictionaryWithObjects:@[SUSystemProfilerCPUCountKey, @"Number of CPUs", stringValue, stringValue] forKeys:profileDictKeys]];
     }
 
     // User preferred language
@@ -151,7 +152,8 @@ NSString *const SUSystemProfilerPreferredLanguageKey = @"lang";
     size_t hz_size = sizeof(unsigned long);
     if (sysctlbyname("hw.cpufrequency", &hz, &hz_size, NULL, 0) == 0) {
         unsigned long mhz = hz / 1000000;
-        [profileArray addObject:[NSDictionary dictionaryWithObjects:@[SUSystemProfilerCPUFrequencyKey, @"CPU Speed (MHz)", @(mhz), @(mhz / 1000.)] forKeys:profileDictKeys]];
+        NSString *stringValue = [NSString stringWithFormat:@"%lu", mhz];
+        [profileArray addObject:[NSDictionary dictionaryWithObjects:@[SUSystemProfilerCPUFrequencyKey, @"CPU Speed (MHz)", stringValue, stringValue] forKeys:profileDictKeys]];
     }
 
     // amount of RAM
@@ -159,7 +161,8 @@ NSString *const SUSystemProfilerPreferredLanguageKey = @"lang";
     size_t bytes_size = sizeof(unsigned long);
     if (sysctlbyname("hw.memsize", &bytes, &bytes_size, NULL, 0) == 0) {
         double megabytes = bytes / (1024. * 1024.);
-        [profileArray addObject:[NSDictionary dictionaryWithObjects:@[SUSystemProfilerMemoryKey, @"Memory (MB)", @(megabytes), @(megabytes)] forKeys:profileDictKeys]];
+        NSString *stringValue = [NSString stringWithFormat:@"%lu", (unsigned long)megabytes];
+        [profileArray addObject:[NSDictionary dictionaryWithObjects:@[SUSystemProfilerMemoryKey, @"Memory (MB)", stringValue, stringValue] forKeys:profileDictKeys]];
     }
 
     return [profileArray copy];

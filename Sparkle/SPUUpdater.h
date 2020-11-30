@@ -211,7 +211,7 @@ SU_EXPORT @interface SPUUpdater : NSObject
 /*!
  The system profile information that is sent when checking for updates
  */
-@property (nonatomic, readonly, copy) NSArray<NSDictionary<NSString *, id> *> *systemProfileArray;
+@property (nonatomic, readonly, copy) NSArray<NSDictionary<NSString *, NSString *> *> *systemProfileArray;
 
 @end
 

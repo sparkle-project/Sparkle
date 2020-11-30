@@ -281,7 +281,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     }
 
     if (shouldPrompt) {
-        NSArray<NSDictionary<NSString *, id> *> *profileInfo = self.systemProfileArray;
+        NSArray<NSDictionary<NSString *, NSString *> *> *profileInfo = self.systemProfileArray;
         // Always say we're sending the system profile here so that the delegate displays the parameters it would send.
         if ([self.delegate respondsToSelector:@selector((feedParametersForUpdater:sendingSystemProfile:))]) {
             NSArray *feedParameters = [self.delegate feedParametersForUpdater:self sendingSystemProfile:YES];
@@ -739,7 +739,7 @@ static NSString *escapeURLComponent(NSString *str) {
     const NSTimeInterval oneWeek = 60 * 60 * 24 * 7;
     sendingSystemProfile &= (-[lastSubmitDate timeIntervalSinceNow] >= oneWeek);
 
-    NSArray<NSDictionary<NSString *, id> *> *parameters = @[];
+    NSArray<NSDictionary<NSString *, NSString *> *> *parameters = @[];
     if ([self.delegate respondsToSelector:@selector((feedParametersForUpdater:sendingSystemProfile:))]) {
         NSArray *feedParameters = [self.delegate feedParametersForUpdater:self sendingSystemProfile:sendingSystemProfile];
         if (feedParameters != nil) {
@@ -773,7 +773,7 @@ static NSString *escapeURLComponent(NSString *str) {
     return parameterizedFeedURL;
 }
 
-- (NSArray<NSDictionary<NSString *, id> *> *)systemProfileArray {
+- (NSArray<NSDictionary<NSString *, NSString *> *> *)systemProfileArray {
     NSArray *systemProfile = [SUSystemProfiler systemProfileArrayForHost:self.host];
     if ([self.delegate respondsToSelector:@selector(allowedSystemProfileKeysForUpdater:)]) {
         NSArray * allowedKeys = [self.delegate allowedSystemProfileKeysForUpdater:self];
