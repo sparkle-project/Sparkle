@@ -756,7 +756,7 @@ static NSString *escapeURLComponent(NSString *str) {
     // Build up the parameterized URL.
     NSMutableArray *parameterStrings = [NSMutableArray array];
     for (NSDictionary<NSString *, NSString *> *currentProfileInfo in parameters) {
-        [parameterStrings addObject:[NSString stringWithFormat:@"%@=%@", escapeURLComponent([[currentProfileInfo objectForKey:@"key"] description]), escapeURLComponent([[currentProfileInfo objectForKey:@"value"] description])]];
+        [parameterStrings addObject:[NSString stringWithFormat:@"%@=%@", escapeURLComponent([currentProfileInfo objectForKey:@"key"]), escapeURLComponent([currentProfileInfo objectForKey:@"value"])]];
     }
 
     NSString *separatorCharacter = @"?";
