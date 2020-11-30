@@ -207,6 +207,12 @@ SU_EXPORT @interface SPUUpdater : NSObject
  */
 - (void)resetUpdateCycle;
 
+
+/*!
+ The system profile information that is sent when checking for updates
+ */
+@property (nonatomic, readonly, copy) NSArray<NSDictionary<NSString *, NSString *> *> *systemProfileArray;
+
 @end
 
 NS_ASSUME_NONNULL_END

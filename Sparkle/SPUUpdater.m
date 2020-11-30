@@ -281,7 +281,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     }
 
     if (shouldPrompt) {
-        NSArray<NSDictionary<NSString *, NSString *> *> *profileInfo = [SUSystemProfiler systemProfileArrayForHost:self.host];
+        NSArray<NSDictionary<NSString *, NSString *> *> *profileInfo = self.systemProfileArray;
         // Always say we're sending the system profile here so that the delegate displays the parameters it would send.
         if ([self.delegate respondsToSelector:@selector((feedParametersForUpdater:sendingSystemProfile:))]) {
             NSArray *feedParameters = [self.delegate feedParametersForUpdater:self sendingSystemProfile:YES];
@@ -748,7 +748,7 @@ static NSString *escapeURLComponent(NSString *str) {
     }
 	if (sendingSystemProfile)
 	{
-        parameters = [parameters arrayByAddingObjectsFromArray:[SUSystemProfiler systemProfileArrayForHost:self.host]];
+        parameters = [parameters arrayByAddingObjectsFromArray:self.systemProfileArray];
         [self.host setObject:[NSDate date] forUserDefaultsKey:SULastProfileSubmitDateKey];
     }
 	if ([parameters count] == 0) { return baseFeedURL; }
@@ -756,7 +756,7 @@ static NSString *escapeURLComponent(NSString *str) {
     // Build up the parameterized URL.
     NSMutableArray *parameterStrings = [NSMutableArray array];
     for (NSDictionary<NSString *, NSString *> *currentProfileInfo in parameters) {
-        [parameterStrings addObject:[NSString stringWithFormat:@"%@=%@", escapeURLComponent([[currentProfileInfo objectForKey:@"key"] description]), escapeURLComponent([[currentProfileInfo objectForKey:@"value"] description])]];
+        [parameterStrings addObject:[NSString stringWithFormat:@"%@=%@", escapeURLComponent([currentProfileInfo objectForKey:@"key"]), escapeURLComponent([currentProfileInfo objectForKey:@"value"])]];
     }
 
     NSString *separatorCharacter = @"?";
@@ -771,6 +771,22 @@ static NSString *escapeURLComponent(NSString *str) {
         SULog(SULogLevelError, @"Unexpected error: parameterized feed URL formed from %@ is invalid", appcastStringWithProfile);
     }
     return parameterizedFeedURL;
+}
+
+- (NSArray<NSDictionary<NSString *, NSString *> *> *)systemProfileArray {
+    NSArray *systemProfile = [SUSystemProfiler systemProfileArrayForHost:self.host];
+    if ([self.delegate respondsToSelector:@selector(allowedSystemProfileKeysForUpdater:)]) {
+        NSArray * allowedKeys = [self.delegate allowedSystemProfileKeysForUpdater:self];
+        NSMutableArray *filteredProfile = [NSMutableArray array];
+        for (NSDictionary *profileElement in systemProfile) {
+            NSString *key = [profileElement objectForKey:@"key"];
+            if (key && [allowedKeys containsObject:key]) {
+                [filteredProfile addObject:profileElement];
+            }
+        }
+        systemProfile = [filteredProfile copy];
+    }
+    return systemProfile;
 }
 
 - (void)setUpdateCheckInterval:(NSTimeInterval)updateCheckInterval
