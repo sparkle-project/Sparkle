@@ -174,6 +174,11 @@
     return [[self versionComparator] compareVersion:[self.host version] toVersion:[ui versionString]] == NSOrderedAscending;
 }
 
+- (BOOL)itemPreventsAutoupdate:(SUAppcastItem *)ui
+{
+    return ([ui minimumAutoupdateVersion] && ! [[ui minimumAutoupdateVersion] isEqualToString:@""] && ([[self versionComparator] compareVersion:[self.host version] toVersion:[ui minimumAutoupdateVersion]] == NSOrderedAscending));
+}
+
 - (BOOL)itemContainsSkippedVersion:(SUAppcastItem *)ui
 {
     NSString *skippedVersion = [self.host objectForUserDefaultsKey:SUSkippedVersionKey];
@@ -239,8 +244,8 @@
 {
     assert(self.updateItem);
 
-    // Handle the case where the update indicates that it should not be installed automatically (e.g. because it is a paid update)
-    if ([self.updateItem doNotAutomaticallyUpdate]) {
+    // Handle the case where the update indicates that an automatic update is only available for specific versions
+    if ([self itemPreventsAutoupdate:self.updateItem]) {
         [self.updater setAutomaticallyDownloadsUpdates:NO]; // This call will persist this setting (automatic downloads will be permanently deactivated), but that is probably OK after the rare case of a non-automatically updateable update - the user can always reactivate this in the settings or when the update information window appears for the next time.
         [self.updater checkForUpdatesInBackground]; // Will end up in SUUIBasedUpdateDriver instead of here
         return;

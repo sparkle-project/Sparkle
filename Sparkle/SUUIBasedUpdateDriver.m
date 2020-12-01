@@ -68,8 +68,8 @@
         [[updater delegate] updater:self.updater didFindValidUpdate:updateItem];
     }
 
-    // Handle the case where the update indicates that it should not be installed automatically (e.g. because it is a paid update)
-    if ([updateItem doNotAutomaticallyUpdate]) {
+    // Handle the case where the update indicates that an automatic update is only available for specific versions
+    if ([self itemPreventsAutoupdate:self.updateItem]) {
         self.automaticallyInstallUpdates = NO;
     }
 
