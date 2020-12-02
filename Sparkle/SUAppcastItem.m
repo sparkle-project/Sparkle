@@ -29,6 +29,7 @@
 @property (strong, readwrite) NSURL *infoURL;
 @property (readwrite, copy) NSDictionary *propertiesDictionary;
 @property (copy, readwrite) NSNumber* phasedRolloutInterval;
+@property (copy, readwrite) NSString *minimumAutoupdateVersion;
 @end
 
 @implementation SUAppcastItem
@@ -48,6 +49,7 @@
 @synthesize osString;
 @synthesize propertiesDictionary;
 @synthesize phasedRolloutInterval;
+@synthesize minimumAutoupdateVersion;
 
 - (BOOL)isDeltaUpdate
 {
@@ -154,7 +156,7 @@
             }
             return nil;
         }
-        
+
         if (enclosureURLString) {
             NSString *enclosureLengthString = [enclosure objectForKey:SURSSAttributeLength];
             long long contentLength = 0;
@@ -225,6 +227,8 @@
             }
             self.deltaUpdates = deltas;
         }
+
+        self.minimumAutoupdateVersion = [dict objectForKey:SUAppcastElementMinimumAutoupdateVersion];
     }
     return self;
 }

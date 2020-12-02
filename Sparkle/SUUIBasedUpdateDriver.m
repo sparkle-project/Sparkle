@@ -63,8 +63,14 @@
 - (void)didFindValidUpdate
 {
     id<SUUpdaterPrivate> updater = self.updater;
+    SUAppcastItem *updateItem = self.updateItem;
     if ([[updater delegate] respondsToSelector:@selector(updater:didFindValidUpdate:)]) {
-        [[updater delegate] updater:self.updater didFindValidUpdate:self.updateItem];
+        [[updater delegate] updater:self.updater didFindValidUpdate:updateItem];
+    }
+
+    // Handle the case where the update indicates that an automatic update is only available for specific versions
+    if ([self itemPreventsAutoupdate:self.updateItem]) {
+        self.automaticallyInstallUpdates = NO;
     }
 
     if (self.automaticallyInstallUpdates) {
@@ -72,7 +78,6 @@
         return;
     }
 
-    SUAppcastItem *updateItem = self.updateItem;
     if (![self shouldShowUpdateAlertForItem:updateItem]) {
         [self abortUpdate];
         return;

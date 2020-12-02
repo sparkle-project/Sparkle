@@ -65,6 +65,7 @@ NSString *const SUAppcastAttributePhasedRolloutInterval = @"sparkle:phasedRollou
 
 NSString *const SUAppcastElementCriticalUpdate = @"sparkle:criticalUpdate";
 NSString *const SUAppcastElementDeltas = @"sparkle:deltas";
+NSString *const SUAppcastElementMinimumAutoupdateVersion = @"sparkle:minimumAutoupdateVersion";
 NSString *const SUAppcastElementMinimumSystemVersion = @"sparkle:minimumSystemVersion";
 NSString *const SUAppcastElementMaximumSystemVersion = @"sparkle:maximumSystemVersion";
 NSString *const SUAppcastElementReleaseNotesLink = @"sparkle:releaseNotesLink";
