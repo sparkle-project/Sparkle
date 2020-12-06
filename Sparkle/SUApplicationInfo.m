@@ -22,6 +22,12 @@
     NSURL *iconURL = [SUBundleIcon iconURLForHost:host];
     
     NSImage *icon = (iconURL == nil) ? nil : [[NSImage alloc] initWithContentsOfURL:iconURL];
+    
+    // Get icon from asset catalog if no explicit filename is provided.
+    if (!icon) {
+        icon = [host.bundle imageForResource:@SPARKLE_ICON_NAME];
+    }
+    
     // Use a default icon if none is defined.
     if (!icon) {
         // this asumption may not be correct (eg. even though we're not the main bundle, it could be still be a regular app)
