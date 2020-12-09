@@ -139,7 +139,7 @@ func writeAppcast(appcastDestPath: URL, updates: [ArchiveItem]) throws {
         for (language, url) in update.localizedReleaseNotes() {
             if !languageNotesNodes.contains(where: { $0.1 == language }) {
                 let localizedNode = XMLNode.element(withName: SUAppcastElementReleaseNotesLink,
-                                                    children: [XMLNode.text(withStringValue: url.lastPathComponent) as! XMLNode],
+                                                    children: [XMLNode.text(withStringValue: url.absoluteString) as! XMLNode],
                                                     attributes: [XMLNode.attribute(withName: SUXMLLanguage,
                                                                                    stringValue: language) as! XMLNode, ])
                 item.addChild(localizedNode as! XMLNode)

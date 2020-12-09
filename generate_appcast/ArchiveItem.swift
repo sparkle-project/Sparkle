@@ -212,7 +212,13 @@ class ArchiveItem: CustomStringConvertible {
                 .appendingPathExtension(languageCode)
                 .appendingPathExtension("html")
             if fileManager.fileExists(atPath: localizedReleaseNoteURL.path) {
-                localizedReleaseNotes.append((languageCode, localizedReleaseNoteURL))
+                if let releaseNotesURLPrefix = self.releaseNotesURLPrefix {
+                    localizedReleaseNotes.append((languageCode, URL(string: localizedReleaseNoteURL.lastPathComponent, relativeTo: releaseNotesURLPrefix)!))
+                }
+                else {
+                    localizedReleaseNotes.append((languageCode, URL(string: localizedReleaseNoteURL.lastPathComponent)!))
+                }
+                
             }
         }
         return localizedReleaseNotes
