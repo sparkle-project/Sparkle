@@ -253,6 +253,8 @@
 		723ABA8A259A593900BDB4FA /* SUAutomaticUpdateAlert.xib in Resources */ = {isa = PBXBuildFile; fileRef = 723ABA8C259A593900BDB4FA /* SUAutomaticUpdateAlert.xib */; };
 		723ABAC5259A5A2300BDB4FA /* SUUpdatePermissionPrompt.xib in Resources */ = {isa = PBXBuildFile; fileRef = 723ABAC7259A5A2300BDB4FA /* SUUpdatePermissionPrompt.xib */; };
 		723ABB89259A5FFC00BDB4FA /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 723ABB87259A5FFC00BDB4FA /* InfoPlist.strings */; };
+		723ABE90259AA3B100BDB4FA /* SUAdHocCodeSigning.m in Sources */ = {isa = PBXBuildFile; fileRef = 723ABE8E259AA3B100BDB4FA /* SUAdHocCodeSigning.m */; };
+		723ABE91259AA3B100BDB4FA /* SUAdHocCodeSigning.m in Sources */ = {isa = PBXBuildFile; fileRef = 723ABE8E259AA3B100BDB4FA /* SUAdHocCodeSigning.m */; };
 		723B25301CEAB3A600909873 /* bscommon.h in Headers */ = {isa = PBXBuildFile; fileRef = 723B252C1CEAB3A600909873 /* bscommon.h */; };
 		72464F7D1E213ED400FB341C /* SUOperatingSystem.m in Sources */ = {isa = PBXBuildFile; fileRef = 726F2CE41BC9C33D001971A4 /* SUOperatingSystem.m */; };
 		72544FFC1D0991A4000CFB2C /* SUFileOperationConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 722954C31D04E66F00ECF9CA /* SUFileOperationConstants.m */; };
@@ -980,6 +982,8 @@
 		723ABC30259A632100BDB4FA /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/MainMenu.strings; sourceTree = "<group>"; };
 		723ABC32259A632200BDB4FA /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/MainMenu.strings; sourceTree = "<group>"; };
 		723ABC34259A632600BDB4FA /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/MainMenu.strings; sourceTree = "<group>"; };
+		723ABE8E259AA3B100BDB4FA /* SUAdHocCodeSigning.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUAdHocCodeSigning.m; sourceTree = "<group>"; };
+		723ABE8F259AA3B100BDB4FA /* SUAdHocCodeSigning.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUAdHocCodeSigning.h; sourceTree = "<group>"; };
 		723B252B1CEAB3A600909873 /* bscommon.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = bscommon.c; sourceTree = "<group>"; };
 		723B252C1CEAB3A600909873 /* bscommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bscommon.h; sourceTree = "<group>"; };
 		7268AC621AD634C200C3E0C1 /* SUBinaryDeltaCreate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUBinaryDeltaCreate.m; sourceTree = "<group>"; };
@@ -1584,6 +1588,8 @@
 				72E45CF21B640CDD005C701A /* SUTestApplicationDelegate.m */,
 				A5BF4F1B1BC7668B007A052A /* SUTestWebServer.h */,
 				A5BF4F1C1BC7668B007A052A /* SUTestWebServer.m */,
+				723ABE8F259AA3B100BDB4FA /* SUAdHocCodeSigning.h */,
+				723ABE8E259AA3B100BDB4FA /* SUAdHocCodeSigning.m */,
 				72E45CF41B640DAE005C701A /* SUUpdateSettingsWindowController.h */,
 				72E45CF51B640DAE005C701A /* SUUpdateSettingsWindowController.m */,
 				72E45CF61B640DAE005C701A /* SUUpdateSettingsWindowController.xib */,
@@ -2388,6 +2394,7 @@
 				5AF9DC3C1981DBEE001EA135 /* SUDSAVerifierTest.m in Sources */,
 				72A4A2401BB6567D00E7820D /* SUFileManagerTest.swift in Sources */,
 				5AF6C7541AEA49840014A3AB /* SUInstallerTest.m in Sources */,
+				723ABE91259AA3B100BDB4FA /* SUAdHocCodeSigning.m in Sources */,
 				14652F8219A9746000959E44 /* SULog.m in Sources */,
 				723A920E1D722438004A9DED /* SUSpotlightImporterTest.swift in Sources */,
 				7210C7681B9A9A1500EB90AC /* SUUnarchiverTest.swift in Sources */,
@@ -2407,6 +2414,7 @@
 				5A6D31EF1BF5325F009C5157 /* SUOperatingSystem.m in Sources */,
 				72E45CF31B640CDD005C701A /* SUTestApplicationDelegate.m in Sources */,
 				A5BF4F1D1BC7668B007A052A /* SUTestWebServer.m in Sources */,
+				723ABE90259AA3B100BDB4FA /* SUAdHocCodeSigning.m in Sources */,
 				72E45CF71B640DAE005C701A /* SUUpdateSettingsWindowController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
