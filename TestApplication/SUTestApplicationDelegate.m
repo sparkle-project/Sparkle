@@ -26,6 +26,25 @@
 
 static NSString * const UPDATED_VERSION = @"2.0";
 
+- (BOOL)codesignAppURL:(NSURL *)appURL
+{
+    BOOL success = NO;
+    @try
+    {
+        // ad-hoc signing with the dash
+        NSString *appPath = [appURL path];
+        NSArray<NSString *> *arguments = @[ @"--force", @"--deep", @"--sign", @"-", appPath ];
+        NSTask *task = [NSTask launchedTaskWithLaunchPath:@"/usr/bin/codesign" arguments:arguments];
+        [task waitUntilExit];
+        success = (task.terminationStatus == 0);
+    }
+    @catch (NSException *exception)
+    {
+        NSLog(@"exception: %@", exception);
+    }
+    return success;
+}
+
 - (void)applicationDidFinishLaunching:(NSNotification * __unused)notification
 {
     NSBundle *mainBundle = [NSBundle mainBundle];
@@ -96,6 +115,9 @@ static NSString * const UPDATED_VERSION = @"2.0";
     
     BOOL wroteInfoFile = [infoDictionary writeToURL:infoURL atomically:NO];
     assert(wroteInfoFile);
+    
+    BOOL signedApp = [self codesignAppURL:destinationBundleURL];
+    assert(signedApp);
     
     // Change current working directory so web server knows where to list files
     NSString *serverDirectoryPath = serverDirectoryURL.path;
