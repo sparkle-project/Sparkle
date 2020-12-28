@@ -21,7 +21,7 @@ if sparkleRoot == nil || htmlPath == nil {
     die("Missing arguments")
 }
 
-let enStringsPath = sparkleRoot! + "/Sparkle/en.lproj/Sparkle.strings"
+let enStringsPath = sparkleRoot! + "/Sparkle/Base.lproj/Sparkle.strings"
 let enStringsDict = NSDictionary(contentsOfFile: enStringsPath)
 if enStringsDict == nil {
     die("Invalid English strings")
@@ -51,7 +51,7 @@ head.addChild(XMLElement(name: "style", stringValue: css))
 
 let locale = Locale.current
 for dirEntry in dirContents {
-    if NSString(string: dirEntry).pathExtension != "lproj" || dirEntry == "en.lproj" {
+    if NSString(string: dirEntry).pathExtension != "lproj" || dirEntry == "Base.lproj" || dirEntry == "en.lproj" {
         continue
     }
 
