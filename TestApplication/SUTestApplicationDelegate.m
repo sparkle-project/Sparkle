@@ -26,6 +26,7 @@
 
 static NSString * const UPDATED_VERSION = @"2.0";
 
+// Copied from SUCodeSigningVerifierTest.m
 - (BOOL)codesignAppURL:(NSURL *)appURL
 {
     BOOL success = NO;
