@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11542" systemVersion="16G29" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="17701" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <development version="7000" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11542"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17701"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="SUStatusController">
@@ -20,13 +20,13 @@
             <windowStyleMask key="styleMask" titled="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="200" y="222" width="400" height="107"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1178"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="875"/>
             <value key="minSize" type="size" width="213" height="107"/>
             <view key="contentView" id="6">
                 <rect key="frame" x="0.0" y="0.0" width="400" height="107"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <imageView id="7">
+                    <imageView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="7">
                         <rect key="frame" x="24" y="28" width="64" height="64"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="axesIndependently" image="NSApplicationIcon" id="53"/>
@@ -34,7 +34,7 @@
                             <binding destination="-2" name="value" keyPath="applicationIcon" id="9"/>
                         </connections>
                     </imageView>
-                    <textField verticalHuggingPriority="750" id="8">
+                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8">
                         <rect key="frame" x="106" y="75" width="277" height="17"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Status Text (set by loc. string in code)" id="54">
@@ -46,7 +46,7 @@
                             <binding destination="-2" name="value" keyPath="title" id="26"/>
                         </connections>
                     </textField>
-                    <progressIndicator verticalHuggingPriority="750" maxValue="100" bezeled="NO" indeterminate="YES" style="bar" id="11">
+                    <progressIndicator verticalHuggingPriority="750" fixedFrame="YES" maxValue="100" bezeled="NO" indeterminate="YES" style="bar" translatesAutoresizingMaskIntoConstraints="NO" id="11">
                         <rect key="frame" x="107" y="47" width="275" height="20"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <connections>
@@ -54,7 +54,7 @@
                             <binding destination="-2" name="value" keyPath="progressValue" previousBinding="13" id="27"/>
                         </connections>
                     </progressIndicator>
-                    <button verticalHuggingPriority="750" id="12">
+                    <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="12">
                         <rect key="frame" x="272" y="12" width="114" height="32"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES"/>
                         <buttonCell key="cell" type="push" title="Button" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="55">
@@ -65,7 +65,7 @@
                             <binding destination="-2" name="title" keyPath="buttonTitle" id="21"/>
                         </connections>
                     </button>
-                    <textField verticalHuggingPriority="750" id="16">
+                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="16">
                         <rect key="frame" x="106" y="22" width="167" height="17"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Small System Font Text" id="56">
@@ -87,9 +87,10 @@
             <connections>
                 <binding destination="-2" name="title" keyPath="windowTitle" id="24"/>
             </connections>
+            <point key="canvasLocation" x="-158" y="132"/>
         </window>
     </objects>
     <resources>
-        <image name="NSApplicationIcon" width="128" height="128"/>
+        <image name="NSApplicationIcon" width="32" height="32"/>
     </resources>
 </document>

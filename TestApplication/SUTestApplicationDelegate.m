@@ -10,6 +10,7 @@
 #import "SUUpdateSettingsWindowController.h"
 #import "SUFileManager.h"
 #import "SUTestWebServer.h"
+#import "SUAdHocCodeSigning.h"
 #import "ed25519.h" // Run `git submodule update --init` if you get an error here
 
 @interface SUTestApplicationDelegate ()
@@ -96,6 +97,9 @@ static NSString * const UPDATED_VERSION = @"2.0";
     
     BOOL wroteInfoFile = [infoDictionary writeToURL:infoURL atomically:NO];
     assert(wroteInfoFile);
+    
+    BOOL signedApp = [SUAdHocCodeSigning codeSignApplicationAtPath:destinationBundleURL.path];
+    assert(signedApp);
     
     // Change current working directory so web server knows where to list files
     NSString *serverDirectoryPath = serverDirectoryURL.path;
