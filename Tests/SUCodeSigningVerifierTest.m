@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 #import <XCTest/XCTest.h>
 #import "SUCodeSigningVerifier.h"
+#import "SUAdHocCodeSigning.h"
 #import "SUFileManager.h"
 
 #if defined(__MAC_10_15)
@@ -182,21 +183,7 @@
 
 - (BOOL)codesignAppURL:(NSURL *)appURL
 {
-    BOOL success = NO;
-    @try
-    {
-        // ad-hoc signing with the dash
-        NSString *appPath = [appURL path];
-        NSArray<NSString *> *arguments = @[ @"--force", @"--deep", @"--sign", @"-", appPath ];
-        NSTask *task = [NSTask launchedTaskWithLaunchPath:@"/usr/bin/codesign" arguments:arguments];
-        [task waitUntilExit];
-        success = (task.terminationStatus == 0);
-    }
-    @catch (NSException *exception)
-    {
-        NSLog(@"exception: %@", exception);
-    }
-    return success;
+    return [SUAdHocCodeSigning codeSignApplicationAtPath:appURL.path];
 }
 
 - (void)testUnsignedApp

@@ -7,3 +7,5 @@ LD_RUNPATH_SEARCH_PATHS = @executable_path/../Frameworks
 PRODUCT_BUNDLE_IDENTIFIER = org.sparkle-project.SparkleTestApp
 CODE_SIGN_ENTITLEMENTS = TestApplication/Sparkle-Test-App.entitlements
 MACOSX_DEPLOYMENT_TARGET = 10.10
+ENABLE_HARDENED_RUNTIME = NO
+CODE_SIGN_IDENTITY = -
