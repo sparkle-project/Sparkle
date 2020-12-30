@@ -1,0 +1,20 @@
+//
+//  SULegacyWebView.h
+//  Sparkle
+//
+//  Created by Mayur Pawashe on 12/30/20.
+//  Copyright © 2020 Sparkle Project. All rights reserved.
+//
+
+#import <Foundation/Foundation.h>
+#import "SUWebView.h"
+
+NS_ASSUME_NONNULL_BEGIN
+
+@interface SULegacyWebView : NSObject <SUWebView>
+
+- (instancetype)initWithColorStyleSheetLocation:(NSURL *)colorStyleSheetLocation fontFamily:(NSString *)fontFamily fontPointSize:(int)fontPointSize javaScriptEnabled:(BOOL)javaScriptEnabled;
+
+@end
+
+NS_ASSUME_NONNULL_END
