@@ -278,6 +278,14 @@
 		72AC6B2C1B9AB0EE00F62325 /* SparkleTestCodeSignApp.tar.xz in Resources */ = {isa = PBXBuildFile; fileRef = 72AC6B2B1B9AB0EE00F62325 /* SparkleTestCodeSignApp.tar.xz */; };
 		72AC6B2E1B9B218C00F62325 /* SparkleTestCodeSignApp.dmg in Resources */ = {isa = PBXBuildFile; fileRef = 72AC6B2D1B9B218C00F62325 /* SparkleTestCodeSignApp.dmg */; };
 		72D4DAA11AD7632900B211E2 /* SUBinaryDeltaCreate.m in Sources */ = {isa = PBXBuildFile; fileRef = 7268AC621AD634C200C3E0C1 /* SUBinaryDeltaCreate.m */; };
+		72E1D7DD25A3E3AD0001BA6D /* SUWebViewCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 72E1D7D625A3E3AC0001BA6D /* SUWebViewCommon.m */; };
+		72E1D7DE25A3E3AD0001BA6D /* SUWebViewCommon.h in Headers */ = {isa = PBXBuildFile; fileRef = 72E1D7D725A3E3AC0001BA6D /* SUWebViewCommon.h */; };
+		72E1D7DF25A3E3AD0001BA6D /* SUWKWebView.h in Headers */ = {isa = PBXBuildFile; fileRef = 72E1D7D825A3E3AC0001BA6D /* SUWKWebView.h */; };
+		72E1D7E025A3E3AD0001BA6D /* SUWebView.h in Headers */ = {isa = PBXBuildFile; fileRef = 72E1D7D925A3E3AC0001BA6D /* SUWebView.h */; };
+		72E1D7E125A3E3AD0001BA6D /* SULegacyWebView.m in Sources */ = {isa = PBXBuildFile; fileRef = 72E1D7DA25A3E3AC0001BA6D /* SULegacyWebView.m */; };
+		72E1D7E225A3E3AD0001BA6D /* SUWKWebView.m in Sources */ = {isa = PBXBuildFile; fileRef = 72E1D7DB25A3E3AD0001BA6D /* SUWKWebView.m */; };
+		72E1D7E325A3E3AD0001BA6D /* SULegacyWebView.h in Headers */ = {isa = PBXBuildFile; fileRef = 72E1D7DC25A3E3AD0001BA6D /* SULegacyWebView.h */; };
+		72E1D82225A3E40F0001BA6D /* ReleaseNotesColorStyle.css in Resources */ = {isa = PBXBuildFile; fileRef = 72E1D82125A3E40F0001BA6D /* ReleaseNotesColorStyle.css */; };
 		72E45CF31B640CDD005C701A /* SUTestApplicationDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 72E45CF21B640CDD005C701A /* SUTestApplicationDelegate.m */; };
 		72E45CF71B640DAE005C701A /* SUUpdateSettingsWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 72E45CF51B640DAE005C701A /* SUUpdateSettingsWindowController.m */; };
 		72E45CF81B640DAE005C701A /* SUUpdateSettingsWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 72E45CF61B640DAE005C701A /* SUUpdateSettingsWindowController.xib */; };
@@ -293,7 +301,6 @@
 		C23E885B1BE7B24F0050BB73 /* SparkleTestCodeSignApp.enc.dmg in Resources */ = {isa = PBXBuildFile; fileRef = C23E88591BE7AF890050BB73 /* SparkleTestCodeSignApp.enc.dmg */; };
 		E1545EC51E1D7E0200FAECE8 /* SUTouchBarButtonGroup.h in Headers */ = {isa = PBXBuildFile; fileRef = E1545EC31E1D7E0200FAECE8 /* SUTouchBarButtonGroup.h */; };
 		E1545EC61E1D7E0200FAECE8 /* SUTouchBarButtonGroup.m in Sources */ = {isa = PBXBuildFile; fileRef = E1545EC41E1D7E0200FAECE8 /* SUTouchBarButtonGroup.m */; };
-		E1D4DDF921C1C5F8003D32E7 /* DarkAqua.css in Resources */ = {isa = PBXBuildFile; fileRef = E1D4DDF821C1C5F8003D32E7 /* DarkAqua.css */; };
 		E1EC2A301E21667000245715 /* SUTouchBarButtonGroup.m in Sources */ = {isa = PBXBuildFile; fileRef = E1545EC41E1D7E0200FAECE8 /* SUTouchBarButtonGroup.m */; };
 		EA1E27F722B60B25004AA304 /* bscommon.h in Copy Headers */ = {isa = PBXBuildFile; fileRef = 723B252C1CEAB3A600909873 /* bscommon.h */; };
 		EA1E27F822B60B25004AA304 /* bspatch.h in Copy Headers */ = {isa = PBXBuildFile; fileRef = 611142E810FB1BE5009810AA /* bspatch.h */; };
@@ -1005,6 +1012,14 @@
 		72AC6B2B1B9AB0EE00F62325 /* SparkleTestCodeSignApp.tar.xz */ = {isa = PBXFileReference; lastKnownFileType = file; path = SparkleTestCodeSignApp.tar.xz; sourceTree = "<group>"; };
 		72AC6B2D1B9B218C00F62325 /* SparkleTestCodeSignApp.dmg */ = {isa = PBXFileReference; lastKnownFileType = file; path = SparkleTestCodeSignApp.dmg; sourceTree = "<group>"; };
 		72AFC6121B9A944200F6B565 /* Sparkle Unit Tests-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Sparkle Unit Tests-Bridging-Header.h"; sourceTree = "<group>"; };
+		72E1D7D625A3E3AC0001BA6D /* SUWebViewCommon.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUWebViewCommon.m; sourceTree = "<group>"; };
+		72E1D7D725A3E3AC0001BA6D /* SUWebViewCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUWebViewCommon.h; sourceTree = "<group>"; };
+		72E1D7D825A3E3AC0001BA6D /* SUWKWebView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUWKWebView.h; sourceTree = "<group>"; };
+		72E1D7D925A3E3AC0001BA6D /* SUWebView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUWebView.h; sourceTree = "<group>"; };
+		72E1D7DA25A3E3AC0001BA6D /* SULegacyWebView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SULegacyWebView.m; sourceTree = "<group>"; };
+		72E1D7DB25A3E3AD0001BA6D /* SUWKWebView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUWKWebView.m; sourceTree = "<group>"; };
+		72E1D7DC25A3E3AD0001BA6D /* SULegacyWebView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SULegacyWebView.h; sourceTree = "<group>"; };
+		72E1D82125A3E40F0001BA6D /* ReleaseNotesColorStyle.css */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.css; name = ReleaseNotesColorStyle.css; path = Resources/ReleaseNotesColorStyle.css; sourceTree = SOURCE_ROOT; };
 		72E45CF11B640CDD005C701A /* SUTestApplicationDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUTestApplicationDelegate.h; sourceTree = "<group>"; };
 		72E45CF21B640CDD005C701A /* SUTestApplicationDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUTestApplicationDelegate.m; sourceTree = "<group>"; };
 		72E45CF41B640DAE005C701A /* SUUpdateSettingsWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUUpdateSettingsWindowController.h; sourceTree = "<group>"; };
@@ -1024,7 +1039,6 @@
 		E1545EC31E1D7E0200FAECE8 /* SUTouchBarButtonGroup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUTouchBarButtonGroup.h; sourceTree = "<group>"; };
 		E1545EC41E1D7E0200FAECE8 /* SUTouchBarButtonGroup.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUTouchBarButtonGroup.m; sourceTree = "<group>"; };
 		E19CA4901E2E7E4D009D4D18 /* SUTouchBarForwardDeclarations.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SUTouchBarForwardDeclarations.h; sourceTree = "<group>"; };
-		E1D4DDF821C1C5F8003D32E7 /* DarkAqua.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = DarkAqua.css; sourceTree = "<group>"; };
 		EA4311A0229D5FBC00A5503D /* libed25519.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libed25519.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		EA4311C7229D612A00A5503D /* ed25519-Shared.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "ed25519-Shared.xcconfig"; sourceTree = "<group>"; };
 		EA4311C8229D613B00A5503D /* ed25519-Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "ed25519-Release.xcconfig"; sourceTree = "<group>"; };
@@ -1247,7 +1261,7 @@
 		089C1665FE841158C02AAC07 /* Framework Resources */ = {
 			isa = PBXGroup;
 			children = (
-				E1D4DDF821C1C5F8003D32E7 /* DarkAqua.css */,
+				72E1D82125A3E40F0001BA6D /* ReleaseNotesColorStyle.css */,
 				8DC2EF5A0486A6940098B216 /* Sparkle-Info.plist */,
 				61AAE8220A321A7F00D8810D /* Sparkle.strings */,
 				55C14BD8136EF00C00649790 /* SUStatus.xib */,
@@ -1525,6 +1539,7 @@
 				E19CA4901E2E7E4D009D4D18 /* SUTouchBarForwardDeclarations.h */,
 				61B5FCA009C5228F00B25A18 /* SUUpdateAlert.h */,
 				61B5FCA109C5228F00B25A18 /* SUUpdateAlert.m */,
+				72E1D7F025A3E3B50001BA6D /* Web View */,
 				612DCBAD0D488BC60015DBEA /* SUUpdatePermissionPrompt.h */,
 				612DCBAE0D488BC60015DBEA /* SUUpdatePermissionPrompt.m */,
 				7205C42F1E1215AD00E370AE /* SUUpdatePermissionResponse.h */,
@@ -1668,6 +1683,20 @@
 			path = UITests;
 			sourceTree = "<group>";
 		};
+		72E1D7F025A3E3B50001BA6D /* Web View */ = {
+			isa = PBXGroup;
+			children = (
+				72E1D7D925A3E3AC0001BA6D /* SUWebView.h */,
+				72E1D7D725A3E3AC0001BA6D /* SUWebViewCommon.h */,
+				72E1D7D625A3E3AC0001BA6D /* SUWebViewCommon.m */,
+				72E1D7D825A3E3AC0001BA6D /* SUWKWebView.h */,
+				72E1D7DB25A3E3AD0001BA6D /* SUWKWebView.m */,
+				72E1D7DC25A3E3AD0001BA6D /* SULegacyWebView.h */,
+				72E1D7DA25A3E3AC0001BA6D /* SULegacyWebView.m */,
+			);
+			name = "Web View";
+			sourceTree = "<group>";
+		};
 		FA1941C40D94A6EA00DD942E /* Configurations */ = {
 			isa = PBXGroup;
 			children = (
@@ -1728,8 +1757,10 @@
 				5AB8F185214D564C00A1187F /* ed25519.h in Headers */,
 				5AB8F184214D564C00A1187F /* fe.h in Headers */,
 				A3AD648D24D283F400058938 /* SUGlobalUpdateLock.h in Headers */,
+				72E1D7E325A3E3AD0001BA6D /* SULegacyWebView.h in Headers */,
 				5AB8F18A214D564C00A1187F /* fixedint.h in Headers */,
 				5AB8F18B214D564C00A1187F /* ge.h in Headers */,
+				72E1D7DE25A3E3AD0001BA6D /* SUWebViewCommon.h in Headers */,
 				5AB8F187214D564C00A1187F /* precomp_data.h in Headers */,
 				5AB8F18F214D564C00A1187F /* sc.h in Headers */,
 				5AB8F181214D564C00A1187F /* sha512.h in Headers */,
@@ -1742,6 +1773,7 @@
 				34074B961FEABD24001CB3A5 /* SPULocalCacheDirectory.h in Headers */,
 				34074B9B1FEABD49001CB3A5 /* SPUURLRequest.h in Headers */,
 				61B5FC0D09C4FC8200B25A18 /* SUAppcast.h in Headers */,
+				72E1D7E025A3E3AD0001BA6D /* SUWebView.h in Headers */,
 				61B5FC7009C51F4A00B25A18 /* SUAppcastItem.h in Headers */,
 				72316BDE1E0E17910039EFD9 /* SUApplicationInfo.h in Headers */,
 				6120721209CC5C4B007FE0F6 /* SUAutomaticUpdateAlert.h in Headers */,
@@ -1756,6 +1788,7 @@
 				14652F8419A978C200959E44 /* SUExport.h in Headers */,
 				7275F9C11B5F1F2900B1D19E /* SUFileManager.h in Headers */,
 				722954C41D04E66F00ECF9CA /* SUFileOperationConstants.h in Headers */,
+				72E1D7DF25A3E3AD0001BA6D /* SUWKWebView.h in Headers */,
 				767B61AC1972D488004E0C3C /* SUGuidedPackageInstaller.h in Headers */,
 				61EF67590E25C5B400F754E0 /* SUHost.h in Headers */,
 				618FA5010DAE88B40026945C /* SUInstaller.h in Headers */,
@@ -2233,11 +2266,11 @@
 			files = (
 				723ABAC5259A5A2300BDB4FA /* SUUpdatePermissionPrompt.xib in Resources */,
 				723ABA8A259A593900BDB4FA /* SUAutomaticUpdateAlert.xib in Resources */,
-				E1D4DDF921C1C5F8003D32E7 /* DarkAqua.css in Resources */,
 				61AAE8280A321A7F00D8810D /* Sparkle.strings in Resources */,
 				615AE3D00D64DC40001CA7BD /* SUModelTranslation.plist in Resources */,
 				55C14BEF136EF21700649790 /* SUStatus.xib in Resources */,
 				723ABA4F259A579D00BDB4FA /* SUUpdateAlert.xib in Resources */,
+				72E1D82225A3E40F0001BA6D /* ReleaseNotesColorStyle.css in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2445,6 +2478,7 @@
 			files = (
 				34074B9E1FEABD5A001CB3A5 /* SPUDownloadData.m in Sources */,
 				34074B901FEABD08001CB3A5 /* SPUDownloader.m in Sources */,
+				72E1D7DD25A3E3AD0001BA6D /* SUWebViewCommon.m in Sources */,
 				34074BA31FEABFD2001CB3A5 /* SPUDownloaderSession.m in Sources */,
 				34074B971FEABD24001CB3A5 /* SPULocalCacheDirectory.m in Sources */,
 				34074B9A1FEABD49001CB3A5 /* SPUURLRequest.m in Sources */,
@@ -2471,6 +2505,7 @@
 				618FA5230DAE8E8A0026945C /* SUPackageInstaller.m in Sources */,
 				61D85D6D0E10B2ED00F9B4A9 /* SUPipedUnarchiver.m in Sources */,
 				618FA5060DAE8AB80026945C /* SUPlainInstaller.m in Sources */,
+				72E1D7E225A3E3AD0001BA6D /* SUWKWebView.m in Sources */,
 				6101347C0DD2541A0049ACDF /* SUProbingUpdateDriver.m in Sources */,
 				61B93C0A0DD112FF00DCD2F8 /* SUScheduledUpdateDriver.m in Sources */,
 				5AF04878214D2E5F00B5789F /* SUSignatures.m in Sources */,
@@ -2482,6 +2517,7 @@
 				A3AD648C24D283F400058938 /* SUGlobalUpdateLock.m in Sources */,
 				E1545EC61E1D7E0200FAECE8 /* SUTouchBarButtonGroup.m in Sources */,
 				61B93A3D0DD02D7000DCD2F8 /* SUUIBasedUpdateDriver.m in Sources */,
+				72E1D7E125A3E3AD0001BA6D /* SULegacyWebView.m in Sources */,
 				61299A8E09CA790200B7442F /* SUUnarchiver.m in Sources */,
 				722589DB1E0B19F4005EA0B9 /* SUUnarchiverNotifier.m in Sources */,
 				61B5FCDE09C52A9F00B25A18 /* SUUpdateAlert.m in Sources */,
