@@ -3,7 +3,6 @@
     <dependencies>
         <deployment identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17701"/>
-        <plugIn identifier="com.apple.WebKitIBPlugin" version="17701"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -13,8 +12,8 @@
                 <outlet property="descriptionField" destination="101" id="9oA-2S-eXN"/>
                 <outlet property="installButton" destination="76" id="176"/>
                 <outlet property="laterButton" destination="22" id="177"/>
+                <outlet property="releaseNotesBoxView" destination="89" id="FhX-K4-uzH"/>
                 <outlet property="releaseNotesContainerView" destination="fKC-QA-GZa" id="BYw-MA-Z5h"/>
-                <outlet property="releaseNotesView" destination="18" id="32"/>
                 <outlet property="skipButton" destination="23" id="178"/>
                 <outlet property="window" destination="5" id="69"/>
             </connections>
@@ -82,27 +81,8 @@
                                 <view key="contentView" id="hbB-V1-Bf6">
                                     <rect key="frame" x="1" y="1" width="490" height="213"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                    <subviews>
-                                        <webView maintainsBackForwardList="NO" translatesAutoresizingMaskIntoConstraints="NO" id="18">
-                                            <rect key="frame" x="0.0" y="-2" width="492" height="215"/>
-                                            <webPreferences key="preferences" defaultFontSize="12" defaultFixedFontSize="12" minimumFontSize="7" plugInsEnabled="NO" javaEnabled="NO" javaScriptCanOpenWindowsAutomatically="NO">
-                                                <nil key="identifier"/>
-                                            </webPreferences>
-                                            <connections>
-                                                <binding destination="-2" name="hidden" keyPath="showsReleaseNotes" id="161">
-                                                    <dictionary key="options">
-                                                        <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                                    </dictionary>
-                                                </binding>
-                                            </connections>
-                                        </webView>
-                                    </subviews>
                                 </view>
                                 <constraints>
-                                    <constraint firstItem="18" firstAttribute="top" secondItem="89" secondAttribute="top" constant="1" id="3ps-Yo-uZA"/>
-                                    <constraint firstAttribute="trailing" secondItem="18" secondAttribute="trailing" constant="-1" id="5W0-Eb-Snn"/>
-                                    <constraint firstAttribute="bottom" secondItem="18" secondAttribute="bottom" constant="-1" id="NOY-VJ-z4I"/>
-                                    <constraint firstItem="18" firstAttribute="leading" secondItem="89" secondAttribute="leading" constant="1" id="kSE-Xj-CRB"/>
                                     <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="100" id="pvn-8k-9Ev"/>
                                 </constraints>
                                 <font key="titleFont" size="11" name="LucidaGrande"/>

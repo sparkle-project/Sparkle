@@ -52,7 +52,7 @@
 		14950073195FCE4E00BC5B5B /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D6A5FE840307C02AAC07 /* AppKit.framework */; };
 		14958C6E19AEBC950061B14F /* signed-test-file.txt in Resources */ = {isa = PBXBuildFile; fileRef = 14958C6B19AEBC530061B14F /* signed-test-file.txt */; };
 		14958C6F19AEBC980061B14F /* test-pubkey.pem in Resources */ = {isa = PBXBuildFile; fileRef = 14958C6C19AEBC610061B14F /* test-pubkey.pem */; };
-		1EAA4C8B2132C7BF00604473 /* DarkAqua.css in Resources */ = {isa = PBXBuildFile; fileRef = 1EAA4C8A2132C7BF00604473 /* DarkAqua.css */; };
+		1EAA4C8B2132C7BF00604473 /* ReleaseNotesColorStyle.css in Resources */ = {isa = PBXBuildFile; fileRef = 1EAA4C8A2132C7BF00604473 /* ReleaseNotesColorStyle.css */; };
 		3772FEA913DE0B6B00F79537 /* SUVersionDisplayProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 3772FEA813DE0B6B00F79537 /* SUVersionDisplayProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		55C14BEF136EF21700649790 /* SUStatus.xib in Resources */ = {isa = PBXBuildFile; fileRef = 55C14BD8136EF00C00649790 /* SUStatus.xib */; };
 		55C14F06136EF6DB00649790 /* SULog.h in Headers */ = {isa = PBXBuildFile; fileRef = 55C14F04136EF6DB00649790 /* SULog.h */; };
@@ -167,6 +167,13 @@
 		723ABD6C259A9CBC00BDB4FA /* SUUpdatePermissionPrompt.xib in Resources */ = {isa = PBXBuildFile; fileRef = 723ABD6A259A9CBB00BDB4FA /* SUUpdatePermissionPrompt.xib */; };
 		723ABDDB259A9E8600BDB4FA /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 723ABDD9259A9E8600BDB4FA /* InfoPlist.strings */; };
 		723ABE02259A9E9E00BDB4FA /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 723ABE00259A9E9E00BDB4FA /* MainMenu.xib */; };
+		723ABF1B259D055E00BDB4FA /* SUWebView.h in Headers */ = {isa = PBXBuildFile; fileRef = 723ABF1A259D055E00BDB4FA /* SUWebView.h */; };
+		723ABF30259D062F00BDB4FA /* SULegacyWebView.h in Headers */ = {isa = PBXBuildFile; fileRef = 723ABF2E259D062F00BDB4FA /* SULegacyWebView.h */; };
+		723ABF31259D062F00BDB4FA /* SULegacyWebView.m in Sources */ = {isa = PBXBuildFile; fileRef = 723ABF2F259D062F00BDB4FA /* SULegacyWebView.m */; };
+		723ABFC4259D4CB300BDB4FA /* SUWKWebView.h in Headers */ = {isa = PBXBuildFile; fileRef = 723ABFC2259D4CB300BDB4FA /* SUWKWebView.h */; };
+		723ABFC5259D4CB300BDB4FA /* SUWKWebView.m in Sources */ = {isa = PBXBuildFile; fileRef = 723ABFC3259D4CB300BDB4FA /* SUWKWebView.m */; };
+		723AC010259DBDAA00BDB4FA /* SUWebViewCommon.h in Headers */ = {isa = PBXBuildFile; fileRef = 723AC00E259DBDAA00BDB4FA /* SUWebViewCommon.h */; };
+		723AC011259DBDAA00BDB4FA /* SUWebViewCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 723AC00F259DBDAA00BDB4FA /* SUWebViewCommon.m */; };
 		723B5DA71CF7AB0100365F95 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 723B5DA01CF7AB0100365F95 /* main.m */; };
 		723B5DA91CF7AB0100365F95 /* SPUDownloader.m in Sources */ = {isa = PBXBuildFile; fileRef = 723B5DA31CF7AB0100365F95 /* SPUDownloader.m */; };
 		723B5DAA1CF7AB6A00365F95 /* SPUDownloader.m in Sources */ = {isa = PBXBuildFile; fileRef = 723B5DA31CF7AB0100365F95 /* SPUDownloader.m */; };
@@ -909,7 +916,7 @@
 		14958C6C19AEBC610061B14F /* test-pubkey.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "test-pubkey.pem"; sourceTree = "<group>"; };
 		149B78631B7D3A0C00D7D62C /* ConfigCommonCoverage.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigCommonCoverage.xcconfig; sourceTree = "<group>"; };
 		149B78641B7D3A4800D7D62C /* ConfigUnitTestCoverage.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigUnitTestCoverage.xcconfig; sourceTree = "<group>"; };
-		1EAA4C8A2132C7BF00604473 /* DarkAqua.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = DarkAqua.css; sourceTree = "<group>"; };
+		1EAA4C8A2132C7BF00604473 /* ReleaseNotesColorStyle.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = ReleaseNotesColorStyle.css; sourceTree = "<group>"; };
 		3772FEA813DE0B6B00F79537 /* SUVersionDisplayProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUVersionDisplayProtocol.h; sourceTree = "<group>"; };
 		4607BEA21948443800EF8DA4 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/Sparkle.strings; sourceTree = "<group>"; };
 		525A278F133D6AE900FD8D70 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
@@ -1135,6 +1142,13 @@
 		723ABE37259A9F2900BDB4FA /* th */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = th; path = th.lproj/MainMenu.strings; sourceTree = "<group>"; };
 		723ABE38259A9F2B00BDB4FA /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/MainMenu.strings; sourceTree = "<group>"; };
 		723ABE39259A9F2E00BDB4FA /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/MainMenu.strings; sourceTree = "<group>"; };
+		723ABF1A259D055E00BDB4FA /* SUWebView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SUWebView.h; sourceTree = "<group>"; };
+		723ABF2E259D062F00BDB4FA /* SULegacyWebView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SULegacyWebView.h; sourceTree = "<group>"; };
+		723ABF2F259D062F00BDB4FA /* SULegacyWebView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SULegacyWebView.m; sourceTree = "<group>"; };
+		723ABFC2259D4CB300BDB4FA /* SUWKWebView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SUWKWebView.h; sourceTree = "<group>"; };
+		723ABFC3259D4CB300BDB4FA /* SUWKWebView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SUWKWebView.m; sourceTree = "<group>"; };
+		723AC00E259DBDAA00BDB4FA /* SUWebViewCommon.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SUWebViewCommon.h; sourceTree = "<group>"; };
+		723AC00F259DBDAA00BDB4FA /* SUWebViewCommon.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SUWebViewCommon.m; sourceTree = "<group>"; };
 		723B5D9F1CF7AB0100365F95 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = Downloader/Info.plist; sourceTree = SOURCE_ROOT; };
 		723B5DA01CF7AB0100365F95 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = Downloader/main.m; sourceTree = SOURCE_ROOT; };
 		723B5DA21CF7AB0100365F95 /* SPUDownloader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SPUDownloader.h; path = Downloader/SPUDownloader.h; sourceTree = SOURCE_ROOT; };
@@ -1705,7 +1719,7 @@
 				657C5F2B218CBC1700925834 /* INSTALL.markdown */,
 				14732BB91960EEEE00593899 /* SampleAppcast.xml */,
 				615AE3CF0D64DC40001CA7BD /* SUModelTranslation.plist */,
-				1EAA4C8A2132C7BF00604473 /* DarkAqua.css */,
+				1EAA4C8A2132C7BF00604473 /* ReleaseNotesColorStyle.css */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -1869,6 +1883,7 @@
 				6196CFE409C71ADE000DC222 /* SUStatusController.m */,
 				61B5FCA009C5228F00B25A18 /* SUUpdateAlert.h */,
 				61B5FCA109C5228F00B25A18 /* SUUpdateAlert.m */,
+				723AC036259DBF1B00BDB4FA /* Web View */,
 				612DCBAD0D488BC60015DBEA /* SUUpdatePermissionPrompt.h */,
 				612DCBAE0D488BC60015DBEA /* SUUpdatePermissionPrompt.m */,
 				720767D21E2EE9C200F9A850 /* SUTouchBarForwardDeclarations.h */,
@@ -2055,6 +2070,20 @@
 				722589B51E0A24B9005EA0B9 /* Security.md */,
 			);
 			name = Internal;
+			sourceTree = "<group>";
+		};
+		723AC036259DBF1B00BDB4FA /* Web View */ = {
+			isa = PBXGroup;
+			children = (
+				723ABF1A259D055E00BDB4FA /* SUWebView.h */,
+				723AC00E259DBDAA00BDB4FA /* SUWebViewCommon.h */,
+				723AC00F259DBDAA00BDB4FA /* SUWebViewCommon.m */,
+				723ABFC2259D4CB300BDB4FA /* SUWKWebView.h */,
+				723ABFC3259D4CB300BDB4FA /* SUWKWebView.m */,
+				723ABF2E259D062F00BDB4FA /* SULegacyWebView.h */,
+				723ABF2F259D062F00BDB4FA /* SULegacyWebView.m */,
+			);
+			name = "Web View";
 			sourceTree = "<group>";
 		};
 		724BB36D1D31D0B7005D534A /* InstallerConnection */ = {
@@ -2386,6 +2415,7 @@
 				7267E5FD1D3DD1B700D1BF90 /* SPUResumableUpdate.h in Headers */,
 				7267E5B61D3D8AEE00D1BF90 /* SPUInstallationInfo.h in Headers */,
 				72B767CE1C9B924900A07552 /* SPUInstallerDriver.h in Headers */,
+				723ABF30259D062F00BDB4FA /* SULegacyWebView.h in Headers */,
 				721BC20E1D1CDE55002BC71E /* SPULocalCacheDirectory.h in Headers */,
 				7267E5B11D3D8AD500D1BF90 /* SPUMessageTypes.h in Headers */,
 				728337A61C9E6FF40085AA99 /* SPUProbeInstallStatus.h in Headers */,
@@ -2407,6 +2437,7 @@
 				726E078D1CA891E9001A286B /* SPUUpdaterSettings.h in Headers */,
 				72F9EC3F1D5E823F004AC8B6 /* SPUUpdaterTimer.h in Headers */,
 				72B09CE71CE6BCBD0052EF9E /* SPUURLDownload.h in Headers */,
+				723ABFC4259D4CB300BDB4FA /* SUWKWebView.h in Headers */,
 				7293A1AE1CEE933800B957A7 /* SPUURLRequest.h in Headers */,
 				725CB9571C7120410064365A /* SPUUserDriver.h in Headers */,
 				725F977B1C8A896F00265BE4 /* SPUUserDriverCoreComponent.h in Headers */,
@@ -2424,9 +2455,11 @@
 				7267E5E51D3D90AA00D1BF90 /* SUFileManager.h in Headers */,
 				72B3DEC91E23472200457642 /* SPUDownloadedUpdate.h in Headers */,
 				61EF67590E25C5B400F754E0 /* SUHost.h in Headers */,
+				723AC010259DBDAA00BDB4FA /* SUWebViewCommon.h in Headers */,
 				72162B081C82C9600013C1C5 /* SULocalizations.h in Headers */,
 				55C14F06136EF6DB00649790 /* SULog.h in Headers */,
 				EA1E286E22B665F0004AA304 /* SUSignatures.h in Headers */,
+				723ABF1B259D055E00BDB4FA /* SUWebView.h in Headers */,
 				72B3DECD1E23479000457642 /* SPUInformationalUpdate.h in Headers */,
 				726F2CE51BC9C33D001971A4 /* SUOperatingSystem.h in Headers */,
 				61A225A40D1C4AC000430CCD /* SUStandardVersionComparator.h in Headers */,
@@ -3117,7 +3150,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				61AAE8280A321A7F00D8810D /* Sparkle.strings in Resources */,
-				1EAA4C8B2132C7BF00604473 /* DarkAqua.css in Resources */,
+				1EAA4C8B2132C7BF00604473 /* ReleaseNotesColorStyle.css in Resources */,
 				723ABD38259A9BA500BDB4FA /* SUUpdateAlert.xib in Resources */,
 				615AE3D00D64DC40001CA7BD /* SUModelTranslation.plist in Resources */,
 				55C14BEF136EF21700649790 /* SUStatus.xib in Resources */,
@@ -3614,10 +3647,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				723ABF31259D062F00BDB4FA /* SULegacyWebView.m in Sources */,
 				72B767E71C9CFD7200A07552 /* SPUAutomaticUpdateDriver.m in Sources */,
 				72B767D71C9C8B5C00A07552 /* SPUBasicUpdateDriver.m in Sources */,
 				72B767E31C9CE90A00A07552 /* SPUCoreBasedUpdateDriver.m in Sources */,
 				72F9EC451D5E9ED8004AC8B6 /* SPUDownloadData.m in Sources */,
+				723ABFC5259D4CB300BDB4FA /* SUWKWebView.m in Sources */,
 				7229E1BE1C98EFF200CB50D0 /* SPUDownloadDriver.m in Sources */,
 				723B5DAA1CF7AB6A00365F95 /* SPUDownloader.m in Sources */,
 				7267E5B71D3D8AEE00D1BF90 /* SPUInstallationInfo.m in Sources */,
@@ -3670,6 +3705,7 @@
 				72F9EBE31D517E2F004AC8B6 /* SUUpdater.m in Sources */,
 				724BB3881D32A167005D534A /* SUXPCInstallerConnection.m in Sources */,
 				724BB3A91D33461B005D534A /* SUXPCInstallerStatus.m in Sources */,
+				723AC011259DBDAA00BDB4FA /* SUWebViewCommon.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
