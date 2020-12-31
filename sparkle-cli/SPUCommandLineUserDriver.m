@@ -113,7 +113,7 @@
 
 - (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem userInitiated:(BOOL)__unused userInitiated reply:(void (^)(SPUUpdateAlertChoice))reply
 {
-    self showUpdateWithAppcastItem:appcastItem updateAdjective:@"new"];
+    [self showUpdateWithAppcastItem:appcastItem updateAdjective:@"new"];
     reply(SPUInstallUpdateChoice);
 }
 
