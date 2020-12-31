@@ -174,7 +174,7 @@
     }
 }
 
-- (void)showUpdateNotFoundWithAcknowledgement:(void (^)(void))__unused acknowledgement
+- (void)showUpdateNotFoundWithAcknowledgement:(void (^)(void))__unused acknowledgement __attribute__((noreturn))
 {
     if (self.verbose) {
         fprintf(stderr, "No new update available!\n");
@@ -182,7 +182,7 @@
     exit(EXIT_SUCCESS);
 }
 
-- (void)showUpdaterError:(NSError *)error acknowledgement:(void (^)(void))__unused acknowledgement
+- (void)showUpdaterError:(NSError *)error acknowledgement:(void (^)(void))__unused acknowledgement __attribute__((noreturn))
 {
     fprintf(stderr, "Error: Update has failed: %s\n", error.localizedDescription.UTF8String);
     exit(EXIT_FAILURE);
@@ -268,7 +268,7 @@
     [self.coreComponent acceptAcknowledgement];
 }
 
-- (void)dismissUpdateInstallation
+- (void)dismissUpdateInstallation __attribute__((noreturn))
 {
     if (self.verbose) {
         fprintf(stderr, "Exiting.\n");
