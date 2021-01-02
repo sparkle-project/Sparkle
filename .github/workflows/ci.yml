@@ -24,7 +24,7 @@ jobs:
           xcodebuild test-without-building -project Sparkle.xcodeproj -scheme Distribution -enableCodeCoverage YES
       - name: Build UI Tests
         run: |
-          xcodebuild build-for-testing -project Sparkle.xcodeproj -scheme UITests
+          xcodebuild build-for-testing -project Sparkle.xcodeproj -scheme UITests -configuration Debug
       - name: Run UI Tests
         run: |
-          xcodebuild test-without-building -project Sparkle.xcodeproj -scheme UITests
+          xcodebuild test-without-building -project Sparkle.xcodeproj -scheme UITests -configuration Debug
