@@ -16,12 +16,15 @@ jobs:
         uses: actions/checkout@v2
         with:
           submodules: true
-      - name: Build
+      - name: Build Unit Tests
         run: |
           xcodebuild build-for-testing -project Sparkle.xcodeproj -scheme Distribution -enableCodeCoverage YES
-      - name: Unit Tests
+      - name: Run Unit Tests
         run: |
           xcodebuild test-without-building -project Sparkle.xcodeproj -scheme Distribution -enableCodeCoverage YES
-      - name: UI Tests
+      - name: Build UI Tests
+        run: |
+          xcodebuild build-for-testing -project Sparkle.xcodeproj -scheme UITests
+      - name: Run UI Tests
         run: |
           xcodebuild test-without-building -project Sparkle.xcodeproj -scheme UITests
