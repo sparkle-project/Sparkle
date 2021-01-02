@@ -8,10 +8,11 @@ on:
 
 jobs:
   build:
+    strategy:
+      matrix:
+        os: [macos-11.0, macos-10.15]
     name: Build and Test Sparkle
-    runs-on:
-      - macos-10.15
-      - macos-11.0
+    runs-on: ${{ matrix.os }}
 
     steps:
       - name: Checkout
