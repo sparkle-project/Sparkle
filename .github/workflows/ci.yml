@@ -1,4 +1,4 @@
-name: XCUI Testing
+name: Build & Tests
 
 on:
   push:
