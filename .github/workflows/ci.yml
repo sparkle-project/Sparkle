@@ -29,6 +29,7 @@ jobs:
         run: |
           xcodebuild test-without-building -project Sparkle.xcodeproj -scheme UITests -configuration Debug -derivedDataPath build
       - name: Archive Test Results
+        if: failure()
         uses: actions/upload-artifact@v2
         with:
           name: build
