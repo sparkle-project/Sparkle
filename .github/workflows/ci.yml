@@ -1,0 +1,25 @@
+name: XCUI Testing
+
+on:
+  push:
+    branches: [ 2.x, master ]
+  pull_request:
+    branches: [ 2.x, master ]
+
+jobs:
+  build:
+    name: Build and Test Sparkle
+    runs-on: [macos-11.0, macos-10.15]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Build
+        run: |
+          xcodebuild build-for-testing -project Sparkle.xcodeproj -scheme Distribution -derivedDataPath build -enableCodeCoverage YES
+      - name: Unit Tests
+        run: |
+          xcodebuild test-without-building -project Sparkle.xcodeproj -scheme Distribution -derivedDataPath build -enableCodeCoverage YES
+      - name: UI Tests
+        run: |
+          xcodebuild test-without-building -project Sparkle.xcodeproj -scheme UITests -derivedDataPath build
