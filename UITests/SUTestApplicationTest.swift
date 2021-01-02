@@ -32,6 +32,9 @@ class SUTestApplicationTest: XCTestCase
         
         let initialRunningApplication = runningTestApplication()
         
+        // Give some time for the Test App to initialize its web server, create an update, and start its updater
+        sleep(60)
+        
         let menuBarsQuery = app.menuBars
         menuBarsQuery.menuBarItems["Sparkle Test App"].click()
         
