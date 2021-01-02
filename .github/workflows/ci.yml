@@ -9,7 +9,9 @@ on:
 jobs:
   build:
     name: Build and Test Sparkle
-    runs-on: [macos-10.15, macos-11.0]
+    runs-on:
+      - macos-10.15
+      - macos-11.0
 
     steps:
       - name: Checkout
