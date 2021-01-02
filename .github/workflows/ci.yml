@@ -12,7 +12,7 @@ jobs:
       matrix:
         xcode: ['/Applications/Xcode_12.2.app/Contents/Developer', '/Applications/Xcode_11.7.app/Contents/Developer']
     name: Build and Test Sparkle
-    runs-on: macos-latest
+    runs-on: macos-10.15
 
     steps:
       - name: Checkout
