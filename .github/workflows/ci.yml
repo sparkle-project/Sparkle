@@ -18,10 +18,10 @@ jobs:
           submodules: true
       - name: Build
         run: |
-          xcodebuild build-for-testing -project Sparkle.xcodeproj -scheme Distribution -derivedDataPath build -enableCodeCoverage YES
+          xcodebuild build-for-testing -project Sparkle.xcodeproj -scheme Distribution -enableCodeCoverage YES
       - name: Unit Tests
         run: |
-          xcodebuild test-without-building -project Sparkle.xcodeproj -scheme Distribution -derivedDataPath build -enableCodeCoverage YES
+          xcodebuild test-without-building -project Sparkle.xcodeproj -scheme Distribution -enableCodeCoverage YES
       - name: UI Tests
         run: |
-          xcodebuild test-without-building -project Sparkle.xcodeproj -scheme UITests -derivedDataPath build
+          xcodebuild test-without-building -project Sparkle.xcodeproj -scheme UITests
