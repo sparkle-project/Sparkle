@@ -10,9 +10,9 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [macos-11.0, macos-10.15]
+        xcode: ['/Applications/Xcode_12.2.app/Contents/Developer', '/Applications/Xcode_11.7.app/Contents/Developer']
     name: Build and Test Sparkle
-    runs-on: ${{ matrix.os }}
+    runs-on: macos-latest
 
     steps:
       - name: Checkout
@@ -20,15 +20,23 @@ jobs:
         with:
           submodules: true
       - name: Build Unit Tests
+        env:
+          DEVELOPER_DIR: ${{ matrix.xcode }}
         run: |
           xcodebuild build-for-testing -project Sparkle.xcodeproj -scheme Distribution -enableCodeCoverage YES -derivedDataPath build
       - name: Run Unit Tests
+        env:
+          DEVELOPER_DIR: ${{ matrix.xcode }}
         run: |
           xcodebuild test-without-building -project Sparkle.xcodeproj -scheme Distribution -enableCodeCoverage YES -derivedDataPath build
       - name: Build UI Tests
+        env:
+          DEVELOPER_DIR: ${{ matrix.xcode }}
         run: |
           xcodebuild build-for-testing -project Sparkle.xcodeproj -scheme UITests -configuration Debug -derivedDataPath build
       - name: Run UI Tests
+        env:
+          DEVELOPER_DIR: ${{ matrix.xcode }}
         run: |
           xcodebuild test-without-building -project Sparkle.xcodeproj -scheme UITests -configuration Debug -derivedDataPath build
       - name: Archive Test Results
