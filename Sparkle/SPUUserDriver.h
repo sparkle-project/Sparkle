@@ -32,16 +32,14 @@ NS_ASSUME_NONNULL_BEGIN
  a response back from the user driver. Note that every parameter block, or reply, *must* be responded to eventually -
  that is, none can be ignored. Furthermore, they can only be replied to *once* - a reply or completion block should be considered
  invalidated after it's once used. The faster a reply can be made, the more Sparkle may be able to idle, and so the better.
- Lastly, every method in this protocol can be called from any thread. Thus, an implementor may choose to always
- dispatch asynchronously to the main thread. However, an implementor should also avoid unnecessary nested asynchronous dispatches.
+ Every method in this protocol can be assumed to be called from the main thread.
  
- An implementor of this protocol should act defensively. For example, it may be possible for an action that says to
- invalidate or dismiss something to be called multiple times in succession, and the implementor may choose to ignore further requests.
+ It may be possible for an action that says to invalidate or dismiss something to be called multiple times in succession, and the implementor may choose to ignore further requests. (TODO: This should be verified if this actually can happen in practice).
  
- Note: Once upon a time, when first developing the user driver API, I had the user driver exist in a separate process from the rest of the framework.
+ Note: Once upon a time, when first developing the user driver API, I had the user driver exist in a separate process from the rest of the framework (this is no longer supported).
  If you're familiar with how the higher level XPC APIs work, this explains why some of the decisions above were made
  (reply block executed on any thread, reply block replied only once, single reply block, void return types, idleness, no optional methods, ...)
- This is somewhat of an artifact (maybe?) now, but I think most of these set of restrictions still enforces a well designed API.
+ This is somewhat of an artifact now, but I think most of these set of restrictions still enforces a well designed API.
  */
 SU_EXPORT @protocol SPUUserDriver <NSObject>
 
