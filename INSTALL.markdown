@@ -5,6 +5,7 @@ If release products have not already been built, they can be built by:
 ```
 cd <path-to>/Sparkle/
 
+git submodule update --init --recursive
 make release
 ```
 
