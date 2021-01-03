@@ -60,11 +60,15 @@
 
 - (void)showCanCheckForUpdates:(BOOL)canCheckForUpdates
 {
+    assert(NSThread.isMainThread);
+    
     [self.coreComponent showCanCheckForUpdates:canCheckForUpdates];
 }
 
 - (BOOL)canCheckForUpdates
 {
+    assert(NSThread.isMainThread);
+    
     return self.coreComponent.canCheckForUpdates;
 }
 
@@ -72,6 +76,8 @@
 
 - (void)showUpdatePermissionRequest:(SPUUpdatePermissionRequest *)request reply:(void (^)(SUUpdatePermissionResponse *))reply
 {
+    assert(NSThread.isMainThread);
+    
     // This shows a modal alert dialog which unlike other alerts cannot be closed until the user makes a decision
     // This means that we can never programatically close the dialog if something goes horribly wrong
     // But this dialog should only show up once in the application's lifetime so this may be an OK decision
@@ -129,6 +135,8 @@
 
 - (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem userInitiated:(BOOL)__unused userInitiated reply:(void (^)(SPUUpdateAlertChoice))reply
 {
+    assert(NSThread.isMainThread);
+    
     [self showUpdateFoundWithAlertHandler:^SUUpdateAlert *(SPUStandardUserDriver *weakSelf, SUHost *host, id<SUVersionDisplay> versionDisplayer) {
         return [[SUUpdateAlert alloc] initWithAppcastItem:appcastItem alreadyDownloaded:NO host:host versionDisplayer:versionDisplayer completionBlock:^(SPUUpdateAlertChoice choice) {
             reply(choice);
@@ -139,6 +147,8 @@
 
 - (void)showDownloadedUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem userInitiated:(BOOL)__unused userInitiated reply:(void (^)(SPUUpdateAlertChoice))reply
 {
+    assert(NSThread.isMainThread);
+    
     [self showUpdateFoundWithAlertHandler:^SUUpdateAlert *(SPUStandardUserDriver *weakSelf, SUHost *host, id<SUVersionDisplay> versionDisplayer) {
         return [[SUUpdateAlert alloc] initWithAppcastItem:appcastItem alreadyDownloaded:YES host:host versionDisplayer:versionDisplayer completionBlock:^(SPUUpdateAlertChoice choice) {
             reply(choice);
@@ -149,6 +159,8 @@
 
 - (void)showResumableUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem userInitiated:(BOOL)__unused userInitiated reply:(void (^)(SPUInstallUpdateStatus))reply
 {
+    assert(NSThread.isMainThread);
+    
     [self showUpdateFoundWithAlertHandler:^SUUpdateAlert *(SPUStandardUserDriver *weakSelf, SUHost *host, id<SUVersionDisplay> versionDisplayer) {
         return [[SUUpdateAlert alloc] initWithAppcastItem:appcastItem host:host versionDisplayer:versionDisplayer resumableCompletionBlock:^(SPUInstallUpdateStatus choice) {
             reply(choice);
@@ -159,6 +171,8 @@
 
 - (void)showInformationalUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem userInitiated:(BOOL)__unused userInitiated reply:(void (^)(SPUInformationalUpdateAlertChoice))reply
 {
+    assert(NSThread.isMainThread);
+    
     [self showUpdateFoundWithAlertHandler:^SUUpdateAlert *(SPUStandardUserDriver *weakSelf, SUHost *host, id<SUVersionDisplay> versionDisplayer) {
         return [[SUUpdateAlert alloc] initWithAppcastItem:appcastItem host:host versionDisplayer:versionDisplayer informationalCompletionBlock:^(SPUInformationalUpdateAlertChoice choice) {
             reply(choice);
@@ -169,11 +183,15 @@
 
 - (void)showUpdateReleaseNotesWithDownloadData:(SPUDownloadData *)downloadData
 {
+    assert(NSThread.isMainThread);
+    
     [self.activeUpdateAlert showUpdateReleaseNotesWithDownloadData:downloadData];
 }
 
 - (void)showUpdateReleaseNotesFailedToDownloadWithError:(NSError *)error
 {
+    assert(NSThread.isMainThread);
+    
     // I don't want to expose SULog here because it's more of a user driver facing error
     // For our purposes we just ignore it and continue on..
     NSLog(@"Failed to download release notes with error: %@", error);
@@ -184,6 +202,8 @@
 
 - (void)showReadyToInstallAndRelaunch:(void (^)(SPUInstallUpdateStatus))installUpdateHandler
 {
+    assert(NSThread.isMainThread);
+    
     [self.statusController beginActionWithTitle:SULocalizedString(@"Ready to Install", nil) maxProgressValue:1.0 statusText:nil];
     [self.statusController setProgressValue:1.0]; // Fill the bar.
     [self.statusController setButtonEnabled:YES];
@@ -203,6 +223,8 @@
 
 - (void)showUserInitiatedUpdateCheckWithCompletion:(void (^)(SPUUserInitiatedCheckStatus))updateCheckStatusCompletion
 {
+    assert(NSThread.isMainThread);
+    
     [self.coreComponent registerUpdateCheckStatusHandler:updateCheckStatusCompletion];
     
     self.checkingController = [[SUStatusController alloc] initWithHost:self.host];
@@ -236,6 +258,8 @@
 
 - (void)dismissUserInitiatedUpdateCheck
 {
+    assert(NSThread.isMainThread);
+    
     [self.coreComponent completeUpdateCheckStatus];
     [self closeCheckingWindow];
 }
@@ -244,6 +268,8 @@
 
 - (void)showUpdaterError:(NSError *)error acknowledgement:(void (^)(void))acknowledgement
 {
+    assert(NSThread.isMainThread);
+    
     [self.coreComponent registerAcknowledgement:acknowledgement];
     
     NSAlert *alert = [[NSAlert alloc] init];
@@ -257,6 +283,8 @@
 
 - (void)showUpdateNotFoundWithAcknowledgement:(void (^)(void))acknowledgement
 {
+    assert(NSThread.isMainThread);
+    
     [self.coreComponent registerAcknowledgement:acknowledgement];
     
     NSAlert *alert = [[NSAlert alloc] init];
@@ -300,6 +328,8 @@
 
 - (void)showDownloadInitiatedWithCompletion:(void (^)(SPUDownloadUpdateStatus))downloadUpdateStatusCompletion
 {
+    assert(NSThread.isMainThread);
+    
     [self.coreComponent registerDownloadStatusHandler:downloadUpdateStatusCompletion];
     
     [self showStatusController];
@@ -314,6 +344,8 @@
 
 - (void)showDownloadDidReceiveExpectedContentLength:(uint64_t)expectedContentLength
 {
+    assert(NSThread.isMainThread);
+    
     [self.statusController setMaxProgressValue:expectedContentLength];
 }
 
@@ -349,6 +381,8 @@
 
 - (void)showDownloadDidReceiveDataOfLength:(uint64_t)length
 {
+    assert(NSThread.isMainThread);
+    
     double newProgressValue = [self.statusController progressValue] + (double)length;
     
     // In case our expected content length was incorrect
@@ -365,6 +399,8 @@
 
 - (void)showDownloadDidStartExtractingUpdate
 {
+    assert(NSThread.isMainThread);
+    
     [self.coreComponent completeDownloadStatus];
     
     [self showStatusController];
@@ -375,25 +411,26 @@
 
 - (void)showExtractionReceivedProgress:(double)progress
 {
+    assert(NSThread.isMainThread);
+    
     if ([self.statusController maxProgressValue] == 0.0) {
         [self.statusController setMaxProgressValue:1];
     }
     [self.statusController setProgressValue:progress];
 }
 
-- (void)_showInstallingUpdate
+- (void)showInstallingUpdate
 {
+    assert(NSThread.isMainThread);
+    
     [self.statusController beginActionWithTitle:SULocalizedString(@"Installing update...", @"Take care not to overflow the status window.") maxProgressValue:0.0 statusText:nil];
     [self.statusController setButtonEnabled:NO];
 }
 
-- (void)showInstallingUpdate
-{
-    [self _showInstallingUpdate];
-}
-
 - (void)showUpdateInstallationDidFinishWithAcknowledgement:(void (^)(void))acknowledgement
 {
+    assert(NSThread.isMainThread);
+    
     // Deciding not to show anything here
     [self.coreComponent registerAcknowledgement:acknowledgement];
     [self.coreComponent acceptAcknowledgement];
@@ -403,6 +440,8 @@
 
 - (void)showSendingTerminationSignal
 {
+    assert(NSThread.isMainThread);
+    
     // The "quit" event can always be canceled or delayed by the application we're updating
     // So we can't easily predict how long the installation will take or if it won't happen right away
     // We close our status window because we don't want it persisting for too long and have it obscure other windows
@@ -412,6 +451,8 @@
 
 - (void)dismissUpdateInstallation
 {
+    assert(NSThread.isMainThread);
+    
     [self.coreComponent dismissUpdateInstallation];
     
     [self closeCheckingWindow];
