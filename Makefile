@@ -14,6 +14,7 @@ localizable-strings:
 
 release:
 	xcodebuild -scheme Distribution -configuration Release -derivedDataPath "$(BUILDDIR)" build
+	git tag -fa <tagname>
 	open "$(BUILDDIR)/Build/Products/Release/"
 	cat Sparkle.podspec
 	@echo "Don't forget to update CocoaPods! pod trunk push"
