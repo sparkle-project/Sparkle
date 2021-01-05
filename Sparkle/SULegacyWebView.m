@@ -78,6 +78,12 @@
     [[self.webView mainFrame] loadData:data MIMEType:MIMEType textEncodingName:textEncodingName baseURL:baseURL];
 }
 
+- (void)loadRequest:(NSURLRequest *)urlRequest completionHandler:(void (^)(NSError * _Nullable))completionHandler
+{
+    self.completionHandler = [completionHandler copy];
+    [[self.webView mainFrame] loadRequest:urlRequest];
+}
+
 - (void)stopLoading
 {
     self.completionHandler = nil;

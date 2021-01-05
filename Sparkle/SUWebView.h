@@ -20,6 +20,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)loadData:(NSData *)data MIMEType:(NSString *)MIMEType textEncodingName:(NSString *)textEncodingName baseURL:(NSURL *)baseURL completionHandler:(void (^)(NSError * _Nullable))completionHandler;
 
+- (void)loadRequest:(NSURLRequest *)urlRequest completionHandler:(void (^)(NSError * _Nullable))completionHandler;
+
 - (void)stopLoading;
 
 - (void)setDrawsBackground:(BOOL)drawsBackground;

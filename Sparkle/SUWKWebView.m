@@ -135,6 +135,17 @@ static WKUserScript *_userScriptWithInjectedStyleSource(NSString *styleSource)
 #pragma clang diagnostic pop
 }
 
+- (void)loadRequest:(NSURLRequest *)urlRequest completionHandler:(void (^)(NSError * _Nullable))completionHandler
+{
+    self.completionHandler = [completionHandler copy];
+    
+    // Remove when minimum system requirement is 10.10+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunguarded-availability"
+    self.currentNavigation = [self.webView loadRequest:urlRequest];
+#pragma clang diagnostic pop
+}
+
 - (void)setDrawsBackground:(BOOL)drawsBackground
 {
     if (self.drawsWebViewBackground != drawsBackground) {

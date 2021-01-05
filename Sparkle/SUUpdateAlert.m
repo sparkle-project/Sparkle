@@ -159,7 +159,13 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
     // If there's a release notes URL, load it; otherwise, just stick the contents of the description into the web view.
     if ([self.updateItem releaseNotesURL])
     {
-        //[[self.releaseNotesView mainFrame] loadRequest:[NSURLRequest requestWithURL:[self.updateItem releaseNotesURL] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30]];
+        __weak __typeof__(self) weakSelf = self;
+        [self.webView loadRequest:[NSURLRequest requestWithURL:[self.updateItem releaseNotesURL] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30] completionHandler:^(NSError * _Nullable error) {
+            if (error != nil) {
+                SULog(SULogLevelError, @"Failed to load URL request from web view: %@", error);
+            }
+            [weakSelf stopReleaseNotesSpinner];
+        }];
     }
     else
     {
