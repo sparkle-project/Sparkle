@@ -18,9 +18,11 @@
 @end
 @protocol WebPolicyDelegate <NSObject>
 @end
+@protocol WebUIDelegate <NSObject>
+@end
 #endif
 
-@interface SULegacyWebView () <WebPolicyDelegate, WebFrameLoadDelegate>
+@interface SULegacyWebView () <WebPolicyDelegate, WebFrameLoadDelegate, WebUIDelegate>
 
 @property (nonatomic, readonly) WebView *webView;
 @property (nonatomic) void (^completionHandler)(NSError * _Nullable);
@@ -57,6 +59,7 @@
         _webView.preferences = preferences;
         _webView.policyDelegate = self;
         _webView.frameLoadDelegate = self;
+        _webView.UIDelegate = self;
     }
     return self;
 }
