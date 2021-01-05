@@ -149,6 +149,15 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 {
     [self adaptReleaseNotesAppearance];
     
+#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 101400
+    if (@available(macOS 10.14, *)) {
+        if (!self.observingAppearance) {
+            [self.webView.view addObserver:self forKeyPath:@"effectiveAppearance" options:0 context:nil];
+            self.observingAppearance = YES;
+        }
+    }
+#endif
+    
     // Stick a nice big spinner in the middle of the web view until the page is loaded.
     NSRect frame = [[self.webView.view superview] frame];
     self.releaseNotesSpinner = [[NSProgressIndicator alloc] initWithFrame:NSMakeRect(NSMidX(frame) - 16, NSMidY(frame) - 16, 32, 32)];
