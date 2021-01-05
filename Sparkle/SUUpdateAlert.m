@@ -13,7 +13,9 @@
 #import "SUUpdateAlert.h"
 
 #import "SUHost.h"
-#import <WebKit/WebKit.h>
+#import "SUWebView.h"
+#import "SUWKWebView.h"
+#import "SULegacyWebView.h"
 
 #import "SUConstants.h"
 #import "SULog.h"
@@ -27,34 +29,25 @@
 
 static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDENTIFIER ".SUUpdateAlert";
 
-// WebKit protocols are not explicitly declared until 10.11 SDK, so
-// declare dummy protocols to keep the build working on earlier SDKs.
-#if __MAC_OS_X_VERSION_MAX_ALLOWED < 101100
-@protocol WebFrameLoadDelegate <NSObject>
-@end
-@protocol WebPolicyDelegate <NSObject>
-@end
-@protocol WebUIDelegate <NSObject>
-@end
-#endif
-
-@interface SUUpdateAlert () <WebFrameLoadDelegate, WebPolicyDelegate, WebUIDelegate, NSTouchBarDelegate>
+@interface SUUpdateAlert () <NSTouchBarDelegate>
 
 @property (strong) SUAppcastItem *updateItem;
 @property (strong) SUHost *host;
 @property (strong) void(^completionBlock)(SUUpdateAlertChoice);
 
 @property (strong) NSProgressIndicator *releaseNotesSpinner;
-@property (assign) BOOL webViewFinishedLoading;
 @property (assign) BOOL observingAppearance;
-
-@property (weak) IBOutlet WebView *releaseNotesView;
 @property (weak) IBOutlet NSView *releaseNotesContainerView;
+@property (weak) IBOutlet NSBox *releaseNotesBoxView;
 @property (weak) IBOutlet NSTextField *descriptionField;
 @property (weak) IBOutlet NSButton *automaticallyInstallUpdatesButton;
 @property (weak) IBOutlet NSButton *installButton;
 @property (weak) IBOutlet NSButton *skipButton;
 @property (weak) IBOutlet NSButton *laterButton;
+
+@property (strong) NSBox *darkBackgroundView;
+
+@property (nonatomic) id<SUWebView> webView;
 
 @end
 
@@ -67,16 +60,19 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 @synthesize host;
 
 @synthesize releaseNotesSpinner;
-@synthesize webViewFinishedLoading;
 @synthesize observingAppearance;
 
-@synthesize releaseNotesView;
 @synthesize releaseNotesContainerView;
+@synthesize releaseNotesBoxView = _releaseNotesBoxView;
 @synthesize descriptionField;
 @synthesize automaticallyInstallUpdatesButton;
 @synthesize installButton;
 @synthesize skipButton;
 @synthesize laterButton;
+
+@synthesize darkBackgroundView = _darkBackgroundView;
+
+@synthesize webView = _webView;
 
 - (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost completionBlock:(void (^)(SUUpdateAlertChoice))block
 {
@@ -87,30 +83,31 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
         host = aHost;
         updateItem = item;
         [self setShouldCascadeWindows:NO];
-
-        // Alex: This dummy line makes sure that the binary is linked against WebKit.
-        // The SUUpdateAlert.xib file contains a WebView and if we don't link against WebKit,
-        // we will get a runtime crash when decoding the NIB. It is better to get a link error.
-        [WebView MIMETypesShownAsHTML];
-    }
-    return self;
-}
-
-- (void)dealloc {
-#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 101400
-    if (SUAVAILABLE(10, 14)) {
-        if (self.observingAppearance) {
-            [self.window removeObserver:self forKeyPath:@"effectiveAppearance"];
-            self.observingAppearance = NO;
+        
+        NSURL *colorStyleURL = [[NSBundle bundleForClass:[self class]] URLForResource:@"ReleaseNotesColorStyle" withExtension:@"css"];
+        
+        // "-apple-system-font" is a reference to the system UI font. "-apple-system" is the new recommended token, but for backward compatibility we can't use it.
+        NSString *defaultFontFamily = @"-apple-system-font";
+        int defaultFontSize = (int)[NSFont systemFontSize];
+        
+        BOOL javaScriptEnabled = [host boolForInfoDictionaryKey:SUEnableJavaScriptKey];
+        
+        BOOL useWKWebView;
+        if (@available(macOS 10.11, *)) {
+            useWKWebView = YES;
+        } else {
+            // Never use WKWebView prior to macOS 10.11. Details are in SUWKWebView.m
+            // Note: 2.x has another case where we fall back to using legacy WKWebView due to certain sandboxing issues.
+            useWKWebView = NO;
+        }
+        
+        if (useWKWebView) {
+            _webView = [[SUWKWebView alloc] initWithColorStyleSheetLocation:colorStyleURL fontFamily:defaultFontFamily fontPointSize:defaultFontSize javaScriptEnabled:javaScriptEnabled];
+        } else {
+            _webView = [[SULegacyWebView alloc] initWithColorStyleSheetLocation:colorStyleURL fontFamily:defaultFontFamily fontPointSize:defaultFontSize javaScriptEnabled:javaScriptEnabled];
         }
     }
-#endif
-}
-
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(__attribute__((unused)) NSDictionary<NSKeyValueChangeKey,id> *)change context:(__attribute__((unused)) void *)context {
-    if (object == self.window && [keyPath isEqualToString:@"effectiveAppearance"]) {
-        [self adaptReleaseNotesAppearance];
-    }
+    return self;
 }
 
 - (NSString *)description { return [NSString stringWithFormat:@"%@ <%@>", [self class], [self.host bundlePath]]; }
@@ -121,11 +118,8 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 
 - (void)endWithSelection:(SUUpdateAlertChoice)choice
 {
-    [self.releaseNotesView stopLoading:self];
-    self.releaseNotesView.frameLoadDelegate = nil;
-    self.releaseNotesView.policyDelegate = nil;
-    self.releaseNotesView.UIDelegate = nil;
-    [self.releaseNotesView removeFromSuperview]; // Otherwise it gets sent Esc presses (why?!) and gets very confused.
+    [self.webView stopLoading];
+    [self.webView.view removeFromSuperview]; // Otherwise it gets sent Esc presses (why?!) and gets very confused.
     [self close];
     self.completionBlock(choice);
     self.completionBlock = nil;
@@ -153,56 +147,109 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 
 - (void)displayReleaseNotes
 {
-    self.releaseNotesView.preferencesIdentifier = SUBundleIdentifier;
-    WebPreferences *prefs = [self.releaseNotesView preferences];
-    prefs.plugInsEnabled = NO;
-    prefs.javaEnabled = NO;
-    prefs.javaScriptEnabled = [self.host boolForInfoDictionaryKey:SUEnableJavaScriptKey];
-    self.releaseNotesView.frameLoadDelegate = self;
-    self.releaseNotesView.policyDelegate = self;
-    self.releaseNotesView.UIDelegate = self;
+    [self adaptReleaseNotesAppearance];
     
-    // Set the default font
-    // "-apple-system-font" is a reference to the system UI font. "-apple-system" is the new recommended token, but for backward compatibility we can't use it.
-    prefs.standardFontFamily = @"-apple-system-font";
-    prefs.defaultFontSize = (int)[NSFont systemFontSize];
-
 #if __MAC_OS_X_VERSION_MAX_ALLOWED >= 101400
-    if (SUAVAILABLE(10, 14))
-    {
-        NSBox *darkBackgroundView = [[NSBox alloc] initWithFrame:self.releaseNotesView.frame];
-        darkBackgroundView.boxType = NSBoxCustom;
-        darkBackgroundView.fillColor = [NSColor textBackgroundColor];
-        darkBackgroundView.borderColor = [NSColor clearColor];
-        // Using auto-resizing mask instead of contraints works well enough
-        darkBackgroundView.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
-        [self.releaseNotesView.superview addSubview:darkBackgroundView positioned:NSWindowBelow relativeTo:self.releaseNotesView];
-        self.releaseNotesView.drawsBackground = NO;
-
-        prefs.userStyleSheetLocation = [[NSBundle bundleForClass:[self class]] URLForResource:@"DarkAqua" withExtension:@"css"];
+    if (@available(macOS 10.14, *)) {
         if (!self.observingAppearance) {
-            [self.window addObserver:self forKeyPath:@"effectiveAppearance" options:NSKeyValueObservingOptionInitial context:nil];
+            [self.webView.view addObserver:self forKeyPath:@"effectiveAppearance" options:0 context:nil];
             self.observingAppearance = YES;
         }
     }
 #endif
+    
     // Stick a nice big spinner in the middle of the web view until the page is loaded.
-    NSRect frame = [[self.releaseNotesView superview] frame];
+    NSRect frame = [[self.webView.view superview] frame];
     self.releaseNotesSpinner = [[NSProgressIndicator alloc] initWithFrame:NSMakeRect(NSMidX(frame) - 16, NSMidY(frame) - 16, 32, 32)];
     [self.releaseNotesSpinner setStyle:NSProgressIndicatorSpinningStyle];
     [self.releaseNotesSpinner startAnimation:self];
-    self.webViewFinishedLoading = NO;
-    [[self.releaseNotesView superview] addSubview:self.releaseNotesSpinner];
+    [[self.webView.view superview] addSubview:self.releaseNotesSpinner];
 
     // If there's a release notes URL, load it; otherwise, just stick the contents of the description into the web view.
     if ([self.updateItem releaseNotesURL])
     {
-        [[self.releaseNotesView mainFrame] loadRequest:[NSURLRequest requestWithURL:[self.updateItem releaseNotesURL] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30]];
+        __weak __typeof__(self) weakSelf = self;
+        [self.webView loadRequest:[NSURLRequest requestWithURL:[self.updateItem releaseNotesURL] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30] completionHandler:^(NSError * _Nullable error) {
+            if (error != nil) {
+                SULog(SULogLevelError, @"Failed to load URL request from web view: %@", error);
+            }
+            [weakSelf stopReleaseNotesSpinner];
+        }];
     }
     else
     {
-        [[self.releaseNotesView mainFrame] loadHTMLString:[self.updateItem itemDescription] baseURL:nil];
+        __weak __typeof__(self) weakSelf = self;
+        [self.webView loadHTMLString:[self.updateItem itemDescription] baseURL:nil completionHandler:^(NSError * _Nullable error) {
+            if (error != nil) {
+                SULog(SULogLevelError, @"Failed to load HTML string from web view: %@", error);
+            }
+            [weakSelf stopReleaseNotesSpinner];
+        }];
     }
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(__attribute__((unused)) NSDictionary<NSKeyValueChangeKey,id> *)change context:(__attribute__((unused)) void *)context {
+#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 101400
+    if (@available(macOS 10.14, *)) {
+        if (object == self.webView.view && [keyPath isEqualToString:@"effectiveAppearance"]) {
+            [self adaptReleaseNotesAppearance];
+        }
+    }
+#endif
+}
+
+- (void)dealloc {
+#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 101400
+    if (@available(macOS 10.14, *)) {
+        if (self.observingAppearance) {
+            [self.webView.view removeObserver:self forKeyPath:@"effectiveAppearance"];
+            self.observingAppearance = NO;
+        }
+    }
+#endif
+}
+
+- (void)adaptReleaseNotesAppearance
+{
+#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 101400
+    if (@available(macOS 10.14, *))
+    {
+        NSAppearanceName bestAppearance = [self.webView.view.effectiveAppearance bestMatchFromAppearancesWithNames:@[NSAppearanceNameAqua, NSAppearanceNameDarkAqua]];
+        if ([bestAppearance isEqualToString:NSAppearanceNameDarkAqua])
+        {
+            // Remove web view background...
+            [self.webView setDrawsBackground:NO];
+            // ... and use NSBox to get the dynamically colored background
+            if (self.darkBackgroundView == nil)
+            {
+                self.darkBackgroundView = [[NSBox alloc] initWithFrame:self.webView.view.frame];
+                self.darkBackgroundView.boxType = NSBoxCustom;
+                self.darkBackgroundView.fillColor = [NSColor textBackgroundColor];
+                self.darkBackgroundView.borderColor = [NSColor clearColor];
+                // Using auto-resizing mask instead of contraints works well enough
+                self.darkBackgroundView.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
+                [self.webView.view.superview addSubview:self.darkBackgroundView positioned:NSWindowBelow relativeTo:self.webView.view];
+                
+                // The release note user stylesheet will not adjust to the user changing the theme until adaptReleaseNoteAppearance is called again.
+                // So lock the appearance of the background to keep the text readable if the system theme changes.
+                self.darkBackgroundView.appearance = self.darkBackgroundView.effectiveAppearance;
+            }
+        }
+        else
+        {
+            // Restore standard dark on light appearance
+            [self.darkBackgroundView removeFromSuperview];
+            self.darkBackgroundView = nil;
+            [self.webView setDrawsBackground:YES];
+        }
+    }
+#endif
+}
+
+- (void)stopReleaseNotesSpinner
+{
+    [self.releaseNotesSpinner stopAnimation:self];
+    [self.releaseNotesSpinner setHidden:YES];
 }
 
 - (BOOL)showsReleaseNotes
@@ -228,6 +275,13 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 - (void)windowDidLoad
 {
     BOOL showReleaseNotes = [self showsReleaseNotes];
+    
+    NSView *boxContentView = self.releaseNotesBoxView.contentView;
+    [boxContentView addSubview:self.webView.view];
+    
+    self.webView.view.frame = boxContentView.bounds;
+    self.webView.view.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
+    self.webView.view.hidden = !showReleaseNotes;
 
     [self.window setFrameAutosaveName: showReleaseNotes ? @"SUUpdateAlert" : @"SUUpdateAlertSmall" ];
 
@@ -321,86 +375,6 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
         finalString = [NSString stringWithFormat:SULocalizedString(@"%@ %@ is now available--you have %@. Would you like to download it now?", @"Description text for SUUpdateAlert when the update is downloadable."), self.host.name, updateItemVersion, hostVersion];
     }
     return finalString;
-}
-
-- (void)adaptReleaseNotesAppearance
-{
-#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 101400
-    if (SUAVAILABLE(10, 14))
-    {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunguarded-availability"
-        NSAppearanceName bestAppearance = [self.window.effectiveAppearance bestMatchFromAppearancesWithNames:@[NSAppearanceNameAqua, NSAppearanceNameDarkAqua]];
-        BOOL isDarkAqua = ([bestAppearance isEqualToString:NSAppearanceNameDarkAqua]);
-        self.releaseNotesView.preferences.userStyleSheetEnabled = isDarkAqua;
-#pragma clang diagnostic pop
-    }
-#endif
-}
-
-- (void)webView:(WebView *)sender didFinishLoadForFrame:(WebFrame *)frame
-{
-    if ([frame parentFrame] == nil) {
-        self.webViewFinishedLoading = YES;
-        [self.releaseNotesSpinner setHidden:YES];
-        [sender display]; // necessary to prevent weird scroll bar artifacting
-    }
-}
-
-- (void)webView:(WebView *)__unused sender decidePolicyForNavigationAction:(NSDictionary *)__unused actionInformation request:(NSURLRequest *)request frame:(WebFrame *)__unused frame decisionListener:(id<WebPolicyDecisionListener>)listener
-{
-    NSURL *requestURL = request.URL;
-    NSString *scheme = requestURL.scheme;
-    BOOL isAboutBlank = [requestURL.absoluteString isEqualToString:@"about:blank"];
-    BOOL whitelistedSafe = isAboutBlank || [@[@"http", @"https", @"macappstore", @"macappstores", @"itms-apps", @"itms-appss"] containsObject:scheme];
-
-    // Do not allow redirects to dangerous protocols such as file://
-    if (!whitelistedSafe) {
-        SULog(SULogLevelDefault, @"Blocked display of %@ URL which may be dangerous", scheme);
-        [listener ignore];
-        return;
-    }
-
-    if (self.webViewFinishedLoading) {
-        if (requestURL && !isAboutBlank) {
-            [[NSWorkspace sharedWorkspace] openURL:requestURL];
-        }
-
-        [listener ignore];
-    }
-    else {
-        [listener use];
-    }
-}
-
-// Clean up the contextual menu.
-- (NSArray<NSMenuItem *> *)webView:(WebView *)__unused sender contextMenuItemsForElement:(NSDictionary *)__unused element defaultMenuItems:(NSArray<NSMenuItem *> *)defaultMenuItems
-{
-    NSMutableArray<NSMenuItem *> *webViewMenuItems = [defaultMenuItems mutableCopy];
-
-    if (webViewMenuItems)
-    {
-        for (NSMenuItem *menuItem in defaultMenuItems)
-        {
-            NSInteger tag = [menuItem tag];
-
-            switch (tag)
-            {
-                case WebMenuItemTagOpenLinkInNewWindow:
-                case WebMenuItemTagDownloadLinkToDisk:
-                case WebMenuItemTagOpenImageInNewWindow:
-                case WebMenuItemTagDownloadImageToDisk:
-                case WebMenuItemTagOpenFrameInNewWindow:
-                case WebMenuItemTagGoBack:
-                case WebMenuItemTagGoForward:
-                case WebMenuItemTagStop:
-                case WebMenuItemTagReload:
-                    [webViewMenuItems removeObjectIdenticalTo:menuItem];
-            }
-        }
-    }
-
-    return webViewMenuItems;
 }
 
 - (NSTouchBar *)makeTouchBar
