@@ -83,29 +83,6 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
         host = aHost;
         updateItem = item;
         [self setShouldCascadeWindows:NO];
-        
-        NSURL *colorStyleURL = [[NSBundle bundleForClass:[self class]] URLForResource:@"ReleaseNotesColorStyle" withExtension:@"css"];
-        
-        // "-apple-system-font" is a reference to the system UI font. "-apple-system" is the new recommended token, but for backward compatibility we can't use it.
-        NSString *defaultFontFamily = @"-apple-system-font";
-        int defaultFontSize = (int)[NSFont systemFontSize];
-        
-        BOOL javaScriptEnabled = [host boolForInfoDictionaryKey:SUEnableJavaScriptKey];
-        
-        BOOL useWKWebView;
-        if (@available(macOS 10.11, *)) {
-            useWKWebView = YES;
-        } else {
-            // Never use WKWebView prior to macOS 10.11. Details are in SUWKWebView.m
-            // Note: 2.x has another case where we fall back to using legacy WKWebView due to certain sandboxing issues.
-            useWKWebView = NO;
-        }
-        
-        if (useWKWebView) {
-            _webView = [[SUWKWebView alloc] initWithColorStyleSheetLocation:colorStyleURL fontFamily:defaultFontFamily fontPointSize:defaultFontSize javaScriptEnabled:javaScriptEnabled];
-        } else {
-            _webView = [[SULegacyWebView alloc] initWithColorStyleSheetLocation:colorStyleURL fontFamily:defaultFontFamily fontPointSize:defaultFontSize javaScriptEnabled:javaScriptEnabled];
-        }
     }
     return self;
 }
@@ -276,12 +253,36 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 {
     BOOL showReleaseNotes = [self showsReleaseNotes];
     
-    NSView *boxContentView = self.releaseNotesBoxView.contentView;
-    [boxContentView addSubview:self.webView.view];
-    
-    self.webView.view.frame = boxContentView.bounds;
-    self.webView.view.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
-    self.webView.view.hidden = !showReleaseNotes;
+    if (showReleaseNotes) {
+        NSURL *colorStyleURL = [[NSBundle bundleForClass:[self class]] URLForResource:@"ReleaseNotesColorStyle" withExtension:@"css"];
+        
+        // "-apple-system-font" is a reference to the system UI font. "-apple-system" is the new recommended token, but for backward compatibility we can't use it.
+        NSString *defaultFontFamily = @"-apple-system-font";
+        int defaultFontSize = (int)[NSFont systemFontSize];
+        
+        BOOL javaScriptEnabled = [self.host boolForInfoDictionaryKey:SUEnableJavaScriptKey];
+        
+        BOOL useWKWebView;
+        if (@available(macOS 10.11, *)) {
+            useWKWebView = YES;
+        } else {
+            // Never use WKWebView prior to macOS 10.11. Details are in SUWKWebView.m
+            // Note: 2.x has another case where we fall back to using legacy WKWebView due to certain sandboxing issues.
+            useWKWebView = NO;
+        }
+        
+        if (useWKWebView) {
+            self.webView = [[SUWKWebView alloc] initWithColorStyleSheetLocation:colorStyleURL fontFamily:defaultFontFamily fontPointSize:defaultFontSize javaScriptEnabled:javaScriptEnabled];
+        } else {
+            self.webView = [[SULegacyWebView alloc] initWithColorStyleSheetLocation:colorStyleURL fontFamily:defaultFontFamily fontPointSize:defaultFontSize javaScriptEnabled:javaScriptEnabled];
+        }
+        
+        NSView *boxContentView = self.releaseNotesBoxView.contentView;
+        [boxContentView addSubview:self.webView.view];
+        
+        self.webView.view.frame = boxContentView.bounds;
+        self.webView.view.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
+    }
 
     [self.window setFrameAutosaveName: showReleaseNotes ? @"SUUpdateAlert" : @"SUUpdateAlertSmall" ];
 
