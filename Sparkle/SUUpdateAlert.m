@@ -326,11 +326,28 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
         self.laterButton.enabled = NO;
         self.laterButton.hidden = YES;
     }
+
+    if([self automaticallyUpdateEnabled]) {
+        self.skipButton.hidden = YES;
+        self.automaticallyInstallUpdatesButton.hidden = YES;
+        [self.laterButton setTitle:SULocalizedString(@"Install later", @"Alternate title for 'Remind me later' button when automatic updates are enabled")];
+    }
+
     [self.window center];
 }
 
 - (BOOL)automaticChecksEnabled {
     NSNumber *automaticChecksEnabled = [self.host objectForKey:SUEnableAutomaticChecksKey];
+    if (automaticChecksEnabled == nil)
+    {
+        return false;
+    }
+
+    return [automaticChecksEnabled boolValue];
+}
+
+- (BOOL)automaticallyUpdateEnabled {
+    NSNumber *automaticChecksEnabled = [self.host objectForKey:SUAutomaticallyUpdateKey];
     if (automaticChecksEnabled == nil)
     {
         return false;
