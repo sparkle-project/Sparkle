@@ -84,7 +84,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 @synthesize loggedATSWarning = _loggedATSWarning;
 @synthesize loggedDSAWarning = _loggedDSAWarning;
 
-#ifdef DEBUG
+#if DEBUG
 + (void)load
 {
     // We're using NSLog instead of SULog here because we don't want to start Sparkle's logger here,
