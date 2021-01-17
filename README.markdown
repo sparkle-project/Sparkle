@@ -1,4 +1,4 @@
-# Sparkle 1.x [![Build Status](https://travis-ci.org/sparkle-project/Sparkle.svg?branch=master)](https://travis-ci.org/sparkle-project/Sparkle) [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage) [![CocoaPods](https://img.shields.io/cocoapods/v/Sparkle.svg?maxAge=2592000)]() <a href="https://www.stackpath.com/?utm_source=sparkle-github&amp;utm_medium=badge&amp;utm_campaign=readme"><img src="https://img.shields.io/badge/sponsored%20by-StackPath-orange.svg" alt="sponsored by: StackPath"></a>
+# Sparkle 1.x ![Build Status](https://github.com/sparkle-project/Sparkle/workflows/Build%20%26%20Tests/badge.svg?branch=master) [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage) [![CocoaPods](https://img.shields.io/cocoapods/v/Sparkle.svg?maxAge=2592000)]() <a href="https://www.stackpath.com/?utm_source=sparkle-github&amp;utm_medium=badge&amp;utm_campaign=readme"><img src="https://img.shields.io/badge/sponsored%20by-StackPath-orange.svg" alt="sponsored by: StackPath"></a>
 
 Secure and reliable software update framework for Cocoa developers.
 
@@ -23,8 +23,8 @@ The upcoming Sparkle 2 (currently in beta) can be found in the [2.x branch](http
 
 ## Requirements
 
-* Runtime: macOS 10.7 or greater
-* Build: Xcode 9 and 10.11 SDK or greater (Xcode 12 if using Swift Package Manager)
+* Runtime: macOS 10.9 or greater
+* Build: Latest major Xcode (stable or beta, whichever is latest) and one major version less; at least Xcode 12 if using Swift Package Manager.
 * HTTPS server for serving updates (see [App Transport Security](http://sparkle-project.org/documentation/app-transport-security/))
 * No sandboxing. Sparkle 1.x can't update sandboxed apps. However, [Sparkle 2.x](https://github.com/sparkle-project/Sparkle/tree/2.x) can.
 
