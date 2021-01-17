@@ -1339,6 +1339,10 @@
 		72D954B71CBB467F006F28BD /* SPUCommandLineUserDriver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SPUCommandLineUserDriver.m; sourceTree = "<group>"; };
 		72DBA37B1D60CC34002594A8 /* SPUUpdatePermissionRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPUUpdatePermissionRequest.h; sourceTree = "<group>"; };
 		72DBA37C1D60CC34002594A8 /* SPUUpdatePermissionRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SPUUpdatePermissionRequest.m; sourceTree = "<group>"; };
+		72E1DAB525B3E8AE0001BA6D /* hr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = hr; path = hr.lproj/SUUpdatePermissionPrompt.strings; sourceTree = "<group>"; };
+		72E1DAB625B3E8AE0001BA6D /* hr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = hr; path = hr.lproj/SUUpdateAlert.strings; sourceTree = "<group>"; };
+		72E1DAB725B3E8AE0001BA6D /* hr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = hr; path = hr.lproj/MainMenu.strings; sourceTree = "<group>"; };
+		72E1DACB25B3E8DF0001BA6D /* hr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = hr; path = hr.lproj/Sparkle.strings; sourceTree = "<group>"; };
 		72E45CF11B640CDD005C701A /* SUTestApplicationDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUTestApplicationDelegate.h; sourceTree = "<group>"; };
 		72E45CF21B640CDD005C701A /* SUTestApplicationDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUTestApplicationDelegate.m; sourceTree = "<group>"; };
 		72E45CF41B640DAE005C701A /* SUUpdateSettingsWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUUpdateSettingsWindowController.h; sourceTree = "<group>"; };
@@ -3016,6 +3020,7 @@
 				"pt-BR",
 				Base,
 				fr_CA,
+				hr,
 			);
 			mainGroup = 0867D691FE84028FC02AAC07 /* Sparkle */;
 			productRefGroup = 034768DFFF38A50411DB9C8B /* Products */;
@@ -3966,6 +3971,7 @@
 				61131A090F846D0A00E97AF6 /* zh_CN */,
 				61131A0A0F846D1100E97AF6 /* zh_TW */,
 				723ABCD7259A9A9D00BDB4FA /* Base */,
+				72E1DACB25B3E8DF0001BA6D /* hr */,
 			);
 			name = Sparkle.strings;
 			sourceTree = "<group>";
@@ -4004,6 +4010,7 @@
 				723ABD67259A9C6100BDB4FA /* th */,
 				723ABD68259A9C6300BDB4FA /* tr */,
 				723ABD69259A9C6600BDB4FA /* uk */,
+				72E1DAB625B3E8AE0001BA6D /* hr */,
 			);
 			name = SUUpdateAlert.xib;
 			sourceTree = "<group>";
@@ -4041,6 +4048,7 @@
 				723ABD9E259A9D5D00BDB4FA /* th */,
 				723ABD9F259A9D6000BDB4FA /* tr */,
 				723ABDA0259A9D6300BDB4FA /* uk */,
+				72E1DAB525B3E8AE0001BA6D /* hr */,
 			);
 			name = SUUpdatePermissionPrompt.xib;
 			sourceTree = "<group>";
@@ -4088,6 +4096,7 @@
 				723ABE37259A9F2900BDB4FA /* th */,
 				723ABE38259A9F2B00BDB4FA /* tr */,
 				723ABE39259A9F2E00BDB4FA /* uk */,
+				72E1DAB725B3E8AE0001BA6D /* hr */,
 			);
 			name = MainMenu.xib;
 			sourceTree = "<group>";
