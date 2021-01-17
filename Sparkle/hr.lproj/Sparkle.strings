@@ -1,0 +1,93 @@
+"%1$@ %2$@ has been downloaded and is ready to use! This is an important update; would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ je preuzeta i spremna za upotrebu! Ovo je važna nadogradnja. Želiš li je sada instalirati, te ponovo pokrenuti %1$@?";
+
+"%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ je preuzeta i spremna za upotrebu! Želiš li je sada instalirati, te ponovo pokrenuti %1$@?";
+
+"%1$@ can't be updated, because it was opened from a read-only or a temporary location." = "%1$@ nije moguće aktualizirati, jer je pokrenuta s lokacije bez korisničkih prava pisanja, npr. dmg.";
+
+"Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "Kopiraj %1$@ u mapu Aplikacije, pokreni je odande i pokušaj ponovo.";
+
+"%@ %@ is currently the newest version available." = "%1$@ %2$@ je trenutačno najnovija dostupna verzija.";
+
+"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%1$@ %2$@ je trenutačno najnovija dostupna verzija.\n(Trenutačno pokrećeš verziju %3$@.)";
+
+/* Description text for SUUpdateAlert when the update is downloadable. */
+"%@ %@ is now available--you have %@. Would you like to download it now?" = "%1$@ %2$@ je sada dostupna. Ti koristiš verziju %3$@. Želiš li je sada preuzeti?";
+
+/* Description text for SUUpdateAlert when the update informational with no download. */
+"%@ %@ is now available--you have %@. Would you like to learn more about this update on the web?" = "%1$@ %2$@ je sada dostupna. Ti koristiš verziju %3$@. Želiš li saznati više o ovoj nadogradnji na našim web-stranicama?";
+
+"%@ downloaded" = "%@ preuzeto";
+
+"%@ of %@" = "%1$@ od %2$@";
+
+"A new version of %@ is available!" = "Dostupna je nova verzija za %@!";
+
+"A new version of %@ is ready to install!" = "Nova verzija za %@ je spremna za instaliranje!";
+
+"An error occurred in retrieving update information. Please try again later." = "Dogodila se greška u dohvaćanju informacija o nadogradnji. Pokušaj kasnije ponovo.";
+
+"An error occurred while downloading the update. Please try again later." = "Dogodila se greška prilikom preuzimanja nadogradnje. Pokušaj kasnije ponovo.";
+
+"An error occurred while extracting the archive. Please try again later." = "Dogodila se greška prilikom raspakiranja arhive. Pokušaj kasnije ponovo.";
+
+"An error occurred while installing the update. Please try again later." = "Dogodila se greška prilikom instaliranja nadogradnje. Pokušaj kasnije ponovo.";
+
+"An error occurred while parsing the update feed." = "Dogodila se greška prilikom obrađivanja nadogradnje.";
+
+"An error occurred while relaunching %1$@, but the new version will be available next time you run %1$@." = "Dogodila se greška prilikom ponovog pokretanja %1$@a. Unatoč tome, nova verzija će biti dostupna prilikom idućeg pokretanja %1$@a.";
+
+"An important update to %@ is ready to install" = "Važna nadogradnja za %@ je spremna za instaliranje";
+
+/* the unit for bytes */
+"B" = "B";
+
+"Cancel" = "Odustani";
+
+"Cancel Update" = "Prekini aktualiziranje";
+
+"Checking for updates..." = "Provjera nadogradnji …";
+
+/* Take care not to overflow the status window. */
+"Downloading update..." = "Preuzimanje nadogradnje …";
+
+/* Take care not to overflow the status window. */
+"Extracting update..." = "Raspakiravanje nadogradnje …";
+
+/* the unit for gigabytes */
+"GB" = "GB";
+
+"Install and Relaunch" = "Instaliraj i ponovo pokreni";
+
+/* Take care not to overflow the status window. */
+"Installing update..." = "Instaliranje nadogradnje …";
+
+/* the unit for kilobytes */
+"KB" = "KB";
+
+/* Alternative name for "Install" button if we have a paid update or other update
+	without a download but with a URL. */
+"Learn More..." = "Saznaj više …";
+
+/* the unit for megabytes */
+"MB" = "MB";
+
+/* OK button. */
+"OK" = "OK";
+
+/* Status message on progress window once download has finished. */
+"Ready to Install" = "Spremno za instaliranje";
+
+/* Message that is optionally shown at startup to allow users to turn on/off update checks. */
+"Should %1$@ automatically check for updates? You can always check for updates manually from the %1$@ menu." = "Želiš li da %1$@ automatski provjerava nadogradnje? Nadogradnje možeš i ručno provjeriti u %1$@ izborniku.";
+
+"The update is improperly signed." = "Nadogradnja ima neispravan potpis.";
+
+"Update Error!" = "Greška prilikom aktualiziranja!";
+
+"Updating %@" = "%@ se aktualizira";
+
+/* 'Error' message when the user checks for updates but is already current or the feed doesn't contain any updates. (not necessarily shown in UI) */
+"You already have the newest version of %@." = "Već koristiš najnoviju verziju za %@.";
+
+/* Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates. */
+"You're up-to-date!" = "Koristiš najnoviju verziju!";
