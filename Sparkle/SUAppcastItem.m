@@ -79,6 +79,7 @@ static NSString *SUAppcastItemInstallationTypeKey = @"SUAppcastItemInstallationT
         _releaseNotesURL = [decoder decodeObjectOfClass:[NSURL class] forKey:SUAppcastItemReleaseNotesURLKey];
         _title = [(NSString *)[decoder decodeObjectOfClass:[NSString class] forKey:SUAppcastItemTitleKey] copy];
         _versionString = [(NSString *)[decoder decodeObjectOfClass:[NSString class] forKey:SUAppcastItemVersionStringKey] copy];
+        _osString = [(NSString *)[decoder decodeObjectOfClass:[NSString class] forKey:SUAppcastAttributeOsType] copy];
         _propertiesDictionary = [decoder decodeObjectOfClasses:[NSSet setWithArray:@[[NSDictionary class], [NSString class], [NSDate class], [NSArray class]]] forKey:SUAppcastItemPropertiesKey];
     }
     
@@ -131,6 +132,10 @@ static NSString *SUAppcastItemInstallationTypeKey = @"SUAppcastItemInstallationT
     
     if (self.versionString != nil) {
         [encoder encodeObject:self.versionString forKey:SUAppcastItemVersionStringKey];
+    }
+    
+    if (self.osString != nil) {
+        [encoder encodeObject:self.osString forKey:SUAppcastAttributeOsType];
     }
     
     if (self.propertiesDictionary != nil) {
@@ -257,6 +262,7 @@ static NSString *SUAppcastItemInstallationTypeKey = @"SUAppcastItemInstallationT
         }
         if (enclosure) {
             _signatures = [[SUSignatures alloc] initWithDsa:[enclosure objectForKey:SUAppcastAttributeDSASignature] ed:[enclosure objectForKey:SUAppcastAttributeEDSignature]];
+            _osString = [enclosure objectForKey:SUAppcastAttributeOsType];
         }
 
         _versionString = [(NSString *)newVersion copy];
