@@ -113,7 +113,8 @@
 - (void)webView:(WebView *)__unused sender decidePolicyForNavigationAction:(NSDictionary *)__unused actionInformation request:(NSURLRequest *)request frame:(WebFrame *)__unused frame decisionListener:(id<WebPolicyDecisionListener>)listener
 {
     NSURL *requestURL = request.URL;
-    BOOL safeURL = SUWebViewIsSafeURL(requestURL);
+    BOOL isAboutBlank = NO;
+    BOOL safeURL = SUWebViewIsSafeURL(requestURL, &isAboutBlank);
 
     // Do not allow redirects to dangerous protocols such as file://
     if (!safeURL) {
@@ -124,7 +125,7 @@
 
     // Ensure we are finished loading
     if (self.completionHandler == nil) {
-        if (requestURL) {
+        if (requestURL && !isAboutBlank) {
             [[NSWorkspace sharedWorkspace] openURL:requestURL];
         }
 
