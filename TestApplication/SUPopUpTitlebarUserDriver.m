@@ -99,20 +99,6 @@
     self.updateButtonAction = nil;
 }
 
-#pragma mark Can Check for Updates?
-
-- (void)showCanCheckForUpdates:(BOOL)canCheckForUpdates
-{
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self.coreComponent showCanCheckForUpdates:canCheckForUpdates];
-    });
-}
-
-- (BOOL)canCheckForUpdates
-{
-    return self.coreComponent.canCheckForUpdates;
-}
-
 #pragma mark Update Permission
 
 - (void)showUpdatePermissionRequest:(SPUUpdatePermissionRequest *)__unused request reply:(void (^)(SUUpdatePermissionResponse *))reply

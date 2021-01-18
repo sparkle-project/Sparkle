@@ -56,6 +56,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 @property (nonatomic) BOOL startedUpdater;
 @property (nonatomic, copy) void (^preStartedScheduledUpdateBlock)(void);
 @property (nonatomic, nullable) id<SPUResumableUpdate> resumableUpdate;
+@property (nonatomic) BOOL canCheckForUpdates;
 
 @property (nonatomic) BOOL loggedATSWarning;
 @property (nonatomic) BOOL loggedDSAWarning;
@@ -78,6 +79,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 @synthesize startedUpdater = _startedUpdater;
 @synthesize preStartedScheduledUpdateBlock = _preStartedScheduledUpdateBlock;
 @synthesize resumableUpdate = _resumableUpdate;
+@synthesize canCheckForUpdates = _canCheckForUpdates;
 @synthesize loggedATSWarning = _loggedATSWarning;
 @synthesize loggedDSAWarning = _loggedDSAWarning;
 
@@ -345,7 +347,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     
     BOOL automaticallyCheckForUpdates = [self automaticallyChecksForUpdates];
     
-    [self.userDriver showCanCheckForUpdates:!automaticallyCheckForUpdates];
+    self.canCheckForUpdates = !automaticallyCheckForUpdates;
     
     if (!automaticallyCheckForUpdates) {
         if ([self.delegate respondsToSelector:@selector(updaterWillIdleSchedulingUpdates:)]) {
@@ -357,7 +359,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     if (firingImmediately) {
         [self checkForUpdatesInBackground];
     } else {
-        [self.userDriver showCanCheckForUpdates:YES];
+        self.canCheckForUpdates = YES;
         
         [self retrieveNextUpdateCheckInterval:^(NSTimeInterval updateCheckInterval) {
             // This callback is asynchronous, so the timer may be set. Invalidate to make sure it isn't.
@@ -553,7 +555,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
             }
         };
         
-        [self.userDriver showCanCheckForUpdates:NO];
+        self.canCheckForUpdates = NO;
         
         if (installerInProgress) {
             [self.driver resumeInstallingUpdateWithCompletion:completionBlock];

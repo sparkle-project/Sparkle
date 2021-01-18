@@ -21,10 +21,6 @@
 
 SU_EXPORT @interface SPUUserDriverCoreComponent : NSObject
 
-- (void)showCanCheckForUpdates:(BOOL)canCheckForUpdates;
-
-@property (nonatomic, readonly) BOOL canCheckForUpdates;
-
 - (void)registerInstallUpdateHandler:(void (^)(SPUInstallUpdateStatus))installUpdateHandler;
 - (void)installUpdateWithChoice:(SPUInstallUpdateStatus)choice;
 

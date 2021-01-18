@@ -44,16 +44,6 @@ NS_ASSUME_NONNULL_BEGIN
 SU_EXPORT @protocol SPUUserDriver <NSObject>
 
 /*!
- * Show that an update can be checked by the user or not
- *
- * A client may choose to update the interface letting the user know if they can check for updates.
- * For example, this can be used for menu item validation on the "Check for Updates" action.
- *
- * This can be called from any thread.
- */
-- (void)showCanCheckForUpdates:(BOOL)canCheckForUpdates;
-
-/*!
  * Show an updater permission request to the user
  *
  * Ask the user for their permission regarding update checks.

@@ -14,7 +14,7 @@
 
 @property (nonatomic) SPUUpdater *updater;
 @property (nonatomic, readonly) BOOL customUserDriver;
-@property (nonatomic) id<SPUStandardUserDriverProtocol> userDriver;
+@property (nonatomic) SPUStandardUserDriver *userDriver;
 
 @end
 
@@ -43,7 +43,7 @@
     NSBundle *hostBundle = [NSBundle mainBundle];
     NSBundle *applicationBundle = hostBundle;
     
-    id<SPUUserDriver, SPUStandardUserDriverProtocol> userDriver;
+    id<SPUUserDriver> userDriver;
     if (self.customUserDriver) {
         userDriver = [[SUPopUpTitlebarUserDriver alloc] initWithWindow:self.window];
     } else {
@@ -73,7 +73,7 @@
 - (BOOL)validateMenuItem:(NSMenuItem *)menuItem
 {
     if (menuItem.action == @selector(checkForUpdates:)) {
-        return self.userDriver.canCheckForUpdates;
+        return self.updater.canCheckForUpdates;
     }
     return YES;
 }
