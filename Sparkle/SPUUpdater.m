@@ -341,13 +341,20 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     [self scheduleNextUpdateCheckFiringImmediately:NO];
 }
 
+- (void)setCanCheckForUpdates:(BOOL)canCheckForUpdates
+{
+    _canCheckForUpdates = canCheckForUpdates;
+    
+    [self.userDriver showCanCheckForUpdates:canCheckForUpdates];
+}
+
 - (void)scheduleNextUpdateCheckFiringImmediately:(BOOL)firingImmediately
 {
     [self.updaterTimer invalidate];
     
     BOOL automaticallyCheckForUpdates = [self automaticallyChecksForUpdates];
     
-    self.canCheckForUpdates = !automaticallyCheckForUpdates;
+    [self setCanCheckForUpdates:!automaticallyCheckForUpdates];
     
     if (!automaticallyCheckForUpdates) {
         if ([self.delegate respondsToSelector:@selector(updaterWillIdleSchedulingUpdates:)]) {
@@ -359,7 +366,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     if (firingImmediately) {
         [self checkForUpdatesInBackground];
     } else {
-        self.canCheckForUpdates = YES;
+        [self setCanCheckForUpdates:YES];
         
         [self retrieveNextUpdateCheckInterval:^(NSTimeInterval updateCheckInterval) {
             // This callback is asynchronous, so the timer may be set. Invalidate to make sure it isn't.
@@ -555,7 +562,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
             }
         };
         
-        self.canCheckForUpdates = NO;
+        [self setCanCheckForUpdates:NO];
         
         if (installerInProgress) {
             [self.driver resumeInstallingUpdateWithCompletion:completionBlock];

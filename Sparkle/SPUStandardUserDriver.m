@@ -56,6 +56,13 @@
     return self;
 }
 
+#pragma mark Is Update Busy?
+
+- (void)showCanCheckForUpdates:(BOOL)canCheckForUpdates
+{
+    assert(NSThread.isMainThread);
+}
+
 #pragma mark Update Permission
 
 - (void)showUpdatePermissionRequest:(SPUUpdatePermissionRequest *)request reply:(void (^)(SUUpdatePermissionResponse *))reply

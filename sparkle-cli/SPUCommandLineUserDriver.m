@@ -44,6 +44,10 @@
     return self;
 }
 
+- (void)showCanCheckForUpdates:(BOOL)canCheckForUpdates
+{
+}
+
 - (void)showUpdatePermissionRequest:(SPUUpdatePermissionRequest *)__unused request reply:(void (^)(SUUpdatePermissionResponse *))reply
 {
     if (self.updatePermissionResponse == nil) {

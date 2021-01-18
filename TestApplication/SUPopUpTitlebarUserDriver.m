@@ -99,6 +99,12 @@
     self.updateButtonAction = nil;
 }
 
+#pragma mark Can Check for Updates?
+
+- (void)showCanCheckForUpdates:(BOOL)canCheckForUpdates
+{
+}
+
 #pragma mark Update Permission
 
 - (void)showUpdatePermissionRequest:(SPUUpdatePermissionRequest *)__unused request reply:(void (^)(SUUpdatePermissionResponse *))reply
