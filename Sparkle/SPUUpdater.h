@@ -106,7 +106,7 @@ SU_EXPORT @interface SPUUpdater : NSObject
 /*!
  A property indicating whether or not updates can be checked.
  
- This property is useful for determing whether update checks can be made programatically or by the user.
+ This property is useful for determining whether update checks can be made programatically or by the user.
  An update check cannot be made when an on-going update check is in progress.
  
  Note this property does not reflect whether or not an update itself is in progress. For example,
