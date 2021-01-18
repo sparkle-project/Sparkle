@@ -2743,8 +2743,6 @@
 				72A5D5EE1D692C360009E5AC /* CopyFiles */,
 				72A5D5F11D692C860009E5AC /* Run Script: Set Git Version Info */,
 				72B4BF081D69805100F5B92D /* Resources */,
-				72B4BF0B1D69811100F5B92D /* Run Script: Link fr_CA to fr */,
-				72B4BF0C1D69814200F5B92D /* Run Script: Link pt to pt_BR */,
 			);
 			buildRules = (
 			);
@@ -2804,8 +2802,6 @@
 				8DC2EF540486A6940098B216 /* Sources */,
 				8DC2EF560486A6940098B216 /* Frameworks */,
 				6131B1910DDCDE32005215F0 /* Run Script: Set Git Version Info */,
-				6195D4B40E40505A00D41A50 /* Run Script: Link fr_CA to fr */,
-				61E31A85103299750051D188 /* Run Script: Link pt to pt_BR */,
 			);
 			buildRules = (
 			);
@@ -3181,40 +3177,6 @@
 			shellScript = "\"$SRCROOT/Configurations/set-git-version-info.sh\"";
 			showEnvVarsInLog = 0;
 		};
-		6195D4B40E40505A00D41A50 /* Run Script: Link fr_CA to fr */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"$(BUILT_PRODUCTS_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/fr.lproj",
-			);
-			name = "Run Script: Link fr_CA to fr";
-			outputPaths = (
-				"$(BUILT_PRODUCTS_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/fr_CA.lproj",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = "/usr/bin/env sh";
-			shellScript = "ln -sfh \"fr.lproj\" \"$BUILT_PRODUCTS_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/fr_CA.lproj\"";
-			showEnvVarsInLog = 0;
-		};
-		61E31A85103299750051D188 /* Run Script: Link pt to pt_BR */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"$(BUILT_PRODUCTS_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/pt_BR.lproj",
-			);
-			name = "Run Script: Link pt to pt_BR";
-			outputPaths = (
-				"$(BUILT_PRODUCTS_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/pt.lproj",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = "/usr/bin/env sh";
-			shellScript = "ln -sfh \"pt_BR.lproj\" \"$BUILT_PRODUCTS_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/pt.lproj\"";
-			showEnvVarsInLog = 0;
-		};
 		721D8A841D498F7A0032E472 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -3267,7 +3229,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"$SRCROOT/Configurations/set-git-version-info.sh\"";
+			shellScript = "\"$SRCROOT/Configurations/set-git-version-info.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		72B4BF051D697E4400F5B92D /* Run Script: Link fr_CA to fr */ = {
@@ -3302,40 +3264,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "ln -sfh \"pt_BR.lproj\" \"$BUILT_PRODUCTS_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/pt.lproj\"";
-			showEnvVarsInLog = 0;
-		};
-		72B4BF0B1D69811100F5B92D /* Run Script: Link fr_CA to fr */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"$(BUILT_PRODUCTS_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/fr.lproj",
-			);
-			name = "Run Script: Link fr_CA to fr";
-			outputPaths = (
-				"$(BUILT_PRODUCTS_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/fr_CA.lproj",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "ln -sfh \"fr.lproj\" \"$BUILT_PRODUCTS_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/fr_CA.lproj\"";
-			showEnvVarsInLog = 0;
-		};
-		72B4BF0C1D69814200F5B92D /* Run Script: Link pt to pt_BR */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"$(BUILT_PRODUCTS_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/pt_BR.lproj",
-			);
-			name = "Run Script: Link pt to pt_BR";
-			outputPaths = (
-				"$(BUILT_PRODUCTS_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/pt.lproj",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "ln -sfh \"pt_BR.lproj\" \"$BUILT_PRODUCTS_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/pt.lproj\"\n";
 			showEnvVarsInLog = 0;
 		};
 		895C5DC524D78E460058A82D /* ShellScript */ = {
