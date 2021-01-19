@@ -133,6 +133,14 @@
         return NO;
     }
     
+    // Try to preserve Finder Tags
+    // TODO: If we ever migrate to -[NSFileManager replaceItemAtURL:..] method, which we should at some point, we wouldn't have to do this step
+    NSArray *resourceTags = nil;
+    BOOL retrievedResourceTags = [oldURL getResourceValue:&resourceTags forKey:NSURLTagNamesKey error:NULL];
+    if (retrievedResourceTags && resourceTags.count > 0) {
+        [newTempURL setResourceValue:resourceTags forKey:NSURLTagNamesKey error:NULL];
+    }
+    
     // We must leave moving the app to its destination as the final step in installing it, so that
     // it's not possible our new app can be left in an incomplete state at the final destination
     if (![fileManager changeOwnerAndGroupOfItemAtRootURL:newTempURL toMatchURL:oldURL error:error]) {

@@ -7,6 +7,8 @@
 
 #import <Foundation/Foundation.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @class SUPublicKeys;
 
 @interface SUHost : NSObject
@@ -24,14 +26,16 @@
 
 @property (getter=isRunningOnReadOnlyVolume, readonly) BOOL runningOnReadOnlyVolume;
 @property (getter=isRunningTranslocated, readonly) BOOL runningTranslocated;
-@property (readonly, nonatomic, copy) NSString *publicDSAKeyFileKey;
+@property (readonly, nonatomic, copy, nullable) NSString *publicDSAKeyFileKey;
 
-- (id)objectForInfoDictionaryKey:(NSString *)key;
+- (nullable id)objectForInfoDictionaryKey:(NSString *)key;
 - (BOOL)boolForInfoDictionaryKey:(NSString *)key;
-- (id)objectForUserDefaultsKey:(NSString *)defaultName;
-- (void)setObject:(id)value forUserDefaultsKey:(NSString *)defaultName;
+- (nullable id)objectForUserDefaultsKey:(NSString *)defaultName;
+- (void)setObject:(nullable id)value forUserDefaultsKey:(NSString *)defaultName;
 - (BOOL)boolForUserDefaultsKey:(NSString *)defaultName;
 - (void)setBool:(BOOL)value forUserDefaultsKey:(NSString *)defaultName;
-- (id)objectForKey:(NSString *)key;
+- (nullable id)objectForKey:(NSString *)key;
 - (BOOL)boolForKey:(NSString *)key;
 @end
+
+NS_ASSUME_NONNULL_END
