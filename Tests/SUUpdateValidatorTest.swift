@@ -82,7 +82,7 @@ class SUUpdateValidatorTest: XCTestCase {
     }
 
     func testPrevalidation(bundle bundleConfig: BundleConfig, signatures signatureConfig: SignatureConfig, expectedResult: Bool, line: UInt = #line) {
-        let host = SUHost(bundle: self.bundle(bundleConfig))!
+        let host = SUHost(bundle: self.bundle(bundleConfig))
         let signatures = self.signatures(signatureConfig)
 
         let validator = SUUpdateValidator(downloadPath: self.signedTestFilePath, signatures: signatures, host: host)
@@ -102,7 +102,7 @@ class SUUpdateValidatorTest: XCTestCase {
 
     func testPostValidation(oldBundle oldBundleConfig: BundleConfig, newBundle newBundleConfig: BundleConfig, signatures signatureConfig: SignatureConfig, expectedResult: Bool, line: UInt = #line) {
         let oldBundle = self.bundle(oldBundleConfig)
-        let host = SUHost(bundle: oldBundle)!
+        let host = SUHost(bundle: oldBundle)
         let signatures = self.signatures(signatureConfig)
 
         let validator = SUUpdateValidator(downloadPath: self.signedTestFilePath, signatures: signatures, host: host)

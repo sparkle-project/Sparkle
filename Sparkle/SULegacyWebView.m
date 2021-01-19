@@ -18,9 +18,11 @@
 @end
 @protocol WebPolicyDelegate <NSObject>
 @end
+@protocol WebUIDelegate <NSObject>
+@end
 #endif
 
-@interface SULegacyWebView () <WebPolicyDelegate, WebFrameLoadDelegate>
+@interface SULegacyWebView () <WebPolicyDelegate, WebFrameLoadDelegate, WebUIDelegate>
 
 @property (nonatomic, readonly) WebView *webView;
 @property (nonatomic) void (^completionHandler)(NSError * _Nullable);
@@ -57,6 +59,7 @@
         _webView.preferences = preferences;
         _webView.policyDelegate = self;
         _webView.frameLoadDelegate = self;
+        _webView.UIDelegate = self;
     }
     return self;
 }
@@ -113,7 +116,8 @@
 - (void)webView:(WebView *)__unused sender decidePolicyForNavigationAction:(NSDictionary *)__unused actionInformation request:(NSURLRequest *)request frame:(WebFrame *)__unused frame decisionListener:(id<WebPolicyDecisionListener>)listener
 {
     NSURL *requestURL = request.URL;
-    BOOL safeURL = SUWebViewIsSafeURL(requestURL);
+    BOOL isAboutBlank = NO;
+    BOOL safeURL = SUWebViewIsSafeURL(requestURL, &isAboutBlank);
 
     // Do not allow redirects to dangerous protocols such as file://
     if (!safeURL) {
@@ -124,7 +128,7 @@
 
     // Ensure we are finished loading
     if (self.completionHandler == nil) {
-        if (requestURL) {
+        if (requestURL && !isAboutBlank) {
             [[NSWorkspace sharedWorkspace] openURL:requestURL];
         }
 

@@ -58,6 +58,8 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 @property (nonatomic, nullable) id<SPUResumableUpdate> resumableUpdate;
 @property (nonatomic) BOOL canCheckForUpdates;
 
+@property (nonatomic, copy) NSDate *updateLastCheckedDate;
+
 @property (nonatomic) BOOL loggedATSWarning;
 @property (nonatomic) BOOL loggedDSAWarning;
 
@@ -80,10 +82,11 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 @synthesize preStartedScheduledUpdateBlock = _preStartedScheduledUpdateBlock;
 @synthesize resumableUpdate = _resumableUpdate;
 @synthesize canCheckForUpdates = _canCheckForUpdates;
+@synthesize updateLastCheckedDate = _updateLastCheckedDate;
 @synthesize loggedATSWarning = _loggedATSWarning;
 @synthesize loggedDSAWarning = _loggedDSAWarning;
 
-#ifdef DEBUG
+#if DEBUG
 + (void)load
 {
     // We're using NSLog instead of SULog here because we don't want to start Sparkle's logger here,
@@ -326,13 +329,20 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 
 - (NSDate *)lastUpdateCheckDate
 {
-    return [self.host objectForUserDefaultsKey:SULastCheckTimeKey];
+    if ([self updateLastCheckedDate] == nil)
+    {
+        [self setUpdateLastCheckedDate:[self.host objectForUserDefaultsKey:SULastCheckTimeKey]];
+    }
+    
+    return [self updateLastCheckedDate];
 }
 
 - (void)updateLastUpdateCheckDate
 {
     [self willChangeValueForKey:NSStringFromSelector(@selector((lastUpdateCheckDate)))];
-    [self.host setObject:[NSDate date] forUserDefaultsKey:SULastCheckTimeKey];
+    // We use an intermediate property for last update check date due to https://github.com/sparkle-project/Sparkle/pull/1135
+    [self setUpdateLastCheckedDate:[NSDate date]];
+    [self.host setObject:[self updateLastCheckedDate] forUserDefaultsKey:SULastCheckTimeKey];
     [self didChangeValueForKey:NSStringFromSelector(@selector((lastUpdateCheckDate)))];
 }
 

@@ -213,7 +213,8 @@ static WKUserScript *_userScriptWithInjectedStyleSource(NSString *styleSource)
 {
     NSURLRequest *request = navigationAction.request;
     NSURL *requestURL = request.URL;
-    BOOL safeURL = SUWebViewIsSafeURL(requestURL);
+    BOOL isAboutBlank = NO;
+    BOOL safeURL = SUWebViewIsSafeURL(requestURL, &isAboutBlank);
     
     // Do not allow redirects to dangerous protocols such as file://
     if (!safeURL) {
@@ -222,7 +223,9 @@ static WKUserScript *_userScriptWithInjectedStyleSource(NSString *styleSource)
     } else {
         // Ensure we're finished loading
         if (self.completionHandler == nil) {
-            [[NSWorkspace sharedWorkspace] openURL:requestURL];
+            if (!isAboutBlank) {
+                [[NSWorkspace sharedWorkspace] openURL:requestURL];
+            }
             
             decisionHandler(WKNavigationActionPolicyCancel);
         } else {
