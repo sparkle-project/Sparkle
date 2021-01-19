@@ -46,7 +46,6 @@
 
 - (void)showCanCheckForUpdates:(BOOL)canCheckForUpdates
 {
-    [self.coreComponent showCanCheckForUpdates:canCheckForUpdates];
 }
 
 - (void)showUpdatePermissionRequest:(SPUUpdatePermissionRequest *)__unused request reply:(void (^)(SUUpdatePermissionResponse *))reply

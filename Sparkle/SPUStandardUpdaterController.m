@@ -18,7 +18,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
 @interface SPUStandardUpdaterController ()
 
 @property (nonatomic) SPUUpdater *updater;
-@property (nonatomic) id <SPUStandardUserDriverProtocol> userDriver;
+@property (nonatomic) SPUStandardUserDriver *userDriver;
 @property (nonatomic) BOOL initializedUpdater;
 
 @end
@@ -56,7 +56,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
         self.initializedUpdater = YES;
         
         NSBundle *hostBundle = [NSBundle mainBundle];
-        id <SPUUserDriver, SPUStandardUserDriverProtocol> userDriver = [[SPUStandardUserDriver alloc] initWithHostBundle:hostBundle delegate:self.userDriverDelegate];
+        SPUStandardUserDriver *userDriver = [[SPUStandardUserDriver alloc] initWithHostBundle:hostBundle delegate:self.userDriverDelegate];
         self.updater = [[SPUUpdater alloc] initWithHostBundle:hostBundle applicationBundle:hostBundle userDriver:userDriver delegate:self.updaterDelegate];
         self.userDriver = userDriver;
         
@@ -93,7 +93,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
 - (BOOL)validateMenuItem:(NSMenuItem *)item
 {
     if ([item action] == @selector(checkForUpdates:)) {
-        return self.userDriver.canCheckForUpdates;
+        return self.updater.canCheckForUpdates;
     }
     return YES;
 }

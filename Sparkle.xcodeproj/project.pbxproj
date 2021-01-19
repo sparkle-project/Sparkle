@@ -218,7 +218,6 @@
 		725F97841C8AA90000265BE4 /* SUPopUpTitlebarUserDriver.m in Sources */ = {isa = PBXBuildFile; fileRef = 725F97831C8AA90000265BE4 /* SUPopUpTitlebarUserDriver.m */; };
 		725F97A51C8B304D00265BE4 /* SUInstallUpdateViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 725F97A31C8B304D00265BE4 /* SUInstallUpdateViewController.m */; };
 		725F97A61C8B304D00265BE4 /* SUInstallUpdateViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 725F97A41C8B304D00265BE4 /* SUInstallUpdateViewController.xib */; };
-		725F97A81C8B42D700265BE4 /* SPUStandardUserDriverProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 725F97A71C8B42D700265BE4 /* SPUStandardUserDriverProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		7267E5751D3D895B00D1BF90 /* SUBinaryDeltaApply.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E56F1D3D895B00D1BF90 /* SUBinaryDeltaApply.m */; };
 		7267E5761D3D895B00D1BF90 /* SUBinaryDeltaApply.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E56F1D3D895B00D1BF90 /* SUBinaryDeltaApply.m */; };
 		7267E5771D3D895B00D1BF90 /* SUBinaryDeltaCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5711D3D895B00D1BF90 /* SUBinaryDeltaCommon.m */; };
@@ -1195,7 +1194,6 @@
 		725F97A21C8B304D00265BE4 /* SUInstallUpdateViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUInstallUpdateViewController.h; sourceTree = "<group>"; };
 		725F97A31C8B304D00265BE4 /* SUInstallUpdateViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUInstallUpdateViewController.m; sourceTree = "<group>"; };
 		725F97A41C8B304D00265BE4 /* SUInstallUpdateViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SUInstallUpdateViewController.xib; sourceTree = "<group>"; };
-		725F97A71C8B42D700265BE4 /* SPUStandardUserDriverProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPUStandardUserDriverProtocol.h; sourceTree = "<group>"; };
 		7267E56E1D3D895B00D1BF90 /* SUBinaryDeltaApply.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SUBinaryDeltaApply.h; path = Autoupdate/SUBinaryDeltaApply.h; sourceTree = SOURCE_ROOT; };
 		7267E56F1D3D895B00D1BF90 /* SUBinaryDeltaApply.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SUBinaryDeltaApply.m; path = Autoupdate/SUBinaryDeltaApply.m; sourceTree = SOURCE_ROOT; };
 		7267E5701D3D895B00D1BF90 /* SUBinaryDeltaCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SUBinaryDeltaCommon.h; path = Autoupdate/SUBinaryDeltaCommon.h; sourceTree = SOURCE_ROOT; };
@@ -2125,7 +2123,6 @@
 				725CB9581C7121830064365A /* SPUStandardUserDriver.h */,
 				725CB9591C7121830064365A /* SPUStandardUserDriver.m */,
 				726E4A361C89116000C57C6A /* SPUStandardUserDriverDelegate.h */,
-				725F97A71C8B42D700265BE4 /* SPUStandardUserDriverProtocol.h */,
 				726DF88D1C84277500188804 /* SPUStatusCompletionResults.h */,
 				725CB9561C7120410064365A /* SPUUserDriver.h */,
 				725F97791C8A896F00265BE4 /* SPUUserDriverCoreComponent.h */,
@@ -2425,7 +2422,6 @@
 				7246E0A31C83B685003B4E75 /* SPUStandardUpdaterController.h in Headers */,
 				725CB95A1C7121830064365A /* SPUStandardUserDriver.h in Headers */,
 				726E4A371C89116000C57C6A /* SPUStandardUserDriverDelegate.h in Headers */,
-				725F97A81C8B42D700265BE4 /* SPUStandardUserDriverProtocol.h in Headers */,
 				726DF88E1C84277600188804 /* SPUStatusCompletionResults.h in Headers */,
 				72B767DA1C9CD2E400A07552 /* SPUUIBasedUpdateDriver.h in Headers */,
 				7229E1B61C97C91100CB50D0 /* SPUUpdateDriver.h in Headers */,

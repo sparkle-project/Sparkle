@@ -61,15 +61,6 @@
 - (void)showCanCheckForUpdates:(BOOL)canCheckForUpdates
 {
     assert(NSThread.isMainThread);
-    
-    [self.coreComponent showCanCheckForUpdates:canCheckForUpdates];
-}
-
-- (BOOL)canCheckForUpdates
-{
-    assert(NSThread.isMainThread);
-    
-    return self.coreComponent.canCheckForUpdates;
 }
 
 #pragma mark Update Permission

@@ -13,8 +13,6 @@
 
 @interface SPUUserDriverCoreComponent ()
 
-@property (nonatomic) BOOL canCheckForUpdates;
-
 @property (nonatomic, copy) void (^installUpdateHandler)(SPUInstallUpdateStatus);
 @property (nonatomic, copy) void (^updateCheckStatusCompletion)(SPUUserInitiatedCheckStatus);
 @property (nonatomic, copy) void (^downloadStatusCompletion)(SPUDownloadUpdateStatus);
@@ -24,18 +22,10 @@
 
 @implementation SPUUserDriverCoreComponent
 
-@synthesize canCheckForUpdates = _canCheckForUpdates;
 @synthesize installUpdateHandler = _installUpdateHandler;
 @synthesize updateCheckStatusCompletion = _updateCheckStatusCompletion;
 @synthesize downloadStatusCompletion = _downloadStatusCompletion;
 @synthesize acknowledgement = _acknowledgement;
-
-#pragma mark Is Update Busy?
-
-- (void)showCanCheckForUpdates:(BOOL)canCheckForUpdates
-{
-    self.canCheckForUpdates = canCheckForUpdates;
-}
 
 #pragma mark Install Updates
 
