@@ -391,7 +391,8 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
     
     // When we show release notes, it looks ugly if the install buttons are not closer to the release notes view
     // However when we don't show release notes, it looks ugly if the install buttons are too close to the description field. Shrugs.
-    if (showReleaseNotes && ![self allowsAutomaticUpdates]) {
+    BOOL automaticDownloadsEnabledByDeveloper = [self.host boolForInfoDictionaryKey:SUAutomaticallyUpdateKey];
+    if (showReleaseNotes && (!self.allowsAutomaticUpdates || automaticDownloadsEnabledByDeveloper)) {
         NSLayoutConstraint *skipButtonToReleaseNotesContainerConstraint = [NSLayoutConstraint constraintWithItem:self.skipButton attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self.releaseNotesContainerView attribute:NSLayoutAttributeBottom multiplier:1.0 constant:12.0];
         
         [self.window.contentView addConstraint:skipButtonToReleaseNotesContainerConstraint];
@@ -399,22 +400,31 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
         [self.automaticallyInstallUpdatesButton removeFromSuperview];
     }
     
+    if (automaticDownloadsEnabledByDeveloper && !showReleaseNotes) {
+        // Disable automatic install updates option if the developer wishes for it in Info.plist
+        // If we are showing release notes, this button will be hidden instead
+        self.automaticallyInstallUpdatesButton.enabled = NO;
+    }
+    
     BOOL startedInstalling = (self.resumableCompletionBlock != nil);
     if (startedInstalling) {
-        // Should we hide the button or disable the button if the update has already started installing?
-        // Personally I think it looks better when the button is visible on the window...
-        // Anyway an already downloaded update can't be skipped
-        self.skipButton.enabled = NO;
+        // An already downloaded & resumable update can't be skipped
+        self.skipButton.hidden = YES;
         
         // We're going to be relaunching pretty instantaneously
         self.installButton.title = SULocalizedString(@"Install & Relaunch", nil);
         
         // We should be explicit that the update will be installed on quit
-        self.laterButton.title = SULocalizedString(@"Install on Quit", nil);
+        self.laterButton.title = SULocalizedString(@"Install Later", @"Alternate title for 'Remind me later' button when downloaded updates can be resumed");
     }
 
     if ([self.updateItem isCriticalUpdate]) {
-        self.skipButton.enabled = NO;
+        self.skipButton.hidden = YES;
+        self.laterButton.hidden = YES;
+    }
+    
+    if (![self.host boolForKey:SUEnableAutomaticChecksKey]) {
+        self.laterButton.hidden = YES;
     }
 
     [self.window center];
