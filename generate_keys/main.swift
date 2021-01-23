@@ -9,6 +9,8 @@
 import Foundation
 import Security
 
+let PRIVATE_KEY_LABEL = "Private key for signing Sparkle updates"
+
 private func commonKeychainItemAttributes() -> [String: Any] {
     /// Attributes used for both adding a new item and matching an existing one.
     return [
@@ -86,7 +88,7 @@ func findPublicKey() -> Data? {
     exit(1)
 }
 
-func generateKeyPair() -> Data {
+func generateKeyPair() -> (publicEdKey: Data, privateEdKey: Data) {
     var seed = Array<UInt8>(repeating: 0, count: 32)
     var publicEdKey = Array<UInt8>(repeating: 0, count: 32)
     var privateEdKey = Array<UInt8>(repeating: 0, count: 64)
@@ -95,7 +97,11 @@ func generateKeyPair() -> Data {
         failure("Unable to initialize random seed. Try restarting your computer.")
     }
     ed25519_create_keypair(&publicEdKey, &privateEdKey, seed)
+    
+    return (Data(publicEdKey), Data(privateEdKey))
+}
 
+func storeKeyPair(publicEdKey: Data, privateEdKey: Data) {
     let query = commonKeychainItemAttributes().merging([
         /// Mark the new item as sensitive (requires keychain password to export - e.g. a private key).
         kSecAttrIsSensitive as String: kCFBooleanTrue!,
@@ -105,7 +111,7 @@ func generateKeyPair() -> Data {
         kSecAttrIsPermanent as String: kCFBooleanTrue!,
 
         /// The label of the new item (shown as its name/title in Keychain Access).
-        kSecAttrLabel       as String: "Private key for signing Sparkle updates",
+        kSecAttrLabel       as String: PRIVATE_KEY_LABEL,
 
         /// A comment regarding the item's content (can be viewed in Keychain Access; we give the public key here).
         kSecAttrComment     as String: "Public key (SUPublicEDKey value) for this key is:\n\n\(Data(publicEdKey).base64EncodedString())",
@@ -120,7 +126,7 @@ func generateKeyPair() -> Data {
     
     switch SecItemAdd(query, nil) {
         case errSecSuccess:
-            return Data(publicEdKey)
+            break
         case errSecDuplicateItem:
             failure("You already have a conflicting key in your Keychain which was not found during lookup.")
         case errSecAuthFailed:
@@ -135,36 +141,98 @@ func generateKeyPair() -> Data {
                 You can look up this error at <https://osstatus.com/search/results?search=\(res)>
                 """)
     }
-    exit(1)
+}
+
+func printNewPublicKeyUsage(_ publicKey: Data) {
+    print("""
+        A key has been generated and saved in your keychain. Add the `SUPublicEDKey` key to
+        the Info.plist of each app for which you intend to use Sparkle for distributing
+        updates. It should appear like this:
+        
+            <key>SUPublicEDKey</key>
+            <string>\(publicKey.base64EncodedString())</string>
+        
+        """)
 }
 
 /// Once it's safe to require Swift 5.3 and Xcode 12 for this code, rename this file to `generate_keys.swift` and
 /// replace this function with a class tagged with `@main`.
 func entryPoint() {
-    let isLookupMode = (CommandLine.arguments.dropFirst().first.map({ $0 == "-p" }) ?? false)
+    let arguments = CommandLine.arguments
+    let programName = arguments.first ?? "generate_keys"
+    
+    let mode = arguments.count > 1 ? arguments[1] : nil
 
-    /// If not in lookup-only mode, give an intro blurb.
-    if !isLookupMode {
+    /// If not in any mode, give an intro blurb.
+    if mode == nil {
         print("""
-            This tool uses the macOS Keychain to store a private key for signing app updates which
-            will be distributed via Sparkle. The key will be associated with your user account.
+            Usage: \(programName) [-p] [-s key-pair]
+            
+            This tool uses the macOS Keychain to store a public/private key pair for signing app updates which
+            will be distributed via Sparkle. This key will be associated with your user account.
             
             Note: You only need one signing key, no matter how many apps you embed Sparkle in.
             
             The keychain may ask permission for this tool to access an existing key, if one
             exists, or for permission to save the new key. You must allow access in order to
             successfully proceed.
+
+            Additional Options:
+            -p
+                Looks up and just prints the existing public key stored in the Keychain.
             
+            -s key-pair
+                Stores the specified key-pair to your keychain instead of generating a new key.
+                If you want to migrate keys from another machine, find \"\(PRIVATE_KEY_LABEL)\"
+                in Keychain Access from your previous machine and retrieve its password,
+                which is the key-pair to specify here. Any existing keys in Keychain Access
+                may need to be removed first before proceeding.
+
+            ----------------------------------------------------------------------------------------------------
+
             """)
     }
     
-    switch (findPublicKey(), isLookupMode) {
-        /// Existing key found, lookup mode - print just the pubkey and exit
-        case (.some(let pubKey), true):
+    switch mode {
+    case .some("-p"):
+        /// Lookup mode - print just the pubkey and exit
+        if let pubKey = findPublicKey() {
             print(pubKey.base64EncodedString())
+        } else {
+            failure("No existing signing key found!")
+        }
+    case .some("-s"):
+        /// Store mode - store the specifed key-pair
+        guard arguments.count > 2 else {
+            failure("key-pair was not specified")
+        }
         
-        /// Existing key found, normal mode - print instructions blurb and pubkey
-        case (.some(let pubKey), false):
+        let privateAndPublicBase64Key = arguments[2]
+        print(privateAndPublicBase64Key)
+        
+        guard let privateAndPublicKey = Data(base64Encoded: privateAndPublicBase64Key, options: .init()) else {
+            failure("Failed to decode private+public key data from: \(privateAndPublicBase64Key)")
+        }
+        
+        guard privateAndPublicKey.count == 64 + 32 else {
+            failure("Specified private+public key must be 96 bytes decoded. Instead it is \(privateAndPublicKey.count) bytes decoded.")
+        }
+        
+        print("Storing signing key..")
+        
+        let publicKey = privateAndPublicKey[64...]
+        let privateKey = privateAndPublicKey[0..<64]
+        
+        storeKeyPair(publicEdKey: publicKey, privateEdKey: privateKey)
+        
+        printNewPublicKeyUsage(publicKey)
+        
+    case .some(let unknownOption):
+        failure("Unknown option: \(unknownOption)")
+    
+    case nil:
+        /// Default mode - find an existing public key and print its usage, or generate new keys
+        if let pubKey = findPublicKey() {
             print("""
                 A pre-existing signing key was found. This is how it should appear in your Info.plist:
 
@@ -172,26 +240,14 @@ func entryPoint() {
                     <string>\(pubKey.base64EncodedString())</string>
                     
                 """)
-        
-        /// No existing key, lookup mode - error out
-        case (.none, true):
-            failure("No existing signing key found!")
-        
-        /// No existing key, normal mode - generate a new one
-        case (.none, false):
+        } else {
             print("Generating a new signing key. This may take a moment, depending on your machine.")
             
-            let pubKey = generateKeyPair()
+            let (pubKey, privKey) = generateKeyPair()
+            storeKeyPair(publicEdKey: pubKey, privateEdKey: privKey)
             
-            print("""
-                A key has been generated and saved in your keychain. Add the `SUPublicEDKey` key to
-                the Info.plist of each app for which you intend to use Sparkle for distributing
-                updates. It should appear like this:
-                
-                    <key>SUPublicEDKey</key>
-                    <string>\(pubKey.base64EncodedString())</string>
-                
-                """)
+            printNewPublicKeyUsage(pubKey)
+        }
     }
 }
 
