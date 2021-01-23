@@ -1,16 +1,12 @@
-# Sparkle Pull Request
+(Insert summary of your pull request here)
+
+Fixes # (issue)
 
 ## Checklist:
 
 - [ ] My change is being tested and reviewed against the Sparkle 2.x branch. New changes must be developed on the 2.x development branch first.
 - [ ] My change is being backported to master branch (Sparkle 1.x), if deemed necessary. Please create a separate pull request for 1.x, should it be backported.
 - [ ] I have reviewed and commented my code, particularly in hard-to-understand areas.
-
-## Description
-
-Please include a summary of the change.
-
-Fixes # (issue)
 
 ## Type of change
 
@@ -26,5 +22,6 @@ I tested and verified my change by using one or multiple of these methods:
 - [ ] Sparkle Test App
 - [ ] Unit Tests
 - [ ] My own app
+- [ ] Other (please specify)
 
 macOS version tested: [place version here]
