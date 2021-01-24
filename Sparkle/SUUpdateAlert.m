@@ -389,10 +389,15 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
         [self.releaseNotesContainerView removeFromSuperview];
     }
     
+    // NOTE: The code below for deciding what buttons to hide is complex! Due to array of feature configurations :)
+    
     // When we show release notes, it looks ugly if the install buttons are not closer to the release notes view
     // However when we don't show release notes, it looks ugly if the install buttons are too close to the description field. Shrugs.
+    // Automatic downloads is enabled by developer if they set SUAutomaticallyUpdateKey in Info.plist,
+    // rather than the user toggling the setting
     BOOL automaticDownloadsEnabledByDeveloper = [self.host boolForInfoDictionaryKey:SUAutomaticallyUpdateKey];
     if (showReleaseNotes && (!self.allowsAutomaticUpdates || automaticDownloadsEnabledByDeveloper)) {
+        // Fix constraints so that buttons aren't far away from web view when we hide the automatic updates check box
         NSLayoutConstraint *skipButtonToReleaseNotesContainerConstraint = [NSLayoutConstraint constraintWithItem:self.skipButton attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self.releaseNotesContainerView attribute:NSLayoutAttributeBottom multiplier:1.0 constant:12.0];
         
         [self.window.contentView addConstraint:skipButtonToReleaseNotesContainerConstraint];
@@ -407,6 +412,7 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
             self.automaticallyInstallUpdatesButton.enabled = NO;
         }
         
+        // A developer wishing for automatic updates shouldn't want users to skip updates
         self.skipButton.hidden = YES;
     }
     
@@ -416,10 +422,10 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
         self.skipButton.hidden = YES;
         
         // We're going to be relaunching pretty instantaneously
-        self.installButton.title = SULocalizedString(@"Install & Relaunch", nil);
+        self.installButton.title = SULocalizedString(@"Install and Relaunch", nil);
         
         // We should be explicit that the update will be installed on quit
-        self.laterButton.title = SULocalizedString(@"Install Later", @"Alternate title for 'Remind me later' button when downloaded updates can be resumed");
+        self.laterButton.title = SULocalizedString(@"Install Later", @"Alternate title for 'Remind Me Later' button when downloaded updates can be resumed");
     }
 
     if ([self.updateItem isCriticalUpdate]) {
