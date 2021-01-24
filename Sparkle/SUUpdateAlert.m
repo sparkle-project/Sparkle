@@ -400,10 +400,14 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
         [self.automaticallyInstallUpdatesButton removeFromSuperview];
     }
     
-    if (automaticDownloadsEnabledByDeveloper && !showReleaseNotes) {
-        // Disable automatic install updates option if the developer wishes for it in Info.plist
-        // If we are showing release notes, this button will be hidden instead
-        self.automaticallyInstallUpdatesButton.enabled = NO;
+    if (automaticDownloadsEnabledByDeveloper) {
+        if (!showReleaseNotes) {
+            // Disable automatic install updates option if the developer wishes for it in Info.plist
+            // If we are showing release notes, this button will be hidden instead
+            self.automaticallyInstallUpdatesButton.enabled = NO;
+        }
+        
+        self.skipButton.hidden = YES;
     }
     
     BOOL startedInstalling = (self.resumableCompletionBlock != nil);
