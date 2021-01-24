@@ -13,7 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface SPUInformationalUpdate : NSObject <SPUResumableUpdate>
 
-- (instancetype)initWithAppcastItem:(SUAppcastItem *)updateItem;
+- (instancetype)initWithAppcastItem:(SUAppcastItem *)updateItem preventsAutoupdate:(BOOL)preventsAutoupdate;
 
 @end
 

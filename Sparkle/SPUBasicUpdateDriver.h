@@ -16,7 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol SPUBasicUpdateDriverDelegate <NSObject>
 
-- (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)appcastItem;
+- (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)appcastItem preventsAutoupdate:(BOOL)preventsAutoupdate;
 
 - (void)basicDriverIsRequestingAbortUpdateWithError:(nullable NSError *)error;
 

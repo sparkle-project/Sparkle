@@ -87,7 +87,7 @@
         [self notifyFinishLoadingAppcast];
         
         SUAppcastItem *nonNullUpdateItem = updateItem;
-        [self didFindValidUpdateWithAppcastItem:nonNullUpdateItem];
+        [self didFindValidUpdateWithAppcastItem:nonNullUpdateItem preventsAutoupdate:NO];
     }
 }
 
@@ -141,7 +141,7 @@
     }
 }
 
-- (void)didFindValidUpdateWithAppcastItem:(SUAppcastItem *)updateItem
+- (void)didFindValidUpdateWithAppcastItem:(SUAppcastItem *)updateItem preventsAutoupdate:(BOOL)preventsAutoupdate
 {
     if (!self.aborted) {
         [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidFindValidUpdateNotification
@@ -152,7 +152,7 @@
             [self.updaterDelegate updater:self.updater didFindValidUpdate:updateItem];
         }
         
-        [self.delegate basicDriverDidFindUpdateWithAppcastItem:updateItem];
+        [self.delegate basicDriverDidFindUpdateWithAppcastItem:updateItem preventsAutoupdate:preventsAutoupdate];
     }
 }
 
