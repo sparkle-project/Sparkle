@@ -174,11 +174,6 @@ DQ
                             <font key="font" metaFont="smallSystem"/>
                         </buttonCell>
                         <connections>
-                            <binding destination="-2" name="hidden" keyPath="allowsAutomaticUpdates" id="141">
-                                <dictionary key="options">
-                                    <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                </dictionary>
-                            </binding>
                             <binding destination="93" name="value" keyPath="values.SUAutomaticallyUpdate" id="135"/>
                         </connections>
                     </button>
