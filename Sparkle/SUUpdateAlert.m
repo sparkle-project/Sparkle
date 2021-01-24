@@ -347,6 +347,8 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
     // (Install Later would be harmfully incorrect if this update cannot be automatically installed)
     // And this is really not the place to do comparison/version checks.
     // Also make sure to check that the system and developer allows us to automatically update.
+    // This logic is not very sound and gets worse in 2.x where apps can be sandboxed. We may need to revisit this
+    // and also decide if we really need this button in the first place.
     if ([self.host boolForKey:SUAutomaticallyUpdateKey] && allowsAutomaticUpdates && self.updateItem.minimumAutoupdateVersion.length == 0) {
         [self.laterButton setTitle:SULocalizedString(@"Install Later", @"Alternate title for 'Remind Me Later' button when automatic updates are enabled")];
     }
