@@ -141,24 +141,24 @@
     }
 }
 
-- (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)updateItem
+- (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)updateItem preventsAutoupdate:(BOOL)preventsAutoupdate
 {
     self.updateItem = updateItem;
     
     if (self.resumingInstallingUpdate) {
         [self.installerDriver resumeInstallingUpdateWithUpdateItem:updateItem];
-        [self.delegate basicDriverDidFindUpdateWithAppcastItem:updateItem];
+        [self.delegate basicDriverDidFindUpdateWithAppcastItem:updateItem preventsAutoupdate:preventsAutoupdate];
     } else {
         if (!self.preventsInstallerInteraction) {
             // Simple case - delegate allows interaction, so we should continue along
-            [self.delegate basicDriverDidFindUpdateWithAppcastItem:updateItem];
+            [self.delegate basicDriverDidFindUpdateWithAppcastItem:updateItem preventsAutoupdate:preventsAutoupdate];
         } else {
             // Package type installations will always require installer interaction as long as we don't support running as root
             // If it's not a package type installation, we should be okay since we did an auth check before checking for updates above
             if (![updateItem.installationType isEqualToString:SPUInstallationTypeApplication]) {
                 [self.delegate coreDriverIsRequestingAbortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUNotAllowedInteractionError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:SULocalizedString(@"A new update is available but cannot be installed because interaction has been prevented.", nil)] }]];
             } else {
-                [self.delegate basicDriverDidFindUpdateWithAppcastItem:updateItem];
+                [self.delegate basicDriverDidFindUpdateWithAppcastItem:updateItem preventsAutoupdate:preventsAutoupdate];
             }
         }
     }
@@ -204,9 +204,9 @@
     [self extractUpdate:downloadedUpdate];
 }
 
-- (void)deferInformationalUpdate:(SUAppcastItem *)updateItem
+- (void)deferInformationalUpdate:(SUAppcastItem *)updateItem preventsAutoupdate:(BOOL)preventsAutoupdate
 {
-    self.resumableUpdate = [[SPUInformationalUpdate alloc] initWithAppcastItem:updateItem];
+    self.resumableUpdate = [[SPUInformationalUpdate alloc] initWithAppcastItem:updateItem preventsAutoupdate:preventsAutoupdate];
 }
 
 - (void)extractDownloadedUpdate

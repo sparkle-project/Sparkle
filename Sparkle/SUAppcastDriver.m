@@ -104,7 +104,7 @@
     
     if ([self itemContainsValidUpdate:item includesSkippedUpdates:includesSkippedUpdates]) {
         self.nonDeltaUpdateItem = nonDeltaUpdateItem;
-        [self.delegate didFindValidUpdateWithAppcastItem:item];
+        [self.delegate didFindValidUpdateWithAppcastItem:item preventsAutoupdate:[self itemPreventsAutoupdate:item]];
     } else {
         [self.delegate didNotFindUpdate];
     }
@@ -176,6 +176,11 @@
 {
     return [[self versionComparator] compareVersion:[self.host version] toVersion:[ui versionString]] == NSOrderedAscending;
 }
+
+- (BOOL)itemPreventsAutoupdate:(SUAppcastItem *)ui
+ {
+     return ([ui minimumAutoupdateVersion] && ! [[ui minimumAutoupdateVersion] isEqualToString:@""] && ([[self versionComparator] compareVersion:[self.host version] toVersion:[ui minimumAutoupdateVersion]] == NSOrderedAscending));
+ }
 
 - (BOOL)itemContainsSkippedVersion:(SUAppcastItem *)ui
 {

@@ -91,7 +91,8 @@
 - (void)resumeUpdate:(id<SPUResumableUpdate>)resumableUpdate completion:(SPUUpdateDriverCompletion)completionBlock
 {
     // Informational downloads shouldn't be presented as updates to be downloaded
-    if (!resumableUpdate.updateItem.isInformationOnlyUpdate) {
+    // Neither should items that prevent auto updating
+    if (!resumableUpdate.updateItem.isInformationOnlyUpdate && !resumableUpdate.preventsAutoupdate) {
         self.resumingDownloadedUpdate = YES;
     }
     [self.coreDriver resumeUpdate:resumableUpdate completion:completionBlock];
@@ -104,7 +105,7 @@
     }
 }
 
-- (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)updateItem
+- (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)updateItem preventsAutoupdate:(BOOL)preventsAutoupdate
 {
     if (updateItem.isInformationOnlyUpdate) {
         assert(!self.resumingDownloadedUpdate);

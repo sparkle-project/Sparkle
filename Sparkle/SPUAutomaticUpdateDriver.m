@@ -77,12 +77,12 @@
     SULog(SULogLevelError, @"Error: resumeDownloadedUpdate:completion: called on SPUAutomaticUpdateDriver");
 }
 
-- (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)updateItem
+- (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)updateItem preventsAutoupdate:(BOOL)preventsAutoupdate
 {
     self.updateItem = updateItem;
     
-    if (updateItem.isInformationOnlyUpdate) {
-        [self.coreDriver deferInformationalUpdate:updateItem];
+    if (updateItem.isInformationOnlyUpdate || preventsAutoupdate) {
+        [self.coreDriver deferInformationalUpdate:updateItem preventsAutoupdate:preventsAutoupdate];
         [self abortUpdate];
     } else {
         [self.coreDriver downloadUpdateFromAppcastItem:updateItem inBackground:YES];

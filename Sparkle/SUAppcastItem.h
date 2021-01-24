@@ -36,6 +36,7 @@ SU_EXPORT @interface SUAppcastItem : NSObject<NSSecureCoding>
 @property (copy, readonly) NSDictionary *deltaUpdates;
 @property (strong, readonly) NSURL *infoURL;
 @property (nonatomic, copy, readonly) NSString *installationType;
+@property (copy, readonly) NSString *minimumAutoupdateVersion;
 
 // Initializes with data from a dictionary provided by the RSS class.
 - (instancetype)initWithDictionary:(NSDictionary *)dict;

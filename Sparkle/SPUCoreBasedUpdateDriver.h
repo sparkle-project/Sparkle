@@ -17,7 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol SPUCoreBasedUpdateDriverDelegate <NSObject>
 
-- (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)updateItem;
+- (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)updateItem preventsAutoupdate:(BOOL)preventsAutoupdate;
 
 - (void)installerDidFinishPreparationAndWillInstallImmediately:(BOOL)willInstallImmediately silently:(BOOL)willInstallSilently;
 
@@ -63,7 +63,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)downloadUpdateFromAppcastItem:(SUAppcastItem *)updateItem inBackground:(BOOL)background;
 
-- (void)deferInformationalUpdate:(SUAppcastItem *)updateItem;
+- (void)deferInformationalUpdate:(SUAppcastItem *)updateItem preventsAutoupdate:(BOOL)preventsAutoupdate;
 
 - (void)extractDownloadedUpdate;
 
