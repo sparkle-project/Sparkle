@@ -326,8 +326,9 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
         }
     }
     
-    if (automaticDownloadsEnabledByDeveloper) {
-        // A developer wishing for automatic updates shouldn't want users to skip updates
+    // A developer wishing for automatic updates shouldn't want users to skip updates
+    // Except maybe when there's a minimum auto update version for auto-downloading specified
+    if (automaticDownloadsEnabledByDeveloper && self.updateItem.minimumAutoupdateVersion.length == 0) {
         self.skipButton.hidden = YES;
     }
 
