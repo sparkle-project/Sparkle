@@ -305,55 +305,53 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
         [self.releaseNotesContainerView removeFromSuperview];
     }
     
+    // NOTE: The code below for deciding what buttons to hide is complex! Due to array of feature configurations :)
+    
     // When we show release notes, it looks ugly if the install buttons are not closer to the release notes view
     // However when we don't show release notes, it looks ugly if the install buttons are too close to the description field. Shrugs.
-    if (showReleaseNotes && ![self allowsAutomaticUpdates]) {
+    BOOL allowsAutomaticUpdates = [self allowsAutomaticUpdates];
+    // Automatic downloads is enabled by developer if they set SUAutomaticallyUpdateKey in Info.plist,
+    // rather than the user toggling the setting
+    BOOL automaticDownloadsEnabledByDeveloper = [self.host boolForInfoDictionaryKey:SUAutomaticallyUpdateKey];
+    if (showReleaseNotes && (!allowsAutomaticUpdates || automaticDownloadsEnabledByDeveloper)) {
+        // Fix constraints so that buttons aren't far away from web view when we hide the automatic updates check box
         NSLayoutConstraint *skipButtonToReleaseNotesContainerConstraint = [NSLayoutConstraint constraintWithItem:self.skipButton attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self.releaseNotesContainerView attribute:NSLayoutAttributeBottom multiplier:1.0 constant:12.0];
         
         [self.window.contentView addConstraint:skipButtonToReleaseNotesContainerConstraint];
         
         [self.automaticallyInstallUpdatesButton removeFromSuperview];
     }
+    
+    if (automaticDownloadsEnabledByDeveloper) {
+        if (!showReleaseNotes) {
+            // Disable automatic install updates option if the developer wishes for it in Info.plist
+            // If we are showing release notes, this button will be hidden instead
+            self.automaticallyInstallUpdatesButton.enabled = NO;
+        }
+        
+        // A developer wishing for automatic updates shouldn't want users to skip updates
+        self.skipButton.hidden = YES;
+    }
 
     if ([self.updateItem isCriticalUpdate]) {
-        self.skipButton.enabled = NO;
         self.skipButton.hidden = YES;
-        self.laterButton.enabled = NO;
         self.laterButton.hidden = YES;
     }
 
-    if (![self automaticChecksEnabled]) {
-        self.laterButton.enabled = NO;
+    // Reminding user later doesn't make sense when automatic update checks are off
+    if (![self.host boolForKey:SUEnableAutomaticChecksKey]) {
         self.laterButton.hidden = YES;
     }
-
-    if([self automaticallyUpdateEnabled]) {
-        self.skipButton.hidden = YES;
-        self.automaticallyInstallUpdatesButton.hidden = YES;
-        [self.laterButton setTitle:SULocalizedString(@"Install later", @"Alternate title for 'Remind me later' button when automatic updates are enabled")];
+    
+    // If the developer makes use of minimumAutoupdateVersion, just stick to Remind Me Later on the safe side
+    // (Install Later would be harmfully incorrect if this update cannot be automatically installed)
+    // And SUUpdateAlert is really not the place to do comparison/version checks.
+    // Also make sure to check that the system allows us to automatically update.
+    if ([self.host boolForKey:SUAutomaticallyUpdateKey] && allowsAutomaticUpdates && self.updateItem.minimumAutoupdateVersion.length == 0) {
+        [self.laterButton setTitle:SULocalizedString(@"Install Later", @"Alternate title for 'Remind Me Later' button when automatic updates are enabled")];
     }
 
     [self.window center];
-}
-
-- (BOOL)automaticChecksEnabled {
-    NSNumber *automaticChecksEnabled = [self.host objectForKey:SUEnableAutomaticChecksKey];
-    if (automaticChecksEnabled == nil)
-    {
-        return false;
-    }
-
-    return [automaticChecksEnabled boolValue];
-}
-
-- (BOOL)automaticallyUpdateEnabled {
-    NSNumber *automaticChecksEnabled = [self.host objectForKey:SUAutomaticallyUpdateKey];
-    if (automaticChecksEnabled == nil)
-    {
-        return false;
-    }
-
-    return [automaticChecksEnabled boolValue];
 }
 
 - (BOOL)windowShouldClose:(NSNotification *) __unused note
