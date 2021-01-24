@@ -425,7 +425,7 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
         self.installButton.title = SULocalizedString(@"Install and Relaunch", nil);
         
         // We should be explicit that the update will be installed on quit
-        self.laterButton.title = SULocalizedString(@"Install Later", @"Alternate title for 'Remind Me Later' button when downloaded updates can be resumed");
+        self.laterButton.title = SULocalizedString(@"Install On Quit", @"Alternate title for 'Remind Me Later' button when downloaded updates can be resumed");
     }
 
     if ([self.updateItem isCriticalUpdate]) {
