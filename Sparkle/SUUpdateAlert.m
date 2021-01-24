@@ -389,32 +389,54 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
         [self.releaseNotesContainerView removeFromSuperview];
     }
     
+    // NOTE: The code below for deciding what buttons to hide is complex! Due to array of feature configurations :)
+    
     // When we show release notes, it looks ugly if the install buttons are not closer to the release notes view
     // However when we don't show release notes, it looks ugly if the install buttons are too close to the description field. Shrugs.
-    if (showReleaseNotes && ![self allowsAutomaticUpdates]) {
-        NSLayoutConstraint *skipButtonToReleaseNotesContainerConstraint = [NSLayoutConstraint constraintWithItem:self.skipButton attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self.releaseNotesContainerView attribute:NSLayoutAttributeBottom multiplier:1.0 constant:12.0];
-        
-        [self.window.contentView addConstraint:skipButtonToReleaseNotesContainerConstraint];
-        
-        [self.automaticallyInstallUpdatesButton removeFromSuperview];
+    // Automatic downloads is enabled by developer if they set SUAutomaticallyUpdateKey in Info.plist,
+    // rather than the user toggling the setting
+    BOOL automaticDownloadsEnabledByDeveloper = [self.host boolForInfoDictionaryKey:SUAutomaticallyUpdateKey];
+    if (!self.allowsAutomaticUpdates || automaticDownloadsEnabledByDeveloper) {
+        if (showReleaseNotes) {
+            // Fix constraints so that buttons aren't far away from web view when we hide the automatic updates check box
+            NSLayoutConstraint *skipButtonToReleaseNotesContainerConstraint = [NSLayoutConstraint constraintWithItem:self.skipButton attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self.releaseNotesContainerView attribute:NSLayoutAttributeBottom multiplier:1.0 constant:12.0];
+            
+            [self.window.contentView addConstraint:skipButtonToReleaseNotesContainerConstraint];
+            
+            [self.automaticallyInstallUpdatesButton removeFromSuperview];
+        } else {
+            // Disable automatic install updates option if the developer wishes for it in Info.plist
+            // If we are showing release notes, this button will be hidden instead
+            self.automaticallyInstallUpdatesButton.enabled = NO;
+        }
+    }
+    
+    // A developer wishing for automatic updates shouldn't want users to skip updates
+    // Except maybe when there's a minimum auto update version for auto-downloading specified
+    if (automaticDownloadsEnabledByDeveloper && self.updateItem.minimumAutoupdateVersion.length == 0) {
+        self.skipButton.hidden = YES;
     }
     
     BOOL startedInstalling = (self.resumableCompletionBlock != nil);
     if (startedInstalling) {
-        // Should we hide the button or disable the button if the update has already started installing?
-        // Personally I think it looks better when the button is visible on the window...
-        // Anyway an already downloaded update can't be skipped
-        self.skipButton.enabled = NO;
+        // An already downloaded & resumable update can't be skipped
+        self.skipButton.hidden = YES;
         
         // We're going to be relaunching pretty instantaneously
-        self.installButton.title = SULocalizedString(@"Install & Relaunch", nil);
+        self.installButton.title = SULocalizedString(@"Install and Relaunch", nil);
         
         // We should be explicit that the update will be installed on quit
-        self.laterButton.title = SULocalizedString(@"Install on Quit", nil);
+        self.laterButton.title = SULocalizedString(@"Install on Quit", @"Alternate title for 'Remind Me Later' button when downloaded updates can be resumed");
     }
 
     if ([self.updateItem isCriticalUpdate]) {
-        self.skipButton.enabled = NO;
+        self.skipButton.hidden = YES;
+        self.laterButton.hidden = YES;
+    }
+    
+    // Reminding user later doesn't make sense when automatic update checks are off
+    if (![self.host boolForKey:SUEnableAutomaticChecksKey]) {
+        self.laterButton.hidden = YES;
     }
 
     [self.window center];
