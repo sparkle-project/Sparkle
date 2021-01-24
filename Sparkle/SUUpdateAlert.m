@@ -396,22 +396,22 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
     // Automatic downloads is enabled by developer if they set SUAutomaticallyUpdateKey in Info.plist,
     // rather than the user toggling the setting
     BOOL automaticDownloadsEnabledByDeveloper = [self.host boolForInfoDictionaryKey:SUAutomaticallyUpdateKey];
-    if (showReleaseNotes && (!self.allowsAutomaticUpdates || automaticDownloadsEnabledByDeveloper)) {
-        // Fix constraints so that buttons aren't far away from web view when we hide the automatic updates check box
-        NSLayoutConstraint *skipButtonToReleaseNotesContainerConstraint = [NSLayoutConstraint constraintWithItem:self.skipButton attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self.releaseNotesContainerView attribute:NSLayoutAttributeBottom multiplier:1.0 constant:12.0];
-        
-        [self.window.contentView addConstraint:skipButtonToReleaseNotesContainerConstraint];
-        
-        [self.automaticallyInstallUpdatesButton removeFromSuperview];
-    }
-    
-    if (automaticDownloadsEnabledByDeveloper) {
-        if (!showReleaseNotes) {
+    if (!self.allowsAutomaticUpdates || automaticDownloadsEnabledByDeveloper) {
+        if (showReleaseNotes) {
+            // Fix constraints so that buttons aren't far away from web view when we hide the automatic updates check box
+            NSLayoutConstraint *skipButtonToReleaseNotesContainerConstraint = [NSLayoutConstraint constraintWithItem:self.skipButton attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self.releaseNotesContainerView attribute:NSLayoutAttributeBottom multiplier:1.0 constant:12.0];
+            
+            [self.window.contentView addConstraint:skipButtonToReleaseNotesContainerConstraint];
+            
+            [self.automaticallyInstallUpdatesButton removeFromSuperview];
+        } else {
             // Disable automatic install updates option if the developer wishes for it in Info.plist
             // If we are showing release notes, this button will be hidden instead
             self.automaticallyInstallUpdatesButton.enabled = NO;
         }
-        
+    }
+    
+    if (automaticDownloadsEnabledByDeveloper) {
         // A developer wishing for automatic updates shouldn't want users to skip updates
         self.skipButton.hidden = YES;
     }
@@ -433,6 +433,7 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
         self.laterButton.hidden = YES;
     }
     
+    // Reminding user later doesn't make sense when automatic update checks are off
     if (![self.host boolForKey:SUEnableAutomaticChecksKey]) {
         self.laterButton.hidden = YES;
     }
