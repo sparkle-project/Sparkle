@@ -22,7 +22,7 @@
 }
 
 + (NSNumber*)updateGroupIdentifierForHost:(SUHost*)host {
-    NSNumber* updateGroupIdentifier = [host objectForInfoDictionaryKey:SUUpdateGroupIdentifierKey];
+    NSNumber* updateGroupIdentifier = [host objectForUserDefaultsKey:SUUpdateGroupIdentifierKey];
     if(updateGroupIdentifier == nil) {
         updateGroupIdentifier = [self setNewUpdateGroupIdentifierForHost:host];
     }
