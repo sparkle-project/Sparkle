@@ -41,7 +41,6 @@
 @property (nonatomic, readonly, weak) id updater; // if we didn't have legacy support, I'd remove this..
 @property (nullable, nonatomic, readonly, weak) id <SPUUpdaterDelegate>updaterDelegate;
 @property (nonatomic) NSString *userAgent;
-@property (nonatomic) BOOL downloadInBackground;
 
 @end
 
@@ -60,7 +59,6 @@
 @synthesize updaterDelegate = _updaterDelegate;
 @synthesize userAgent = _userAgent;
 @synthesize resumableUpdate = _resumableUpdate;
-@synthesize downloadInBackground = _downloadInBackground;
 
 - (instancetype)initWithHost:(SUHost *)host applicationBundle:(NSBundle *)applicationBundle sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater updaterDelegate:(nullable id <SPUUpdaterDelegate>)updaterDelegate delegate:(id<SPUCoreBasedUpdateDriverDelegate>)delegate
 {
@@ -169,8 +167,6 @@
 
 - (void)downloadUpdateFromAppcastItem:(SUAppcastItem *)updateItem inBackground:(BOOL)background
 {
-    self.downloadInBackground = background;
-    
     self.downloadDriver = [[SPUDownloadDriver alloc] initWithUpdateItem:updateItem host:self.host userAgent:self.userAgent inBackground:background delegate:self];
     
     if ([self.updaterDelegate respondsToSelector:@selector((updater:willDownloadUpdate:withRequest:))]) {
@@ -205,8 +201,10 @@
 
 - (void)downloadDriverDidDownloadUpdate:(SPUDownloadedUpdate *)downloadedUpdate
 {
-    // Use a new update group for our next downloaded update, if applicable
-    if (self.downloadInBackground && downloadedUpdate.updateItem.phasedRolloutInterval != nil) {
+    // Use a new update group for our next downloaded update
+    // We could restrict this to when the appcast was downloaded in the background,
+    // but it shouldn't matter.
+    if (downloadedUpdate.updateItem.phasedRolloutInterval != nil) {
         [SUPhasedUpdateGroupInfo setNewUpdateGroupIdentifierForHost:self.host];
     }
     
