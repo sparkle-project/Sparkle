@@ -15,7 +15,6 @@ NS_ASSUME_NONNULL_BEGIN
 @interface SUPhasedUpdateGroupInfo : NSObject
 
 + (NSUInteger)updateGroupForHost:(SUHost*)host;
-+ (NSNumber*)updateGroupIdentifierForHost:(SUHost*)host;
 + (NSNumber*)setNewUpdateGroupIdentifierForHost:(SUHost*)host;
 
 @end
