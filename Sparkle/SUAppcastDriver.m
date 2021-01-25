@@ -139,6 +139,11 @@
 
 - (BOOL)hostSupportsItem:(SUAppcastItem *)ui inBackground:(BOOL)background
 {
+    return [self itemOperatingSystemIsOK:ui] && [self itemIsReadyForPhasedRollout:ui inBackground:background];
+}
+
+- (BOOL)itemOperatingSystemIsOK:(SUAppcastItem *)ui
+{
     BOOL osOK = [ui isMacOsUpdate];
     if (([ui minimumSystemVersion] == nil || [[ui minimumSystemVersion] isEqualToString:@""]) &&
         ([ui maximumSystemVersion] == nil || [[ui maximumSystemVersion] isEqualToString:@""])) {
@@ -159,7 +164,7 @@
         maximumVersionOK = [versionComparator compareVersion:[ui maximumSystemVersion] toVersion:[SUOperatingSystem systemVersionString]] != NSOrderedAscending;
     }
     
-    return minimumVersionOK && maximumVersionOK && osOK && [self itemIsReadyForPhasedRollout:ui inBackground:background];
+    return minimumVersionOK && maximumVersionOK && osOK;
 }
 
 - (id<SUVersionComparison>)versionComparator
