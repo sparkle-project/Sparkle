@@ -95,7 +95,7 @@
     {
         // Find the best supported update
         SUAppcastItem *deltaUpdateItem = nil;
-        item = [[self class] bestItemFromAppcastItems:ac.items getDeltaItem:&deltaUpdateItem withHostVersion:self.host.version comparator:[self versionComparator]];
+        item = [self bestItemFromAppcastItems:ac.items getDeltaItem:&deltaUpdateItem inBackground:background];
         
         if (item && deltaUpdateItem) {
             nonDeltaUpdateItem = item;
@@ -111,11 +111,16 @@
     }
 }
 
-+ (SUAppcastItem *)bestItemFromAppcastItems:(NSArray *)appcastItems getDeltaItem:(SUAppcastItem * __autoreleasing *)deltaItem withHostVersion:(NSString *)hostVersion comparator:(id<SUVersionComparison>)comparator
+- (SUAppcastItem *)bestItemFromAppcastItems:(NSArray *)appcastItems getDeltaItem:(SUAppcastItem * __autoreleasing *)deltaItem inBackground:(BOOL)background
 {
+    // BUG: We should really filter out the hostSupportsItem: checks before reaching here and before
+    // giving the delegate an opportunity to decide the best appcast item.
+    
+    NSString *hostVersion = self.host.version;
+    id<SUVersionComparison> comparator = [self versionComparator];
     SUAppcastItem *item = nil;
     for(SUAppcastItem *candidate in appcastItems) {
-        if ([[self class] hostSupportsItem:candidate]) {
+        if ([self hostSupportsItem:candidate inBackground:background]) {
             if (!item || [comparator compareVersion:item.versionString toVersion:candidate.versionString] == NSOrderedAscending) {
                 item = candidate;
             }
@@ -124,7 +129,7 @@
     
     if (item && deltaItem) {
         SUAppcastItem *deltaUpdateItem = [item deltaUpdates][hostVersion];
-        if (deltaUpdateItem && [[self class] hostSupportsItem:deltaUpdateItem]) {
+        if (deltaUpdateItem && [self hostSupportsItem:deltaUpdateItem inBackground:background]) {
             *deltaItem = deltaUpdateItem;
         }
     }
@@ -132,7 +137,7 @@
     return item;
 }
 
-+ (BOOL)hostSupportsItem:(SUAppcastItem *)ui
+- (BOOL)hostSupportsItem:(SUAppcastItem *)ui inBackground:(BOOL)background
 {
     BOOL osOK = [ui isMacOsUpdate];
     if (([ui minimumSystemVersion] == nil || [[ui minimumSystemVersion] isEqualToString:@""]) &&
@@ -140,9 +145,10 @@
         return osOK;
     }
     
-    BOOL minimumVersionOK = TRUE;
-    BOOL maximumVersionOK = TRUE;
+    BOOL minimumVersionOK = YES;
+    BOOL maximumVersionOK = YES;
     
+    // We don't want to use delegate's comparator for comparing OS versions
     id<SUVersionComparison> versionComparator = [[SUStandardVersionComparator alloc] init];
     
     // Check minimum and maximum System Version
@@ -153,7 +159,7 @@
         maximumVersionOK = [versionComparator compareVersion:[ui maximumSystemVersion] toVersion:[SUOperatingSystem systemVersionString]] != NSOrderedAscending;
     }
     
-    return minimumVersionOK && maximumVersionOK && osOK;
+    return minimumVersionOK && maximumVersionOK && osOK && [self itemIsReadyForPhasedRollout:ui inBackground:background];
 }
 
 - (id<SUVersionComparison>)versionComparator
@@ -190,6 +196,34 @@
     return [[self versionComparator] compareVersion:[ui versionString] toVersion:skippedVersion] != NSOrderedDescending;
 }
 
+- (BOOL)itemIsReadyForPhasedRollout:(SUAppcastItem *)ui inBackground:(BOOL)background
+{
+    if (!background || [ui isCriticalUpdate]) {
+        return YES;
+    }
+    
+    NSNumber *phasedRolloutIntervalObject = [ui phasedRolloutInterval];
+    if (phasedRolloutIntervalObject == nil) {
+        return YES;
+    }
+    
+    NSDate* itemReleaseDate = ui.date;
+    if (itemReleaseDate == nil) {
+        return YES;
+    }
+    
+    NSTimeInterval timeSinceRelease = [[NSDate date] timeIntervalSinceDate:itemReleaseDate];
+    
+    NSTimeInterval phasedRolloutInterval = [phasedRolloutIntervalObject doubleValue];
+    NSTimeInterval timeToWaitForGroup = phasedRolloutInterval * [SUPhasedUpdateGroupInfo updateGroupForHost:self.host];
+    
+    if (timeSinceRelease >= timeToWaitForGroup) {
+        return YES;
+    }
+    
+    return NO;
+}
+
 - (BOOL)itemContainsValidUpdate:(SUAppcastItem *)ui inBackground:(BOOL)background includesSkippedUpdates:(BOOL)includesSkippedUpdates
 {
     if (ui == nil) {
@@ -204,24 +238,6 @@
     // Check for skipped updates
     if (!includesSkippedUpdates && [self itemContainsSkippedVersion:ui]) {
         return NO;
-    }
-    
-    // Check phased group rollout for this appcast item
-    if (background && ![ui isCriticalUpdate]) {
-        NSNumber *phasedRolloutIntervalObject = [ui phasedRolloutInterval];
-        if (phasedRolloutIntervalObject != nil) {
-            NSDate* itemReleaseDate = ui.date;
-            if (itemReleaseDate != nil) {
-                NSTimeInterval timeSinceRelease = [[NSDate date] timeIntervalSinceDate:itemReleaseDate];
-                
-                NSTimeInterval phasedRolloutInterval = [phasedRolloutIntervalObject doubleValue];
-                NSTimeInterval timeToWaitForGroup = phasedRolloutInterval * [SUPhasedUpdateGroupInfo updateGroupForHost:self.host];
-                
-                if (timeSinceRelease < timeToWaitForGroup) {
-                    return NO;
-                }
-            }
-        }
     }
     
     return YES;
