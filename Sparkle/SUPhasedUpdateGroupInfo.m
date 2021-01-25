@@ -9,7 +9,6 @@
 #import "SUPhasedUpdateGroupInfo.h"
 #import "SUHost.h"
 #import "SUConstants.h"
-#import "SUFileManager.h"
 
 
 #include "AppKitPrevention.h"
