@@ -84,7 +84,7 @@ static NSString *SUAppcastItemInstallationTypeKey = @"SUAppcastItemInstallationT
         _versionString = [(NSString *)[decoder decodeObjectOfClass:[NSString class] forKey:SUAppcastItemVersionStringKey] copy];
         _osString = [(NSString *)[decoder decodeObjectOfClass:[NSString class] forKey:SUAppcastAttributeOsType] copy];
         _propertiesDictionary = [decoder decodeObjectOfClasses:[NSSet setWithArray:@[[NSDictionary class], [NSString class], [NSDate class], [NSArray class]]] forKey:SUAppcastItemPropertiesKey];
-        _phasedRolloutInterval = [decoder decodeObjectOfClass:[NSNumber class] forKey:SUAppcastAttributePhasedRolloutInterval];
+        _phasedRolloutInterval = [decoder decodeObjectOfClass:[NSNumber class] forKey:SUAppcastElementPhasedRolloutInterval];
     }
     
     return self;
@@ -155,7 +155,7 @@ static NSString *SUAppcastItemInstallationTypeKey = @"SUAppcastItemInstallationT
     }
     
     if (self.phasedRolloutInterval != nil) {
-        [encoder encodeObject:self.phasedRolloutInterval forKey:SUAppcastAttributePhasedRolloutInterval];
+        [encoder encodeObject:self.phasedRolloutInterval forKey:SUAppcastElementPhasedRolloutInterval];
     }
 }
 
@@ -294,6 +294,11 @@ static NSString *SUAppcastItemInstallationTypeKey = @"SUAppcastItemInstallationT
         _minimumSystemVersion = [(NSString *)[dict objectForKey:SUAppcastElementMinimumSystemVersion] copy];
         _maximumSystemVersion = [(NSString *)[dict objectForKey:SUAppcastElementMaximumSystemVersion] copy];
         _minimumAutoupdateVersion = [(NSString *)[dict objectForKey:SUAppcastElementMinimumAutoupdateVersion] copy];
+        
+        NSString* rolloutIntervalString = [(NSString *)[dict objectForKey:SUAppcastElementPhasedRolloutInterval] copy];
+        if (rolloutIntervalString != nil) {
+            _phasedRolloutInterval = @(rolloutIntervalString.integerValue);
+        }
 
         NSString *shortVersionString = [enclosure objectForKey:SUAppcastAttributeShortVersionString];
         if (nil == shortVersionString) {
@@ -316,11 +321,6 @@ static NSString *SUAppcastItemInstallationTypeKey = @"SUAppcastItemInstallationT
             return nil;
         } else if ([_installationType isEqualToString:SPUInstallationTypeInteractivePackage]) {
             SULog(SULogLevelDefault, @"warning: '%@' for %@ is deprecated. Use '%@' instead.", SPUInstallationTypeInteractivePackage, SUAppcastAttributeInstallationType, SPUInstallationTypeGuidedPackage);
-        }
-        
-        NSString* enclosureRolloutIntervalString = [enclosure objectForKey:SUAppcastAttributePhasedRolloutInterval];
-        if (enclosureRolloutIntervalString != nil) {
-            _phasedRolloutInterval = @(enclosureRolloutIntervalString.integerValue);
         }
 
         // Find the appropriate release notes URL.
