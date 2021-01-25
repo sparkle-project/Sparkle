@@ -15,6 +15,7 @@
 #import "SPUUpdaterDelegate.h"
 #import "SUHost.h"
 #import "SUConstants.h"
+#import "SUPhasedUpdateGroupInfo.h"
 
 
 #include "AppKitPrevention.h"
@@ -62,12 +63,12 @@
         if (error != nil) {
             [self.delegate didFailToFetchAppcastWithError:error];
         } else {
-            [self appcastDidFinishLoading:appcast includesSkippedUpdates:includesSkippedUpdates];
+            [self appcastDidFinishLoading:appcast inBackground:background includesSkippedUpdates:includesSkippedUpdates];
         }
     }];
 }
 
-- (void)appcastDidFinishLoading:(SUAppcast *)ac includesSkippedUpdates:(BOOL)includesSkippedUpdates
+- (void)appcastDidFinishLoading:(SUAppcast *)ac inBackground:(BOOL)background includesSkippedUpdates:(BOOL)includesSkippedUpdates
 {
     [self.delegate didFinishLoadingAppcast:ac];
     
@@ -102,7 +103,7 @@
         }
     }
     
-    if ([self itemContainsValidUpdate:item includesSkippedUpdates:includesSkippedUpdates]) {
+    if ([self itemContainsValidUpdate:item inBackground:background includesSkippedUpdates:includesSkippedUpdates]) {
         self.nonDeltaUpdateItem = nonDeltaUpdateItem;
         [self.delegate didFindValidUpdateWithAppcastItem:item preventsAutoupdate:[self itemPreventsAutoupdate:item]];
     } else {
@@ -189,9 +190,41 @@
     return [[self versionComparator] compareVersion:[ui versionString] toVersion:skippedVersion] != NSOrderedDescending;
 }
 
-- (BOOL)itemContainsValidUpdate:(SUAppcastItem *)ui includesSkippedUpdates:(BOOL)includesSkippedUpdates
+- (BOOL)itemContainsValidUpdate:(SUAppcastItem *)ui inBackground:(BOOL)background includesSkippedUpdates:(BOOL)includesSkippedUpdates
 {
-    return ui && [[self class] hostSupportsItem:ui] && [self isItemNewer:ui] && (includesSkippedUpdates || ![self itemContainsSkippedVersion:ui]);
+    if (ui == nil) {
+        return NO;
+    }
+    
+    // Check that we have a newer appcast item than host
+    if (![self isItemNewer:ui]) {
+        return NO;
+    }
+    
+    // Check for skipped updates
+    if (!includesSkippedUpdates && [self itemContainsSkippedVersion:ui]) {
+        return NO;
+    }
+    
+    // Check phased group rollout for this appcast item
+    if (background && ![ui isCriticalUpdate]) {
+        NSNumber *phasedRolloutIntervalObject = [ui phasedRolloutInterval];
+        if (phasedRolloutIntervalObject != nil) {
+            NSDate* itemReleaseDate = ui.date;
+            if (itemReleaseDate != nil) {
+                NSTimeInterval timeSinceRelease = [[NSDate date] timeIntervalSinceDate:itemReleaseDate];
+                
+                NSTimeInterval phasedRolloutInterval = [phasedRolloutIntervalObject doubleValue];
+                NSTimeInterval timeToWaitForGroup = phasedRolloutInterval * [SUPhasedUpdateGroupInfo updateGroupForHost:self.host];
+                
+                if (timeSinceRelease < timeToWaitForGroup) {
+                    return NO;
+                }
+            }
+        }
+    }
+    
+    return YES;
 }
 
 @end

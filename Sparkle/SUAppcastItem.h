@@ -23,6 +23,7 @@
 SU_EXPORT @interface SUAppcastItem : NSObject<NSSecureCoding>
 @property (copy, readonly) NSString *title;
 @property (copy, readonly) NSString *dateString;
+@property (copy, readonly) NSDate *date;
 @property (copy, readonly) NSString *itemDescription;
 @property (strong, readonly) NSURL *releaseNotesURL;
 @property (strong, readonly) SUSignatures *signatures;
@@ -35,6 +36,7 @@ SU_EXPORT @interface SUAppcastItem : NSObject<NSSecureCoding>
 @property (copy, readonly) NSString *displayVersionString;
 @property (copy, readonly) NSDictionary *deltaUpdates;
 @property (strong, readonly) NSURL *infoURL;
+@property (copy, readonly) NSNumber* phasedRolloutInterval;
 @property (nonatomic, copy, readonly) NSString *installationType;
 @property (copy, readonly) NSString *minimumAutoupdateVersion;
 
