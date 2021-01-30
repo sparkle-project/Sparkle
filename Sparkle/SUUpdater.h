@@ -202,7 +202,7 @@ SU_EXPORT @interface SUUpdater : NSObject
     You may want to respond to the userDidCancelDownload delegate method in case
     the user clicks the "Cancel" button while the update is downloading.
  */
-- (void)installUpdatesIfAvailable;
+- (void)installUpdatesIfAvailable __attribute__((deprecated("This method is deprecated. Please set SUAutomaticallyUpdate in your Info.plist or use automaticallyDownloadsUpdates property instead.")));
 
 /*!
     Returns the date of last update check.
