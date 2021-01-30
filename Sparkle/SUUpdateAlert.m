@@ -411,12 +411,6 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
         }
     }
     
-    // A developer wishing for automatic updates shouldn't want users to skip updates
-    // Except maybe when there's a minimum auto update version for auto-downloading specified
-    if (automaticDownloadsEnabledByDeveloper && self.updateItem.minimumAutoupdateVersion.length == 0) {
-        self.skipButton.hidden = YES;
-    }
-    
     BOOL startedInstalling = (self.resumableCompletionBlock != nil);
     if (startedInstalling) {
         // An already downloaded & resumable update can't be skipped
