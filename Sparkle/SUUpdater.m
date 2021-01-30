@@ -64,7 +64,6 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 @synthesize shouldRescheduleOnWake;
 @synthesize userAgentString = customUserAgentString;
 @synthesize httpHeaders;
-@synthesize systemProfileInformationArray;
 @synthesize driver;
 @synthesize host;
 @synthesize sparkleBundle;
@@ -133,15 +132,6 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
         }
         [sharedUpdaters setObject:self forKey:[NSValue valueWithNonretainedObject:bundle]];
         host = [[SUHost alloc] initWithBundle:bundle];
-
-        if (self) {
-            NSArray<NSDictionary<NSString *, NSString *> *> *profileInfo = [SUSystemProfiler systemProfileArrayForHost:self.host];
-            BOOL sendingSystemProfile = [self sendsSystemProfile];
-            if ([self.delegate respondsToSelector:@selector(feedParametersForUpdater:sendingSystemProfile:)]) {
-                profileInfo = [profileInfo arrayByAddingObjectsFromArray:[self.delegate feedParametersForUpdater:self sendingSystemProfile:sendingSystemProfile]];
-            }
-            self.systemProfileInformationArray = profileInfo;
-        }
 
         // This runs the permission prompt if needed, but never before the app has finished launching because the runloop won't run before that
         [self performSelector:@selector(startUpdateCycle) withObject:nil afterDelay:0];
@@ -241,7 +231,6 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
         if ([self.delegate respondsToSelector:@selector(feedParametersForUpdater:sendingSystemProfile:)]) {
             profileInfo = [profileInfo arrayByAddingObjectsFromArray:[self.delegate feedParametersForUpdater:self sendingSystemProfile:YES]];
         }
-        self.systemProfileInformationArray = profileInfo;
         [SUUpdatePermissionPrompt promptWithHost:self.host systemProfile:profileInfo reply:^(SUUpdatePermissionResponse *response) {
             [self updatePermissionRequestFinishedWithResponse:response];
             // Schedule checks, but make sure we ignore the delayed call from KVO
@@ -577,7 +566,6 @@ static NSString *escapeURLComponent(NSString *str) {
         parameters = [parameters arrayByAddingObjectsFromArray:[SUSystemProfiler systemProfileArrayForHost:self.host]];
         [self.host setObject:[NSDate date] forUserDefaultsKey:SULastProfileSubmitDateKey];
     }
-    self.systemProfileInformationArray = parameters;
     if ([parameters count] == 0) { return baseFeedURL; }
 
     // Build up the parameterized URL.
