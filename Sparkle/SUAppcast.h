@@ -29,6 +29,7 @@ SU_EXPORT @interface SUAppcast : NSObject<NSURLDownloadDelegate>
 
 - (void)fetchAppcastFromURL:(NSURL *)url inBackground:(BOOL)bg completionBlock:(void (^)(NSError *_Nullable))err;
 - (SUAppcast *)copyWithoutDeltaUpdates;
+- (SUAppcast *)copyByFilteringItems:(BOOL (^)(SUAppcastItem *))filterBlock;
 
 @property (readonly, copy, nullable) NSArray *items;
 @end

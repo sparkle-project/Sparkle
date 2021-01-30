@@ -68,12 +68,14 @@
     }];
 }
 
-- (void)appcastDidFinishLoading:(SUAppcast *)ac inBackground:(BOOL)background includesSkippedUpdates:(BOOL)includesSkippedUpdates
+- (void)appcastDidFinishLoading:(SUAppcast *)loadedAppcast inBackground:(BOOL)background includesSkippedUpdates:(BOOL)includesSkippedUpdates
 {
-    [self.delegate didFinishLoadingAppcast:ac];
+    [self.delegate didFinishLoadingAppcast:loadedAppcast];
     
-    NSDictionary *userInfo = @{ SUUpdaterAppcastNotificationKey: ac };
+    NSDictionary *userInfo = @{ SUUpdaterAppcastNotificationKey: loadedAppcast };
     [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidFinishLoadingAppCastNotification object:self.updater userInfo:userInfo];
+    
+    SUAppcast *supportedAppcast = [[self class] filterSupportedAppcast:loadedAppcast phasedUpdateGroup:[SUPhasedUpdateGroupInfo updateGroupForHost:self.host] inBackground:background];
     
     SUAppcastItem *item = nil;
     SUAppcastItem *nonDeltaUpdateItem = nil;
@@ -81,21 +83,21 @@
     // Now we have to find the best valid update in the appcast.
     if ([self.updaterDelegate respondsToSelector:@selector((bestValidUpdateInAppcast:forUpdater:))])
     {
-        item = [self.updaterDelegate bestValidUpdateInAppcast:ac forUpdater:(id _Nonnull)self.updater];
+        item = [self.updaterDelegate bestValidUpdateInAppcast:supportedAppcast forUpdater:(id _Nonnull)self.updater];
     }
     
     if (item != nil)
     {
         // Does the delegate want to handle it?
         if ([item isDeltaUpdate]) {
-            nonDeltaUpdateItem = [self.updaterDelegate bestValidUpdateInAppcast:[ac copyWithoutDeltaUpdates] forUpdater:(id _Nonnull)self.updater];
+            nonDeltaUpdateItem = [self.updaterDelegate bestValidUpdateInAppcast:[supportedAppcast copyWithoutDeltaUpdates] forUpdater:(id _Nonnull)self.updater];
         }
     }
     else // If not, we'll take care of it ourselves.
     {
         // Find the best supported update
         SUAppcastItem *deltaUpdateItem = nil;
-        item = [self bestItemFromAppcastItems:ac.items getDeltaItem:&deltaUpdateItem inBackground:background];
+        item = [[self class] bestItemFromAppcastItems:supportedAppcast.items getDeltaItem:&deltaUpdateItem withHostVersion:self.host.version comparator:[self versionComparator]];
         
         if (item && deltaUpdateItem) {
             nonDeltaUpdateItem = item;
@@ -111,25 +113,28 @@
     }
 }
 
-- (SUAppcastItem *)bestItemFromAppcastItems:(NSArray *)appcastItems getDeltaItem:(SUAppcastItem * __autoreleasing *)deltaItem inBackground:(BOOL)background
+// This method is used by unit tests
++ (SUAppcast *)filterSupportedAppcast:(SUAppcast *)appcast phasedUpdateGroup:(NSUInteger)phasedUpdateGroup inBackground:(BOOL)background
 {
-    // BUG: We should really filter out the hostSupportsItem: checks before reaching here and before
-    // giving the delegate an opportunity to decide the best appcast item.
-    
-    NSString *hostVersion = self.host.version;
-    id<SUVersionComparison> comparator = [self versionComparator];
+    return [appcast copyByFilteringItems:^(SUAppcastItem *item) {
+        return (BOOL)[[self class] hostSupportsItem:item phasedUpdateGroup:phasedUpdateGroup inBackground:background];
+    }];
+}
+
+// This method is used by unit tests
+// This method should not do *any* filtering, only version comparing
++ (SUAppcastItem *)bestItemFromAppcastItems:(NSArray *)appcastItems getDeltaItem:(SUAppcastItem * __autoreleasing *)deltaItem withHostVersion:(NSString *)hostVersion comparator:(id<SUVersionComparison>)comparator
+{
     SUAppcastItem *item = nil;
     for(SUAppcastItem *candidate in appcastItems) {
-        if ([self hostSupportsItem:candidate inBackground:background]) {
-            if (!item || [comparator compareVersion:item.versionString toVersion:candidate.versionString] == NSOrderedAscending) {
-                item = candidate;
-            }
+        if (!item || [comparator compareVersion:item.versionString toVersion:candidate.versionString] == NSOrderedAscending) {
+            item = candidate;
         }
     }
     
     if (item && deltaItem) {
         SUAppcastItem *deltaUpdateItem = [item deltaUpdates][hostVersion];
-        if (deltaUpdateItem && [self hostSupportsItem:deltaUpdateItem inBackground:background]) {
+        if (deltaUpdateItem) {
             *deltaItem = deltaUpdateItem;
         }
     }
@@ -137,12 +142,12 @@
     return item;
 }
 
-- (BOOL)hostSupportsItem:(SUAppcastItem *)ui inBackground:(BOOL)background
++ (BOOL)hostSupportsItem:(SUAppcastItem *)ui phasedUpdateGroup:(NSUInteger)phasedUpdateGroup inBackground:(BOOL)background
 {
-    return [self itemOperatingSystemIsOK:ui] && [self itemIsReadyForPhasedRollout:ui inBackground:background];
+    return [[self class] itemOperatingSystemIsOK:ui] && [[self class] itemIsReadyForPhasedRollout:ui phasedUpdateGroup:phasedUpdateGroup inBackground:background];
 }
 
-- (BOOL)itemOperatingSystemIsOK:(SUAppcastItem *)ui
++ (BOOL)itemOperatingSystemIsOK:(SUAppcastItem *)ui
 {
     BOOL osOK = [ui isMacOsUpdate];
     if (([ui minimumSystemVersion] == nil || [[ui minimumSystemVersion] isEqualToString:@""]) &&
@@ -201,7 +206,7 @@
     return [[self versionComparator] compareVersion:[ui versionString] toVersion:skippedVersion] != NSOrderedDescending;
 }
 
-- (BOOL)itemIsReadyForPhasedRollout:(SUAppcastItem *)ui inBackground:(BOOL)background
++ (BOOL)itemIsReadyForPhasedRollout:(SUAppcastItem *)ui phasedUpdateGroup:(NSUInteger)phasedUpdateGroup inBackground:(BOOL)background
 {
     if (!background || [ui isCriticalUpdate]) {
         return YES;
@@ -220,7 +225,7 @@
     NSTimeInterval timeSinceRelease = [[NSDate date] timeIntervalSinceDate:itemReleaseDate];
     
     NSTimeInterval phasedRolloutInterval = [phasedRolloutIntervalObject doubleValue];
-    NSTimeInterval timeToWaitForGroup = phasedRolloutInterval * [SUPhasedUpdateGroupInfo updateGroupForHost:self.host];
+    NSTimeInterval timeToWaitForGroup = phasedRolloutInterval * phasedUpdateGroup;
     
     if (timeSinceRelease >= timeToWaitForGroup) {
         return YES;

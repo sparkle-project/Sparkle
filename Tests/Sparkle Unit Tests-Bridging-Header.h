@@ -36,6 +36,8 @@ static const char *SUAppleQuarantineIdentifier = "com.apple.quarantine";
 
 + (SUAppcastItem *)bestItemFromAppcastItems:(NSArray *)appcastItems getDeltaItem:(SUAppcastItem *_Nullable __autoreleasing *_Nullable)deltaItem withHostVersion:(NSString *)hostVersion comparator:(id<SUVersionComparison>)comparator;
 
++ (SUAppcast *)filterSupportedAppcast:(SUAppcast *)appcast phasedUpdateGroup:(NSUInteger)phasedUpdateGroup inBackground:(BOOL)background;
+
 @end
 
 
