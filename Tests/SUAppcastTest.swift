@@ -44,7 +44,7 @@ class SUAppcastTest: XCTestCase {
             XCTAssertFalse(items[3].isCriticalUpdate)
 
             // Test best appcast item & a delta update item
-            let supportedAppcast = SUAppcastDriver.filterSupportedAppcast(appcast, phasedUpdateGroup: 0, inBackground: false)
+            let supportedAppcast = SUAppcastDriver.filterSupportedAppcast(appcast, phasedUpdateGroup: nil)
             
             let supportedAppcastItems = supportedAppcast.items!
             

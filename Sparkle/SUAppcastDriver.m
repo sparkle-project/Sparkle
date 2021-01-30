@@ -75,7 +75,8 @@
     NSDictionary *userInfo = @{ SUUpdaterAppcastNotificationKey: loadedAppcast };
     [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidFinishLoadingAppCastNotification object:self.updater userInfo:userInfo];
     
-    SUAppcast *supportedAppcast = [[self class] filterSupportedAppcast:loadedAppcast phasedUpdateGroup:[SUPhasedUpdateGroupInfo updateGroupForHost:self.host] inBackground:background];
+    NSNumber *phasedUpdateGroup = background ? @([SUPhasedUpdateGroupInfo updateGroupForHost:self.host]) : nil;
+    SUAppcast *supportedAppcast = [[self class] filterSupportedAppcast:loadedAppcast phasedUpdateGroup:phasedUpdateGroup];
     
     SUAppcastItem *item = nil;
     SUAppcastItem *nonDeltaUpdateItem = nil;
@@ -114,10 +115,10 @@
 }
 
 // This method is used by unit tests
-+ (SUAppcast *)filterSupportedAppcast:(SUAppcast *)appcast phasedUpdateGroup:(NSUInteger)phasedUpdateGroup inBackground:(BOOL)background
++ (SUAppcast *)filterSupportedAppcast:(SUAppcast *)appcast phasedUpdateGroup:(NSNumber * _Nullable)phasedUpdateGroup
 {
     return [appcast copyByFilteringItems:^(SUAppcastItem *item) {
-        return (BOOL)([[self class] itemOperatingSystemIsOK:item] && [[self class] itemIsReadyForPhasedRollout:item phasedUpdateGroup:phasedUpdateGroup inBackground:background]);
+        return (BOOL)([[self class] itemOperatingSystemIsOK:item] && [[self class] itemIsReadyForPhasedRollout:item phasedUpdateGroup:phasedUpdateGroup]);
     }];
 }
 
@@ -201,9 +202,9 @@
     return [[self versionComparator] compareVersion:[ui versionString] toVersion:skippedVersion] != NSOrderedDescending;
 }
 
-+ (BOOL)itemIsReadyForPhasedRollout:(SUAppcastItem *)ui phasedUpdateGroup:(NSUInteger)phasedUpdateGroup inBackground:(BOOL)background
++ (BOOL)itemIsReadyForPhasedRollout:(SUAppcastItem *)ui phasedUpdateGroup:(NSNumber * _Nullable)phasedUpdateGroup
 {
-    if (!background || [ui isCriticalUpdate]) {
+    if (phasedUpdateGroup == nil || [ui isCriticalUpdate]) {
         return YES;
     }
     
@@ -220,7 +221,7 @@
     NSTimeInterval timeSinceRelease = [[NSDate date] timeIntervalSinceDate:itemReleaseDate];
     
     NSTimeInterval phasedRolloutInterval = [phasedRolloutIntervalObject doubleValue];
-    NSTimeInterval timeToWaitForGroup = phasedRolloutInterval * phasedUpdateGroup;
+    NSTimeInterval timeToWaitForGroup = phasedRolloutInterval * phasedUpdateGroup.unsignedIntegerValue;
     
     if (timeSinceRelease >= timeToWaitForGroup) {
         return YES;
