@@ -117,7 +117,7 @@
 + (SUAppcast *)filterSupportedAppcast:(SUAppcast *)appcast phasedUpdateGroup:(NSUInteger)phasedUpdateGroup inBackground:(BOOL)background
 {
     return [appcast copyByFilteringItems:^(SUAppcastItem *item) {
-        return (BOOL)[[self class] hostSupportsItem:item phasedUpdateGroup:phasedUpdateGroup inBackground:background];
+        return (BOOL)([[self class] itemOperatingSystemIsOK:item] && [[self class] itemIsReadyForPhasedRollout:item phasedUpdateGroup:phasedUpdateGroup inBackground:background]);
     }];
 }
 
@@ -140,11 +140,6 @@
     }
     
     return item;
-}
-
-+ (BOOL)hostSupportsItem:(SUAppcastItem *)ui phasedUpdateGroup:(NSUInteger)phasedUpdateGroup inBackground:(BOOL)background
-{
-    return [[self class] itemOperatingSystemIsOK:ui] && [[self class] itemIsReadyForPhasedRollout:ui phasedUpdateGroup:phasedUpdateGroup inBackground:background];
 }
 
 + (BOOL)itemOperatingSystemIsOK:(SUAppcastItem *)ui
