@@ -191,7 +191,7 @@
             self.displayVersionString = self.versionString;
         }
 
-        NSString* enclosureRolloutIntervalString = [enclosure objectForKey:SUAppcastAttributePhasedRolloutInterval];
+        NSString* enclosureRolloutIntervalString = [dict objectForKey:SUAppcastElementPhasedRolloutInterval];
         if(enclosureRolloutIntervalString) {
             self.phasedRolloutInterval = @(enclosureRolloutIntervalString.integerValue);
         }

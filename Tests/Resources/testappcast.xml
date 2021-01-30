@@ -12,7 +12,8 @@
     <!-- The best chosen release -->
     <item>
         <title>Version 3.0</title>
-        <enclosure url="http://localhost:1337/Sparkle_Test_App.zip" sparkle:version="3.0" sparkle:phasedRolloutInterval="86400" />
+        <sparkle:phasedRolloutInterval>86400</sparkle:phasedRolloutInterval>
+        <enclosure url="http://localhost:1337/Sparkle_Test_App.zip" sparkle:version="3.0" />
         <sparkle:deltas>
             <enclosure url="http://localhost:1337/3.0_from_2.0.patch"
             sparkle:version="3.0"
