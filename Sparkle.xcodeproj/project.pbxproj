@@ -154,6 +154,8 @@
 		721D588E25BE59F900D23BEA /* SUPhasedUpdateGroupInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 721D588B25BE59F900D23BEA /* SUPhasedUpdateGroupInfo.h */; };
 		721D588F25BE59F900D23BEA /* SUPhasedUpdateGroupInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 721D588C25BE59F900D23BEA /* SUPhasedUpdateGroupInfo.m */; };
 		721D589025BE59F900D23BEA /* SUPhasedUpdateGroupInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 721D588C25BE59F900D23BEA /* SUPhasedUpdateGroupInfo.m */; };
+		721D5A8525C65D3F00D23BEA /* SUFlatPackageUnarchiver.m in Sources */ = {isa = PBXBuildFile; fileRef = 721D5A8425C65D3F00D23BEA /* SUFlatPackageUnarchiver.m */; };
+		721D5ABC25C680A300D23BEA /* SUFlatPackageUnarchiver.m in Sources */ = {isa = PBXBuildFile; fileRef = 721D5A8425C65D3F00D23BEA /* SUFlatPackageUnarchiver.m */; };
 		721D8A611D48413B0032E472 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 61B5F8F609C4CEB300B25A18 /* Security.framework */; };
 		721D8A721D4950B80032E472 /* Autoupdate in Copy Tools */ = {isa = PBXBuildFile; fileRef = 72B398D21D3D879300EE297F /* Autoupdate */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		721D8A7B1D4963190032E472 /* SPULocalCacheDirectory.m in Sources */ = {isa = PBXBuildFile; fileRef = 721BC20D1D1CDE55002BC71E /* SPULocalCacheDirectory.m */; };
@@ -1034,6 +1036,8 @@
 		721C24581CB7567D005440CB /* InstallerProgress-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "InstallerProgress-Info.plist"; path = "Sparkle/InstallerProgress/InstallerProgress-Info.plist"; sourceTree = SOURCE_ROOT; };
 		721D588B25BE59F900D23BEA /* SUPhasedUpdateGroupInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUPhasedUpdateGroupInfo.h; sourceTree = "<group>"; };
 		721D588C25BE59F900D23BEA /* SUPhasedUpdateGroupInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUPhasedUpdateGroupInfo.m; sourceTree = "<group>"; };
+		721D5A8325C65D3F00D23BEA /* SUFlatPackageUnarchiver.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SUFlatPackageUnarchiver.h; path = Autoupdate/SUFlatPackageUnarchiver.h; sourceTree = SOURCE_ROOT; };
+		721D5A8425C65D3F00D23BEA /* SUFlatPackageUnarchiver.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SUFlatPackageUnarchiver.m; path = Autoupdate/SUFlatPackageUnarchiver.m; sourceTree = SOURCE_ROOT; };
 		721D8A831D498F1D0032E472 /* set-agent-signing.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "set-agent-signing.sh"; sourceTree = "<group>"; };
 		721D8A881D4D272E0032E472 /* Installation.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = Installation.md; sourceTree = "<group>"; };
 		722194511D3BF987004C34FF /* SPUInstallerAgentProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SPUInstallerAgentProtocol.h; path = Sparkle/InstallerProgress/SPUInstallerAgentProtocol.h; sourceTree = SOURCE_ROOT; };
@@ -1823,6 +1827,8 @@
 				7267E5811D3D89B300D1BF90 /* SUDiskImageUnarchiver.m */,
 				7267E5821D3D89B300D1BF90 /* SUPipedUnarchiver.h */,
 				7267E5831D3D89B300D1BF90 /* SUPipedUnarchiver.m */,
+				721D5A8325C65D3F00D23BEA /* SUFlatPackageUnarchiver.h */,
+				721D5A8425C65D3F00D23BEA /* SUFlatPackageUnarchiver.m */,
 				7267E5841D3D89B300D1BF90 /* SUUnarchiver.h */,
 				7267E5851D3D89B300D1BF90 /* SUUnarchiver.m */,
 				72316BD11E0DA8430039EFD9 /* SUUnarchiverNotifier.h */,
@@ -3304,6 +3310,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				721D5ABC25C680A300D23BEA /* SUFlatPackageUnarchiver.m in Sources */,
 				725F97771C8A62F500265BE4 /* SUAdHocCodeSigning.m in Sources */,
 				5A4094481C74EA5200983BE0 /* SUAppcastTest.swift in Sources */,
 				7267E5EE1D3D915900D1BF90 /* SUBinaryDeltaApply.m in Sources */,
@@ -3555,6 +3562,7 @@
 				7267E5D71D3D8D3F00D1BF90 /* SUHost.m in Sources */,
 				7267E5C31D3D8B2700D1BF90 /* SUInstaller.m in Sources */,
 				5A6DD17123FE1FFC000AEF33 /* SUSignatures.m in Sources */,
+				721D5A8525C65D3F00D23BEA /* SUFlatPackageUnarchiver.m in Sources */,
 				7267E5CE1D3D8C7500D1BF90 /* SULog.m in Sources */,
 				7267E5C41D3D8B2700D1BF90 /* SUPackageInstaller.m in Sources */,
 				7267E5871D3D89B300D1BF90 /* SUPipedUnarchiver.m in Sources */,

@@ -17,6 +17,7 @@
 #import "SUUpdateValidator.h"
 #import "SUHost.h"
 #import "SUSignatures.h"
+#import "SPUInstallationType.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

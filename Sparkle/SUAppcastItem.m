@@ -313,7 +313,14 @@ static NSString *SUAppcastItemInstallationTypeKey = @"SUAppcastItemInstallationT
         
         _installationType = [enclosure objectForKey:SUAppcastAttributeInstallationType];
         if (_installationType == nil) {
-            _installationType = SPUInstallationTypeDefault;
+            // If we have a flat package, assume installation type is guided
+            // (flat / non-archived interactive packages are not supported)
+            // Otherwise assume we have a normal application inside an archive
+            if ([_fileURL.pathExtension isEqualToString:@"pkg"]) {
+                _installationType = SPUInstallationTypeGuidedPackage;
+            } else {
+                _installationType = SPUInstallationTypeApplication;
+            }
         } else if (!SPUValidInstallationType(_installationType)) {
             if (error != NULL) {
                 *error = [NSString stringWithFormat:@"Feed item's enclosure lacks valid %@ (found %@)", SUAppcastAttributeInstallationType, _installationType];
