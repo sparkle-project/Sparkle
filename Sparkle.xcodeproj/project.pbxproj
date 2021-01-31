@@ -226,6 +226,7 @@
 		721D5B5A25C6940400D23BEA /* SUFlatPackageUnarchiver.m in Sources */ = {isa = PBXBuildFile; fileRef = 721D5B5825C6940400D23BEA /* SUFlatPackageUnarchiver.m */; };
 		721D5B5B25C6940400D23BEA /* SUFlatPackageUnarchiver.h in Headers */ = {isa = PBXBuildFile; fileRef = 721D5B5925C6940400D23BEA /* SUFlatPackageUnarchiver.h */; };
 		721D5B6925C69A6900D23BEA /* test.sparkle_interactive.pkg in Resources */ = {isa = PBXBuildFile; fileRef = 721D5B6825C69A6900D23BEA /* test.sparkle_interactive.pkg */; };
+		721D5B8625C69F4A00D23BEA /* SUFlatPackageUnarchiver.m in Sources */ = {isa = PBXBuildFile; fileRef = 721D5B5825C6940400D23BEA /* SUFlatPackageUnarchiver.m */; };
 		722589D71E0AD86B005EA0B9 /* SUUnarchiverProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 722589D61E0AD86B005EA0B9 /* SUUnarchiverProtocol.h */; };
 		722589DA1E0B19F4005EA0B9 /* SUUnarchiverNotifier.h in Headers */ = {isa = PBXBuildFile; fileRef = 722589D81E0B19F4005EA0B9 /* SUUnarchiverNotifier.h */; };
 		722589DB1E0B19F4005EA0B9 /* SUUnarchiverNotifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 722589D91E0B19F4005EA0B9 /* SUUnarchiverNotifier.m */; };
@@ -2379,6 +2380,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				721D5B8625C69F4A00D23BEA /* SUFlatPackageUnarchiver.m in Sources */,
 				5AE13FA01E0D4F65000D2C2C /* Appcast.swift in Sources */,
 				5AAD00521E0BE6BE00AF411E /* ArchiveItem.swift in Sources */,
 				5A5AC5381E0C6D3000998119 /* FeedXML.swift in Sources */,
