@@ -50,6 +50,7 @@ static NSString *SUAppcastItemInstallationTypeKey = @"SUAppcastItemInstallationT
 @synthesize propertiesDictionary = _propertiesDictionary;
 @synthesize installationType = _installationType;
 @synthesize minimumAutoupdateVersion = _minimumAutoupdateVersion;
+@synthesize phasedRolloutInterval = _phasedRolloutInterval;
 
 + (BOOL)supportsSecureCoding
 {
@@ -83,6 +84,7 @@ static NSString *SUAppcastItemInstallationTypeKey = @"SUAppcastItemInstallationT
         _versionString = [(NSString *)[decoder decodeObjectOfClass:[NSString class] forKey:SUAppcastItemVersionStringKey] copy];
         _osString = [(NSString *)[decoder decodeObjectOfClass:[NSString class] forKey:SUAppcastAttributeOsType] copy];
         _propertiesDictionary = [decoder decodeObjectOfClasses:[NSSet setWithArray:@[[NSDictionary class], [NSString class], [NSDate class], [NSArray class]]] forKey:SUAppcastItemPropertiesKey];
+        _phasedRolloutInterval = [decoder decodeObjectOfClass:[NSNumber class] forKey:SUAppcastElementPhasedRolloutInterval];
     }
     
     return self;
@@ -151,6 +153,10 @@ static NSString *SUAppcastItemInstallationTypeKey = @"SUAppcastItemInstallationT
     if (self.installationType != nil) {
         [encoder encodeObject:self.installationType forKey:SUAppcastItemInstallationTypeKey];
     }
+    
+    if (self.phasedRolloutInterval != nil) {
+        [encoder encodeObject:self.phasedRolloutInterval forKey:SUAppcastElementPhasedRolloutInterval];
+    }
 }
 
 - (BOOL)isDeltaUpdate
@@ -167,6 +173,19 @@ static NSString *SUAppcastItemInstallationTypeKey = @"SUAppcastItemInstallationT
 - (BOOL)isMacOsUpdate
 {
     return self.osString == nil || [self.osString isEqualToString:SUAppcastAttributeValueMacOS];
+}
+
+- (NSDate *)date
+{
+    if (self.dateString == nil) {
+        return nil;
+    }
+    
+    NSDateFormatter* dateFormatter = [[NSDateFormatter alloc] init];
+    dateFormatter.locale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US"];
+    dateFormatter.dateFormat = @"E, dd MMM yyyy HH:mm:ss Z";
+    
+    return [dateFormatter dateFromString:self.dateString];
 }
 
 - (BOOL)isInformationOnlyUpdate
@@ -275,6 +294,11 @@ static NSString *SUAppcastItemInstallationTypeKey = @"SUAppcastItemInstallationT
         _minimumSystemVersion = [(NSString *)[dict objectForKey:SUAppcastElementMinimumSystemVersion] copy];
         _maximumSystemVersion = [(NSString *)[dict objectForKey:SUAppcastElementMaximumSystemVersion] copy];
         _minimumAutoupdateVersion = [(NSString *)[dict objectForKey:SUAppcastElementMinimumAutoupdateVersion] copy];
+        
+        NSString* rolloutIntervalString = [(NSString *)[dict objectForKey:SUAppcastElementPhasedRolloutInterval] copy];
+        if (rolloutIntervalString != nil) {
+            _phasedRolloutInterval = @(rolloutIntervalString.integerValue);
+        }
 
         NSString *shortVersionString = [enclosure objectForKey:SUAppcastAttributeShortVersionString];
         if (nil == shortVersionString) {

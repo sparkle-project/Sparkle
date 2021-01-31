@@ -15,6 +15,7 @@
 #import "SPUUpdaterDelegate.h"
 #import "SUHost.h"
 #import "SUConstants.h"
+#import "SUPhasedUpdateGroupInfo.h"
 
 
 #include "AppKitPrevention.h"
@@ -62,17 +63,20 @@
         if (error != nil) {
             [self.delegate didFailToFetchAppcastWithError:error];
         } else {
-            [self appcastDidFinishLoading:appcast includesSkippedUpdates:includesSkippedUpdates];
+            [self appcastDidFinishLoading:appcast inBackground:background includesSkippedUpdates:includesSkippedUpdates];
         }
     }];
 }
 
-- (void)appcastDidFinishLoading:(SUAppcast *)ac includesSkippedUpdates:(BOOL)includesSkippedUpdates
+- (void)appcastDidFinishLoading:(SUAppcast *)loadedAppcast inBackground:(BOOL)background includesSkippedUpdates:(BOOL)includesSkippedUpdates
 {
-    [self.delegate didFinishLoadingAppcast:ac];
+    [self.delegate didFinishLoadingAppcast:loadedAppcast];
     
-    NSDictionary *userInfo = @{ SUUpdaterAppcastNotificationKey: ac };
+    NSDictionary *userInfo = @{ SUUpdaterAppcastNotificationKey: loadedAppcast };
     [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidFinishLoadingAppCastNotification object:self.updater userInfo:userInfo];
+    
+    NSNumber *phasedUpdateGroup = background ? @([SUPhasedUpdateGroupInfo updateGroupForHost:self.host]) : nil;
+    SUAppcast *supportedAppcast = [[self class] filterSupportedAppcast:loadedAppcast phasedUpdateGroup:phasedUpdateGroup];
     
     SUAppcastItem *item = nil;
     SUAppcastItem *nonDeltaUpdateItem = nil;
@@ -80,21 +84,21 @@
     // Now we have to find the best valid update in the appcast.
     if ([self.updaterDelegate respondsToSelector:@selector((bestValidUpdateInAppcast:forUpdater:))])
     {
-        item = [self.updaterDelegate bestValidUpdateInAppcast:ac forUpdater:(id _Nonnull)self.updater];
+        item = [self.updaterDelegate bestValidUpdateInAppcast:supportedAppcast forUpdater:(id _Nonnull)self.updater];
     }
     
     if (item != nil)
     {
         // Does the delegate want to handle it?
         if ([item isDeltaUpdate]) {
-            nonDeltaUpdateItem = [self.updaterDelegate bestValidUpdateInAppcast:[ac copyWithoutDeltaUpdates] forUpdater:(id _Nonnull)self.updater];
+            nonDeltaUpdateItem = [self.updaterDelegate bestValidUpdateInAppcast:[supportedAppcast copyWithoutDeltaUpdates] forUpdater:(id _Nonnull)self.updater];
         }
     }
     else // If not, we'll take care of it ourselves.
     {
         // Find the best supported update
         SUAppcastItem *deltaUpdateItem = nil;
-        item = [[self class] bestItemFromAppcastItems:ac.items getDeltaItem:&deltaUpdateItem withHostVersion:self.host.version comparator:[self versionComparator]];
+        item = [[self class] bestItemFromAppcastItems:supportedAppcast.items getDeltaItem:&deltaUpdateItem withHostVersion:self.host.version comparator:[self versionComparator]];
         
         if (item && deltaUpdateItem) {
             nonDeltaUpdateItem = item;
@@ -102,7 +106,7 @@
         }
     }
     
-    if ([self itemContainsValidUpdate:item includesSkippedUpdates:includesSkippedUpdates]) {
+    if ([self itemContainsValidUpdate:item inBackground:background includesSkippedUpdates:includesSkippedUpdates]) {
         self.nonDeltaUpdateItem = nonDeltaUpdateItem;
         [self.delegate didFindValidUpdateWithAppcastItem:item preventsAutoupdate:[self itemPreventsAutoupdate:item]];
     } else {
@@ -110,20 +114,30 @@
     }
 }
 
+// This method is used by unit tests
++ (SUAppcast *)filterSupportedAppcast:(SUAppcast *)appcast phasedUpdateGroup:(NSNumber * _Nullable)phasedUpdateGroup
+{
+    NSDate *currentDate = [NSDate date];
+    
+    return [appcast copyByFilteringItems:^(SUAppcastItem *item) {
+        return (BOOL)([[self class] itemOperatingSystemIsOK:item] && [[self class] itemIsReadyForPhasedRollout:item phasedUpdateGroup:phasedUpdateGroup currentDate:currentDate]);
+    }];
+}
+
+// This method is used by unit tests
+// This method should not do *any* filtering, only version comparing
 + (SUAppcastItem *)bestItemFromAppcastItems:(NSArray *)appcastItems getDeltaItem:(SUAppcastItem * __autoreleasing *)deltaItem withHostVersion:(NSString *)hostVersion comparator:(id<SUVersionComparison>)comparator
 {
     SUAppcastItem *item = nil;
     for(SUAppcastItem *candidate in appcastItems) {
-        if ([[self class] hostSupportsItem:candidate]) {
-            if (!item || [comparator compareVersion:item.versionString toVersion:candidate.versionString] == NSOrderedAscending) {
-                item = candidate;
-            }
+        if (!item || [comparator compareVersion:item.versionString toVersion:candidate.versionString] == NSOrderedAscending) {
+            item = candidate;
         }
     }
     
     if (item && deltaItem) {
         SUAppcastItem *deltaUpdateItem = [item deltaUpdates][hostVersion];
-        if (deltaUpdateItem && [[self class] hostSupportsItem:deltaUpdateItem]) {
+        if (deltaUpdateItem) {
             *deltaItem = deltaUpdateItem;
         }
     }
@@ -131,7 +145,7 @@
     return item;
 }
 
-+ (BOOL)hostSupportsItem:(SUAppcastItem *)ui
++ (BOOL)itemOperatingSystemIsOK:(SUAppcastItem *)ui
 {
     BOOL osOK = [ui isMacOsUpdate];
     if (([ui minimumSystemVersion] == nil || [[ui minimumSystemVersion] isEqualToString:@""]) &&
@@ -139,9 +153,10 @@
         return osOK;
     }
     
-    BOOL minimumVersionOK = TRUE;
-    BOOL maximumVersionOK = TRUE;
+    BOOL minimumVersionOK = YES;
+    BOOL maximumVersionOK = YES;
     
+    // We don't want to use delegate's comparator for comparing OS versions
     id<SUVersionComparison> versionComparator = [[SUStandardVersionComparator alloc] init];
     
     // Check minimum and maximum System Version
@@ -189,9 +204,51 @@
     return [[self versionComparator] compareVersion:[ui versionString] toVersion:skippedVersion] != NSOrderedDescending;
 }
 
-- (BOOL)itemContainsValidUpdate:(SUAppcastItem *)ui includesSkippedUpdates:(BOOL)includesSkippedUpdates
++ (BOOL)itemIsReadyForPhasedRollout:(SUAppcastItem *)ui phasedUpdateGroup:(NSNumber * _Nullable)phasedUpdateGroup currentDate:(NSDate *)currentDate
 {
-    return ui && [[self class] hostSupportsItem:ui] && [self isItemNewer:ui] && (includesSkippedUpdates || ![self itemContainsSkippedVersion:ui]);
+    if (phasedUpdateGroup == nil || [ui isCriticalUpdate]) {
+        return YES;
+    }
+    
+    NSNumber *phasedRolloutIntervalObject = [ui phasedRolloutInterval];
+    if (phasedRolloutIntervalObject == nil) {
+        return YES;
+    }
+    
+    NSDate* itemReleaseDate = ui.date;
+    if (itemReleaseDate == nil) {
+        return YES;
+    }
+    
+    NSTimeInterval timeSinceRelease = [currentDate timeIntervalSinceDate:itemReleaseDate];
+    
+    NSTimeInterval phasedRolloutInterval = [phasedRolloutIntervalObject doubleValue];
+    NSTimeInterval timeToWaitForGroup = phasedRolloutInterval * phasedUpdateGroup.unsignedIntegerValue;
+    
+    if (timeSinceRelease >= timeToWaitForGroup) {
+        return YES;
+    }
+    
+    return NO;
+}
+
+- (BOOL)itemContainsValidUpdate:(SUAppcastItem *)ui inBackground:(BOOL)background includesSkippedUpdates:(BOOL)includesSkippedUpdates
+{
+    if (ui == nil) {
+        return NO;
+    }
+    
+    // Check that we have a newer appcast item than host
+    if (![self isItemNewer:ui]) {
+        return NO;
+    }
+    
+    // Check for skipped updates
+    if (!includesSkippedUpdates && [self itemContainsSkippedVersion:ui]) {
+        return NO;
+    }
+    
+    return YES;
 }
 
 @end

@@ -150,6 +150,10 @@
 		721C24621CB75C68005440CB /* SULog.m in Sources */ = {isa = PBXBuildFile; fileRef = 55C14F05136EF6DB00649790 /* SULog.m */; };
 		721CF1AA1AD7647000D9AC09 /* libxar.1.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D1AF5890FD7678C0065DB48 /* libxar.1.dylib */; };
 		721CF1AB1AD764EB00D9AC09 /* libbz2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D06E8FB0FD68D61005AE3F6 /* libbz2.dylib */; };
+		721D588D25BE59F900D23BEA /* SUPhasedUpdateGroupInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 721D588B25BE59F900D23BEA /* SUPhasedUpdateGroupInfo.h */; };
+		721D588E25BE59F900D23BEA /* SUPhasedUpdateGroupInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 721D588B25BE59F900D23BEA /* SUPhasedUpdateGroupInfo.h */; };
+		721D588F25BE59F900D23BEA /* SUPhasedUpdateGroupInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 721D588C25BE59F900D23BEA /* SUPhasedUpdateGroupInfo.m */; };
+		721D589025BE59F900D23BEA /* SUPhasedUpdateGroupInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 721D588C25BE59F900D23BEA /* SUPhasedUpdateGroupInfo.m */; };
 		721D8A611D48413B0032E472 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 61B5F8F609C4CEB300B25A18 /* Security.framework */; };
 		721D8A721D4950B80032E472 /* Autoupdate in Copy Tools */ = {isa = PBXBuildFile; fileRef = 72B398D21D3D879300EE297F /* Autoupdate */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		721D8A7B1D4963190032E472 /* SPULocalCacheDirectory.m in Sources */ = {isa = PBXBuildFile; fileRef = 721BC20D1D1CDE55002BC71E /* SPULocalCacheDirectory.m */; };
@@ -1028,6 +1032,8 @@
 		721C24451CB753E6005440CB /* Updater.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Updater.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		721C24571CB754E8005440CB /* ConfigInstallerProgress.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigInstallerProgress.xcconfig; sourceTree = "<group>"; };
 		721C24581CB7567D005440CB /* InstallerProgress-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "InstallerProgress-Info.plist"; path = "Sparkle/InstallerProgress/InstallerProgress-Info.plist"; sourceTree = SOURCE_ROOT; };
+		721D588B25BE59F900D23BEA /* SUPhasedUpdateGroupInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUPhasedUpdateGroupInfo.h; sourceTree = "<group>"; };
+		721D588C25BE59F900D23BEA /* SUPhasedUpdateGroupInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUPhasedUpdateGroupInfo.m; sourceTree = "<group>"; };
 		721D8A831D498F1D0032E472 /* set-agent-signing.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "set-agent-signing.sh"; sourceTree = "<group>"; };
 		721D8A881D4D272E0032E472 /* Installation.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = Installation.md; sourceTree = "<group>"; };
 		722194511D3BF987004C34FF /* SPUInstallerAgentProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SPUInstallerAgentProtocol.h; path = Sparkle/InstallerProgress/SPUInstallerAgentProtocol.h; sourceTree = SOURCE_ROOT; };
@@ -1862,6 +1868,8 @@
 				61B5FB9509C4F04600B25A18 /* SUAppcast.m */,
 				61B5FC5309C5182000B25A18 /* SUAppcastItem.h */,
 				61B5FC5409C5182000B25A18 /* SUAppcastItem.m */,
+				721D588B25BE59F900D23BEA /* SUPhasedUpdateGroupInfo.h */,
+				721D588C25BE59F900D23BEA /* SUPhasedUpdateGroupInfo.m */,
 				61A225A20D1C4AC000430CCD /* SUStandardVersionComparator.h */,
 				61A225A30D1C4AC000430CCD /* SUStandardVersionComparator.m */,
 				61A2279A0D1CEE7600430CCD /* SUSystemProfiler.h */,
@@ -2380,6 +2388,7 @@
 				72A5D5DE1D692ACC0009E5AC /* SparkleCore.h in Headers */,
 				72B3DECE1E23479000457642 /* SPUInformationalUpdate.h in Headers */,
 				72A5D5EB1D692BD40009E5AC /* SPUDownloadData.h in Headers */,
+				721D588E25BE59F900D23BEA /* SUPhasedUpdateGroupInfo.h in Headers */,
 				72A5D5F91D692F4C0009E5AC /* SPUStatusCompletionResults.h in Headers */,
 				72A5D5E71D692BB00009E5AC /* SPUUpdatePermissionRequest.h in Headers */,
 				EA1E286F22B6661D004AA304 /* SUSignatures.h in Headers */,
@@ -2464,6 +2473,7 @@
 				72A1C2631CD6849C004CD282 /* SUUpdatePermissionPrompt.h in Headers */,
 				72A450531C69A68900D67EEA /* SUUpdatePermissionResponse.h in Headers */,
 				72F9EBE21D517E2F004AC8B6 /* SUUpdater.h in Headers */,
+				721D588D25BE59F900D23BEA /* SUPhasedUpdateGroupInfo.h in Headers */,
 				72A6F98A1C94E2D6005F404C /* SUUpdaterDelegate.h in Headers */,
 				61A2259E0D1C495D00430CCD /* SUVersionComparisonProtocol.h in Headers */,
 				3772FEA913DE0B6B00F79537 /* SUVersionDisplayProtocol.h in Headers */,
@@ -3503,6 +3513,7 @@
 				72A5D5C01D6929F80009E5AC /* SUConstants.m in Sources */,
 				72A5D5C21D6929F80009E5AC /* SUFileManager.m in Sources */,
 				72A5D5C11D6929F80009E5AC /* SUHost.m in Sources */,
+				721D589025BE59F900D23BEA /* SUPhasedUpdateGroupInfo.m in Sources */,
 				72A5D5B01D6929F80009E5AC /* SUInstallerConnection.m in Sources */,
 				72A5D5AE1D6929F80009E5AC /* SUInstallerLauncher.m in Sources */,
 				72B3DED01E23479000457642 /* SPUInformationalUpdate.m in Sources */,
@@ -3597,6 +3608,7 @@
 				61B5F8EE09C4CE3C00B25A18 /* SPUUpdater.m in Sources */,
 				720E217C1D0D00BF003A311C /* SPUUpdaterCycle.m in Sources */,
 				726E078E1CA891E9001A286B /* SPUUpdaterSettings.m in Sources */,
+				721D588F25BE59F900D23BEA /* SUPhasedUpdateGroupInfo.m in Sources */,
 				72F9EC401D5E823F004AC8B6 /* SPUUpdaterTimer.m in Sources */,
 				72B09CE81CE6BCBD0052EF9E /* SPUURLDownload.m in Sources */,
 				7293A1AF1CEE933800B957A7 /* SPUURLRequest.m in Sources */,

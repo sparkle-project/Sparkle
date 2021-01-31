@@ -307,14 +307,23 @@
 }
 
 - (SUAppcast *)copyWithoutDeltaUpdates {
+    return [self copyByFilteringItems:^(SUAppcastItem *item) {
+        return (BOOL)![item isDeltaUpdate];
+    }];
+}
+
+- (SUAppcast *)copyByFilteringItems:(BOOL (^)(SUAppcastItem *))filterBlock
+{
     SUAppcast *other = [SUAppcast new];
-    NSMutableArray *nonDeltaItems = [NSMutableArray new];
-
-    for(SUAppcastItem *item in self.items) {
-        if (![item isDeltaUpdate]) [nonDeltaItems addObject:item];
+    NSMutableArray *newItems = [NSMutableArray new];
+    
+    for (SUAppcastItem *item in self.items) {
+        if (filterBlock(item)) {
+            [newItems addObject:item];
+        }
     }
-
-    other.items = nonDeltaItems;
+    
+    other.items = newItems;
     return other;
 }
 

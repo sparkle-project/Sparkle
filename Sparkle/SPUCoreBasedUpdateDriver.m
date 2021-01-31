@@ -20,6 +20,7 @@
 #import "SUAppcastItem.h"
 #import "SULocalizations.h"
 #import "SPUInstallationType.h"
+#import "SUPhasedUpdateGroupInfo.h"
 
 
 #include "AppKitPrevention.h"
@@ -200,6 +201,13 @@
 
 - (void)downloadDriverDidDownloadUpdate:(SPUDownloadedUpdate *)downloadedUpdate
 {
+    // Use a new update group for our next downloaded update
+    // We could restrict this to when the appcast was downloaded in the background,
+    // but it shouldn't matter.
+    if (downloadedUpdate.updateItem.phasedRolloutInterval != nil) {
+        [SUPhasedUpdateGroupInfo setNewUpdateGroupIdentifierForHost:self.host];
+    }
+    
     self.resumableUpdate = downloadedUpdate;
     [self extractUpdate:downloadedUpdate];
 }
