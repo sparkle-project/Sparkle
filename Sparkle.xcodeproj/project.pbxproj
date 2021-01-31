@@ -156,6 +156,7 @@
 		721D589025BE59F900D23BEA /* SUPhasedUpdateGroupInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 721D588C25BE59F900D23BEA /* SUPhasedUpdateGroupInfo.m */; };
 		721D5A8525C65D3F00D23BEA /* SUFlatPackageUnarchiver.m in Sources */ = {isa = PBXBuildFile; fileRef = 721D5A8425C65D3F00D23BEA /* SUFlatPackageUnarchiver.m */; };
 		721D5ABC25C680A300D23BEA /* SUFlatPackageUnarchiver.m in Sources */ = {isa = PBXBuildFile; fileRef = 721D5A8425C65D3F00D23BEA /* SUFlatPackageUnarchiver.m */; };
+		721D5B1B25C692BB00D23BEA /* SUFlatPackageUnarchiver.m in Sources */ = {isa = PBXBuildFile; fileRef = 721D5A8425C65D3F00D23BEA /* SUFlatPackageUnarchiver.m */; };
 		721D8A611D48413B0032E472 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 61B5F8F609C4CEB300B25A18 /* Security.framework */; };
 		721D8A721D4950B80032E472 /* Autoupdate in Copy Tools */ = {isa = PBXBuildFile; fileRef = 72B398D21D3D879300EE297F /* Autoupdate */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		721D8A7B1D4963190032E472 /* SPULocalCacheDirectory.m in Sources */ = {isa = PBXBuildFile; fileRef = 721BC20D1D1CDE55002BC71E /* SPULocalCacheDirectory.m */; };
@@ -3359,6 +3360,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				721D5B1B25C692BB00D23BEA /* SUFlatPackageUnarchiver.m in Sources */,
 				72464F7C1E2097F600FB341C /* SUOperatingSystem.m in Sources */,
 				7205C44C1E1304CE00E370AE /* Appcast.swift in Sources */,
 				7205C44D1E1304CE00E370AE /* ArchiveItem.swift in Sources */,

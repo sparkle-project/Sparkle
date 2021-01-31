@@ -18,7 +18,7 @@ func unarchive(itemPath: URL, archiveDestDir: URL, callback: @escaping (Error?) 
         } catch {
             try fileManager.copyItem(at: itemPath, to: itemCopy)
         }
-        if let unarchiver = SUUnarchiver.unarchiver(forPath: itemCopy.path, updatingHostBundlePath: nil, decryptionPassword: nil) {
+        if let unarchiver = SUUnarchiver.unarchiver(forPath: itemCopy.path, updatingHostBundlePath: nil, decryptionPassword: nil, expectingInstallationType: SPUInstallationTypeApplication) {
             unarchiver.unarchive(completionBlock: { (error: Error?) in
                 if error != nil {
                     callback(error)
