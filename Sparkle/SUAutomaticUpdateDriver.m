@@ -234,4 +234,9 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
     }
 }
 
+- (BOOL)usesPhasedRollout
+{
+    return YES;
+}
+
 @end

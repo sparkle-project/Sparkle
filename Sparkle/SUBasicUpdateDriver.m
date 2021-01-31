@@ -26,6 +26,7 @@
 #import "SUAppcast.h"
 #import "SUAppcastItem.h"
 #import "SUGlobalUpdateLock.h"
+#import "SUSystemUpdateInfo.h"
 
 #import "SPUURLRequest.h"
 #import "SPUDownloaderSession.h"
@@ -145,7 +146,35 @@
     return item;
 }
 
+- (BOOL)usesPhasedRollout
+{
+    return NO;
+}
+
+- (BOOL)isItemReadyForPhasedRollout:(SUAppcastItem *)ui {
+    if(![self usesPhasedRollout] || [ui isCriticalUpdate] || ![ui phasedRolloutInterval]) {
+        return YES;
+    }
+
+    NSDate* itemReleaseDate = ui.date;
+    if(!itemReleaseDate) {
+        return YES;
+    }
+
+    NSTimeInterval timeSinceRelease = [[NSDate date] timeIntervalSinceDate:itemReleaseDate];
+
+    NSTimeInterval phasedRolloutInterval = [[ui phasedRolloutInterval] doubleValue];
+    NSTimeInterval timeToWaitForGroup = phasedRolloutInterval * [SUSystemUpdateInfo updateGroupForHost:self.host];
+
+    return timeSinceRelease >= timeToWaitForGroup;
+}
+
 - (BOOL)hostSupportsItem:(SUAppcastItem *)ui
+{
+    return [self hostSupportsOperatingSystemInItem:ui] && [self isItemReadyForPhasedRollout:ui];
+}
+
+- (BOOL)hostSupportsOperatingSystemInItem:(SUAppcastItem *)ui
 {
     BOOL osOK = [ui isMacOsUpdate];
     if (([ui minimumSystemVersion] == nil || [[ui minimumSystemVersion] isEqualToString:@""]) &&
@@ -358,6 +387,12 @@
 {
     // finished. downloadData should be nil as this was a permanent download
     assert(self.updateItem);
+    
+    if (self.updateItem.phasedRolloutInterval != nil) {
+        // use new update group next time, even if the driver doesn't usesPhasedRollout
+        [SUSystemUpdateInfo setNewUpdateGroupIdentifierForHost:self.host];
+    }
+    
     id<SUUpdaterPrivate> updater = self.updater;
     if ([[updater delegate] respondsToSelector:@selector(updater:didDownloadUpdate:)]) {
         [[updater delegate] updater:self.updater didDownloadUpdate:self.updateItem];
