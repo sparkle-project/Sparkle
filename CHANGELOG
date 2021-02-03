@@ -15,7 +15,6 @@
    * Remove max size from update alert. (George Nachman)
  * Integrate generate_keys export/import options changes from #1730 (Zorg)
  * Add `—release-notes-url-prefix` support to localized release notes (Adam Tharani)
- * Exposed systemProfileInformationArray, e.g. for use by the app preferences GUI (Piers Uso Walter)
  * Translations
    * Enable base internalization for alert xibs (Zorg)
    * Capitalizes french translation of "Vous utilisez actuellement..." ("You are currently running...") (Micah Moore)
@@ -23,6 +22,9 @@
    * Remove non-english localizations from TestApplication (Zorg)
  * Fix catch-22 Swift Package Manager binary target (Jonas Zaugg)
  * Add explicit dependencies to fix Xcode linking errors (Kornel)
+ * Add phased rollouts feature to automatic update driver too (Zorg)
+ * Remove hiding skip button and retitling later button (Zorg)
+ * Deprecate installUpdatesIfAvailable (Zorg)
 
  # 1.24.0
 
