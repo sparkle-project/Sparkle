@@ -10,7 +10,7 @@ if [ "$commits_since_tag" -gt 0 ]; then
     echo "Package.swift has not been committed and tag has not been moved."
 else
     # TODO: add sanity check to see if version is actually being updated or not?
-    read -p "Do you want to commit changes to Package.swift and force move tag '$latest_git_tag'? (required for Swift Package Manager release) " -n 1 -r
+    read -p "Do you want to commit changes to Package.swift and force move tag '$latest_git_tag'? (required for SPM release) [y/N]" -n 1 -r
     echo    # (optional) move to a new line
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         long_message=$(git tag -n99 -l $latest_git_tag) # gets corresponding message
