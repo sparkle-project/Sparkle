@@ -90,6 +90,8 @@ if [ "$ACTION" = "" ] ; then
     # Get latest git tag
     cd "$SRCROOT"
     latest_git_tag=$(git describe --abbrev=0)
+    # Check semantic versioning
+    [[ $latest_git_tag =~ ^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-((0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*)(\.(0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*))*))?(\\+([0-9a-zA-Z-]+(\.[0-9a-zA-Z-]+)*))?$ ]] && echo "Tag $latest_git_tag follows semantic versioning" || echo "WARNING: Tag $latest_git_tag does not follow semantic versioning! SPM will not be able to resolve the repository"
     # Generate new Package manifest
     cd "$CONFIGURATION_BUILD_DIR"
     cp "$SRCROOT/Package.swift" "$CONFIGURATION_BUILD_DIR"
