@@ -53,6 +53,7 @@ if [ "$ACTION" = "" ] ; then
     #rm -rf "$CONFIGURATION_BUILD_DIR/Sparkle.xcarchive"
     zip -rqyX -9 "../Sparkle-for-Swift-Package-Manager.zip" *
     # Get latest git tag
+    cd "$SRCROOT"
     latest_git_tag=$(git describe --abbrev=0)
     # Generate new Package manifest
     cd "$CONFIGURATION_BUILD_DIR"
@@ -61,7 +62,7 @@ if [ "$ACTION" = "" ] ; then
         # is equivalent to shasum -a 256 FILE
         spm_checksum=$(swift package compute-checksum "Sparkle-for-Swift-Package-Manager.zip")
         rm -rf ".build"
-        sed -E -i '' -e '/let tag/ s/".+"/"$latest_git_tag"/' -e '/let version/ s/".+"/"$CURRENT_PROJECT_VERSION"/' -e "/let checksum/ s/[[:xdigit:]]{64}/$spm_checksum/" "Package.swift"
+        sed -E -i '' -e "/let tag/ s/\".+\"/\"$latest_git_tag\"/" -e "/let version/ s/\".+\"/\"$CURRENT_PROJECT_VERSION\"/" -e "/let checksum/ s/[[:xdigit:]]{64}/$spm_checksum/" "Package.swift"
         cp "Package.swift" "$SRCROOT"
         echo "Package.swift updated with the following values:"
         echo "Version: $CURRENT_PROJECT_VERSION"
