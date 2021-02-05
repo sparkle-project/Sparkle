@@ -94,7 +94,12 @@ if [ "$ACTION" = "" ] ; then
         cd "$SRCROOT"
         latest_git_tag=$(git describe --abbrev=0)
         # Check semantic versioning
-        [[ $latest_git_tag =~ ^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-((0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*)(\.(0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*))*))?(\\+([0-9a-zA-Z-]+(\.[0-9a-zA-Z-]+)*))?$ ]] && echo "Tag $latest_git_tag follows semantic versioning" || echo "WARNING: Tag $latest_git_tag does not follow semantic versioning! SPM will not be able to resolve the repository"
+        if [[ $latest_git_tag =~ ^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-((0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*)(\.(0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*))*))?(\\+([0-9a-zA-Z-]+(\.[0-9a-zA-Z-]+)*))?$ ]]; then
+            echo "Tag $latest_git_tag follows semantic versioning"
+        else
+            echo "ERROR: Tag $latest_git_tag does not follow semantic versioning! SPM will not be able to resolve the repository" >&2
+            exit 1
+        fi
     else
         # Dummy placeholder for CI test builds as we don't really need to update Package.swift for building and testing purposes
         latest_git_tag="CI_BUILD"
