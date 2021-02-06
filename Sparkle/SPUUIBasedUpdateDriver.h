@@ -20,6 +20,7 @@ NS_ASSUME_NONNULL_BEGIN
 @optional
 
 - (void)basicDriverDidFinishLoadingAppcast;
+- (void)uiDriverDidShowUpdate;
 
 @end
 

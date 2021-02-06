@@ -167,6 +167,10 @@
         }];
     }
     
+    if ([self.delegate respondsToSelector:@selector(uiDriverDidShowUpdate)]) {
+        [self.delegate uiDriverDidShowUpdate];
+    }
+    
     id <SPUUpdaterDelegate> updaterDelegate = self.updaterDelegate;
     if (updateItem.releaseNotesURL != nil && (![updaterDelegate respondsToSelector:@selector(updaterShouldDownloadReleaseNotes:)] || [updaterDelegate updaterShouldDownloadReleaseNotes:self.updater])) {
         NSURLRequest *request = [NSURLRequest requestWithURL:updateItem.releaseNotesURL cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30];
