@@ -169,7 +169,8 @@
          errorWithDomain:SUSparkleErrorDomain
          code:SUNoUpdateError
          userInfo:@{
-                    NSLocalizedDescriptionKey: [NSString stringWithFormat:SULocalizedString(@"You already have the newest version of %@.", "'Error' message when the user checks for updates but is already current or the feed doesn't contain any updates. (not necessarily shown in UI)"), self.host.name]
+                    NSLocalizedDescriptionKey: SULocalizedString(@"You're up-to-date!", "Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates."),
+                    NSLocalizedRecoverySuggestionErrorKey: [NSString stringWithFormat:SULocalizedString(@"%@ %@ is currently the newest version available.", nil), [self.host name], [self.host displayVersion]]
                     }
          ];
         [self.delegate basicDriverIsRequestingAbortUpdateWithError:notFoundError];

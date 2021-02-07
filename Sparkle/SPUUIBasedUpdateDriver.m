@@ -274,7 +274,7 @@
         NSError *nonNullError = error;
         
         if (error.code == SUNoUpdateError) {
-            [self.userDriver showUpdateNotFoundWithAcknowledgement:^{
+            [self.userDriver showUpdateNotFoundWithError:(NSError * _Nonnull)error acknowledgement:^{
                 dispatch_async(dispatch_get_main_queue(), ^{
                     abortUpdate();
                 });
