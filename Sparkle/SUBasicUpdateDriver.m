@@ -352,7 +352,19 @@
         request.networkServiceType = NSURLNetworkServiceTypeBackground;
     }
 
-    [request setValue:[updater userAgentString] forHTTPHeaderField:@"User-Agent"];
+    NSString *userAgentString = [updater userAgentString];
+    if (userAgentString) {
+        [request setValue:userAgentString forHTTPHeaderField:@"User-Agent"];
+    }
+
+    NSDictionary<NSString *, NSString *> *httpHeaders = [updater httpHeaders];
+    if (httpHeaders) {
+        for (NSString *key in httpHeaders) {
+            NSString *value = [httpHeaders objectForKey:key];
+            [request setValue:value forHTTPHeaderField:key];
+        }
+    }
+
     if ([[updater delegate] respondsToSelector:@selector(updater:willDownloadUpdate:withRequest:)]) {
         [[updater delegate] updater:self.updater
                       willDownloadUpdate:self.updateItem
