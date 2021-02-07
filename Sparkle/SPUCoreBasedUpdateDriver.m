@@ -41,6 +41,7 @@
 @property (nonatomic, readonly, weak) id updater; // if we didn't have legacy support, I'd remove this..
 @property (nullable, nonatomic, readonly, weak) id <SPUUpdaterDelegate>updaterDelegate;
 @property (nonatomic) NSString *userAgent;
+@property (nonatomic, nullable) NSDictionary *httpHeaders;
 
 @end
 
@@ -58,6 +59,7 @@
 @synthesize updater = _updater;
 @synthesize updaterDelegate = _updaterDelegate;
 @synthesize userAgent = _userAgent;
+@synthesize httpHeaders = _httpHeaders;
 @synthesize resumableUpdate = _resumableUpdate;
 
 - (instancetype)initWithHost:(SUHost *)host applicationBundle:(NSBundle *)applicationBundle sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater updaterDelegate:(nullable id <SPUUpdaterDelegate>)updaterDelegate delegate:(id<SPUCoreBasedUpdateDriverDelegate>)delegate
@@ -111,6 +113,7 @@
 - (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background includesSkippedUpdates:(BOOL)includesSkippedUpdates requiresSilentInstall:(BOOL)silentInstall
 {
     self.userAgent = userAgent;
+    self.httpHeaders = httpHeaders;
     self.silentInstall = silentInstall;
     
     [self.basicDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders inBackground:background includesSkippedUpdates:includesSkippedUpdates];
@@ -167,7 +170,7 @@
 
 - (void)downloadUpdateFromAppcastItem:(SUAppcastItem *)updateItem inBackground:(BOOL)background
 {
-    self.downloadDriver = [[SPUDownloadDriver alloc] initWithUpdateItem:updateItem host:self.host userAgent:self.userAgent inBackground:background delegate:self];
+    self.downloadDriver = [[SPUDownloadDriver alloc] initWithUpdateItem:updateItem host:self.host userAgent:self.userAgent httpHeaders:self.httpHeaders inBackground:background delegate:self];
     
     if ([self.updaterDelegate respondsToSelector:@selector((updater:willDownloadUpdate:withRequest:))]) {
         [self.updaterDelegate updater:self.updater

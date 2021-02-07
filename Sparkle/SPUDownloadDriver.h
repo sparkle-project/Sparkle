@@ -28,7 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface SPUDownloadDriver : NSObject
 
-- (instancetype)initWithUpdateItem:(SUAppcastItem *)updateItem host:(SUHost *)host userAgent:(NSString *)userAgent inBackground:(BOOL)background delegate:(id<SPUDownloadDriverDelegate>)delegate;
+- (instancetype)initWithUpdateItem:(SUAppcastItem *)updateItem host:(SUHost *)host userAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background delegate:(id<SPUDownloadDriverDelegate>)delegate;
 
 - (void)downloadUpdate;
 
