@@ -156,7 +156,7 @@
     }
 }
 
-- (void)didNotFindUpdate
+- (void)didNotFindUpdateWithLatestAppcastItem:(nullable SUAppcastItem *)latestAppcastItem hostToLatestAppcastItemComparisonResult:(NSComparisonResult)hostToLatestAppcastItemComparisonResult
 {
     if (!self.aborted) {
         if ([self.updaterDelegate respondsToSelector:@selector((updaterDidNotFindUpdate:))]) {
@@ -164,12 +164,34 @@
         }
         [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidNotFindUpdateNotification object:self.updater];
         
+        NSString *localizedDescription;
+        NSString *recoverySuggestion;
+        NSString *recoveryOption;
+        
+        if (latestAppcastItem != nil) { // if the appcast was successfully loaded
+            localizedDescription = SULocalizedString(@"You're up-to-date!", "Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates.");
+            
+            if (hostToLatestAppcastItemComparisonResult == NSOrderedDescending) { // this means the user is a 'newer than latest' version. give a slight hint to the user instead of wrongly claiming this version is identical to the latest feed version.
+                recoverySuggestion = [NSString stringWithFormat:SULocalizedString(@"%@ %@ is currently the newest version available.\n(You are currently running version %@.)", nil), [self.host name], latestAppcastItem.displayVersionString, [self.host displayVersion]];
+            } else {
+                recoverySuggestion = [NSString stringWithFormat:SULocalizedString(@"%@ %@ is currently the newest version available.", nil), [self.host name], [self.host displayVersion]];
+            }
+            
+            recoveryOption = @"OK";
+        } else {
+            localizedDescription = SULocalizedString(@"Update Error!", nil);
+            recoverySuggestion = SULocalizedString(@"No valid update information could be loaded.", nil);
+            recoveryOption = @"Cancel Update";
+        }
+        
         NSError *notFoundError =
         [NSError
          errorWithDomain:SUSparkleErrorDomain
          code:SUNoUpdateError
          userInfo:@{
-                    NSLocalizedDescriptionKey: [NSString stringWithFormat:SULocalizedString(@"You already have the newest version of %@.", "'Error' message when the user checks for updates but is already current or the feed doesn't contain any updates. (not necessarily shown in UI)"), self.host.name]
+                    NSLocalizedDescriptionKey: localizedDescription,
+                    NSLocalizedRecoverySuggestionErrorKey: recoverySuggestion,
+                    NSLocalizedRecoveryOptionsErrorKey: @[recoveryOption]
                     }
          ];
         [self.delegate basicDriverIsRequestingAbortUpdateWithError:notFoundError];

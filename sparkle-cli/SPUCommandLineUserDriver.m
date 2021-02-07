@@ -173,7 +173,7 @@
     }
 }
 
-- (void)showUpdateNotFoundWithAcknowledgement:(void (^)(void))__unused acknowledgement __attribute__((noreturn))
+- (void)showUpdateNotFoundWithError:(NSError *)error acknowledgement:(void (^)(void))__unused acknowledgement __attribute__((noreturn))
 {
     if (self.verbose) {
         fprintf(stderr, "No new update available!\n");

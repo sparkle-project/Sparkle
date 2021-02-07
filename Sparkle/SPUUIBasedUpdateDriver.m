@@ -274,11 +274,23 @@
         NSError *nonNullError = error;
         
         if (error.code == SUNoUpdateError) {
-            [self.userDriver showUpdateNotFoundWithAcknowledgement:^{
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    abortUpdate();
-                });
-            }];
+            if ([self.userDriver respondsToSelector:@selector(showUpdateNotFoundWithError:acknowledgement:)]) {
+                [self.userDriver showUpdateNotFoundWithError:(NSError * _Nonnull)error acknowledgement:^{
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        abortUpdate();
+                    });
+                }];
+            } else if ([self.userDriver respondsToSelector:@selector(showUpdateNotFoundWithAcknowledgement:)]) {
+                // Eventually we should remove this fallback once clients adopt -showUpdateNotFoundWithError:acknowledgement:
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+                [self.userDriver showUpdateNotFoundWithAcknowledgement:^{
+#pragma clang diagnostic pop
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        abortUpdate();
+                    });
+                }];
+            }
         } else if (error.code == SUInstallationCanceledError || error.code == SUInstallationAuthorizeLaterError) {
             abortUpdate();
         } else {

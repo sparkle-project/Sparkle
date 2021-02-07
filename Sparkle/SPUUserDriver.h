@@ -171,9 +171,10 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  *
  * Let the user know a new update was not found after they tried initiating an update check.
  *
- * @param acknowledgement Acknowledge to the updater that no update found was shown.
+ * @param error The error associated with why a new update was not found.
+ * @param acknowledgement Acknowledge to the updater that no update found error was shown.
  */
-- (void)showUpdateNotFoundWithAcknowledgement:(void (^)(void))acknowledgement;
+- (void)showUpdateNotFoundWithError:(NSError *)error acknowledgement:(void (^)(void))acknowledgement;
 
 /*!
  * Show the user an update error occurred
@@ -181,6 +182,7 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  * Let the user know that the updater failed with an error. This will not be invoked without the user having been
  * aware that an update was in progress.
  *
+ * @param error The error associated with what update error occurred..
  * @param acknowledgement Acknowledge to the updater that the error was shown.
  */
 - (void)showUpdaterError:(NSError *)error acknowledgement:(void (^)(void))acknowledgement;
@@ -286,6 +288,10 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  * Basically, stop everything that could have been started. Sparkle may invoke this when aborting or finishing an update.
  */
 - (void)dismissUpdateInstallation;
+
+@optional
+
+- (void)showUpdateNotFoundWithAcknowledgement:(void (^)(void))acknowledgement __deprecated_msg("Implement -showUpdateNotFoundWithError:acknowledgement: instead");
 
 @end
 
