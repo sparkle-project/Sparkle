@@ -24,4 +24,6 @@ I tested and verified my change by using one or multiple of these methods:
 - [ ] My own app
 - [ ] Other (please specify)
 
+(Describe all the cases that were tested)
+
 macOS version tested: [place version here]
