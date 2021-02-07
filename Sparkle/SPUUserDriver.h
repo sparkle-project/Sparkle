@@ -289,6 +289,10 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  */
 - (void)dismissUpdateInstallation;
 
+@optional
+
+- (void)showUpdateNotFoundWithAcknowledgement:(void (^)(void))acknowledgement __deprecated_msg("Implement -showUpdateNotFoundWithError:acknowledgement: instead");
+
 @end
 
 NS_ASSUME_NONNULL_END
