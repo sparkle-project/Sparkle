@@ -232,7 +232,7 @@
     [self acceptAcknowledgementAfterDelay];
 }
 
-- (void)showUpdateNotFoundWithAcknowledgement:(void (^)(void))acknowledgement
+- (void)showUpdateNotFoundWithError:(NSError *)error acknowledgement:(void (^)(void))acknowledgement
 {
     [self.coreComponent registerAcknowledgement:acknowledgement];
     

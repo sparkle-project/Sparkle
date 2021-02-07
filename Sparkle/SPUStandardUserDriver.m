@@ -272,7 +272,6 @@
     [self.coreComponent acceptAcknowledgement];
 }
 
-//- (void)showUpdateNotFoundWithAcknowledgement:(void (^)(void))acknowledgement
 - (void)showUpdateNotFoundWithError:(NSError *)error acknowledgement:(void (^)(void))acknowledgement
 {
     assert(NSThread.isMainThread);
