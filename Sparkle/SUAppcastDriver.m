@@ -110,7 +110,8 @@
         self.nonDeltaUpdateItem = nonDeltaUpdateItem;
         [self.delegate didFindValidUpdateWithAppcastItem:item preventsAutoupdate:[self itemPreventsAutoupdate:item]];
     } else {
-        [self.delegate didNotFindUpdate];
+        NSComparisonResult hostToLatestAppcastItemComparisonResult = (item != nil) ? [[self versionComparator] compareVersion:[self.host version] toVersion:[item versionString]] : 0;
+        [self.delegate didNotFindUpdateWithLatestAppcastItem:item hostToLatestAppcastItemComparisonResult:hostToLatestAppcastItemComparisonResult];
     }
 }
 
