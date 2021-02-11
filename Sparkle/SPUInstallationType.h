@@ -13,7 +13,6 @@
 #define SPUInstallationTypeGuidedPackage @"package" // the preferred installation type for package installations
 #define SPUInstallationTypeInteractivePackage @"interactive-package" // the deprecated installation type; use guided package instead
 
-#define SPUInstallationTypeDefault SPUInstallationTypeApplication
 #define SPUInstallationTypesArray (@[SPUInstallationTypeApplication, SPUInstallationTypeGuidedPackage, SPUInstallationTypeInteractivePackage])
 #define SPUValidInstallationType(x) ((x != nil) && [SPUInstallationTypesArray containsObject:x])
 

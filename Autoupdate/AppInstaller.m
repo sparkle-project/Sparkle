@@ -186,7 +186,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     [self.communicator handleMessageWithIdentifier:SPUExtractionStarted data:[NSData data]];
     
     NSString *archivePath = [self.updateDirectoryPath stringByAppendingPathComponent:self.downloadName];
-    id<SUUnarchiverProtocol> unarchiver = [SUUnarchiver unarchiverForPath:archivePath updatingHostBundlePath:self.host.bundlePath decryptionPassword:self.decryptionPassword];
+    id<SUUnarchiverProtocol> unarchiver = [SUUnarchiver unarchiverForPath:archivePath updatingHostBundlePath:self.host.bundlePath decryptionPassword:self.decryptionPassword expectingInstallationType:self.installationType];
     
     BOOL success = NO;
     if (!unarchiver) {
@@ -213,6 +213,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
         [unarchiver
          unarchiveWithCompletionBlock:^(NSError * _Nullable error) {
              if (error != nil) {
+                 SULog(SULogLevelError, @"Failed to unarchive %@ with error: %@", archivePath, error);
                  [self unarchiverDidFail];
              } else {
                  [self.communicator handleMessageWithIdentifier:SPUValidationStarted data:[NSData data]];
