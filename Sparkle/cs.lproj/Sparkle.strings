@@ -36,7 +36,7 @@
 
 "An error occurred while installing the update. Please try again later." = "Při instalaci aktualizace se vyskytla chyba. Zkuste to prosím později.";
 
-"An error occurred while parsing the update feed." = "Při zpracovávání údajů o aktualizaci se vyskytla chyba. Zkuste to prosím později.";
+"An error occurred while parsing the update feed." = "Při zpracování údajů o aktualizaci se vyskytla chyba. Zkuste to prosím později.";
 
 "An error occurred while relaunching %1$@, but the new version will be available next time you run %1$@." = "Vyskytla se chyba při novém spouštění aplikace %1$@, nová verze bude dostupná při dalším spuštění %1$@.";
 
@@ -49,7 +49,7 @@
 
 "Cancel Update" = "Zrušit aktualizaci";
 
-"Checking for updates..." = "Ověřuje se dostupnost aktualizací…";
+"Checking for updates..." = "Hledání aktualizací…";
 
 /* Take care not to overflow the status window. */
 "Downloading update..." = "Stahuje se aktualizace…";
@@ -82,7 +82,7 @@
 "Ready to Install" = "Připraveno k instalaci";
 
 /* Message that is optionally shown at startup to allow users to turn on/off update checks. */
-"Should %1$@ automatically check for updates? You can always check for updates manually from the %1$@ menu." = "Přejete si, aby aplikace %1$@ automaticky ověřovala dostupnost aktualizací? Tuto volbu můžete kdykoliv změnit v nabídce %1$@.";
+"Should %1$@ automatically check for updates? You can always check for updates manually from the %1$@ menu." = "Přejete si, aby aplikace %1$@ automaticky vyhledávala aktualizace? Tuto volbu můžete kdykoliv změnit v nabídce %1$@.";
 
 "The update is improperly signed." = "Tato aktualizace je nesprávně podepsána.";
 
