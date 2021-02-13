@@ -28,7 +28,7 @@
 
 + (BOOL)canUnarchivePath:(NSString *)path
 {
-    return [path.pathExtension isEqualToString:@"pkg"];
+    return [path.pathExtension isEqualToString:@"pkg"] || [path.pathExtension isEqualToString:@"mpkg"];
 }
 
 + (BOOL)mustValidateBeforeExtraction
