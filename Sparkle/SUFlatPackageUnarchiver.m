@@ -25,7 +25,7 @@
 
 + (BOOL)canUnarchivePath:(NSString *)path
 {
-    return [path.pathExtension isEqualToString:@"pkg"];
+    return [path.pathExtension isEqualToString:@"pkg"] || [path.pathExtension isEqualToString:@"mpkg"];
 }
 
 // Note in 2.x this method returns YES, but 1.x does not support pre-validation of pkgs
