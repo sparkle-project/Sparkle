@@ -316,7 +316,7 @@ static NSString *SUAppcastItemInstallationTypeKey = @"SUAppcastItemInstallationT
             // If we have a flat package, assume installation type is guided
             // (flat / non-archived interactive packages are not supported)
             // Otherwise assume we have a normal application inside an archive
-            if ([_fileURL.pathExtension isEqualToString:@"pkg"]) {
+            if ([_fileURL.pathExtension isEqualToString:@"pkg"] || [_fileURL.pathExtension isEqualToString:@"mpkg"]) {
                 _installationType = SPUInstallationTypeGuidedPackage;
             } else {
                 _installationType = SPUInstallationTypeApplication;
