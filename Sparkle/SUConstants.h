@@ -19,6 +19,7 @@
 extern const NSTimeInterval SUDefaultUpdatePermissionPromptInterval;
 extern const NSTimeInterval SUMinimumUpdateCheckInterval;
 extern const NSTimeInterval SUDefaultUpdateCheckInterval;
+extern const uint64_t SULeewayUpdateCheckInterval;
 extern const NSTimeInterval SUImpatientUpdateCheckInterval;
 
 extern NSString *const SUBundleIdentifier;
