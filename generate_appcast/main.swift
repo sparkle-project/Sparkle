@@ -126,8 +126,8 @@ func parseCommandLineOptions() -> CommandLineArguments {
         }
 
         // remove the already parsed arguments
-        arguments.remove(at: privateDSAKeyOptionIndex)
         arguments.remove(at: privateDSAKeyOptionIndex + 1)
+        arguments.remove(at: privateDSAKeyOptionIndex)
     }
 
     // check if the private dsa sould be loaded using the keyname and the name of the keychain
