@@ -408,6 +408,20 @@
 			remoteGlobalIDString = 55C14BB6136EEF1500649790;
 			remoteInfo = Autoupdate;
 		};
+		3F64D40F25A6895D00BF9F2D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = EA4311E9229D651300A5503D;
+			remoteInfo = bsdiff;
+		};
+		3F64D41D25A689C800BF9F2D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = EA43119F229D5FBC00A5503D;
+			remoteInfo = ed25519;
+		};
 		55C14F96136F044100649790 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
@@ -2057,6 +2071,8 @@
 				5F349B6225683CBA00B015B0 /* PBXTargetDependency */,
 				5F349B6025683CB800B015B0 /* PBXTargetDependency */,
 				55C14F97136F044100649790 /* PBXTargetDependency */,
+				3F64D41025A6895D00BF9F2D /* PBXTargetDependency */,
+				3F64D41E25A689C800BF9F2D /* PBXTargetDependency */,
 			);
 			name = Sparkle;
 			productInstallPath = "$(HOME)/Library/Frameworks";
@@ -2619,6 +2635,16 @@
 			isa = PBXTargetDependency;
 			target = 55C14BB6136EEF1500649790 /* Autoupdate */;
 			targetProxy = 1495006B195FB8A600BC5B5B /* PBXContainerItemProxy */;
+		};
+		3F64D41025A6895D00BF9F2D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = EA4311E9229D651300A5503D /* bsdiff */;
+			targetProxy = 3F64D40F25A6895D00BF9F2D /* PBXContainerItemProxy */;
+		};
+		3F64D41E25A689C800BF9F2D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = EA43119F229D5FBC00A5503D /* ed25519 */;
+			targetProxy = 3F64D41D25A689C800BF9F2D /* PBXContainerItemProxy */;
 		};
 		55C14F97136F044100649790 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
