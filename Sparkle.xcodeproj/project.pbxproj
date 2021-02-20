@@ -281,6 +281,7 @@
 		72AC6B2A1B9AAF3A00F62325 /* SparkleTestCodeSignApp.tar.bz2 in Resources */ = {isa = PBXBuildFile; fileRef = 72AC6B291B9AAF3A00F62325 /* SparkleTestCodeSignApp.tar.bz2 */; };
 		72AC6B2C1B9AB0EE00F62325 /* SparkleTestCodeSignApp.tar.xz in Resources */ = {isa = PBXBuildFile; fileRef = 72AC6B2B1B9AB0EE00F62325 /* SparkleTestCodeSignApp.tar.xz */; };
 		72AC6B2E1B9B218C00F62325 /* SparkleTestCodeSignApp.dmg in Resources */ = {isa = PBXBuildFile; fileRef = 72AC6B2D1B9B218C00F62325 /* SparkleTestCodeSignApp.dmg */; };
+		72C4AB7A25E0B4C500D14562 /* SULog.m in Sources */ = {isa = PBXBuildFile; fileRef = 55C14F05136EF6DB00649790 /* SULog.m */; };
 		72D4DAA11AD7632900B211E2 /* SUBinaryDeltaCreate.m in Sources */ = {isa = PBXBuildFile; fileRef = 7268AC621AD634C200C3E0C1 /* SUBinaryDeltaCreate.m */; };
 		72E1D7DD25A3E3AD0001BA6D /* SUWebViewCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 72E1D7D625A3E3AC0001BA6D /* SUWebViewCommon.m */; };
 		72E1D7DE25A3E3AD0001BA6D /* SUWebViewCommon.h in Headers */ = {isa = PBXBuildFile; fileRef = 72E1D7D725A3E3AC0001BA6D /* SUWebViewCommon.h */; };
@@ -2469,6 +2470,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				72C4AB7A25E0B4C500D14562 /* SULog.m in Sources */,
 				722954B71D04ADAF00ECF9CA /* fileop.m in Sources */,
 				722954BD1D04AE3800ECF9CA /* SUConstants.m in Sources */,
 				722954BC1D04AE1100ECF9CA /* SUFileManager.m in Sources */,

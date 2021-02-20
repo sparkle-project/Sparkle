@@ -136,7 +136,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
         self.statusController = [[SUStatusController alloc] initWithHost:host];
         [self.statusController setButtonTitle:SULocalizedString(@"Cancel Update", @"") target:nil action:Nil isDefault:NO];
         [self.statusController beginActionWithTitle:SULocalizedString(@"Installing update...", @"")
-                                   maxProgressValue:100 statusText: @""];
+                                   maxProgressValue:0 statusText: @""];
         [self.statusController showWindow:self];
     }
     
@@ -151,10 +151,13 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
             return;
         }
         
-        void(^progressBlock)(double) = ^(double progress){
-            dispatch_async(dispatch_get_main_queue(), ^(){
-                self.statusController.progressValue = progress * 100.0;
-            });
+        void(^progressBlock)(double) = ^(double __unused progress){
+            // Showing determinate progress doesn't work anymore and may be fragile to support, so disabling it and using intermediate progress bar with maxProgressValue as 0
+            // instead of 100 above in beginActionWithTitle:maxProgressValue:statusText: call
+            
+            //dispatch_async(dispatch_get_main_queue(), ^(){
+            //    self.statusController.progressValue = progress * 100.0;
+            //});
         };
 
         NSError *finalInstallationError = nil;
