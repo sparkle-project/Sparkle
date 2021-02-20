@@ -78,4 +78,9 @@ static NSString *SUOpenUtilityPath = @"/usr/bin/open";
     return NO;
 }
 
+- (BOOL)supportsDeterminateProgress
+{
+    return NO;
+}
+
 @end

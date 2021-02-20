@@ -54,4 +54,11 @@
     return YES;
 }
 
+// We used to, but it broke due to fragile text processing
+// Maybe one day someone will fix it, but until then.
+- (BOOL)supportsDeterminateProgress
+{
+    return NO;
+}
+
 @end
