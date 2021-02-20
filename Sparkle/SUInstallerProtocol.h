@@ -31,6 +31,8 @@ NS_ASSUME_NONNULL_BEGIN
 // Should be thread safe
 - (NSString *)installationPath;
 
+- (BOOL)supportsDeterminateProgress;
+
 @end
 
 NS_ASSUME_NONNULL_END

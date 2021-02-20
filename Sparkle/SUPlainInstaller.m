@@ -265,4 +265,9 @@
     return YES;
 }
 
+- (BOOL)supportsDeterminateProgress
+{
+    return YES;
+}
+
 @end
