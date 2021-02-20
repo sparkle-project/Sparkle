@@ -189,6 +189,14 @@ typedef NS_ENUM(NSInteger, SPUUpdateCheck)
 - (void)updaterDidNotFindUpdate:(SPUUpdater *)updater;
 
 /*!
+ Called when an update is skipped by the user.
+ 
+ \param updater The updater instance.
+ \param item The appcast item corresponding to the update that the user skipped.
+ */
+- (void)updater:(SPUUpdater *)updater userDidSkipThisVersion:(SUAppcastItem *)item;
+
+/*!
  Returns whether the release notes (if available) should be downloaded after an update is found and shown.
  
  This is specifically for the releaseNotesLink element in the appcast.

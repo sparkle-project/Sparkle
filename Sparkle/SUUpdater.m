@@ -326,6 +326,13 @@ static NSMutableDictionary *sharedUpdaters = nil;
     }
 }
 
+- (void)updater:(SPUUpdater *)__unused updater userDidSkipThisVersion:(nonnull SUAppcastItem *)item
+{
+    if ([self.delegate respondsToSelector:@selector(updater:userDidSkipThisVersion:)]) {
+        [self.delegate updater:self userDidSkipThisVersion:item];
+    }
+}
+
 - (void)updater:(SPUUpdater *)__unused updater willDownloadUpdate:(SUAppcastItem *)item withRequest:(NSMutableURLRequest *)request
 {
     if ([self.delegate respondsToSelector:@selector(updater:willDownloadUpdate:withRequest:)]) {

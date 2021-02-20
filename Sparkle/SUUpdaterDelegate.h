@@ -161,6 +161,14 @@ __deprecated_msg("See SPUUpdaterDelegate instead")
 - (void)updater:(SUUpdater *)updater willInstallUpdate:(SUAppcastItem *)item;
 
 /*!
+ Called when an update is skipped by the user.
+ 
+ \param updater The updater instance.
+ \param item The appcast item corresponding to the update that the user skipped.
+ */
+- (void)updater:(SUUpdater *)updater userDidSkipThisVersion:(SUAppcastItem *)item;
+
+/*!
  Returns whether the relaunch should be delayed in order to perform other tasks.
  
  This is not called if the user didn't relaunch on the previous update,
