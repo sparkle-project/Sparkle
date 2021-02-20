@@ -321,7 +321,7 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
         return NO;
     }
 
-    SULog(SULogLevelDefault, @"Sparkle: Authorization required to remove quarantine: %d", rootURL);
+    SULog(SULogLevelDefault, @"Sparkle: Authorization required to remove quarantine: %@", rootURL);
 
     NSError *executeError = nil;
     BOOL success = [self _authorizeAndExecuteCommand:SUFileOpRemoveQuarantineCommand sourcePath:path destinationPath:NULL error:&executeError];
