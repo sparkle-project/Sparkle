@@ -91,7 +91,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 {
     // We're using NSLog instead of SULog here because we don't want to start Sparkle's logger here,
     // and because this is not really an error, just a warning notice
-    NSLog(@"WARNING: This is running a Debug build of Sparkle; don't use this in production!");
+    NSLog(@"WARNING: This is running a Debug build of Sparkle 2; don't use this in production!");
 }
 #endif
 
