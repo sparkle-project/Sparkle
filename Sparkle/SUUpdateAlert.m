@@ -392,10 +392,7 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
     
     // When we show release notes, it looks ugly if the install buttons are not closer to the release notes view
     // However when we don't show release notes, it looks ugly if the install buttons are too close to the description field. Shrugs.
-    // Automatic downloads is enabled by developer if they set SUAutomaticallyUpdateKey in Info.plist,
-    // rather than the user toggling the setting
-    BOOL automaticDownloadsEnabledByDeveloper = [self.host boolForInfoDictionaryKey:SUAutomaticallyUpdateKey];
-    if (!self.allowsAutomaticUpdates || automaticDownloadsEnabledByDeveloper) {
+    if (!self.allowsAutomaticUpdates) {
         if (showReleaseNotes) {
             // Fix constraints so that buttons aren't far away from web view when we hide the automatic updates check box
             NSLayoutConstraint *skipButtonToReleaseNotesContainerConstraint = [NSLayoutConstraint constraintWithItem:self.skipButton attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self.releaseNotesContainerView attribute:NSLayoutAttributeBottom multiplier:1.0 constant:12.0];
