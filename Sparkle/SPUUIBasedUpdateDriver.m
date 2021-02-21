@@ -107,6 +107,8 @@
 
 - (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)updateItem preventsAutoupdate:(BOOL)preventsAutoupdate
 {
+    id <SPUUpdaterDelegate> updaterDelegate = self.updaterDelegate;
+    
     if (updateItem.isInformationOnlyUpdate) {
         assert(!self.resumingDownloadedUpdate);
         assert(!self.resumingInstallingUpdate);
@@ -116,6 +118,10 @@
                 switch (choice) {
                     case SPUSkipThisInformationalVersionChoice:
                         [self.host setObject:[updateItem versionString] forUserDefaultsKey:SUSkippedVersionKey];
+                        
+                        if ([self.updaterDelegate respondsToSelector:@selector(updater:userDidSkipThisVersion:)]) {
+                            [self.updaterDelegate updater:self.updater userDidSkipThisVersion:updateItem];
+                        }
                         // Fall through
                     case SPUDismissInformationalNoticeChoice:
                         [self.delegate uiDriverIsRequestingAbortUpdateWithError:nil];
@@ -134,6 +140,10 @@
                     case SPUSkipThisVersionChoice:
                         [self.coreDriver clearDownloadedUpdate];
                         [self.host setObject:[updateItem versionString] forUserDefaultsKey:SUSkippedVersionKey];
+                        
+                        if ([self.updaterDelegate respondsToSelector:@selector(updater:userDidSkipThisVersion:)]) {
+                            [self.updaterDelegate updater:self.updater userDidSkipThisVersion:updateItem];
+                        }
                         // Fall through
                     case SPUInstallLaterChoice:
                         [self.delegate uiDriverIsRequestingAbortUpdateWithError:nil];
@@ -151,6 +161,10 @@
                         break;
                     case SPUSkipThisVersionChoice:
                         [self.host setObject:[updateItem versionString] forUserDefaultsKey:SUSkippedVersionKey];
+                        
+                        if ([self.updaterDelegate respondsToSelector:@selector(updater:userDidSkipThisVersion:)]) {
+                            [self.updaterDelegate updater:self.updater userDidSkipThisVersion:updateItem];
+                        }
                         // Fall through
                     case SPUInstallLaterChoice:
                         [self.delegate uiDriverIsRequestingAbortUpdateWithError:nil];
@@ -171,7 +185,6 @@
         [self.delegate uiDriverDidShowUpdate];
     }
     
-    id <SPUUpdaterDelegate> updaterDelegate = self.updaterDelegate;
     if (updateItem.releaseNotesURL != nil && (![updaterDelegate respondsToSelector:@selector(updaterShouldDownloadReleaseNotes:)] || [updaterDelegate updaterShouldDownloadReleaseNotes:self.updater])) {
         NSURLRequest *request = [NSURLRequest requestWithURL:updateItem.releaseNotesURL cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30];
         

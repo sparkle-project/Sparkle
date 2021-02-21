@@ -326,11 +326,25 @@ static NSMutableDictionary *sharedUpdaters = nil;
     }
 }
 
+- (void)updater:(SPUUpdater *)__unused updater userDidSkipThisVersion:(nonnull SUAppcastItem *)item
+{
+    if ([self.delegate respondsToSelector:@selector(updater:userDidSkipThisVersion:)]) {
+        [self.delegate updater:self userDidSkipThisVersion:item];
+    }
+}
+
 - (void)updater:(SPUUpdater *)__unused updater willDownloadUpdate:(SUAppcastItem *)item withRequest:(NSMutableURLRequest *)request
 {
     if ([self.delegate respondsToSelector:@selector(updater:willDownloadUpdate:withRequest:)]) {
         [self.delegate updater:self willDownloadUpdate:item withRequest:request];
-        }
+    }
+}
+
+- (void)updater:(SPUUpdater *)__unused updater didDownloadUpdate:(SUAppcastItem *)item
+{
+    if ([self.delegate respondsToSelector:@selector(updater:didDownloadUpdate:)]) {
+        [self.delegate updater:self didDownloadUpdate:item];
+    }
 }
 
 - (void)updater:(SPUUpdater *)__unused updater failedToDownloadUpdate:(SUAppcastItem *)item error:(NSError *)error
@@ -344,6 +358,20 @@ static NSMutableDictionary *sharedUpdaters = nil;
 {
     if ([self.delegate respondsToSelector:@selector(userDidCancelDownload:)]) {
         [self.delegate userDidCancelDownload:self];
+    }
+}
+
+- (void)updater:(SPUUpdater *)updater willExtractUpdate:(SUAppcastItem *)item
+{
+    if ([self.delegate respondsToSelector:@selector(updater:willExtractUpdate:)]) {
+        [self.delegate updater:self willExtractUpdate:item];
+    }
+}
+
+- (void)updater:(SPUUpdater *)updater didExtractUpdate:(SUAppcastItem *)item
+{
+    if ([self.delegate respondsToSelector:@selector(updater:didExtractUpdate:)]) {
+        [self.delegate updater:self didExtractUpdate:item];
     }
 }
 
@@ -377,6 +405,9 @@ static NSMutableDictionary *sharedUpdaters = nil;
         self.postponedInstallHandler = installHandler;
 
         shouldPostponeRelaunch = [self.delegate updater:self shouldPostponeRelaunchForUpdate:item untilInvoking:invocation];
+    } else if ([self.delegate respondsToSelector:@selector(updater:shouldPostponeRelaunchForUpdate:)]) {
+        // This API should really take a block, but not fixing a 1.x mishap now
+        shouldPostponeRelaunch = [self.delegate updater:self shouldPostponeRelaunchForUpdate:item];
     }
     
     return shouldPostponeRelaunch;
@@ -434,7 +465,13 @@ static NSMutableDictionary *sharedUpdaters = nil;
 {
     BOOL installationHandledByDelegate = NO;
     
-    if ([self.delegate respondsToSelector:@selector(updater:willInstallUpdateOnQuit:immediateInstallationInvocation:)]) {
+    if ([self.delegate respondsToSelector:@selector((updater:willInstallUpdateOnQuit:immediateInstallationBlock:))]) {
+        [self.delegate updater:self willInstallUpdateOnQuit:item immediateInstallationBlock:immediateInstallHandler];
+        
+        // We have to assume they will handle the installation since they implement this method
+        // Not ideal, but this is why this delegate callback is deprecated
+        installationHandledByDelegate = YES;
+    } else if ([self.delegate respondsToSelector:@selector(updater:willInstallUpdateOnQuit:immediateInstallationInvocation:)]) {
         NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[[self class] instanceMethodSignatureForSelector:@selector(finishSilentInstallation)]];
         
         // This invocation will retain self, but this instance is kept alive forever by our singleton pattern anyway

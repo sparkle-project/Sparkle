@@ -211,6 +211,10 @@
         [SUPhasedUpdateGroupInfo setNewUpdateGroupIdentifierForHost:self.host];
     }
     
+    if ([self.updaterDelegate respondsToSelector:@selector(updater:didDownloadUpdate:)]) {
+        [self.updaterDelegate updater:self.updater didDownloadUpdate:self.updateItem];
+    }
+    
     self.resumableUpdate = downloadedUpdate;
     [self extractUpdate:downloadedUpdate];
 }
@@ -233,6 +237,10 @@
 
 - (void)extractUpdate:(SPUDownloadedUpdate *)downloadedUpdate
 {
+    if ([self.updaterDelegate respondsToSelector:@selector(updater:willExtractUpdate:)]) {
+        [self.updaterDelegate updater:self.updater willExtractUpdate:self.updateItem];
+    }
+    
     // Now we have to extract the downloaded archive.
     if ([self.delegate respondsToSelector:@selector(coreDriverDidStartExtractingUpdate)]) {
         [self.delegate coreDriverDidStartExtractingUpdate];
@@ -245,6 +253,10 @@
             // If the installer started properly, we can't use the downloaded update archive anymore
             // Especially if the installer fails later and we try resuming the update with a missing archive file
             [self clearDownloadedUpdate];
+            
+            if ([self.updaterDelegate respondsToSelector:@selector(updater:didExtractUpdate:)]) {
+                [self.updaterDelegate updater:self.updater didExtractUpdate:self.updateItem];
+            }
         }
     }];
 }
