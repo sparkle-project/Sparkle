@@ -1,3 +1,13 @@
+# 1.26.0
+
+ * Flat package support from #1745 (Zorg)
+ * Correct generate_appcast -s command line argument usage help (Lance Lovette)
+ * Fix -f command line argument handling (Lance Lovette)
+ * Fix progress for guided pkg install (Zorg)
+ * Fix XQuartz update failing because NSLog caused issues (Zorg)
+ * Update localization (Vojtěch Koňařík)
+ * Various fixes to SPM logic (Jonas Zaugg)
+
 # 1.25.0
 
  * Raise minimum system version to 10.9 (Kornel)
@@ -25,6 +35,7 @@
  * Add phased rollouts feature to automatic update driver too (Zorg)
  * Remove hiding skip button and retitling later button (Zorg)
  * Deprecate installUpdatesIfAvailable (Zorg)
+ * Apply custom headers to app download (Geraint White)
 
  # 1.24.0
 
