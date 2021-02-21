@@ -337,7 +337,14 @@ static NSMutableDictionary *sharedUpdaters = nil;
 {
     if ([self.delegate respondsToSelector:@selector(updater:willDownloadUpdate:withRequest:)]) {
         [self.delegate updater:self willDownloadUpdate:item withRequest:request];
-        }
+    }
+}
+
+- (void)updater:(SPUUpdater *)__unused updater didDownloadUpdate:(SUAppcastItem *)item
+{
+    if ([self.delegate respondsToSelector:@selector(updater:didDownloadUpdate:)]) {
+        [self.delegate updater:self didDownloadUpdate:item];
+    }
 }
 
 - (void)updater:(SPUUpdater *)__unused updater failedToDownloadUpdate:(SUAppcastItem *)item error:(NSError *)error
@@ -351,6 +358,20 @@ static NSMutableDictionary *sharedUpdaters = nil;
 {
     if ([self.delegate respondsToSelector:@selector(userDidCancelDownload:)]) {
         [self.delegate userDidCancelDownload:self];
+    }
+}
+
+- (void)updater:(SPUUpdater *)updater willExtractUpdate:(SUAppcastItem *)item
+{
+    if ([self.delegate respondsToSelector:@selector(updater:willExtractUpdate:)]) {
+        [self.delegate updater:self willExtractUpdate:item];
+    }
+}
+
+- (void)updater:(SPUUpdater *)updater didExtractUpdate:(SUAppcastItem *)item
+{
+    if ([self.delegate respondsToSelector:@selector(updater:didExtractUpdate:)]) {
+        [self.delegate updater:self didExtractUpdate:item];
     }
 }
 
