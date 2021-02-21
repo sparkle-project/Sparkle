@@ -462,7 +462,13 @@ static NSMutableDictionary *sharedUpdaters = nil;
 {
     BOOL installationHandledByDelegate = NO;
     
-    if ([self.delegate respondsToSelector:@selector(updater:willInstallUpdateOnQuit:immediateInstallationInvocation:)]) {
+    if ([self.delegate respondsToSelector:@selector((updater:willInstallUpdateOnQuit:immediateInstallationBlock:))]) {
+        [self.delegate updater:self willInstallUpdateOnQuit:item immediateInstallationBlock:immediateInstallHandler];
+        
+        // We have to assume they will handle the installation since they implement this method
+        // Not ideal, but this is why this delegate callback is deprecated
+        installationHandledByDelegate = YES;
+    } else if ([self.delegate respondsToSelector:@selector(updater:willInstallUpdateOnQuit:immediateInstallationInvocation:)]) {
         NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[[self class] instanceMethodSignatureForSelector:@selector(finishSilentInstallation)]];
         
         // This invocation will retain self, but this instance is kept alive forever by our singleton pattern anyway
