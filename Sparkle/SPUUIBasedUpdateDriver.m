@@ -118,6 +118,10 @@
                 switch (choice) {
                     case SPUSkipThisInformationalVersionChoice:
                         [self.host setObject:[updateItem versionString] forUserDefaultsKey:SUSkippedVersionKey];
+                        
+                        if ([self.updaterDelegate respondsToSelector:@selector(updater:userDidSkipThisVersion:)]) {
+                            [self.updaterDelegate updater:self.updater userDidSkipThisVersion:updateItem];
+                        }
                         // Fall through
                     case SPUDismissInformationalNoticeChoice:
                         [self.delegate uiDriverIsRequestingAbortUpdateWithError:nil];
