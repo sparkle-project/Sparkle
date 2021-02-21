@@ -121,7 +121,7 @@
                  code:SUInstallationError
                  userInfo:@{
                             NSLocalizedDescriptionKey: SULocalizedString(@"An error occurred while running the updater. Please try again later.", nil),
-                            NSLocalizedFailureReasonErrorKey:@"The remote port connection was invalidated from the updater"
+                            NSLocalizedFailureReasonErrorKey:@"The remote port connection was invalidated from the updater. Please check Console logs for "@SPARKLE_RELAUNCH_TOOL_NAME
                             }
                  ];
                 [strongSelf.delegate installerIsRequestingAbortInstallWithError:remoteError];
