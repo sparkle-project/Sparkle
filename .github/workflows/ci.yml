@@ -39,6 +39,11 @@ jobs:
           DEVELOPER_DIR: ${{ matrix.xcode }}
         run: |
           xcodebuild test-without-building -project Sparkle.xcodeproj -scheme UITests -configuration Debug -derivedDataPath build
+      - name: Build Release Distribution
+        env:
+          DEVELOPER_DIR: ${{ matrix.xcode }}
+        run: |
+          xcodebuild build -project Sparkle.xcodeproj -scheme Distribution -configuration Release -derivedDataPath build
       - name: Archive Test Results
         if: failure()
         uses: actions/upload-artifact@v2
