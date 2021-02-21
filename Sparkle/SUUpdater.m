@@ -405,6 +405,9 @@ static NSMutableDictionary *sharedUpdaters = nil;
         self.postponedInstallHandler = installHandler;
 
         shouldPostponeRelaunch = [self.delegate updater:self shouldPostponeRelaunchForUpdate:item untilInvoking:invocation];
+    } else if ([self.delegate respondsToSelector:@selector(updater:shouldPostponeRelaunchForUpdate:)]) {
+        // This API should really take a block, but not fixing a 1.x mishap now
+        shouldPostponeRelaunch = [self.delegate updater:self shouldPostponeRelaunchForUpdate:item];
     }
     
     return shouldPostponeRelaunch;

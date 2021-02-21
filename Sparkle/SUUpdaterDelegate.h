@@ -209,6 +209,21 @@ __deprecated_msg("See SPUUpdaterDelegate instead")
 - (BOOL)updater:(SUUpdater *)updater shouldPostponeRelaunchForUpdate:(SUAppcastItem *)item untilInvoking:(NSInvocation *)invocation;
 
 /*!
+ Returns whether the relaunch should be delayed in order to perform other tasks.
+ 
+ This is not called if the user didn't relaunch on the previous update,
+ in that case it will immediately restart.
+ 
+ This method acts as a simpler alternative to SUUpdaterDelegate::updater:shouldPostponeRelaunchForUpdate:untilInvoking: avoiding usage of NSInvocation, which is not available in Swift environments.
+ 
+ \param updater The SUUpdater instance.
+ \param item The appcast item corresponding to the update that is proposed to be installed.
+ 
+ \return \c YES to delay the relaunch.
+ */
+- (BOOL)updater:(SUUpdater *)updater shouldPostponeRelaunchForUpdate:(SUAppcastItem *)item;
+
+/*!
  Returns whether the application should be relaunched at all.
  
  Some apps \b cannot be relaunched under certain circumstances.
