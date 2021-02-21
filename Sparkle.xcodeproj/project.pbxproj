@@ -2622,8 +2622,6 @@
 				721C24411CB753E6005440CB /* Sources */,
 				721C24421CB753E6005440CB /* Frameworks */,
 				721C24431CB753E6005440CB /* Resources */,
-				72B4BF051D697E4400F5B92D /* Run Script: Link fr_CA to fr */,
-				72B4BF061D697E7300F5B92D /* Run Script: Link pt to pt_BR */,
 			);
 			buildRules = (
 			);
@@ -3195,7 +3193,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"$SRCROOT/Configurations/set-agent-signing.sh\"";
+			shellScript = "\"$SRCROOT/Configurations/set-agent-signing.sh\"\n";
 		};
 		729BB3CC1D501A8F007C4276 /* Run Script */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -3222,7 +3220,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Configurations/set-ats-exceptions-downloader-service.sh\"";
+			shellScript = "\"${SRCROOT}/Configurations/set-ats-exceptions-downloader-service.sh\"\n";
 		};
 		72A5D5F11D692C860009E5AC /* Run Script: Set Git Version Info */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -3237,40 +3235,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"$SRCROOT/Configurations/set-git-version-info.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		72B4BF051D697E4400F5B92D /* Run Script: Link fr_CA to fr */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"$(BUILT_PRODUCTS_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/fr.lproj",
-			);
-			name = "Run Script: Link fr_CA to fr";
-			outputPaths = (
-				"$(BUILT_PRODUCTS_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/fr_CA.lproj",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "ln -sfh \"fr.lproj\" \"$BUILT_PRODUCTS_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/fr_CA.lproj\"";
-			showEnvVarsInLog = 0;
-		};
-		72B4BF061D697E7300F5B92D /* Run Script: Link pt to pt_BR */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"$(BUILT_PRODUCTS_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/pt_BR.lproj",
-			);
-			name = "Run Script: Link pt to pt_BR";
-			outputPaths = (
-				"$(BUILT_PRODUCTS_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/pt.lproj",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "ln -sfh \"pt_BR.lproj\" \"$BUILT_PRODUCTS_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/pt.lproj\"";
 			showEnvVarsInLog = 0;
 		};
 		895C5DC524D78E460058A82D /* ShellScript */ = {
