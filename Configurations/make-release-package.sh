@@ -14,6 +14,7 @@ if [ "$ACTION" = "" ] ; then
     rm -rf "$CONFIGURATION_BUILD_DIR/staging"
     rm -rf "$CONFIGURATION_BUILD_DIR/staging-spm"
     rm -f "Sparkle-$CURRENT_PROJECT_VERSION.tar.xz"
+    rm -f "Sparkle-$CURRENT_PROJECT_VERSION.tar.bz2"
     rm -f "Sparkle-for-Swift-Package-Manager.zip"
 
     mkdir -p "$CONFIGURATION_BUILD_DIR/staging"
@@ -44,8 +45,20 @@ if [ "$ACTION" = "" ] ; then
     cp -R "$CONFIGURATION_BUILD_DIR/staging/bin" "$CONFIGURATION_BUILD_DIR/staging-spm"
 
     cd "$CONFIGURATION_BUILD_DIR/staging"
+    
+    if [ -x "$(command -v xz)" ]; then
+        XZ_EXISTS=1
+    else
+        XZ_EXISTS=0
+    fi
+    
     # Sorted file list groups similar files together, which improves tar compression
-    find . \! -type d | rev | sort | rev | tar cv --files-from=- | xz -9 > "../Sparkle-$CURRENT_PROJECT_VERSION.tar.xz"
+    if [ "$XZ_EXISTS" -eq 1 ] ; then
+        find . \! -type d | rev | sort | rev | tar cv --files-from=- | xz -9 > "../Sparkle-$CURRENT_PROJECT_VERSION.tar.xz"
+    else
+        # Fallback to bz2 compression if xz utility is not available
+        find . \! -type d | rev | sort | rev | tar cjvf "../Sparkle-$CURRENT_PROJECT_VERSION.tar.bz2" --files-from=-
+    fi
     rm -rf "$CONFIGURATION_BUILD_DIR/staging"
     
     # Generate zip containing the xcframework for SPM
@@ -85,5 +98,10 @@ if [ "$ACTION" = "" ] ; then
     else
         echo "warning: Xcode version $XCODE_VERSION_ACTUAL does not support computing checksums for Swift Packages. Please update the Package manifest manually."
     fi
+    
+    if [ "$XZ_EXISTS" -eq 1 ] ; then
+        echo "WARNING: xz compression is used for official releases but bz2 is being used instead because xz tool is not installed on your system."
+    fi
+        
     rm -rf "$CONFIGURATION_BUILD_DIR/staging-spm"
 fi
