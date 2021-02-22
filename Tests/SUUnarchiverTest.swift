@@ -30,7 +30,7 @@ class SUUnarchiverTest: XCTestCase
         self.unarchiveTestAppWithExtension(archiveExtension, appName: appName, tempDirectoryURL: tempDirectoryURL, tempArchiveURL: tempArchiveURL, archiveResourceURL: archiveResourceURL, password: password, expectingInstallationType: installationType, expectingSuccess: expectingSuccess, testExpectation: unarchivedSuccessExpectation)
         self.unarchiveNonExistentFileTestFailureAppWithExtension(archiveExtension, tempDirectoryURL: tempDirectoryURL, password: password, expectingInstallationType: installationType, testExpectation: unarchivedFailureExpectation)
 
-        super.waitForExpectations(timeout: 7.0, handler: nil)
+        super.waitForExpectations(timeout: 30.0, handler: nil)
 
         if !archiveExtension.hasSuffix("pkg") {
             XCTAssertTrue(fileManager.fileExists(atPath: extractedAppURL.path))
