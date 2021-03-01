@@ -31,6 +31,7 @@
 @synthesize agent = _agent;
 @synthesize delegate = _delegate;
 @synthesize connected = _connected;
+@synthesize invalidationError = _invalidationError;
 
 - (instancetype)initWithHostBundleIdentifier:(NSString *)bundleIdentifier delegate:(id<AgentConnectionDelegate>)delegate
 {
