@@ -49,7 +49,8 @@ typedef NS_ENUM(OSStatus, SUError) {
 
     // Extraction phase errors.
     SUUnarchivingError = 3000,
-    SUValidationError = 3001,
+    SUSignatureError = 3001,
+    SUValidationError = 3002,
     
     // Installation phase errors.
     SUFileCopyFailure = 4000,
