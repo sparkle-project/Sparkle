@@ -38,11 +38,6 @@ typedef NS_ENUM(int32_t, SPUUpdaterMessageType)
     SPUUpdaterAlivePong = 3
 };
 
-typedef NS_ENUM(int32_t, SPUAgentMessageType)
-{
-    SPUAgentError = 100
-};
-
 BOOL SPUInstallerMessageTypeIsLegal(SPUInstallerMessageType oldMessageType, SPUInstallerMessageType newMessageType);
 
 NSString *SPUInstallerServiceNameForBundleIdentifier(NSString *bundleIdentifier);

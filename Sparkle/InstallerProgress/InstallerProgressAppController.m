@@ -115,7 +115,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
                     int exitStatus = (strongSelf.repliedToRegistration ? EXIT_SUCCESS : EXIT_FAILURE);
                     NSError *registrationError;
                     if (!strongSelf.repliedToRegistration) {
-                        registrationError = [NSError errorWithDomain:SUSparkleErrorDomain code:SPUAgentError userInfo:@{ NSLocalizedDescriptionKey: @"Error: Agent Invalidating without having the chance to reply to installer" }];
+                        registrationError = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAgentInvalidationError userInfo:@{ NSLocalizedDescriptionKey: @"Error: Agent Invalidating without having the chance to reply to installer" }];
                     } else {
                         registrationError = nil;
                     }
@@ -215,7 +215,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
         if (applicationBundlePath != nil && !self.willTerminate) {
             NSBundle *applicationBundle = [NSBundle bundleWithPath:applicationBundlePath];
             if (applicationBundle == nil) {
-                [self cleanupAndExitWithStatus:EXIT_FAILURE error:[NSError errorWithDomain:SUSparkleErrorDomain code:SPUAgentError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Error: Encountered invalid path for waiting termination: %@", applicationBundlePath] }]];
+                [self cleanupAndExitWithStatus:EXIT_FAILURE error:[NSError errorWithDomain:SUSparkleErrorDomain code:SUAgentInvalidationError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Error: Encountered invalid path for waiting termination: %@", applicationBundlePath] }]];
             }
             
             NSArray<NSRunningApplication *> *runningApplications = [self runningApplicationsWithBundle:applicationBundle];
@@ -275,7 +275,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
             // We should at least make sure we're opening a bundle however
             NSBundle *relaunchBundle = [NSBundle bundleWithPath:pathToRelaunch];
             if (relaunchBundle == nil) {
-                [self cleanupAndExitWithStatus:EXIT_FAILURE error:[NSError errorWithDomain:SUSparkleErrorDomain code:SPUAgentError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Error: Encountered invalid path to relaunch: %@", pathToRelaunch] }]];
+                [self cleanupAndExitWithStatus:EXIT_FAILURE error:[NSError errorWithDomain:SUSparkleErrorDomain code:SUAgentInvalidationError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Error: Encountered invalid path to relaunch: %@", pathToRelaunch] }]];
             }
             
             // We only launch applications, but I'm not sure how reliable -launchApplicationAtURL:options:config: is so we're not using it

@@ -62,6 +62,7 @@ typedef NS_ENUM(OSStatus, SUError) {
     SUInstallationCanceledError = 4007,
     SUInstallationAuthorizeLaterError = 4008,
     SUNotAllowedInteractionError = 4009,
+    SUAgentInvalidationError = 4010,
     
     // API misuse errors.
     SUIncorrectAPIUsageError = 5000
