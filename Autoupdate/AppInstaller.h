@@ -17,7 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)start;
 
-- (void)cleanupAndExitWithStatus:(int)status error:(NSError * _Nullable)error;
+- (void)cleanupAndExitWithStatus:(int)status error:(NSError * _Nullable)error __attribute__((noreturn));
 
 @end
 
