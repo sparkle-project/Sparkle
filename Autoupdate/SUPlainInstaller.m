@@ -81,7 +81,10 @@
     // They could be potentially be preserved when archiving an application, but also an update could just be sitting on the system for a long time
     // before being installed
     if (![fileManager updateAccessTimeOfItemAtRootURL:newURL error:error]) {
-        SULog(SULogLevelError, @"Failed to recursively update new application's modification time before moving into temporary directory");
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey: @"Failed to recursively update new application's modification time before moving into temporary directory" }];
+        }
+        
         return NO;
     }
     
@@ -91,7 +94,10 @@
     NSURL *tempNewDirectoryURL = [fileManager makeTemporaryDirectoryWithPreferredName:preferredName appropriateForDirectoryURL:installationDirectory error:error];
     
     if (tempNewDirectoryURL == nil) {
-        SULog(SULogLevelError, @"Failed to make new temp directory");
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey: @"Failed to make new temporary directory" }];
+        }
+        
         return NO;
     }
 
@@ -103,7 +109,10 @@
     NSString *newURLLastPathComponent = newURL.lastPathComponent;
     NSURL *newTempURL = [tempNewDirectoryURL URLByAppendingPathComponent:newURLLastPathComponent];
     if (![fileManager moveItemAtURL:newURL toURL:newTempURL error:error]) {
-        SULog(SULogLevelError, @"Failed to move the new app from %@ to its temp directory at %@", newURL.path, newTempURL.path);
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to move the new app from %@ to its temp directory at %@", newURL.path, newTempURL.path] }];
+        }
+        
         [fileManager removeItemAtURL:tempNewDirectoryURL error:NULL];
         return NO;
     }
@@ -145,7 +154,10 @@
     // it's not possible our new app can be left in an incomplete state at the final destination
     if (![fileManager changeOwnerAndGroupOfItemAtRootURL:newTempURL toMatchURL:oldURL error:error]) {
         // But this is big enough of a deal to fail
-        SULog(SULogLevelError, @"Failed to change owner and group of new app at %@ to match old app at %@", newTempURL.path, oldURL.path);
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to change owner and group of new app at %@ to match old app at %@", newTempURL.path, oldURL.path] }];
+        }
+        
         [fileManager removeItemAtURL:tempNewDirectoryURL error:NULL];
         return NO;
     }
@@ -174,7 +186,10 @@
     NSURL *oldDirectoryURL = oldURL.URLByDeletingLastPathComponent;
     NSURL *tempOldDirectoryURL = (oldDirectoryURL != nil) ? [fileManager makeTemporaryDirectoryWithPreferredName:oldDestinationName appropriateForDirectoryURL:oldDirectoryURL error:error] : nil;
     if (tempOldDirectoryURL == nil) {
-        SULog(SULogLevelError, @"Failed to create temporary directory for old app at %@", oldURL.path);
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to create temporary directory for old app at %@", oldURL.path] }];
+        }
+        
         [fileManager removeItemAtURL:tempNewDirectoryURL error:NULL];
         return NO;
     }
@@ -186,7 +201,9 @@
     // Move the old app to the temporary directory
     NSURL *oldTempURL = [tempOldDirectoryURL URLByAppendingPathComponent:oldDestinationNameWithPathExtension];
     if (![fileManager moveItemAtURL:oldURL toURL:oldTempURL error:error]) {
-        SULog(SULogLevelError, @"Failed to move the old app at %@ to a temporary location at %@", oldURL.path, oldTempURL.path);
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to move the old app at %@ to a temporary location at %@", oldURL.path, oldTempURL.path] }];
+        }
         
         // Just forget about our updated app on failure
         [fileManager removeItemAtURL:tempNewDirectoryURL error:NULL];
@@ -201,7 +218,9 @@
 
     // Move the new app to its final destination
     if (![fileManager moveItemAtURL:newTempURL toURL:installationURL error:error]) {
-        SULog(SULogLevelError, @"Failed to move new app at %@ to final destination %@", newTempURL.path, installationURL.path);
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to move new app at %@ to final destination %@", newTempURL.path, installationURL.path] }];
+        }
         
         // Forget about our updated app on failure
         [fileManager removeItemAtURL:tempNewDirectoryURL error:NULL];
