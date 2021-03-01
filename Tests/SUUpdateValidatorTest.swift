@@ -87,7 +87,7 @@ class SUUpdateValidatorTest: XCTestCase {
 
         let validator = SUUpdateValidator(downloadPath: self.signedTestFilePath, signatures: signatures, host: host)
 
-        let result = validator.validateDownloadPath()
+        let result = (try? validator.validateDownloadPath()) != nil
         XCTAssertEqual(result, expectedResult, "bundle: \(bundleConfig), signatures: \(signatureConfig)", line: line)
     }
 
@@ -112,7 +112,7 @@ class SUUpdateValidatorTest: XCTestCase {
         let newBundle = self.bundle(newBundleConfig)
         try! FileManager.default.copyItem(at: newBundle.bundleURL, to: URL(fileURLWithPath: updateDirectory).appendingPathComponent(oldBundle.bundleURL.lastPathComponent))
 
-        let result = validator.validate(withUpdateDirectory: updateDirectory)
+        let result = (try? validator.validate(withUpdateDirectory: updateDirectory)) != nil
         XCTAssertEqual(result, expectedResult, "oldBundle: \(oldBundleConfig), newBundle: \(newBundleConfig), signatures: \(signatureConfig)", line: line)
     }
 
