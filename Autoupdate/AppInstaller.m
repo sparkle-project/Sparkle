@@ -279,7 +279,14 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 - (void)agentConnectionDidInvalidate
 {
     if (!self.finishedValidation || !self.agentInitiatedConnection) {
-        [self cleanupAndExitWithStatus:EXIT_FAILURE error:[NSError errorWithDomain:SUSparkleErrorDomain code:SPUInstallerError userInfo:@{ NSLocalizedDescriptionKey: @"Error: Agent connection invalidated before installation began" }]];
+        NSMutableDictionary *userInfo = [NSMutableDictionary dictionaryWithDictionary:@{ NSLocalizedDescriptionKey: @"Error: Agent connection invalidated before installation began" }];
+        
+        NSError *agentError = self.agentConnection.invalidationError;
+        if (agentError != nil) {
+            userInfo[NSUnderlyingErrorKey] = agentError;
+        }
+        
+        [self cleanupAndExitWithStatus:EXIT_FAILURE error:[NSError errorWithDomain:SUSparkleErrorDomain code:SPUInstallerError userInfo:userInfo]];
     }
 }
 

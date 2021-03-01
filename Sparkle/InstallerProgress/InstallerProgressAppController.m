@@ -15,6 +15,7 @@
 #import "SUInstallerAgentInitiationProtocol.h"
 #import "StatusInfo.h"
 #import "SUHost.h"
+#import "SUErrors.h"
 
 /*!
  * Terminate the application after a delay from launching the new update to avoid OS activation issues
@@ -61,25 +62,25 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
     if (self != nil) {
         if (arguments.count != 3) {
             SULog(SULogLevelError, @"Error: Invalid number of arguments supplied: %@", arguments);
-            [self cleanupAndExitWithStatus:EXIT_FAILURE];
+            [self cleanupAndExitWithStatus:EXIT_FAILURE error:nil];
         }
         
         NSString *hostBundlePath = arguments[1];
         if (hostBundlePath.length == 0) {
             SULog(SULogLevelError, @"Error: Host bundle path length is 0");
-            [self cleanupAndExitWithStatus:EXIT_FAILURE];
+            [self cleanupAndExitWithStatus:EXIT_FAILURE error:nil];
         }
         
         _hostBundle = [NSBundle bundleWithPath:hostBundlePath];
         if (_hostBundle == nil) {
             SULog(SULogLevelError, @"Error: Host bundle for target is nil");
-            [self cleanupAndExitWithStatus:EXIT_FAILURE];
+            [self cleanupAndExitWithStatus:EXIT_FAILURE error:nil];
         }
         
         NSString *hostBundleIdentifier = _hostBundle.bundleIdentifier;
         if (hostBundleIdentifier == nil) {
             SULog(SULogLevelError, @"Error: Host bundle identifier for target is nil");
-            [self cleanupAndExitWithStatus:EXIT_FAILURE];
+            [self cleanupAndExitWithStatus:EXIT_FAILURE error:nil];
             return nil; // just to silence analyzer warnings later about hostBundleIdentifier being nil
         }
         
@@ -112,11 +113,14 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
                 InstallerProgressAppController *strongSelf = weakSelf;
                 if (strongSelf != nil) {
                     int exitStatus = (strongSelf.repliedToRegistration ? EXIT_SUCCESS : EXIT_FAILURE);
+                    NSError *registrationError;
                     if (!strongSelf.repliedToRegistration) {
-                        SULog(SULogLevelError, @"Error: Agent Invalidating without having the chance to reply to installer");
+                        registrationError = [NSError errorWithDomain:SUSparkleErrorDomain code:SPUAgentError userInfo:@{ NSLocalizedDescriptionKey: @"Error: Agent Invalidating without having the chance to reply to installer" }];
+                    } else {
+                        registrationError = nil;
                     }
                     if (!strongSelf.willTerminate) {
-                        [strongSelf cleanupAndExitWithStatus:exitStatus];
+                        [strongSelf cleanupAndExitWithStatus:exitStatus error:registrationError];
                     }
                 }
             });
@@ -144,7 +148,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(CONNECTION_ACKNOWLEDGEMENT_TIMEOUT * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         if (!self.connected) {
             SULog(SULogLevelError, @"Timeout error: failed to receive acknowledgement from installer");
-            [self cleanupAndExitWithStatus:EXIT_FAILURE];
+            [self cleanupAndExitWithStatus:EXIT_FAILURE error:nil];
         }
     });
 }
@@ -154,8 +158,19 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
     [self startConnection];
 }
 
-- (void)cleanupAndExitWithStatus:(int)status __attribute__((noreturn))
+- (void)cleanupAndExitWithStatus:(int)status error:(NSError * _Nullable)error __attribute__((noreturn))
 {
+    if (error != nil) {
+        SULog(SULogLevelError, @"Agent failed with error: %@", error);
+        
+        NSError *underlyingError = error.userInfo[NSUnderlyingErrorKey];
+        if (underlyingError != nil) {
+            SULog(SULogLevelError, @"Error: %@", underlyingError);
+        }
+        
+        [(id<SUInstallerAgentInitiationProtocol>)self.connection.remoteObjectProxy connectionWillInvalidateWithError:error];
+    }
+    
     [self.statusInfo invalidate];
     [self.connection invalidate];
     
@@ -200,8 +215,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
         if (applicationBundlePath != nil && !self.willTerminate) {
             NSBundle *applicationBundle = [NSBundle bundleWithPath:applicationBundlePath];
             if (applicationBundle == nil) {
-                SULog(SULogLevelError, @"Error: Encountered invalid path for waiting termination: %@", applicationBundlePath);
-                [self cleanupAndExitWithStatus:EXIT_FAILURE];
+                [self cleanupAndExitWithStatus:EXIT_FAILURE error:[NSError errorWithDomain:SUSparkleErrorDomain code:SPUAgentError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Error: Encountered invalid path for waiting termination: %@", applicationBundlePath] }]];
             }
             
             NSArray<NSRunningApplication *> *runningApplications = [self runningApplicationsWithBundle:applicationBundle];
@@ -261,8 +275,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
             // We should at least make sure we're opening a bundle however
             NSBundle *relaunchBundle = [NSBundle bundleWithPath:pathToRelaunch];
             if (relaunchBundle == nil) {
-                SULog(SULogLevelError, @"Error: Encountered invalid path to relaunch: %@", pathToRelaunch);
-                [self cleanupAndExitWithStatus:EXIT_FAILURE];
+                [self cleanupAndExitWithStatus:EXIT_FAILURE error:[NSError errorWithDomain:SUSparkleErrorDomain code:SPUAgentError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Error: Encountered invalid path to relaunch: %@", pathToRelaunch] }]];
             }
             
             // We only launch applications, but I'm not sure how reliable -launchApplicationAtURL:options:config: is so we're not using it
@@ -276,7 +289,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
             
             self.willTerminate = YES;
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(SUTerminationTimeDelay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                [self cleanupAndExitWithStatus:EXIT_SUCCESS];
+                [self cleanupAndExitWithStatus:EXIT_SUCCESS error:nil];
             });
         }
     });

@@ -12,4 +12,6 @@
 
 - (void)connectionDidInitiateWithReply:(void (^)(void))acknowledgement;
 
+- (void)connectionWillInvalidateWithError:(NSError *)error;
+
 @end
