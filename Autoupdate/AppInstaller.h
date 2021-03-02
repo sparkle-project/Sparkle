@@ -9,12 +9,16 @@
 #import <Foundation/Foundation.h>
 #import "SUUnarchiverProtocol.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface AppInstaller : NSObject
 
 - (instancetype)initWithHostBundleIdentifier:(NSString *)hostBundleIdentifier;
 
 - (void)start;
 
-- (void)cleanupAndExitWithStatus:(int)status __attribute__((noreturn));
+- (void)cleanupAndExitWithStatus:(int)status error:(NSError * _Nullable)error __attribute__((noreturn));
 
 @end
+
+NS_ASSUME_NONNULL_END

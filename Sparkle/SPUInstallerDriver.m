@@ -59,6 +59,7 @@
 @property (nonatomic, copy) NSString *temporaryDirectory;
 
 @property (nonatomic) BOOL aborted;
+@property (nonatomic, nullable) NSError *installerError;
 
 @end
 
@@ -80,6 +81,7 @@
 @synthesize downloadName = _downloadName;
 @synthesize temporaryDirectory = _temporaryDirectory;
 @synthesize aborted = _aborted;
+@synthesize installerError = _installerError;
 
 - (instancetype)initWithHost:(SUHost *)host applicationBundle:(NSBundle *)applicationBundle sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater updaterDelegate:(id<SPUUpdaterDelegate>)updaterDelegate delegate:(nullable id<SPUInstallerDriverDelegate>)delegate
 {
@@ -115,16 +117,18 @@
         dispatch_async(dispatch_get_main_queue(), ^{
             SPUInstallerDriver *strongSelf = weakSelf;
             if (strongSelf.installerConnection != nil && !strongSelf.aborted) {
-                NSError *remoteError =
-                [NSError
-                 errorWithDomain:SUSparkleErrorDomain
-                 code:SUInstallationError
-                 userInfo:@{
-                            NSLocalizedDescriptionKey: SULocalizedString(@"An error occurred while running the updater. Please try again later.", nil),
-                            NSLocalizedFailureReasonErrorKey:@"The remote port connection was invalidated from the updater. Please check Console logs for "@SPARKLE_RELAUNCH_TOOL_NAME
-                            }
-                 ];
-                [strongSelf.delegate installerIsRequestingAbortInstallWithError:remoteError];
+                
+                NSMutableDictionary *userInfo = [NSMutableDictionary dictionaryWithDictionary:@{
+                    NSLocalizedDescriptionKey: SULocalizedString(@"An error occurred while running the updater. Please try again later.", nil),
+                    NSLocalizedFailureReasonErrorKey:@"The remote port connection was invalidated from the updater. For additional details, please check Console logs for "@SPARKLE_RELAUNCH_TOOL_NAME
+                }];
+                
+                NSError *installerError = strongSelf.installerError;
+                if (installerError != nil) {
+                    userInfo[NSUnderlyingErrorKey] = installerError;
+                }
+                
+                [strongSelf.delegate installerIsRequestingAbortInstallWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:userInfo]];
             }
         });
     }];
@@ -234,7 +238,14 @@
             [self.delegate installerDidFailToApplyDeltaUpdate];
         } else {
             // Don't have to store current stage because we're going to abort
-            [self.delegate installerIsRequestingAbortInstallWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUUnarchivingError userInfo:@{ NSLocalizedDescriptionKey:SULocalizedString(@"An error occurred while extracting the archive. Please try again later.", nil) }]];
+            NSMutableDictionary *userInfo = [NSMutableDictionary dictionaryWithDictionary:@{ NSLocalizedDescriptionKey:SULocalizedString(@"An error occurred while extracting the archive. Please try again later.", nil) }];
+            
+            NSError *unarchivedError = (NSError *)SPUUnarchiveRootObjectSecurely(data, [NSError class]);
+            if (unarchivedError != nil) {
+                userInfo[NSUnderlyingErrorKey] = unarchivedError;
+            }
+            
+            [self.delegate installerIsRequestingAbortInstallWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUUnarchivingError userInfo:userInfo]];
         }
     } else if (identifier == SPUValidationStarted) {
         self.currentStage = identifier;
@@ -300,6 +311,9 @@
     } else if (identifier == SPUUpdaterAlivePing) {
         // Don't update the current stage; a ping request has no effect on that.
         [self.installerConnection handleMessageWithIdentifier:SPUUpdaterAlivePong data:[NSData data]];
+    } else if (identifier == SPUInstallerError) {
+        // Don't update the current stage; an installation error has no effect on that.
+        self.installerError = (NSError *)SPUUnarchiveRootObjectSecurely(data, [NSError class]);
     }
 }
 

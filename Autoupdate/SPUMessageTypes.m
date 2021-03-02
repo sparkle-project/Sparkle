@@ -55,9 +55,10 @@ BOOL SPUInstallerMessageTypeIsLegal(SPUInstallerMessageType oldMessageType, SPUI
         case SPUInstallationFinishedStage3:
             legal = (oldMessageType == SPUInstallationFinishedStage2);
             break;
+        case SPUInstallerError:
         case SPUUpdaterAlivePing:
             // Having this state being dependent on other installation states would make the complicate our logic
-            // So just always allow this type of message
+            // So just always allow these type of messages
             legal = YES;
             break;
     }

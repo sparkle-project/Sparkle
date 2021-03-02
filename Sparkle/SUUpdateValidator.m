@@ -13,6 +13,8 @@
 #import "SUHost.h"
 #import "SULog.h"
 #import "SUSignatures.h"
+#import "SUErrors.h"
+
 
 #include "AppKitPrevention.h"
 
@@ -43,23 +45,28 @@
     return self;
 }
 
-- (BOOL)validateDownloadPath {
+- (BOOL)validateDownloadPathWithError:(NSError * __autoreleasing *)error
+{
     SUPublicKeys *publicKeys = self.host.publicKeys;
     SUSignatures *signatures = self.signatures;
 
     if (!publicKeys.hasAnyKeys) {
-        SULog(SULogLevelError, @"Failed to validate update before unarchiving because no (Ed)DSA public key was found in the old app");
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey: @"Failed to validate update before unarchiving because no (Ed)DSA public key was found in the old app" }];
+        }
     } else {
         if ([SUSignatureVerifier validatePath:self.downloadPath withSignatures:signatures withPublicKeys:publicKeys]) {
             self.prevalidatedSignature = YES;
             return YES;
         }
-        SULog(SULogLevelError, @"(Ed)DSA signature validation before unarchiving failed for update %@", self.downloadPath);
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"(Ed)DSA signature validation before unarchiving failed for update %@", self.downloadPath] }];
+        }
     }
     return NO;
 }
 
-- (BOOL)validateWithUpdateDirectory:(NSString *)updateDirectory
+- (BOOL)validateWithUpdateDirectory:(NSString *)updateDirectory error:(NSError * __autoreleasing *)error
 {
     SUSignatures *signatures = self.signatures;
     SUPublicKeys *publicKeys = self.host.publicKeys;
@@ -71,7 +78,9 @@
     // install source could point to a new bundle or a package
     NSString *installSource = [SUInstaller installSourcePathInUpdateFolder:updateDirectory forHost:host isPackage:&isPackage isGuided:NULL];
     if (installSource == nil) {
-        SULog(SULogLevelError, @"No suitable install is found in the update. The update will be rejected.");
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUValidationError userInfo:@{ NSLocalizedDescriptionKey: @"No suitable install is found in the update. The update will be rejected." }];
+        }
         return NO;
     }
 
@@ -84,12 +93,14 @@
             // For package type updates, all we do is check if the DSA signature is valid
             BOOL validationCheckSuccess = [SUSignatureVerifier validatePath:downloadPath withSignatures:signatures withPublicKeys:publicKeys];
             if (!validationCheckSuccess) {
-                SULog(SULogLevelError, @"DSA signature validation of the package failed. The update contains an installer package, and valid DSA signatures are mandatory for all installer packages. The update will be rejected. Sign the installer with a valid DSA key or use an .app bundle update instead.");
+                if (error != NULL) {
+                    *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUValidationError userInfo:@{ NSLocalizedDescriptionKey: @"DSA signature validation of the package failed. The update contains an installer package, and valid DSA signatures are mandatory for all installer packages. The update will be rejected. Sign the installer with a valid DSA key or use an .app bundle update instead." }];
+                }
             }
             return validationCheckSuccess;
         } else {
             // For application bundle updates, we check both the DSA and Apple code signing signatures
-            return [self validateUpdateForHost:host downloadedToPath:downloadPath newBundleURL:installSourceURL signatures:signatures];
+            return [self validateUpdateForHost:host downloadedToPath:downloadPath newBundleURL:installSourceURL signatures:signatures error:error];
         }
     } else if (isPackage) {
         // We already prevalidated the package and nothing else needs to be done
@@ -98,9 +109,12 @@
         // Because we already validated the DSA signature, this is just a consistency check to see
         // if the developer signed their application properly with their Apple ID
         // Currently, this case only gets hit for binary delta updates
-        NSError *error = nil;
-        if ([SUCodeSigningVerifier bundleAtURLIsCodeSigned:installSourceURL] && ![SUCodeSigningVerifier codeSignatureIsValidAtBundleURL:installSourceURL error:&error]) {
-            SULog(SULogLevelError, @"Failed to validate apple code sign signature on bundle after archive validation with error: %@", error);
+        NSError *innerError = nil;
+        if ([SUCodeSigningVerifier bundleAtURLIsCodeSigned:installSourceURL] && ![SUCodeSigningVerifier codeSignatureIsValidAtBundleURL:installSourceURL error:&innerError]) {
+            if (error != NULL) {
+                *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUValidationError userInfo:@{ NSLocalizedDescriptionKey: @"Failed to validate apple code sign signature on bundle after archive validation", NSUnderlyingErrorKey: innerError }];
+            }
+            
             return NO;
         } else {
             return YES;
@@ -116,11 +130,13 @@
  *  * old and new Code Signing identity are the same and valid
  *
  */
-- (BOOL)validateUpdateForHost:(SUHost *)host downloadedToPath:(NSString *)downloadedPath newBundleURL:(NSURL *)newBundleURL signatures:(SUSignatures *)signatures
+- (BOOL)validateUpdateForHost:(SUHost *)host downloadedToPath:(NSString *)downloadedPath newBundleURL:(NSURL *)newBundleURL signatures:(SUSignatures *)signatures error:(NSError * __autoreleasing *)error
 {
     NSBundle *newBundle = [NSBundle bundleWithURL:newBundleURL];
     if (newBundle == nil) {
-        SULog(SULogLevelError, @"No suitable bundle is found in the update. The update will be rejected.");
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUValidationError userInfo:@{ NSLocalizedDescriptionKey: @"No suitable bundle is found in the update. The update will be rejected." }];
+        }
         return NO;
     }
 
@@ -140,7 +156,9 @@
 
     // This is not essential for security, only a policy
     if (oldHasAnyDSAKey && !newHasAnyDSAKey) {
-        SULog(SULogLevelError, @"A public (Ed)DSA key was found in the old bundle but no public (Ed)DSA key was found in the new update. Sparkle only supports rotation, but not removal of (Ed)DSA keys. Please add an EdDSA key to the new app.");
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUValidationError userInfo:@{ NSLocalizedDescriptionKey: @"A public (Ed)DSA key was found in the old bundle but no public (Ed)DSA key was found in the new update. Sparkle only supports rotation, but not removal of (Ed)DSA keys. Please add an EdDSA key to the new app." }];
+        }
         return NO;
     }
 
@@ -154,8 +172,8 @@
     }
 
     if (hostIsCodeSigned) {
-        NSError *error = nil;
-        passedCodeSigning = [SUCodeSigningVerifier codeSignatureAtBundleURL:host.bundle.bundleURL matchesSignatureAtBundleURL:newHost.bundle.bundleURL error:&error];
+        NSError *innerError = nil;
+        passedCodeSigning = [SUCodeSigningVerifier codeSignatureAtBundleURL:host.bundle.bundleURL matchesSignatureAtBundleURL:newHost.bundle.bundleURL error:&innerError];
     }
     // End of security-critical part
 
@@ -163,14 +181,18 @@
     // In that case, the check ensures that the app author has correctly used DSA keys, so that the app will be updateable in the next version.
     if (!passedDSACheck && newHasAnyDSAKey) {
         if (![SUSignatureVerifier validatePath:downloadedPath withSignatures:signatures withPublicKeys:newPublicKeys]) {
-            SULog(SULogLevelError, @"The update has a public (Ed)DSA key, but the public key shipped with the update doesn't match the signature. To prevent future problems, the update will be rejected.");
+            if (error != NULL) {
+                *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUValidationError userInfo:@{ NSLocalizedDescriptionKey: @"The update has a public (Ed)DSA key, but the public key shipped with the update doesn't match the signature. To prevent future problems, the update will be rejected." }];
+            }
             return NO;
         }
     }
 
-    NSError *error = nil;
-    if (passedDSACheck && updateIsCodeSigned && ![SUCodeSigningVerifier codeSignatureIsValidAtBundleURL:newHost.bundle.bundleURL error:&error]) {
-        SULog(SULogLevelError, @"The update archive has a valid (Ed)DSA signature, but the app is also signed with Code Signing, which is corrupted: %@. The update will be rejected.", error);
+    NSError *innerError = nil;
+    if (passedDSACheck && updateIsCodeSigned && ![SUCodeSigningVerifier codeSignatureIsValidAtBundleURL:newHost.bundle.bundleURL error:&innerError]) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUValidationError userInfo:@{ NSLocalizedDescriptionKey: @"The update archive has a valid (Ed)DSA signature, but the app is also signed with Code Signing, which is corrupted. The update will be rejected.", NSUnderlyingErrorKey: innerError }];
+        }
         return NO;
     }
 
@@ -195,9 +217,14 @@
 
     if (!hostIsCodeSigned || !updateIsCodeSigned) {
         NSString *acsStatus = !hostIsCodeSigned ? @"old app hasn't been signed with app Code Signing" : @"new app isn't signed with app Code Signing";
-        SULog(SULogLevelError, @"The update archive %@, and the %@. At least one method of signature verification must be valid. The update will be rejected.", dsaStatus, acsStatus);
+        
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUValidationError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"The update archive %@, and the %@. At least one method of signature verification must be valid. The update will be rejected.", dsaStatus, acsStatus] }];
+        }
     } else {
-        SULog(SULogLevelError, @"The update archive %@, and the app is signed with a new Code Signing identity that doesn't match code signing of the original app: %@. At least one method of signature verification must be valid. The update will be rejected.", dsaStatus, error);
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUValidationError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"The update archive %@, and the app is signed with a new Code Signing identity that doesn't match code signing of the original app. At least one method of signature verification must be valid. The update will be rejected.", dsaStatus] }];
+        }
     }
 
     return NO;

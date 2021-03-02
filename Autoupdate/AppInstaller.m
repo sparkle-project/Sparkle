@@ -147,8 +147,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
             AppInstaller *strongSelf = weakSelf;
             if (strongSelf != nil) {
                 if (strongSelf.activeConnection != nil && !strongSelf.willCompleteInstallation) {
-                    SULog(SULogLevelError, @"Invalidation on remote port being called, and installation is not close enough to completion!");
-                    [strongSelf cleanupAndExitWithStatus:EXIT_FAILURE];
+                    [strongSelf cleanupAndExitWithStatus:EXIT_FAILURE error:[NSError errorWithDomain:SUSparkleErrorDomain code:SPUInstallerError userInfo:@{ NSLocalizedDescriptionKey: @"Invalidation on remote port being called, and installation is not close enough to completion!" }]];
                 }
                 strongSelf.communicator = nil;
                 strongSelf.activeConnection = nil;
@@ -170,13 +169,11 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(FIRST_UPDATER_MESSAGE_TIMEOUT * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         if (!self.receivedInstallationData) {
-            SULog(SULogLevelError, @"Timeout: installation data was never received");
-            [self cleanupAndExitWithStatus:EXIT_FAILURE];
+            [self cleanupAndExitWithStatus:EXIT_FAILURE error:[NSError errorWithDomain:SUSparkleErrorDomain code:SPUInstallerError userInfo:@{ NSLocalizedDescriptionKey: @"Timeout: installation data was never received" }]];
         }
         
         if (!self.agentConnection.connected) {
-            SULog(SULogLevelError, @"Timeout: agent connection was never initiated");
-            [self cleanupAndExitWithStatus:EXIT_FAILURE];
+            [self cleanupAndExitWithStatus:EXIT_FAILURE error:[NSError errorWithDomain:SUSparkleErrorDomain code:SPUInstallerError userInfo:@{ NSLocalizedDescriptionKey: @"Timeout: agent connection was never initiated" }]];
         }
     });
 }
@@ -188,9 +185,10 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     NSString *archivePath = [self.updateDirectoryPath stringByAppendingPathComponent:self.downloadName];
     id<SUUnarchiverProtocol> unarchiver = [SUUnarchiver unarchiverForPath:archivePath updatingHostBundlePath:self.host.bundlePath decryptionPassword:self.decryptionPassword expectingInstallationType:self.installationType];
     
+    NSError *unarchiverError = nil;
     BOOL success = NO;
     if (!unarchiver) {
-        SULog(SULogLevelError, @"Error: No valid unarchiver for %@", archivePath);
+        unarchiverError = [NSError errorWithDomain:SUSparkleErrorDomain code:SUUnarchivingError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"No valid unarchiver was found for %@", archivePath] }];
         
         success = NO;
     } else {
@@ -201,28 +199,27 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
         BOOL needsPrevalidation = [[unarchiver class] mustValidateBeforeExtraction] || ![self.installationType isEqualToString:SPUInstallationTypeApplication];
 
         if (needsPrevalidation) {
-            success = [self.updateValidator validateDownloadPath];
+            success = [self.updateValidator validateDownloadPathWithError:&unarchiverError];
         } else {
             success = YES;
         }
     }
     
     if (!success) {
-        [self unarchiverDidFail];
+        [self unarchiverDidFailWithError:unarchiverError];
     } else {
         [unarchiver
          unarchiveWithCompletionBlock:^(NSError * _Nullable error) {
              if (error != nil) {
-                 SULog(SULogLevelError, @"Failed to unarchive %@ with error: %@", archivePath, error);
-                 [self unarchiverDidFail];
+                 [self unarchiverDidFailWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUUnarchivingError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to unarchive %@", archivePath], NSUnderlyingErrorKey: (NSError * _Nonnull)error }]];
              } else {
                  [self.communicator handleMessageWithIdentifier:SPUValidationStarted data:[NSData data]];
                  
-                 BOOL validationSuccess = [self.updateValidator validateWithUpdateDirectory:self.updateDirectoryPath];
+                 NSError *validationError = nil;
+                 BOOL validationSuccess = [self.updateValidator validateWithUpdateDirectory:self.updateDirectoryPath error:&validationError];
                  
                  if (!validationSuccess) {
-                     SULog(SULogLevelError, @"Error: update validation was a failure");
-                     [self cleanupAndExitWithStatus:EXIT_FAILURE];
+                     [self cleanupAndExitWithStatus:EXIT_FAILURE error:[NSError errorWithDomain:SUSparkleErrorDomain code:SPUInstallerError userInfo:@{ NSLocalizedDescriptionKey: @"Update validation was a failure", NSUnderlyingErrorKey: validationError }]];
                  } else {
                      [self.communicator handleMessageWithIdentifier:SPUInstallationStartedStage1 data:[NSData data]];
                      
@@ -244,8 +241,15 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     }
 }
 
-- (void)unarchiverDidFail
+- (void)unarchiverDidFailWithError:(NSError *)error
 {
+    SULog(SULogLevelError, @"Failed to unarchive file: %@", error);
+    
+    NSError *underlyingError = error.userInfo[NSUnderlyingErrorKey];
+    if (underlyingError != nil) {
+        SULog(SULogLevelError, @"Error: %@", underlyingError);
+    }
+    
     // No longer need update validator until next possible extraction (eg: if initial delta update fails)
     self.updateValidator = nil;
     
@@ -260,7 +264,8 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     self.relaunchPath = nil;
     self.host = nil;
     
-    [self.communicator handleMessageWithIdentifier:SPUArchiveExtractionFailed data:[NSData data]];
+    NSData *archivedError = SPUArchiveRootObjectSecurely(error);
+    [self.communicator handleMessageWithIdentifier:SPUArchiveExtractionFailed data:archivedError != nil ? archivedError : [NSData data]];
 }
 
 - (void)agentConnectionDidInitiate
@@ -274,8 +279,14 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 - (void)agentConnectionDidInvalidate
 {
     if (!self.finishedValidation || !self.agentInitiatedConnection) {
-        SULog(SULogLevelError, @"Error: Agent connection invalidated before installation began");
-        [self cleanupAndExitWithStatus:EXIT_FAILURE];
+        NSMutableDictionary *userInfo = [NSMutableDictionary dictionaryWithDictionary:@{ NSLocalizedDescriptionKey: @"Error: Agent connection invalidated before installation began" }];
+        
+        NSError *agentError = self.agentConnection.invalidationError;
+        if (agentError != nil) {
+            userInfo[NSUnderlyingErrorKey] = agentError;
+        }
+        
+        [self cleanupAndExitWithStatus:EXIT_FAILURE error:[NSError errorWithDomain:SUSparkleErrorDomain code:SPUInstallerError userInfo:userInfo]];
     }
 }
 
@@ -294,8 +305,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(RETRIEVE_PROCESS_IDENTIFIER_TIMEOUT * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         if (self.terminationListener == nil) {
-            SULog(SULogLevelError, @"Timeout error: failed to retreive process identifier from agent");
-            [self cleanupAndExitWithStatus:EXIT_FAILURE];
+            [self cleanupAndExitWithStatus:EXIT_FAILURE error:[NSError errorWithDomain:SUSparkleErrorDomain code:SPUInstallerError userInfo:@{ NSLocalizedDescriptionKey: @"Timeout error: failed to retreive process identifier from agent" }]];
         }
     });
 }
@@ -310,15 +320,13 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
             
             SPUInstallationInputData *installationData = (SPUInstallationInputData *)SPUUnarchiveRootObjectSecurely(data, [SPUInstallationInputData class]);
             if (installationData == nil) {
-                SULog(SULogLevelError, @"Error: Failed to unarchive input installation data");
-                [self cleanupAndExitWithStatus:EXIT_FAILURE];
+                [self cleanupAndExitWithStatus:EXIT_FAILURE error:[NSError errorWithDomain:SUSparkleErrorDomain code:SPUInstallerError userInfo:@{ NSLocalizedDescriptionKey: @"Error: Failed to unarchive input installation data" }]];
                 return;
             }
             
             NSString *installationType = installationData.installationType;
             if (!SPUValidInstallationType(installationType)) {
-                SULog(SULogLevelError, @"Error: Received invalid installation type: %@", installationType);
-                [self cleanupAndExitWithStatus:EXIT_FAILURE];
+                [self cleanupAndExitWithStatus:EXIT_FAILURE error:[NSError errorWithDomain:SUSparkleErrorDomain code:SPUInstallerError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Error: Received invalid installation type: %@", installationType] }]];
                 return;
             }
             
@@ -326,15 +334,13 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
             
             NSString *bundleIdentifier = hostBundle.bundleIdentifier;
             if (bundleIdentifier == nil || ![bundleIdentifier isEqualToString:self.hostBundleIdentifier]) {
-                SULog(SULogLevelError, @"Error: Failed to match host bundle identifiers %@ and %@", self.hostBundleIdentifier, bundleIdentifier);
-                [self cleanupAndExitWithStatus:EXIT_FAILURE];
+                [self cleanupAndExitWithStatus:EXIT_FAILURE error:[NSError errorWithDomain:SUSparkleErrorDomain code:SPUInstallerError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Error: Failed to match host bundle identifiers %@ and %@", self.hostBundleIdentifier, bundleIdentifier] }]];
                 return;
             }
             
             // This will be important later
             if (installationData.relaunchPath == nil) {
-                SULog(SULogLevelError, @"Error: Failed to obtain relaunch path from installation data");
-                [self cleanupAndExitWithStatus:EXIT_FAILURE];
+                [self cleanupAndExitWithStatus:EXIT_FAILURE error:[NSError errorWithDomain:SUSparkleErrorDomain code:SPUInstallerError userInfo:@{ NSLocalizedDescriptionKey: @"Error: Failed to obtain relaunch path from installation data" }]];
                 return;
             }
             
@@ -345,8 +351,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
             
             NSString *cacheInstallationPath = [SPULocalCacheDirectory createUniqueDirectoryInDirectory:rootCacheInstallationPath];
             if (cacheInstallationPath == nil) {
-                SULog(SULogLevelError, @"Error: Failed to create installation cache directory in %@", rootCacheInstallationPath);
-                [self cleanupAndExitWithStatus:EXIT_FAILURE];
+                [self cleanupAndExitWithStatus:EXIT_FAILURE error:[NSError errorWithDomain:SUSparkleErrorDomain code:SPUInstallerError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Error: Failed to create installation cache directory in %@", rootCacheInstallationPath] }]];
                 return;
             }
             
@@ -359,8 +364,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
             
             NSError *moveError = nil;
             if (![[[SUFileManager alloc] init] moveItemAtURL:downloadURL toURL:downloadDestinationURL error:&moveError]) {
-                SULog(SULogLevelError, @"Error: Failed to move download archive to new location: %@", moveError);
-                [self cleanupAndExitWithStatus:EXIT_FAILURE];
+                [self cleanupAndExitWithStatus:EXIT_FAILURE error:[NSError errorWithDomain:SUSparkleErrorDomain code:SPUInstallerError userInfo:@{ NSLocalizedDescriptionKey: @"Error: Failed to move download archive to new location", NSUnderlyingErrorKey: moveError }]];
                 return;
             }
             
@@ -368,22 +372,21 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
             NSError *attributesError = nil;
             NSString *downloadDestinationPath = downloadDestinationURL.path;
             if (downloadDestinationPath == nil) {
-                SULog(SULogLevelError, @"Error: Failed to retrieve download archive path from %@", downloadDestinationURL);
-                [self cleanupAndExitWithStatus:EXIT_FAILURE];
+                [self cleanupAndExitWithStatus:EXIT_FAILURE error:[NSError errorWithDomain:SUSparkleErrorDomain code:SPUInstallerError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Error: Failed to retrieve download archive path from %@", downloadDestinationURL] }]];
+                
                 return;
             }
             
             NSDictionary<NSString *, id> *archiveAttributes = [[NSFileManager defaultManager] attributesOfItemAtPath:downloadDestinationPath error:&attributesError];
             
             if (archiveAttributes == nil) {
-                SULog(SULogLevelError, @"Error: Failed to retrieve download archive attributes from %@", downloadDestinationPath);
-                [self cleanupAndExitWithStatus:EXIT_FAILURE];
+                [self cleanupAndExitWithStatus:EXIT_FAILURE error:[NSError errorWithDomain:SUSparkleErrorDomain code:SPUInstallerError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Error: Failed to retrieve download archive attributes from %@", downloadDestinationPath] }]];
+                
                 return;
             }
             
             if (![(NSString *)archiveAttributes[NSFileType] isEqualToString:NSFileTypeRegular]) {
-                SULog(SULogLevelError, @"Error: Received bad archive file type: %@", archiveAttributes[NSFileType]);
-                [self cleanupAndExitWithStatus:EXIT_FAILURE];
+                [self cleanupAndExitWithStatus:EXIT_FAILURE error:[NSError errorWithDomain:SUSparkleErrorDomain code:SPUInstallerError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Error: Received bad archive file type: %@", archiveAttributes[NSFileType]] }]];
                 return;
             }
             
@@ -442,20 +445,18 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
         id <SUInstallerProtocol> installer = [SUInstaller installerForHost:self.host expectedInstallationType:self.installationType updateDirectory:self.updateDirectoryPath error:&installerError];
         
         if (installer == nil) {
-            SULog(SULogLevelError, @"Error: Failed to create installer instance with error: %@", installerError);
             dispatch_async(dispatch_get_main_queue(), ^{
-                [self cleanupAndExitWithStatus:EXIT_FAILURE];
+                [self cleanupAndExitWithStatus:EXIT_FAILURE error:[NSError errorWithDomain:SUSparkleErrorDomain code:SPUInstallerError userInfo:@{ NSLocalizedDescriptionKey: @"Error: Failed to create installer instance", NSUnderlyingErrorKey: installerError }]];
             });
             return;
         }
         
         NSError *firstStageError = nil;
         if (![installer performInitialInstallation:&firstStageError]) {
-            SULog(SULogLevelError, @"Error: Failed to start installer with error: %@", firstStageError);
             self.installer = nil;
             
             dispatch_async(dispatch_get_main_queue(), ^{
-                [self cleanupAndExitWithStatus:EXIT_FAILURE];
+                [self cleanupAndExitWithStatus:EXIT_FAILURE error:[NSError errorWithDomain:SUSparkleErrorDomain code:SPUInstallerError userInfo:@{ NSLocalizedDescriptionKey: @"Error: Failed to start installer", NSUnderlyingErrorKey: firstStageError }]];
             });
             return;
         }
@@ -503,11 +504,10 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
             [self.agentConnection.agent sendTerminationSignal];
         });
     } else {
-        SULog(SULogLevelError, @"Error: Failed to resume installer on stage 2 because installation cannot be installed silently");
         self.installer = nil;
         
         dispatch_async(dispatch_get_main_queue(), ^{
-            [self cleanupAndExitWithStatus:EXIT_FAILURE];
+            [self cleanupAndExitWithStatus:EXIT_FAILURE error:[NSError errorWithDomain:SUSparkleErrorDomain code:SPUInstallerError userInfo:@{ NSLocalizedDescriptionKey: @"Error: Failed to resume installer on stage 2 because installation cannot be installed silently" }]];
         });
     }
 }
@@ -516,8 +516,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 {
     [self.terminationListener startListeningWithCompletion:^(BOOL success) {
         if (!success) {
-            SULog(SULogLevelError, @"Failed to listen for application termination");
-            [self cleanupAndExitWithStatus:EXIT_FAILURE];
+            [self cleanupAndExitWithStatus:EXIT_FAILURE error:[NSError errorWithDomain:SUSparkleErrorDomain code:SPUInstallerError userInfo:@{ NSLocalizedDescriptionKey: @"Failed to listen for application termination" }]];
             return;
         }
         
@@ -556,12 +555,10 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
             
             NSError *thirdStageError = nil;
             if (![self.installer performFinalInstallationProgressBlock:nil error:&thirdStageError]) {
-                SULog(SULogLevelError, @"Failed to finalize installation with error: %@", thirdStageError);
-                
                 self.installer = nil;
                 
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    [self cleanupAndExitWithStatus:EXIT_FAILURE];
+                    [self cleanupAndExitWithStatus:EXIT_FAILURE error:[NSError errorWithDomain:SUSparkleErrorDomain code:SPUInstallerError userInfo:@{ NSLocalizedDescriptionKey: @"Failed to finalize installation", NSUnderlyingErrorKey: thirdStageError }]];
                 });
                 return;
             }
@@ -591,14 +588,28 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
                     [self.agentConnection.agent relaunchPath:pathToRelaunch];
                 }
                 
-                [self cleanupAndExitWithStatus:EXIT_SUCCESS];
+                [self cleanupAndExitWithStatus:EXIT_SUCCESS error:nil];
             });
         });
     }];
 }
 
-- (void)cleanupAndExitWithStatus:(int)status __attribute__((noreturn))
+- (void)cleanupAndExitWithStatus:(int)status error:(NSError * _Nullable)error __attribute__((noreturn))
 {
+    if (error != nil) {
+        SULog(SULogLevelError, @"Error: %@", error);
+        
+        NSError *underlyingError = error.userInfo[NSUnderlyingErrorKey];
+        if (underlyingError != nil) {
+            SULog(SULogLevelError, @"Error: %@", underlyingError);
+        }
+        
+        NSData *errorData = SPUArchiveRootObjectSecurely((NSError * _Nonnull)error);
+        if (errorData != nil) {
+            [self.communicator handleMessageWithIdentifier:SPUInstallerError data:errorData];
+        }
+    }
+    
     // It's nice to tell the other end we're invalidating
     
     [self.activeConnection invalidate];
