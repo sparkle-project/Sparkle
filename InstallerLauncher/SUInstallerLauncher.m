@@ -266,20 +266,19 @@
     return status;
 }
 
-// First we check if the tool is in an auxiliary directory. If that fails, we then check if it is in a resources directory
 - (NSString *)pathForBundledTool:(NSString *)toolName extension:(NSString *)extension inBundle:(NSBundle *)bundle
 {
-    NSString *resultPath = nil;
     // If the path extension is empty, we don't want to add a "." at the end
-    NSString *pathWithExtension = (extension.length > 0) ? [toolName stringByAppendingPathExtension:extension] : toolName;
-    assert(pathWithExtension != nil);
-    NSString *auxiliaryPath = [bundle pathForAuxiliaryExecutable:pathWithExtension];
-    if (auxiliaryPath == nil || ![[NSFileManager defaultManager] fileExistsAtPath:auxiliaryPath]) {
-        resultPath = [bundle pathForResource:toolName ofType:extension];
-    } else {
-        resultPath = auxiliaryPath;
-    }
-    return resultPath;
+    NSString *nameWithExtension = (extension.length > 0) ? [toolName stringByAppendingPathExtension:extension] : toolName;
+    assert(nameWithExtension != nil);
+    
+    NSURL *auxiliaryToolURL = [bundle URLForAuxiliaryExecutable:nameWithExtension];
+    assert(auxiliaryToolURL != nil);
+    
+    NSURL *resolvedAuxiliaryToolURL = [auxiliaryToolURL URLByResolvingSymlinksInPath];
+    assert(resolvedAuxiliaryToolURL != nil);
+    
+    return resolvedAuxiliaryToolURL.path;
 }
 
 // Note: do not pass untrusted information such as paths to the installer and progress agent tools, when we can find them ourselves here
