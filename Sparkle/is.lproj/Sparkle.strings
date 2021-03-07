@@ -4,6 +4,8 @@
 
 "%@ %@ is currently the newest version available." = "%@ %@ er nýjasta útgáfan sem er fáanleg þessa stundina.";
 
+"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%@ %@ er nýjasta útgáfan sem er fáanleg þessa stundina.\n(You are currently running version %@.)";
+
 /* Description text for SUUpdateAlert when the update is downloadable. */
 "%@ %@ is now available--you have %@. Would you like to download it now?" = "Útgafa %2$@ af %1$@ er nú fáanlegt en þú ert með %3$@. Viltu sækja hana núna?";
 
