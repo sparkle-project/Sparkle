@@ -10,7 +10,15 @@ jobs:
   build:
     strategy:
       matrix:
-        xcode: ['/Applications/Xcode_12.2.app/Contents/Developer', '/Applications/Xcode_11.7.app/Contents/Developer']
+        xcode: ['xcode12.2', 'xcode11.7']
+        include:
+            - xcode: 'xcode12.2'
+              xcode-path: '/Applications/Xcode_12.2.app/Contents/Developer'
+              upload-dist: true
+            - xcode: 'xcode11.7'
+              xcode-path: '/Applications/Xcode_11.7.app/Contents/Developer'
+              upload-dist: false # No arm64 slice, so no upload
+            
     name: Build and Test Sparkle
     runs-on: macos-10.15
 
@@ -21,27 +29,27 @@ jobs:
           submodules: true
       - name: Build Unit Tests
         env:
-          DEVELOPER_DIR: ${{ matrix.xcode }}
+          DEVELOPER_DIR: ${{ matrix.xcode-path }}
         run: |
           xcodebuild build-for-testing -project Sparkle.xcodeproj -scheme Distribution -enableCodeCoverage YES -derivedDataPath build
       - name: Run Unit Tests
         env:
-          DEVELOPER_DIR: ${{ matrix.xcode }}
+          DEVELOPER_DIR: ${{ matrix.xcode-path }}
         run: |
           xcodebuild test-without-building -project Sparkle.xcodeproj -scheme Distribution -enableCodeCoverage YES -derivedDataPath build
       - name: Build UI Tests
         env:
-          DEVELOPER_DIR: ${{ matrix.xcode }}
+          DEVELOPER_DIR: ${{ matrix.xcode-path }}
         run: |
           xcodebuild build-for-testing -project Sparkle.xcodeproj -scheme UITests -configuration Debug -derivedDataPath build
       - name: Run UI Tests
         env:
-          DEVELOPER_DIR: ${{ matrix.xcode }}
+          DEVELOPER_DIR: ${{ matrix.xcode-path }}
         run: |
           xcodebuild test-without-building -project Sparkle.xcodeproj -scheme UITests -configuration Debug -derivedDataPath build
       - name: Build Release Distribution
         env:
-          DEVELOPER_DIR: ${{ matrix.xcode }}
+          DEVELOPER_DIR: ${{ matrix.xcode-path }}
         run: |
           xcodebuild build -project Sparkle.xcodeproj -scheme Distribution -configuration Release -derivedDataPath build
       - name: Archive Test Results
@@ -50,3 +58,9 @@ jobs:
         with:
           name: build-logs
           path: build/Logs
+      - name: Upload Distribution
+        if: ${{ success() && matrix.upload-dist }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: Sparkle-distribution-${{ matrix.xcode }}.tar.xz
+          path: build/Build/Products/Release/sparkle-dist.tar.xz
