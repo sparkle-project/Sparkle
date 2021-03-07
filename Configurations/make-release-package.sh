@@ -15,7 +15,7 @@ if [ "$ACTION" = "" ] ; then
     rm -rf "$CONFIGURATION_BUILD_DIR/staging-spm"
     rm -f "Sparkle-$CURRENT_PROJECT_VERSION.tar.xz"
     rm -f "Sparkle-$CURRENT_PROJECT_VERSION.tar.bz2"
-    rm -f "Sparkle-SPM-$CURRENT_PROJECT_VERSION.zip"
+    rm -f "Sparkle-for-Swift-Package-Manager.zip"
 
     mkdir -p "$CONFIGURATION_BUILD_DIR/staging"
     mkdir -p "$CONFIGURATION_BUILD_DIR/staging-spm"
@@ -86,13 +86,13 @@ if [ "$ACTION" = "" ] ; then
     # Generate zip containing the xcframework for SPM
     cd "$CONFIGURATION_BUILD_DIR/staging-spm"
     #rm -rf "$CONFIGURATION_BUILD_DIR/Sparkle.xcarchive"
-    zip -rqyX -9 "../Sparkle-SPM-$CURRENT_PROJECT_VERSION.zip" *
+    zip -rqyX -9 "../Sparkle-for-Swift-Package-Manager.zip" *
     # Generate new Package manifest
     cd "$CONFIGURATION_BUILD_DIR"
     cp "$SRCROOT/Package.swift" "$CONFIGURATION_BUILD_DIR"
     if [ "$XCODE_VERSION_MAJOR" -ge "1200" ]; then
         # is equivalent to shasum -a 256 FILE
-        spm_checksum=$(swift package compute-checksum "Sparkle-SPM-$CURRENT_PROJECT_VERSION.zip")
+        spm_checksum=$(swift package compute-checksum "Sparkle-for-Swift-Package-Manager.zip")
         rm -rf ".build"
         sed -E -i '' -e "/let version/ s/[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+/$CURRENT_PROJECT_VERSION/" -e "/let checksum/ s/[[:xdigit:]]{64}/$spm_checksum/" "Package.swift"
         cp "Package.swift" "$SRCROOT"
