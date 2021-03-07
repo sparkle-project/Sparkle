@@ -1283,6 +1283,8 @@
 		726E4A361C89116000C57C6A /* SPUStandardUserDriverDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPUStandardUserDriverDelegate.h; sourceTree = "<group>"; };
 		726F2CE31BC9C33D001971A4 /* SUOperatingSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUOperatingSystem.h; sourceTree = "<group>"; };
 		726F2CE41BC9C33D001971A4 /* SUOperatingSystem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUOperatingSystem.m; sourceTree = "<group>"; };
+		726FD2CB25F4BE5F00123BC6 /* fa */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fa; path = fa.lproj/MainMenu.strings; sourceTree = "<group>"; };
+		726FD2CC25F4BE5F00123BC6 /* fa */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fa; path = fa.lproj/Sparkle.strings; sourceTree = "<group>"; };
 		728337A41C9E6FF40085AA99 /* SPUProbeInstallStatus.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPUProbeInstallStatus.h; sourceTree = "<group>"; };
 		728337A51C9E6FF40085AA99 /* SPUProbeInstallStatus.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SPUProbeInstallStatus.m; sourceTree = "<group>"; };
 		728638EE1CAF589C00783084 /* ConfigDownloader.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigDownloader.xcconfig; sourceTree = "<group>"; };
@@ -3026,6 +3028,7 @@
 				Base,
 				fr_CA,
 				hr,
+				fa,
 			);
 			mainGroup = 0867D691FE84028FC02AAC07 /* Sparkle */;
 			productRefGroup = 034768DFFF38A50411DB9C8B /* Products */;
@@ -3902,6 +3905,7 @@
 				61131A0A0F846D1100E97AF6 /* zh_TW */,
 				723ABCD7259A9A9D00BDB4FA /* Base */,
 				72E1DACB25B3E8DF0001BA6D /* hr */,
+				726FD2CC25F4BE5F00123BC6 /* fa */,
 			);
 			name = Sparkle.strings;
 			sourceTree = "<group>";
@@ -4027,6 +4031,7 @@
 				723ABE38259A9F2B00BDB4FA /* tr */,
 				723ABE39259A9F2E00BDB4FA /* uk */,
 				72E1DAB725B3E8AE0001BA6D /* hr */,
+				726FD2CB25F4BE5F00123BC6 /* fa */,
 			);
 			name = MainMenu.xib;
 			sourceTree = "<group>";
