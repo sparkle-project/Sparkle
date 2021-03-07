@@ -50,3 +50,9 @@ jobs:
         with:
           name: build-logs
           path: build/Logs
+      - name: Upload Distribution
+        if: success()
+        uses: actions/upload-artifact@v2
+        with:
+          name: Sparkle-dist
+          path: /tmp/sparkle-dist.tar.xz

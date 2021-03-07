@@ -74,13 +74,43 @@ if [ "$ACTION" = "" ] ; then
         XZ_EXISTS=0
     fi
     
+    rm -rf "/tmp/sparkle-extract"
+    mkdir -p "/tmp/sparkle-extract"
+
     # Sorted file list groups similar files together, which improves tar compression
     if [ "$XZ_EXISTS" -eq 1 ] ; then
         find . \! -type d | rev | sort | rev | tar cv --files-from=- | xz -9 > "../Sparkle-$CURRENT_PROJECT_VERSION.tar.xz"
+
+        # Copy archived distribution for CI
+        rm -f "/tmp/sparkle-dist.tar.xz"
+        cp "../Sparkle-$CURRENT_PROJECT_VERSION.tar.xz" "/tmp/sparkle-dist.tar.xz"
+
+        # Extract archive for testing binary validity
+        tar -xf "../Sparkle-$CURRENT_PROJECT_VERSION.tar.xz" -C "/tmp/sparkle-extract"
     else
         # Fallback to bz2 compression if xz utility is not available
         find . \! -type d | rev | sort | rev | tar cjvf "../Sparkle-$CURRENT_PROJECT_VERSION.tar.bz2" --files-from=-
+
+        # Extract archive for testing binary validity
+        tar -xf "../Sparkle-$CURRENT_PROJECT_VERSION.tar.bz2" -C "/tmp/sparkle-extract"
     fi
+
+    # Test code signing validity of the extracted products
+    # This guards against our archives being corrupt / created incorrectly
+    codesign --verify -vvv --deep "/tmp/sparkle-extract/Sparkle.framework"
+    codesign --verify -vvv --deep "/tmp/sparkle-extract/SparkleCore.framework"
+    codesign --verify -vvv --deep "/tmp/sparkle-extract/XPCServices/org.sparkle-project.Downloader.xpc"
+    codesign --verify -vvv --deep "/tmp/sparkle-extract/XPCServices/org.sparkle-project.InstallerConnection.xpc"
+    codesign --verify -vvv --deep "/tmp/sparkle-extract/XPCServices/org.sparkle-project.InstallerLauncher.xpc"
+    codesign --verify -vvv --deep "/tmp/sparkle-extract/XPCServices/org.sparkle-project.InstallerStatus.xpc"
+    codesign --verify -vvv --deep "/tmp/sparkle-extract/sparkle.app"
+    codesign --verify -vvv --deep "/tmp/sparkle-extract/Sparkle Test App.app"
+    codesign --verify -vvv --deep "/tmp/sparkle-extract/bin/BinaryDelta"
+    codesign --verify -vvv --deep "/tmp/sparkle-extract/bin/generate_appcast"
+    codesign --verify -vvv --deep "/tmp/sparkle-extract/bin/sign_update"
+    codesign --verify -vvv --deep "/tmp/sparkle-extract/bin/generate_keys"
+
+    rm -rf "/tmp/sparkle-extract"
     rm -rf "$CONFIGURATION_BUILD_DIR/staging"
     
     # Generate zip containing the xcframework for SPM
