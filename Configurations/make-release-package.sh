@@ -92,7 +92,7 @@ if [ "$ACTION" = "" ] ; then
     if [ "$CI" != true ]; then
         # Get latest git tag
         cd "$SRCROOT"
-        latest_git_tag=$(git describe --abbrev=0)
+        latest_git_tag=$(git describe --tags --abbrev=0)
         # Check semantic versioning
         if [[ $latest_git_tag =~ ^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-((0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*)(\.(0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*))*))?(\\+([0-9a-zA-Z-]+(\.[0-9a-zA-Z-]+)*))?$ ]]; then
             echo "Tag $latest_git_tag follows semantic versioning"
