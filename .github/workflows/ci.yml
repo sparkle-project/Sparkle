@@ -14,8 +14,10 @@ jobs:
         include:
             - xcode: 'xcode12.2'
               xcode-path: '/Applications/Xcode_12.2.app/Contents/Developer'
+              upload-dist: true
             - xcode: 'xcode11.7'
               xcode-path: '/Applications/Xcode_11.7.app/Contents/Developer'
+              upload-dist: false # No arm64 slice, so no upload
             
     name: Build and Test Sparkle
     runs-on: macos-10.15
@@ -57,7 +59,7 @@ jobs:
           name: build-logs
           path: build/Logs
       - name: Upload Distribution
-        if: success()
+        if: ${{ success() && matrix.upload-dist }}
         uses: actions/upload-artifact@v2
         with:
           name: Sparkle-distribution-${{ matrix.xcode }}.tar.xz
