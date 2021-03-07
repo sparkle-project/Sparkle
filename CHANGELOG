@@ -18,7 +18,46 @@
 
 Please visit [Sparkle's website](http://sparkle-project.org) for more information on documentation and migration.
 
-# 1.24.0
+# 1.26.0
+
+ * Flat package support from #1745 (Zorg)
+ * Correct generate_appcast -s command line argument usage help (Lance Lovette)
+ * Fix -f command line argument handling (Lance Lovette)
+ * Fix progress for guided pkg install (Zorg)
+ * Fix XQuartz update failing because NSLog caused issues (Zorg)
+ * Update localization (Vojtěch Koňařík)
+ * Various fixes to SPM logic (Jonas Zaugg)
+
+# 1.25.0
+
+ * Raise minimum system version to 10.9 (Kornel)
+ * Allow an appcast to prevent the new version from being installed automatically (#1688) (pierswalter)
+ * UI fixes
+   * Show check for updates button only when automatic updates are enabled (Lorena Rangel)
+   * Don't initialize the webview if we don't show release notes (Tobias Fonfara)
+   * Keep skip button available if there is a minimum autoupdate version (Zorg)
+   * Fix automatic updates checkbox state when not showing release notes (Zorg)
+   * Fix edge cases with hiding alert buttons and using "Install Later" (Zorg)
+   * Re-add setting WebUIDelegate fix for legacy web view (Zorg)
+   * Adopt WKWebView for 1.x (Zorg)
+   * Add auto layout constraints to SUAutomaticUpdateAlert window (Zorg)
+   * Made buttons wide enough to display the full text. Made window wide enough to display the widened buttons (el, fi, ru, uk) (Piers Uso Walter)
+   * Remove max size from update alert. (George Nachman)
+ * Integrate generate_keys export/import options changes from #1730 (Zorg)
+ * Add `—release-notes-url-prefix` support to localized release notes (Adam Tharani)
+ * Translations
+   * Enable base internalization for alert xibs (Zorg)
+   * Capitalizes french translation of "Vous utilisez actuellement..." ("You are currently running...") (Micah Moore)
+   * Fix and cleanup Hebrew, Catalan, Finnish localizations (Zorg)
+   * Remove non-english localizations from TestApplication (Zorg)
+ * Fix catch-22 Swift Package Manager binary target (Jonas Zaugg)
+ * Add explicit dependencies to fix Xcode linking errors (Kornel)
+ * Add phased rollouts feature to automatic update driver too (Zorg)
+ * Remove hiding skip button and retitling later button (Zorg)
+ * Deprecate installUpdatesIfAvailable (Zorg)
+ * Apply custom headers to app download (Geraint White)
+
+ # 1.24.0
 
  * Prioritize UserDefaults when fetching value for EnableAutomaticChecks (Nicolas Bosi)
  * Improve best appcast item selection handling (Ian Bytchek)
