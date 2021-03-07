@@ -54,5 +54,5 @@ jobs:
         if: success()
         uses: actions/upload-artifact@v2
         with:
-          name: Sparkle-dist
-          path: /tmp/sparkle-dist.tar.xz
+          name: Sparkle-distribution.tar.xz
+          path: build/Build/Products/Release/sparkle-dist.tar.xz

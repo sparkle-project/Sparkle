@@ -82,8 +82,7 @@ if [ "$ACTION" = "" ] ; then
         find . \! -type d | rev | sort | rev | tar cv --files-from=- | xz -9 > "../Sparkle-$CURRENT_PROJECT_VERSION.tar.xz"
 
         # Copy archived distribution for CI
-        rm -f "/tmp/sparkle-dist.tar.xz"
-        cp "../Sparkle-$CURRENT_PROJECT_VERSION.tar.xz" "/tmp/sparkle-dist.tar.xz"
+        cp -f "../Sparkle-$CURRENT_PROJECT_VERSION.tar.xz" "../sparkle-dist.tar.xz"
 
         # Extract archive for testing binary validity
         tar -xf "../Sparkle-$CURRENT_PROJECT_VERSION.tar.xz" -C "/tmp/sparkle-extract"
