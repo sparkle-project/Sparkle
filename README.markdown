@@ -1,4 +1,4 @@
-# Sparkle 2.x (Beta) ![Build Status](https://github.com/sparkle-project/Sparkle/workflows/Build%20%26%20Tests/badge.svg?branch=2.x) <a href="https://www.stackpath.com/?utm_source=sparkle-github&amp;utm_medium=badge&amp;utm_campaign=readme"><img src="https://img.shields.io/badge/sponsored%20by-StackPath-orange.svg" alt="sponsored by: StackPath"></a>
+# Sparkle 2 (Beta) ![Build Status](https://github.com/sparkle-project/Sparkle/workflows/Build%20%26%20Tests/badge.svg?branch=2.x) <a href="https://www.stackpath.com/?utm_source=sparkle-github&amp;utm_medium=badge&amp;utm_campaign=readme"><img src="https://img.shields.io/badge/sponsored%20by-StackPath-orange.svg" alt="sponsored by: StackPath"></a>
 
 Secure and reliable software update framework for Cocoa developers.
 
@@ -7,20 +7,15 @@ Secure and reliable software update framework for Cocoa developers.
 This is the upcoming new version of Sparkle.
 Major new features are support for sandboxing, custom user interfaces, updating other bundles, and a more modern secure architecture.
 
-For the production ready version of Sparkle, please see the [Sparkle 1.x (master) branch](https://github.com/sparkle-project/Sparkle/tree/master).
+For the production ready version of Sparkle, please see the [Sparkle 1.x (master) branch](https://github.com/sparkle-project/Sparkle/tree/master). Note development has shifted to Sparkle 2 and the 1.x branch is now only accepting bug fixes, localization updates, and adoption of critical upcoming OS features.
 
-Sparkle 2.x is currently in beta. Some people already use it in production, but some work is still required before it can be released:
-
-1. A transitional phase needs to be made for primary development, testing / bug-fixing, and migration.
-2. Changes from the master branch need to be re-evaluated and ported.
-
-The current status of Sparkle 2.x is tracked in issue [#1523](https://github.com/sparkle-project/Sparkle/issues/1523).
+Sparkle 2 is currently in beta. Applications, typically sandboxed, have already been using it in production, but some work including testing is still required before an official version can be released. In the meantime, a nightly build can be downloaded by selecting a recent [workflow run](https://github.com/sparkle-project/Sparkle/actions?query=event%3Apush+is%3Asuccess+branch%3A2.x) and downloading the corresponding Sparkle-distribution artifact. The current status of Sparkle 2 is tracked in issue [#1523](https://github.com/sparkle-project/Sparkle/issues/1523).
 
 If you can help with any of the above, please submit pull requests!
 
-New issues that are found should be [reported here](https://github.com/sparkle-project/Sparkle/issues). Internal design documents can be found in [Documentation](Documentation/). Discussion of this fork can be found in [this issue](https://github.com/sparkle-project/Sparkle/issues/363).
+New issues should be [reported here](https://github.com/sparkle-project/Sparkle/issues). Internal design documents can be found in [Documentation](Documentation/).
 
-Please visit [Sparkle's website](http://sparkle-project.org) for up to date documentation on using and migrating over to Sparkle 2.x. Refer to [Changelog](CHANGELOG) for a more detailed list of changes.
+Please visit [Sparkle's website](http://sparkle-project.org) for up to date documentation on using and migrating over to Sparkle 2. Refer to [Changelog](CHANGELOG) for a more detailed list of changes.
 
 ## Features
 
@@ -71,7 +66,7 @@ If you are adding a symbol to the public API you must decorate the declaration w
 
 ### Building the distribution package
 
-`cd` to the root of the Sparkle source tree and run `make release`. Sparkle-*VERSION*.tar.bz2 will be created in a temporary directory and revealed in Finder after the build has completed.
+`cd` to the root of the Sparkle source tree and run `make release`. Sparkle-*VERSION*.tar.xz (or .bz2) will be created in a temporary directory and revealed in Finder after the build has completed.
 
 Alternatively, build the Distribution scheme in the Xcode UI.
 
