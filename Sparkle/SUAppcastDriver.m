@@ -101,8 +101,8 @@
             item = deltaUpdateItem;
         }
     }
-    
-    if ([self itemContainsValidUpdate:item includesSkippedUpdates:includesSkippedUpdates]) {
+
+    if ((item != nil) && ([self itemContainsValidUpdate:item includesSkippedUpdates:includesSkippedUpdates])) {
         self.nonDeltaUpdateItem = nonDeltaUpdateItem;
         [self.delegate didFindValidUpdateWithAppcastItem:item];
     } else {

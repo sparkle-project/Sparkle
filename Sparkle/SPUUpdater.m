@@ -85,7 +85,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 {
     // We're using NSLog instead of SULog here because we don't want to start Sparkle's logger here,
     // and because this is not really an error, just a warning notice
-    NSLog(@"WARNING: This is running a Debug build of Sparkle; don't use this in production!");
+    //NSLog(@"WARNING: This is running a Debug build of Sparkle; don't use this in production!");
 }
 #endif
 
@@ -666,7 +666,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         SULog(SULogLevelError, @"Fatal Feed Error (%ld): %@", feedError.code, feedError.localizedDescription);
         abort();
     }
-    return feedURL;
+    return (NSURL* _Nonnull)feedURL;
 }
 
 - (NSString *)userAgentString
