@@ -152,16 +152,13 @@
     
     // We must leave moving the app to its destination as the final step in installing it, so that
     // it's not possible our new app can be left in an incomplete state at the final destination
-    if (![fileManager changeOwnerAndGroupOfItemAtRootURL:newTempURL toMatchURL:oldURL error:error]) {
-        // But this is big enough of a deal to fail
-        if (error != NULL) {
-            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to change owner and group of new app at %@ to match old app at %@", newTempURL.path, oldURL.path] }];
-        }
-        
-        [fileManager removeItemAtURL:tempNewDirectoryURL error:NULL];
-        return NO;
-    }
     
+    NSError *changeOwnerAndGroupError = nil;
+    if (![fileManager changeOwnerAndGroupOfItemAtRootURL:newTempURL toMatchURL:oldURL error:&changeOwnerAndGroupError]) {
+        // Not a fatal error
+        SULog(SULogLevelError, @"Failed to change owner and group of new app at %@ to match old app at %@", newTempURL.path, oldURL.path);
+        SULog(SULogLevelError, @"Error: %@", changeOwnerAndGroupError);
+    }
 
     if (progress) {
         progress(5/10.0);
