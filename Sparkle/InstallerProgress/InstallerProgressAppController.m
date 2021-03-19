@@ -10,6 +10,7 @@
 #import "InstallerProgressDelegate.h"
 #import "SPUMessageTypes.h"
 #import "SULog.h"
+#import "SULog+NSError.h"
 #import "SUApplicationInfo.h"
 #import "SPUInstallerAgentProtocol.h"
 #import "SUInstallerAgentInitiationProtocol.h"
@@ -161,12 +162,8 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
 - (void)cleanupAndExitWithStatus:(int)status error:(NSError * _Nullable)error __attribute__((noreturn))
 {
     if (error != nil) {
-        SULog(SULogLevelError, @"Agent failed with error: %@", error);
-        
-        NSError *underlyingError = error.userInfo[NSUnderlyingErrorKey];
-        if (underlyingError != nil) {
-            SULog(SULogLevelError, @"Error: %@", underlyingError);
-        }
+        SULog(SULogLevelError, @"Agent failed..");
+        SULogError(error);
         
         [(id<SUInstallerAgentInitiationProtocol>)self.connection.remoteObjectProxy connectionWillInvalidateWithError:error];
     }

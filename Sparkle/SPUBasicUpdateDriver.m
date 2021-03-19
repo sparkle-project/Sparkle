@@ -11,6 +11,7 @@
 #import "SPUUpdaterDelegate.h"
 #import "SUErrors.h"
 #import "SULog.h"
+#import "SULog+NSError.h"
 #import "SULocalizations.h"
 #import "SUHost.h"
 #import "SUAppcastItem.h"
@@ -204,12 +205,7 @@
     
     if (error != nil) {
         if (error.code != SUNoUpdateError && error.code != SUInstallationCanceledError && error.code != SUInstallationAuthorizeLaterError) { // Let's not bother logging this.
-            NSError *errorToDisplay = error;
-            int finiteRecursion=5;
-            do {
-                SULog(SULogLevelError, @"Error: %@ %@ (URL %@)", errorToDisplay.localizedDescription, errorToDisplay.localizedFailureReason, errorToDisplay.userInfo[NSURLErrorFailingURLErrorKey]);
-                errorToDisplay = errorToDisplay.userInfo[NSUnderlyingErrorKey];
-            } while(--finiteRecursion && errorToDisplay);
+            SULogError(error);
         }
         
         // Notify host app that updater has aborted
