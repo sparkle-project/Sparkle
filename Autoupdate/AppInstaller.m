@@ -11,6 +11,7 @@
 #import "SUInstaller.h"
 #import "SUUpdateValidator.h"
 #import "SULog.h"
+#import "SULog+NSError.h"
 #import "SUHost.h"
 #import "SULocalizations.h"
 #import "SUStandardVersionComparator.h"
@@ -243,12 +244,8 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 
 - (void)unarchiverDidFailWithError:(NSError *)error
 {
-    SULog(SULogLevelError, @"Failed to unarchive file: %@", error);
-    
-    NSError *underlyingError = error.userInfo[NSUnderlyingErrorKey];
-    if (underlyingError != nil) {
-        SULog(SULogLevelError, @"Error: %@", underlyingError);
-    }
+    SULog(SULogLevelError, @"Failed to unarchive file");
+    SULogError(error);
     
     // No longer need update validator until next possible extraction (eg: if initial delta update fails)
     self.updateValidator = nil;
@@ -597,12 +594,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 - (void)cleanupAndExitWithStatus:(int)status error:(NSError * _Nullable)error __attribute__((noreturn))
 {
     if (error != nil) {
-        SULog(SULogLevelError, @"Error: %@", error);
-        
-        NSError *underlyingError = error.userInfo[NSUnderlyingErrorKey];
-        if (underlyingError != nil) {
-            SULog(SULogLevelError, @"Error: %@", underlyingError);
-        }
+        SULogError(error);
         
         NSData *errorData = SPUArchiveRootObjectSecurely((NSError * _Nonnull)error);
         if (errorData != nil) {
