@@ -70,6 +70,10 @@
     return success;
 }
 
+- (void)performCleanup
+{
+}
+
 - (BOOL)canInstallSilently
 {
     return YES;

@@ -22,6 +22,12 @@ NS_ASSUME_NONNULL_BEGIN
 // Should be able to be called from non-main thread
 - (BOOL)performFinalInstallationProgressBlock:(nullable void(^)(double))cb error:(NSError **)error;
 
+// Any clean up work can be done here
+// This is work that may be performed after the user application may have been updated / relaunched,
+// or after an error occurred in the previous stages.
+// Should be able to be called from any thread
+- (void)performCleanup;
+
 // Indicates whether or not this installer can install the update silently in the background, without hindering the user
 // If this returns NO, then the installation can fail if the user did not directly request for the install to occur.
 // Should be thread safe
