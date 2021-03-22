@@ -78,7 +78,7 @@
 
 #pragma mark Update Alert Focus
 
-- (void)setUpFocusForActiveUpdateAlert
+- (void)setUpFocusForActiveUpdateAlertWithUserInitiation:(BOOL)userInitiated
 {
     // Make sure the window is loaded in any case
     [self.activeUpdateAlert window];
@@ -96,10 +96,14 @@
     }
     
     // Only show the update alert if the app is active; otherwise, we'll wait until it is.
-    if ([NSApp isActive])
+    if ([NSApp isActive]) {
+        if (!userInitiated) {
+            [self.activeUpdateAlert disableKeyboardShortcutForInstallButton];
+        }
         [self.activeUpdateAlert.window makeKeyAndOrderFront:self];
-    else
+    } else {
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:NSApplicationDidBecomeActiveNotification object:NSApp];
+    }
 }
 
 - (void)applicationDidBecomeActive:(NSNotification *)__unused aNotification
@@ -110,7 +114,7 @@
 
 #pragma mark Update Found
 
-- (void)showUpdateFoundWithAlertHandler:(SUUpdateAlert *(^)(SPUStandardUserDriver *, SUHost *, id<SUVersionDisplay>))alertHandler
+- (void)showUpdateFoundWithAlertHandler:(SUUpdateAlert *(^)(SPUStandardUserDriver *, SUHost *, id<SUVersionDisplay>))alertHandler userInitiated:(BOOL)userInitiated
 {
     id <SUVersionDisplay> versionDisplayer = nil;
     if ([self.delegate respondsToSelector:@selector(standardUserDriverRequestsVersionDisplayer)]) {
@@ -121,10 +125,10 @@
     SUHost *host = self.host;
     self.activeUpdateAlert = alertHandler(weakSelf, host, versionDisplayer);
     
-    [self setUpFocusForActiveUpdateAlert];
+    [self setUpFocusForActiveUpdateAlertWithUserInitiation:userInitiated];
 }
 
-- (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem userInitiated:(BOOL)__unused userInitiated reply:(void (^)(SPUUpdateAlertChoice))reply
+- (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem userInitiated:(BOOL)userInitiated reply:(void (^)(SPUUpdateAlertChoice))reply
 {
     assert(NSThread.isMainThread);
     
@@ -133,10 +137,10 @@
             reply(choice);
             weakSelf.activeUpdateAlert = nil;
         }];
-    }];
+    } userInitiated:userInitiated];
 }
 
-- (void)showDownloadedUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem userInitiated:(BOOL)__unused userInitiated reply:(void (^)(SPUUpdateAlertChoice))reply
+- (void)showDownloadedUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem userInitiated:(BOOL)userInitiated reply:(void (^)(SPUUpdateAlertChoice))reply
 {
     assert(NSThread.isMainThread);
     
@@ -145,10 +149,10 @@
             reply(choice);
             weakSelf.activeUpdateAlert = nil;
         }];
-    }];
+    } userInitiated:userInitiated];
 }
 
-- (void)showResumableUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem userInitiated:(BOOL)__unused userInitiated reply:(void (^)(SPUInstallUpdateStatus))reply
+- (void)showResumableUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem userInitiated:(BOOL)userInitiated reply:(void (^)(SPUInstallUpdateStatus))reply
 {
     assert(NSThread.isMainThread);
     
@@ -157,10 +161,10 @@
             reply(choice);
             weakSelf.activeUpdateAlert = nil;
         }];
-    }];
+    } userInitiated:userInitiated];
 }
 
-- (void)showInformationalUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem userInitiated:(BOOL)__unused userInitiated reply:(void (^)(SPUInformationalUpdateAlertChoice))reply
+- (void)showInformationalUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem userInitiated:(BOOL)userInitiated reply:(void (^)(SPUInformationalUpdateAlertChoice))reply
 {
     assert(NSThread.isMainThread);
     
@@ -169,7 +173,7 @@
             reply(choice);
             weakSelf.activeUpdateAlert = nil;
         }];
-    }];
+    } userInitiated:userInitiated];
 }
 
 - (void)showUpdateReleaseNotesWithDownloadData:(SPUDownloadData *)downloadData
