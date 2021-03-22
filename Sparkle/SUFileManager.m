@@ -17,6 +17,8 @@
 
 #include "AppKitPrevention.h"
 
+extern int renamex_np(const char *, const char *, unsigned int) __attribute__((weak_import));
+
 static char SUAppleQuarantineIdentifier[] = "com.apple.quarantine";
 
 static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
@@ -307,6 +309,35 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
     }
 
     return [_fileManager moveItemAtURL:sourceURL toURL:destinationURL error:error];
+}
+
+- (BOOL)replaceItemAtURL:(NSURL *)originalItemURL withItemAtURL:(NSURL *)newItemURL error:(NSError * __autoreleasing *)error __OSX_AVAILABLE(10.13)
+{
+    char originalPath[PATH_MAX] = {0};
+    if (![originalItemURL.path getFileSystemRepresentation:originalPath maxLength:sizeof(originalPath)]) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Original item %@ to replace cannot be represented as a valid file name", originalItemURL.lastPathComponent] }];
+        }
+        return NO;
+    }
+    
+    char newPath[PATH_MAX] = {0};
+    if (![newItemURL.path getFileSystemRepresentation:newPath maxLength:sizeof(newPath)]) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"New item %@ to replace cannot be represented as a valid file name", newItemURL.lastPathComponent] }];
+        }
+        return NO;
+    }
+    
+    int status = renamex_np(newPath, originalPath, RENAME_SWAP);
+    if (status != 0) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to replace %@ with %@.", originalItemURL.lastPathComponent, newItemURL.lastPathComponent] }];
+        }
+        return NO;
+    }
+    
+    return YES;
 }
 
 - (BOOL)_changeOwnerAndGroupOfItemAtURL:(NSURL *)targetURL ownerID:(NSNumber *)ownerID groupID:(NSNumber *)groupID error:(NSError * __autoreleasing *)error

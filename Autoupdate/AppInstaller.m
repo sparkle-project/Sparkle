@@ -552,6 +552,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
             
             NSError *thirdStageError = nil;
             if (![self.installer performFinalInstallationProgressBlock:nil error:&thirdStageError]) {
+                [self.installer performCleanup];
                 self.installer = nil;
                 
                 dispatch_async(dispatch_get_main_queue(), ^{
@@ -584,6 +585,8 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
                     // This will also signal to the agent that it will terminate soon
                     [self.agentConnection.agent relaunchPath:pathToRelaunch];
                 }
+                
+                [self.installer performCleanup];
                 
                 [self cleanupAndExitWithStatus:EXIT_SUCCESS error:nil];
             });
