@@ -39,7 +39,6 @@
 @synthesize delegate = _delegate;
 @synthesize checkingController = _checkingController;
 @synthesize activeUpdateAlert = _activeUpdateAlert;
-@synthesize hideOnDeactivate = _hideOnDeactivate;
 @synthesize statusController = _statusController;
 
 #pragma mark Birth
@@ -51,7 +50,6 @@
         _host = [[SUHost alloc] initWithBundle:hostBundle];
         _delegate = delegate;
         _coreComponent = [[SPUUserDriverCoreComponent alloc] init];
-        _hideOnDeactivate = YES;
     }
     return self;
 }
@@ -83,15 +81,10 @@
     // Make sure the window is loaded in any case
     [self.activeUpdateAlert window];
     
-    if (!self.hideOnDeactivate) {
-        [self.activeUpdateAlert.window setHidesOnDeactivate:NO];
-    }
-    
     // If the app is a menubar app or the like, we need to focus it first and alter the
     // update prompt to behave like a normal window. Otherwise if the window were hidden
     // there may be no way for the application to be activated to make it visible again.
     if ([SUApplicationInfo isBackgroundApplication:[NSApplication sharedApplication]]) {
-        [self.activeUpdateAlert.window setHidesOnDeactivate:NO];
         [NSApp activateIgnoringOtherApps:YES];
     }
     
