@@ -4,15 +4,15 @@
 * Support for writing custom user interfaces
 * Command line utility to update Sparkle-based applications and bundles
 * More modern architecture that moves extraction, validation, and installation into a submitted launchd agent/daemon.
-* Faster updates that are relaunched quicker
-* More robust updates that require authorization
+* Faster installs with shorter update/relaunch times.
+* More robust updates that require user authorization.
 * Adoption of atomic-safe bundle replacement updates leveraging APFS
 * Decoupled AppKit and UI logic in the framework from core functionality
 * Ensure (most) API / ABI compatibility with Sparkle 1.x
 * Introduced new SPUStandardUpdaterController, SPUUpdater, SPUUserDriver classes/protocols.
 * Deprecated SUUpdater, albeit it is still functional for transitional purposes
 * The installer will attempt installing the update after extraction is finished, even if the user quits the process and doesn't relaunch the application explicitly.
-* Updates can be downloaded in the background automatically (if enabled) and be resumed by the user later, even if the user has insufficent permission to install them initially.
+* Updates can be downloaded in the background automatically (if enabled) and be resumed by the user later, even if the user has insufficient permission to install them initially.
 * Authorization now occurs before launching the installer and before terminating the application, which can be canceled by the user cleanly.
 * Sudden termination for silent updates isn't disabled because Sparkle doesn't listen for AppKit events anymore such as termination or power off (note the installer running as a separate process listens for termination).
 * Distributing updates without EdDSA signing the archives is now deprecated.
