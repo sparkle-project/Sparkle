@@ -1,23 +1,34 @@
 # 2.0.0
 
-* Support for Sandboxed applications
-* Support for writing custom user interfaces
-* Command line utility to update Sparkle-based applications and bundles
-* More modern architecture that moves extraction, validation, and installation into a submitted launchd agent/daemon.
-* Faster installs with shorter update/relaunch times.
-* More robust updates that require user authorization.
-* Adoption of atomic-safe bundle replacement updates leveraging APFS
-* Decoupled AppKit and UI logic in the framework from core functionality
-* Ensure (most) API / ABI compatibility with Sparkle 1.x
-* Introduced new SPUStandardUpdaterController, SPUUpdater, SPUUserDriver classes/protocols.
-* Deprecated SUUpdater, albeit it is still functional for transitional purposes
-* The installer will attempt installing the update after extraction is finished, even if the user quits the process and doesn't relaunch the application explicitly.
-* Updates can be downloaded in the background automatically (if enabled) and be resumed by the user later, even if the user has insufficient permission to install them initially.
-* Authorization now occurs before launching the installer and before terminating the application, which can be canceled by the user cleanly.
-* Sudden termination for silent updates isn't disabled because Sparkle doesn't listen for AppKit events anymore such as termination or power off (note the installer running as a separate process listens for termination).
-* Distributing updates without EdDSA signing the archives is now deprecated.
-* Sparkle's icon in the official branch is no longer used for installation. Instead, the icon of the bundle to update is used. A 32x32 image representation of the icon is needed for the authorization dialog.
-* Delegation methods may have been removed or added to the newer updater API. Please review `SPUUpdaterDelegate` if using `SPUUpdater`.
+* Support for Sandboxed Applications (Zorg)
+* Support for writing custom user interfaces (Zorg)
+* Support for updating external Sparkle-based bundles (Zorg)
+  * Added command line utility to update Sparkle-based bundles (Zorg)
+* More modern architecture
+  * Moves extraction, validation, and installation into a submitted launchd agent/daemon with XPC communication (Zorg)
+  * Features faster installs with shorter update/relaunch times (Zorg)
+  * Provides more robust installs that need to request user authorization (Zorg)
+  * Adoption of atomic-safe bundle replacing updates leveraging APFS (#1801) (Zorg)
+* API Changes
+  * Introduced new SPUStandardUpdaterController, SPUUpdater, SPUUserDriver classes/protocols (Zorg)
+  * Decoupled AppKit and UI logic in the framework from core functionality (Zorg)
+  * Ensure (most) API / ABI compatibility with Sparkle 1.x; you can likely test Sparkle 2 in an existing app without any changes (Zorg)
+  * Deprecated SUUpdater, albeit it is still functional for testing and transitional purposes (Zorg)
+  * Delegation methods may have been removed or added to the newer updater API. Please review `SPUUpdaterDelegate` if using `SPUUpdater`. (Zorg)
+* Updater Changes
+  * Automatic silent and manual update alert prompts are now merged together
+  * Updates will attempt to install even if the user quits the application without relaunching the application update explicitly (Zorg)
+  * Updates can be downloaded in the background automatically but later prompt the user to install them, particularly if Sparkle doesn't have sufficient permission to install them without the user's permission (Zorg)
+  * Authorization now occurs before launching the installer and before terminating the application, which can be canceled by the user cleanly (Zorg)
+  * Sparkle uses the icon of the bundle to update for its authorization dialog. A 32x32 image representation of the icon is needed. (Zorg)
+  * Sudden termination for silent automatic updates isn't disabled anymore (Zorg)
+* Policy Changes
+  * Distributing updates without EdDSA signing the archives is now deprecated (Zorg)
+  * Package based updates that are zipped or archived must add sparkle:installationType="package" to the appcast item enclosure (Zorg)
+* System profiler privacy and transparency (#1690) (Martin Pilkington)
+* Support getting app icon from asset catalog (#1694) (Charles Srstka)
+* Don't hide update alert window now on deactivation (#1804) (Zorg)
+* Special thanks to developers using early builds of this release in production and contributors for keeping this running (Kornel, Jonas Zaugg, Gwynne Raskind, Jordan Rose, Tony Arnold, Bryan Jones, Christian Tietze, Jakob Egger, and many more)
 
 Please visit [Sparkle's website](http://sparkle-project.org) for more information on documentation and migration.
 
