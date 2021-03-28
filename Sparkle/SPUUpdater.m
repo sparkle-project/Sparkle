@@ -54,7 +54,6 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 @property (nonatomic, readonly) SPUUpdaterCycle *updaterCycle;
 @property (nonatomic, readonly) SPUUpdaterTimer *updaterTimer;
 @property (nonatomic) BOOL startedUpdater;
-@property (nonatomic, copy) void (^preStartedScheduledUpdateBlock)(void);
 @property (nonatomic, nullable) id<SPUResumableUpdate> resumableUpdate;
 @property (nonatomic) BOOL canCheckForUpdates;
 
@@ -79,7 +78,6 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 @synthesize updaterTimer = _updaterTimer;
 @synthesize sparkleBundle = _sparkleBundle;
 @synthesize startedUpdater = _startedUpdater;
-@synthesize preStartedScheduledUpdateBlock = _preStartedScheduledUpdateBlock;
 @synthesize resumableUpdate = _resumableUpdate;
 @synthesize canCheckForUpdates = _canCheckForUpdates;
 @synthesize updateLastCheckedDate = _updateLastCheckedDate;
@@ -149,7 +147,13 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     }
     
     self.startedUpdater = YES;
-    [self startUpdateCycle];
+    
+    // Start updater on next update cycle so we make sure the application invoking the updater is ready
+    // This also gives the developer a cycle to check for updates before Sparkle's update cycle scheduler kicks in
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self startUpdateCycle];
+    });
+    
     return YES;
 }
 
@@ -269,10 +273,6 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     if ([self.host objectForUserDefaultsKey:SUEnableAutomaticChecksKey] != nil) {
         shouldPrompt = NO;
     }
-    // If the developer wants to check for updates, we shouldn't bug the user about a prompt yet
-    else if (self.preStartedScheduledUpdateBlock != nil) {
-        shouldPrompt = NO;
-    }
     // Does the delegate want to take care of the logic for when we should ask permission to update?
     else if ([self.delegate respondsToSelector:@selector((updaterShouldPromptForPermissionToCheckForUpdates:))]) {
         shouldPrompt = [self.delegate updaterShouldPromptForPermissionToCheckForUpdates:self];
@@ -313,13 +313,8 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         
         // We start the update checks and register as observer for changes after the prompt finishes
     } else {
-        if (self.preStartedScheduledUpdateBlock != nil) {
-            self.preStartedScheduledUpdateBlock();
-            self.preStartedScheduledUpdateBlock = nil;
-        } else {
-            // We check if the user's said they want updates, or they haven't said anything, and the default is set to checking.
-            [self scheduleNextUpdateCheck];
-        }
+        // We check if the user's said they want updates, or they haven't said anything, and the default is set to checking.
+        [self scheduleNextUpdateCheck];
     }
 }
 
@@ -414,10 +409,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 - (void)checkForUpdatesInBackground
 {
     if (!self.startedUpdater) {
-        __weak SPUUpdater *weakSelf = self;
-        self.preStartedScheduledUpdateBlock = ^{
-            [weakSelf checkForUpdatesInBackground];
-        };
+        SULog(SULogLevelError, @"Error: checkForUpdatesInBackground - updater hasn't been started yet. Please call -startUpdater: first");
         return;
     }
     
@@ -470,9 +462,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 {
     __weak SPUUpdater *weakSelf = self;
     if (!self.startedUpdater) {
-        self.preStartedScheduledUpdateBlock = ^{
-            [weakSelf checkForUpdates];
-        };
+        SULog(SULogLevelError, @"Error: checkForUpdates - updater hasn't been started yet. Please call -startUpdater: first");
         return;
     }
     
@@ -505,9 +495,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 {
     __weak SPUUpdater *weakSelf = self;
     if (!self.startedUpdater) {
-        self.preStartedScheduledUpdateBlock = ^{
-            [weakSelf checkForUpdateInformation];
-        };
+        SULog(SULogLevelError, @"Error: checkForUpdateInformation - updater hasn't been started yet. Please call -startUpdater: first");
         return;
     }
     
@@ -598,6 +586,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 - (void)resetUpdateCycle
 {
     if (!self.startedUpdater) {
+        SULog(SULogLevelError, @"Error: resetUpdateCycle - updater hasn't been started yet. Please call -startUpdater: first");
         return; // not even ready yet
     }
     

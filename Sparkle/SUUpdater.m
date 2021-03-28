@@ -79,15 +79,11 @@ static NSMutableDictionary *sharedUpdaters = nil;
         // See -[SUUpdater _standardUserDriverRequestsPathToRelaunch] and -[SUUpdater _pathToRelaunchForUpdater:] implemented below which resolves this
         _userDriver = [[SPUStandardUserDriver alloc] initWithHostBundle:bundle delegate:self];
         _updater = [[SPUUpdater alloc] initWithHostBundle:bundle applicationBundle:bundle userDriver:_userDriver delegate:self];
-
-        // Delay starting the updater, so that the host has a chance to configure the updater
-        // either in applicationWillFinishLaunching: or by setting properties right after initialisation
-        dispatch_async(dispatch_get_main_queue(), ^{
-            NSError *updaterError = nil;
-            if (![self.updater startUpdater:&updaterError]) {
-                SULog(SULogLevelError, @"Error: Failed to start updater with error: %@", updaterError);
-            }
-        });
+        
+        NSError *updaterError = nil;
+        if (![self.updater startUpdater:&updaterError]) {
+            SULog(SULogLevelError, @"Error: Failed to start updater with error: %@", updaterError);
+        }
     }
     return self;
 }

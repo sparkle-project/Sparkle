@@ -145,20 +145,21 @@
 
 - (void)runAndCheckForUpdatesNow:(BOOL)checkForUpdatesNow
 {
+    [self startUpdater];
+    
     if (checkForUpdatesNow) {
         // When we start the updater, this scheduled check will start afterwards too
         [self.updater checkForUpdates];
     }
-    
-    [self startUpdater];
 }
 
 - (void)probeForUpdates
 {
+    [self startUpdater];
+    
     // When we start the updater, this info check will start afterwards too
     self.probingForUpdates = YES;
     [self.updater checkForUpdateInformation];
-    [self startUpdater];
 }
 
 @end
