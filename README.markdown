@@ -5,13 +5,13 @@ Secure and reliable software update framework for Cocoa developers.
 <img src="Resources/Screenshot.png" width="732" alt="Sparkle shows familiar update window with release notes">
 
 This is the upcoming new version of Sparkle.
-Major new features are support for sandboxing, custom user interfaces, updating other bundles, and a more modern secure architecture.
+Major new features are support for sandboxing, custom user interfaces, updating external bundles, and a more modern secure architecture which includes faster and more reliable installs.
 
 For the production ready version of Sparkle, please see the [Sparkle 1.x (master) branch](https://github.com/sparkle-project/Sparkle/tree/master). Note development has shifted to Sparkle 2 and the 1.x branch is now only accepting bug fixes, localization updates, and adoption of critical upcoming OS features.
 
 Sparkle 2 is currently in beta. Applications, typically sandboxed, have already been using it in production, but some work including testing is still required before an official version can be released. In the meantime, a nightly build can be downloaded by selecting a recent [workflow run](https://github.com/sparkle-project/Sparkle/actions?query=event%3Apush+is%3Asuccess+branch%3A2.x) and downloading the corresponding Sparkle-distribution artifact. The current status of Sparkle 2 is tracked in issue [#1523](https://github.com/sparkle-project/Sparkle/issues/1523).
 
-If you can help with any of the above, please submit pull requests!
+If you can help with testing or reviewing over the new changes, please report issues or submit pull requests!
 
 New issues should be [reported here](https://github.com/sparkle-project/Sparkle/issues). Internal design documents can be found in [Documentation](Documentation/).
 
