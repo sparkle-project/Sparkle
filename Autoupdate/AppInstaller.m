@@ -573,17 +573,8 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
                 [self.communicator handleMessageWithIdentifier:SPUInstallationFinishedStage3 data:[NSData data]];
                 
                 if (self.shouldRelaunch) {
-                    NSString *pathToRelaunch = nil;
-                    // If the relaunch path is the same as the host bundle path, use the installation path from the installer which may be normalized
-                    // Otherwise use the requested relaunch path in all other cases
-                    if ([self.relaunchPath.pathComponents isEqualToArray:self.host.bundlePath.pathComponents]) {
-                        pathToRelaunch = installationPath;
-                    } else {
-                        pathToRelaunch = self.relaunchPath;
-                    }
-                    
                     // This will also signal to the agent that it will terminate soon
-                    [self.agentConnection.agent relaunchPath:pathToRelaunch];
+                    [self.agentConnection.agent relaunchApplication];
                 }
                 
                 [self.installer performCleanup];

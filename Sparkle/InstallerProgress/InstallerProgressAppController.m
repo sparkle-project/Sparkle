@@ -17,6 +17,7 @@
 #import "StatusInfo.h"
 #import "SUHost.h"
 #import "SUErrors.h"
+#import "SUNormalization.h"
 
 /*!
  * Terminate the application after a delay from launching the new update to avoid OS activation issues
@@ -38,6 +39,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
 @property (nonatomic) BOOL willTerminate;
 @property (nonatomic) BOOL applicationInitiallyAlive;
 @property (nonatomic) NSBundle *applicationBundle;
+@property (nonatomic) NSString *normalizedPath;
 
 @end
 
@@ -56,6 +58,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
 @synthesize willTerminate = _willTerminate;
 @synthesize applicationInitiallyAlive = _applicationInitiallyAlive;
 @synthesize applicationBundle = _applicationBundle;
+@synthesize normalizedPath = _normalizedPath;
 
 - (instancetype)initWithApplication:(NSApplication *)application arguments:(NSArray<NSString *> *)arguments delegate:(id<InstallerProgressDelegate>)delegate
 {
@@ -215,6 +218,20 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
                 [self cleanupAndExitWithStatus:EXIT_FAILURE error:[NSError errorWithDomain:SUSparkleErrorDomain code:SUAgentInvalidationError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Error: Encountered invalid path for waiting termination: %@", applicationBundlePath] }]];
             }
             
+            // Compute normalized path that we may use later for relaunching the application
+            // We compute normalized path from progress agent instead of trusting or having the installer
+            // pass it to us
+            if (SPARKLE_NORMALIZE_INSTALLED_APPLICATION_NAME) {
+                SUHost *applicationHost = [[SUHost alloc] initWithBundle:applicationBundle];
+                
+                NSString *normalizedPath = SUNormalizedInstallationPath(applicationHost);
+                // We only use normalized path if it doesn't already exist
+                // Check the installer which has the same logic
+                if (![[NSFileManager defaultManager] fileExistsAtPath:normalizedPath]) {
+                    self.normalizedPath = SUNormalizedInstallationPath(applicationHost);
+                }
+            }
+            
             NSArray<NSRunningApplication *> *runningApplications = [self runningApplicationsWithBundle:applicationBundle];
             
             // We're just picking the first running application to send..
@@ -256,27 +273,23 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
     });
 }
 
-- (void)relaunchPath:(NSString *)requestedPathToRelaunch
+- (void)relaunchApplication
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         if (!self.willTerminate && self.applicationBundle != nil && self.applicationInitiallyAlive) {
-            // If the normalized setting is not enabled, we shouldn't trust the relaunch path input that is being passed to us
-            // because we already have the application path to relaunch, and we verified that it was running before
             NSString *pathToRelaunch;
-            if (SPARKLE_NORMALIZE_INSTALLED_APPLICATION_NAME) {
-                pathToRelaunch = requestedPathToRelaunch;
+            if (self.normalizedPath != nil) {
+                pathToRelaunch = self.normalizedPath;
             } else {
                 pathToRelaunch = self.applicationBundle.bundlePath;
             }
             
-            // We should at least make sure we're opening a bundle however
+            // We should at least make sure we're opening a bundle
             NSBundle *relaunchBundle = [NSBundle bundleWithPath:pathToRelaunch];
             if (relaunchBundle == nil) {
                 [self cleanupAndExitWithStatus:EXIT_FAILURE error:[NSError errorWithDomain:SUSparkleErrorDomain code:SUAgentInvalidationError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Error: Encountered invalid path to relaunch: %@", pathToRelaunch] }]];
             }
             
-            // We only launch applications, but I'm not sure how reliable -launchApplicationAtURL:options:config: is so we're not using it
-            // Eg: http://www.openradar.me/10952677
             if (![[NSWorkspace sharedWorkspace] openFile:pathToRelaunch]) {
                 SULog(SULogLevelError, @"Error: Failed to relaunch bundle at %@", pathToRelaunch);
             }

@@ -15,6 +15,7 @@
 #import "SULog.h"
 #import "SUErrors.h"
 #import "SPUInstallationType.h"
+#import "SUNormalization.h"
 
 
 #include "AppKitPrevention.h"
@@ -152,11 +153,12 @@
         } else {
             NSString *normalizedInstallationPath = nil;
             if (SPARKLE_NORMALIZE_INSTALLED_APPLICATION_NAME) {
-                normalizedInstallationPath = [self normalizedInstallationPathForHost:host];
+                normalizedInstallationPath = SUNormalizedInstallationPath(host);
             }
             
             // If we have a normalized path, we'll install to "#{CFBundleName}.app", but only if that path doesn't already exist. If we're "Foo 4.2.app," and there's a "Foo.app" in this directory, we don't want to overwrite it! But if there's no "Foo.app," we'll take that name.
             // Otherwise if there's no normalized path (the more likely case), we'll just use the host bundle's path
+            // Check progress agent app which computes normalized path too according to these rules
             NSString *installationPath;
             if (normalizedInstallationPath != nil && ![[NSFileManager defaultManager] fileExistsAtPath:normalizedInstallationPath]) {
                 installationPath = normalizedInstallationPath;
@@ -169,24 +171,6 @@
     }
     
     return installer;
-}
-
-+ (NSString *)normalizedInstallationPathForHost:(SUHost *)host
-{
-    NSBundle *bundle = host.bundle;
-    assert(bundle != nil);
-   
-   NSString * baseBundleName = [host objectForInfoDictionaryKey:@"SUBundleName"];
-   
-   if (baseBundleName == nil) {
-      baseBundleName = [host objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleNameKey];
-   }
-   
-    NSString *normalizedAppPath = [[[bundle bundlePath] stringByDeletingLastPathComponent] stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.%@", baseBundleName, [[bundle bundlePath] pathExtension]]];
-
-    // Roundtrip string through fileSystemRepresentation to ensure it uses filesystem's Unicode normalization
-    // rather than arbitrary Unicode form from Info.plist - #1017
-    return [NSString stringWithUTF8String:[normalizedAppPath fileSystemRepresentation]];
 }
 
 @end
