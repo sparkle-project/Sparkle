@@ -168,6 +168,8 @@
 		7229E1BA1C97CC4D00CB50D0 /* SPUScheduledUpdateDriver.m in Sources */ = {isa = PBXBuildFile; fileRef = 7229E1B81C97CC4D00CB50D0 /* SPUScheduledUpdateDriver.m */; };
 		7229E1BD1C98EFF200CB50D0 /* SPUDownloadDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 7229E1BB1C98EFF200CB50D0 /* SPUDownloadDriver.h */; };
 		7229E1BE1C98EFF200CB50D0 /* SPUDownloadDriver.m in Sources */ = {isa = PBXBuildFile; fileRef = 7229E1BC1C98EFF200CB50D0 /* SPUDownloadDriver.m */; };
+		722FB7E5260EE53F00EB571C /* SUNormalization.m in Sources */ = {isa = PBXBuildFile; fileRef = 722FB7E4260EE53F00EB571C /* SUNormalization.m */; };
+		722FB7E6260EE53F00EB571C /* SUNormalization.m in Sources */ = {isa = PBXBuildFile; fileRef = 722FB7E4260EE53F00EB571C /* SUNormalization.m */; };
 		72316BD31E0DA8430039EFD9 /* SUUnarchiverNotifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 72316BD21E0DA8430039EFD9 /* SUUnarchiverNotifier.m */; };
 		72316BD41E0DB37E0039EFD9 /* SUUnarchiverNotifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 72316BD21E0DA8430039EFD9 /* SUUnarchiverNotifier.m */; };
 		723ABD38259A9BA500BDB4FA /* SUUpdateAlert.xib in Resources */ = {isa = PBXBuildFile; fileRef = 723ABD36259A9BA500BDB4FA /* SUUpdateAlert.xib */; };
@@ -1059,6 +1061,8 @@
 		7229E1BB1C98EFF200CB50D0 /* SPUDownloadDriver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPUDownloadDriver.h; sourceTree = "<group>"; };
 		7229E1BC1C98EFF200CB50D0 /* SPUDownloadDriver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SPUDownloadDriver.m; sourceTree = "<group>"; };
 		722FB7CA1DD69897001D40CE /* ConfigSwift.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigSwift.xcconfig; sourceTree = "<group>"; };
+		722FB7E3260EE53F00EB571C /* SUNormalization.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SUNormalization.h; sourceTree = "<group>"; };
+		722FB7E4260EE53F00EB571C /* SUNormalization.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SUNormalization.m; sourceTree = "<group>"; };
 		72316BD11E0DA8430039EFD9 /* SUUnarchiverNotifier.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SUUnarchiverNotifier.h; path = Autoupdate/SUUnarchiverNotifier.h; sourceTree = SOURCE_ROOT; };
 		72316BD21E0DA8430039EFD9 /* SUUnarchiverNotifier.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SUUnarchiverNotifier.m; path = Autoupdate/SUUnarchiverNotifier.m; sourceTree = SOURCE_ROOT; };
 		723ABCD7259A9A9D00BDB4FA /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/Sparkle.strings; sourceTree = "<group>"; };
@@ -1924,6 +1928,8 @@
 				7267E5BB1D3D8B2700D1BF90 /* SUGuidedPackageInstaller.m */,
 				7267E5BC1D3D8B2700D1BF90 /* SUInstaller.h */,
 				7267E5BD1D3D8B2700D1BF90 /* SUInstaller.m */,
+				722FB7E3260EE53F00EB571C /* SUNormalization.h */,
+				722FB7E4260EE53F00EB571C /* SUNormalization.m */,
 				7267E5B91D3D8B0B00D1BF90 /* SUInstallerProtocol.h */,
 				7267E5BE1D3D8B2700D1BF90 /* SUPackageInstaller.h */,
 				7267E5BF1D3D8B2700D1BF90 /* SUPackageInstaller.m */,
@@ -3400,6 +3406,7 @@
 				7267E5FA1D3DAC3600D1BF90 /* StatusInfo.m in Sources */,
 				720595EF1D700568000572E8 /* SUApplicationInfo.m in Sources */,
 				7214B8831D456C2400CB5CED /* SUBundleIcon.m in Sources */,
+				722FB7E6260EE53F00EB571C /* SUNormalization.m in Sources */,
 				721C245E1CB757DE005440CB /* SUConstants.m in Sources */,
 				7267E5EB1D3D90C200D1BF90 /* SUFileManager.m in Sources */,
 				721C24611CB75C5D005440CB /* SUHost.m in Sources */,
@@ -3578,6 +3585,7 @@
 				72316BD31E0DA8430039EFD9 /* SUUnarchiverNotifier.m in Sources */,
 				729924941DF4A45000DBCDF5 /* SUUpdateValidator.m in Sources */,
 				7267E5AB1D3D8AA800D1BF90 /* TerminationListener.m in Sources */,
+				722FB7E5260EE53F00EB571C /* SUNormalization.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
