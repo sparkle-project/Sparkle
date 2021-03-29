@@ -544,6 +544,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     }
 
     self.driver = d;
+    assert(self.driver != nil);
 
     // Because an application can change the configuration (eg: the feed url) at any point, we should always check if it's valid
     NSError *configurationError = nil;
