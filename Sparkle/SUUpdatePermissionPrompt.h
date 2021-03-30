@@ -15,10 +15,8 @@
 
 @interface SUUpdatePermissionPrompt : NSWindowController
 
-+ (void)promptWithHost:(SUHost *)host request:(SPUUpdatePermissionRequest *)request reply:(void (^)(SUUpdatePermissionResponse *))reply;
+- (instancetype)initPromptWithHost:(SUHost *)theHost request:(SPUUpdatePermissionRequest *)request reply:(void (^)(SUUpdatePermissionResponse *))reply;
 
-- (IBAction)toggleMoreInfo:(id)sender;
-- (IBAction)finishPrompt:(NSButton *)sender;
 @end
 
 #endif

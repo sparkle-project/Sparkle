@@ -29,6 +29,7 @@
 @property (nonatomic) SUStatusController *checkingController;
 @property (nonatomic) SUUpdateAlert *activeUpdateAlert;
 @property (nonatomic) SUStatusController *statusController;
+@property (nonatomic) SUUpdatePermissionPrompt *permissionPrompt;
 
 @end
 
@@ -40,6 +41,7 @@
 @synthesize checkingController = _checkingController;
 @synthesize activeUpdateAlert = _activeUpdateAlert;
 @synthesize statusController = _statusController;
+@synthesize permissionPrompt = _permissionPrompt;
 
 #pragma mark Birth
 
@@ -67,11 +69,17 @@
 {
     assert(NSThread.isMainThread);
     
-    // This shows a modal alert dialog which unlike other alerts cannot be closed until the user makes a decision
-    // This means that we can never programatically close the dialog if something goes horribly wrong
-    // But this dialog should only show up once in the application's lifetime so this may be an OK decision
+    if ([SUApplicationInfo isBackgroundApplication:[NSApplication sharedApplication]]) {
+        [[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
+    }
     
-    [SUUpdatePermissionPrompt promptWithHost:self.host request:request reply:reply];
+    __weak __typeof__(self) weakSelf = self;
+    self.permissionPrompt = [[SUUpdatePermissionPrompt alloc] initPromptWithHost:self.host request:request reply:^(SUUpdatePermissionResponse *response) {
+        reply(response);
+        weakSelf.permissionPrompt = nil;
+    }];
+    
+    [self.permissionPrompt showWindow:nil];
 }
 
 #pragma mark Update Alert Focus
@@ -442,6 +450,11 @@
     [self.coreComponent dismissUpdateInstallation];
     
     [self closeCheckingWindow];
+    
+    if (self.permissionPrompt) {
+        [self.permissionPrompt close];
+        self.permissionPrompt = nil;
+    }
     
     if (self.statusController) {
         [self.statusController close];
