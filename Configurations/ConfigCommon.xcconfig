@@ -13,6 +13,7 @@ SPARKLE_AUTOMATED_DOWNGRADES = 0
 // following on to always reset the name back to "MyApp"
 // If you are using this option to change the name of your app, you should
 // disable the option again when you no longer need it
+// Note this option is only supported for regular application updates and not plug-ins
 SPARKLE_NORMALIZE_INSTALLED_APPLICATION_NAME = 0
 
 SPARKLE_ICON_NAME = AppIcon

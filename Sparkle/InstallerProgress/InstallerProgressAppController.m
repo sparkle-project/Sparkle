@@ -18,6 +18,7 @@
 #import "SUHost.h"
 #import "SUErrors.h"
 #import "SUNormalization.h"
+#import "SUConstants.h"
 
 /*!
  * Terminate the application after a delay from launching the new update to avoid OS activation issues
@@ -33,7 +34,9 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
 @property (nonatomic, readonly) NSXPCConnection *connection;
 @property (nonatomic) BOOL connected;
 @property (nonatomic) BOOL repliedToRegistration;
-@property (nonatomic, readonly) NSBundle *hostBundle;
+@property (nonatomic, readonly) SUHost *oldHost;
+@property (nonatomic, readonly) BOOL shouldRelaunchHostBundle;
+@property (nonatomic, readonly) NSString *oldHostBundlePath;
 @property (nonatomic) StatusInfo *statusInfo;
 @property (nonatomic) BOOL submittedLauncherJob;
 @property (nonatomic) BOOL willTerminate;
@@ -52,7 +55,9 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
 @synthesize connection = _connection;
 @synthesize connected = _connected;
 @synthesize repliedToRegistration = _repliedToRegistration;
-@synthesize hostBundle = _hostBundle;
+@synthesize oldHost = _oldHost;
+@synthesize shouldRelaunchHostBundle = _shouldRelaunchHostBundle;
+@synthesize oldHostBundlePath = _oldHostBundlePath;
 @synthesize statusInfo = _statusInfo;
 @synthesize submittedLauncherJob = _submittedLauncherJob;
 @synthesize willTerminate = _willTerminate;
@@ -75,18 +80,24 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
             [self cleanupAndExitWithStatus:EXIT_FAILURE error:nil];
         }
         
-        _hostBundle = [NSBundle bundleWithPath:hostBundlePath];
-        if (_hostBundle == nil) {
+        NSBundle *hostBundle = [NSBundle bundleWithPath:hostBundlePath];
+        if (hostBundle == nil) {
             SULog(SULogLevelError, @"Error: Host bundle for target is nil");
             [self cleanupAndExitWithStatus:EXIT_FAILURE error:nil];
         }
         
-        NSString *hostBundleIdentifier = _hostBundle.bundleIdentifier;
+        NSString *hostBundleIdentifier = hostBundle.bundleIdentifier;
         if (hostBundleIdentifier == nil) {
             SULog(SULogLevelError, @"Error: Host bundle identifier for target is nil");
             [self cleanupAndExitWithStatus:EXIT_FAILURE error:nil];
             return nil; // just to silence analyzer warnings later about hostBundleIdentifier being nil
         }
+        
+        SUHost *host = [[SUHost alloc] initWithBundle:hostBundle];
+        _shouldRelaunchHostBundle = [host boolForInfoDictionaryKey:SURelaunchHostBundleKey];
+        _oldHostBundlePath = host.bundlePath;
+        
+        _oldHost = host;
         
         // Note that we are connecting to the installer rather than the installer connecting to us
         // This difference is significant. We shouldn't have a model where the 'server' tries to connect to a 'client',
@@ -221,14 +232,12 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
             // Compute normalized path that we may use later for relaunching the application
             // We compute normalized path from progress agent instead of trusting or having the installer
             // pass it to us
-            if (SPARKLE_NORMALIZE_INSTALLED_APPLICATION_NAME) {
-                SUHost *applicationHost = [[SUHost alloc] initWithBundle:applicationBundle];
-                
-                NSString *normalizedPath = SUNormalizedInstallationPath(applicationHost);
+            if (SPARKLE_NORMALIZE_INSTALLED_APPLICATION_NAME && [applicationBundle.bundlePath isEqualToString:self.oldHostBundlePath]) {
+                NSString *normalizedPath = SUNormalizedInstallationPath(self.oldHost);
                 // We only use normalized path if it doesn't already exist
                 // Check the installer which has the same logic
                 if (![[NSFileManager defaultManager] fileExistsAtPath:normalizedPath]) {
-                    self.normalizedPath = SUNormalizedInstallationPath(applicationHost);
+                    self.normalizedPath = SUNormalizedInstallationPath(self.oldHost);
                 }
             }
             
@@ -280,6 +289,9 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
             NSString *pathToRelaunch;
             if (self.normalizedPath != nil) {
                 pathToRelaunch = self.normalizedPath;
+            } else if (self.shouldRelaunchHostBundle) {
+                // Use self.oldHostBundlePath because it was computed before self.oldHost could have been removed
+                pathToRelaunch = self.oldHostBundlePath;
             } else {
                 pathToRelaunch = self.applicationBundle.bundlePath;
             }
@@ -290,6 +302,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
                 [self cleanupAndExitWithStatus:EXIT_FAILURE error:[NSError errorWithDomain:SUSparkleErrorDomain code:SUAgentInvalidationError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Error: Encountered invalid path to relaunch: %@", pathToRelaunch] }]];
             }
             
+            // Note: we can launch application bundles or open plug-in bundles
             if (![[NSWorkspace sharedWorkspace] openFile:pathToRelaunch]) {
                 SULog(SULogLevelError, @"Error: Failed to relaunch bundle at %@", pathToRelaunch);
             }
@@ -314,13 +327,12 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
             TransformProcessType(&psn, kProcessTransformToForegroundApplication);
             
             // Note: the application icon needs to be set after showing the icon in the dock
-            SUHost *host = [[SUHost alloc] initWithBundle:self.hostBundle];
-            self.application.applicationIconImage = [SUApplicationInfo bestIconForHost:host];
+            self.application.applicationIconImage = [SUApplicationInfo bestIconForHost:self.oldHost];
             
             // Activate ourselves otherwise we will probably be in the background
             [self.application activateIgnoringOtherApps:YES];
             
-            [self.delegate installerProgressShouldDisplayWithHost:host];
+            [self.delegate installerProgressShouldDisplayWithHost:self.oldHost];
         }
     });
 }
