@@ -19,6 +19,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) SUAppcastItem *appcastItem;
 @property (nonatomic, readonly) BOOL canSilentlyInstall;
 
+@property (nonatomic) BOOL systemDomain;
+
 @end
 
 NS_ASSUME_NONNULL_END

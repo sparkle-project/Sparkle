@@ -54,7 +54,7 @@
     [self.basicDriver resumeUpdate:resumableUpdate completion:completionBlock];
 }
 
-- (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)__unused appcastItem preventsAutoupdate:(BOOL)__unused preventsAutoupdate
+- (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)__unused appcastItem preventsAutoupdate:(BOOL)__unused preventsAutoupdate systemDomain:(NSNumber * _Nullable)__unused systemDomain
 {
     // Stop as soon as we have an answer
     [self abortUpdate];

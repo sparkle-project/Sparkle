@@ -145,12 +145,13 @@
     }
 }
 
-- (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)updateItem preventsAutoupdate:(BOOL)preventsAutoupdate
+- (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)updateItem preventsAutoupdate:(BOOL)preventsAutoupdate systemDomain:(NSNumber * _Nullable)systemDomain
 {
     self.updateItem = updateItem;
     
     if (self.resumingInstallingUpdate) {
-        [self.installerDriver resumeInstallingUpdateWithUpdateItem:updateItem];
+        assert(systemDomain != nil);
+        [self.installerDriver resumeInstallingUpdateWithUpdateItem:updateItem systemDomain:systemDomain.boolValue];
         [self.delegate basicDriverDidFindUpdateWithAppcastItem:updateItem preventsAutoupdate:preventsAutoupdate];
     } else {
         if (!self.preventsInstallerInteraction) {

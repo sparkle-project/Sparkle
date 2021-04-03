@@ -8,6 +8,9 @@
 
 #import <Foundation/Foundation.h>
 
+// If we are using XPC without using XPC Services, our custom classes will not be (de)serialized automatically,
+// hence needing functions to archive/unarchive NSSecureCoding objects.
+
 NS_ASSUME_NONNULL_BEGIN
 
 NSData * _Nullable SPUArchiveRootObjectSecurely(id<NSSecureCoding> rootObject);

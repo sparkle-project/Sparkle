@@ -19,6 +19,8 @@
 #import "SUErrors.h"
 #import "SUNormalization.h"
 #import "SUConstants.h"
+#import "SPUSecureCoding.h"
+#import "SPUInstallationInfo.h"
 
 /*!
  * Terminate the application after a delay from launching the new update to avoid OS activation issues
@@ -37,6 +39,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
 @property (nonatomic, readonly) SUHost *oldHost;
 @property (nonatomic, readonly) BOOL shouldRelaunchHostBundle;
 @property (nonatomic, readonly) NSString *oldHostBundlePath;
+@property (nonatomic, readonly) BOOL systemDomain;
 @property (nonatomic) StatusInfo *statusInfo;
 @property (nonatomic) BOOL submittedLauncherJob;
 @property (nonatomic) BOOL willTerminate;
@@ -58,6 +61,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
 @synthesize oldHost = _oldHost;
 @synthesize shouldRelaunchHostBundle = _shouldRelaunchHostBundle;
 @synthesize oldHostBundlePath = _oldHostBundlePath;
+@synthesize systemDomain = _systemDomain;
 @synthesize statusInfo = _statusInfo;
 @synthesize submittedLauncherJob = _submittedLauncherJob;
 @synthesize willTerminate = _willTerminate;
@@ -104,6 +108,8 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
         // nor have a model where a process that runs at the highest level (the installer can run as root) tries to connect to a user level agent or process
         BOOL systemDomain = arguments[2].boolValue;
         NSXPCConnectionOptions connectionOptions = systemDomain ? NSXPCConnectionPrivileged : 0;
+        
+        _systemDomain = systemDomain;
         _connection = [[NSXPCConnection alloc] initWithMachServiceName:SPUProgressAgentServiceNameForBundleIdentifier(hostBundleIdentifier) options:connectionOptions];
         
         _statusInfo = [[StatusInfo alloc] initWithHostBundleIdentifier:hostBundleIdentifier];
@@ -264,8 +270,15 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
 - (void)registerInstallationInfoData:(NSData *)installationInfoData
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        if (self.statusInfo.installationInfoData == nil) {
-            self.statusInfo.installationInfoData = installationInfoData;
+        if (self.statusInfo.installationInfoData == nil && installationInfoData != nil) {
+            SPUInstallationInfo *installationInfo = (SPUInstallationInfo *)SPUUnarchiveRootObjectSecurely(installationInfoData, [SPUInstallationInfo class]);
+            
+            if (installationInfo != nil) {
+                installationInfo.systemDomain = self.systemDomain;
+                self.statusInfo.installationInfoData = SPUArchiveRootObjectSecurely(installationInfo);
+            } else {
+                SULog(SULogLevelError, @"Error: Failed to decode initial installation info from installer: %@", installationInfoData);
+            }
         }
     });
 }

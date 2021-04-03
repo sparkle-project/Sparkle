@@ -130,6 +130,9 @@
 		7205C4631E1306B500E370AE /* libxar.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 726E07681CA616A4001A286B /* libxar.tbd */; };
 		7205C4641E1306BE00E370AE /* libbz2.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 726E076A1CA616B3001A286B /* libbz2.tbd */; };
 		720767D31E2EE9C200F9A850 /* SUTouchBarForwardDeclarations.h in Headers */ = {isa = PBXBuildFile; fileRef = 720767D21E2EE9C200F9A850 /* SUTouchBarForwardDeclarations.h */; };
+		720AC2A42618E85700E25A3E /* SPUInstallationInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5B51D3D8AEE00D1BF90 /* SPUInstallationInfo.m */; };
+		720AC2C92618E89500E25A3E /* SUAppcastItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 61B5FC5409C5182000B25A18 /* SUAppcastItem.m */; };
+		720AC2DC2618E8A500E25A3E /* SPUSecureCoding.m in Sources */ = {isa = PBXBuildFile; fileRef = 726E075B1CA3A6D6001A286B /* SPUSecureCoding.m */; };
 		720B16451C66433D006985FB /* SUTestApplicationTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 720B16431C66433D006985FB /* SUTestApplicationTest.swift */; };
 		720E217B1D0D00BF003A311C /* SPUUpdaterCycle.h in Headers */ = {isa = PBXBuildFile; fileRef = 720E21791D0D00BF003A311C /* SPUUpdaterCycle.h */; };
 		720E217C1D0D00BF003A311C /* SPUUpdaterCycle.m in Sources */ = {isa = PBXBuildFile; fileRef = 720E217A1D0D00BF003A311C /* SPUUpdaterCycle.m */; };
@@ -139,7 +142,6 @@
 		7214B8831D456C2400CB5CED /* SUBundleIcon.m in Sources */ = {isa = PBXBuildFile; fileRef = 7214B8801D456A8500CB5CED /* SUBundleIcon.m */; };
 		7214B8841D456C9500CB5CED /* SUBundleIcon.m in Sources */ = {isa = PBXBuildFile; fileRef = 7214B8801D456A8500CB5CED /* SUBundleIcon.m */; };
 		72162B081C82C9600013C1C5 /* SULocalizations.h in Headers */ = {isa = PBXBuildFile; fileRef = 72162B071C82C9600013C1C5 /* SULocalizations.h */; };
-		721652621D3C44A100FD13D8 /* SPUSystemAuthorization.m in Sources */ = {isa = PBXBuildFile; fileRef = 724BB3AC1D347EDE005D534A /* SPUSystemAuthorization.m */; };
 		721BC20E1D1CDE55002BC71E /* SPULocalCacheDirectory.h in Headers */ = {isa = PBXBuildFile; fileRef = 721BC20C1D1CDE55002BC71E /* SPULocalCacheDirectory.h */; };
 		721BC20F1D1CDE55002BC71E /* SPULocalCacheDirectory.m in Sources */ = {isa = PBXBuildFile; fileRef = 721BC20D1D1CDE55002BC71E /* SPULocalCacheDirectory.m */; };
 		721BC2101D1CDE55002BC71E /* SPULocalCacheDirectory.m in Sources */ = {isa = PBXBuildFile; fileRef = 721BC20D1D1CDE55002BC71E /* SPULocalCacheDirectory.m */; };
@@ -208,10 +210,6 @@
 		724BB3A81D33461B005D534A /* SUXPCInstallerStatus.h in Headers */ = {isa = PBXBuildFile; fileRef = 724BB3A61D33461B005D534A /* SUXPCInstallerStatus.h */; };
 		724BB3A91D33461B005D534A /* SUXPCInstallerStatus.m in Sources */ = {isa = PBXBuildFile; fileRef = 724BB3A71D33461B005D534A /* SUXPCInstallerStatus.m */; };
 		724BB3AA1D3347C2005D534A /* SUInstallerStatus.m in Sources */ = {isa = PBXBuildFile; fileRef = 724BB3971D333832005D534A /* SUInstallerStatus.m */; };
-		724BB3AF1D34828A005D534A /* SPUSystemAuthorization.m in Sources */ = {isa = PBXBuildFile; fileRef = 724BB3AC1D347EDE005D534A /* SPUSystemAuthorization.m */; };
-		724BB3B01D3482BA005D534A /* SPUSystemAuthorization.m in Sources */ = {isa = PBXBuildFile; fileRef = 724BB3AC1D347EDE005D534A /* SPUSystemAuthorization.m */; };
-		724BB3B11D3484B2005D534A /* SPUSystemAuthorization.m in Sources */ = {isa = PBXBuildFile; fileRef = 724BB3AC1D347EDE005D534A /* SPUSystemAuthorization.m */; };
-		724BB3B21D34862A005D534A /* SPUSystemAuthorization.m in Sources */ = {isa = PBXBuildFile; fileRef = 724BB3AC1D347EDE005D534A /* SPUSystemAuthorization.m */; };
 		724BB3B71D35ABA8005D534A /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 61B5F8F609C4CEB300B25A18 /* Security.framework */; };
 		724F76F91D6EAD0D00ECD062 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 525A278F133D6AE900FD8D70 /* Cocoa.framework */; };
 		725264A91D5FBD9100CD6400 /* Sparkle.strings in Resources */ = {isa = PBXBuildFile; fileRef = 61AAE8220A321A7F00D8810D /* Sparkle.strings */; };
@@ -337,7 +335,6 @@
 		72A5D5B51D6929F80009E5AC /* SPUMessageTypes.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5B01D3D8AD500D1BF90 /* SPUMessageTypes.m */; };
 		72A5D5B61D6929F80009E5AC /* SPUSecureCoding.m in Sources */ = {isa = PBXBuildFile; fileRef = 726E075B1CA3A6D6001A286B /* SPUSecureCoding.m */; };
 		72A5D5B71D6929F80009E5AC /* SPUInstallationInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5B51D3D8AEE00D1BF90 /* SPUInstallationInfo.m */; };
-		72A5D5B81D6929F80009E5AC /* SPUSystemAuthorization.m in Sources */ = {isa = PBXBuildFile; fileRef = 724BB3AC1D347EDE005D534A /* SPUSystemAuthorization.m */; };
 		72A5D5B91D6929F80009E5AC /* SUAppcast.m in Sources */ = {isa = PBXBuildFile; fileRef = 61B5FB9509C4F04600B25A18 /* SUAppcast.m */; };
 		72A5D5BA1D6929F80009E5AC /* SUAppcastItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 61B5FC5409C5182000B25A18 /* SUAppcastItem.m */; };
 		72A5D5BB1D6929F80009E5AC /* SPUURLDownload.m in Sources */ = {isa = PBXBuildFile; fileRef = 72B09CE61CE6BCBD0052EF9E /* SPUURLDownload.m */; };
@@ -1198,8 +1195,6 @@
 		724BB3A51D3338C8005D534A /* ConfigInstallerStatusDebug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigInstallerStatusDebug.xcconfig; sourceTree = "<group>"; };
 		724BB3A61D33461B005D534A /* SUXPCInstallerStatus.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUXPCInstallerStatus.h; sourceTree = "<group>"; };
 		724BB3A71D33461B005D534A /* SUXPCInstallerStatus.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUXPCInstallerStatus.m; sourceTree = "<group>"; };
-		724BB3AB1D347EDE005D534A /* SPUSystemAuthorization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SPUSystemAuthorization.h; path = Sparkle/SPUSystemAuthorization.h; sourceTree = SOURCE_ROOT; };
-		724BB3AC1D347EDE005D534A /* SPUSystemAuthorization.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SPUSystemAuthorization.m; path = Sparkle/SPUSystemAuthorization.m; sourceTree = SOURCE_ROOT; };
 		724BB3B51D35AAC3005D534A /* ServiceManagement.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ServiceManagement.framework; path = System/Library/Frameworks/ServiceManagement.framework; sourceTree = SDKROOT; };
 		725602D31C83551C00DAA70E /* SUApplicationInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUApplicationInfo.h; sourceTree = "<group>"; };
 		725602D41C83551C00DAA70E /* SUApplicationInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUApplicationInfo.m; sourceTree = "<group>"; };
@@ -2225,8 +2220,6 @@
 				7267E5B01D3D8AD500D1BF90 /* SPUMessageTypes.m */,
 				726E075A1CA3A6D6001A286B /* SPUSecureCoding.h */,
 				726E075B1CA3A6D6001A286B /* SPUSecureCoding.m */,
-				724BB3AB1D347EDE005D534A /* SPUSystemAuthorization.h */,
-				724BB3AC1D347EDE005D534A /* SPUSystemAuthorization.m */,
 			);
 			name = IPC;
 			path = Autoupdate;
@@ -3395,13 +3388,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				720AC2DC2618E8A500E25A3E /* SPUSecureCoding.m in Sources */,
+				720AC2C92618E89500E25A3E /* SUAppcastItem.m in Sources */,
+				720AC2A42618E85700E25A3E /* SPUInstallationInfo.m in Sources */,
 				72D954811CBACC35006F28BD /* InstallerProgressAppController.m in Sources */,
 				72D954831CBAD34F006F28BD /* main.m in Sources */,
 				72EB87EA1CB8798800C37F42 /* ShowInstallerProgress.m in Sources */,
 				727F340E2605321D00020E85 /* SULog+NSError.m in Sources */,
 				7267E5DC1D3D8F1E00D1BF90 /* SPUMessageTypes.m in Sources */,
 				723C8A561E2D60DB00C14942 /* SUTouchBarButtonGroup.m in Sources */,
-				721652621D3C44A100FD13D8 /* SPUSystemAuthorization.m in Sources */,
 				5AA89BA623FE276A0094DAB8 /* SUSignatures.m in Sources */,
 				7267E5FA1D3DAC3600D1BF90 /* StatusInfo.m in Sources */,
 				720595EF1D700568000572E8 /* SUApplicationInfo.m in Sources */,
@@ -3421,7 +3416,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				724BB3731D31D0B7005D534A /* main.m in Sources */,
-				724BB3B11D3484B2005D534A /* SPUSystemAuthorization.m in Sources */,
 				72F9EC341D5BF542004AC8B6 /* SUFileManager.m in Sources */,
 				724BB3711D31D0B7005D534A /* SUInstallerConnection.m in Sources */,
 			);
@@ -3432,7 +3426,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				724BB39A1D333832005D534A /* main.m in Sources */,
-				724BB3B21D34862A005D534A /* SPUSystemAuthorization.m in Sources */,
 				72F9EC351D5BF54E004AC8B6 /* SUFileManager.m in Sources */,
 				724BB3981D333832005D534A /* SUInstallerStatus.m in Sources */,
 			);
@@ -3455,7 +3448,6 @@
 				726E07B41CAF08D6001A286B /* main.m in Sources */,
 				721D8A7B1D4963190032E472 /* SPULocalCacheDirectory.m in Sources */,
 				7267E5E11D3D901600D1BF90 /* SPUMessageTypes.m in Sources */,
-				724BB3AF1D34828A005D534A /* SPUSystemAuthorization.m in Sources */,
 				5AA89BA523FE27660094DAB8 /* SUSignatures.m in Sources */,
 				7214B8841D456C9500CB5CED /* SUBundleIcon.m in Sources */,
 				726E07BF1CAF0C6C001A286B /* SUConstants.m in Sources */,
@@ -3512,7 +3504,6 @@
 				72A5D5CA1D6929F80009E5AC /* SPUProbingUpdateDriver.m in Sources */,
 				72A5D5C91D6929F80009E5AC /* SPUScheduledUpdateDriver.m in Sources */,
 				72A5D5B61D6929F80009E5AC /* SPUSecureCoding.m in Sources */,
-				72A5D5B81D6929F80009E5AC /* SPUSystemAuthorization.m in Sources */,
 				72A5D5CC1D6929F80009E5AC /* SPUUIBasedUpdateDriver.m in Sources */,
 				72A5D5D61D6929F80009E5AC /* SPUUpdatePermissionRequest.m in Sources */,
 				72A5D5D41D6929F80009E5AC /* SPUUpdater.m in Sources */,
@@ -3623,7 +3614,6 @@
 				726E075D1CA3A6D6001A286B /* SPUSecureCoding.m in Sources */,
 				7246E0A41C83B685003B4E75 /* SPUStandardUpdaterController.m in Sources */,
 				725CB95B1C7121830064365A /* SPUStandardUserDriver.m in Sources */,
-				724BB3B01D3482BA005D534A /* SPUSystemAuthorization.m in Sources */,
 				723C8A551E2D60DB00C14942 /* SUTouchBarButtonGroup.m in Sources */,
 				72B767DB1C9CD2E400A07552 /* SPUUIBasedUpdateDriver.m in Sources */,
 				72DBA37E1D60CC34002594A8 /* SPUUpdatePermissionRequest.m in Sources */,
