@@ -79,7 +79,7 @@
     }
 }
 
-- (void)notifyResumableUpdateItem:(SUAppcastItem *)updateItem
+- (void)notifyResumableUpdateItem:(SUAppcastItem *)updateItem systemDomain:(NSNumber * _Nullable)systemDomain
 {
     if (updateItem == nil) {
         [self.delegate basicDriverIsRequestingAbortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUResumeAppcastError userInfo:@{ NSLocalizedDescriptionKey: SULocalizedString(@"Failed to resume installing update.", nil) }]];
@@ -88,7 +88,7 @@
         [self notifyFinishLoadingAppcast];
         
         SUAppcastItem *nonNullUpdateItem = updateItem;
-        [self didFindValidUpdateWithAppcastItem:nonNullUpdateItem preventsAutoupdate:NO];
+        [self notifyFoundValidUpdateWithAppcastItem:nonNullUpdateItem preventsAutoupdate:NO systemDomain:systemDomain];
     }
 }
 
@@ -100,7 +100,7 @@
     assert(hostBundleIdentifier != nil);
     [SPUProbeInstallStatus probeInstallerUpdateItemForHostBundleIdentifier:hostBundleIdentifier completion:^(SPUInstallationInfo * _Nullable installationInfo) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            [self notifyResumableUpdateItem:installationInfo.appcastItem];
+            [self notifyResumableUpdateItem:installationInfo.appcastItem systemDomain:@(installationInfo.systemDomain)];
         });
     }];
 }
@@ -109,7 +109,7 @@
 {
     self.completionBlock = completionBlock;
     
-    [self notifyResumableUpdateItem:resumableUpdate.updateItem];
+    [self notifyResumableUpdateItem:resumableUpdate.updateItem systemDomain:nil];
 }
 
 - (SUAppcastItem *)nonDeltaUpdateItem
@@ -142,7 +142,7 @@
     }
 }
 
-- (void)didFindValidUpdateWithAppcastItem:(SUAppcastItem *)updateItem preventsAutoupdate:(BOOL)preventsAutoupdate
+- (void)notifyFoundValidUpdateWithAppcastItem:(SUAppcastItem *)updateItem preventsAutoupdate:(BOOL)preventsAutoupdate systemDomain:(NSNumber * _Nullable)systemDomain
 {
     if (!self.aborted) {
         [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidFindValidUpdateNotification
@@ -153,8 +153,13 @@
             [self.updaterDelegate updater:self.updater didFindValidUpdate:updateItem];
         }
         
-        [self.delegate basicDriverDidFindUpdateWithAppcastItem:updateItem preventsAutoupdate:preventsAutoupdate];
+        [self.delegate basicDriverDidFindUpdateWithAppcastItem:updateItem preventsAutoupdate:preventsAutoupdate systemDomain:systemDomain];
     }
+}
+
+- (void)didFindValidUpdateWithAppcastItem:(SUAppcastItem *)updateItem preventsAutoupdate:(BOOL)preventsAutoupdate
+{
+    [self notifyFoundValidUpdateWithAppcastItem:updateItem preventsAutoupdate:preventsAutoupdate systemDomain:nil];
 }
 
 - (void)didNotFindUpdateWithLatestAppcastItem:(nullable SUAppcastItem *)latestAppcastItem hostToLatestAppcastItemComparisonResult:(NSComparisonResult)hostToLatestAppcastItemComparisonResult

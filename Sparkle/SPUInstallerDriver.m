@@ -54,6 +54,8 @@
 @property (nonatomic, weak, readonly) id<SPUUpdaterDelegate> updaterDelegate;
 @property (nonatomic) BOOL willRelaunch;
 
+@property (nonatomic) BOOL systemDomain;
+
 @property (nonatomic) SUAppcastItem *updateItem;
 @property (nonatomic, copy) NSString *downloadName;
 @property (nonatomic, copy) NSString *temporaryDirectory;
@@ -77,6 +79,7 @@
 @synthesize updater = _updater;
 @synthesize updaterDelegate = _updaterDelegate;
 @synthesize willRelaunch = _willRelaunch;
+@synthesize systemDomain = _systemDomain;
 @synthesize updateItem = _updateItem;
 @synthesize downloadName = _downloadName;
 @synthesize temporaryDirectory = _temporaryDirectory;
@@ -137,7 +140,7 @@
     NSString *installationType = self.updateItem.installationType;
     assert(installationType != nil);
     
-    [self.installerConnection setServiceName:serviceName hostPath:self.host.bundlePath installationType:installationType];
+    [self.installerConnection setServiceName:serviceName systemDomain:self.systemDomain];
     
     [self sendInstallationData];
 }
@@ -160,9 +163,10 @@
     }
 }
 
-- (void)resumeInstallingUpdateWithUpdateItem:(SUAppcastItem *)updateItem
+- (void)resumeInstallingUpdateWithUpdateItem:(SUAppcastItem *)updateItem systemDomain:(BOOL)systemDomain
 {
     self.updateItem = updateItem;
+    self.systemDomain = systemDomain;
 }
 
 - (void)sendInstallationData
@@ -433,7 +437,7 @@
     
     // The installer launcher could be in a XPC service, so we don't want to do localization in there
     NSString *authorizationPrompt = [NSString stringWithFormat:SULocalizedString(@"%1$@ wants to update.", nil), self.host.name];
-    [installerLauncher launchInstallerWithHostBundlePath:hostBundlePath authorizationPrompt:authorizationPrompt installationType:installationType allowingDriverInteraction:driverAllowsInteraction allowingUpdaterInteraction:!preventsInstallerInteraction completion:^(SUInstallerLauncherStatus result) {
+    [installerLauncher launchInstallerWithHostBundlePath:hostBundlePath authorizationPrompt:authorizationPrompt installationType:installationType allowingDriverInteraction:driverAllowsInteraction allowingUpdaterInteraction:!preventsInstallerInteraction completion:^(SUInstallerLauncherStatus result, BOOL systemDomain) {
         dispatch_async(dispatch_get_main_queue(), ^{
             retrievedLaunchStatus = YES;
             [launcherConnection invalidate];
@@ -450,6 +454,7 @@
                     completionHandler([NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationAuthorizeLaterError userInfo:nil]);
                     break;
                 case SUInstallerLauncherSuccess:
+                    self.systemDomain = systemDomain;
                     [self setUpConnection];
                     completionHandler(nil);
                     break;
@@ -461,12 +466,6 @@
 - (BOOL)mayUpdateAndRestart
 {
     return (!self.updaterDelegate || ![self.updaterDelegate respondsToSelector:@selector((updaterShouldRelaunchApplication:))] || [self.updaterDelegate updaterShouldRelaunchApplication:self.updater]);
-}
-
-// Only implemented due to backwards compability reasons; see -installWithToolAndRelaunch:displayingUserInterface: below
-- (void)installWithToolAndRelaunch:(BOOL)relaunch
-{
-    [self installWithToolAndRelaunch:relaunch displayingUserInterface:relaunch];
 }
 
 - (void)installWithToolAndRelaunch:(BOOL)relaunch displayingUserInterface:(BOOL)showUI
