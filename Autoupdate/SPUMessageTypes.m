@@ -12,11 +12,10 @@
 #include "AppKitPrevention.h"
 
 // Tags added to the bundle identifier which is used as Mach service names
-// These should be very short because length restrictions exist on earlier versions of macOS
+// These should be very short because of length restrictions
 #define SPARKLE_INSTALLER_TAG @"-spki"
 #define SPARKLE_STATUS_TAG @"-spks"
 #define SPARKLE_PROGRESS_TAG @"-spkp"
-#define SPARKLE_PROGRESS_LAUNCH_INSTALLER_TAG @"-spkl"
 
 // macOS 10.8 couldn't handle service names that are >= 64 characters,
 // but 10.9 raised this to >= 128 characters
