@@ -7,12 +7,9 @@
 //
 
 #import "SPUMessageTypes.h"
-#import "SUHost.h"
 
 
 #include "AppKitPrevention.h"
-
-NSString *SPUAppcastItemArchiveKey = @"SPUAppcastItemArchive";
 
 // Tags added to the bundle identifier which is used as Mach service names
 // These should be very short because length restrictions exist on earlier versions of macOS
@@ -21,10 +18,9 @@ NSString *SPUAppcastItemArchiveKey = @"SPUAppcastItemArchive";
 #define SPARKLE_PROGRESS_TAG @"-spkp"
 #define SPARKLE_PROGRESS_LAUNCH_INSTALLER_TAG @"-spkl"
 
-// macOS 10.8 at least can't handle service names that are 64 characters or longer
-// This was fixed some point after 10.8, but I'm not sure if it was fixed in 10.9 or 10.10 or 10.11
-// If we knew when it was fixed, this could only be relevant to OS versions prior to that
-#define MAX_SERVICE_NAME_LENGTH 63u
+// macOS 10.8 couldn't handle service names that are >= 64 characters,
+// but 10.9 raised this to >= 128 characters
+#define MAX_SERVICE_NAME_LENGTH 127u
 
 BOOL SPUInstallerMessageTypeIsLegal(SPUInstallerMessageType oldMessageType, SPUInstallerMessageType newMessageType)
 {
