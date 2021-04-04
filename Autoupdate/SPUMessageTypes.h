@@ -10,10 +10,6 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class SUHost;
-
-extern NSString *SPUAppcastItemArchiveKey;
-
 // Order matters; higher stages have higher values.
 typedef NS_ENUM(int32_t, SPUInstallerMessageType)
 {
@@ -40,10 +36,13 @@ typedef NS_ENUM(int32_t, SPUUpdaterMessageType)
 
 BOOL SPUInstallerMessageTypeIsLegal(SPUInstallerMessageType oldMessageType, SPUInstallerMessageType newMessageType);
 
+// Used by framework to communicate to installer (Autoupdate)
 NSString *SPUInstallerServiceNameForBundleIdentifier(NSString *bundleIdentifier);
 
+// Used by framework to communicate to progress agent tool (Updater)
 NSString *SPUStatusInfoServiceNameForBundleIdentifier(NSString *bundleIdentifier);
 
+// Used by progress agent tool to communicate to installer (Autoupdate)
 NSString *SPUProgressAgentServiceNameForBundleIdentifier(NSString *bundleIdentifier);
 
 NS_ASSUME_NONNULL_END
