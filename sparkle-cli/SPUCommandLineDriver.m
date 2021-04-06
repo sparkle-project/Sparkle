@@ -75,7 +75,7 @@
 
 // If the installation is interactive, we can show an authorization prompt for requesting additional privileges,
 // along with allowing the installer to show UI when installing
-- (BOOL)updater:(SPUUpdater *)__unused updater shouldAllowInstallerInteractionForScheduledChecks:(SPUUpdateCheck)updateCheck
+- (BOOL)updater:(SPUUpdater *)__unused updater shouldAllowInstallerInteractionForUpdateCheck:(SPUUpdateCheck)updateCheck
 {
     switch (updateCheck) {
         case SPUUpdateCheckUserInitiated:
