@@ -43,7 +43,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)installerIsSendingAppTerminationSignal;
 
-- (void)installerDidFinishInstallationWithAcknowledgement:(void(^)(void))acknowledgement;
+- (void)installerDidFinishInstallationAndRelaunched:(BOOL)relaunched acknowledgement:(void(^)(void))acknowledgement;
 
 @end
 

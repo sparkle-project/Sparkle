@@ -292,7 +292,7 @@
     [self removeUpdateButton];
 }
 
-- (void)showUpdateInstallationDidFinishWithAcknowledgement:(void (^)(void))acknowledgement
+- (void)showUpdateInstalledAndRelaunched:(BOOL)__unused relaunched acknowledgement:(void (^)(void))acknowledgement
 {
     [self.coreComponent registerAcknowledgement:acknowledgement];
     
