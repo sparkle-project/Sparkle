@@ -152,7 +152,7 @@ SU_EXPORT @interface SPUUpdater : NSObject
  
  This property must be called on the main thread; calls from background threads will return nil.
  */
-@property (nonatomic, readonly) NSURL *feedURL;
+@property (nonatomic, readonly, nullable) NSURL *feedURL;
 
 /*!
  Set the URL of the appcast used to download update information. Using this method is discouraged.
