@@ -19,12 +19,12 @@
 #endif
 
 typedef NS_ENUM(NSUInteger, SPUUserInitiatedCheckStatus) {
-    SPUUserInitiatedCheckDone,
+    SPUUserInitiatedCheckDone __deprecated_msg("Deprecated because SPUUserInitiatedCheckDone has no effect. Just don't reply with this status."),
     SPUUserInitiatedCheckCanceled
 };
 
 typedef NS_ENUM(NSUInteger, SPUDownloadUpdateStatus) {
-    SPUDownloadUpdateDone,
+    SPUDownloadUpdateDone __deprecated_msg("Deprecated because SPUDownloadUpdateDone has no effect. Just don't reply with this status."),
     SPUDownloadUpdateCanceled
 };
 

@@ -52,7 +52,11 @@
                 
                 [self.userDriver showUserInitiatedUpdateCheckWithCompletion:^(SPUUserInitiatedCheckStatus completionStatus) {
                     switch (completionStatus) {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
                         case SPUUserInitiatedCheckDone:
+                            // Note this status is documented to have no effect
+#pragma clang diagnostic pop
                             break;
                         case SPUUserInitiatedCheckCanceled:
                             dispatch_async(dispatch_get_main_queue(), ^{

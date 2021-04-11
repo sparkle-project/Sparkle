@@ -67,10 +67,7 @@
 
 - (void)completeUpdateCheckStatus
 {
-    if (self.updateCheckStatusCompletion != nil) {
-        self.updateCheckStatusCompletion(SPUUserInitiatedCheckDone);
-        self.updateCheckStatusCompletion = nil;
-    }
+    self.updateCheckStatusCompletion = nil;
 }
 
 #pragma mark Download Status
@@ -90,10 +87,7 @@
 
 - (void)completeDownloadStatus
 {
-    if (self.downloadStatusCompletion != nil) {
-        self.downloadStatusCompletion(SPUDownloadUpdateDone);
-        self.downloadStatusCompletion = nil;
-    }
+    self.downloadStatusCompletion = nil;
 }
 
 #pragma mark Simple Acknoledgments

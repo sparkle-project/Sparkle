@@ -203,7 +203,11 @@
 {
     [self.userDriver showDownloadInitiatedWithCompletion:^(SPUDownloadUpdateStatus downloadCompletionStatus) {
         switch (downloadCompletionStatus) {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
             case SPUDownloadUpdateDone:
+                // Note this status is documented to have no effect
+#pragma clang diagnostic pop
                 break;
             case SPUDownloadUpdateCanceled:
                 dispatch_async(dispatch_get_main_queue(), ^{
