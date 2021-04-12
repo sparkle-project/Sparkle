@@ -24,13 +24,9 @@ SU_EXPORT @interface SPUUserDriverCoreComponent : NSObject
 - (void)registerInstallUpdateHandler:(void (^)(SPUInstallUpdateStatus))installUpdateHandler;
 - (void)installUpdateWithChoice:(SPUInstallUpdateStatus)choice;
 
-- (void)registerUpdateCheckStatusHandler:(void (^)(SPUUserInitiatedCheckStatus))updateCheckStatusCompletion;
-- (void)cancelUpdateCheckStatus;
-- (void)completeUpdateCheckStatus;
-
-- (void)registerDownloadStatusHandler:(void (^)(SPUDownloadUpdateStatus))downloadUpdateStatusCompletion;
-- (void)cancelDownloadStatus;
-- (void)completeDownloadStatus;
+- (void)registerCancellation:(void (^)(void))cancellation;
+- (void)cancel;
+- (void)clearCancellation;
 
 - (void)registerAcknowledgement:(void (^)(void))acknowledgement;
 - (void)acceptAcknowledgement;

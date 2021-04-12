@@ -201,25 +201,32 @@
 
 - (void)downloadDriverWillBeginDownload
 {
-    [self.userDriver showDownloadInitiatedWithCompletion:^(SPUDownloadUpdateStatus downloadCompletionStatus) {
-        switch (downloadCompletionStatus) {
+    void (^cancelDownload)(void) = ^{
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if ([self.updaterDelegate respondsToSelector:@selector((userDidCancelDownload:))]) {
+                [self.updaterDelegate userDidCancelDownload:self.updater];
+            }
+            
+            [self.delegate uiDriverIsRequestingAbortUpdateWithError:nil];
+        });
+    };
+    
+    if ([self.userDriver respondsToSelector:@selector(showDownloadInitiatedWithCancellation:)]) {
+        [self.userDriver showDownloadInitiatedWithCancellation:cancelDownload];
+    } else {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
-            case SPUDownloadUpdateDone:
-                // Note this status is documented to have no effect
+        [self.userDriver showDownloadInitiatedWithCompletion:^(SPUDownloadUpdateStatus downloadCompletionStatus) {
+            switch (downloadCompletionStatus) {
 #pragma clang diagnostic pop
-                break;
-            case SPUDownloadUpdateCanceled:
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    if ([self.updaterDelegate respondsToSelector:@selector((userDidCancelDownload:))]) {
-                        [self.updaterDelegate userDidCancelDownload:self.updater];
-                    }
-                    
-                    [self.delegate uiDriverIsRequestingAbortUpdateWithError:nil];
-                });
-                break;
-        }
-    }];
+                case SPUDownloadUpdateDone:
+                    break;
+                case SPUDownloadUpdateCanceled:
+                    cancelDownload();
+                    break;
+            }
+        }];
+    }
 }
 
 - (void)downloadDriverDidReceiveExpectedContentLength:(uint64_t)expectedContentLength

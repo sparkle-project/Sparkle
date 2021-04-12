@@ -14,8 +14,7 @@
 @interface SPUUserDriverCoreComponent ()
 
 @property (nonatomic, copy) void (^installUpdateHandler)(SPUInstallUpdateStatus);
-@property (nonatomic, copy) void (^updateCheckStatusCompletion)(SPUUserInitiatedCheckStatus);
-@property (nonatomic, copy) void (^downloadStatusCompletion)(SPUDownloadUpdateStatus);
+@property (nonatomic, copy) void (^cancellation)(void);
 @property (nonatomic, copy) void (^acknowledgement)(void);
 
 @end
@@ -23,8 +22,7 @@
 @implementation SPUUserDriverCoreComponent
 
 @synthesize installUpdateHandler = _installUpdateHandler;
-@synthesize updateCheckStatusCompletion = _updateCheckStatusCompletion;
-@synthesize downloadStatusCompletion = _downloadStatusCompletion;
+@synthesize cancellation = _cancellation;
 @synthesize acknowledgement = _acknowledgement;
 
 #pragma mark Install Updates
@@ -50,44 +48,24 @@
     }
 }
 
-#pragma mark Update Check Status
+#pragma mark Cancellation
 
-- (void)registerUpdateCheckStatusHandler:(void (^)(SPUUserInitiatedCheckStatus))updateCheckStatusCompletion
+- (void)registerCancellation:(void (^)(void))cancellation
 {
-    self.updateCheckStatusCompletion = updateCheckStatusCompletion;
+    self.cancellation = cancellation;
 }
 
-- (void)cancelUpdateCheckStatus
+- (void)cancel
 {
-    if (self.updateCheckStatusCompletion != nil) {
-        self.updateCheckStatusCompletion(SPUUserInitiatedCheckCanceled);
-        self.updateCheckStatusCompletion = nil;
+    if (self.cancellation != nil) {
+        self.cancellation();
+        self.cancellation = nil;
     }
 }
 
-- (void)completeUpdateCheckStatus
+- (void)clearCancellation
 {
-    self.updateCheckStatusCompletion = nil;
-}
-
-#pragma mark Download Status
-
-- (void)registerDownloadStatusHandler:(void (^)(SPUDownloadUpdateStatus))downloadUpdateStatusCompletion
-{
-    self.downloadStatusCompletion = downloadUpdateStatusCompletion;
-}
-
-- (void)cancelDownloadStatus
-{
-    if (self.downloadStatusCompletion != nil) {
-        self.downloadStatusCompletion(SPUDownloadUpdateCanceled);
-        self.downloadStatusCompletion = nil;
-    }
-}
-
-- (void)completeDownloadStatus
-{
-    self.downloadStatusCompletion = nil;
+    self.cancellation = nil;
 }
 
 #pragma mark Simple Acknoledgments
@@ -109,10 +87,9 @@
 
 - (void)dismissUpdateInstallation
 {
-    [self acceptAcknowledgement];
-    [self cancelUpdateCheckStatus];
-    [self cancelDownloadStatus];
-    [self dismissInstallAndRestart];
+    self.acknowledgement = nil;
+    self.cancellation = nil;
+    self.installUpdateHandler = nil;
 }
 
 @end

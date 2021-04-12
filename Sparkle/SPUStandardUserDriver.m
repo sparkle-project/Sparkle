@@ -217,11 +217,11 @@
 
 #pragma mark Check for Updates
 
-- (void)showUserInitiatedUpdateCheckWithCompletion:(void (^)(SPUUserInitiatedCheckStatus))updateCheckStatusCompletion
+- (void)showUserInitiatedUpdateCheckWithCancellation:(void (^)(void))cancellation
 {
     assert(NSThread.isMainThread);
     
-    [self.coreComponent registerUpdateCheckStatusHandler:updateCheckStatusCompletion];
+    [self.coreComponent registerCancellation:cancellation];
     
     self.checkingController = [[SUStatusController alloc] initWithHost:self.host];
     [[self.checkingController window] center]; // Force the checking controller to load its window.
@@ -248,7 +248,7 @@
 
 - (void)cancelCheckForUpdates:(id)__unused sender
 {
-    [self.coreComponent cancelUpdateCheckStatus];
+    [self.coreComponent cancel];
     [self closeCheckingWindow];
 }
 
@@ -256,7 +256,7 @@
 {
     assert(NSThread.isMainThread);
     
-    [self.coreComponent completeUpdateCheckStatus];
+    [self.coreComponent clearCancellation];
     [self closeCheckingWindow];
 }
 
@@ -320,11 +320,11 @@
     }
 }
 
-- (void)showDownloadInitiatedWithCompletion:(void (^)(SPUDownloadUpdateStatus))downloadUpdateStatusCompletion
+- (void)showDownloadInitiatedWithCancellation:(void (^)(void))cancellation
 {
     assert(NSThread.isMainThread);
     
-    [self.coreComponent registerDownloadStatusHandler:downloadUpdateStatusCompletion];
+    [self.coreComponent registerCancellation:cancellation];
     
     [self showStatusController];
     [self.statusController beginActionWithTitle:SULocalizedString(@"Downloading update...", @"Take care not to overflow the status window.") maxProgressValue:0.0 statusText:nil];
@@ -333,7 +333,7 @@
 
 - (void)cancelDownload:(id)__unused sender
 {
-    [self.coreComponent cancelDownloadStatus];
+    [self.coreComponent cancel];
 }
 
 - (void)showDownloadDidReceiveExpectedContentLength:(uint64_t)expectedContentLength
@@ -395,7 +395,7 @@
 {
     assert(NSThread.isMainThread);
     
-    [self.coreComponent completeDownloadStatus];
+    [self.coreComponent clearCancellation];
     
     [self showStatusController];
     [self.statusController beginActionWithTitle:SULocalizedString(@"Extracting update...", @"Take care not to overflow the status window.") maxProgressValue:0.0 statusText:nil];

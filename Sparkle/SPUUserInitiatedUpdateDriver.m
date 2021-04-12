@@ -50,23 +50,30 @@
             } else {
                 self.showingUserInitiatedProgress = YES;
                 
-                [self.userDriver showUserInitiatedUpdateCheckWithCompletion:^(SPUUserInitiatedCheckStatus completionStatus) {
-                    switch (completionStatus) {
+                void (^cancelUpdateCheck)(void) = ^{
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        if (self.showingUserInitiatedProgress) {
+                            [self abortUpdate];
+                        }
+                    });
+                };
+                
+                if ([self.userDriver respondsToSelector:@selector(showUserInitiatedUpdateCheckWithCancellation:)]) {
+                    [self.userDriver showUserInitiatedUpdateCheckWithCancellation:cancelUpdateCheck];
+                } else {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
-                        case SPUUserInitiatedCheckDone:
-                            // Note this status is documented to have no effect
+                    [self.userDriver showUserInitiatedUpdateCheckWithCompletion:^(SPUUserInitiatedCheckStatus completionStatus) {
 #pragma clang diagnostic pop
-                            break;
-                        case SPUUserInitiatedCheckCanceled:
-                            dispatch_async(dispatch_get_main_queue(), ^{
-                                if (self.showingUserInitiatedProgress) {
-                                    [self abortUpdate];
-                                }
-                            });
-                            break;
-                    }
-                }];
+                        switch (completionStatus) {
+                            case SPUUserInitiatedCheckDone:
+                                break;
+                            case SPUUserInitiatedCheckCanceled:
+                                cancelUpdateCheck();
+                                break;
+                        }
+                    }];
+                }
                 
                 [self.uiDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders inBackground:NO includesSkippedUpdates:YES];
             }

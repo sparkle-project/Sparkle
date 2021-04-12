@@ -18,16 +18,6 @@
 #import <Foundation/Foundation.h>
 #endif
 
-typedef NS_ENUM(NSUInteger, SPUUserInitiatedCheckStatus) {
-    SPUUserInitiatedCheckDone __deprecated_msg("Deprecated because SPUUserInitiatedCheckDone has no effect. Just don't reply with this status."),
-    SPUUserInitiatedCheckCanceled
-};
-
-typedef NS_ENUM(NSUInteger, SPUDownloadUpdateStatus) {
-    SPUDownloadUpdateDone __deprecated_msg("Deprecated because SPUDownloadUpdateDone has no effect. Just don't reply with this status."),
-    SPUDownloadUpdateCanceled
-};
-
 typedef NS_ENUM(NSUInteger, SPUInstallUpdateStatus) {
     SPUInstallUpdateNow,
     SPUInstallAndRelaunchUpdateNow,
@@ -43,6 +33,18 @@ typedef NS_ENUM(NSInteger, SPUUpdateAlertChoice) {
 typedef NS_ENUM(NSInteger, SPUInformationalUpdateAlertChoice) {
     SPUDismissInformationalNoticeChoice,
     SPUSkipThisInformationalVersionChoice
+};
+
+// Deprecated
+typedef NS_ENUM(NSUInteger, SPUUserInitiatedCheckStatus) {
+    SPUUserInitiatedCheckDone,
+    SPUUserInitiatedCheckCanceled
+};
+
+// Deprecated
+typedef NS_ENUM(NSUInteger, SPUDownloadUpdateStatus) {
+    SPUDownloadUpdateDone,
+    SPUDownloadUpdateCanceled
 };
 
 #endif /* SPUStatusCompletionResults_h */

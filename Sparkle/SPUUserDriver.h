@@ -55,10 +55,10 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  *
  * Respond to the user initiating an update check. Sparkle uses this to show the user a window with an indeterminate progress bar.
  *
- * @param updateCheckStatusCompletion A reply that can be used to cancel the update check with SPUUserInitiatedCheckCanceled.
+ * @param cancellation Invoke this cancellation block to cancel the update check.
  * Attempts to canceling can be made before -dismissUserInitiatedUpdateCheck is invoked.
  */
-- (void)showUserInitiatedUpdateCheckWithCompletion:(void (^)(SPUUserInitiatedCheckStatus))updateCheckStatusCompletion;
+- (void)showUserInitiatedUpdateCheckWithCancellation:(void (^)(void))cancellation;
 
 /*!
  * Dismiss the user initiated update check from the user
@@ -179,10 +179,9 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  *
  * Let the user know that downloading the new update started.
  *
- * @param downloadUpdateStatusCompletion A reply of SPUDownloadUpdateCanceled can be used to cancel
- * the download at any point before -showDownloadDidStartExtractingUpdate is invoked.
+ * @param cancellation Invoke this cancellation block to cancel the download at any point before -showDownloadDidStartExtractingUpdate is invoked.
  */
-- (void)showDownloadInitiatedWithCompletion:(void (^)(SPUDownloadUpdateStatus))downloadUpdateStatusCompletion;
+- (void)showDownloadInitiatedWithCancellation:(void (^)(void))cancellation;
 
 /*!
  * Show the user the content length of the new update that will be downloaded
@@ -267,15 +266,24 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
 /*!
  * Dismiss the current update installation
  *
- * Stop and tear down everything. Reply to all outstanding reply/completion blocks.
+ * Stop and tear down everything.
  * Dismiss all update windows, alerts, progress, etc from the user.
  * Basically, stop everything that could have been started. Sparkle may invoke this when aborting or finishing an update.
  */
 - (void)dismissUpdateInstallation;
 
+/*
+ * Below are deprecated methods that have been replaced by better alternatives.
+ * The deprecated methods will be used if the alternatives have not been implemented yet.
+ * In the future support for using these deprecated methods may be removed however.
+ */
 @optional
 
 - (void)showUpdateNotFoundWithAcknowledgement:(void (^)(void))acknowledgement __deprecated_msg("Implement -showUpdateNotFoundWithError:acknowledgement: instead");
+
+- (void)showUserInitiatedUpdateCheckWithCompletion:(void (^)(SPUUserInitiatedCheckStatus))updateCheckStatusCompletion __deprecated_msg("Implement -showUserInitiatedUpdateCheckWithCancellation: instead");
+
+- (void)showDownloadInitiatedWithCompletion:(void (^)(SPUDownloadUpdateStatus))downloadUpdateStatusCompletion __deprecated_msg("Implement -showDownloadInitiatedWithCancellation: instead");
 
 @end
 
