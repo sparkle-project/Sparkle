@@ -622,20 +622,6 @@
 			remoteGlobalIDString = 721C24441CB753E6005440CB;
 			remoteInfo = "Installer Progress";
 		};
-		724BB3821D3203A9005D534A /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 724BB36B1D31D0B7005D534A;
-			remoteInfo = SparkleInstallerConnection;
-		};
-		724BB39C1D333832005D534A /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 724BB3921D333832005D534A;
-			remoteInfo = InstallerStatus;
-		};
 		726B2B621C645FC900388755 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
@@ -698,13 +684,6 @@
 			proxyType = 1;
 			remoteGlobalIDString = 726E07AC1CAF08D6001A286B;
 			remoteInfo = SparkleInstallerLauncher;
-		};
-		72F94F631CC48669002DEE68 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 726E07EE1CAF37BD001A286B;
-			remoteInfo = SparkleUpdateDownloader;
 		};
 		72F94F6A1CC4A0C8002DEE68 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -2598,11 +2577,8 @@
 			);
 			dependencies = (
 				61B5F91C09C4CF7200B25A18 /* PBXTargetDependency */,
-				724BB3831D3203A9005D534A /* PBXTargetDependency */,
 				72F94F621CC48669002DEE68 /* PBXTargetDependency */,
-				72F94F641CC48669002DEE68 /* PBXTargetDependency */,
 				726E4A201C86C88F00C57C6A /* PBXTargetDependency */,
-				724BB39D1D333832005D534A /* PBXTargetDependency */,
 			);
 			name = "Sparkle Test App";
 			productName = "Test Application";
@@ -3794,16 +3770,6 @@
 			target = 721C24441CB753E6005440CB /* Installer Progress */;
 			targetProxy = 721D8A791D4952B60032E472 /* PBXContainerItemProxy */;
 		};
-		724BB3831D3203A9005D534A /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 724BB36B1D31D0B7005D534A /* SparkleInstallerConnection */;
-			targetProxy = 724BB3821D3203A9005D534A /* PBXContainerItemProxy */;
-		};
-		724BB39D1D333832005D534A /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 724BB3921D333832005D534A /* SparkleInstallerStatus */;
-			targetProxy = 724BB39C1D333832005D534A /* PBXContainerItemProxy */;
-		};
 		726B2B631C645FC900388755 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 61B5F90109C4CEE200B25A18 /* Sparkle Test App */;
@@ -3848,11 +3814,6 @@
 			isa = PBXTargetDependency;
 			target = 726E07AC1CAF08D6001A286B /* SparkleInstallerLauncher */;
 			targetProxy = 72F94F611CC48669002DEE68 /* PBXContainerItemProxy */;
-		};
-		72F94F641CC48669002DEE68 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 726E07EE1CAF37BD001A286B /* SparkleDownloader */;
-			targetProxy = 72F94F631CC48669002DEE68 /* PBXContainerItemProxy */;
 		};
 		72F94F6B1CC4A0C8002DEE68 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
