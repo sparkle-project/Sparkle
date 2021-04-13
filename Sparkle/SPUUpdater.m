@@ -310,12 +310,14 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         
         __weak SPUUpdater *weakSelf = self;
         [self.userDriver showUpdatePermissionRequest:updatePermissionRequest reply:^(SUUpdatePermissionResponse *response) {
-            SPUUpdater *strongSelf = weakSelf;
-            if (strongSelf != nil) {
-                [strongSelf updatePermissionRequestFinishedWithResponse:response];
-                // Schedule checks, but make sure we ignore the delayed call from KVO
-                [strongSelf resetUpdateCycle];
-            }
+            dispatch_async(dispatch_get_main_queue(), ^{
+                SPUUpdater *strongSelf = weakSelf;
+                if (strongSelf != nil) {
+                    [strongSelf updatePermissionRequestFinishedWithResponse:response];
+                    // Schedule checks, but make sure we ignore the delayed call from KVO
+                    [strongSelf resetUpdateCycle];
+                }
+            });
         }];
         
         // We start the update checks and register as observer for changes after the prompt finishes

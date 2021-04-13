@@ -17,7 +17,6 @@
 @property (nonatomic, nullable, readonly) SUUpdatePermissionResponse *updatePermissionResponse;
 @property (nonatomic, readonly) BOOL deferInstallation;
 @property (nonatomic, readonly) BOOL verbose;
-@property (nonatomic, readonly) SPUUserDriverCoreComponent *coreComponent;
 @property (nonatomic) uint64_t bytesDownloaded;
 @property (nonatomic) uint64_t bytesToDownload;
 
@@ -28,7 +27,6 @@
 @synthesize updatePermissionResponse = _updatePermissionResponse;
 @synthesize deferInstallation = _deferInstallation;
 @synthesize verbose = _verbose;
-@synthesize coreComponent = _coreComponent;
 @synthesize bytesDownloaded = _bytesDownloaded;
 @synthesize bytesToDownload = _bytesToDownload;
 
@@ -39,7 +37,6 @@
         _updatePermissionResponse = updatePermissionResponse;
         _deferInstallation = deferInstallation;
         _verbose = verbose;
-        _coreComponent = [[SPUUserDriverCoreComponent alloc] init];
     }
     return self;
 }
@@ -62,9 +59,8 @@
     }
 }
 
-- (void)showUserInitiatedUpdateCheckWithCompletion:(void (^)(SPUUserInitiatedCheckStatus))updateCheckStatusCompletion
+- (void)showUserInitiatedUpdateCheckWithCancellation:(void (^)(void))__unused cancellation
 {
-    [self.coreComponent registerUpdateCheckStatusHandler:updateCheckStatusCompletion];
     if (self.verbose) {
         fprintf(stderr, "Checking for Updates...\n");
     }
@@ -72,7 +68,6 @@
 
 - (void)dismissUserInitiatedUpdateCheck
 {
-    [self.coreComponent completeUpdateCheckStatus];
 }
 
 - (void)displayReleaseNotes:(const char * _Nullable)releaseNotes
@@ -124,16 +119,15 @@
 
 - (void)showResumableUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem userInitiated:(BOOL)__unused userInitiated reply:(void (^)(SPUInstallUpdateStatus))reply
 {
-    [self.coreComponent registerInstallUpdateHandler:reply];
     [self showUpdateWithAppcastItem:appcastItem updateAdjective:@"resumable"];
     
     if (self.deferInstallation) {
         if (self.verbose) {
             fprintf(stderr, "Deferring Installation.\n");
         }
-        [self.coreComponent installUpdateWithChoice:SPUDismissUpdateInstallation];
+        reply(SPUDismissUpdateInstallation);
     } else {
-        [self.coreComponent installUpdateWithChoice:SPUInstallAndRelaunchUpdateNow];
+        reply(SPUInstallAndRelaunchUpdateNow);
     }
 }
 
@@ -187,10 +181,8 @@
     exit(EXIT_FAILURE);
 }
 
-- (void)showDownloadInitiatedWithCompletion:(void (^)(SPUDownloadUpdateStatus))downloadUpdateStatusCompletion
+- (void)showDownloadInitiatedWithCancellation:(void (^)(void))__unused cancellation
 {
-    [self.coreComponent registerDownloadStatusHandler:downloadUpdateStatusCompletion];
-    
     if (self.verbose) {
         fprintf(stderr, "Downloading Update...\n");
     }
@@ -221,8 +213,6 @@
 
 - (void)showDownloadDidStartExtractingUpdate
 {
-    [self.coreComponent completeDownloadStatus];
-    
     if (self.verbose) {
         fprintf(stderr, "Extracting update...\n");
     }
@@ -237,15 +227,13 @@
 
 - (void)showReadyToInstallAndRelaunch:(void (^)(SPUInstallUpdateStatus))installUpdateHandler
 {
-    [self.coreComponent registerInstallUpdateHandler:installUpdateHandler];
-    
     if (self.deferInstallation) {
         if (self.verbose) {
             fprintf(stderr, "Deferring Installation.\n");
         }
-        [self.coreComponent installUpdateWithChoice:SPUDismissUpdateInstallation];
+        installUpdateHandler(SPUDismissUpdateInstallation);
     } else {
-        [self.coreComponent installUpdateWithChoice:SPUInstallAndRelaunchUpdateNow];
+        installUpdateHandler(SPUInstallAndRelaunchUpdateNow);
     }
 }
 
@@ -258,13 +246,11 @@
 
 - (void)showUpdateInstalledAndRelaunched:(BOOL)__unused relaunched acknowledgement:(void (^)(void))acknowledgement
 {
-    [self.coreComponent registerAcknowledgement:acknowledgement];
-    
     if (self.verbose) {
        fprintf(stderr, "Installation Finished.\n");
     }
     
-    [self.coreComponent acceptAcknowledgement];
+    acknowledgement();
 }
 
 - (void)dismissUpdateInstallation __attribute__((noreturn))

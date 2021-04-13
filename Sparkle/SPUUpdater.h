@@ -49,6 +49,13 @@ SU_EXPORT @interface SPUUpdater : NSObject
 - (instancetype)initWithHostBundle:(NSBundle *)hostBundle applicationBundle:(NSBundle *)applicationBundle userDriver:(id <SPUUserDriver>)userDriver delegate:(id<SPUUpdaterDelegate> _Nullable)delegate;
 
 /*!
+ Use -initWithHostBundle:applicationBundle:userDriver:delegate: or SPUStandardUpdaterController standard adapter instead.
+ 
+ If you want to drop an updater into a nib, use SPUStandardUpdaterController.
+ */
+- (instancetype)init NS_UNAVAILABLE;
+
+/*!
  Starts the updater.
 
  This method checks if Sparkle is configured properly. A valid feed URL should be set before this method is invoked.

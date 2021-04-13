@@ -13,7 +13,6 @@
 
 @property (nonatomic, readonly) NSWindow *window;
 @property (nonatomic, nullable) SUInstallUpdateViewController *installUpdateViewController;
-@property (nonatomic, readonly) SPUUserDriverCoreComponent *coreComponent;
 @property (nonatomic) NSTitlebarAccessoryViewController *accessoryViewController;
 @property (nonatomic) BOOL addedAccessory;
 @property (nonatomic) NSButton *updateButton;
@@ -27,7 +26,6 @@
 
 @synthesize window = _window;
 @synthesize installUpdateViewController = _installUpdateViewController;
-@synthesize coreComponent = _coreComponent;
 @synthesize accessoryViewController = _accessoryViewController;
 @synthesize addedAccessory = _addedAccessory;
 @synthesize updateButton = _updateButton;
@@ -40,7 +38,6 @@
     self = [super init];
     if (self != nil) {
         _window = window;
-        _coreComponent = [[SPUUserDriverCoreComponent alloc] init];
     }
     return self;
 }
@@ -189,63 +186,52 @@
 
 - (void)showReadyToInstallAndRelaunch:(void (^)(SPUInstallUpdateStatus))installUpdateHandler
 {
-    [self.coreComponent registerInstallUpdateHandler:installUpdateHandler];
-    
-    __weak SUPopUpTitlebarUserDriver *weakSelf = self;
     [self addUpdateButtonWithTitle:@"Install & Relaunch" action:^(NSButton *__unused button) {
-        [weakSelf.coreComponent installUpdateWithChoice:SPUInstallAndRelaunchUpdateNow];
+        installUpdateHandler(SPUInstallAndRelaunchUpdateNow);
     }];
 }
 
 #pragma mark Check for Updates
 
-- (void)showUserInitiatedUpdateCheckWithCompletion:(void (^)(SPUUserInitiatedCheckStatus))updateCheckStatusCompletion
+- (void)showUserInitiatedUpdateCheckWithCancellation:(void (^)(void))__unused cancellation
 {
-    [self.coreComponent registerUpdateCheckStatusHandler:updateCheckStatusCompletion];
-    
     [self addUpdateButtonWithTitle:@"Checking for Updates…"];
 }
 
 - (void)dismissUserInitiatedUpdateCheck
 {
-    [self.coreComponent completeUpdateCheckStatus];
     [self removeUpdateButton];
 }
 
 #pragma mark Update Errors
 
-- (void)acceptAcknowledgementAfterDelay
+- (void)acceptAcknowledgementAfterDelay:(void (^)(void))acknowledgement
 {
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         // Installation will be dismissed shortly after this
-        [self.coreComponent acceptAcknowledgement];
+        acknowledgement();
     });
 }
 
 - (void)showUpdaterError:(NSError *)error acknowledgement:(void (^)(void))acknowledgement
 {
-    [self.coreComponent registerAcknowledgement:acknowledgement];
-    
     NSLog(@"Error: %@", error);
     [self addUpdateButtonWithTitle:@"Update Errored!" action:nil];
     
-    [self acceptAcknowledgementAfterDelay];
+    [self acceptAcknowledgementAfterDelay:acknowledgement];
 }
 
 - (void)showUpdateNotFoundWithError:(NSError *)error acknowledgement:(void (^)(void))acknowledgement
 {
-    [self.coreComponent registerAcknowledgement:acknowledgement];
-    
     [self addUpdateButtonWithTitle:@"No Update Available" action:nil];
     
-    [self acceptAcknowledgementAfterDelay];
+    [self acceptAcknowledgementAfterDelay:acknowledgement];
 }
 
 #pragma mark Download & Install Updates
 
-- (void)showDownloadInitiatedWithCompletion:(void (^)(SPUDownloadUpdateStatus))downloadUpdateStatusCompletion
+- (void)showDownloadInitiatedWithCancellation:(void (^)(void))__unused cancellation
 {
-    [self.coreComponent registerDownloadStatusHandler:downloadUpdateStatusCompletion];
 }
 
 - (void)showDownloadDidReceiveExpectedContentLength:(uint64_t)expectedContentLength
@@ -272,7 +258,6 @@
 
 - (void)showDownloadDidStartExtractingUpdate
 {
-    [self.coreComponent completeDownloadStatus];
     [self addUpdateButtonWithTitle:@"Extracting…"];
 }
 
@@ -294,19 +279,15 @@
 
 - (void)showUpdateInstalledAndRelaunched:(BOOL)__unused relaunched acknowledgement:(void (^)(void))acknowledgement
 {
-    [self.coreComponent registerAcknowledgement:acknowledgement];
-    
     [self addUpdateButtonWithTitle:@"Installation Finished!"];
     
-    [self acceptAcknowledgementAfterDelay];
+    [self acceptAcknowledgementAfterDelay:acknowledgement];
 }
 
 #pragma mark Aborting Everything
 
 - (void)dismissUpdateInstallation
 {
-    [self.coreComponent dismissUpdateInstallation];
-    
     [self removeUpdateButton];
 }
 
