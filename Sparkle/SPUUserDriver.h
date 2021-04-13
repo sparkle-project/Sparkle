@@ -28,18 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
  This protocol is used for implementing a user interface for the Sparkle updater. Sparkle's internal drivers tell
  an object that implements this protocol what actions to take and show to the user.
  
- Every method in this protocol is required (i.e, not optional) and has a void return type and can optionally take a single parameter block, which waits for
- a response back from the user driver. Note that every parameter block, or reply, *must* be responded to eventually -
- that is, none can be ignored. Furthermore, they can only be replied to *once* - a reply or completion block should be considered
- invalidated after it's once used. The faster a reply can be made, the more Sparkle may be able to idle, and so the better.
  Every method in this protocol can be assumed to be called from the main thread.
- 
- It may be possible for an action that says to invalidate or dismiss something to be called multiple times in succession, and the implementor may choose to ignore further requests. (TODO: This should be verified if this actually can happen in practice).
- 
- Note: Once upon a time, when first developing the user driver API, I had the user driver exist in a separate process from the rest of the framework (this is no longer supported).
- If you're familiar with how the higher level XPC APIs work, this explains why some of the decisions above were made
- (reply block executed on any thread, reply block replied only once, single reply block, void return types, idleness, no optional methods, ...)
- This is somewhat of an artifact now, but I think most of these set of restrictions still enforces a well designed API.
  */
 SU_EXPORT @protocol SPUUserDriver <NSObject>
 
@@ -66,17 +55,15 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  *
  * Respond to the user initiating an update check. Sparkle uses this to show the user a window with an indeterminate progress bar.
  *
- * @param updateCheckStatusCompletion A reply indicating whether the initiated update check is done or canceled.
- * Attempts to canceling can be made before -dismissUserInitiatedUpdateCheck is invoked. Replying with SPUUserInitiatedCheckDone
- * on the other hand should not be done until -dismissUserInitiatedUpdateCheck is invoked.
+ * @param cancellation Invoke this cancellation block to cancel the update check.
+ * Attempts to canceling can be made before -dismissUserInitiatedUpdateCheck is invoked.
  */
-- (void)showUserInitiatedUpdateCheckWithCompletion:(void (^)(SPUUserInitiatedCheckStatus))updateCheckStatusCompletion;
+- (void)showUserInitiatedUpdateCheckWithCancellation:(void (^)(void))cancellation;
 
 /*!
  * Dismiss the user initiated update check from the user
  *
  * Dismiss whatever was started in -showUserInitiatedUpdateCheckWithCompletion:
- * This is an appropriate time to reply with SPUUserInitiatedCheckDone if not having done so already
  */
 - (void)dismissUserInitiatedUpdateCheck;
 
@@ -192,12 +179,9 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  *
  * Let the user know that downloading the new update started.
  *
- * @param downloadUpdateStatusCompletion A reply of SPUDownloadUpdateCanceled can be used to cancel
- * the download at any point before -showDownloadDidStartExtractingUpdate is invoked.
- * A reply of SPUDownloadUpdateDone signifies that the download is done, which should not be invoked until
- * -showDownloadDidStartExtractingUpdate
+ * @param cancellation Invoke this cancellation block to cancel the download at any point before -showDownloadDidStartExtractingUpdate is invoked.
  */
-- (void)showDownloadInitiatedWithCompletion:(void (^)(SPUDownloadUpdateStatus))downloadUpdateStatusCompletion;
+- (void)showDownloadInitiatedWithCancellation:(void (^)(void))cancellation;
 
 /*!
  * Show the user the content length of the new update that will be downloaded
@@ -219,7 +203,6 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
 /*!
  * Show the user that the update finished downloading and started extracting
  *
- * This is an appropriate time to reply with SPUDownloadUpdateDone if not done so already
  * Sparkle uses this to show an indeterminate progress bar.
  *
  * Note that an update can resume at this point after having been downloaded before,
@@ -283,15 +266,24 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
 /*!
  * Dismiss the current update installation
  *
- * Stop and tear down everything. Reply to all outstanding reply/completion blocks.
+ * Stop and tear down everything.
  * Dismiss all update windows, alerts, progress, etc from the user.
  * Basically, stop everything that could have been started. Sparkle may invoke this when aborting or finishing an update.
  */
 - (void)dismissUpdateInstallation;
 
+/*
+ * Below are deprecated methods that have been replaced by better alternatives.
+ * The deprecated methods will be used if the alternatives have not been implemented yet.
+ * In the future support for using these deprecated methods may be removed however.
+ */
 @optional
 
 - (void)showUpdateNotFoundWithAcknowledgement:(void (^)(void))acknowledgement __deprecated_msg("Implement -showUpdateNotFoundWithError:acknowledgement: instead");
+
+- (void)showUserInitiatedUpdateCheckWithCompletion:(void (^)(SPUUserInitiatedCheckStatus))updateCheckStatusCompletion __deprecated_msg("Implement -showUserInitiatedUpdateCheckWithCancellation: instead");
+
+- (void)showDownloadInitiatedWithCompletion:(void (^)(SPUDownloadUpdateStatus))downloadUpdateStatusCompletion __deprecated_msg("Implement -showDownloadInitiatedWithCancellation: instead");
 
 @end
 

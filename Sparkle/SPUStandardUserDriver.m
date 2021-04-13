@@ -7,7 +7,6 @@
 //
 
 #import "SPUStandardUserDriver.h"
-#import "SPUUserDriverCoreComponent.h"
 #import "SPUStandardUserDriverDelegate.h"
 #import "SUAppcastItem.h"
 #import "SUVersionDisplayProtocol.h"
@@ -23,8 +22,10 @@
 
 @property (nonatomic, readonly) SUHost *host;
 
-@property (nonatomic, readonly) SPUUserDriverCoreComponent *coreComponent;
 @property (nonatomic, weak, nullable, readonly) id <SPUStandardUserDriverDelegate> delegate;
+
+@property (nonatomic, copy) void (^installUpdateHandler)(SPUInstallUpdateStatus);
+@property (nonatomic, copy) void (^cancellation)(void);
 
 @property (nonatomic) SUStatusController *checkingController;
 @property (nonatomic) SUUpdateAlert *activeUpdateAlert;
@@ -36,7 +37,8 @@
 @implementation SPUStandardUserDriver
 
 @synthesize host = _host;
-@synthesize coreComponent = _coreComponent;
+@synthesize installUpdateHandler = _installUpdateHandler;
+@synthesize cancellation = _cancellation;
 @synthesize delegate = _delegate;
 @synthesize checkingController = _checkingController;
 @synthesize activeUpdateAlert = _activeUpdateAlert;
@@ -51,7 +53,6 @@
     if (self != nil) {
         _host = [[SUHost alloc] initWithBundle:hostBundle];
         _delegate = delegate;
-        _coreComponent = [[SPUUserDriverCoreComponent alloc] init];
     }
     return self;
 }
@@ -207,21 +208,24 @@
     [[self.statusController window] makeKeyAndOrderFront:self];
     [NSApp requestUserAttention:NSInformationalRequest];
     
-    [self.coreComponent registerInstallUpdateHandler:installUpdateHandler];
+    self.installUpdateHandler = installUpdateHandler;
 }
 
 - (void)installAndRestart:(id)__unused sender
 {
-    [self.coreComponent installUpdateWithChoice:SPUInstallAndRelaunchUpdateNow];
+    if (self.installUpdateHandler != nil) {
+        self.installUpdateHandler(SPUInstallAndRelaunchUpdateNow);
+        self.installUpdateHandler = nil;
+    }
 }
 
 #pragma mark Check for Updates
 
-- (void)showUserInitiatedUpdateCheckWithCompletion:(void (^)(SPUUserInitiatedCheckStatus))updateCheckStatusCompletion
+- (void)showUserInitiatedUpdateCheckWithCancellation:(void (^)(void))cancellation
 {
     assert(NSThread.isMainThread);
     
-    [self.coreComponent registerUpdateCheckStatusHandler:updateCheckStatusCompletion];
+    self.cancellation = cancellation;
     
     self.checkingController = [[SUStatusController alloc] initWithHost:self.host];
     [[self.checkingController window] center]; // Force the checking controller to load its window.
@@ -248,7 +252,10 @@
 
 - (void)cancelCheckForUpdates:(id)__unused sender
 {
-    [self.coreComponent cancelUpdateCheckStatus];
+    if (self.cancellation != nil) {
+        self.cancellation();
+        self.cancellation = nil;
+    }
     [self closeCheckingWindow];
 }
 
@@ -256,7 +263,7 @@
 {
     assert(NSThread.isMainThread);
     
-    [self.coreComponent completeUpdateCheckStatus];
+    self.cancellation = nil;
     [self closeCheckingWindow];
 }
 
@@ -266,28 +273,24 @@
 {
     assert(NSThread.isMainThread);
     
-    [self.coreComponent registerAcknowledgement:acknowledgement];
-    
     NSAlert *alert = [[NSAlert alloc] init];
     alert.messageText = SULocalizedString(@"Update Error!", nil);
     alert.informativeText = [NSString stringWithFormat:@"%@", [error localizedDescription]];
     [alert addButtonWithTitle:SULocalizedString(@"Cancel Update", nil)];
     [self showAlert:alert];
     
-    [self.coreComponent acceptAcknowledgement];
+    acknowledgement();
 }
 
 - (void)showUpdateNotFoundWithError:(NSError *)error acknowledgement:(void (^)(void))acknowledgement
 {
     assert(NSThread.isMainThread);
     
-    [self.coreComponent registerAcknowledgement:acknowledgement];
-    
     NSAlert *alert = [NSAlert alertWithError:error];
     alert.alertStyle = NSAlertStyleInformational;
     [self showAlert:alert];
     
-    [self.coreComponent acceptAcknowledgement];
+    acknowledgement();
 }
 
 - (void)showAlert:(NSAlert *)alert
@@ -320,11 +323,11 @@
     }
 }
 
-- (void)showDownloadInitiatedWithCompletion:(void (^)(SPUDownloadUpdateStatus))downloadUpdateStatusCompletion
+- (void)showDownloadInitiatedWithCancellation:(void (^)(void))cancellation
 {
     assert(NSThread.isMainThread);
     
-    [self.coreComponent registerDownloadStatusHandler:downloadUpdateStatusCompletion];
+    self.cancellation = cancellation;
     
     [self showStatusController];
     [self.statusController beginActionWithTitle:SULocalizedString(@"Downloading update...", @"Take care not to overflow the status window.") maxProgressValue:0.0 statusText:nil];
@@ -333,7 +336,10 @@
 
 - (void)cancelDownload:(id)__unused sender
 {
-    [self.coreComponent cancelDownloadStatus];
+    if (self.cancellation != nil) {
+        self.cancellation();
+        self.cancellation = nil;
+    }
 }
 
 - (void)showDownloadDidReceiveExpectedContentLength:(uint64_t)expectedContentLength
@@ -395,7 +401,7 @@
 {
     assert(NSThread.isMainThread);
     
-    [self.coreComponent completeDownloadStatus];
+    self.cancellation = nil;
     
     [self showStatusController];
     [self.statusController beginActionWithTitle:SULocalizedString(@"Extracting update...", @"Take care not to overflow the status window.") maxProgressValue:0.0 statusText:nil];
@@ -426,8 +432,7 @@
     assert(NSThread.isMainThread);
     
     // Deciding not to show anything here
-    [self.coreComponent registerAcknowledgement:acknowledgement];
-    [self.coreComponent acceptAcknowledgement];
+    acknowledgement();
 }
 
 #pragma mark Aborting Everything
@@ -447,7 +452,8 @@
 {
     assert(NSThread.isMainThread);
     
-    [self.coreComponent dismissUpdateInstallation];
+    self.installUpdateHandler = nil;
+    self.cancellation = nil;
     
     [self closeCheckingWindow];
     

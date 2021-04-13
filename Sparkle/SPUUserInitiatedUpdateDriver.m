@@ -50,19 +50,30 @@
             } else {
                 self.showingUserInitiatedProgress = YES;
                 
-                [self.userDriver showUserInitiatedUpdateCheckWithCompletion:^(SPUUserInitiatedCheckStatus completionStatus) {
-                    switch (completionStatus) {
-                        case SPUUserInitiatedCheckDone:
-                            break;
-                        case SPUUserInitiatedCheckCanceled:
-                            dispatch_async(dispatch_get_main_queue(), ^{
-                                if (self.showingUserInitiatedProgress) {
-                                    [self abortUpdate];
-                                }
-                            });
-                            break;
-                    }
-                }];
+                void (^cancelUpdateCheck)(void) = ^{
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        if (self.showingUserInitiatedProgress) {
+                            [self abortUpdate];
+                        }
+                    });
+                };
+                
+                if ([self.userDriver respondsToSelector:@selector(showUserInitiatedUpdateCheckWithCancellation:)]) {
+                    [self.userDriver showUserInitiatedUpdateCheckWithCancellation:cancelUpdateCheck];
+                } else {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+                    [self.userDriver showUserInitiatedUpdateCheckWithCompletion:^(SPUUserInitiatedCheckStatus completionStatus) {
+#pragma clang diagnostic pop
+                        switch (completionStatus) {
+                            case SPUUserInitiatedCheckDone:
+                                break;
+                            case SPUUserInitiatedCheckCanceled:
+                                cancelUpdateCheck();
+                                break;
+                        }
+                    }];
+                }
                 
                 [self.uiDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders inBackground:NO includesSkippedUpdates:YES];
             }
