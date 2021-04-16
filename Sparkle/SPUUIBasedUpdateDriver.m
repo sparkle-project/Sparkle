@@ -178,6 +178,7 @@
             });
         }];
     } else {
+        // Legacy path that will be removed eventually
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
         if (updateItem.isInformationOnlyUpdate) {
