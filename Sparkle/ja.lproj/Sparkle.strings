@@ -14,6 +14,12 @@
 
 "%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%1$@ %2$@は現在入手できる最新バージョンです。\n（現在使用中のバージョンは%3$@です。）";
 
+"Update Installed" = "アップデートがインストールされました";
+
+"%@ is now updated to version %@!" = "%@はバージョン%@にアップデートされました!";
+
+"%@ is now updated!" = "%@はアップデートされました!";
+
 /* Description text for SUUpdateAlert when the update is downloadable. */
 "%@ %@ is now available--you have %@. Would you like to download it now?" = "%1$@ %2$@が入手できます（使用中のバージョンは%3$@です）。今すぐダウンロードしますか?";
 
