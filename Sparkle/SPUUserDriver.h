@@ -256,12 +256,15 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  * Show the user that the update installation finished
  *
  * Let the user know that the update finished installing.
- * This will only be invoked if the updater process is still alive, which is typically not the case if
- * the updater's lifetime is tied to the application it is updating.
  *
- * @param acknowledgement Acknowledge to the updater that the installation finish was shown.
+ * This will only be invoked if the updater process is still alive, which is typically not the case if
+ * the updater's lifetime is tied to the application it is updating. This implementation must not try to reference
+ * the old bundle prior to the installation, which will no longer be around.
+ *
+ * @param relaunched Indicates if the update was relaunched.
+ * @param acknowledgement Acknowledge to the updater that the finished installation was shown.
  */
-- (void)showUpdateInstallationDidFinishWithAcknowledgement:(void (^)(void))acknowledgement;
+- (void)showUpdateInstalledAndRelaunched:(BOOL)relaunched acknowledgement:(void (^)(void))acknowledgement;
 
 /*!
  * Dismiss the current update installation
@@ -279,11 +282,13 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  */
 @optional
 
-- (void)showUpdateNotFoundWithAcknowledgement:(void (^)(void))acknowledgement __deprecated_msg("Implement -showUpdateNotFoundWithError:acknowledgement: instead");
-
 - (void)showUserInitiatedUpdateCheckWithCompletion:(void (^)(SPUUserInitiatedCheckStatus))updateCheckStatusCompletion __deprecated_msg("Implement -showUserInitiatedUpdateCheckWithCancellation: instead");
 
 - (void)showDownloadInitiatedWithCompletion:(void (^)(SPUDownloadUpdateStatus))downloadUpdateStatusCompletion __deprecated_msg("Implement -showDownloadInitiatedWithCancellation: instead");
+
+- (void)showUpdateNotFoundWithAcknowledgement:(void (^)(void))acknowledgement __deprecated_msg("Implement -showUpdateNotFoundWithError:acknowledgement: instead");
+
+- (void)showUpdateInstallationDidFinishWithAcknowledgement:(void (^)(void))acknowledgement __deprecated_msg("Implement -showUpdateInstalledAndRelaunched:acknowledgement: instead");
 
 @end
 

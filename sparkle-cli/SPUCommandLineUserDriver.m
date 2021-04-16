@@ -244,7 +244,7 @@
     }
 }
 
-- (void)showUpdateInstallationDidFinishWithAcknowledgement:(void (^)(void))acknowledgement
+- (void)showUpdateInstalledAndRelaunched:(BOOL)__unused relaunched acknowledgement:(void (^)(void))acknowledgement
 {
     if (self.verbose) {
        fprintf(stderr, "Installation Finished.\n");
