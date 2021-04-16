@@ -21,6 +21,10 @@
 @interface SPUStandardUserDriver ()
 
 @property (nonatomic, readonly) SUHost *host;
+// We must store the oldHostName before the host is potentially replaced
+// because we may use this property after update has been installed
+@property (nonatomic, readonly) NSString *oldHostName;
+@property (nonatomic, readonly) NSURL *oldHostBundleURL;
 
 @property (nonatomic, weak, nullable, readonly) id <SPUStandardUserDriverDelegate> delegate;
 
@@ -37,6 +41,8 @@
 @implementation SPUStandardUserDriver
 
 @synthesize host = _host;
+@synthesize oldHostName = _oldHostName;
+@synthesize oldHostBundleURL = _oldHostBundleURL;
 @synthesize installUpdateHandler = _installUpdateHandler;
 @synthesize cancellation = _cancellation;
 @synthesize delegate = _delegate;
@@ -52,6 +58,8 @@
     self = [super init];
     if (self != nil) {
         _host = [[SUHost alloc] initWithBundle:hostBundle];
+        _oldHostName = _host.name;
+        _oldHostBundleURL = hostBundle.bundleURL;
         _delegate = delegate;
     }
     return self;
@@ -431,11 +439,42 @@
     [self.statusController setButtonEnabled:NO];
 }
 
-- (void)showUpdateInstallationDidFinishWithAcknowledgement:(void (^)(void))acknowledgement
+- (void)showUpdateInstalledAndRelaunched:(BOOL)relaunched acknowledgement:(void (^)(void))acknowledgement
 {
     assert(NSThread.isMainThread);
     
-    // Deciding not to show anything here
+    // Close window showing update is installing
+    [self.statusController close];
+    self.statusController = nil;
+    
+    // Only show installed prompt when the app is not relaunched
+    // When the app is relaunched, there is enough of a UI from relaunching the app.
+    if (!relaunched) {
+        NSAlert *alert = [[NSAlert alloc] init];
+        alert.messageText = SULocalizedString(@"Update Installed", nil);
+        
+        // Extract information from newly updated bundle if available
+        NSString *hostName;
+        NSString *hostVersion;
+        NSBundle *newBundle = [NSBundle bundleWithURL:self.oldHostBundleURL];
+        if (newBundle != nil) {
+            SUHost *newHost = [[SUHost alloc] initWithBundle:newBundle];
+            hostName = newHost.name;
+            hostVersion = newHost.displayVersion;
+        } else {
+            // This may happen if Sparkle's normalization is enabled
+            hostName = self.oldHostName;
+            hostVersion = nil;
+        }
+        
+        if (hostVersion != nil) {
+            alert.informativeText = [NSString stringWithFormat:SULocalizedString(@"%@ is now updated to version %@!", nil), hostName, hostVersion];
+        } else {
+            alert.informativeText = [NSString stringWithFormat:SULocalizedString(@"%@ is now updated!", nil), hostName];
+        }
+        [self showAlert:alert];
+    }
+    
     acknowledgement();
 }
 

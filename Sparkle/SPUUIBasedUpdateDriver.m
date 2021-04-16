@@ -270,9 +270,16 @@
     [self.userDriver showSendingTerminationSignal];
 }
 
-- (void)installerDidFinishInstallationWithAcknowledgement:(void(^)(void))acknowledgement
+- (void)installerDidFinishInstallationAndRelaunched:(BOOL)relaunched acknowledgement:(void(^)(void))acknowledgement
 {
-    [self.userDriver showUpdateInstallationDidFinishWithAcknowledgement:acknowledgement];
+    if ([self.userDriver respondsToSelector:@selector(showUpdateInstalledAndRelaunched:acknowledgement:)]) {
+        [self.userDriver showUpdateInstalledAndRelaunched:relaunched acknowledgement:acknowledgement];
+    } else {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+        [self.userDriver showUpdateInstallationDidFinishWithAcknowledgement:acknowledgement];
+#pragma clang diagnostic pop
+    }
 }
 
 - (void)basicDriverIsRequestingAbortUpdateWithError:(nullable NSError *)error

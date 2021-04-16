@@ -52,7 +52,7 @@
 @property (nonatomic) BOOL postponedOnce;
 @property (nonatomic, weak, readonly) id updater;
 @property (nonatomic, weak, readonly) id<SPUUpdaterDelegate> updaterDelegate;
-@property (nonatomic) BOOL willRelaunch;
+@property (nonatomic) BOOL relaunch;
 
 @property (nonatomic) BOOL systemDomain;
 
@@ -78,7 +78,7 @@
 @synthesize postponedOnce = _postponedOnce;
 @synthesize updater = _updater;
 @synthesize updaterDelegate = _updaterDelegate;
-@synthesize willRelaunch = _willRelaunch;
+@synthesize relaunch = _relaunch;
 @synthesize systemDomain = _systemDomain;
 @synthesize updateItem = _updateItem;
 @synthesize downloadName = _downloadName;
@@ -296,7 +296,7 @@
             hasTargetTerminated = (BOOL)*((const uint8_t *)data.bytes);
         }
         
-        [self.delegate installerWillFinishInstallationAndRelaunch:self.willRelaunch];
+        [self.delegate installerWillFinishInstallationAndRelaunch:self.relaunch];
         
         if (!hasTargetTerminated) {
             [self.delegate installerIsSendingAppTerminationSignal];
@@ -307,7 +307,7 @@
         [self.installerConnection invalidate];
         self.installerConnection = nil;
         
-        [self.delegate installerDidFinishInstallationWithAcknowledgement:^{
+        [self.delegate installerDidFinishInstallationAndRelaunched:self.relaunch acknowledgement:^{
             dispatch_async(dispatch_get_main_queue(), ^{
                 [self.delegate installerIsRequestingAbortInstallWithError:nil];
             });
@@ -498,7 +498,7 @@
     // For resumability, we'll assume we are far enough for the installation to continue
     self.currentStage = SPUInstallationFinishedStage1;
     
-    self.willRelaunch = relaunch;
+    self.relaunch = relaunch;
     
     uint8_t response[2] = {(uint8_t)relaunch, (uint8_t)showUI};
     NSData *responseData = [NSData dataWithBytes:response length:sizeof(response)];
