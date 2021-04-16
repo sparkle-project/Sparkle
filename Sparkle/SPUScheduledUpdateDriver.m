@@ -19,7 +19,6 @@
 
 @property (nonatomic, readonly) SPUUIBasedUpdateDriver *uiDriver;
 @property (nonatomic) BOOL showedUpdate;
-@property (nonatomic) BOOL showingUpdate;
 
 @end
 
@@ -27,7 +26,6 @@
 
 @synthesize uiDriver = _uiDriver;
 @synthesize showedUpdate = _showedUpdate;
-@synthesize showingUpdate = _showingUpdate;
 
 - (instancetype)initWithHost:(SUHost *)host applicationBundle:(NSBundle *)applicationBundle sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater userDriver:(id <SPUUserDriver>)userDriver updaterDelegate:(nullable id <SPUUpdaterDelegate>)updaterDelegate
 {
@@ -65,12 +63,11 @@
 - (void)uiDriverDidShowUpdate
 {
     self.showedUpdate = YES;
-    self.showingUpdate = YES;
 }
 
-- (void)uiDriverFinishedShowingUpdate
+- (BOOL)showingUpdate
 {
-    self.showingUpdate = NO;
+    return self.uiDriver.showingUpdate;
 }
 
 - (void)basicDriverIsRequestingAbortUpdateWithError:(nullable NSError *) error

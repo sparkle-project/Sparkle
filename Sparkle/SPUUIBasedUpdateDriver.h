@@ -17,11 +17,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)coreDriverIsRequestingAbortUpdateWithError:(nullable NSError *)error;
 - (void)uiDriverIsRequestingAbortUpdateWithError:(nullable NSError *)error;
 
-- (void)uiDriverDidShowUpdate;
-- (void)uiDriverFinishedShowingUpdate;
-
 @optional
 
+- (void)uiDriverDidShowUpdate;
 - (void)basicDriverDidFinishLoadingAppcast;
 
 @end
@@ -42,6 +40,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)resumeInstallingUpdateWithCompletion:(SPUUpdateDriverCompletion)completionBlock;
 
 - (void)resumeUpdate:(id<SPUResumableUpdate>)resumableUpdate completion:(SPUUpdateDriverCompletion)completionBlock;
+
+@property (nonatomic, readonly) BOOL showingUpdate;
 
 - (void)abortUpdateWithError:(nullable NSError *)error;
 
