@@ -14,6 +14,12 @@
 
 "%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%1$@ %2$@ is currently the newest version available.\n(You are currently running version %3$@.)";
 
+"Update Installed" = "Update Installed";
+
+"%@ is now updated to version %@!" = "%@ is now updated to version %@!";
+
+"%@ is now updated!" = "%@ is now updated!";
+
 /* Description text for SUUpdateAlert when the update is downloadable. */
 "%@ %@ is now available--you have %@. Would you like to download it now?" = "%1$@ %2$@ is now available—you have %3$@. Would you like to download it now?";
 
