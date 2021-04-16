@@ -93,7 +93,7 @@
     // Only show the update alert if the app is active; otherwise, we'll wait until it is.
     if ([NSApp isActive]) {
         [self.activeUpdateAlert setInstallButtonFocus:userInitiated];
-        [self.activeUpdateAlert.window makeKeyAndOrderFront:self];
+        [self.activeUpdateAlert showWindow:nil];
     } else {
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:NSApplicationDidBecomeActiveNotification object:NSApp];
     }
@@ -101,7 +101,7 @@
 
 - (void)applicationDidBecomeActive:(NSNotification *)__unused aNotification
 {
-    [self.activeUpdateAlert.window makeKeyAndOrderFront:self];
+    [self.activeUpdateAlert showWindow:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:NSApplicationDidBecomeActiveNotification object:NSApp];
 }
 
@@ -188,7 +188,13 @@
 
 - (void)showUpdateInFocus
 {
-    [self setUpFocusForActiveUpdateAlertWithUserInitiation:YES];
+    if (self.activeUpdateAlert != nil) {
+        [self setUpFocusForActiveUpdateAlertWithUserInitiation:YES];
+    } else if (self.permissionPrompt != nil) {
+        [self.permissionPrompt showWindow:nil];
+    } else if (self.statusController != nil) {
+        [self.statusController showWindow:nil];
+    }
 }
 
 #pragma mark Install & Relaunch Update
@@ -197,11 +203,13 @@
 {
     assert(NSThread.isMainThread);
     
+    [self createAndShowStatusController];
+    
     [self.statusController beginActionWithTitle:SULocalizedString(@"Ready to Install", nil) maxProgressValue:1.0 statusText:nil];
     [self.statusController setProgressValue:1.0]; // Fill the bar.
     [self.statusController setButtonEnabled:YES];
     [self.statusController setButtonTitle:SULocalizedString(@"Install and Relaunch", nil) target:self action:@selector(installAndRestart:) isDefault:YES];
-    [[self.statusController window] makeKeyAndOrderFront:self];
+    
     [NSApp requestUserAttention:NSInformationalRequest];
     
     self.installUpdateHandler = installUpdateHandler;
@@ -311,7 +319,7 @@
 
 #pragma mark Download & Install Updates
 
-- (void)showStatusController
+- (void)createAndShowStatusController
 {
     if (self.statusController == nil) {
         self.statusController = [[SUStatusController alloc] initWithHost:self.host];
@@ -325,7 +333,7 @@
     
     self.cancellation = cancellation;
     
-    [self showStatusController];
+    [self createAndShowStatusController];
     [self.statusController beginActionWithTitle:SULocalizedString(@"Downloading update...", @"Take care not to overflow the status window.") maxProgressValue:0.0 statusText:nil];
     [self.statusController setButtonTitle:SULocalizedString(@"Cancel", nil) target:self action:@selector(cancelDownload:) isDefault:NO];
 }
@@ -399,7 +407,7 @@
     
     self.cancellation = nil;
     
-    [self showStatusController];
+    [self createAndShowStatusController];
     [self.statusController beginActionWithTitle:SULocalizedString(@"Extracting update...", @"Take care not to overflow the status window.") maxProgressValue:0.0 statusText:nil];
     [self.statusController setButtonTitle:SULocalizedString(@"Cancel", nil) target:nil action:nil isDefault:NO];
     [self.statusController setButtonEnabled:NO];

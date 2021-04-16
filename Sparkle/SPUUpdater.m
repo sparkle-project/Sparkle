@@ -56,6 +56,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 @property (nonatomic) BOOL startedUpdater;
 @property (nonatomic, nullable) id<SPUResumableUpdate> resumableUpdate;
 @property (nonatomic) BOOL sessionInProgress;
+@property (nonatomic) BOOL showingPermissionRequest;
 
 @property (nonatomic, copy) NSDate *updateLastCheckedDate;
 
@@ -80,6 +81,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 @synthesize startedUpdater = _startedUpdater;
 @synthesize resumableUpdate = _resumableUpdate;
 @synthesize sessionInProgress = _sessionInProgress;
+@synthesize showingPermissionRequest = _showingPermissionRequest;
 @synthesize updateLastCheckedDate = _updateLastCheckedDate;
 @synthesize loggedATSWarning = _loggedATSWarning;
 @synthesize loggedDSAWarning = _loggedDSAWarning;
@@ -307,11 +309,17 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         
         SPUUpdatePermissionRequest *updatePermissionRequest = [[SPUUpdatePermissionRequest alloc] initWithSystemProfile:profileInfo];
         
+        self.showingPermissionRequest = YES;
+        self.sessionInProgress = YES;
+        
         __weak SPUUpdater *weakSelf = self;
         [self.userDriver showUpdatePermissionRequest:updatePermissionRequest reply:^(SUUpdatePermissionResponse *response) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 SPUUpdater *strongSelf = weakSelf;
                 if (strongSelf != nil) {
+                    strongSelf.sessionInProgress = NO;
+                    strongSelf.showingPermissionRequest = NO;
+                    
                     [strongSelf updatePermissionRequestFinishedWithResponse:response];
                     // Schedule checks, but make sure we ignore the delayed call from KVO
                     [strongSelf resetUpdateCycle];
@@ -358,7 +366,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 
 - (BOOL)canCheckForUpdates
 {
-    return self.startedUpdater && (self.driver.showingUpdate || !self.sessionInProgress);
+    return self.startedUpdater && (self.showingPermissionRequest || self.driver.showingUpdate || !self.sessionInProgress);
 }
 
 - (void)scheduleNextUpdateCheckFiringImmediately:(BOOL)firingImmediately
@@ -466,7 +474,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 
 - (void)checkForUpdates
 {
-    if (self.driver.showingUpdate) {
+    if (self.showingPermissionRequest || self.driver.showingUpdate) {
         if ([self.userDriver respondsToSelector:@selector(showUpdateInFocus)]) {
             [self.userDriver showUpdateInFocus];
         }

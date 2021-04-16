@@ -125,13 +125,6 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
 - (void)showInformationalUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem userInitiated:(BOOL)userInitiated reply:(void (^)(SPUInformationalUpdateAlertChoice))reply;
 
 /*!
- * Show the user currently presented update in utmost focus
- *
- * Sparkle uses this to make its update frontmost again
- */
-- (void)showUpdateInFocus;
-
-/*!
  * Show the user the release notes for the new update
  *
  * Display the release notes to the user. This will be called after showing the new update.
@@ -262,6 +255,14 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  * @param acknowledgement Acknowledge to the updater that the installation finish was shown.
  */
 - (void)showUpdateInstallationDidFinishWithAcknowledgement:(void (^)(void))acknowledgement;
+
+/*!
+ * Show the user the current presented update or its progress in utmost focus
+ *
+ * The user wishes to check for updates while the user is being shown update progress.
+ * Bring whatever is on screen to frontmost focus (permission request, update information, downloading or extraction status, choice to install update, etc).
+ */
+- (void)showUpdateInFocus;
 
 /*!
  * Dismiss the current update installation

@@ -67,7 +67,7 @@
 
 - (BOOL)showingUpdate
 {
-    return self.uiDriver.showingUpdate;
+    return self.showedUpdate;
 }
 
 - (void)basicDriverIsRequestingAbortUpdateWithError:(nullable NSError *) error

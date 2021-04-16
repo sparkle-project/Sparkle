@@ -41,8 +41,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)resumeUpdate:(id<SPUResumableUpdate>)resumableUpdate completion:(SPUUpdateDriverCompletion)completionBlock;
 
-@property (nonatomic, readonly) BOOL showingUpdate;
-
 - (void)abortUpdateWithError:(nullable NSError *)error;
 
 @end

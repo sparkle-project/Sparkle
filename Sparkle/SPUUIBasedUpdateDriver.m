@@ -33,7 +33,6 @@
 @property (nonatomic) BOOL resumingInstallingUpdate;
 @property (nonatomic) BOOL resumingDownloadedUpdate;
 @property (nonatomic) BOOL preventsInstallerInteraction;
-@property (nonatomic) BOOL showingUpdate;
 
 @end
 
@@ -49,7 +48,6 @@
 @synthesize resumingInstallingUpdate = _resumingInstallingUpdate;
 @synthesize resumingDownloadedUpdate = _resumingDownloadedUpdate;
 @synthesize preventsInstallerInteraction = _preventsInstallerInteraction;
-@synthesize showingUpdate = _showingUpdate;
 
 - (instancetype)initWithHost:(SUHost *)host applicationBundle:(NSBundle *)applicationBundle sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater userDriver:(id <SPUUserDriver>)userDriver userInitiated:(BOOL)userInitiated updaterDelegate:(nullable id <SPUUpdaterDelegate>)updaterDelegate delegate:(id<SPUUIBasedUpdateDriverDelegate>)delegate
 {
@@ -117,8 +115,6 @@
         
         [self.userDriver showInformationalUpdateFoundWithAppcastItem:updateItem userInitiated:self.userInitiated reply:^(SPUInformationalUpdateAlertChoice choice) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                self.showingUpdate = NO;
-                
                 switch (choice) {
                     case SPUSkipThisInformationalVersionChoice:
                         [self.host setObject:[updateItem versionString] forUserDefaultsKey:SUSkippedVersionKey];
@@ -136,8 +132,6 @@
     } else if (self.resumingDownloadedUpdate) {
         [self.userDriver showDownloadedUpdateFoundWithAppcastItem:updateItem userInitiated:self.userInitiated reply:^(SPUUpdateAlertChoice choice) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                self.showingUpdate = NO;
-                
                 [self.host setObject:nil forUserDefaultsKey:SUSkippedVersionKey];
                 switch (choice) {
                     case SPUInstallUpdateChoice:
@@ -160,8 +154,6 @@
     } else if (!self.resumingInstallingUpdate) {
         [self.userDriver showUpdateFoundWithAppcastItem:updateItem userInitiated:self.userInitiated reply:^(SPUUpdateAlertChoice choice) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                self.showingUpdate = NO;
-                
                 [self.host setObject:nil forUserDefaultsKey:SUSkippedVersionKey];
                 switch (choice) {
                     case SPUInstallUpdateChoice:
@@ -183,15 +175,11 @@
     } else {
         [self.userDriver showResumableUpdateFoundWithAppcastItem:updateItem userInitiated:self.userInitiated reply:^(SPUInstallUpdateStatus choice) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                self.showingUpdate = NO;
-                
                 [self.host setObject:nil forUserDefaultsKey:SUSkippedVersionKey];
                 [self.coreDriver finishInstallationWithResponse:choice displayingUserInterface:!self.preventsInstallerInteraction];
             });
         }];
     }
-    
-    self.showingUpdate = YES;
     
     if ([self.delegate respondsToSelector:@selector(uiDriverDidShowUpdate)]) {
         [self.delegate uiDriverDidShowUpdate];

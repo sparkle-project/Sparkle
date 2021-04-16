@@ -119,7 +119,7 @@ SU_EXPORT @interface SPUUpdater : NSObject
 /*!
  A property indicating whether or not updates can be checked by the user.
  
- An update check can be made by the user when an update session isn't in progress, or when an update is presently being shown.
+ An update check can be made by the user when an update session isn't in progress, or when an update or its progress is being shown to the user.
  
  This property is suitable to use for menu item validation for seeing if -checkForUpdates can be invoked.
  
@@ -131,7 +131,8 @@ SU_EXPORT @interface SPUUpdater : NSObject
  A property indicating whether or not an update session is in progress.
  
  An update session is in progress when the appcast is being downloaded, an update is being downloaded,
- an update is being shown, or the installer is being started. An active session is when Sparkle's fired scheduler is running.
+ an update is being shown, update permission is being requested, or the installer is being started.
+ An active session is when Sparkle's fired scheduler is running.
  
  Note an update session may be inactive even though Sparkle's installer (ran as a separate process) may be running,
  or even though the update has been downloaded but the installation has been deferred. In both of these cases, an update session
