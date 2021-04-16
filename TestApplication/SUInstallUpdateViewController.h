@@ -11,7 +11,7 @@
 
 @interface SUInstallUpdateViewController : NSViewController
 
-- (instancetype)initWithAppcastItem:(SUAppcastItem *)appcastItem skippable:(BOOL)skippable reply:(void (^)(SPUUpdateAlertChoice))reply;
+- (instancetype)initWithAppcastItem:(SUAppcastItem *)appcastItem skippable:(BOOL)skippable reply:(void (^)(SPUUserUpdateChoice))reply;
 
 - (void)showReleaseNotesWithDownloadData:(SPUDownloadData *)downloadData;
 
