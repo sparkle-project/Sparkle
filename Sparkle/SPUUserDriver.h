@@ -251,7 +251,6 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
 
 // Clients should move to non-deprecated methods
 // Deprecated methods are only (temporarily) kept around for binary compatibility reasons
-#if DEBUG
 
 - (void)showUserInitiatedUpdateCheckWithCompletion:(void (^)(SPUUserInitiatedCheckStatus))updateCheckStatusCompletion __deprecated_msg("Implement -showUserInitiatedUpdateCheckWithCancellation: instead");
 
@@ -268,8 +267,6 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
 - (void)showResumableUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem userInitiated:(BOOL)userInitiated reply:(void (^)(SPUUserUpdateChoice))reply __deprecated_msg("Implement -showUpdateFoundWithAppcastItem:userInitiated:state:reply: instead");
 
 - (void)showInformationalUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem userInitiated:(BOOL)userInitiated reply:(void (^)(SPUInformationalUpdateAlertChoice))reply __deprecated_msg("Implement -showUpdateFoundWithAppcastItem:userInitiated:state:reply: instead");
-
-#endif
 
 @end
 
