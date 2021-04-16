@@ -77,7 +77,7 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  * @param userInitiated A flag indicating whether or not a user initiated this update check
  *
  * @param state The current state of the update.
- *  SPUUserUpdateStateNotDownloaded - Update has not been downloaded yet.
+ *  SPUUserUpdateStateNew - Update has not been downloaded yet.
  *  SPUUserUpdateStateDownloaded - Update has already been downloaded but not started installing yet.
  *  SPUUserUpdateStateInstalling - Update has been downloaded and already started installing.
  *  SPUUserUpdateStateInformational - Update is only informational and has no download. You can direct the user to the the infoURL property of the appcastItem in their web browser. The informationOnlyUpdate property of the appcastItem will be YES.
@@ -89,8 +89,8 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  * If the state is SPUUserUpdateStateInstalling, this may send a quit event to the application and relaunch it immediately (in this state, this behaves as a fast "install and Relaunch").
  *
  * A reply of SPUUserUpdateChoiceDismiss dismisses the update for the time being. The user may be reminded of the update at a later point.
- * If the state is SPUUserUpdateStateDownloaded, the downloaded update is kept upon dismissing until the next time an update is shown to the user.
- * If the state is SPUUserUpdateStateInstalling, the installing update is also preserved upon dismissing. In this state however, the update will still be installed after the application is terminated.
+ * If the state is SPUUserUpdateStateDownloaded, the downloaded update is kept after dismissing until the next time an update is shown to the user.
+ * If the state is SPUUserUpdateStateInstalling, the installing update is also preserved after dismissing. In this state however, the update will also still be installed after the application is terminated.
  *
  * A reply of SPUUserUpdateChoiceSkip skips this particular version and won't notify the user again, unless they initiate an update check themselves.
  * If the state is SPUUserUpdateStateInstalling, the update cannot be skipped, only dismissed or installed.
