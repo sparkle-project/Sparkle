@@ -32,7 +32,8 @@
 - (IBAction)installUpdate:sender;
 - (IBAction)skipThisVersion:sender;
 - (IBAction)remindMeLater:sender;
-- (void)disableKeyboardShortcutForInstallButton;
+
+- (void)setInstallButtonFocus:(BOOL)focus;
 
 @end
 

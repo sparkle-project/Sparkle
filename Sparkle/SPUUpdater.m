@@ -55,7 +55,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 @property (nonatomic, readonly) SPUUpdaterTimer *updaterTimer;
 @property (nonatomic) BOOL startedUpdater;
 @property (nonatomic, nullable) id<SPUResumableUpdate> resumableUpdate;
-@property (nonatomic) BOOL canCheckForUpdates;
+@property (nonatomic) BOOL sessionInProgress;
 
 @property (nonatomic, copy) NSDate *updateLastCheckedDate;
 
@@ -79,7 +79,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 @synthesize sparkleBundle = _sparkleBundle;
 @synthesize startedUpdater = _startedUpdater;
 @synthesize resumableUpdate = _resumableUpdate;
-@synthesize canCheckForUpdates = _canCheckForUpdates;
+@synthesize sessionInProgress = _sessionInProgress;
 @synthesize updateLastCheckedDate = _updateLastCheckedDate;
 @synthesize loggedATSWarning = _loggedATSWarning;
 @synthesize loggedDSAWarning = _loggedDSAWarning;
@@ -147,12 +147,11 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     }
     
     self.startedUpdater = YES;
-    [self setCanCheckForUpdates:YES];
     
     // Start updater on next update cycle so we make sure the application invoking the updater is ready
     // This also gives the developer a cycle to check for updates before Sparkle's update cycle scheduler kicks in
     dispatch_async(dispatch_get_main_queue(), ^{
-        if ([self canCheckForUpdates]) {
+        if (!self.sessionInProgress) {
             [self startUpdateCycle];
         }
     });
@@ -357,11 +356,9 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     [self scheduleNextUpdateCheckFiringImmediately:NO];
 }
 
-- (void)setCanCheckForUpdates:(BOOL)canCheckForUpdates
+- (BOOL)canCheckForUpdates
 {
-    _canCheckForUpdates = canCheckForUpdates;
-    
-    [self.userDriver showCanCheckForUpdates:canCheckForUpdates];
+    return self.startedUpdater && (self.driver.showingUpdate || !self.sessionInProgress);
 }
 
 - (void)scheduleNextUpdateCheckFiringImmediately:(BOOL)firingImmediately
@@ -416,11 +413,11 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         return;
     }
     
-    if (!self.canCheckForUpdates) {
-        SULog(SULogLevelError, @"Error: -checkForUpdatesInBackground called but .canCheckForUpdates == NO");
+    if (self.sessionInProgress) {
+        SULog(SULogLevelError, @"Error: -checkForUpdatesInBackground called but .sessionInProgress == YES");
     }
     
-    [self setCanCheckForUpdates:NO];
+    self.sessionInProgress = YES;
     
     // We don't want the probe check to act on the driver if the updater is going near death
     __weak SPUUpdater *weakSelf = self;
@@ -469,26 +466,34 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 
 - (void)checkForUpdates
 {
-    __weak SPUUpdater *weakSelf = self;
+    if (self.driver.showingUpdate) {
+        if ([self.userDriver respondsToSelector:@selector(showUpdateInFocus)]) {
+            [self.userDriver showUpdateInFocus];
+        }
+        return;
+    }
+    
     if (!self.startedUpdater) {
         SULog(SULogLevelError, @"Error: checkForUpdates - updater hasn't been started yet. Please call -startUpdater: first");
         return;
     }
     
-    if (!self.canCheckForUpdates) {
-        SULog(SULogLevelError, @"Error: -checkForUpdates called but .canCheckForUpdates == NO");
+    if (self.sessionInProgress) {
+        SULog(SULogLevelError, @"Error: -checkForUpdates called but .sessionInProgress == YES");
     }
     
     if (self.driver != nil) {
         return;
     }
     
-    [self setCanCheckForUpdates:NO];
+    self.sessionInProgress = YES;
     
     id <SPUUpdateDriver> theUpdateDriver = [[SPUUserInitiatedUpdateDriver alloc] initWithHost:self.host applicationBundle:self.applicationBundle sparkleBundle:self.sparkleBundle updater:self userDriver:self.userDriver updaterDelegate:self.delegate];
     
     NSString *bundleIdentifier = self.host.bundle.bundleIdentifier;
     assert(bundleIdentifier != nil);
+    
+    __weak SPUUpdater *weakSelf = self;
     [SPUProbeInstallStatus probeInstallerInProgressForHostBundleIdentifier:bundleIdentifier completion:^(BOOL installerInProgress) {
         dispatch_async(dispatch_get_main_queue(), ^{
             SPUUpdater *strongSelf = weakSelf;
@@ -514,11 +519,11 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         return;
     }
     
-    if (!self.canCheckForUpdates) {
-        SULog(SULogLevelError, @"Error: -checkForUpdateInformation called but .canCheckForUpdates == NO");
+    if (self.sessionInProgress) {
+        SULog(SULogLevelError, @"Error: -checkForUpdateInformation called but .sessionInProgress == YES");
     }
     
-    [self setCanCheckForUpdates:NO];
+    self.sessionInProgress = YES;
     
     NSString *bundleIdentifier = self.host.bundle.bundleIdentifier;
     assert(bundleIdentifier != nil);
@@ -544,7 +549,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 
     if( [self.delegate respondsToSelector: @selector((updaterMayCheckForUpdates:))] && ![self.delegate updaterMayCheckForUpdates:self] )
 	{
-        [self setCanCheckForUpdates:YES];
+        self.sessionInProgress = NO;
         [self scheduleNextUpdateCheck];
         return;
     }
@@ -560,7 +565,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         SULog(SULogLevelError, @"Sparkle configuration error (%ld): %@", (long)configurationError.code, configurationError.localizedDescription);
         SULog(SULogLevelDefault, @"Disabling scheduled updates..");
         
-        [self setCanCheckForUpdates:YES];
+        self.sessionInProgress = NO;
         [self.driver abortUpdateWithError:configurationError];
         self.driver = nil;
         
@@ -575,7 +580,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
             if (strongSelf != nil) {
                 strongSelf.resumableUpdate = resumableUpdate;
                 strongSelf.driver = nil;
-                [strongSelf setCanCheckForUpdates:YES];
+                self.sessionInProgress = NO;
                 [strongSelf updateLastUpdateCheckDate];
                 [strongSelf scheduleNextUpdateCheckFiringImmediately:shouldShowUpdateImmediately];
             }
@@ -591,7 +596,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     } else {
         // I think this is really unlikely to occur but better be safe
         [self.driver abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUInvalidFeedURLError userInfo:@{ NSLocalizedDescriptionKey: @"Sparkle cannot form a valid feed URL." }]];
-        [self setCanCheckForUpdates:YES];
+        self.sessionInProgress = NO;
         self.driver = nil;
     }
 }
@@ -608,7 +613,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         return; // not even ready yet
     }
     
-    if (self.canCheckForUpdates) {
+    if (!self.sessionInProgress) {
         [self cancelNextUpdateCycle];
         [self scheduleNextUpdateCheck];
     }

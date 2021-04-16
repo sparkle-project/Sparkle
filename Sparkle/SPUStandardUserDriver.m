@@ -57,13 +57,6 @@
     return self;
 }
 
-#pragma mark Is Update Busy?
-
-- (void)showCanCheckForUpdates:(BOOL)canCheckForUpdates
-{
-    assert(NSThread.isMainThread);
-}
-
 #pragma mark Update Permission
 
 - (void)showUpdatePermissionRequest:(SPUUpdatePermissionRequest *)request reply:(void (^)(SUUpdatePermissionResponse *))reply
@@ -99,9 +92,7 @@
     
     // Only show the update alert if the app is active; otherwise, we'll wait until it is.
     if ([NSApp isActive]) {
-        if (!userInitiated) {
-            [self.activeUpdateAlert disableKeyboardShortcutForInstallButton];
-        }
+        [self.activeUpdateAlert setInstallButtonFocus:userInitiated];
         [self.activeUpdateAlert.window makeKeyAndOrderFront:self];
     } else {
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:NSApplicationDidBecomeActiveNotification object:NSApp];
@@ -193,6 +184,11 @@
     // For our purposes we just ignore it and continue on..
     NSLog(@"Failed to download release notes with error: %@", error);
     [self.activeUpdateAlert showReleaseNotesFailedToDownload];
+}
+
+- (void)showUpdateInFocus
+{
+    [self setUpFocusForActiveUpdateAlertWithUserInitiation:YES];
 }
 
 #pragma mark Install & Relaunch Update

@@ -96,12 +96,6 @@
     self.updateButtonAction = nil;
 }
 
-#pragma mark Can Check for Updates?
-
-- (void)showCanCheckForUpdates:(BOOL)canCheckForUpdates
-{
-}
-
 #pragma mark Update Permission
 
 - (void)showUpdatePermissionRequest:(SPUUpdatePermissionRequest *)__unused request reply:(void (^)(SUUpdatePermissionResponse *))reply
@@ -180,6 +174,11 @@
 
 - (void)showUpdateReleaseNotesFailedToDownloadWithError:(NSError *)__unused error
 {
+}
+
+- (void)showUpdateInFocus
+{
+    [self.window makeKeyAndOrderFront:nil];
 }
 
 #pragma mark Install & Relaunch Update

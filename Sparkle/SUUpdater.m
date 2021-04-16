@@ -212,7 +212,7 @@ static NSMutableDictionary *sharedUpdaters = nil;
 {
     // This is not quite true -- we may be able to check / resume an update if one is in progress
     // But this is a close enough approximation for 1.x updater API
-    return !self.updater.canCheckForUpdates;
+    return self.updater.sessionInProgress;
 }
 
 // Not implemented properly at the moment - leaning towards it not be in the future

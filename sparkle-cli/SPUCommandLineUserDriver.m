@@ -41,10 +41,6 @@
     return self;
 }
 
-- (void)showCanCheckForUpdates:(BOOL)canCheckForUpdates
-{
-}
-
 - (void)showUpdatePermissionRequest:(SPUUpdatePermissionRequest *)__unused request reply:(void (^)(SUUpdatePermissionResponse *))reply
 {
     if (self.updatePermissionResponse == nil) {
@@ -136,6 +132,10 @@
     fprintf(stderr, "Found information for new update: %s\n", appcastItem.infoURL.absoluteString.UTF8String);
     
     reply(SPUDismissInformationalNoticeChoice);
+}
+
+- (void)showUpdateInFocus
+{
 }
 
 - (void)showUpdateReleaseNotesWithDownloadData:(SPUDownloadData *)downloadData

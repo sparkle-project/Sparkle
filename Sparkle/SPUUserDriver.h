@@ -33,13 +33,6 @@ NS_ASSUME_NONNULL_BEGIN
 SU_EXPORT @protocol SPUUserDriver <NSObject>
 
 /*!
- * Show that an update can be checked by the user or not
- *
- * A client may choose to update the interface letting the user know if they can check for updates.
- */
-- (void)showCanCheckForUpdates:(BOOL)canCheckForUpdates;
-
-/*!
  * Show an updater permission request to the user
  *
  * Ask the user for their permission regarding update checks.
@@ -130,6 +123,13 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  * unless they initiate an update check themselves.
  */
 - (void)showInformationalUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem userInitiated:(BOOL)userInitiated reply:(void (^)(SPUInformationalUpdateAlertChoice))reply;
+
+/*!
+ * Show the user currently presented update in utmost focus
+ *
+ * Sparkle uses this to make its update frontmost again
+ */
+- (void)showUpdateInFocus;
 
 /*!
  * Show the user the release notes for the new update

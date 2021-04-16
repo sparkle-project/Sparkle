@@ -115,6 +115,8 @@
         
         [self.userDriver showInformationalUpdateFoundWithAppcastItem:updateItem userInitiated:self.userInitiated reply:^(SPUInformationalUpdateAlertChoice choice) {
             dispatch_async(dispatch_get_main_queue(), ^{
+                [self.delegate uiDriverFinishedShowingUpdate];
+                
                 switch (choice) {
                     case SPUSkipThisInformationalVersionChoice:
                         [self.host setObject:[updateItem versionString] forUserDefaultsKey:SUSkippedVersionKey];
@@ -132,6 +134,8 @@
     } else if (self.resumingDownloadedUpdate) {
         [self.userDriver showDownloadedUpdateFoundWithAppcastItem:updateItem userInitiated:self.userInitiated reply:^(SPUUpdateAlertChoice choice) {
             dispatch_async(dispatch_get_main_queue(), ^{
+                [self.delegate uiDriverFinishedShowingUpdate];
+                
                 [self.host setObject:nil forUserDefaultsKey:SUSkippedVersionKey];
                 switch (choice) {
                     case SPUInstallUpdateChoice:
@@ -154,6 +158,8 @@
     } else if (!self.resumingInstallingUpdate) {
         [self.userDriver showUpdateFoundWithAppcastItem:updateItem userInitiated:self.userInitiated reply:^(SPUUpdateAlertChoice choice) {
             dispatch_async(dispatch_get_main_queue(), ^{
+                [self.delegate uiDriverFinishedShowingUpdate];
+                
                 [self.host setObject:nil forUserDefaultsKey:SUSkippedVersionKey];
                 switch (choice) {
                     case SPUInstallUpdateChoice:
@@ -175,15 +181,15 @@
     } else {
         [self.userDriver showResumableUpdateFoundWithAppcastItem:updateItem userInitiated:self.userInitiated reply:^(SPUInstallUpdateStatus choice) {
             dispatch_async(dispatch_get_main_queue(), ^{
+                [self.delegate uiDriverFinishedShowingUpdate];
+                
                 [self.host setObject:nil forUserDefaultsKey:SUSkippedVersionKey];
                 [self.coreDriver finishInstallationWithResponse:choice displayingUserInterface:!self.preventsInstallerInteraction];
             });
         }];
     }
     
-    if ([self.delegate respondsToSelector:@selector(uiDriverDidShowUpdate)]) {
-        [self.delegate uiDriverDidShowUpdate];
-    }
+    [self.delegate uiDriverDidShowUpdate];
     
     if (updateItem.releaseNotesURL != nil && (![updaterDelegate respondsToSelector:@selector(updaterShouldDownloadReleaseNotes:)] || [updaterDelegate updaterShouldDownloadReleaseNotes:self.updater])) {
         NSURLRequest *request = [NSURLRequest requestWithURL:updateItem.releaseNotesURL cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30];

@@ -18,6 +18,7 @@
 @property (nonatomic, readonly) SPUUIBasedUpdateDriver *uiDriver;
 @property (nonatomic, readonly) id<SPUUserDriver> userDriver;
 @property (nonatomic) BOOL showingUserInitiatedProgress;
+@property (nonatomic) BOOL showingUpdate;
 @property (nonatomic) BOOL aborted;
 
 @end
@@ -26,6 +27,7 @@
 
 @synthesize uiDriver = _uiDriver;
 @synthesize userDriver = _userDriver;
+@synthesize showingUpdate = _showingUpdate;
 @synthesize showingUserInitiatedProgress = _showingUserInitiatedProgress;
 @synthesize aborted = _aborted;
 
@@ -89,6 +91,16 @@
 - (void)resumeUpdate:(id<SPUResumableUpdate>)resumableUpdate completion:(SPUUpdateDriverCompletion)completionBlock
 {
     [self.uiDriver resumeUpdate:resumableUpdate completion:completionBlock];
+}
+
+- (void)uiDriverDidShowUpdate
+{
+    self.showingUpdate = YES;
+}
+
+- (void)uiDriverFinishedShowingUpdate
+{
+    self.showingUpdate = NO;
 }
 
 - (void)basicDriverIsRequestingAbortUpdateWithError:(nullable NSError *)error

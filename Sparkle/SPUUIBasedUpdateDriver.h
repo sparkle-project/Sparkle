@@ -17,10 +17,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)coreDriverIsRequestingAbortUpdateWithError:(nullable NSError *)error;
 - (void)uiDriverIsRequestingAbortUpdateWithError:(nullable NSError *)error;
 
+- (void)uiDriverDidShowUpdate;
+- (void)uiDriverFinishedShowingUpdate;
+
 @optional
 
 - (void)basicDriverDidFinishLoadingAppcast;
-- (void)uiDriverDidShowUpdate;
 
 @end
 
