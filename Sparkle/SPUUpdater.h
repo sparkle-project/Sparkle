@@ -76,16 +76,15 @@ SU_EXPORT @interface SPUUpdater : NSObject
 - (BOOL)startUpdater:(NSError * __autoreleasing *)error;
 
 /*!
- Checks for updates, and displays progress while doing so.
+ Checks for updates, and displays progress while doing so if needed.
  
- This is meant for users initiating an update check.
+ This is meant for users initiating a new update check or checking the current update progress.
  
- If an update session isn't in progress, the user will be shown that a check for new updates is occurring.
- If a new update is already being shown, that update will be shown to the user in active focus.
+ If an update hasn't started, the user may be shown that a new check for updates is occurring.
+ If an update has already been downloaded or begun installing, the user may be presented to install that update.
+ If the user is already being presented with an update, that update will be shown to the user in active focus.
  
- This may find a resumable update that has already been downloaded or has begun installing, or
- this may find a new update that can start to be downloaded if the user requests it.
- This will find updates that the user has opted into skipping.
+ This will find updates that the user has previously opted into skipping.
  
  See canCheckForUpdates property which can determine if this method may be invoked.
  */
@@ -135,8 +134,8 @@ SU_EXPORT @interface SPUUpdater : NSObject
  An active session is when Sparkle's fired scheduler is running.
  
  Note an update session may be inactive even though Sparkle's installer (ran as a separate process) may be running,
- or even though the update has been downloaded but the installation has been deferred. In both of these cases, an update session
- may be activated and resumed at a later point (automatically or manually).
+ or even though the update has been downloaded but the installation has been deferred. In both of these cases, a new update session
+ may be activated with the update resumed at a later point (automatically or manually).
  
  See also canCheckForUpdates property which is more suited for menu item validation.
  */
