@@ -28,7 +28,7 @@
 
 @property (nonatomic, weak, nullable, readonly) id <SPUStandardUserDriverDelegate> delegate;
 
-@property (nonatomic, copy) void (^installUpdateHandler)(SPUInstallUpdateStatus);
+@property (nonatomic, copy) void (^installUpdateHandler)(SPUUserUpdateChoice);
 @property (nonatomic, copy) void (^cancellation)(void);
 
 @property (nonatomic) SUStatusController *checkingController;
@@ -115,66 +115,22 @@
 
 #pragma mark Update Found
 
-- (void)showUpdateFoundWithAlertHandler:(SUUpdateAlert *(^)(SPUStandardUserDriver *, SUHost *, id<SUVersionDisplay>))alertHandler userInitiated:(BOOL)userInitiated
+- (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem userInitiated:(BOOL)userInitiated state:(SPUUserUpdateState)state reply:(void (^)(SPUUserUpdateChoice))reply
 {
+    assert(NSThread.isMainThread);
+    
     id <SUVersionDisplay> versionDisplayer = nil;
     if ([self.delegate respondsToSelector:@selector(standardUserDriverRequestsVersionDisplayer)]) {
         versionDisplayer = [self.delegate standardUserDriverRequestsVersionDisplayer];
     }
     
     __weak SPUStandardUserDriver *weakSelf = self;
-    SUHost *host = self.host;
-    self.activeUpdateAlert = alertHandler(weakSelf, host, versionDisplayer);
+    self.activeUpdateAlert = [[SUUpdateAlert alloc] initWithAppcastItem:appcastItem state:state host:self.host versionDisplayer:versionDisplayer completionBlock:^(SPUUserUpdateChoice choice) {
+        reply(choice);
+        weakSelf.activeUpdateAlert = nil;
+    }];
     
     [self setUpFocusForActiveUpdateAlertWithUserInitiation:userInitiated];
-}
-
-- (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem userInitiated:(BOOL)userInitiated reply:(void (^)(SPUUpdateAlertChoice))reply
-{
-    assert(NSThread.isMainThread);
-    
-    [self showUpdateFoundWithAlertHandler:^SUUpdateAlert *(SPUStandardUserDriver *weakSelf, SUHost *host, id<SUVersionDisplay> versionDisplayer) {
-        return [[SUUpdateAlert alloc] initWithAppcastItem:appcastItem alreadyDownloaded:NO host:host versionDisplayer:versionDisplayer completionBlock:^(SPUUpdateAlertChoice choice) {
-            reply(choice);
-            weakSelf.activeUpdateAlert = nil;
-        }];
-    } userInitiated:userInitiated];
-}
-
-- (void)showDownloadedUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem userInitiated:(BOOL)userInitiated reply:(void (^)(SPUUpdateAlertChoice))reply
-{
-    assert(NSThread.isMainThread);
-    
-    [self showUpdateFoundWithAlertHandler:^SUUpdateAlert *(SPUStandardUserDriver *weakSelf, SUHost *host, id<SUVersionDisplay> versionDisplayer) {
-        return [[SUUpdateAlert alloc] initWithAppcastItem:appcastItem alreadyDownloaded:YES host:host versionDisplayer:versionDisplayer completionBlock:^(SPUUpdateAlertChoice choice) {
-            reply(choice);
-            weakSelf.activeUpdateAlert = nil;
-        }];
-    } userInitiated:userInitiated];
-}
-
-- (void)showResumableUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem userInitiated:(BOOL)userInitiated reply:(void (^)(SPUInstallUpdateStatus))reply
-{
-    assert(NSThread.isMainThread);
-    
-    [self showUpdateFoundWithAlertHandler:^SUUpdateAlert *(SPUStandardUserDriver *weakSelf, SUHost *host, id<SUVersionDisplay> versionDisplayer) {
-        return [[SUUpdateAlert alloc] initWithAppcastItem:appcastItem host:host versionDisplayer:versionDisplayer resumableCompletionBlock:^(SPUInstallUpdateStatus choice) {
-            reply(choice);
-            weakSelf.activeUpdateAlert = nil;
-        }];
-    } userInitiated:userInitiated];
-}
-
-- (void)showInformationalUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem userInitiated:(BOOL)userInitiated reply:(void (^)(SPUInformationalUpdateAlertChoice))reply
-{
-    assert(NSThread.isMainThread);
-    
-    [self showUpdateFoundWithAlertHandler:^SUUpdateAlert *(SPUStandardUserDriver *weakSelf, SUHost *host, id<SUVersionDisplay> versionDisplayer) {
-        return [[SUUpdateAlert alloc] initWithAppcastItem:appcastItem host:host versionDisplayer:versionDisplayer informationalCompletionBlock:^(SPUInformationalUpdateAlertChoice choice) {
-            reply(choice);
-            weakSelf.activeUpdateAlert = nil;
-        }];
-    } userInitiated:userInitiated];
 }
 
 - (void)showUpdateReleaseNotesWithDownloadData:(SPUDownloadData *)downloadData
@@ -207,7 +163,7 @@
 
 #pragma mark Install & Relaunch Update
 
-- (void)showReadyToInstallAndRelaunch:(void (^)(SPUInstallUpdateStatus))installUpdateHandler
+- (void)showReadyToInstallAndRelaunch:(void (^)(SPUUserUpdateChoice))installUpdateHandler
 {
     assert(NSThread.isMainThread);
     
@@ -226,7 +182,7 @@
 - (void)installAndRestart:(id)__unused sender
 {
     if (self.installUpdateHandler != nil) {
-        self.installUpdateHandler(SPUInstallAndRelaunchUpdateNow);
+        self.installUpdateHandler(SPUUserUpdateChoiceInstall);
         self.installUpdateHandler = nil;
     }
 }

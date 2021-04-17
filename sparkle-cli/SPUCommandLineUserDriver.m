@@ -101,37 +101,32 @@
     }
 }
 
-- (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem userInitiated:(BOOL)__unused userInitiated reply:(void (^)(SPUUpdateAlertChoice))reply
+- (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem userInitiated:(BOOL)userInitiated state:(SPUUserUpdateState)state reply:(void (^)(SPUUserUpdateChoice))reply
 {
-    [self showUpdateWithAppcastItem:appcastItem updateAdjective:@"new"];
-    reply(SPUInstallUpdateChoice);
-}
-
-- (void)showDownloadedUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem userInitiated:(BOOL)__unused userInitiated reply:(void (^)(SPUUpdateAlertChoice))reply
-{
-    [self showUpdateWithAppcastItem:appcastItem updateAdjective:@"downloaded"];
-    reply(SPUInstallUpdateChoice);
-}
-
-- (void)showResumableUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem userInitiated:(BOOL)__unused userInitiated reply:(void (^)(SPUInstallUpdateStatus))reply
-{
-    [self showUpdateWithAppcastItem:appcastItem updateAdjective:@"resumable"];
-    
-    if (self.deferInstallation) {
-        if (self.verbose) {
-            fprintf(stderr, "Deferring Installation.\n");
-        }
-        reply(SPUDismissUpdateInstallation);
-    } else {
-        reply(SPUInstallAndRelaunchUpdateNow);
+    switch (state) {
+        case SPUUserUpdateStateNotDownloaded:
+            [self showUpdateWithAppcastItem:appcastItem updateAdjective:@"new"];
+            reply(SPUUserUpdateChoiceInstall);
+            break;
+        case SPUUserUpdateStateDownloaded:
+            [self showUpdateWithAppcastItem:appcastItem updateAdjective:@"downloaded"];
+            reply(SPUUserUpdateChoiceInstall);
+            break;
+        case SPUUserUpdateStateInstalling:
+            if (self.deferInstallation) {
+                if (self.verbose) {
+                    fprintf(stderr, "Deferring Installation.\n");
+                }
+                reply(SPUUserUpdateChoiceDismiss);
+            } else {
+                reply(SPUUserUpdateChoiceInstall);
+            }
+            break;
+        case SPUUserUpdateStateInformational:
+            fprintf(stderr, "Found information for new update: %s\n", appcastItem.infoURL.absoluteString.UTF8String);
+            reply(SPUUserUpdateChoiceDismiss);
+            break;
     }
-}
-
-- (void)showInformationalUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem userInitiated:(BOOL)__unused userInitiated reply:(void (^)(SPUInformationalUpdateAlertChoice))reply
-{
-    fprintf(stderr, "Found information for new update: %s\n", appcastItem.infoURL.absoluteString.UTF8String);
-    
-    reply(SPUDismissInformationalNoticeChoice);
 }
 
 - (void)showUpdateInFocus
@@ -225,15 +220,15 @@
     }
 }
 
-- (void)showReadyToInstallAndRelaunch:(void (^)(SPUInstallUpdateStatus))installUpdateHandler
+- (void)showReadyToInstallAndRelaunch:(void (^)(SPUUserUpdateChoice))installUpdateHandler
 {
     if (self.deferInstallation) {
         if (self.verbose) {
             fprintf(stderr, "Deferring Installation.\n");
         }
-        installUpdateHandler(SPUDismissUpdateInstallation);
+        installUpdateHandler(SPUUserUpdateChoiceDismiss);
     } else {
-        installUpdateHandler(SPUInstallAndRelaunchUpdateNow);
+        installUpdateHandler(SPUUserUpdateChoiceInstall);
     }
 }
 
