@@ -77,7 +77,7 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  * @param userInitiated A flag indicating whether or not a user initiated this update check
  *
  * @param state The current state of the update.
- *  SPUUserUpdateStateNew - Update has not been downloaded yet.
+ *  SPUUserUpdateStateNotDownloaded - Update has not been downloaded yet.
  *  SPUUserUpdateStateDownloaded - Update has already been downloaded but not started installing yet.
  *  SPUUserUpdateStateInstalling - Update has been downloaded and already started installing.
  *  SPUUserUpdateStateInformational - Update is only informational and has no download. You can direct the user to the the infoURL property of the appcastItem in their web browser. The informationOnlyUpdate property of the appcastItem will be YES.

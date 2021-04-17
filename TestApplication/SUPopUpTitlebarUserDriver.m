@@ -149,7 +149,7 @@
             reply(SPUUserUpdateChoiceDismiss);
             
             break;
-        case SPUUserUpdateStateNew:
+        case SPUUserUpdateStateNotDownloaded:
         case SPUUserUpdateStateDownloaded:
             [self showUpdateWithAppcastItem:appcastItem skippable:YES reply:reply];
             break;

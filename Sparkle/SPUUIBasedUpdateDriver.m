@@ -117,7 +117,7 @@
         } else if (self.resumingInstallingUpdate) {
             state = SPUUserUpdateStateInstalling;
         } else {
-            state = SPUUserUpdateStateNew;
+            state = SPUUserUpdateStateNotDownloaded;
         }
         
         [self.userDriver showUpdateFoundWithAppcastItem:updateItem userInitiated:self.userInitiated state:state reply:^(SPUUserUpdateChoice userChoice) {
@@ -142,7 +142,7 @@
                             case SPUUserUpdateStateInstalling:
                                 [self.coreDriver finishInstallationWithResponse:validatedChoice displayingUserInterface:!self.preventsInstallerInteraction];
                                 break;
-                            case SPUUserUpdateStateNew:
+                            case SPUUserUpdateStateNotDownloaded:
                                 [self.coreDriver downloadUpdateFromAppcastItem:updateItem inBackground:NO];
                                 break;
                             case SPUUserUpdateStateInformational:
@@ -163,7 +163,7 @@
                     case SPUUserUpdateChoiceDismiss:
                         switch (state) {
                             case SPUUserUpdateStateDownloaded:
-                            case SPUUserUpdateStateNew:
+                            case SPUUserUpdateStateNotDownloaded:
                             case SPUUserUpdateStateInformational:
                                 [self.host setObject:nil forUserDefaultsKey:SUSkippedVersionKey];
                                 [self.delegate uiDriverIsRequestingAbortUpdateWithError:nil];

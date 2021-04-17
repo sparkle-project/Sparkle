@@ -108,7 +108,7 @@
 - (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem userInitiated:(BOOL)userInitiated state:(SPUUserUpdateState)state reply:(void (^)(SPUUserUpdateChoice))reply
 {
     switch (state) {
-        case SPUUserUpdateStateNew:
+        case SPUUserUpdateStateNotDownloaded:
             [self showUpdateWithAppcastItem:appcastItem updateAdjective:@"new"];
             reply(SPUUserUpdateChoiceInstall);
             break;

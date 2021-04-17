@@ -26,7 +26,7 @@ typedef NS_ENUM(NSInteger, SPUUserUpdateChoice) {
 };
 
 typedef NS_ENUM(NSInteger, SPUUserUpdateState) {
-    SPUUserUpdateStateNew,
+    SPUUserUpdateStateNotDownloaded,
     SPUUserUpdateStateDownloaded,
     SPUUserUpdateStateInstalling,
     SPUUserUpdateStateInformational
