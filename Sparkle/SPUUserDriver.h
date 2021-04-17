@@ -68,68 +68,34 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
 - (void)dismissUserInitiatedUpdateCheck;
 
 /*!
- * Show the user a new update is found and can be downloaded and installed
+ * Show the user a new update is found.
  *
  * Let the user know a new update is found and ask them what they want to do.
  *
- * @param appcastItem The Appcast Item containing information that reflects the new update
- *
- * @param userInitiated A flag indicating whether or not a user initiated this update check
- *
- * @param reply
- * A reply of SPUInstallUpdateChoice begins downloading and installing the new update.
- *
- * A reply of SPUInstallLaterChoice reminds the user later of the update, which can act as a "do nothing" option.
- *
- * A reply of SPUSkipThisVersionChoice skips this particular version and won't bother the user again,
- * unless they initiate an update check themselves.
- */
-- (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem userInitiated:(BOOL)userInitiated reply:(void (^)(SPUUpdateAlertChoice))reply;
-
-/*!
- * Show the user a new update has been downloaded and can be installed
- *
- * This method behaves just like -showUpdateFoundWithAppcastItem:reply: except the update has already been downloaded.
- */
-- (void)showDownloadedUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem userInitiated:(BOOL)userInitiated reply:(void (^)(SPUUpdateAlertChoice))reply;
-
-/*!
- * Show the user an update that has started installing can be resumed and installed immediately
- *
- * Let the user know an update that has already been downloaded and started installing can be resumed.
- * Note at this point the update cannot be canceled.
- *
- * @param appcastItem The Appcast Item containing information that reflects the new update
- *
- * @param userInitiated A flag indicating whether or not a user initiated this update check
- *
- * @param reply
- * A reply of SPUInstallAndRelaunchUpdateNow installs the update immediately and relaunches the new update.
- * Note: the application is not relaunched if it was not running before installing the update.
- * A reply of SPUInstallUpdateNow installs the update immediately but does not relaunch the new update.
- * A reply of SPUDismissUpdateInstallation dismisses the update installation. Note the update will attempt to finish installation
- * after the application terminates.
- */
-- (void)showResumableUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem userInitiated:(BOOL)userInitiated reply:(void (^)(SPUInstallUpdateStatus))reply;
-
-/*!
- * Show the user a new informational only update has been found
- *
- * Let the user know a new informational update is found and ask them what they want to do.
- *
  * @param appcastItem The Appcast Item containing information that reflects the new update.
- * The infoURL property for the appcastItem may be of interest.
  *
  * @param userInitiated A flag indicating whether or not a user initiated this update check
  *
- * @param reply
- * A reply of SPUDismissInformationalNoticeChoice dismisses this notice.
- * An implementor may decide to invoke another action before dismissing the notice.
+ * @param state The current state of the update.
+ *  SPUUserUpdateStateNotDownloaded - Update has not been downloaded yet.
+ *  SPUUserUpdateStateDownloaded - Update has already been downloaded but not started installing yet.
+ *  SPUUserUpdateStateInstalling - Update has been downloaded and already started installing.
+ *  SPUUserUpdateStateInformational - Update is only informational and has no download. You can direct the user to the the infoURL property of the appcastItem in their web browser. The informationOnlyUpdate property of the appcastItem will be YES.
  *
- * A reply of SPUSkipThisInformationalVersionChoice skips this particular version and won't bother the user again,
- * unless they initiate an update check themselves.
+ * Additionally, you may want to check the criticalUpdate property of the appcastItem to let the user know if the update is critical.
+ *
+ * @param reply
+ * A reply of SPUUserUpdateChoiceInstall begins or resumes downloading or installing the update.
+ * If the state is SPUUserUpdateStateInstalling, this may send a quit event to the application and relaunch it immediately (in this state, this behaves as a fast "install and Relaunch").
+ *
+ * A reply of SPUUserUpdateChoiceDismiss dismisses the update for the time being. The user may be reminded of the update at a later point.
+ * If the state is SPUUserUpdateStateDownloaded, the downloaded update is kept after dismissing until the next time an update is shown to the user.
+ * If the state is SPUUserUpdateStateInstalling, the installing update is also preserved after dismissing. In this state however, the update will also still be installed after the application is terminated.
+ *
+ * A reply of SPUUserUpdateChoiceSkip skips this particular version and won't notify the user again, unless they initiate an update check themselves.
+ * If the state is SPUUserUpdateStateInstalling, the update cannot be skipped, only dismissed or installed.
  */
-- (void)showInformationalUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem userInitiated:(BOOL)userInitiated reply:(void (^)(SPUInformationalUpdateAlertChoice))reply;
+- (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem userInitiated:(BOOL)userInitiated state:(SPUUserUpdateState)state reply:(void (^)(SPUUserUpdateChoice))reply;
 
 /*!
  * Show the user the release notes for the new update
@@ -220,19 +186,20 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
 - (void)showExtractionReceivedProgress:(double)progress;
 
 /*!
- * Show the user that the update is ready to install
+ * Show the user that the update is ready to install & relaunch
  *
- * Let the user know that the update is ready and ask them whether they want to install or not.
- * Note if the target application is already terminated and an update can be performed silently, this method may not be invoked.
+ * Let the user know that the update is ready to install and relaunch, and ask them whether they want to proceed.
+ * Note if the target application has already terminated, this method may not be invoked.
  *
- * @param installUpdateHandler
- * A reply of SPUInstallAndRelaunchUpdateNow installs the update immediately and relaunches the new update.
- * Note: the application is not relaunched if it was not running before installing the update.
- * A reply of SPUInstallUpdateNow installes the update immediately but does not relaunch the new update.
- * A reply of SPUDismissUpdateInstallation dismisses the update installation. Note the update may still be installed after
- * the application terminates, however there is not a strong guarantee that this will happen.
+ * @param reply
+ * A reply of SPUUserUpdateChoiceInstall installs the update and relaunches the new update immediately.
+ *
+ * A reply of SPUUserUpdateChoiceDismiss dismisses the update installation for the time being. Note the update may still be installed automatically after
+ * the application terminates.
+ *
+ * A reply of SPUUserUpdateChoiceSkip acts the same as dismissing. This update which has started installing cannot be skipped.
  */
-- (void)showReadyToInstallAndRelaunch:(void (^)(SPUInstallUpdateStatus))installUpdateHandler;
+- (void)showReadyToInstallAndRelaunch:(void (^)(SPUUserUpdateChoice))reply;
 
 /*!
  * Show the user that the update is installing
@@ -282,6 +249,9 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  */
 @optional
 
+// Clients should move to non-deprecated methods
+// Deprecated methods are only (temporarily) kept around for binary compatibility reasons
+
 - (void)showUserInitiatedUpdateCheckWithCompletion:(void (^)(SPUUserInitiatedCheckStatus))updateCheckStatusCompletion __deprecated_msg("Implement -showUserInitiatedUpdateCheckWithCancellation: instead");
 
 - (void)showDownloadInitiatedWithCompletion:(void (^)(SPUDownloadUpdateStatus))downloadUpdateStatusCompletion __deprecated_msg("Implement -showDownloadInitiatedWithCancellation: instead");
@@ -289,6 +259,14 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
 - (void)showUpdateNotFoundWithAcknowledgement:(void (^)(void))acknowledgement __deprecated_msg("Implement -showUpdateNotFoundWithError:acknowledgement: instead");
 
 - (void)showUpdateInstallationDidFinishWithAcknowledgement:(void (^)(void))acknowledgement __deprecated_msg("Implement -showUpdateInstalledAndRelaunched:acknowledgement: instead");
+
+- (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem userInitiated:(BOOL)userInitiated reply:(void (^)(SPUUpdateAlertChoice))reply __deprecated_msg("Implement -showUpdateFoundWithAppcastItem:userInitiated:state:reply: instead");
+
+- (void)showDownloadedUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem userInitiated:(BOOL)userInitiated reply:(void (^)(SPUUpdateAlertChoice))reply __deprecated_msg("Implement -showUpdateFoundWithAppcastItem:userInitiated:state:reply: instead");
+
+- (void)showResumableUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem userInitiated:(BOOL)userInitiated reply:(void (^)(SPUUserUpdateChoice))reply __deprecated_msg("Implement -showUpdateFoundWithAppcastItem:userInitiated:state:reply: instead");
+
+- (void)showInformationalUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem userInitiated:(BOOL)userInitiated reply:(void (^)(SPUInformationalUpdateAlertChoice))reply __deprecated_msg("Implement -showUpdateFoundWithAppcastItem:userInitiated:state:reply: instead");
 
 @end
 

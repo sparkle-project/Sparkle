@@ -14,7 +14,7 @@
 @property (nonatomic) IBOutlet NSTextView *textView;
 @property (nonatomic, readonly) SUAppcastItem *appcastItem;
 @property (nonatomic, nullable) NSAttributedString *preloadedReleaseNotes;
-@property (nonatomic, copy) void (^reply)(SPUUpdateAlertChoice);
+@property (nonatomic, copy) void (^reply)(SPUUserUpdateChoice);
 @property (nonatomic, readonly) BOOL skippable;
 
 @end
@@ -28,7 +28,7 @@
 @synthesize reply = _reply;
 @synthesize skippable = _skippable;
 
-- (instancetype)initWithAppcastItem:(SUAppcastItem *)appcastItem skippable:(BOOL)skippable reply:(void (^)(SPUUpdateAlertChoice))reply
+- (instancetype)initWithAppcastItem:(SUAppcastItem *)appcastItem skippable:(BOOL)skippable reply:(void (^)(SPUUserUpdateChoice))reply
 {
     self = [super initWithNibName:@"SUInstallUpdateViewController" bundle:nil];
     if (self != nil) {
@@ -109,7 +109,7 @@
 - (IBAction)installUpdate:(id)__unused sender
 {
     if (self.reply != nil) {
-        self.reply(SPUInstallUpdateChoice);
+        self.reply(SPUUserUpdateChoiceInstall);
         self.reply = nil;
     }
 }
@@ -117,7 +117,7 @@
 - (IBAction)installUpdateLater:(id)__unused sender
 {
     if (self.reply != nil) {
-        self.reply(SPUInstallLaterChoice);
+        self.reply(SPUUserUpdateChoiceDismiss);
         self.reply = nil;
     }
 }
@@ -125,7 +125,7 @@
 - (IBAction)skipUpdate:(id)__unused sender
 {
     if (self.reply != nil) {
-        self.reply(SPUSkipThisVersionChoice);
+        self.reply(SPUUserUpdateChoiceSkip);
         self.reply = nil;
     }
 }

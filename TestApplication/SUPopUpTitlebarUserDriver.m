@@ -113,7 +113,7 @@
 
 #pragma mark Update Found
 
-- (void)showUpdateWithAppcastItem:(SUAppcastItem *)appcastItem skippable:(BOOL)skippable reply:(void (^)(SPUUpdateAlertChoice))reply
+- (void)showUpdateWithAppcastItem:(SUAppcastItem *)appcastItem skippable:(BOOL)skippable reply:(void (^)(SPUUserUpdateChoice))reply
 {
     NSPopover *popover = [[NSPopover alloc] init];
     popover.behavior = NSPopoverBehaviorTransient;
@@ -121,7 +121,7 @@
     __weak SUPopUpTitlebarUserDriver *weakSelf = self;
     __block NSButton *actionButton = nil;
     
-    SUInstallUpdateViewController *viewController = [[SUInstallUpdateViewController alloc] initWithAppcastItem:appcastItem skippable:skippable reply:^(SPUUpdateAlertChoice choice) {
+    SUInstallUpdateViewController *viewController = [[SUInstallUpdateViewController alloc] initWithAppcastItem:appcastItem skippable:skippable reply:^(SPUUserUpdateChoice choice) {
         reply(choice);
         
         [popover close];
@@ -139,38 +139,24 @@
     }];
 }
 
-- (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem userInitiated:(BOOL)__unused userInitiated reply:(void (^)(SPUUpdateAlertChoice))reply
+- (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem userInitiated:(BOOL)userInitiated state:(SPUUserUpdateState)state reply:(void (^)(SPUUserUpdateChoice))reply
 {
-    [self showUpdateWithAppcastItem:appcastItem skippable:YES reply:reply];
-}
-
-- (void)showDownloadedUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem userInitiated:(BOOL)__unused userInitiated reply:(void (^)(SPUUpdateAlertChoice))reply
-{
-    [self showUpdateWithAppcastItem:appcastItem skippable:YES reply:reply];
-}
-
-- (void)showResumableUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem userInitiated:(BOOL)__unused userInitiated reply:(void (^)(SPUInstallUpdateStatus))reply
-{
-    [self showUpdateWithAppcastItem:appcastItem skippable:NO reply:^(SPUUpdateAlertChoice choice) {
-        switch (choice) {
-            case SPUInstallUpdateChoice:
-                reply(SPUInstallAndRelaunchUpdateNow);
-                break;
-            case SPUInstallLaterChoice:
-                reply(SPUDismissUpdateInstallation);
-                break;
-            case SPUSkipThisVersionChoice:
-                abort();
-        }
-    }];
-}
-
-- (void)showInformationalUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem userInitiated:(BOOL)__unused userInitiated reply:(void (^)(SPUInformationalUpdateAlertChoice))reply
-{
-    // Todo: show user interface for this
-    NSLog(@"Found info URL: %@", appcastItem.infoURL);
-    
-    reply(SPUDismissInformationalNoticeChoice);
+    switch (state) {
+        case SPUUserUpdateStateInformational:
+            // Todo: show user interface for this
+            NSLog(@"Found info URL: %@", appcastItem.infoURL);
+            
+            reply(SPUUserUpdateChoiceDismiss);
+            
+            break;
+        case SPUUserUpdateStateNotDownloaded:
+        case SPUUserUpdateStateDownloaded:
+            [self showUpdateWithAppcastItem:appcastItem skippable:YES reply:reply];
+            break;
+        case SPUUserUpdateStateInstalling:
+            [self showUpdateWithAppcastItem:appcastItem skippable:NO reply:reply];
+            break;
+    }
 }
 
 - (void)showUpdateReleaseNotesWithDownloadData:(SPUDownloadData *)downloadData
@@ -184,10 +170,10 @@
 
 #pragma mark Install & Relaunch Update
 
-- (void)showReadyToInstallAndRelaunch:(void (^)(SPUInstallUpdateStatus))installUpdateHandler
+- (void)showReadyToInstallAndRelaunch:(void (^)(SPUUserUpdateChoice))installUpdateHandler
 {
     [self addUpdateButtonWithTitle:@"Install & Relaunch" action:^(NSButton *__unused button) {
-        installUpdateHandler(SPUInstallAndRelaunchUpdateNow);
+        installUpdateHandler(SPUUserUpdateChoiceInstall);
     }];
 }
 
