@@ -103,6 +103,7 @@ NS_ASSUME_NONNULL_BEGIN
  * If the owner and group IDs match on the root items of targetURL and matchURL, this method stops and assumes that nothing needs to be done.
  * Otherwise this method recursively changes the IDs if the target is a directory. If an item in the directory is encountered that is unable to be changed,
  * then this method stops and returns NO.
+ * While this method will try to change the group ID, being unable to change the group ID does not result in a failure if the owner ID can be changed or matched.
  *
  * This is not an atomic operation.
  */
