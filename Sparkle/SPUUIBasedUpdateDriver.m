@@ -157,6 +157,8 @@
                             [self.updaterDelegate updater:self.updater userDidSkipThisVersion:updateItem];
                         }
                         
+                        [self.coreDriver clearDownloadedUpdate];
+                        
                         [self.delegate uiDriverIsRequestingAbortUpdateWithError:nil];
                         
                         break;
