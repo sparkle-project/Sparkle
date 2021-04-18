@@ -436,8 +436,31 @@
     assert(installationType != nil);
     
     // The installer launcher could be in a XPC service, so we don't want to do localization in there
-    NSString *authorizationPrompt = [NSString stringWithFormat:SULocalizedString(@"%1$@ wants to update.", nil), self.host.name];
-    [installerLauncher launchInstallerWithHostBundlePath:hostBundlePath authorizationPrompt:authorizationPrompt installationType:installationType allowingDriverInteraction:driverAllowsInteraction allowingUpdaterInteraction:!preventsInstallerInteraction completion:^(SUInstallerLauncherStatus result, BOOL systemDomain) {
+    // Make sure the authorization prompt reflects whether or not the updater is updating itself, or
+    // if the updater is updating another application. We use SUHost.name property, so an application
+    // or Sparkle helper application can override its name with SUBundleName key
+    
+    SUHost *mainBundleHost = [[SUHost alloc] initWithBundle:[NSBundle mainBundle]];
+    NSString *mainBundleName = mainBundleHost.name;
+    NSString *hostName = self.host.name;
+    
+    // Changing this authorization prompt is a little complicated because the
+    // Auth database retains and caches the right we use, and there isn't a good way
+    // of updating the prompt. See code in SUInstallerLauncher.m
+    NSString *authorizationPrompt;
+    if ([mainBundleName isEqualToString:hostName]) {
+        authorizationPrompt = [NSString stringWithFormat:SULocalizedString(@"%1$@ wants permission to update.", nil), hostName];
+    } else {
+        authorizationPrompt = [NSString stringWithFormat:SULocalizedString(@"%1$@ wants permission to update %2$@.", nil), mainBundleName, hostName];
+    }
+    
+    NSString *mainBundleIdentifier;
+    {
+        NSString *bundleIdentifier = mainBundleHost.bundle.bundleIdentifier;
+        mainBundleIdentifier = (bundleIdentifier == nil) ? mainBundleName : bundleIdentifier;
+    }
+    
+    [installerLauncher launchInstallerWithHostBundlePath:hostBundlePath updaterIdentifier:mainBundleIdentifier authorizationPrompt:authorizationPrompt installationType:installationType allowingDriverInteraction:driverAllowsInteraction allowingUpdaterInteraction:!preventsInstallerInteraction completion:^(SUInstallerLauncherStatus result, BOOL systemDomain) {
         dispatch_async(dispatch_get_main_queue(), ^{
             retrievedLaunchStatus = YES;
             [launcherConnection invalidate];

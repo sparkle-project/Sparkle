@@ -91,7 +91,7 @@
     return (submittedJob == true);
 }
 
-- (SUInstallerLauncherStatus)submitInstallerAtPath:(NSString *)installerPath withHostBundle:(NSBundle *)hostBundle authorizationPrompt:(NSString *)authorizationPrompt inSystemDomain:(BOOL)systemDomain
+- (SUInstallerLauncherStatus)submitInstallerAtPath:(NSString *)installerPath withHostBundle:(NSBundle *)hostBundle updaterIdentifier:(NSString *)updaterIdentifier authorizationPrompt:(NSString *)authorizationPrompt inSystemDomain:(BOOL)systemDomain
 {
     SUFileManager *fileManager = [[SUFileManager alloc] init];
     
@@ -121,8 +121,19 @@
         // https://developer.apple.com/library/mac/technotes/tn2095/_index.html#//apple_ref/doc/uid/DTS10003110-CH1-SECTION7
         // We can set a custom right name for authenticating as an administrator
         // Using this right rather than using something like kSMRightModifySystemDaemons allows us to present a better worded prompt
+        // Note the right name is cached, so if we want to change the authorization
+        // prompt, we may need to change the right name. I have found no good way around this :|
+        NSString *sparkleAuthTag = @"sparkle2-auth"; // this needs to change if auth wording changes
+        NSString *rightNameString;
+        if ([hostBundleIdentifier isEqualToString:updaterIdentifier]) {
+            // Application bundle is likely updating itself
+            rightNameString = [NSString stringWithFormat:@"%@.%@", hostBundleIdentifier, sparkleAuthTag];
+        } else {
+            // Updater is likely updating a bundle that is not itself
+            rightNameString = [NSString stringWithFormat:@"%@.%@.%@", updaterIdentifier, hostBundleIdentifier, sparkleAuthTag];
+        }
         
-        const char *rightName = [[NSString stringWithFormat:@"%@.sparkle-auth", hostBundleIdentifier] UTF8String];
+        const char *rightName = rightNameString.UTF8String;
         assert(rightName != NULL);
         
         OSStatus getRightResult = AuthorizationRightGet(rightName, NULL);
@@ -323,7 +334,7 @@ static BOOL SPUNeedsSystemAuthorizationAccess(NSString *path, NSString *installa
 
 
 // Note: do not pass untrusted information such as paths to the installer and progress agent tools, when we can find them ourselves here
-- (void)launchInstallerWithHostBundlePath:(NSString *)hostBundlePath authorizationPrompt:(NSString *)authorizationPrompt installationType:(NSString *)installationType allowingDriverInteraction:(BOOL)allowingDriverInteraction allowingUpdaterInteraction:(BOOL)allowingUpdaterInteraction completion:(void (^)(SUInstallerLauncherStatus, BOOL))completionHandler
+- (void)launchInstallerWithHostBundlePath:(NSString *)hostBundlePath updaterIdentifier:(NSString *)updaterIdentifier authorizationPrompt:(NSString *)authorizationPrompt installationType:(NSString *)installationType allowingDriverInteraction:(BOOL)allowingDriverInteraction allowingUpdaterInteraction:(BOOL)allowingUpdaterInteraction completion:(void (^)(SUInstallerLauncherStatus, BOOL))completionHandler
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         NSBundle *hostBundle = [NSBundle bundleWithPath:hostBundlePath];
@@ -397,7 +408,7 @@ static BOOL SPUNeedsSystemAuthorizationAccess(NSString *path, NSString *installa
             return;
         }
         
-        SUInstallerLauncherStatus installerStatus = [self submitInstallerAtPath:installerPath withHostBundle:hostBundle authorizationPrompt:authorizationPrompt inSystemDomain:needsSystemAuthorization];
+        SUInstallerLauncherStatus installerStatus = [self submitInstallerAtPath:installerPath withHostBundle:hostBundle updaterIdentifier:updaterIdentifier authorizationPrompt:authorizationPrompt inSystemDomain:needsSystemAuthorization];
         
         BOOL submittedProgressTool = NO;
         if (installerStatus == SUInstallerLauncherSuccess) {
