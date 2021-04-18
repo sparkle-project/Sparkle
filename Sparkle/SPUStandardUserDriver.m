@@ -128,6 +128,8 @@
 {
     assert(NSThread.isMainThread);
     
+    [self closeCheckingWindow];
+    
     id <SUVersionDisplay> versionDisplayer = nil;
     if ([self.delegate respondsToSelector:@selector(standardUserDriverRequestsVersionDisplayer)]) {
         versionDisplayer = [self.delegate standardUserDriverRequestsVersionDisplayer];
@@ -209,8 +211,9 @@
 {
     if (self.checkingController != nil)
     {
-        [[self.checkingController window] close];
+        [self.checkingController close];
         self.checkingController = nil;
+        self.cancellation = nil;
     }
 }
 
@@ -223,19 +226,16 @@
     [self closeCheckingWindow];
 }
 
-- (void)dismissUserInitiatedUpdateCheck
-{
-    assert(NSThread.isMainThread);
-    
-    self.cancellation = nil;
-    [self closeCheckingWindow];
-}
-
 #pragma mark Update Errors
 
 - (void)showUpdaterError:(NSError *)error acknowledgement:(void (^)(void))acknowledgement
 {
     assert(NSThread.isMainThread);
+    
+    [self closeCheckingWindow];
+    
+    [self.statusController close];
+    self.statusController = nil;
     
     NSAlert *alert = [[NSAlert alloc] init];
     alert.messageText = SULocalizedString(@"Update Error!", nil);
@@ -249,6 +249,8 @@
 - (void)showUpdateNotFoundWithError:(NSError *)error acknowledgement:(void (^)(void))acknowledgement
 {
     assert(NSThread.isMainThread);
+    
+    [self closeCheckingWindow];
     
     NSAlert *alert = [NSAlert alertWithError:error];
     alert.alertStyle = NSAlertStyleInformational;

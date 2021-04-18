@@ -55,22 +55,15 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  *
  * Respond to the user initiating an update check. Sparkle uses this to show the user a window with an indeterminate progress bar.
  *
- * @param cancellation Invoke this cancellation block to cancel the update check.
- * Attempts to canceling can be made before -dismissUserInitiatedUpdateCheck is invoked.
+ * @param cancellation Invoke this cancellation block to cancel the update check before the update check is completed.
  */
 - (void)showUserInitiatedUpdateCheckWithCancellation:(void (^)(void))cancellation;
-
-/*!
- * Dismiss the user initiated update check from the user
- *
- * Dismiss whatever was started in -showUserInitiatedUpdateCheckWithCompletion:
- */
-- (void)dismissUserInitiatedUpdateCheck;
 
 /*!
  * Show the user a new update is found.
  *
  * Let the user know a new update is found and ask them what they want to do.
+ * Before this point, -showUserInitiatedUpdateCheckWithCancellation: may be called.
  *
  * @param appcastItem The Appcast Item containing information that reflects the new update.
  *
@@ -123,6 +116,7 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  * Show the user a new update was not found
  *
  * Let the user know a new update was not found after they tried initiating an update check.
+ * Before this point, -showUserInitiatedUpdateCheckWithCancellation: may be called.
  *
  * @param error The error associated with why a new update was not found.
  * @param acknowledgement Acknowledge to the updater that no update found error was shown.
@@ -134,6 +128,8 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  *
  * Let the user know that the updater failed with an error. This will not be invoked without the user having been
  * aware that an update was in progress.
+ *
+ * Before this point, any of the non-error user driver methods may have been invoked.
  *
  * @param error The error associated with what update error occurred..
  * @param acknowledgement Acknowledge to the updater that the error was shown.
@@ -181,9 +177,20 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  *
  * Let the user know how far along the update extraction is.
  *
+ * Before this point, -showDownloadDidStartExtractingUpdate is called.
+ *
  * @param progress The progress of the extraction from a 0.0 to 1.0 scale
  */
 - (void)showExtractionReceivedProgress:(double)progress;
+
+/*!
+ * Show the user that the update is installing
+ *
+ * Let the user know that the update is currently installing. Sparkle uses this to show an indeterminate progress bar.
+ *
+ * Before this point, -showExtractionReceivedProgress: may be called.
+ */
+- (void)showInstallingUpdate;
 
 /*!
  * Show the user that the update is ready to install & relaunch
@@ -192,30 +199,27 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  * Note if the target application has already terminated, this method may not be invoked.
  *
  * @param reply
- * A reply of SPUUserUpdateChoiceInstall installs the update and relaunches the new update immediately.
+ * A reply of SPUUserUpdateChoiceInstall installs the update the new update immediately. The application is relaunched only if it is still running by the time this reply is invoked. If the application terminates on its own, Sparkle will attempt to automatically install the update.
  *
  * A reply of SPUUserUpdateChoiceDismiss dismisses the update installation for the time being. Note the update may still be installed automatically after
  * the application terminates.
  *
  * A reply of SPUUserUpdateChoiceSkip acts the same as dismissing. This update which has started installing cannot be skipped.
+ *
+ * Before this point, -showInstallingUpdate will be called.
  */
 - (void)showReadyToInstallAndRelaunch:(void (^)(SPUUserUpdateChoice))reply;
 
 /*!
- * Show the user that the update is installing
- *
- * Let the user know that the update is currently installing. Sparkle uses this to show an indeterminate progress bar.
- */
-- (void)showInstallingUpdate;
-
-/*!
- * Show or dismiss progress while a termination signal is being sent to the application
+ * Show or dismiss progress while a termination signal is being sent to the application from Sparkle's installer
  *
  * Terminating and relaunching the application (if requested to be relaunched) may happen quickly,
  * or it may take some time to perform the final installation, or the termination signal can be canceled or delayed by the application or user.
  *
  * It is up to the implementor whether or not to decide to continue showing installation progress
  * or dismissing UI that won't remain obscuring other parts of the user interface.
+ *
+ * This will not be invoked if the application that is being updated is already terminated.
  */
 - (void)showSendingTerminationSignal;
 
@@ -227,6 +231,8 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  * This will only be invoked if the updater process is still alive, which is typically not the case if
  * the updater's lifetime is tied to the application it is updating. This implementation must not try to reference
  * the old bundle prior to the installation, which will no longer be around.
+ *
+ * Before this point, -showSendingTerminationSignal or -showReadyToInstallAndRelaunch: may be called.
  *
  * @param relaunched Indicates if the update was relaunched.
  * @param acknowledgement Acknowledge to the updater that the finished installation was shown.
@@ -267,6 +273,8 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
 - (void)showResumableUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem userInitiated:(BOOL)userInitiated reply:(void (^)(SPUUserUpdateChoice))reply __deprecated_msg("Implement -showUpdateFoundWithAppcastItem:userInitiated:state:reply: instead");
 
 - (void)showInformationalUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem userInitiated:(BOOL)userInitiated reply:(void (^)(SPUInformationalUpdateAlertChoice))reply __deprecated_msg("Implement -showUpdateFoundWithAppcastItem:userInitiated:state:reply: instead");
+
+- (void)dismissUserInitiatedUpdateCheck __deprecated_msg("Transition to new UI appropriately when a new update is shown, when no update is found, or when an update error occurs.");;
 
 @end
 

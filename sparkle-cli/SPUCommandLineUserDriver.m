@@ -66,10 +66,6 @@
     }
 }
 
-- (void)dismissUserInitiatedUpdateCheck
-{
-}
-
 - (void)displayReleaseNotes:(const char * _Nullable)releaseNotes
 {
     if (releaseNotes != NULL) {
