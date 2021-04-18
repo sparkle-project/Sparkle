@@ -62,6 +62,8 @@
 
 "Install and Relaunch" = "Instalovat a znovu spustit";
 
+"Install on Quit" = "Instalovat a ukončit";
+
 /* Take care not to overflow the status window. */
 "Installing update..." = "Instaluje se aktualizace…";
 
