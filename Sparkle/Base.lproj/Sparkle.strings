@@ -14,6 +14,22 @@
 
 "%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%1$@ %2$@ is currently the newest version available.\n(You are currently running version %3$@.)";
 
+"No valid update information could be loaded." = "No valid update information could be loaded.";
+
+"No new update has been checked because the installation will require interaction, which has been prevented." = "No new update has been checked because the installation will require interaction, which has been prevented.";
+
+"A new update is available but cannot be installed because interaction has been prevented." = "A new update is available but cannot be installed because interaction has been prevented.";
+
+"An error occurred while running the updater. Please try again later." = "An error occurred while running the updater. Please try again later.";
+
+"An error occurred while encoding the installer parameters. Please try again later." = "An error occurred while encoding the installer parameters. Please try again later.";
+
+"An error occurred while starting the installer. Please try again later." = "An error occurred while starting the installer. Please try again later.";
+
+"An error occurred while connecting to the installer. Please try again later." = "An error occurred while connecting to the installer. Please try again later.";
+
+"An error occurred while launching the installer. Please try again later." = "An error occurred while launching the installer. Please try again later.";
+
 "Update Installed" = "Update Installed";
 
 "%@ is now updated to version %@!" = "%@ is now updated to version %@!";
@@ -25,6 +41,9 @@
 
 /* Description text for SUUpdateAlert when the update informational with no download. */
 "%@ %@ is now available--you have %@. Would you like to learn more about this update on the web?" = "%1$@ %2$@ is now available—you have %3$@. Would you like to learn more about this update on the web?";
+
+/* Critical downloadable update */
+"%@ %@ is now available--you have %@. This is an important update; would you like to download it now?" = "%1$@ %2$@ is now available--you have %3$@. This is an important update; would you like to download it now?";
 
 "%@ downloaded" = "%@ downloaded";
 
@@ -43,6 +62,10 @@
 "An error occurred while installing the update. Please try again later." = "An error occurred while installing the update. Please try again later.";
 
 "An error occurred while parsing the update feed." = "An error occurred while parsing the update feed.";
+
+"An error occurred while downloading the update feed." = "An error occurred while downloading the update feed.";
+
+"Failed to resume installing update." = "Failed to resume installing update.";
 
 "An error occurred while relaunching %1$@, but the new version will be available next time you run %1$@." = "An error occurred while relaunching %1$@, but the new version will be available next time you run %1$@.";
 
@@ -67,6 +90,8 @@
 "GB" = "GB";
 
 "Install and Relaunch" = "Install and Relaunch";
+
+"Install on Quit" = "Install on Quit";
 
 /* Take care not to overflow the status window. */
 "Installing update..." = "Installing update…";

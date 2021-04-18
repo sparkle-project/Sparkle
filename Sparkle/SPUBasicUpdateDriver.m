@@ -187,7 +187,7 @@
         } else {
             localizedDescription = SULocalizedString(@"Update Error!", nil);
             recoverySuggestion = SULocalizedString(@"No valid update information could be loaded.", nil);
-            recoveryOption = @"Cancel Update";
+            recoveryOption = SULocalizedString(@"Cancel Update", nil);
         }
         
         NSError *notFoundError =
