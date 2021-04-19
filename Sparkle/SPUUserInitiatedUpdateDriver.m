@@ -114,7 +114,12 @@
 {
     if (self.showingUserInitiatedProgress) {
         self.showingUserInitiatedProgress = NO;
-        [self.userDriver dismissUserInitiatedUpdateCheck];
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+        if ([self.userDriver respondsToSelector:@selector(dismissUserInitiatedUpdateCheck)]) {
+            [self.userDriver dismissUserInitiatedUpdateCheck];
+        }
+#pragma clang diagnostic pop
     }
 }
 
@@ -126,7 +131,12 @@
 - (void)abortUpdateWithError:(nullable NSError *)error
 {
     if (self.showingUserInitiatedProgress) {
-        [self.userDriver dismissUserInitiatedUpdateCheck];
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+        if ([self.userDriver respondsToSelector:@selector(dismissUserInitiatedUpdateCheck)]) {
+            [self.userDriver dismissUserInitiatedUpdateCheck];
+        }
+#pragma clang diagnostic pop
         self.showingUserInitiatedProgress = NO;
     }
     self.aborted = YES;

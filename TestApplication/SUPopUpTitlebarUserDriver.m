@@ -140,6 +140,9 @@
             // Todo: show user interface for this
             NSLog(@"Found info URL: %@", appcastItem.infoURL);
             
+            // Remove UI from user initiated check
+            [self removeUpdateButton];
+            
             reply(SPUUserUpdateChoiceDismiss);
             
             break;
@@ -190,11 +193,6 @@
 - (void)showUserInitiatedUpdateCheckWithCancellation:(void (^)(void))__unused cancellation
 {
     [self addUpdateButtonWithTitle:@"Checking for Updates…"];
-}
-
-- (void)dismissUserInitiatedUpdateCheck
-{
-    [self removeUpdateButton];
 }
 
 #pragma mark Update Errors
