@@ -189,7 +189,7 @@
     
     NSData *archivedData = SPUArchiveRootObjectSecurely(installationData);
     if (archivedData == nil) {
-        [self.delegate installerIsRequestingAbortInstallWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey:SULocalizedString(@"An error occurred while encoding the installer parameters. Please try again later.", nil) }]];
+        [self.delegate installerIsRequestingAbortInstallWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey:@"An error occurred while encoding the installer parameters. Please try again later." }]];
         return;
     }
     
