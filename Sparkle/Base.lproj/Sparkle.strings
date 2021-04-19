@@ -101,3 +101,9 @@
 
 /* Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates. */
 "You're up-to-date!" = "You’re up to date!";
+
+/* Authorization message shown when app wants permission to update itself. */
+"%1$@ wants permission to update." = "%1$@ wants permission to update.";
+
+/* Authorization message shown when app wants permission to update another app / bundle. */
+"%1$@ wants permission to update %2$@." = "%1$@ wants permission to update %2$@.";
