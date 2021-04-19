@@ -33,13 +33,6 @@ NS_ASSUME_NONNULL_BEGIN
 SU_EXPORT @protocol SPUUserDriver <NSObject>
 
 /*!
- * Show that an update can be checked by the user or not
- *
- * A client may choose to update the interface letting the user know if they can check for updates.
- */
-- (void)showCanCheckForUpdates:(BOOL)canCheckForUpdates;
-
-/*!
  * Show an updater permission request to the user
  *
  * Ask the user for their permission regarding update checks.
@@ -232,6 +225,14 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  * @param acknowledgement Acknowledge to the updater that the finished installation was shown.
  */
 - (void)showUpdateInstalledAndRelaunched:(BOOL)relaunched acknowledgement:(void (^)(void))acknowledgement;
+
+/*!
+ * Show the user the current presented update or its progress in utmost focus
+ *
+ * The user wishes to check for updates while the user is being shown update progress.
+ * Bring whatever is on screen to frontmost focus (permission request, update information, downloading or extraction status, choice to install update, etc).
+ */
+- (void)showUpdateInFocus;
 
 /*!
  * Dismiss the current update installation

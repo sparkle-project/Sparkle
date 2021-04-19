@@ -41,10 +41,6 @@
     return self;
 }
 
-- (void)showCanCheckForUpdates:(BOOL)canCheckForUpdates
-{
-}
-
 - (void)showUpdatePermissionRequest:(SPUUpdatePermissionRequest *)__unused request reply:(void (^)(SUUpdatePermissionResponse *))reply
 {
     if (self.updatePermissionResponse == nil) {
@@ -131,6 +127,10 @@
             reply(SPUUserUpdateChoiceDismiss);
             break;
     }
+}
+
+- (void)showUpdateInFocus
+{
 }
 
 - (void)showUpdateReleaseNotesWithDownloadData:(SPUDownloadData *)downloadData

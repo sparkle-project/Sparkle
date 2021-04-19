@@ -89,6 +89,11 @@
     }
 }
 
+- (BOOL)showingUpdate
+{
+    return NO;
+}
+
 - (void)installerDidFinishPreparationAndWillInstallImmediately:(BOOL)willInstallImmediately silently:(BOOL)willInstallSilently
 {
     self.willInstallSilently = willInstallSilently;

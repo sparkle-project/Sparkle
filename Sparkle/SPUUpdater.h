@@ -76,12 +76,17 @@ SU_EXPORT @interface SPUUpdater : NSObject
 - (BOOL)startUpdater:(NSError * __autoreleasing *)error;
 
 /*!
- Checks for updates, and displays progress while doing so.
+ Checks for updates, and displays progress while doing so if needed.
  
- This is meant for users initiating an update check.
- This may find a resumable update that has already been downloaded or has begun installing, or
- this may find a new update that can start to be downloaded if the user requests it.
- This will find updates that the user has opted into skipping.
+ This is meant for users initiating a new update check or checking the current update progress.
+ 
+ If an update hasn't started, the user may be shown that a new check for updates is occurring.
+ If an update has already been downloaded or begun installing, the user may be presented to install that update.
+ If the user is already being presented with an update, that update will be shown to the user in active focus.
+ 
+ This will find updates that the user has previously opted into skipping.
+ 
+ See canCheckForUpdates property which can determine if this method may be invoked.
  */
 - (void)checkForUpdates;
 
@@ -111,15 +116,30 @@ SU_EXPORT @interface SPUUpdater : NSObject
 - (void)checkForUpdateInformation;
 
 /*!
- A property indicating whether or not updates can be checked.
+ A property indicating whether or not updates can be checked by the user.
  
- This property is useful for determining whether update checks can be made programatically or by the user.
- An update check cannot be made when an on-going update check is in progress.
+ An update check can be made by the user when an update session isn't in progress, or when an update or its progress is being shown to the user.
  
- Note this property does not reflect whether or not an update itself is in progress. For example,
- an update check can be done to check if there's an already started update that can be resumed.
+ This property is suitable to use for menu item validation for seeing if -checkForUpdates can be invoked.
+ 
+ Note this property does not reflect whether or not an update session is in progress. Please see sessionInProgress property instead.
  */
 @property (nonatomic, readonly) BOOL canCheckForUpdates;
+
+/*!
+ A property indicating whether or not an update session is in progress.
+ 
+ An update session is in progress when the appcast is being downloaded, an update is being downloaded,
+ an update is being shown, update permission is being requested, or the installer is being started.
+ An active session is when Sparkle's fired scheduler is running.
+ 
+ Note an update session may be inactive even though Sparkle's installer (ran as a separate process) may be running,
+ or even though the update has been downloaded but the installation has been deferred. In both of these cases, a new update session
+ may be activated with the update resumed at a later point (automatically or manually).
+ 
+ See also canCheckForUpdates property which is more suited for menu item validation.
+ */
+@property (nonatomic, readonly) BOOL sessionInProgress;
 
 /*!
  A property indicating whether or not to check for updates automatically.

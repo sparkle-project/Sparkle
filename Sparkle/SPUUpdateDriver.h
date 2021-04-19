@@ -25,6 +25,8 @@ typedef void (^SPUUpdateDriverCompletion)(BOOL shouldShowUpdateImmediately, id<S
 
 - (void)resumeUpdate:(id<SPUResumableUpdate>)resumableUpdate completion:(SPUUpdateDriverCompletion)completionBlock;
 
+@property (nonatomic, readonly) BOOL showingUpdate;
+
 // A likely implementation of -abortUpdate is invoking -abortUpdateWithError: by passing nil
 - (void)abortUpdate;
 

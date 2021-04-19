@@ -18,6 +18,7 @@
 @property (nonatomic, readonly) SPUUIBasedUpdateDriver *uiDriver;
 @property (nonatomic, readonly) id<SPUUserDriver> userDriver;
 @property (nonatomic) BOOL showingUserInitiatedProgress;
+@property (nonatomic) BOOL showingUpdate;
 @property (nonatomic) BOOL aborted;
 
 @end
@@ -27,6 +28,7 @@
 @synthesize uiDriver = _uiDriver;
 @synthesize userDriver = _userDriver;
 @synthesize showingUserInitiatedProgress = _showingUserInitiatedProgress;
+@synthesize showingUpdate = _showingUpdate;
 @synthesize aborted = _aborted;
 
 - (instancetype)initWithHost:(SUHost *)host applicationBundle:(NSBundle *)applicationBundle sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater userDriver:(id <SPUUserDriver>)userDriver updaterDelegate:(nullable id <SPUUpdaterDelegate>)updaterDelegate
@@ -57,6 +59,8 @@
                         }
                     });
                 };
+                
+                self.showingUpdate = YES;
                 
                 if ([self.userDriver respondsToSelector:@selector(showUserInitiatedUpdateCheckWithCancellation:)]) {
                     [self.userDriver showUserInitiatedUpdateCheckWithCancellation:cancelUpdateCheck];

@@ -65,6 +65,11 @@
     self.showedUpdate = YES;
 }
 
+- (BOOL)showingUpdate
+{
+    return self.showedUpdate;
+}
+
 - (void)basicDriverIsRequestingAbortUpdateWithError:(nullable NSError *) error
 {
     // Don't tell the user that no update was found or some appcast fetch error occurred for scheduled update checks if we haven't shown the update
