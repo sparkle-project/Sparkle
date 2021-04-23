@@ -21,7 +21,7 @@ func findKeys() -> (Data, Data) {
     if res == errSecSuccess, let encoded = item as? Data, let keys = Data(base64Encoded: encoded) {
         return (keys[0..<64], keys[64..<(64+32)])
     } else if res == errSecItemNotFound {
-        print("ERROR! Signing key not found. Please run generate_keys tool first.")
+        print("ERROR! Signing key not found. Please run generate_keys tool first or provide path to pem file as a second parameter.")
     } else if res == errSecAuthFailed {
         print("ERROR! Access denied. Can't get keys from the keychain.")
         print("Go to Keychain Access.app, lock the login keychain, then unlock it again.")
@@ -33,6 +33,25 @@ func findKeys() -> (Data, Data) {
         print("ERROR! Unable to access required key in the Keychain", res, "(you can look it up at osstatus.com)")
     }
     exit(1)
+}
+
+func findKeys(inFile privateAndPublicBase64KeyFile: String) throws -> (Data, Data) {
+    let privateAndPublicBase64Key = try String(contentsOfFile: privateAndPublicBase64KeyFile)
+    
+    guard let privateAndPublicKey = Data(base64Encoded: privateAndPublicBase64Key.trimmingCharacters(in: .whitespacesAndNewlines), options: .init()) else {
+        print("Failed to decode base64 encoded key data from: \(privateAndPublicBase64Key)")
+        exit(1)
+    }
+    
+    guard privateAndPublicKey.count == 64 + 32 else {
+        print("Imported key must be 96 bytes decoded. Instead it is \(privateAndPublicKey.count) bytes decoded.")
+        exit(1)
+    }
+    
+    let publicKey = privateAndPublicKey[64...]
+    let privateKey = privateAndPublicKey[0..<64]
+    
+    return (privateKey, publicKey)
 }
 
 func edSignature(data: Data, publicEdKey: Data, privateEdKey: Data) -> String {
@@ -47,14 +66,15 @@ func edSignature(data: Data, publicEdKey: Data, privateEdKey: Data) -> String {
 }
 
 let args = CommandLine.arguments
-if args.count != 2 {
-    print("Usage: \(args[0]) <archive to sign>\nPrivate EdDSA (ed25519) key is automatically read from the Keychain.\n")
+if args.count < 2 || args.count > 3 {
+    print("Usage: \(args[0]) <archive to sign> [<private_key_file>]\nPrivate EdDSA (ed25519) key is automatically read from the Keychain if no <private_key_file> is given.\n")
     exit(1)
 }
 
-let(priv, pub) = findKeys()
-
 do {
+    let(priv, pub) = (args.count == 3)
+        ? try findKeys(inFile: args[2])
+        : findKeys()
     let data = try Data.init(contentsOf: URL.init(fileURLWithPath: args[1]), options: .mappedIfSafe)
     let sig = edSignature(data: data, publicEdKey: pub, privateEdKey: priv)
     print("sparkle:edSignature=\"\(sig)\" length=\"\(data.count)\"")
