@@ -69,14 +69,7 @@
 
 - (SUAppcastItem * _Nullable)preferredUpdateForRegularAppcastItem:(SUAppcastItem * _Nullable)regularItem secondaryUpdate:(SUAppcastItem * __autoreleasing _Nullable *)secondaryUpdate
 {
-    if (regularItem == nil) {
-        if (secondaryUpdate != NULL) {
-            *secondaryUpdate = nil;
-        }
-        return nil;
-    }
-    
-    SUAppcastItem *deltaItem = [[self class] deltaUpdateFromAppcastItem:regularItem hostVersion:self.host.version];
+    SUAppcastItem *deltaItem = (regularItem != nil) ? [[self class] deltaUpdateFromAppcastItem:regularItem hostVersion:self.host.version] : nil;
     
     if (deltaItem != nil) {
         if (secondaryUpdate != NULL) {
@@ -84,6 +77,9 @@
         }
         return deltaItem;
     } else {
+        if (secondaryUpdate != NULL) {
+            *secondaryUpdate = nil;
+        }
         return regularItem;
     }
 }
