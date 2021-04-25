@@ -12,16 +12,20 @@
 #import "SUTestWebServer.h"
 #import "TestAppHelperProtocol.h"
 #import "ed25519.h" // Run `git submodule update --init` if you get an error here
+#import <Sparkle/Sparkle.h>
+#import "SUPopUpTitlebarUserDriver.h"
 
 @interface SUTestApplicationDelegate ()
 
-@property (nonatomic) NSWindowController *updateSettingsWindowController;
+@property (nonatomic) SPUUpdater *updater;
+@property (nonatomic) SUUpdateSettingsWindowController *updateSettingsWindowController;
 @property (nonatomic) SUTestWebServer *webServer;
 
 @end
 
 @implementation SUTestApplicationDelegate
 
+@synthesize updater = _updater;
 @synthesize updateSettingsWindowController = _updateSettingsWindowController;
 @synthesize webServer = _webServer;
 
@@ -194,10 +198,40 @@ static NSString * const UPDATED_VERSION = @"2.0";
             }
             self.webServer = webServer;
             
-            // Show the Settings window
-            self.updateSettingsWindowController = [[SUUpdateSettingsWindowController alloc] initWithCustomUserDriver:shiftKeyHeldDown];
-            
-            [self.updateSettingsWindowController showWindow:nil];
+            // Set up updater and the updater settings window
+            {
+                self.updateSettingsWindowController = [[SUUpdateSettingsWindowController alloc] init];
+                
+                NSWindow *settingsWindow = self.updateSettingsWindowController.window;
+                
+                NSBundle *hostBundle = [NSBundle mainBundle];
+                NSBundle *applicationBundle = hostBundle;
+                
+                id<SPUUserDriver> userDriver;
+                if (shiftKeyHeldDown) {
+                    userDriver = [[SUPopUpTitlebarUserDriver alloc] initWithWindow:settingsWindow];
+                } else {
+                    userDriver = [[SPUStandardUserDriver alloc] initWithHostBundle:hostBundle delegate:nil];
+                }
+                
+                SPUUpdater *updater = [[SPUUpdater alloc] initWithHostBundle:hostBundle applicationBundle:applicationBundle userDriver:userDriver delegate:nil];
+                
+                self.updater = updater;
+                self.updateSettingsWindowController.updater = updater;
+                
+                NSError *updaterError = nil;
+                if (![updater startUpdater:&updaterError]) {
+                    NSLog(@"Failed to start updater with error: %@", updaterError);
+                    
+                    NSAlert *alert = [[NSAlert alloc] init];
+                    alert.messageText = @"Updater Error";
+                    alert.informativeText = @"The Updater failed to start. For detailed error information, check the Console.app log.";
+                    [alert addButtonWithTitle:@"OK"];
+                    [alert runModal];
+                }
+                
+                [self.updateSettingsWindowController showWindow:nil];
+            }
         });
     }];
 }
@@ -220,6 +254,19 @@ static NSString * const UPDATED_VERSION = @"2.0";
 - (void)applicationWillTerminate:(NSNotification * __unused)notification
 {
     [self.webServer close];
+}
+
+- (IBAction)checkForUpdates:(id __unused)sender
+{
+    [self.updater checkForUpdates];
+}
+
+- (BOOL)validateMenuItem:(NSMenuItem *)menuItem
+{
+    if (menuItem.action == @selector(checkForUpdates:)) {
+        return self.updater.canCheckForUpdates;
+    }
+    return YES;
 }
 
 @end
