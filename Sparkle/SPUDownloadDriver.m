@@ -53,12 +53,64 @@
 @synthesize expectedContentLength = _expectedContentLength;
 @synthesize cleaningUp = _cleaningUp;
 
-- (instancetype)initWithUpdateItem:(SUAppcastItem *)updateItem host:(SUHost *)host userAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background delegate:(id<SPUDownloadDriverDelegate>)delegate
+- (instancetype)initWithHost:(SUHost *)host
 {
     self = [super init];
     if (self != nil) {
-        _updateItem = updateItem;
         _host = host;
+        
+        if (!SPUXPCServiceExists(@DOWNLOADER_BUNDLE_ID)) {
+            _downloader = [[SPUDownloader alloc] initWithDelegate:self];
+        } else {
+            _connection = [[NSXPCConnection alloc] initWithServiceName:@DOWNLOADER_BUNDLE_ID];
+            _connection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SPUDownloaderProtocol)];
+            _connection.exportedInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SPUDownloaderDelegate)];
+            _connection.exportedObject = self;
+            
+            _downloader = _connection.remoteObjectProxy;
+            
+            __weak SPUDownloadDriver *weakSelf = self;
+            
+            _connection.interruptionHandler = ^{
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    SPUDownloadDriver *strongSelf = weakSelf;
+                    if (strongSelf != nil && !strongSelf.retrievedDownloadResult) {
+                        [strongSelf.connection invalidate];
+                    }
+                });
+            };
+            
+            _connection.invalidationHandler = ^{
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    SPUDownloadDriver *strongSelf = weakSelf;
+                    if (strongSelf != nil && !strongSelf.retrievedDownloadResult && !strongSelf.cleaningUp) {
+                        strongSelf.downloader = nil;
+                        
+                        SULog(SULogLevelError, @"Connection to update downloader was invalidated");
+                        
+                        NSDictionary *userInfo =
+                        @{
+                          NSLocalizedDescriptionKey: SULocalizedString(@"An error occurred while downloading the update. Please try again later.", nil),
+                          };
+                        
+                        NSError *downloadError = [NSError errorWithDomain:SUSparkleErrorDomain code:SUDownloadError userInfo:userInfo];
+                        
+                        [strongSelf.delegate downloadDriverDidFailToDownloadUpdateWithError:downloadError];
+                    }
+                });
+            };
+            
+            [_connection resume];
+        }
+    }
+    return self;
+}
+
+- (instancetype)initWithUpdateItem:(SUAppcastItem *)updateItem host:(SUHost *)host userAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background delegate:(id<SPUDownloadDriverDelegate>)delegate
+{
+    self = [self initWithHost:host];
+    if (self != nil) {
+        _updateItem = updateItem;
         _delegate = delegate;
         
         _inBackground = background;
@@ -72,75 +124,59 @@
                 [_request setValue:value forHTTPHeaderField:key];
             }
         }
-        
-        if (!SPUXPCServiceExists(@DOWNLOADER_BUNDLE_ID)) {
-            _downloader = [[SPUDownloader alloc] initWithDelegate:self];
-        } else {
-            _connection = [[NSXPCConnection alloc] initWithServiceName:@DOWNLOADER_BUNDLE_ID];
-            _connection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SPUDownloaderProtocol)];
-            _connection.exportedInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SPUDownloaderDelegate)];
-            _connection.exportedObject = self;
-            
-            _downloader = _connection.remoteObjectProxy;
-        }
     }
     return self;
 }
 
 - (void)downloadUpdate
 {
-    NSString *bundleIdentifier = self.host.bundle.bundleIdentifier;
-    assert(bundleIdentifier != nil);
-    
-    __weak SPUDownloadDriver *weakSelf = self;
-    
-    self.connection.interruptionHandler = ^{
-        dispatch_async(dispatch_get_main_queue(), ^{
-            SPUDownloadDriver *strongSelf = weakSelf;
-            if (strongSelf != nil && !strongSelf.retrievedDownloadResult) {
-                [strongSelf.connection invalidate];
-            }
-        });
-    };
-    
-    self.connection.invalidationHandler = ^{
-        dispatch_async(dispatch_get_main_queue(), ^{
-            SPUDownloadDriver *strongSelf = weakSelf;
-            if (strongSelf != nil && !strongSelf.retrievedDownloadResult && !strongSelf.cleaningUp) {
-                SULog(SULogLevelError, @"Connection to update downloader was invalidated");
-                
-                NSDictionary *userInfo =
-                @{
-                  NSLocalizedDescriptionKey: SULocalizedString(@"An error occurred while downloading the update. Please try again later.", nil),
-                  };
-                
-                NSError *downloadError = [NSError errorWithDomain:SUSparkleErrorDomain code:SUDownloadError userInfo:userInfo];
-                
-                [strongSelf.delegate downloadDriverDidFailToDownloadUpdateWithError:downloadError];
-            }
-        });
-    };
-    
-    [self.connection resume];
-    
     [self.delegate downloadDriverWillBeginDownload];
     
     NSString *desiredFilename = [NSString stringWithFormat:@"%@ %@", [self.host name], [self.updateItem versionString]];
+    
+    NSString *bundleIdentifier = self.host.bundle.bundleIdentifier;
+    assert(bundleIdentifier != nil);
+    
     [self.downloader startPersistentDownloadWithRequest:[SPUURLRequest URLRequestWithRequest:self.request] bundleIdentifier:bundleIdentifier desiredFilename:desiredFilename];
 }
 
-- (void)cleanup
+- (void)removeDownloadedUpdate:(SPUDownloadedUpdate *)downloadedUpdate
 {
-    self.cleaningUp = YES;
+    NSString *bundleIdentifier = self.host.bundle.bundleIdentifier;
+    assert(bundleIdentifier != nil);
     
-    if (self.connection != nil) {
-        [self.connection invalidate];
-        self.connection = nil;
+    if (bundleIdentifier != nil) {
+        // Grab eg "0bCSun8tj" from org.sparkle-project.Sparkle/PersistentDownloads/0bCSun8tj/Sparkle Test App 2.0/
+        NSString *tempDirectoryName = downloadedUpdate.temporaryDirectory.stringByDeletingLastPathComponent.lastPathComponent;
+        
+        [self.downloader removeDownloadDirectory:tempDirectoryName bundleIdentifier:bundleIdentifier];
     }
-    self.downloadName = nil;
+}
+
+- (void)cleanup:(void (^)(void))completionHandler
+{
+    void (^cleanupBlock)(void) = ^{
+        self.cleaningUp = YES;
+        
+        if (self.connection != nil) {
+            [self.connection invalidate];
+            self.connection = nil;
+        }
+        self.downloadName = nil;
+        self.downloader = nil;
+        
+        completionHandler();
+    };
     
-    [self.downloader cancelDownload];
-    self.downloader = nil;
+    if (self.downloader == nil) {
+        cleanupBlock();
+    } else {
+        [self.downloader cleanup:^{
+            dispatch_async(dispatch_get_main_queue(), ^{
+                cleanupBlock();
+            });
+        }];
+    }
 }
 
 - (void)downloaderDidFinishWithTemporaryDownloadData:(SPUDownloadData * _Nullable)__unused downloadData
@@ -155,7 +191,6 @@
         SPUDownloadedUpdate *downloadedUpdate = [[SPUDownloadedUpdate alloc] initWithAppcastItem:self.updateItem downloadName:self.downloadName temporaryDirectory:self.temporaryDirectory];
         
         [self.delegate downloadDriverDidDownloadUpdate:downloadedUpdate];
-        [self cleanup];
     });
 }
 
@@ -179,8 +214,6 @@
         
         NSError *downloadError = [NSError errorWithDomain:SUSparkleErrorDomain code:SUDownloadError userInfo:userInfo];
         [self.delegate downloadDriverDidFailToDownloadUpdateWithError:downloadError];
-        
-        [self cleanup];
     });
 }
 

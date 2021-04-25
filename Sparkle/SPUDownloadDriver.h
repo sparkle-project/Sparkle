@@ -30,12 +30,16 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithUpdateItem:(SUAppcastItem *)updateItem host:(SUHost *)host userAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background delegate:(id<SPUDownloadDriverDelegate>)delegate;
 
+- (instancetype)initWithHost:(SUHost *)host;
+
 - (void)downloadUpdate;
+
+- (void)removeDownloadedUpdate:(SPUDownloadedUpdate *)downloadedUpdate;
 
 @property (nonatomic, readonly) NSMutableURLRequest *request;
 @property (nonatomic, readonly) BOOL inBackground;
 
-- (void)cleanup;
+- (void)cleanup:(void (^)(void))completionHandler;
 
 @end
 

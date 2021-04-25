@@ -111,12 +111,25 @@ static NSString *SUDownloadingReason = @"Downloading update related file";
     }
 }
 
-- (void)cancelDownload
+- (NSString *)rootPersistentDownloadCachePathForBundleIdentifier:(NSString *)bundleIdentifier
 {
-    [self cleanup];
+    return [[SPULocalCacheDirectory cachePathForBundleIdentifier:bundleIdentifier] stringByAppendingPathComponent:@"PersistentDownloads"];
 }
 
-- (void)cleanup
+- (void)removeDownloadDirectory:(NSString *)directoryName bundleIdentifier:(NSString *)bundleIdentifier
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSString *rootPersistentDownloadCachePath = [self rootPersistentDownloadCachePathForBundleIdentifier:bundleIdentifier];
+        if (rootPersistentDownloadCachePath != nil) {
+            NSString *sanitizedDirectoryName = directoryName.lastPathComponent;
+            NSString *tempDir = [rootPersistentDownloadCachePath stringByAppendingPathComponent:sanitizedDirectoryName];
+            
+            [[NSFileManager defaultManager] removeItemAtPath:tempDir error:NULL];
+        }
+    });
+}
+
+- (void)_cleanup
 {
     [self enableAutomaticTermination];
     [self.download cancel];
@@ -132,6 +145,15 @@ static NSString *SUDownloadingReason = @"Downloading update related file";
     }
 }
 
+- (void)cleanup:(void (^)(void))completionHandler
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self _cleanup];
+        
+        completionHandler();
+    });
+}
+
 - (void)URLSession:(NSURLSession *)__unused session downloadTask:(NSURLSessionDownloadTask *)__unused downloadTask didFinishDownloadingToURL:(NSURL *)location
 {
     if (self.mode == SPUDownloadModeTemporary)
@@ -142,8 +164,8 @@ static NSString *SUDownloadingReason = @"Downloading update related file";
     else
     {
         // Remove our old caches path so we don't start accumulating files in there
-        NSString *rootPersistentDownloadCachePath = [[SPULocalCacheDirectory cachePathForBundleIdentifier:self.bundleIdentifier] stringByAppendingPathComponent:@"PersistentDownloads"];
-        
+        NSString *rootPersistentDownloadCachePath = [self rootPersistentDownloadCachePathForBundleIdentifier:self.bundleIdentifier];
+
         [SPULocalCacheDirectory removeOldItemsInDirectory:rootPersistentDownloadCachePath];
         
         NSString *tempDir = [SPULocalCacheDirectory createUniqueDirectoryInDirectory:rootPersistentDownloadCachePath];
@@ -231,20 +253,21 @@ static NSString *SUDownloadingReason = @"Downloading update related file";
             } else {
                 [self.delegate downloaderDidFailWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUDownloadError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to read temporary downloaded data from %@", self.downloadFilename]}]];
             }
+            
+            [self _cleanup];
             break;
         case SPUDownloadModePersistent:
             [self.delegate downloaderDidFinishWithTemporaryDownloadData:nil];
             break;
     }
-    
-    [self cleanup];
 }
 
 - (void)URLSession:(NSURLSession *)__unused session task:(NSURLSessionTask *)__unused task didCompleteWithError:(NSError *)error
 {
     self.download = nil;
-    [self.delegate downloaderDidFailWithError:error];
-    [self cleanup];
+    if (error != nil) {
+        [self.delegate downloaderDidFailWithError:error];
+    }
 }
 
 // NSURLDownload has a [downlaod:shouldDecodeSourceDataOfMIMEType:] to determine if the data should be decoded.

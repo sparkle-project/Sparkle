@@ -16,6 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol SPUInstallerDriverDelegate <NSObject>
 
 - (void)installerDidStartInstalling;
+- (void)installerDidStartExtracting;
 - (void)installerDidExtractUpdateWithProgress:(double)progress;
 - (void)installerDidFinishPreparationAndWillInstallImmediately:(BOOL)willInstallImmediately silently:(BOOL)willInstallSilently;
 - (void)installerIsSendingAppTerminationSignal;
