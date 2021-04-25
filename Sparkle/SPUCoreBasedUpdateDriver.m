@@ -381,16 +381,16 @@
 
 - (void)installerDidFailToApplyDeltaUpdate
 {
-    SUAppcastItem *nonDeltaUpdateItem = self.basicDriver.nonDeltaUpdateItem;
-    assert(nonDeltaUpdateItem != nil);
+    SUAppcastItem *secondaryUpdateItem = self.basicDriver.secondaryUpdateItem;
+    assert(secondaryUpdateItem != nil);
     
     BOOL backgroundDownload = self.downloadDriver.inBackground;
     
     [self clearDownloadedUpdate];
     
     // Fall back to the non-delta update. Note that we don't want to trigger another update was found event.
-    self.updateItem = nonDeltaUpdateItem;
-    [self downloadUpdateFromAppcastItem:nonDeltaUpdateItem inBackground:backgroundDownload];
+    self.updateItem = secondaryUpdateItem;
+    [self downloadUpdateFromAppcastItem:secondaryUpdateItem inBackground:backgroundDownload];
 }
 
 - (void)abortUpdateAndShowNextUpdateImmediately:(BOOL)shouldShowUpdateImmediately error:(nullable NSError *)error

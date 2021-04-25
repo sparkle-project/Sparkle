@@ -16,6 +16,7 @@
 #import "SUHost.h"
 #import "SUConstants.h"
 #import "SUPhasedUpdateGroupInfo.h"
+#import "SULog.h"
 
 
 #include "AppKitPrevention.h"
@@ -26,7 +27,7 @@
 @property (nonatomic, copy) NSString *userAgent;
 @property (nullable, nonatomic, readonly, weak) id updater;
 @property (nullable, nonatomic, readonly, weak) id <SPUUpdaterDelegate> updaterDelegate;
-@property (nullable, nonatomic) SUAppcastItem *nonDeltaUpdateItem;
+@property (nullable, nonatomic) SUAppcastItem *secondaryUpdateItem;
 @property (nullable, nonatomic, readonly, weak) id <SUAppcastDriverDelegate> delegate;
 
 @end
@@ -37,7 +38,7 @@
 @synthesize userAgent = _userAgent;
 @synthesize updater = _updater;
 @synthesize updaterDelegate = _updaterDelegate;
-@synthesize nonDeltaUpdateItem = _nonDeltaUpdateItem;
+@synthesize secondaryUpdateItem = _secondaryUpdateItem;
 @synthesize delegate = _delegate;
 
 - (instancetype)initWithHost:(SUHost *)host updater:(id)updater updaterDelegate:(id <SPUUpdaterDelegate>)updaterDelegate delegate:(id <SUAppcastDriverDelegate>)delegate
@@ -68,6 +69,24 @@
     }];
 }
 
+- (SUAppcastItem * _Nullable)preferredUpdateForRegularAppcastItem:(SUAppcastItem * _Nullable)regularItem secondaryUpdate:(SUAppcastItem * __autoreleasing _Nullable *)secondaryUpdate
+{
+    if (regularItem == nil) {
+        return nil;
+    }
+    
+    SUAppcastItem *deltaItem = [[self class] deltaUpdateFromAppcastItem:regularItem hostVersion:self.host.version];
+    
+    if (deltaItem != nil) {
+        if (secondaryUpdate != NULL) {
+            *secondaryUpdate = regularItem;
+        }
+        return deltaItem;
+    } else {
+        return regularItem;
+    }
+}
+
 - (void)appcastDidFinishLoading:(SUAppcast *)loadedAppcast inBackground:(BOOL)background includesSkippedUpdates:(BOOL)includesSkippedUpdates
 {
     [self.delegate didFinishLoadingAppcast:loadedAppcast];
@@ -79,35 +98,33 @@
     SUAppcast *supportedAppcast = [[self class] filterSupportedAppcast:loadedAppcast phasedUpdateGroup:phasedUpdateGroup];
     
     SUAppcastItem *item = nil;
-    SUAppcastItem *nonDeltaUpdateItem = nil;
+    SUAppcastItem *secondaryItem = nil;
     
-    // Now we have to find the best valid update in the appcast.
+    // Find the best valid update in the appcast by asking the delegate
     if ([self.updaterDelegate respondsToSelector:@selector((bestValidUpdateInAppcast:forUpdater:))])
     {
-        item = [self.updaterDelegate bestValidUpdateInAppcast:supportedAppcast forUpdater:(id _Nonnull)self.updater];
+        SUAppcastItem *regularItem = [self.updaterDelegate bestValidUpdateInAppcast:supportedAppcast forUpdater:(id _Nonnull)self.updater];
+        
+        assert(!regularItem.deltaUpdate);
+        if (regularItem.deltaUpdate) {
+            // Client would have to go out of their way to examine the .deltaUpdates to return one
+            // This is very unlikely, and we need them to give us a regular update item back
+            SULog(SULogLevelError, @"Error: -bestValidUpdateInAppcast:forUpdater: cannot return a delta update item");
+        } else {
+            item = [self preferredUpdateForRegularAppcastItem:regularItem secondaryUpdate:&secondaryItem];
+        }
     }
     
-    if (item != nil)
+    // Take care of finding best appcast item ourselves if delegate does not
+    if (item == nil)
     {
-        // Does the delegate want to handle it?
-        if ([item isDeltaUpdate]) {
-            nonDeltaUpdateItem = [self.updaterDelegate bestValidUpdateInAppcast:[supportedAppcast copyWithoutDeltaUpdates] forUpdater:(id _Nonnull)self.updater];
-        }
-    }
-    else // If not, we'll take care of it ourselves.
-    {
-        // Find the best supported update
-        SUAppcastItem *deltaUpdateItem = nil;
-        item = [[self class] bestItemFromAppcastItems:supportedAppcast.items getDeltaItem:&deltaUpdateItem withHostVersion:self.host.version comparator:[self versionComparator]];
+        SUAppcastItem *regularItem = [[self class] bestItemFromAppcastItems:supportedAppcast.items comparator:[self versionComparator]];
         
-        if (item && deltaUpdateItem) {
-            nonDeltaUpdateItem = item;
-            item = deltaUpdateItem;
-        }
+        item = [self preferredUpdateForRegularAppcastItem:regularItem secondaryUpdate:&secondaryItem];
     }
     
     if ([self itemContainsValidUpdate:item inBackground:background includesSkippedUpdates:includesSkippedUpdates]) {
-        self.nonDeltaUpdateItem = nonDeltaUpdateItem;
+        self.secondaryUpdateItem = secondaryItem;
         [self.delegate didFindValidUpdateWithAppcastItem:item preventsAutoupdate:[self itemPreventsAutoupdate:item]];
     } else {
         NSComparisonResult hostToLatestAppcastItemComparisonResult = (item != nil) ? [[self versionComparator] compareVersion:[self.host version] toVersion:[item versionString]] : 0;
@@ -125,9 +142,12 @@
     }];
 }
 
-// This method is used by unit tests
-// This method should not do *any* filtering, only version comparing
-+ (SUAppcastItem *)bestItemFromAppcastItems:(NSArray *)appcastItems getDeltaItem:(SUAppcastItem * __autoreleasing *)deltaItem withHostVersion:(NSString *)hostVersion comparator:(id<SUVersionComparison>)comparator
++ (SUAppcastItem * _Nullable)deltaUpdateFromAppcastItem:(SUAppcastItem *)appcastItem hostVersion:(NSString *)hostVersion
+{
+    return appcastItem.deltaUpdates[hostVersion];
+}
+
++ (SUAppcastItem * _Nullable)bestItemFromAppcastItems:(NSArray *)appcastItems comparator:(id<SUVersionComparison>)comparator
 {
     SUAppcastItem *item = nil;
     for(SUAppcastItem *candidate in appcastItems) {
@@ -135,14 +155,17 @@
             item = candidate;
         }
     }
-    
-    if (item && deltaItem) {
-        SUAppcastItem *deltaUpdateItem = [item deltaUpdates][hostVersion];
-        if (deltaUpdateItem) {
-            *deltaItem = deltaUpdateItem;
-        }
+    return item;
+}
+
+// This method is used by unit tests
+// This method should not do *any* filtering, only version comparing
++ (SUAppcastItem *)bestItemFromAppcastItems:(NSArray *)appcastItems getDeltaItem:(SUAppcastItem * __autoreleasing *)deltaItem withHostVersion:(NSString *)hostVersion comparator:(id<SUVersionComparison>)comparator
+{
+    SUAppcastItem *item = [self bestItemFromAppcastItems:appcastItems comparator:comparator];
+    if (item != nil && deltaItem != NULL) {
+        *deltaItem = [self deltaUpdateFromAppcastItem:item hostVersion:hostVersion];
     }
-    
     return item;
 }
 

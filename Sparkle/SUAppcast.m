@@ -47,7 +47,7 @@
 
 @interface SUAppcast () <NSURLDownloadDelegate>
 @property (strong) void (^completionBlock)(NSError *);
-@property (copy) NSArray *items;
+@property (copy) NSArray<SUAppcastItem *> *items;
 - (void)reportError:(NSError *)error;
 - (NSXMLNode *)bestNodeInNodes:(NSArray *)nodes;
 @end
@@ -304,12 +304,6 @@
         i = 0;
     }
     return [nodes objectAtIndex:i];
-}
-
-- (SUAppcast *)copyWithoutDeltaUpdates {
-    return [self copyByFilteringItems:^(SUAppcastItem *item) {
-        return (BOOL)![item isDeltaUpdate];
-    }];
 }
 
 - (SUAppcast *)copyByFilteringItems:(BOOL (^)(SUAppcastItem *))filterBlock

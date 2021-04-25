@@ -112,9 +112,9 @@
     [self notifyResumableUpdateItem:resumableUpdate.updateItem systemDomain:nil];
 }
 
-- (SUAppcastItem *)nonDeltaUpdateItem
+- (SUAppcastItem *)secondaryUpdateItem
 {
-    return self.appcastDriver.nonDeltaUpdateItem;
+    return self.appcastDriver.secondaryUpdateItem;
 }
 
 - (void)didFailToFetchAppcastWithError:(NSError *)error
