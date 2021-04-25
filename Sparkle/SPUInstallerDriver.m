@@ -448,11 +448,13 @@
     // Changing this authorization prompt is a little complicated because the
     // Auth database retains and caches the right we use, and there isn't a good way
     // of updating the prompt. See code in SUInstallerLauncher.m
+    // For this reason, we don't provide localized strings for this prompt yet
+    // (and I believe, the authorization framework has a different way of specifying localizations..)
     NSString *authorizationPrompt;
     if ([mainBundleName isEqualToString:hostName]) {
-        authorizationPrompt = [NSString stringWithFormat:SULocalizedString(@"%1$@ wants permission to update.", nil), hostName];
+        authorizationPrompt = [NSString stringWithFormat:@"%1$@ wants permission to update.", hostName];
     } else {
-        authorizationPrompt = [NSString stringWithFormat:SULocalizedString(@"%1$@ wants permission to update %2$@.", nil), mainBundleName, hostName];
+        authorizationPrompt = [NSString stringWithFormat:@"%1$@ wants permission to update %2$@.", mainBundleName, hostName];
     }
     
     NSString *mainBundleIdentifier;
