@@ -28,6 +28,7 @@
 @property (nonatomic) id<SPUDownloaderProtocol> downloader;
 @property (nonatomic) NSXPCConnection *connection;
 @property (nonatomic, readonly) SUAppcastItem *updateItem;
+@property (nonatomic, readonly) SUAppcastItem *secondaryUpdateItem;
 @property (nonatomic, readonly) SUHost *host;
 @property (nonatomic, copy) NSString *temporaryDirectory;
 @property (nonatomic, copy) NSString *downloadName;
@@ -43,6 +44,7 @@
 @synthesize downloader = _downloader;
 @synthesize connection = _connection;
 @synthesize updateItem = _updateItem;
+@synthesize secondaryUpdateItem = _secondaryUpdateItem;
 @synthesize request = _request;
 @synthesize inBackground = _inBackground;
 @synthesize host = _host;
@@ -106,11 +108,12 @@
     return self;
 }
 
-- (instancetype)initWithUpdateItem:(SUAppcastItem *)updateItem host:(SUHost *)host userAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background delegate:(id<SPUDownloadDriverDelegate>)delegate
+- (instancetype)initWithUpdateItem:(SUAppcastItem *)updateItem secondaryUpdateItem:(SUAppcastItem * _Nullable)secondaryUpdateItem host:(SUHost *)host userAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background delegate:(id<SPUDownloadDriverDelegate>)delegate
 {
     self = [self initWithHost:host];
     if (self != nil) {
         _updateItem = updateItem;
+        _secondaryUpdateItem = secondaryUpdateItem;
         _delegate = delegate;
         
         _inBackground = background;
@@ -188,7 +191,7 @@
             SULog(SULogLevelError, @"Warning: Downloader's expected content length (%llu) != Appcast item's length (%llu)", self.expectedContentLength, self.updateItem.contentLength);
         }
         
-        SPUDownloadedUpdate *downloadedUpdate = [[SPUDownloadedUpdate alloc] initWithAppcastItem:self.updateItem downloadName:self.downloadName temporaryDirectory:self.temporaryDirectory];
+        SPUDownloadedUpdate *downloadedUpdate = [[SPUDownloadedUpdate alloc] initWithAppcastItem:self.updateItem secondaryAppcastItem:self.secondaryUpdateItem downloadName:self.downloadName temporaryDirectory:self.temporaryDirectory];
         
         [self.delegate downloadDriverDidDownloadUpdate:downloadedUpdate];
     });

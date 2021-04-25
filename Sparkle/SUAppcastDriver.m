@@ -27,7 +27,6 @@
 @property (nonatomic, copy) NSString *userAgent;
 @property (nullable, nonatomic, readonly, weak) id updater;
 @property (nullable, nonatomic, readonly, weak) id <SPUUpdaterDelegate> updaterDelegate;
-@property (nullable, nonatomic) SUAppcastItem *secondaryUpdateItem;
 @property (nullable, nonatomic, readonly, weak) id <SUAppcastDriverDelegate> delegate;
 
 @end
@@ -38,7 +37,6 @@
 @synthesize userAgent = _userAgent;
 @synthesize updater = _updater;
 @synthesize updaterDelegate = _updaterDelegate;
-@synthesize secondaryUpdateItem = _secondaryUpdateItem;
 @synthesize delegate = _delegate;
 
 - (instancetype)initWithHost:(SUHost *)host updater:(id)updater updaterDelegate:(id <SPUUpdaterDelegate>)updaterDelegate delegate:(id <SUAppcastDriverDelegate>)delegate
@@ -124,8 +122,7 @@
     }
     
     if ([self itemContainsValidUpdate:item inBackground:background includesSkippedUpdates:includesSkippedUpdates]) {
-        self.secondaryUpdateItem = secondaryItem;
-        [self.delegate didFindValidUpdateWithAppcastItem:item preventsAutoupdate:[self itemPreventsAutoupdate:item]];
+        [self.delegate didFindValidUpdateWithAppcastItem:item secondaryAppcastItem:secondaryItem preventsAutoupdate:[self itemPreventsAutoupdate:item]];
     } else {
         NSComparisonResult hostToLatestAppcastItemComparisonResult = (item != nil) ? [[self versionComparator] compareVersion:[self.host version] toVersion:[item versionString]] : 0;
         [self.delegate didNotFindUpdateWithLatestAppcastItem:item hostToLatestAppcastItemComparisonResult:hostToLatestAppcastItemComparisonResult];

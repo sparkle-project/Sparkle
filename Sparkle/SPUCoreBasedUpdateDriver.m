@@ -32,6 +32,7 @@
 @property (nonatomic, readonly) SPUInstallerDriver *installerDriver;
 @property (nonatomic, weak, readonly) id<SPUCoreBasedUpdateDriverDelegate> delegate;
 @property (nonatomic) SUAppcastItem *updateItem;
+@property (nonatomic) SUAppcastItem *secondaryUpdateItem;
 @property (nonatomic) id<SPUResumableUpdate> resumableUpdate;
 @property (nonatomic) SPUDownloadedUpdate *downloadedUpdateForRemoval;
 
@@ -53,6 +54,7 @@
 @synthesize installerDriver = _installerDriver;
 @synthesize delegate = _delegate;
 @synthesize updateItem = _updateItem;
+@synthesize secondaryUpdateItem = _secondaryUpdateItem;
 @synthesize host = _host;
 @synthesize resumingInstallingUpdate = _resumingInstallingUpdate;
 @synthesize silentInstall = _silentInstall;
@@ -147,33 +149,34 @@
     }
 }
 
-- (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)updateItem preventsAutoupdate:(BOOL)preventsAutoupdate systemDomain:(NSNumber * _Nullable)systemDomain
+- (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)updateItem secondaryAppcastItem:(SUAppcastItem *)secondaryUpdateItem preventsAutoupdate:(BOOL)preventsAutoupdate systemDomain:(NSNumber * _Nullable)systemDomain
 {
     self.updateItem = updateItem;
+    self.secondaryUpdateItem = secondaryUpdateItem;
     
     if (self.resumingInstallingUpdate) {
         assert(systemDomain != nil);
         [self.installerDriver resumeInstallingUpdateWithUpdateItem:updateItem systemDomain:systemDomain.boolValue];
-        [self.delegate basicDriverDidFindUpdateWithAppcastItem:updateItem preventsAutoupdate:preventsAutoupdate];
+        [self.delegate basicDriverDidFindUpdateWithAppcastItem:updateItem secondaryAppcastItem:secondaryUpdateItem preventsAutoupdate:preventsAutoupdate];
     } else {
         if (!self.preventsInstallerInteraction) {
             // Simple case - delegate allows interaction, so we should continue along
-            [self.delegate basicDriverDidFindUpdateWithAppcastItem:updateItem preventsAutoupdate:preventsAutoupdate];
+            [self.delegate basicDriverDidFindUpdateWithAppcastItem:updateItem secondaryAppcastItem:secondaryUpdateItem preventsAutoupdate:preventsAutoupdate];
         } else {
             // Package type installations will always require installer interaction as long as we don't support running as root
             // If it's not a package type installation, we should be okay since we did an auth check before checking for updates above
             if (![updateItem.installationType isEqualToString:SPUInstallationTypeApplication]) {
                 [self.delegate coreDriverIsRequestingAbortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUNotAllowedInteractionError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"A new update is available but cannot be installed because interaction has been prevented."] }]];
             } else {
-                [self.delegate basicDriverDidFindUpdateWithAppcastItem:updateItem preventsAutoupdate:preventsAutoupdate];
+                [self.delegate basicDriverDidFindUpdateWithAppcastItem:updateItem secondaryAppcastItem:secondaryUpdateItem preventsAutoupdate:preventsAutoupdate];
             }
         }
     }
 }
 
-- (void)downloadUpdateFromAppcastItem:(SUAppcastItem *)updateItem inBackground:(BOOL)background
+- (void)downloadUpdateFromAppcastItem:(SUAppcastItem *)updateItem secondaryAppcastItem:(SUAppcastItem * _Nullable)secondaryUpdateItem inBackground:(BOOL)background
 {
-    self.downloadDriver = [[SPUDownloadDriver alloc] initWithUpdateItem:updateItem host:self.host userAgent:self.userAgent httpHeaders:self.httpHeaders inBackground:background delegate:self];
+    self.downloadDriver = [[SPUDownloadDriver alloc] initWithUpdateItem:updateItem secondaryUpdateItem:secondaryUpdateItem host:self.host userAgent:self.userAgent httpHeaders:self.httpHeaders inBackground:background delegate:self];
     
     if ([self.updaterDelegate respondsToSelector:@selector((updater:willDownloadUpdate:withRequest:))]) {
         [self.updaterDelegate updater:self.updater
@@ -222,9 +225,9 @@
     [self extractUpdate:downloadedUpdate];
 }
 
-- (void)deferInformationalUpdate:(SUAppcastItem *)updateItem preventsAutoupdate:(BOOL)preventsAutoupdate
+- (void)deferInformationalUpdate:(SUAppcastItem *)updateItem secondaryUpdate:(SUAppcastItem *)secondaryUpdateItem preventsAutoupdate:(BOOL)preventsAutoupdate
 {
-    self.resumableUpdate = [[SPUInformationalUpdate alloc] initWithAppcastItem:updateItem preventsAutoupdate:preventsAutoupdate];
+    self.resumableUpdate = [[SPUInformationalUpdate alloc] initWithAppcastItem:updateItem secondaryAppcastItem:secondaryUpdateItem preventsAutoupdate:preventsAutoupdate];
 }
 
 - (void)extractDownloadedUpdate
@@ -381,7 +384,7 @@
 
 - (void)installerDidFailToApplyDeltaUpdate
 {
-    SUAppcastItem *secondaryUpdateItem = self.basicDriver.secondaryUpdateItem;
+    SUAppcastItem *secondaryUpdateItem = self.secondaryUpdateItem;
     assert(secondaryUpdateItem != nil);
     
     BOOL backgroundDownload = self.downloadDriver.inBackground;
@@ -390,7 +393,9 @@
     
     // Fall back to the non-delta update. Note that we don't want to trigger another update was found event.
     self.updateItem = secondaryUpdateItem;
-    [self downloadUpdateFromAppcastItem:secondaryUpdateItem inBackground:backgroundDownload];
+    self.secondaryUpdateItem = nil;
+    
+    [self downloadUpdateFromAppcastItem:secondaryUpdateItem secondaryAppcastItem:nil inBackground:backgroundDownload];
 }
 
 - (void)abortUpdateAndShowNextUpdateImmediately:(BOOL)shouldShowUpdateImmediately error:(nullable NSError *)error
