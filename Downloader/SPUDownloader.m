@@ -118,6 +118,10 @@ static NSString *SUDownloadingReason = @"Downloading update related file";
 
 - (void)removeDownloadDirectory:(NSString *)directoryName bundleIdentifier:(NSString *)bundleIdentifier
 {
+    // Only take the directory name and compute most of the base path ourselves
+    // This way we do not have to send/trust an absolute path
+    // The downloader instance that creates this temp directory isn't necessarily the same as the one
+    // that clears it (eg upon skipping an already downloaded update), so we can't just preserve it here too
     dispatch_async(dispatch_get_main_queue(), ^{
         NSString *rootPersistentDownloadCachePath = [self rootPersistentDownloadCachePathForBundleIdentifier:bundleIdentifier];
         if (rootPersistentDownloadCachePath != nil) {
