@@ -272,6 +272,7 @@
         } else {
             // If the installer started properly, we can't use the downloaded update archive anymore
             // Especially if the installer fails later and we try resuming the update with a missing archive file
+            // We must clear the download after the installer begins using it however (in -installerDidStartInstalling)
             self.downloadedUpdateForRemoval = downloadedUpdate;
             self.resumableUpdate = nil;
             
