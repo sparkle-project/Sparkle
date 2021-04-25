@@ -193,8 +193,21 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
     
     // Remove the agent bundle; it is assumed this bundle is in a temporary/cache/support directory
     NSError *theError = nil;
-    if (![[NSFileManager defaultManager] removeItemAtPath:[[NSBundle mainBundle] bundlePath] error:&theError]) {
+    NSString *bundlePath = [[NSBundle mainBundle] bundlePath];
+    
+    if (![[NSFileManager defaultManager] removeItemAtPath:bundlePath error:&theError]) {
         SULog(SULogLevelError, @"Couldn't remove agent bundle: %@.", theError);
+    } else {
+        // There should be nothing else in the parent temporary directory given to us,
+        // so let us try to remove it. Note rmdir() will fail if there are unexpectably other
+        // items present
+        NSString *parentDirectory = bundlePath.stringByDeletingLastPathComponent;
+        const char *fileSystemRepresentation = parentDirectory.fileSystemRepresentation;
+        if (fileSystemRepresentation != NULL) {
+            if (rmdir(fileSystemRepresentation) != 0) {
+                SULog(SULogLevelError, @"Failed to remove parent agent bundle directory: %@: %d", parentDirectory, errno);
+            }
+        }
     }
     
     exit(status);
