@@ -70,6 +70,9 @@
 - (SUAppcastItem * _Nullable)preferredUpdateForRegularAppcastItem:(SUAppcastItem * _Nullable)regularItem secondaryUpdate:(SUAppcastItem * __autoreleasing _Nullable *)secondaryUpdate
 {
     if (regularItem == nil) {
+        if (secondaryUpdate != NULL) {
+            *secondaryUpdate = nil;
+        }
         return nil;
     }
     
@@ -95,37 +98,43 @@
     NSNumber *phasedUpdateGroup = background ? @([SUPhasedUpdateGroupInfo updateGroupForHost:self.host]) : nil;
     SUAppcast *supportedAppcast = [[self class] filterSupportedAppcast:loadedAppcast phasedUpdateGroup:phasedUpdateGroup];
     
-    SUAppcastItem *item = nil;
-    SUAppcastItem *secondaryItem = nil;
-    
     // Find the best valid update in the appcast by asking the delegate
-    if ([self.updaterDelegate respondsToSelector:@selector((bestValidUpdateInAppcast:forUpdater:))])
-    {
-        SUAppcastItem *regularItem = [self.updaterDelegate bestValidUpdateInAppcast:supportedAppcast forUpdater:(id _Nonnull)self.updater];
+    SUAppcastItem *regularItemFromDelegate;
+    if ([self.updaterDelegate respondsToSelector:@selector((bestValidUpdateInAppcast:forUpdater:))]) {
+        SUAppcastItem *candidateItem = [self.updaterDelegate bestValidUpdateInAppcast:supportedAppcast forUpdater:(id _Nonnull)self.updater];
         
-        assert(!regularItem.deltaUpdate);
-        if (regularItem.deltaUpdate) {
+        assert(!candidateItem.deltaUpdate);
+        if (candidateItem.deltaUpdate) {
             // Client would have to go out of their way to examine the .deltaUpdates to return one
             // This is very unlikely, and we need them to give us a regular update item back
             SULog(SULogLevelError, @"Error: -bestValidUpdateInAppcast:forUpdater: cannot return a delta update item");
+            regularItemFromDelegate = nil;
         } else {
-            item = [self preferredUpdateForRegularAppcastItem:regularItem secondaryUpdate:&secondaryItem];
+            regularItemFromDelegate = candidateItem;
         }
+    } else {
+        regularItemFromDelegate = nil;
     }
     
     // Take care of finding best appcast item ourselves if delegate does not
-    if (item == nil)
-    {
-        SUAppcastItem *regularItem = [[self class] bestItemFromAppcastItems:supportedAppcast.items comparator:[self versionComparator]];
-        
-        item = [self preferredUpdateForRegularAppcastItem:regularItem secondaryUpdate:&secondaryItem];
+    SUAppcastItem *regularItem;
+    if (regularItemFromDelegate == nil) {
+        regularItem = [[self class] bestItemFromAppcastItems:supportedAppcast.items comparator:[self versionComparator]];
+    } else {
+        regularItem = regularItemFromDelegate;
     }
     
-    if ([self itemContainsValidUpdate:item inBackground:background includesSkippedUpdates:includesSkippedUpdates]) {
-        [self.delegate didFindValidUpdateWithAppcastItem:item secondaryAppcastItem:secondaryItem preventsAutoupdate:[self itemPreventsAutoupdate:item]];
+    // Retrieve the preferred primary and secondary update items
+    // In the case of a delta update, the preferred primary item will be the delta update,
+    // and the secondary item will be the regular update.
+    SUAppcastItem *secondaryItem = nil;
+    SUAppcastItem *primaryItem = [self preferredUpdateForRegularAppcastItem:regularItem secondaryUpdate:&secondaryItem];
+    
+    if ([self itemContainsValidUpdate:primaryItem inBackground:background includesSkippedUpdates:includesSkippedUpdates]) {
+        [self.delegate didFindValidUpdateWithAppcastItem:primaryItem secondaryAppcastItem:secondaryItem preventsAutoupdate:[self itemPreventsAutoupdate:primaryItem]];
     } else {
-        NSComparisonResult hostToLatestAppcastItemComparisonResult = (item != nil) ? [[self versionComparator] compareVersion:[self.host version] toVersion:[item versionString]] : 0;
-        [self.delegate didNotFindUpdateWithLatestAppcastItem:item hostToLatestAppcastItemComparisonResult:hostToLatestAppcastItemComparisonResult];
+        NSComparisonResult hostToLatestAppcastItemComparisonResult = (primaryItem != nil) ? [[self versionComparator] compareVersion:[self.host version] toVersion:[primaryItem versionString]] : 0;
+        [self.delegate didNotFindUpdateWithLatestAppcastItem:primaryItem hostToLatestAppcastItemComparisonResult:hostToLatestAppcastItemComparisonResult];
     }
 }
 
