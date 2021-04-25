@@ -229,6 +229,7 @@
     if (identifier == SPUExtractionStarted) {
         self.extractionAttempts++;
         self.currentStage = identifier;
+        [self.delegate installerDidStartExtracting];
     } else if (identifier == SPUExtractedArchiveWithProgress) {
         if (data.length == sizeof(double) && sizeof(double) == sizeof(uint64_t)) {
             uint64_t progressValue = CFSwapInt64LittleToHost(*(const uint64_t *)data.bytes);

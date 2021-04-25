@@ -19,8 +19,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)startTemporaryDownloadWithRequest:(SPUURLRequest *)request;
 
-// Cancels any ongoing download
-- (void)cancelDownload;
+- (void)removeDownloadDirectory:(NSString *)directoryName bundleIdentifier:(NSString *)bundleIdentifier;
+
+- (void)cleanup:(void (^)(void))completionHandler;
 
 @end
 

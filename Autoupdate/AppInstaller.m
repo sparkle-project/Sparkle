@@ -242,6 +242,17 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     }
 }
 
+- (void)clearUpdateDirectory
+{
+    if (self.updateDirectoryPath != nil) {
+        NSError *theError = nil;
+        if (![[[SUFileManager alloc] init] removeItemAtURL:[NSURL fileURLWithPath:self.updateDirectoryPath] error:&theError]) {
+            SULog(SULogLevelError, @"Couldn't remove update folder: %@.", theError);
+        }
+        self.updateDirectoryPath = nil;
+    }
+}
+
 - (void)unarchiverDidFailWithError:(NSError *)error
 {
     SULog(SULogLevelError, @"Failed to unarchive file");
@@ -254,7 +265,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     // Eg: one common case is if a delta update fails, client may want to fall back to regular update
     // We really only need to set updateDirectoryPath to nil since that's the field we check if we've received installation data,
     // but may as well set other fields to nil too
-    self.updateDirectoryPath = nil;
+    [self clearUpdateDirectory];
     self.downloadName = nil;
     self.decryptionPassword = nil;
     self.signatures = nil;
@@ -607,12 +618,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     [self.agentConnection invalidate];
     self.agentConnection = nil;
     
-    if (self.updateDirectoryPath != nil) {
-        NSError *theError = nil;
-        if (![[[SUFileManager alloc] init] removeItemAtURL:[NSURL fileURLWithPath:self.updateDirectoryPath] error:&theError]) {
-            SULog(SULogLevelError, @"Couldn't remove update folder: %@.", theError);
-        }
-    }
+    [self clearUpdateDirectory];
     
     exit(status);
 }

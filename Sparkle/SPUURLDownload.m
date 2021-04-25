@@ -51,14 +51,20 @@
 
 - (void)downloaderDidFinishWithTemporaryDownloadData:(SPUDownloadData * _Nullable)downloadData
 {
-    self.completionBlock(downloadData, nil);
-    self.completionBlock = nil;
+    assert(self.completionBlock != nil);
+    if (self.completionBlock != nil) {
+        self.completionBlock(downloadData, nil);
+        self.completionBlock = nil;
+    }
 }
 
 - (void)downloaderDidFailWithError:(NSError *)error
 {
-    self.completionBlock(nil, error);
-    self.completionBlock = nil;
+    assert(self.completionBlock != nil);
+    if (self.completionBlock != nil) {
+        self.completionBlock(nil, error);
+        self.completionBlock = nil;
+    }
 }
 
 @end

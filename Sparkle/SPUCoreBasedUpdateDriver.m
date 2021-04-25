@@ -33,6 +33,7 @@
 @property (nonatomic, weak, readonly) id<SPUCoreBasedUpdateDriverDelegate> delegate;
 @property (nonatomic) SUAppcastItem *updateItem;
 @property (nonatomic) id<SPUResumableUpdate> resumableUpdate;
+@property (nonatomic) SPUDownloadedUpdate *downloadedUpdateForRemoval;
 
 @property (nonatomic, readonly) SUHost *host;
 @property (nonatomic) BOOL resumingInstallingUpdate;
@@ -61,6 +62,7 @@
 @synthesize userAgent = _userAgent;
 @synthesize httpHeaders = _httpHeaders;
 @synthesize resumableUpdate = _resumableUpdate;
+@synthesize downloadedUpdateForRemoval = _downloadedUpdateForRemoval;
 
 - (instancetype)initWithHost:(SUHost *)host applicationBundle:(NSBundle *)applicationBundle sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater updaterDelegate:(nullable id <SPUUpdaterDelegate>)updaterDelegate delegate:(id<SPUCoreBasedUpdateDriverDelegate>)delegate
 {
@@ -233,6 +235,19 @@
 
 - (void)clearDownloadedUpdate
 {
+    id<NSObject> downloadedUpdateObject = (self.resumableUpdate != nil) ? self.resumableUpdate : self.downloadedUpdateForRemoval;
+    assert(downloadedUpdateObject != nil);
+    
+    if (downloadedUpdateObject != nil && [downloadedUpdateObject isKindOfClass:[SPUDownloadedUpdate class]]) {
+        if (self.downloadDriver == nil) {
+            self.downloadDriver = [[SPUDownloadDriver alloc] initWithHost:self.host];
+        }
+        
+        SPUDownloadedUpdate *downloadedUpdate = (SPUDownloadedUpdate *)downloadedUpdateObject;
+        [self.downloadDriver removeDownloadedUpdate:downloadedUpdate];
+    }
+    
+    // Clear any type of resumable update
     self.resumableUpdate = nil;
 }
 
@@ -249,11 +264,17 @@
     
     [self.installerDriver extractDownloadedUpdate:downloadedUpdate silently:self.silentInstall preventsInstallerInteraction:self.preventsInstallerInteraction completion:^(NSError * _Nullable error) {
         if (error != nil) {
+            if (error.code != SUInstallationAuthorizeLaterError) {
+                [self clearDownloadedUpdate];
+            }
+            
             [self.delegate coreDriverIsRequestingAbortUpdateWithError:error];
         } else {
             // If the installer started properly, we can't use the downloaded update archive anymore
             // Especially if the installer fails later and we try resuming the update with a missing archive file
-            [self clearDownloadedUpdate];
+            // We must clear the download after the installer begins using it however (in -installerDidStartInstalling)
+            self.downloadedUpdateForRemoval = downloadedUpdate;
+            self.resumableUpdate = nil;
             
             if ([self.updaterDelegate respondsToSelector:@selector(updater:didExtractUpdate:)]) {
                 [self.updaterDelegate updater:self.updater didExtractUpdate:self.updateItem];
@@ -283,6 +304,12 @@
     if ([self.delegate respondsToSelector:@selector(installerDidStartInstalling)]) {
         [self.delegate installerDidStartInstalling];
     }
+}
+
+- (void)installerDidStartExtracting
+{
+    // The installer has moved the archive and no longer needs the download directory
+    [self clearDownloadedUpdate];
 }
 
 - (void)installerDidExtractUpdateWithProgress:(double)progress
@@ -369,11 +396,20 @@
 - (void)abortUpdateAndShowNextUpdateImmediately:(BOOL)shouldShowUpdateImmediately error:(nullable NSError *)error
 {
     [self.installerDriver abortInstall];
-    [self.downloadDriver cleanup];
     
-    id<SPUResumableUpdate> resumableUpdate = (error == nil || error.code == SUInstallationAuthorizeLaterError) ? self.resumableUpdate : nil;
+    void (^basicDriverAbort)(void) = ^{
+        id<SPUResumableUpdate> resumableUpdate = (error == nil || error.code == SUInstallationAuthorizeLaterError) ? self.resumableUpdate : nil;
+        
+        [self.basicDriver abortUpdateAndShowNextUpdateImmediately:shouldShowUpdateImmediately resumableUpdate:resumableUpdate error:error];
+    };
     
-    [self.basicDriver abortUpdateAndShowNextUpdateImmediately:shouldShowUpdateImmediately resumableUpdate:resumableUpdate error:error];
+    if (self.downloadDriver != nil) {
+        [self.downloadDriver cleanup:^{
+            basicDriverAbort();
+        }];
+    } else {
+        basicDriverAbort();
+    }
 }
 
 @end

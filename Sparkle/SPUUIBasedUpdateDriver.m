@@ -157,7 +157,11 @@
                             [self.updaterDelegate updater:self.updater userDidSkipThisVersion:updateItem];
                         }
                         
-                        [self.coreDriver clearDownloadedUpdate];
+                        // Informational updates can be resumed too, so make sure we check
+                        // self.resumingDownloadedUpdate instead of the state we pass to user driver
+                        if (self.resumingDownloadedUpdate) {
+                            [self.coreDriver clearDownloadedUpdate];
+                        }
                         
                         [self.delegate uiDriverIsRequestingAbortUpdateWithError:nil];
                         
