@@ -21,7 +21,7 @@ func findKeysInKeychain() -> (Data, Data) {
     if res == errSecSuccess, let encoded = item as? Data, let keys = Data(base64Encoded: encoded) {
         return (keys[0..<64], keys[64..<(64+32)])
     } else if res == errSecItemNotFound {
-        print("ERROR! Signing key not found. Please run generate_keys tool first or provide path to pem file as a second parameter.")
+        print("ERROR! Signing key not found. Please run generate_keys tool first or provide key with -f <private_key_file> or -s <private_key> parameter.")
     } else if res == errSecAuthFailed {
         print("ERROR! Access denied. Can't get keys from the keychain.")
         print("Go to Keychain Access.app, lock the login keychain, then unlock it again.")
