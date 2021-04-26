@@ -8,8 +8,10 @@
 
 #import <Cocoa/Cocoa.h>
 
+@class SPUUpdater;
+
 @interface SUUpdateSettingsWindowController : NSWindowController
 
-- (instancetype)initWithCustomUserDriver:(BOOL)customUserDriver;
+@property (nonatomic) SPUUpdater *updater;
 
 @end
