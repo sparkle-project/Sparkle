@@ -9,7 +9,7 @@
 import Foundation
 import Security
 
-func findKeys() -> (Data, Data) {
+func findKeysInKeychain() -> (Data, Data) {
     var item: CFTypeRef?
     let res = SecItemCopyMatching([
         kSecClass as String: kSecClassGenericPassword,
@@ -37,14 +37,17 @@ func findKeys() -> (Data, Data) {
 
 func findKeys(inFile privateAndPublicBase64KeyFile: String) throws -> (Data, Data) {
     let privateAndPublicBase64Key = try String(contentsOfFile: privateAndPublicBase64KeyFile)
-    
+    return findKeys(inString: privateAndPublicBase64Key)
+}
+
+func findKeys(inString privateAndPublicBase64Key: String) -> (Data, Data) {
     guard let privateAndPublicKey = Data(base64Encoded: privateAndPublicBase64Key.trimmingCharacters(in: .whitespacesAndNewlines), options: .init()) else {
-        print("Failed to decode base64 encoded key data from: \(privateAndPublicBase64Key)")
+        print("ERROR! Failed to decode base64 encoded key data from: \(privateAndPublicBase64Key)")
         exit(1)
     }
     
     guard privateAndPublicKey.count == 64 + 32 else {
-        print("Imported key must be 96 bytes decoded. Instead it is \(privateAndPublicKey.count) bytes decoded.")
+        print("ERROR! Imported key must be 96 bytes decoded. Instead it is \(privateAndPublicKey.count) bytes decoded.")
         exit(1)
     }
     
@@ -66,15 +69,26 @@ func edSignature(data: Data, publicEdKey: Data, privateEdKey: Data) -> String {
 }
 
 let args = CommandLine.arguments
-if args.count < 2 || args.count > 3 {
-    print("Usage: \(args[0]) <archive to sign> [<private_key_file>]\nPrivate EdDSA (ed25519) key is automatically read from the Keychain if no <private_key_file> is given.\n")
+if args.count != 2 && args.count != 4 {
+    print("Usage: \(args[0]) <archive to sign> [-f <private_key_file> | -s <private_key>]\nPrivate EdDSA (ed25519) key is automatically read from the Keychain if no <private_key_file> or <private_key> is given.\n")
     exit(1)
 }
 
 do {
-    let(priv, pub) = (args.count == 3)
-        ? try findKeys(inFile: args[2])
-        : findKeys()
+    let (priv, pub): (Data, Data)
+    let mode = args.count > 2 ? args[2] : nil
+    
+    switch mode {
+    case .some("-f"):
+        (priv, pub) = try findKeys(inFile: args[3])
+        
+    case .some("-s"):
+        (priv, pub) = findKeys(inString: args[3])
+        
+    default:
+        (priv, pub) = findKeysInKeychain()
+    }
+    
     let data = try Data.init(contentsOf: URL.init(fileURLWithPath: args[1]), options: .mappedIfSafe)
     let sig = edSignature(data: data, publicEdKey: pub, privateEdKey: priv)
     print("sparkle:edSignature=\"\(sig)\" length=\"\(data.count)\"")
