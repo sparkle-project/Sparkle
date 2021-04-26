@@ -105,7 +105,7 @@
     }
 }
 
-- (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)updateItem preventsAutoupdate:(BOOL)preventsAutoupdate
+- (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)updateItem secondaryAppcastItem:(SUAppcastItem *)secondaryUpdateItem preventsAutoupdate:(BOOL)preventsAutoupdate
 {
     id <SPUUpdaterDelegate> updaterDelegate = self.updaterDelegate;
     if ([self.userDriver respondsToSelector:@selector(showUpdateFoundWithAppcastItem:userInitiated:state:reply:)]) {
@@ -143,7 +143,7 @@
                                 [self.coreDriver finishInstallationWithResponse:validatedChoice displayingUserInterface:!self.preventsInstallerInteraction];
                                 break;
                             case SPUUserUpdateStateNotDownloaded:
-                                [self.coreDriver downloadUpdateFromAppcastItem:updateItem inBackground:NO];
+                                [self.coreDriver downloadUpdateFromAppcastItem:updateItem secondaryAppcastItem:secondaryUpdateItem inBackground:NO];
                                 break;
                             case SPUUserUpdateStateInformational:
                                 assert(false);
@@ -235,7 +235,7 @@
                     [self.host setObject:nil forUserDefaultsKey:SUSkippedVersionKey];
                     switch (choice) {
                         case SPUInstallUpdateChoice:
-                            [self.coreDriver downloadUpdateFromAppcastItem:updateItem inBackground:NO];
+                            [self.coreDriver downloadUpdateFromAppcastItem:updateItem secondaryAppcastItem:secondaryUpdateItem inBackground:NO];
                             break;
                         case SPUSkipThisVersionChoice:
                             [self.host setObject:[updateItem versionString] forUserDefaultsKey:SUSkippedVersionKey];

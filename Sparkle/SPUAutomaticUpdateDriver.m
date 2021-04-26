@@ -77,15 +77,15 @@
     SULog(SULogLevelError, @"Error: resumeDownloadedUpdate:completion: called on SPUAutomaticUpdateDriver");
 }
 
-- (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)updateItem preventsAutoupdate:(BOOL)preventsAutoupdate
+- (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)updateItem secondaryAppcastItem:(SUAppcastItem *)secondaryUpdateItem preventsAutoupdate:(BOOL)preventsAutoupdate
 {
     self.updateItem = updateItem;
     
     if (updateItem.isInformationOnlyUpdate || preventsAutoupdate) {
-        [self.coreDriver deferInformationalUpdate:updateItem preventsAutoupdate:preventsAutoupdate];
+        [self.coreDriver deferInformationalUpdate:updateItem secondaryUpdate:secondaryUpdateItem preventsAutoupdate:preventsAutoupdate];
         [self abortUpdate];
     } else {
-        [self.coreDriver downloadUpdateFromAppcastItem:updateItem inBackground:YES];
+        [self.coreDriver downloadUpdateFromAppcastItem:updateItem secondaryAppcastItem:secondaryUpdateItem inBackground:YES];
     }
 }
 
