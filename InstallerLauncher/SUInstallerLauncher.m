@@ -337,8 +337,16 @@ static BOOL SPUNeedsSystemAuthorizationAccess(NSString *path, NSString *installa
 - (void)launchInstallerWithHostBundlePath:(NSString *)hostBundlePath updaterIdentifier:(NSString *)updaterIdentifier authorizationPrompt:(NSString *)authorizationPrompt installationType:(NSString *)installationType allowingDriverInteraction:(BOOL)allowingDriverInteraction allowingUpdaterInteraction:(BOOL)allowingUpdaterInteraction completion:(void (^)(SUInstallerLauncherStatus, BOOL))completionHandler
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        NSBundle *hostBundle = [NSBundle bundleWithPath:hostBundlePath];
         BOOL needsSystemAuthorization = SPUNeedsSystemAuthorizationAccess(hostBundlePath, installationType);
+        
+        NSBundle *hostBundle = [NSBundle bundleWithPath:hostBundlePath];
+        if (hostBundle == nil) {
+            SULog(SULogLevelError, @"InstallerLauncher failed to create bundle at %@", hostBundlePath);
+            SULog(SULogLevelError, @"Please make sure InstallerLauncher is not sandboxed and do not sign your app by passing --deep. Check: codesign -d --entitlements :- \"%@\"", NSBundle.mainBundle.bundlePath);
+            SULog(SULogLevelError, @"More information regarding sandboxing: https://sparkle-project.org/documentation/sandboxing/");
+            completionHandler(SUInstallerLauncherFailure, needsSystemAuthorization);
+            return;
+        }
         
         if (needsSystemAuthorization && !allowingUpdaterInteraction) {
             SULog(SULogLevelError, @"Updater is not allowing interaction to the launcher.");
