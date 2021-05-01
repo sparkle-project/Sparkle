@@ -14,7 +14,6 @@
 #import "SPUUpdaterDelegate.h"
 #import "SUAppcastItem.h"
 #import "SUErrors.h"
-#import "SPUURLDownload.h"
 #import "SPUDownloadData.h"
 #import "SPUResumableUpdate.h"
 
@@ -268,14 +267,14 @@
     if (updateItem.releaseNotesURL != nil && (![updaterDelegate respondsToSelector:@selector(updaterShouldDownloadReleaseNotes:)] || [updaterDelegate updaterShouldDownloadReleaseNotes:self.updater])) {
         NSURLRequest *request = [NSURLRequest requestWithURL:updateItem.releaseNotesURL cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30];
         
-        id <SPUUserDriver> userDriver = self.userDriver;
-        SPUDownloadURLWithRequest(request, ^(SPUDownloadData * _Nullable downloadData, NSError * _Nullable error) {
-            if (downloadData != nil) {
-                [userDriver showUpdateReleaseNotesWithDownloadData:(SPUDownloadData * _Nonnull)downloadData];
-            } else {
-                [userDriver showUpdateReleaseNotesFailedToDownloadWithError:(NSError * _Nonnull)error];
-            }
-        });
+//        id <SPUUserDriver> userDriver = self.userDriver;
+//        SPUDownloadURLWithRequest(request, ^(SPUDownloadData * _Nullable downloadData, NSError * _Nullable error) {
+//            if (downloadData != nil) {
+//                [userDriver showUpdateReleaseNotesWithDownloadData:(SPUDownloadData * _Nonnull)downloadData];
+//            } else {
+//                [userDriver showUpdateReleaseNotesFailedToDownloadWithError:(NSError * _Nonnull)error];
+//            }
+//        });
     }
 }
 

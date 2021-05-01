@@ -184,7 +184,7 @@
                                       withRequest:self.downloadDriver.request];
     }
     
-    [self.downloadDriver downloadUpdate];
+    [self.downloadDriver downloadFile];
 }
 
 - (void)downloadDriverWillBeginDownload
@@ -286,7 +286,7 @@
     }];
 }
 
-- (void)downloadDriverDidFailToDownloadUpdateWithError:(NSError *)error
+- (void)downloadDriverDidFailToDownloadFileWithError:(NSError *)error
 {
     if ([self.updaterDelegate respondsToSelector:@selector((updater:failedToDownloadUpdate:error:))]) {
         NSError *errorToReport = [error.userInfo objectForKey:NSUnderlyingErrorKey];

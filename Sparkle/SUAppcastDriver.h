@@ -28,6 +28,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)loadAppcastFromURL:(NSURL *)appcastURL userAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background includesSkippedUpdates:(BOOL)includesSkippedUpdates;
 
+- (void)cleanup:(void (^)(void))completionHandler;
+
 @end
 
 NS_ASSUME_NONNULL_END

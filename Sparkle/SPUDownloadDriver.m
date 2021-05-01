@@ -97,7 +97,7 @@
                         
                         NSError *downloadError = [NSError errorWithDomain:SUSparkleErrorDomain code:SUDownloadError userInfo:userInfo];
                         
-                        [strongSelf.delegate downloadDriverDidFailToDownloadUpdateWithError:downloadError];
+                        [strongSelf.delegate downloadDriverDidFailToDownloadFileWithError:downloadError];
                     }
                 });
             };
@@ -108,20 +108,18 @@
     return self;
 }
 
-- (instancetype)initWithUpdateItem:(SUAppcastItem *)updateItem secondaryUpdateItem:(SUAppcastItem * _Nullable)secondaryUpdateItem host:(SUHost *)host userAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background delegate:(id<SPUDownloadDriverDelegate>)delegate
+- (instancetype)initWithRequestURL:(NSURL *)requestURL host:(SUHost *)host userAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background delegate:(id<SPUDownloadDriverDelegate>)delegate
 {
     self = [self initWithHost:host];
     if (self != nil) {
-        _updateItem = updateItem;
-        _secondaryUpdateItem = secondaryUpdateItem;
         _delegate = delegate;
         
         _inBackground = background;
-        _request = [NSMutableURLRequest requestWithURL:updateItem.fileURL];
+        _request = [NSMutableURLRequest requestWithURL:requestURL];
         [_request setValue:userAgent forHTTPHeaderField:@"User-Agent"];
         _request.networkServiceType = background ? NSURLNetworkServiceTypeBackground : NSURLNetworkServiceTypeDefault;
 
-        if (httpHeaders) {
+        if (httpHeaders != nil) {
             for (NSString *key in httpHeaders) {
                 NSString *value = [httpHeaders objectForKey:key];
                 [_request setValue:value forHTTPHeaderField:key];
@@ -131,16 +129,32 @@
     return self;
 }
 
-- (void)downloadUpdate
+- (instancetype)initWithUpdateItem:(SUAppcastItem *)updateItem secondaryUpdateItem:(SUAppcastItem * _Nullable)secondaryUpdateItem host:(SUHost *)host userAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background delegate:(id<SPUDownloadDriverDelegate>)delegate
 {
-    [self.delegate downloadDriverWillBeginDownload];
+    self = [self initWithRequestURL:updateItem.fileURL host:host userAgent:userAgent httpHeaders:httpHeaders inBackground:background delegate:delegate];
+    if (self != nil) {
+        _updateItem = updateItem;
+        _secondaryUpdateItem = secondaryUpdateItem;
+    }
+    return self;
+}
+
+- (void)downloadFile
+{
+    if ([self.delegate respondsToSelector:@selector(downloadDriverWillBeginDownload)]) {
+        [self.delegate downloadDriverWillBeginDownload];
+    }
     
-    NSString *desiredFilename = [NSString stringWithFormat:@"%@ %@", [self.host name], [self.updateItem versionString]];
-    
-    NSString *bundleIdentifier = self.host.bundle.bundleIdentifier;
-    assert(bundleIdentifier != nil);
-    
-    [self.downloader startPersistentDownloadWithRequest:[SPUURLRequest URLRequestWithRequest:self.request] bundleIdentifier:bundleIdentifier desiredFilename:desiredFilename];
+    if (self.updateItem != nil) {
+        NSString *desiredFilename = [NSString stringWithFormat:@"%@ %@", [self.host name], [self.updateItem versionString]];
+        
+        NSString *bundleIdentifier = self.host.bundle.bundleIdentifier;
+        assert(bundleIdentifier != nil);
+        
+        [self.downloader startPersistentDownloadWithRequest:[SPUURLRequest URLRequestWithRequest:self.request] bundleIdentifier:bundleIdentifier desiredFilename:desiredFilename];
+    } else {
+        [self.downloader startTemporaryDownloadWithRequest:[SPUURLRequest URLRequestWithRequest:self.request]];
+    }
 }
 
 - (void)removeDownloadedUpdate:(SPUDownloadedUpdate *)downloadedUpdate
@@ -182,18 +196,28 @@
     }
 }
 
-- (void)downloaderDidFinishWithTemporaryDownloadData:(SPUDownloadData * _Nullable)__unused downloadData
+- (void)downloaderDidFinishWithTemporaryDownloadData:(SPUDownloadData * _Nullable)downloadData
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         self.retrievedDownloadResult = YES;
         
-        if (self.expectedContentLength > 0 && self.updateItem.contentLength > 0 && self.expectedContentLength != self.updateItem.contentLength) {
-            SULog(SULogLevelError, @"Warning: Downloader's expected content length (%llu) != Appcast item's length (%llu)", self.expectedContentLength, self.updateItem.contentLength);
+        if (self.updateItem != nil) {
+            if (self.expectedContentLength > 0 && self.updateItem.contentLength > 0 && self.expectedContentLength != self.updateItem.contentLength) {
+                SULog(SULogLevelError, @"Warning: Downloader's expected content length (%llu) != Appcast item's length (%llu)", self.expectedContentLength, self.updateItem.contentLength);
+            }
+            
+            SPUDownloadedUpdate *downloadedUpdate = [[SPUDownloadedUpdate alloc] initWithAppcastItem:self.updateItem secondaryAppcastItem:self.secondaryUpdateItem downloadName:self.downloadName temporaryDirectory:self.temporaryDirectory];
+            
+            if ([self.delegate respondsToSelector:@selector(downloadDriverDidDownloadUpdate:)]) {
+                [self.delegate downloadDriverDidDownloadUpdate:downloadedUpdate];
+            }
+        } else {
+            assert(downloadData != nil);
+            SPUDownloadData *nonNullDownloadData = downloadData;
+            if ([self.delegate respondsToSelector:@selector(downloadDriverDidDownloadData:)]) {
+                [self.delegate downloadDriverDidDownloadData:nonNullDownloadData];
+            }
         }
-        
-        SPUDownloadedUpdate *downloadedUpdate = [[SPUDownloadedUpdate alloc] initWithAppcastItem:self.updateItem secondaryAppcastItem:self.secondaryUpdateItem downloadName:self.downloadName temporaryDirectory:self.temporaryDirectory];
-        
-        [self.delegate downloadDriverDidDownloadUpdate:downloadedUpdate];
     });
 }
 
@@ -216,7 +240,7 @@
         }
         
         NSError *downloadError = [NSError errorWithDomain:SUSparkleErrorDomain code:SUDownloadError userInfo:userInfo];
-        [self.delegate downloadDriverDidFailToDownloadUpdateWithError:downloadError];
+        [self.delegate downloadDriverDidFailToDownloadFileWithError:downloadError];
     });
 }
 
@@ -232,7 +256,9 @@
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         // Fallback to appcast item's content length if we don't get the length from HTTP header
-        [self.delegate downloadDriverDidReceiveExpectedContentLength:expectedContentLength > 0 ? (uint64_t)expectedContentLength : self.updateItem.contentLength];
+        if ([self.delegate respondsToSelector:@selector(downloadDriverDidReceiveExpectedContentLength:)]) {
+            [self.delegate downloadDriverDidReceiveExpectedContentLength:expectedContentLength > 0 ? (uint64_t)expectedContentLength : self.updateItem.contentLength];
+        }
         
         // Reset expected content length from downloader
         // Later we verify if the total length matches with the content length from the appcast
@@ -245,7 +271,9 @@
 - (void)downloaderDidReceiveDataOfLength:(uint64_t)length
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self.delegate downloadDriverDidReceiveDataOfLength:length];
+        if ([self.delegate respondsToSelector:@selector(downloadDriverDidReceiveDataOfLength:)]) {
+            [self.delegate downloadDriverDidReceiveDataOfLength:length];
+        }
     });
 }
 

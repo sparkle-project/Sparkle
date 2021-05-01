@@ -203,21 +203,23 @@
 {
     self.aborted = YES;
     
-    if (error != nil) {
-        if (error.code != SUNoUpdateError && error.code != SUInstallationCanceledError && error.code != SUInstallationAuthorizeLaterError) { // Let's not bother logging this.
-            SULogError(error);
+    [self.appcastDriver cleanup:^{
+        if (error != nil) {
+            if (error.code != SUNoUpdateError && error.code != SUInstallationCanceledError && error.code != SUInstallationAuthorizeLaterError) { // Let's not bother logging this.
+                SULogError(error);
+            }
+            
+            // Notify host app that updater has aborted
+            if ([self.updaterDelegate respondsToSelector:@selector((updater:didAbortWithError:))]) {
+                [self.updaterDelegate updater:self.updater didAbortWithError:(NSError * _Nonnull)error];
+            }
         }
         
-        // Notify host app that updater has aborted
-        if ([self.updaterDelegate respondsToSelector:@selector((updater:didAbortWithError:))]) {
-            [self.updaterDelegate updater:self.updater didAbortWithError:(NSError * _Nonnull)error];
+        if (self.completionBlock != nil) {
+            self.completionBlock(shouldShowUpdateImmediately, resumableUpdate);
+            self.completionBlock = nil;
         }
-    }
-    
-    if (self.completionBlock != nil) {
-        self.completionBlock(shouldShowUpdateImmediately, resumableUpdate);
-        self.completionBlock = nil;
-    }
+    }];
 }
 
 @end

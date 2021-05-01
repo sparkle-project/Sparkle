@@ -10,29 +10,39 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class SUAppcastItem, SUHost, SPUDownloadedUpdate;
+@class SUAppcastItem, SUHost, SPUDownloadedUpdate, SPUDownloadData;
 
 @protocol SPUDownloadDriverDelegate <NSObject>
 
+- (void)downloadDriverDidFailToDownloadFileWithError:(NSError *)error;
+
+@optional
+
 - (void)downloadDriverWillBeginDownload;
 
-- (void)downloadDriverDidReceiveExpectedContentLength:(uint64_t)expectedContentLength;
-
-- (void)downloadDriverDidReceiveDataOfLength:(uint64_t)length;
-
+// For persitent update downloads
 - (void)downloadDriverDidDownloadUpdate:(SPUDownloadedUpdate *)downloadedUpdate;
 
-- (void)downloadDriverDidFailToDownloadUpdateWithError:(NSError *)error;
+// For temporary downloads
+- (void)downloadDriverDidDownloadData:(SPUDownloadData *)downloadData;
+
+// Only for persistent downloads
+- (void)downloadDriverDidReceiveExpectedContentLength:(uint64_t)expectedContentLength;
+
+// Only for persistent downloads
+- (void)downloadDriverDidReceiveDataOfLength:(uint64_t)length;
 
 @end
 
 @interface SPUDownloadDriver : NSObject
 
+- (instancetype)initWithRequestURL:(NSURL *)requestURL host:(SUHost *)host userAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background delegate:(id<SPUDownloadDriverDelegate>)delegate;
+
 - (instancetype)initWithUpdateItem:(SUAppcastItem *)updateItem secondaryUpdateItem:(SUAppcastItem * _Nullable)secondaryUpdateItem host:(SUHost *)host userAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background delegate:(id<SPUDownloadDriverDelegate>)delegate;
 
 - (instancetype)initWithHost:(SUHost *)host;
 
-- (void)downloadUpdate;
+- (void)downloadFile;
 
 - (void)removeDownloadedUpdate:(SPUDownloadedUpdate *)downloadedUpdate;
 
