@@ -18,13 +18,15 @@
 #import <Foundation/Foundation.h>
 #endif
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface SUAppcastItem (Private)
 
 // Initializes with data from a dictionary provided by the RSS class.
-- (instancetype)initWithDictionary:(NSDictionary *)dict;
-- (instancetype)initWithDictionary:(NSDictionary *)dict failureReason:(NSString **)error;
-- (instancetype)initWithDictionary:(NSDictionary *)dict relativeToURL:(NSURL *)appcastURL failureReason:(NSString **)error;
+- (nullable instancetype)initWithDictionary:(NSDictionary *)dict relativeToURL:(NSURL * _Nullable)appcastURL failureReason:(NSString * _Nullable __autoreleasing *_Nullable)error;
 
 @end
+
+NS_ASSUME_NONNULL_END
 
 #endif /* SUAppcastItem_Private_h */

@@ -128,7 +128,10 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 
 - (IBAction)openInfoURL:(id)__unused sender
 {
-    [[NSWorkspace sharedWorkspace] openURL:self.updateItem.infoURL];
+    NSURL *infoURL = self.updateItem.infoURL;
+    assert(infoURL);
+    
+    [[NSWorkspace sharedWorkspace] openURL:infoURL];
     
     [self endWithSelection:SPUUserUpdateChoiceDismiss];
 }
@@ -167,13 +170,16 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
     // Otherwise we'll wait until the client wants us to show release notes
 	if (self.updateItem.releaseNotesURL == nil)
 	{
-        __weak __typeof__(self) weakSelf = self;
-        [self.webView loadHTMLString:[self.updateItem itemDescription] baseURL:nil completionHandler:^(NSError * _Nullable error) {
-            if (error != nil) {
-                SULog(SULogLevelError, @"Failed to load HTML string from web view: %@", error);
-            }
-            [weakSelf stopReleaseNotesSpinner];
-        }];
+        NSString *itemDescription = self.updateItem.itemDescription;
+        if (itemDescription != nil) {
+            __weak __typeof__(self) weakSelf = self;
+            [self.webView loadHTMLString:itemDescription baseURL:nil completionHandler:^(NSError * _Nullable error) {
+                if (error != nil) {
+                    SULog(SULogLevelError, @"Failed to load HTML string from web view: %@", error);
+                }
+                [weakSelf stopReleaseNotesSpinner];
+            }];
+        }
     }
 }
 
