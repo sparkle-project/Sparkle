@@ -427,6 +427,7 @@ static BOOL SPUNeedsSystemAuthorizationAccess(NSString *path, NSString *installa
             }
         } else if (installerStatus == SUInstallerLauncherFailure) {
             SULog(SULogLevelError, @"Failed to submit installer job");
+            SULog(SULogLevelError, @"If your application is sandboxed please follow steps at: https://sparkle-project.org/documentation/sandboxing/");
         }
         
         if (installerStatus == SUInstallerLauncherCanceled) {
