@@ -153,6 +153,7 @@
 {
     SUAppcastItem *item = nil;
     for(SUAppcastItem *candidate in appcastItems) {
+        // Note if two items are equal, we must select the first matching one
         if (!item || [comparator compareVersion:item.versionString toVersion:candidate.versionString] == NSOrderedAscending) {
             item = candidate;
         }
