@@ -37,9 +37,11 @@
       launchStyle = "0"
       useCustomWorkingDirectory = "NO"
       ignoresPersistentStateOnLaunch = "NO"
-      debugDocumentVersioning = "YES"
+      debugDocumentVersioning = "NO"
       debugServiceExtension = "internal"
-      allowLocationSimulation = "YES">
+      enableGPUFrameCaptureMode = "3"
+      enableGPUValidationMode = "1"
+      allowLocationSimulation = "NO">
       <BuildableProductRunnable
          runnableDebuggingMode = "0">
          <BuildableReference
