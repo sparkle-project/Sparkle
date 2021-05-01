@@ -24,10 +24,6 @@ NS_ASSUME_NONNULL_BEGIN
 @class SUAppcastItem;
 SU_EXPORT @interface SUAppcast : NSObject
 
-- (nullable instancetype)initWithXMLData:(NSData *)xmlData relativeToURL:(NSURL *)relativeURL error:(NSError * __autoreleasing *)error;
-
-- (SUAppcast *)copyByFilteringItems:(BOOL (^)(SUAppcastItem *))filterBlock;
-
 @property (readonly, copy, nullable) NSArray<SUAppcastItem *> *items;
 
 @end

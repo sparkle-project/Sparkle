@@ -40,11 +40,6 @@ SU_EXPORT @interface SUAppcastItem : NSObject<NSSecureCoding>
 @property (nonatomic, copy, readonly) NSString *installationType;
 @property (copy, readonly) NSString *minimumAutoupdateVersion;
 
-// Initializes with data from a dictionary provided by the RSS class.
-- (instancetype)initWithDictionary:(NSDictionary *)dict;
-- (instancetype)initWithDictionary:(NSDictionary *)dict failureReason:(NSString **)error;
-- (instancetype)initWithDictionary:(NSDictionary *)dict relativeToURL:(NSURL *)appcastURL failureReason:(NSString **)error;
-
 @property (getter=isDeltaUpdate, readonly) BOOL deltaUpdate;
 @property (getter=isCriticalUpdate, readonly) BOOL criticalUpdate;
 @property (getter=isMacOsUpdate, readonly) BOOL macOsUpdate;
@@ -52,8 +47,6 @@ SU_EXPORT @interface SUAppcastItem : NSObject<NSSecureCoding>
 
 // Returns the dictionary provided in initWithDictionary; this might be useful later for extensions.
 @property (readonly, copy) NSDictionary *propertiesDictionary;
-
-- (NSURL *)infoURL;
 
 @end
 
