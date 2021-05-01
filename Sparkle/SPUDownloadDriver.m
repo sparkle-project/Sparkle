@@ -108,28 +108,34 @@
     return self;
 }
 
-- (instancetype)initWithRequestURL:(NSURL *)requestURL host:(SUHost *)host userAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background delegate:(id<SPUDownloadDriverDelegate>)delegate
+- (instancetype)initWithRequestURL:(NSURL *)requestURL host:(SUHost *)host userAgent:(NSString * _Nullable)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background delegate:(id<SPUDownloadDriverDelegate>)delegate
 {
     self = [self initWithHost:host];
     if (self != nil) {
         _delegate = delegate;
-        
         _inBackground = background;
-        _request = [NSMutableURLRequest requestWithURL:requestURL];
-        [_request setValue:userAgent forHTTPHeaderField:@"User-Agent"];
-        _request.networkServiceType = background ? NSURLNetworkServiceTypeBackground : NSURLNetworkServiceTypeDefault;
+        
+        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:requestURL cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30.0];
+        
+        if (userAgent != nil) {
+            [request setValue:(NSString * _Nonnull)userAgent forHTTPHeaderField:@"User-Agent"];
+        }
+        
+        request.networkServiceType = background ? NSURLNetworkServiceTypeBackground : NSURLNetworkServiceTypeDefault;
 
         if (httpHeaders != nil) {
             for (NSString *key in httpHeaders) {
                 NSString *value = [httpHeaders objectForKey:key];
-                [_request setValue:value forHTTPHeaderField:key];
+                [request setValue:value forHTTPHeaderField:key];
             }
         }
+        
+        _request = request;
     }
     return self;
 }
 
-- (instancetype)initWithUpdateItem:(SUAppcastItem *)updateItem secondaryUpdateItem:(SUAppcastItem * _Nullable)secondaryUpdateItem host:(SUHost *)host userAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background delegate:(id<SPUDownloadDriverDelegate>)delegate
+- (instancetype)initWithUpdateItem:(SUAppcastItem *)updateItem secondaryUpdateItem:(SUAppcastItem * _Nullable)secondaryUpdateItem host:(SUHost *)host userAgent:(NSString * _Nullable)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background delegate:(id<SPUDownloadDriverDelegate>)delegate
 {
     self = [self initWithRequestURL:updateItem.fileURL host:host userAgent:userAgent httpHeaders:httpHeaders inBackground:background delegate:delegate];
     if (self != nil) {

@@ -16,9 +16,62 @@
 #import "SUErrors.h"
 #import "SPUDownloadData.h"
 #import "SPUResumableUpdate.h"
+#import "SPUDownloadDriver.h"
 
 
 #include "AppKitPrevention.h"
+
+// Private class for downloading release notes
+@interface SPUReleaseNotesDriver: NSObject <SPUDownloadDriverDelegate>
+
+@property (nonatomic, readonly) SPUDownloadDriver *downloadDriver;
+@property (nonatomic) void (^completionHandler)(SPUDownloadData * _Nullable, NSError  * _Nullable );
+
+@end
+
+@implementation SPUReleaseNotesDriver
+
+@synthesize downloadDriver = _downloadDriver;
+@synthesize completionHandler = _completionHandler;
+
+- (instancetype)initWithReleaseNotesURL:(NSURL *)releaseNotesURL host:(SUHost *)host completionHandler:(void (^)(SPUDownloadData * _Nullable, NSError * _Nullable))completionHandler
+{
+    self = [super init];
+    if (self != nil) {
+        _downloadDriver = [[SPUDownloadDriver alloc] initWithRequestURL:releaseNotesURL host:host userAgent:nil httpHeaders:nil inBackground:NO delegate:self];
+        _completionHandler = [completionHandler copy];
+    }
+    return self;
+}
+
+- (void)startDownload
+{
+    [self.downloadDriver downloadFile];
+}
+
+- (void)downloadDriverDidDownloadData:(SPUDownloadData *)downloadData
+{
+    if (self.completionHandler != nil) {
+        self.completionHandler(downloadData, nil);
+        self.completionHandler = nil;
+    }
+}
+
+- (void)downloadDriverDidFailToDownloadFileWithError:(nonnull NSError *)error
+{
+    if (self.completionHandler != nil) {
+        self.completionHandler(nil, error);
+        self.completionHandler = nil;
+    }
+}
+
+- (void)cleanup:(void (^)(void))cleanupHandler
+{
+    self.completionHandler = nil;
+    [self.downloadDriver cleanup:cleanupHandler];
+}
+
+@end
 
 @interface SPUUIBasedUpdateDriver() <SPUCoreBasedUpdateDriverDelegate>
 
@@ -29,6 +82,7 @@
 @property (weak, nonatomic, readonly) id<SPUUpdaterDelegate> updaterDelegate;
 @property (nonatomic, weak, readonly) id<SPUUIBasedUpdateDriverDelegate> delegate;
 @property (nonatomic, readonly) id<SPUUserDriver> userDriver;
+@property (nonatomic) SPUReleaseNotesDriver *releaseNotesDriver;
 @property (nonatomic) BOOL resumingInstallingUpdate;
 @property (nonatomic) BOOL resumingDownloadedUpdate;
 @property (nonatomic) BOOL preventsInstallerInteraction;
@@ -43,6 +97,7 @@
 @synthesize userInitiated = _userInitiated;
 @synthesize updaterDelegate = _updaterDelegate;
 @synthesize userDriver = _userDriver;
+@synthesize releaseNotesDriver = _releaseNotesDriver;
 @synthesize delegate = _delegate;
 @synthesize resumingInstallingUpdate = _resumingInstallingUpdate;
 @synthesize resumingDownloadedUpdate = _resumingDownloadedUpdate;
@@ -265,16 +320,19 @@
     }
     
     if (updateItem.releaseNotesURL != nil && (![updaterDelegate respondsToSelector:@selector(updaterShouldDownloadReleaseNotes:)] || [updaterDelegate updaterShouldDownloadReleaseNotes:self.updater])) {
-        NSURLRequest *request = [NSURLRequest requestWithURL:updateItem.releaseNotesURL cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30];
         
-//        id <SPUUserDriver> userDriver = self.userDriver;
-//        SPUDownloadURLWithRequest(request, ^(SPUDownloadData * _Nullable downloadData, NSError * _Nullable error) {
-//            if (downloadData != nil) {
-//                [userDriver showUpdateReleaseNotesWithDownloadData:(SPUDownloadData * _Nonnull)downloadData];
-//            } else {
-//                [userDriver showUpdateReleaseNotesFailedToDownloadWithError:(NSError * _Nonnull)error];
-//            }
-//        });
+        __weak __typeof__(self) weakSelf = self;
+        self.releaseNotesDriver = [[SPUReleaseNotesDriver alloc] initWithReleaseNotesURL:updateItem.releaseNotesURL host:self.host completionHandler:^(SPUDownloadData * _Nullable downloadData, NSError * _Nullable error) {
+            __typeof__(self) strongSelf = weakSelf;
+            id <SPUUserDriver> userDriver = strongSelf.userDriver;
+            if (downloadData != nil) {
+                [userDriver showUpdateReleaseNotesWithDownloadData:(SPUDownloadData * _Nonnull)downloadData];
+            } else {
+                [userDriver showUpdateReleaseNotesFailedToDownloadWithError:(NSError * _Nonnull)error];
+            }
+        }];
+        
+        [self.releaseNotesDriver startDownload];
     }
 }
 
@@ -373,7 +431,7 @@
     [self.delegate coreDriverIsRequestingAbortUpdateWithError:error];
 }
 
-- (void)abortUpdateWithError:(nullable NSError *)error
+- (void)_abortUpdateWithError:(nullable NSError *)error
 {
     void (^abortUpdate)(void) = ^{
         [self.userDriver dismissUpdateInstallation];
@@ -412,6 +470,17 @@
         }
     } else {
         abortUpdate();
+    }
+}
+
+- (void)abortUpdateWithError:(nullable NSError *)error
+{
+    if (self.releaseNotesDriver != nil) {
+        [self.releaseNotesDriver cleanup:^{
+            [self _abortUpdateWithError:error];
+        }];
+    } else {
+        [self _abortUpdateWithError:error];
     }
 }
 
