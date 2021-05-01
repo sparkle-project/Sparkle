@@ -19,7 +19,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface SUAppcast (Private)
 
-- (nullable instancetype)initWithXMLData:(NSData *)xmlData relativeToURL:(NSURL *)relativeURL error:(NSError * __autoreleasing *)error;
+- (nullable instancetype)initWithXMLData:(NSData *)xmlData relativeToURL:(NSURL * _Nullable)relativeURL error:(NSError * __autoreleasing *)error;
 
 - (SUAppcast *)copyByFilteringItems:(BOOL (^)(SUAppcastItem *))filterBlock;
 

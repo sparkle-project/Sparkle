@@ -204,7 +204,7 @@ static NSString *SUAppcastItemInstallationTypeKey = @"SUAppcastItemInstallationT
     return [self initWithDictionary:dict relativeToURL:nil failureReason:error];
 }
 
-- (instancetype)initWithDictionary:(NSDictionary *)dict relativeToURL:(NSURL *)appcastURL failureReason:(NSString *__autoreleasing *)error
+- (instancetype)initWithDictionary:(NSDictionary *)dict relativeToURL:(NSURL * _Nullable)appcastURL failureReason:(NSString *__autoreleasing *)error
 {
     self = [super init];
     if (self) {
@@ -284,7 +284,11 @@ static NSString *SUAppcastItemInstallationTypeKey = @"SUAppcastItemInstallationT
         if (enclosureURLString) {
             // Sparkle used to always URL-encode, so for backwards compatibility spaces in URLs must be forgiven.
             NSString *fileURLString = [enclosureURLString stringByReplacingOccurrencesOfString:@" " withString:@"%20"];
-            _fileURL = [NSURL URLWithString:fileURLString relativeToURL:appcastURL];
+            if (appcastURL != nil) {
+                _fileURL = [NSURL URLWithString:fileURLString relativeToURL:appcastURL];
+            } else {
+                _fileURL = [NSURL URLWithString:fileURLString];
+            }
         }
         if (enclosure) {
             _signatures = [[SUSignatures alloc] initWithDsa:[enclosure objectForKey:SUAppcastAttributeDSASignature] ed:[enclosure objectForKey:SUAppcastAttributeEDSignature]];
@@ -334,7 +338,12 @@ static NSString *SUAppcastItemInstallationTypeKey = @"SUAppcastItemInstallationT
         // Find the appropriate release notes URL.
         NSString *releaseNotesString = [dict objectForKey:SUAppcastElementReleaseNotesLink];
         if (releaseNotesString) {
-            NSURL *url = [NSURL URLWithString:releaseNotesString relativeToURL:appcastURL];
+            NSURL *url;
+            if (appcastURL != nil) {
+                url = [NSURL URLWithString:releaseNotesString relativeToURL:appcastURL];
+            } else {
+                url = [NSURL URLWithString:releaseNotesString];
+            }
             if ([url isFileURL]) {
                 SULog(SULogLevelError, @"Release notes with file:// URLs are not supported");
             } else {

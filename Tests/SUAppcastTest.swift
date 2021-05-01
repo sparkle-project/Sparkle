@@ -12,12 +12,13 @@ import Sparkle
 class SUAppcastTest: XCTestCase {
 
     func testParseAppcast() {
-        let appcast = SUAppcast()
-        let testFile = Bundle(for: SUAppcastTest.self).path(forResource: "testappcast", ofType: "xml")!
-        let testData = NSData(contentsOfFile: testFile)!
-
+        let testURL = Bundle(for: SUAppcastTest.self).url(forResource: "testappcast", withExtension: "xml")!
+        
         do {
-            let items = try appcast.parseAppcastItems(fromXMLData: testData as Data, relativeTo: nil) as! [SUAppcastItem]
+            let testData = try Data(contentsOf: testURL)
+            
+            let appcast = try SUAppcast(xmlData: testData, relativeTo: nil)
+            let items = appcast.items
 
             XCTAssertEqual(4, items.count)
 
@@ -46,7 +47,7 @@ class SUAppcastTest: XCTestCase {
             // Test best appcast item & a delta update item
             let supportedAppcast = SUAppcastDriver.filterSupportedAppcast(appcast, phasedUpdateGroup: nil)
             
-            let supportedAppcastItems = supportedAppcast.items!
+            let supportedAppcastItems = supportedAppcast.items
             
             var deltaItem: SUAppcastItem?
             let bestAppcastItem = SUAppcastDriver.bestItem(fromAppcastItems: supportedAppcastItems, getDeltaItem: &deltaItem, withHostVersion: "1.0", comparator: SUStandardVersionComparator())
@@ -72,7 +73,6 @@ class SUAppcastTest: XCTestCase {
     }
 
     func testParseAppcastWithLocalizedReleaseNotes() {
-        let appcast = SUAppcast()
         let testFile = Bundle(for: SUAppcastTest.self).path(forResource: "testlocalizedreleasenotesappcast",
                                                             ofType: "xml")!
         let testFileUrl = URL(fileURLWithPath: testFile)
@@ -80,7 +80,8 @@ class SUAppcastTest: XCTestCase {
 
          do {
             let testFileData = try Data(contentsOf: testFileUrl)
-            let items = try appcast.parseAppcastItems(fromXMLData: testFileData, relativeTo: testFileUrl) as! [SUAppcastItem];
+            let appcast = try SUAppcast(xmlData: testFileData, relativeTo: testFileUrl)
+            let items = appcast.items
             XCTAssertEqual("https://sparkle-project.org/#localized_notes_link_works", items[0].releaseNotesURL.absoluteString)
         } catch let err as NSError {
             NSLog("%@", err)
@@ -89,12 +90,12 @@ class SUAppcastTest: XCTestCase {
     }
 
     func testNamespaces() {
-        let appcast = SUAppcast()
         let testFile = Bundle(for: SUAppcastTest.self).path(forResource: "testnamespaces", ofType: "xml")!
         let testData = NSData(contentsOfFile: testFile)!
 
         do {
-            let items = try appcast.parseAppcastItems(fromXMLData: testData as Data, relativeTo: nil) as! [SUAppcastItem]
+            let appcast = try SUAppcast(xmlData: testData as Data, relativeTo: nil)
+            let items = appcast.items
 
             XCTAssertEqual(2, items.count)
 
@@ -109,13 +110,14 @@ class SUAppcastTest: XCTestCase {
     }
 
     func testRelativeURLs() {
-        let appcast = SUAppcast()
         let testFile = Bundle(for: SUAppcastTest.self).path(forResource: "test-relative-urls", ofType: "xml")!
         let testData = NSData(contentsOfFile: testFile)!
 
         do {
             let baseURL = URL(string: "https://fake.sparkle-project.org/updates/index.xml")!
-            let items = try appcast.parseAppcastItems(fromXMLData: testData as Data, relativeTo: baseURL) as! [SUAppcastItem]
+            
+            let appcast = try SUAppcast(xmlData: testData as Data, relativeTo: baseURL)
+            let items = appcast.items
 
             XCTAssertEqual(2, items.count)
 

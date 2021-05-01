@@ -24,7 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
 @class SUAppcastItem;
 SU_EXPORT @interface SUAppcast : NSObject
 
-@property (readonly, copy, nullable) NSArray<SUAppcastItem *> *items;
+@property (readonly, copy) NSArray<SUAppcastItem *> *items;
 
 @end
 

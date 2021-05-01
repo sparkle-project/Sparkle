@@ -30,7 +30,7 @@
 
 @synthesize items = _items;
 
-- (nullable instancetype)initWithXMLData:(NSData *)xmlData relativeToURL:(NSURL *)relativeURL error:(NSError * __autoreleasing *)error
+- (nullable instancetype)initWithXMLData:(NSData *)xmlData relativeToURL:(NSURL * _Nullable)relativeURL error:(NSError * __autoreleasing *)error
 {
     self = [super init];
     if (self != nil) {
@@ -72,7 +72,7 @@
     }
 }
 
--(NSArray *)parseAppcastItemsFromXMLData:(NSData *)appcastData relativeToURL:(NSURL *)appcastURL error:(NSError *__autoreleasing*)errorp {
+-(NSArray *)parseAppcastItemsFromXMLData:(NSData *)appcastData relativeToURL:(NSURL * _Nullable)appcastURL error:(NSError *__autoreleasing*)errorp {
     if (errorp) {
         *errorp = nil;
     }
