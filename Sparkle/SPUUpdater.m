@@ -423,6 +423,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     
     if (self.sessionInProgress) {
         SULog(SULogLevelError, @"Error: -checkForUpdatesInBackground called but .sessionInProgress == YES");
+        return;
     }
     
     self.sessionInProgress = YES;
@@ -488,6 +489,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     
     if (self.sessionInProgress) {
         SULog(SULogLevelError, @"Error: -checkForUpdates called but .sessionInProgress == YES");
+        return;
     }
     
     if (self.driver != nil) {
@@ -529,6 +531,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     
     if (self.sessionInProgress) {
         SULog(SULogLevelError, @"Error: -checkForUpdateInformation called but .sessionInProgress == YES");
+        return;
     }
     
     self.sessionInProgress = YES;

@@ -141,8 +141,6 @@
     assert(installationType != nil);
     
     [self.installerConnection setServiceName:serviceName systemDomain:self.systemDomain];
-    
-    [self sendInstallationData];
 }
 
 // This can be called multiple times (eg: if a delta update fails, this may be called again with a regular update item)
@@ -482,6 +480,7 @@
                 case SUInstallerLauncherSuccess:
                     self.systemDomain = systemDomain;
                     [self setUpConnection];
+                    [self sendInstallationData];
                     completionHandler(nil);
                     break;
             }
@@ -532,6 +531,18 @@
     [self.installerConnection handleMessageWithIdentifier:SPUResumeInstallationToStage2 data:responseData];
     
     // the installer will send us SPUInstallationFinishedStage2 when stage 2 is done
+}
+
+- (void)cancelUpdate
+{
+    // Set up connection to the installer if one is not set up already
+    [self setUpConnection];
+    
+    self.aborted = YES;
+    
+    [self.installerConnection handleMessageWithIdentifier:SPUCancelInstallation data:[NSData data]];
+    
+    [self.delegate installerIsRequestingAbortInstallWithError:nil];
 }
 
 - (void)abortInstall

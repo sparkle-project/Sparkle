@@ -179,14 +179,14 @@
                 
                 // Rule out invalid choices
                 SPUUserUpdateChoice validatedChoice;
-                if ((state == SPUUserUpdateStateInstalling && userChoice == SPUUserUpdateChoiceSkip) || (state == SPUUserUpdateStateInformational && userChoice == SPUUserUpdateChoiceInstall)) {
+                if (state == SPUUserUpdateStateInformational && userChoice == SPUUserUpdateChoiceInstall) {
                     validatedChoice = SPUUserUpdateChoiceDismiss;
                 } else {
                     validatedChoice = userChoice;
                 }
                 
                 switch (validatedChoice) {
-                    case SPUUserUpdateChoiceInstall:
+                    case SPUUserUpdateChoiceInstall: {
                         [self.host setObject:nil forUserDefaultsKey:SUSkippedVersionKey];
                         
                         switch (state) {
@@ -204,29 +204,26 @@
                                 break;
                         }
                         break;
-                    case SPUUserUpdateChoiceSkip:
+                    }
+                    case SPUUserUpdateChoiceSkip: {
                         [self.host setObject:[updateItem versionString] forUserDefaultsKey:SUSkippedVersionKey];
                         
                         if ([self.updaterDelegate respondsToSelector:@selector(updater:userDidSkipThisVersion:)]) {
                             [self.updaterDelegate updater:self.updater userDidSkipThisVersion:updateItem];
                         }
                         
-                        // Informational updates can be resumed too, so make sure we check
-                        // self.resumingDownloadedUpdate instead of the state we pass to user driver
-                        if (self.resumingDownloadedUpdate) {
-                            [self.coreDriver clearDownloadedUpdate];
-                        }
-                        
-                        [self.delegate uiDriverIsRequestingAbortUpdateWithError:nil];
-                        
-                        break;
-                    case SPUUserUpdateChoiceDismiss:
                         switch (state) {
                             case SPUUserUpdateStateDownloaded:
                             case SPUUserUpdateStateNotDownloaded:
                             case SPUUserUpdateStateInformational:
-                                [self.host setObject:nil forUserDefaultsKey:SUSkippedVersionKey];
+                                // Informational updates can be resumed too, so make sure we check
+                                // self.resumingDownloadedUpdate instead of the state we pass to user driver
+                                if (self.resumingDownloadedUpdate) {
+                                    [self.coreDriver clearDownloadedUpdate];
+                                }
+                                
                                 [self.delegate uiDriverIsRequestingAbortUpdateWithError:nil];
+                                
                                 break;
                             case SPUUserUpdateStateInstalling:
                                 [self.coreDriver finishInstallationWithResponse:validatedChoice displayingUserInterface:!self.preventsInstallerInteraction];
@@ -234,6 +231,25 @@
                         }
                         
                         break;
+                    }
+                    case SPUUserUpdateChoiceDismiss: {
+                        [self.host setObject:nil forUserDefaultsKey:SUSkippedVersionKey];
+                        
+                        switch (state) {
+                            case SPUUserUpdateStateDownloaded:
+                            case SPUUserUpdateStateNotDownloaded:
+                            case SPUUserUpdateStateInformational: {
+                                [self.delegate uiDriverIsRequestingAbortUpdateWithError:nil];
+                                break;
+                            }
+                            case SPUUserUpdateStateInstalling: {
+                                [self.coreDriver finishInstallationWithResponse:validatedChoice displayingUserInterface:!self.preventsInstallerInteraction];
+                                break;
+                            }
+                        }
+                        
+                        break;
+                    }
                 }
             });
         }];
