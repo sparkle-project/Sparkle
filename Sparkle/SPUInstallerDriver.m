@@ -123,7 +123,7 @@
                 
                 NSMutableDictionary *userInfo = [NSMutableDictionary dictionaryWithDictionary:@{
                     NSLocalizedDescriptionKey: SULocalizedString(@"An error occurred while running the updater. Please try again later.", nil),
-                    NSLocalizedFailureReasonErrorKey:@"The remote port connection was invalidated from the updater. For additional details, please check Console logs for "@SPARKLE_RELAUNCH_TOOL_NAME
+                    NSLocalizedFailureReasonErrorKey:@"The remote port connection was invalidated from the updater. For additional details, please check Console logs for "@SPARKLE_RELAUNCH_TOOL_NAME". If your application is sandboxed, please also ensure Installer Connection & Status entitlements are correctly set up: https://sparkle-project.org/documentation/sandboxing/"
                 }];
                 
                 NSError *installerError = strongSelf.installerError;
