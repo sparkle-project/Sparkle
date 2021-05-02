@@ -167,6 +167,11 @@ typedef NS_ENUM(NSInteger, SPUUpdateCheck)
  implement this to use your own logic for finding a valid update, if any,
  in the given appcast.
  
+ Do not base your logic by filtering out items with a minimum or maximum OS or application system version,
+ because Sparkle already has logic for determining whether or not those items should be filtered out.
+ 
+ This method may be called multiple times for different selections and filters. This method should be efficient.
+ 
  \param appcast The appcast that was downloaded from the remote server.
  \param updater The updater instance.
  \return The best valid appcast item, or nil if you don't want to be delegated this task.
