@@ -29,6 +29,11 @@ SU_EXPORT @interface SUUpdatePermissionResponse : NSObject<NSSecureCoding>
  */
 - (instancetype)initWithAutomaticUpdateChecks:(BOOL)automaticUpdateChecks sendSystemProfile:(BOOL)sendSystemProfile;
 
+/*
+ Use -initWithAutomaticUpdateChecks:sendSystemProfile: instead.
+ */
+- (instancetype)init NS_UNAVAILABLE;
+
 /*!
  A read-only property indicating whether automatic update checks are allowed or not.
  */

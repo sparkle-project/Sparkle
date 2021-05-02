@@ -34,6 +34,11 @@ SU_EXPORT @interface SPUStandardUserDriver : NSObject <SPUUserDriver>
  */
 - (instancetype)initWithHostBundle:(NSBundle *)hostBundle delegate:(nullable id<SPUStandardUserDriverDelegate>)delegate;
 
+/*!
+ Use initWithHostBundle:delegate: instead.
+ */
+- (instancetype)init NS_UNAVAILABLE;
+
 @end
 
 NS_ASSUME_NONNULL_END
