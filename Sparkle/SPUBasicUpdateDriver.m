@@ -65,7 +65,7 @@
     self.completionBlock = completionBlock;
 }
 
-- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background includesSkippedUpdates:(BOOL)includesSkippedUpdates
+- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background
 {
     if ([self.host isRunningOnReadOnlyVolume]) {
         NSString *hostName = self.host.name;
@@ -75,7 +75,7 @@
             [self.delegate basicDriverIsRequestingAbortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SURunningFromDiskImageError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:SULocalizedString(@"%1$@ can't be updated, because it was opened from a read-only or a temporary location.", nil), hostName], NSLocalizedRecoverySuggestionErrorKey: [NSString stringWithFormat:SULocalizedString(@"Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again.", nil), hostName] }]];
         }
     } else {
-        [self.appcastDriver loadAppcastFromURL:appcastURL userAgent:userAgent httpHeaders:httpHeaders inBackground:background includesSkippedUpdates:includesSkippedUpdates];
+        [self.appcastDriver loadAppcastFromURL:appcastURL userAgent:userAgent httpHeaders:httpHeaders inBackground:background];
     }
 }
 
@@ -169,7 +169,7 @@
         NSString *recoverySuggestion;
         NSString *recoveryOption;
         
-        if (latestAppcastItem != nil) { // if the appcast was successfully loaded
+        if (latestAppcastItem != nil) {
             switch (hostToLatestAppcastItemComparisonResult) {
                 case NSOrderedDescending:
                     // This means the user is a 'newer than latest' version. give a slight hint to the user instead of wrongly claiming this version is identical to the latest feed version.
@@ -204,7 +204,8 @@
             
             recoveryOption = @"OK";
         } else {
-            // When no updates are found in the appcast
+            // When no updates are found in the appcast, or latest appcast item info
+            // was not provided (i.e, for a background update check)
             localizedDescription = SULocalizedString(@"Update Error!", nil);
             recoverySuggestion = SULocalizedString(@"No valid update information could be loaded.", nil);
             recoveryOption = SULocalizedString(@"Cancel Update", nil);

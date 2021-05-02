@@ -33,7 +33,6 @@
 @property (nullable, nonatomic, readonly, weak) id <SPUUpdaterDelegate> updaterDelegate;
 @property (nullable, nonatomic, readonly, weak) id <SUAppcastDriverDelegate> delegate;
 @property (nonatomic) SPUDownloadDriver *downloadDriver;
-@property (nonatomic) BOOL includesSkippedUpdates;
 
 @end
 
@@ -44,7 +43,6 @@
 @synthesize updaterDelegate = _updaterDelegate;
 @synthesize delegate = _delegate;
 @synthesize downloadDriver = _downloadDriver;
-@synthesize includesSkippedUpdates = _includesSkippedUpdates;
 
 - (instancetype)initWithHost:(SUHost *)host updater:(id)updater updaterDelegate:(id <SPUUpdaterDelegate>)updaterDelegate delegate:(id <SUAppcastDriverDelegate>)delegate
 {
@@ -58,7 +56,7 @@
     return self;
 }
 
-- (void)loadAppcastFromURL:(NSURL *)appcastURL userAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background includesSkippedUpdates:(BOOL)includesSkippedUpdates
+- (void)loadAppcastFromURL:(NSURL *)appcastURL userAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background
 {
     NSMutableDictionary *requestHTTPHeaders = [NSMutableDictionary dictionary];
     if (httpHeaders != nil) {
@@ -67,8 +65,6 @@
     requestHTTPHeaders[@"Accept"] = @"application/rss+xml,*/*;q=0.1";
     
     self.downloadDriver = [[SPUDownloadDriver alloc] initWithRequestURL:appcastURL host:self.host userAgent:userAgent httpHeaders:requestHTTPHeaders inBackground:background delegate:self];
-    
-    self.includesSkippedUpdates = includesSkippedUpdates;
     
     [self.downloadDriver downloadFile];
 }
@@ -87,7 +83,7 @@
         
         [self.delegate didFailToFetchAppcastWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUAppcastParseError userInfo:userInfo]];
     } else {
-        [self appcastDidFinishLoading:appcast inBackground:self.downloadDriver.inBackground includesSkippedUpdates:self.includesSkippedUpdates];
+        [self appcastDidFinishLoading:appcast inBackground:self.downloadDriver.inBackground];
     }
 }
 
@@ -155,7 +151,7 @@
     return [self preferredUpdateForRegularAppcastItem:regularItem secondaryUpdate:secondaryAppcastItem];
 }
 
-- (void)appcastDidFinishLoading:(SUAppcast *)loadedAppcast inBackground:(BOOL)background includesSkippedUpdates:(BOOL)includesSkippedUpdates
+- (void)appcastDidFinishLoading:(SUAppcast *)loadedAppcast inBackground:(BOOL)background
 {
     [self.delegate didFinishLoadingAppcast:loadedAppcast];
     
@@ -171,7 +167,7 @@
     
     NSNumber *phasedUpdateGroup = background ? @([SUPhasedUpdateGroupInfo updateGroupForHost:self.host]) : nil;
     
-    NSString *skippedVersion = !includesSkippedUpdates ? [self.host objectForUserDefaultsKey:SUSkippedVersionKey] : nil;
+    NSString *skippedVersion = background ? [self.host objectForUserDefaultsKey:SUSkippedVersionKey] : nil;
     
     // First filter out min/max OS version and see if there's an update that passes
     // the minimum autoupdate version. We filter out updates that fail the minimum
@@ -203,11 +199,12 @@
     } else {
         // Find the latest appcast item even if it fails min/max OS test
         // We want to inform the user if an update requires a different OS version
-        SUAppcastItem *notFoundPrimaryItem = [self retrieveBestAppcastItemFromAppcast:macOSAppcast versionComparator:applicationVersionComparator secondaryUpdate:nil];
+        // We only need to do this if an update is being checked automatically in the background
+        SUAppcastItem *notFoundPrimaryItem = background ? [self retrieveBestAppcastItemFromAppcast:macOSAppcast versionComparator:applicationVersionComparator secondaryUpdate:nil] : nil;
         
         NSComparisonResult hostToLatestAppcastItemComparisonResult = (notFoundPrimaryItem != nil) ? [applicationVersionComparator compareVersion:self.host.version toVersion:notFoundPrimaryItem.versionString] : 0;
         
-        SUStandardVersionComparator *standardVersionComparator = [[SUStandardVersionComparator alloc] init];
+        SUStandardVersionComparator *standardVersionComparator = (notFoundPrimaryItem != nil) ? [[SUStandardVersionComparator alloc] init] : nil;
         
         BOOL passesMinOSVersion = (notFoundPrimaryItem != nil) ? [[self class] isItemMinimumOperatingSystemVersionOK:notFoundPrimaryItem versionComparator:standardVersionComparator] : YES;
         BOOL passesMaxOSVersion = (notFoundPrimaryItem != nil) ? [[self class] isItemMaximumOperatingSystemVersionOK:notFoundPrimaryItem versionComparator:standardVersionComparator] : YES;
