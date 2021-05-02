@@ -79,7 +79,7 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  * If the state is SPUUserUpdateStateInstalling, the installing update is also preserved after dismissing. In this state however, the update will also still be installed after the application is terminated.
  *
  * A reply of SPUUserUpdateChoiceSkip skips this particular version and won't notify the user again, unless they initiate an update check themselves.
- * If the state is SPUUserUpdateStateInstalling, the update cannot be skipped, only dismissed or installed.
+ * If the state is SPUUserUpdateStateInstalling, the installation is also canceled when the update is skipped.
  */
 - (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem userInitiated:(BOOL)userInitiated state:(SPUUserUpdateState)state reply:(void (^)(SPUUserUpdateChoice))reply;
 
@@ -194,10 +194,9 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  * @param reply
  * A reply of SPUUserUpdateChoiceInstall installs the update the new update immediately. The application is relaunched only if it is still running by the time this reply is invoked. If the application terminates on its own, Sparkle will attempt to automatically install the update.
  *
- * A reply of SPUUserUpdateChoiceDismiss dismisses the update installation for the time being. Note the update may still be installed automatically after
- * the application terminates.
+ * A reply of SPUUserUpdateChoiceDismiss dismisses the update installation for the time being. Note the update may still be installed automatically after the application terminates.
  *
- * A reply of SPUUserUpdateChoiceSkip acts the same as dismissing. This update which has started installing cannot be skipped.
+ * A reply of SPUUserUpdateChoiceSkip cancels the current update that has begun installing and dismisses the update. In this circumstance, the update is canceled but this update version is not skipped in the future.
  *
  * Before this point, -showInstallingUpdate will be called.
  */

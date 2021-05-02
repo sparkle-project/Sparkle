@@ -437,6 +437,10 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
                 });
             }
         });
+    } else if (identifier == SPUCancelInstallation) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self cleanupAndExitWithStatus:0 error:nil];
+        });
     } else if (identifier == SPUUpdaterAlivePong) {
         self.receivedUpdaterPong = YES;
     }
