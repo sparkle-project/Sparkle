@@ -31,7 +31,8 @@ typedef NS_ENUM(int32_t, SPUUpdaterMessageType)
     SPUInstallationData = 0,
     SPUSentUpdateAppcastItemData = 1,
     SPUResumeInstallationToStage2 = 2,
-    SPUUpdaterAlivePong = 3
+    SPUUpdaterAlivePong = 3,
+    SPUCancelInstallation = 4
 };
 
 BOOL SPUInstallerMessageTypeIsLegal(SPUInstallerMessageType oldMessageType, SPUInstallerMessageType newMessageType);

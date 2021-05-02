@@ -357,9 +357,6 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
     }
     
     if (self.state == SPUUserUpdateStateInstalling) {
-        // An already downloaded & resumable update can't be skipped
-        self.skipButton.hidden = YES;
-        
         // We're going to be relaunching pretty instantaneously
         self.installButton.title = SULocalizedString(@"Install and Relaunch", nil);
         

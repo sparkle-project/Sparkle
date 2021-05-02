@@ -331,8 +331,10 @@
 {
     switch (response) {
         case SPUUserUpdateChoiceDismiss:
-        case SPUUserUpdateChoiceSkip:
             [self.delegate coreDriverIsRequestingAbortUpdateWithError:nil];
+            break;
+        case SPUUserUpdateChoiceSkip:
+            [self.installerDriver cancelUpdate];
             break;
         case SPUUserUpdateChoiceInstall:
             [self.installerDriver installWithToolAndRelaunch:YES displayingUserInterface:displayingUserInterface];

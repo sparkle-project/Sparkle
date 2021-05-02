@@ -40,6 +40,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)installWithToolAndRelaunch:(BOOL)relaunch displayingUserInterface:(BOOL)showUI;
 
+- (void)cancelUpdate;
+
 - (void)abortInstall;
 
 @end
