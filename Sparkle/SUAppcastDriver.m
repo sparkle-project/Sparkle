@@ -8,6 +8,7 @@
 
 #import "SUAppcastDriver.h"
 #import "SUAppcast.h"
+#import "SUAppcast+Private.h"
 #import "SUAppcastItem.h"
 #import "SUVersionComparisonProtocol.h"
 #import "SUStandardVersionComparator.h"
@@ -17,27 +18,33 @@
 #import "SUConstants.h"
 #import "SUPhasedUpdateGroupInfo.h"
 #import "SULog.h"
+#import "SPUDownloadDriver.h"
+#import "SPUDownloadData.h"
+#import "SULocalizations.h"
+#import "SUErrors.h"
 
 
 #include "AppKitPrevention.h"
 
-@interface SUAppcastDriver ()
+@interface SUAppcastDriver () <SPUDownloadDriverDelegate>
 
 @property (nonatomic, readonly) SUHost *host;
-@property (nonatomic, copy) NSString *userAgent;
 @property (nullable, nonatomic, readonly, weak) id updater;
 @property (nullable, nonatomic, readonly, weak) id <SPUUpdaterDelegate> updaterDelegate;
 @property (nullable, nonatomic, readonly, weak) id <SUAppcastDriverDelegate> delegate;
+@property (nonatomic) SPUDownloadDriver *downloadDriver;
+@property (nonatomic) BOOL includesSkippedUpdates;
 
 @end
 
 @implementation SUAppcastDriver
 
 @synthesize host = _host;
-@synthesize userAgent = _userAgent;
 @synthesize updater = _updater;
 @synthesize updaterDelegate = _updaterDelegate;
 @synthesize delegate = _delegate;
+@synthesize downloadDriver = _downloadDriver;
+@synthesize includesSkippedUpdates = _includesSkippedUpdates;
 
 - (instancetype)initWithHost:(SUHost *)host updater:(id)updater updaterDelegate:(id <SPUUpdaterDelegate>)updaterDelegate delegate:(id <SUAppcastDriverDelegate>)delegate
 {
@@ -53,18 +60,48 @@
 
 - (void)loadAppcastFromURL:(NSURL *)appcastURL userAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background includesSkippedUpdates:(BOOL)includesSkippedUpdates
 {
-    self.userAgent = userAgent;
+    NSMutableDictionary *requestHTTPHeaders = [NSMutableDictionary dictionary];
+    if (httpHeaders != nil) {
+        [requestHTTPHeaders addEntriesFromDictionary:(NSDictionary * _Nonnull)httpHeaders];
+    }
+    requestHTTPHeaders[@"Accept"] = @"application/rss+xml,*/*;q=0.1";
     
-    SUAppcast *appcast = [[SUAppcast alloc] init];
-    [appcast setUserAgentString:userAgent];
-    [appcast setHttpHeaders:httpHeaders];
-    [appcast fetchAppcastFromURL:appcastURL inBackground:background completionBlock:^(NSError *error) {
-        if (error != nil) {
-            [self.delegate didFailToFetchAppcastWithError:error];
-        } else {
-            [self appcastDidFinishLoading:appcast inBackground:background includesSkippedUpdates:includesSkippedUpdates];
+    self.downloadDriver = [[SPUDownloadDriver alloc] initWithRequestURL:appcastURL host:self.host userAgent:userAgent httpHeaders:requestHTTPHeaders inBackground:background delegate:self];
+    
+    self.includesSkippedUpdates = includesSkippedUpdates;
+    
+    [self.downloadDriver downloadFile];
+}
+
+- (void)downloadDriverDidDownloadData:(SPUDownloadData *)downloadData
+{
+    NSError *appcastError = nil;
+    SUAppcast *appcast = [[SUAppcast alloc] initWithXMLData:downloadData.data relativeToURL:downloadData.URL error:&appcastError];
+    
+    if (appcast == nil) {
+        NSMutableDictionary *userInfo = [NSMutableDictionary dictionaryWithObject:SULocalizedString(@"An error occurred while parsing the update feed.", nil) forKey:NSLocalizedDescriptionKey];
+        
+        if (appcastError != nil) {
+            [userInfo setObject:appcastError forKey:NSUnderlyingErrorKey];
         }
-    }];
+        
+        [self.delegate didFailToFetchAppcastWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUAppcastParseError userInfo:userInfo]];
+    } else {
+        [self appcastDidFinishLoading:appcast inBackground:self.downloadDriver.inBackground includesSkippedUpdates:self.includesSkippedUpdates];
+    }
+}
+
+- (void)downloadDriverDidFailToDownloadFileWithError:(nonnull NSError *)error
+{
+    SULog(SULogLevelError, @"Encountered download feed error: %@", error);
+
+    NSMutableDictionary *userInfo = [NSMutableDictionary dictionaryWithDictionary:@{NSLocalizedDescriptionKey:SULocalizedString(@"An error occurred in retrieving update information. Please try again later.", nil)}];
+    
+    if (error != nil) {
+        [userInfo setObject:error forKey:NSUnderlyingErrorKey];
+    }
+    
+    [self.delegate didFailToFetchAppcastWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUDownloadError userInfo:userInfo]];
 }
 
 - (SUAppcastItem * _Nullable)preferredUpdateForRegularAppcastItem:(SUAppcastItem * _Nullable)regularItem secondaryUpdate:(SUAppcastItem * __autoreleasing _Nullable *)secondaryUpdate
@@ -276,6 +313,15 @@
     }
     
     return YES;
+}
+
+- (void)cleanup:(void (^)(void))completionHandler
+{
+    if (self.downloadDriver == nil) {
+        completionHandler();
+    } else {
+        [self.downloadDriver cleanup:completionHandler];
+    }
 }
 
 @end

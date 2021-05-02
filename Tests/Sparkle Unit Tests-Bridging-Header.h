@@ -10,6 +10,7 @@
 #import "SUFileManager.h"
 #import "SUExport.h"
 #import "SUAppcast.h"
+#import "SUAppcast+Private.h"
 #import "SUAppcastItem.h"
 #import "SUAppcastDriver.h"
 #import "SUVersionComparisonProtocol.h"
@@ -38,13 +39,6 @@ static const char *SUAppleQuarantineIdentifier = "com.apple.quarantine";
 + (SUAppcastItem *)bestItemFromAppcastItems:(NSArray *)appcastItems getDeltaItem:(SUAppcastItem *_Nullable __autoreleasing *_Nullable)deltaItem withHostVersion:(NSString *)hostVersion comparator:(id<SUVersionComparison>)comparator;
 
 + (SUAppcast *)filterSupportedAppcast:(SUAppcast *)appcast phasedUpdateGroup:(NSNumber * _Nullable)phasedUpdateGroup;
-
-@end
-
-
-@interface SUAppcast (Private)
-
--(nullable NSArray *)parseAppcastItemsFromXMLData:(NSData *)appcastData relativeToURL:(nullable NSURL *)appcastURL error:(NSError *__autoreleasing*)errorp;
 
 @end
 
