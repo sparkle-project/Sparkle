@@ -137,7 +137,10 @@
 
 - (instancetype)initWithUpdateItem:(SUAppcastItem *)updateItem secondaryUpdateItem:(SUAppcastItem * _Nullable)secondaryUpdateItem host:(SUHost *)host userAgent:(NSString * _Nullable)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background delegate:(id<SPUDownloadDriverDelegate>)delegate
 {
-    self = [self initWithRequestURL:updateItem.fileURL host:host userAgent:userAgent httpHeaders:httpHeaders inBackground:background delegate:delegate];
+    NSURL *updateFileURL = updateItem.fileURL;
+    assert(updateFileURL != nil);
+    
+    self = [self initWithRequestURL:updateFileURL host:host userAgent:userAgent httpHeaders:httpHeaders inBackground:background delegate:delegate];
     if (self != nil) {
         _updateItem = updateItem;
         _secondaryUpdateItem = secondaryUpdateItem;

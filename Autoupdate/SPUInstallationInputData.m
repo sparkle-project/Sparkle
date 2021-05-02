@@ -30,7 +30,7 @@ static NSString *SUInstallationTypeKey = @"SUInstallationType";
 @synthesize decryptionPassword = _decryptionPassword;
 @synthesize installationType = _installationType;
 
-- (instancetype)initWithRelaunchPath:(NSString *)relaunchPath hostBundlePath:(NSString *)hostBundlePath updateDirectoryPath:(NSString *)updateDirectoryPath downloadName:(NSString *)downloadName installationType:(NSString *)installationType signatures:(SUSignatures *)signatures decryptionPassword:(nullable NSString *)decryptionPassword
+- (instancetype)initWithRelaunchPath:(NSString *)relaunchPath hostBundlePath:(NSString *)hostBundlePath updateDirectoryPath:(NSString *)updateDirectoryPath downloadName:(NSString *)downloadName installationType:(NSString *)installationType signatures:(SUSignatures * _Nullable)signatures decryptionPassword:(nullable NSString *)decryptionPassword
 {
     self = [super init];
     if (self != nil) {

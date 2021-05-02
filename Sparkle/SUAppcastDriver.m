@@ -166,7 +166,8 @@
     if ([self itemContainsValidUpdate:primaryItem inBackground:background includesSkippedUpdates:includesSkippedUpdates]) {
         [self.delegate didFindValidUpdateWithAppcastItem:primaryItem secondaryAppcastItem:secondaryItem preventsAutoupdate:[self itemPreventsAutoupdate:primaryItem]];
     } else {
-        NSComparisonResult hostToLatestAppcastItemComparisonResult = (primaryItem != nil) ? [[self versionComparator] compareVersion:[self.host version] toVersion:[primaryItem versionString]] : 0;
+        NSComparisonResult hostToLatestAppcastItemComparisonResult = (primaryItem != nil) ? [[self versionComparator] compareVersion:self.host.version toVersion:primaryItem.versionString] : NSOrderedSame;
+        
         [self.delegate didNotFindUpdateWithLatestAppcastItem:primaryItem hostToLatestAppcastItemComparisonResult:hostToLatestAppcastItemComparisonResult];
     }
 }
@@ -212,8 +213,12 @@
 + (BOOL)itemOperatingSystemIsOK:(SUAppcastItem *)ui
 {
     BOOL osOK = [ui isMacOsUpdate];
-    if (([ui minimumSystemVersion] == nil || [[ui minimumSystemVersion] isEqualToString:@""]) &&
-        ([ui maximumSystemVersion] == nil || [[ui maximumSystemVersion] isEqualToString:@""])) {
+    
+    NSString *minimumSystemVersion = ui.minimumSystemVersion;
+    NSString *maximumSystemVersion = ui.maximumSystemVersion;
+    
+    if ((minimumSystemVersion == nil || [minimumSystemVersion isEqualToString:@""]) &&
+        (maximumSystemVersion == nil || [maximumSystemVersion isEqualToString:@""])) {
         return osOK;
     }
     
@@ -224,11 +229,11 @@
     id<SUVersionComparison> versionComparator = [[SUStandardVersionComparator alloc] init];
     
     // Check minimum and maximum System Version
-    if ([ui minimumSystemVersion] != nil && ![[ui minimumSystemVersion] isEqualToString:@""]) {
-        minimumVersionOK = [versionComparator compareVersion:[ui minimumSystemVersion] toVersion:[SUOperatingSystem systemVersionString]] != NSOrderedDescending;
+    if (minimumSystemVersion != nil && ![minimumSystemVersion isEqualToString:@""]) {
+        minimumVersionOK = [versionComparator compareVersion:minimumSystemVersion toVersion:[SUOperatingSystem systemVersionString]] != NSOrderedDescending;
     }
-    if ([ui maximumSystemVersion] != nil && ![[ui maximumSystemVersion] isEqualToString:@""]) {
-        maximumVersionOK = [versionComparator compareVersion:[ui maximumSystemVersion] toVersion:[SUOperatingSystem systemVersionString]] != NSOrderedAscending;
+    if (maximumSystemVersion != nil && ![maximumSystemVersion isEqualToString:@""]) {
+        maximumVersionOK = [versionComparator compareVersion:maximumSystemVersion toVersion:[SUOperatingSystem systemVersionString]] != NSOrderedAscending;
     }
     
     return minimumVersionOK && maximumVersionOK && osOK;
@@ -253,19 +258,21 @@
 
 - (BOOL)isItemNewer:(SUAppcastItem *)ui
 {
-    return [[self versionComparator] compareVersion:[self.host version] toVersion:[ui versionString]] == NSOrderedAscending;
+    return ui != nil && [[self versionComparator] compareVersion:self.host.version toVersion:ui.versionString] == NSOrderedAscending;
 }
 
 - (BOOL)itemPreventsAutoupdate:(SUAppcastItem *)ui
  {
-     return ([ui minimumAutoupdateVersion] && ! [[ui minimumAutoupdateVersion] isEqualToString:@""] && ([[self versionComparator] compareVersion:[self.host version] toVersion:[ui minimumAutoupdateVersion]] == NSOrderedAscending));
+     NSString *minimumAutoupdateVersion = ui.minimumAutoupdateVersion;
+     return (minimumAutoupdateVersion.length > 0 && ([[self versionComparator] compareVersion:[self.host version] toVersion:minimumAutoupdateVersion] == NSOrderedAscending));
  }
 
 - (BOOL)itemContainsSkippedVersion:(SUAppcastItem *)ui
 {
     NSString *skippedVersion = [self.host objectForUserDefaultsKey:SUSkippedVersionKey];
     if (skippedVersion == nil) { return NO; }
-    return [[self versionComparator] compareVersion:[ui versionString] toVersion:skippedVersion] != NSOrderedDescending;
+    
+    return [[self versionComparator] compareVersion:ui.versionString toVersion:skippedVersion] != NSOrderedDescending;
 }
 
 + (BOOL)itemIsReadyForPhasedRollout:(SUAppcastItem *)ui phasedUpdateGroup:(NSNumber * _Nullable)phasedUpdateGroup currentDate:(NSDate *)currentDate

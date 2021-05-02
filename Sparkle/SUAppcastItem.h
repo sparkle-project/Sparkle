@@ -20,34 +20,38 @@
 #import "SUExport.h"
 @class SUSignatures;
 
+NS_ASSUME_NONNULL_BEGIN
+
 SU_EXPORT @interface SUAppcastItem : NSObject<NSSecureCoding>
-@property (copy, readonly) NSString *title;
-@property (copy, readonly) NSString *dateString;
-@property (copy, readonly) NSDate *date;
-@property (copy, readonly) NSString *itemDescription;
-@property (strong, readonly) NSURL *releaseNotesURL;
-@property (strong, readonly) SUSignatures *signatures;
-@property (copy, readonly) NSString *minimumSystemVersion;
-@property (copy, readonly) NSString *maximumSystemVersion;
-@property (strong, readonly) NSURL *fileURL;
+@property (copy, readonly, nullable) NSString *title;
+@property (copy, readonly, nullable) NSString *dateString;
+@property (copy, readonly, nullable) NSDate *date;
+@property (copy, readonly, nullable) NSString *itemDescription;
+@property (strong, readonly, nullable) NSURL *releaseNotesURL;
+@property (strong, readonly, nullable) SUSignatures *signatures;
+@property (copy, readonly, nullable) NSString *minimumSystemVersion;
+@property (copy, readonly, nullable) NSString *maximumSystemVersion;
+@property (strong, readonly, nullable) NSURL *fileURL;
 @property (nonatomic, readonly) uint64_t contentLength;
 @property (copy, readonly) NSString *versionString;
-@property (copy, readonly) NSString *osString;
-@property (copy, readonly) NSString *displayVersionString;
-@property (copy, readonly) NSDictionary *deltaUpdates;
-@property (strong, readonly) NSURL *infoURL;
-@property (copy, readonly) NSNumber* phasedRolloutInterval;
+@property (copy, readonly, nullable) NSString *osString;
+@property (copy, readonly, nullable) NSString *displayVersionString;
+@property (copy, readonly, nullable) NSDictionary *deltaUpdates;
+@property (strong, readonly, nullable) NSURL *infoURL;
+@property (copy, readonly, nullable) NSNumber* phasedRolloutInterval;
 @property (nonatomic, copy, readonly) NSString *installationType;
-@property (copy, readonly) NSString *minimumAutoupdateVersion;
+@property (copy, readonly, nullable) NSString *minimumAutoupdateVersion;
 
 @property (getter=isDeltaUpdate, readonly) BOOL deltaUpdate;
 @property (getter=isCriticalUpdate, readonly) BOOL criticalUpdate;
 @property (getter=isMacOsUpdate, readonly) BOOL macOsUpdate;
 @property (getter=isInformationOnlyUpdate, readonly) BOOL informationOnlyUpdate;
 
-// Returns the dictionary provided in initWithDictionary; this might be useful later for extensions.
+// Returns the dictionary representing the appcast item; this might be useful later for extensions.
 @property (readonly, copy) NSDictionary *propertiesDictionary;
 
 @end
+
+NS_ASSUME_NONNULL_END
 
 #endif

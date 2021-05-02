@@ -53,13 +53,13 @@ class SUAppcastTest: XCTestCase {
             let bestAppcastItem = SUAppcastDriver.bestItem(fromAppcastItems: supportedAppcastItems, getDeltaItem: &deltaItem, withHostVersion: "1.0", comparator: SUStandardVersionComparator())
 
             XCTAssertEqual(bestAppcastItem, items[1])
-            XCTAssertEqual(deltaItem!.fileURL.lastPathComponent, "3.0_from_1.0.patch")
+            XCTAssertEqual(deltaItem!.fileURL!.lastPathComponent, "3.0_from_1.0.patch")
 
             // Test latest delta update item available
             var latestDeltaItem: SUAppcastItem?
             SUAppcastDriver.bestItem(fromAppcastItems: supportedAppcastItems, getDeltaItem: &latestDeltaItem, withHostVersion: "2.0", comparator: SUStandardVersionComparator())
 
-            XCTAssertEqual(latestDeltaItem!.fileURL.lastPathComponent, "3.0_from_2.0.patch")
+            XCTAssertEqual(latestDeltaItem!.fileURL!.lastPathComponent, "3.0_from_2.0.patch")
 
             // Test a delta item that does not exist
             var nonexistantDeltaItem: SUAppcastItem?
@@ -82,7 +82,7 @@ class SUAppcastTest: XCTestCase {
             let testFileData = try Data(contentsOf: testFileUrl)
             let appcast = try SUAppcast(xmlData: testFileData, relativeTo: testFileUrl)
             let items = appcast.items
-            XCTAssertEqual("https://sparkle-project.org/#localized_notes_link_works", items[0].releaseNotesURL.absoluteString)
+            XCTAssertEqual("https://sparkle-project.org/#localized_notes_link_works", items[0].releaseNotesURL!.absoluteString)
         } catch let err as NSError {
             NSLog("%@", err)
             XCTFail(err.localizedDescription)
