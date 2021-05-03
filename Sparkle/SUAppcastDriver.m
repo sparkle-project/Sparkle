@@ -226,11 +226,6 @@
 }
 
 // This method is used by unit tests
-+ (SUAppcast *)filterSupportedAppcast:(SUAppcast *)appcast phasedUpdateGroup:(NSNumber * _Nullable)phasedUpdateGroup
-{
-    return [self filterSupportedAppcast:appcast phasedUpdateGroup:phasedUpdateGroup skippedVersion:nil hostVersion:nil versionComparator:nil testOSVersion:YES testMinimumAutoupdateVersion:NO];
-}
-
 + (SUAppcast *)filterSupportedAppcast:(SUAppcast *)appcast phasedUpdateGroup:(NSNumber * _Nullable)phasedUpdateGroup skippedVersion:(NSString * _Nullable)skippedVersion hostVersion:(NSString * _Nullable)hostVersion versionComparator:(id<SUVersionComparison> _Nullable)versionComparator testOSVersion:(BOOL)testOSVersion testMinimumAutoupdateVersion:(BOOL)testMinimumAutoupdateVersion
 {
     NSDate *currentDate = [NSDate date];
