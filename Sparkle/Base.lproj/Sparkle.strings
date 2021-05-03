@@ -128,7 +128,7 @@
 
 "Your macOS version is too new" = "Your macOS version is too new";
 
-"Your macOS version is too new" = "%1$@ %2$@ is available but your macOS version is too new for this update. This update only supports up to macOS %3$@.";
+"%1$@ %2$@ is available but your macOS version is too new for this update. This update only supports up to macOS %3$@." = "%1$@ %2$@ is available but your macOS version is too new for this update. This update only supports up to macOS %3$@.";
 
 /* Authorization message shown when app wants permission to update itself. */
 "%1$@ wants permission to update." = "%1$@ wants permission to update.";
