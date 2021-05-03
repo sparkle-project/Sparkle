@@ -169,6 +169,8 @@ typedef NS_ENUM(NSInteger, SPUUpdateCheck)
  
  Do not base your logic by filtering out items with a minimum or maximum OS or application system version,
  because Sparkle already has logic for determining whether or not those items should be filtered out.
+ Also do not return a non-top level item from the appcast such as a delta item. Delta items will be ignored.
+ Sparkle picks the delta item from your selection if the appropriate one is available.
  
  This method may be called multiple times for different selections and filters. This method should be efficient.
  
