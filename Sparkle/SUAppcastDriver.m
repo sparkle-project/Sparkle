@@ -199,15 +199,27 @@
     } else {
         // Find the latest appcast item even if it fails min/max OS test
         // We want to inform the user if an update requires a different OS version
-        // We only need to do this if an update is being checked automatically in the background
-        SUAppcastItem *notFoundPrimaryItem = background ? [self retrieveBestAppcastItemFromAppcast:macOSAppcast versionComparator:applicationVersionComparator secondaryUpdate:nil] : nil;
-        
-        NSComparisonResult hostToLatestAppcastItemComparisonResult = (notFoundPrimaryItem != nil) ? [applicationVersionComparator compareVersion:self.host.version toVersion:notFoundPrimaryItem.versionString] : 0;
-        
-        SUStandardVersionComparator *standardVersionComparator = (notFoundPrimaryItem != nil) ? [[SUStandardVersionComparator alloc] init] : nil;
-        
-        BOOL passesMinOSVersion = (notFoundPrimaryItem != nil) ? [[self class] isItemMinimumOperatingSystemVersionOK:notFoundPrimaryItem versionComparator:standardVersionComparator] : YES;
-        BOOL passesMaxOSVersion = (notFoundPrimaryItem != nil) ? [[self class] isItemMaximumOperatingSystemVersionOK:notFoundPrimaryItem versionComparator:standardVersionComparator] : YES;
+        // We only need to do this if an update is being checked by the user manually
+        SUAppcastItem *notFoundPrimaryItem;
+        NSComparisonResult hostToLatestAppcastItemComparisonResult;
+        BOOL passesMinOSVersion;
+        BOOL passesMaxOSVersion;
+        if (!background) {
+            notFoundPrimaryItem = [self retrieveBestAppcastItemFromAppcast:macOSAppcast versionComparator:applicationVersionComparator secondaryUpdate:nil];
+            
+            hostToLatestAppcastItemComparisonResult = [applicationVersionComparator compareVersion:self.host.version toVersion:notFoundPrimaryItem.versionString];
+            
+            SUStandardVersionComparator *standardVersionComparator = [[SUStandardVersionComparator alloc] init];
+            
+            passesMinOSVersion = [[self class] isItemMinimumOperatingSystemVersionOK:notFoundPrimaryItem versionComparator:standardVersionComparator];
+            
+            passesMaxOSVersion = [[self class] isItemMaximumOperatingSystemVersionOK:notFoundPrimaryItem versionComparator:standardVersionComparator];
+        } else {
+            notFoundPrimaryItem = nil;
+            hostToLatestAppcastItemComparisonResult = 0;
+            passesMinOSVersion = YES;
+            passesMaxOSVersion = YES;
+        }
         
         [self.delegate didNotFindUpdateWithLatestAppcastItem:notFoundPrimaryItem hostToLatestAppcastItemComparisonResult:hostToLatestAppcastItemComparisonResult passesMinOSVersion:passesMinOSVersion passesMaxOSVersion:passesMaxOSVersion];
     }

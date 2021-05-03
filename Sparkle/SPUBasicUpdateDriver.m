@@ -206,6 +206,7 @@
         } else {
             // When no updates are found in the appcast, or latest appcast item info
             // was not provided (i.e, for a background update check)
+            // In the case no info was provided ofr a background check, the error isn't shown anywhere
             localizedDescription = SULocalizedString(@"Update Error!", nil);
             recoverySuggestion = SULocalizedString(@"No valid update information could be loaded.", nil);
             recoveryOption = SULocalizedString(@"Cancel Update", nil);
