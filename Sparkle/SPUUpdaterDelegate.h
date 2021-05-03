@@ -172,6 +172,10 @@ typedef NS_ENUM(NSInteger, SPUUpdateCheck)
  Also do not return a non-top level item from the appcast such as a delta item. Delta items will be ignored.
  Sparkle picks the delta item from your selection if the appropriate one is available.
  
+ This method will not be invoked with an appcast that has zero items. Pick the best item from the appcast.
+ If an item is available that has the same version as the application or bundle to update,
+ do not pick an item that is worse than that version.
+ 
  This method may be called multiple times for different selections and filters. This method should be efficient.
  
  \param appcast The appcast that was downloaded from the remote server.
