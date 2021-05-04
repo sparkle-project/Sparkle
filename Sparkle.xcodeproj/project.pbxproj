@@ -213,6 +213,7 @@
 		725264A91D5FBD9100CD6400 /* Sparkle.strings in Resources */ = {isa = PBXBuildFile; fileRef = 61AAE8220A321A7F00D8810D /* Sparkle.strings */; };
 		725602D51C83551C00DAA70E /* SUApplicationInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 725602D31C83551C00DAA70E /* SUApplicationInfo.h */; };
 		725602D61C83551C00DAA70E /* SUApplicationInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 725602D41C83551C00DAA70E /* SUApplicationInfo.m */; };
+		725B3A82263FBF0C0041AB8E /* testappcast_minimumAutoupdateVersion.xml in Resources */ = {isa = PBXBuildFile; fileRef = 725B3A81263FBF0C0041AB8E /* testappcast_minimumAutoupdateVersion.xml */; };
 		725CB9571C7120410064365A /* SPUUserDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 725CB9561C7120410064365A /* SPUUserDriver.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		725CB95A1C7121830064365A /* SPUStandardUserDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 725CB9581C7121830064365A /* SPUStandardUserDriver.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		725CB95B1C7121830064365A /* SPUStandardUserDriver.m in Sources */ = {isa = PBXBuildFile; fileRef = 725CB9591C7121830064365A /* SPUStandardUserDriver.m */; };
@@ -1181,6 +1182,7 @@
 		724BB3B51D35AAC3005D534A /* ServiceManagement.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ServiceManagement.framework; path = System/Library/Frameworks/ServiceManagement.framework; sourceTree = SDKROOT; };
 		725602D31C83551C00DAA70E /* SUApplicationInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUApplicationInfo.h; sourceTree = "<group>"; };
 		725602D41C83551C00DAA70E /* SUApplicationInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUApplicationInfo.m; sourceTree = "<group>"; };
+		725B3A81263FBF0C0041AB8E /* testappcast_minimumAutoupdateVersion.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = testappcast_minimumAutoupdateVersion.xml; sourceTree = "<group>"; };
 		725CB9561C7120410064365A /* SPUUserDriver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPUUserDriver.h; sourceTree = "<group>"; };
 		725CB9581C7121830064365A /* SPUStandardUserDriver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPUStandardUserDriver.h; sourceTree = "<group>"; };
 		725CB9591C7121830064365A /* SPUStandardUserDriver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SPUStandardUserDriver.m; sourceTree = "<group>"; };
@@ -1763,6 +1765,7 @@
 				14958C6C19AEBC610061B14F /* test-pubkey.pem */,
 				5AF6C74E1AEA46D10014A3AB /* test.pkg */,
 				5AD0FA7E1C73F2E2004BCEFF /* testappcast.xml */,
+				725B3A81263FBF0C0041AB8E /* testappcast_minimumAutoupdateVersion.xml */,
 				5F1510A11C96E591006E1629 /* testnamespaces.xml */,
 				FA30773C24CBC295007BA37D /* testlocalizedreleasenotesappcast.xml */,
 				5A5DD41B249F0F4B0045EB3E /* test-relative-urls.xml */,
@@ -3046,6 +3049,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				725B3A82263FBF0C0041AB8E /* testappcast_minimumAutoupdateVersion.xml in Resources */,
 				14958C6E19AEBC950061B14F /* signed-test-file.txt in Resources */,
 				72AC6B2E1B9B218C00F62325 /* SparkleTestCodeSignApp.dmg in Resources */,
 				C23E885B1BE7B24F0050BB73 /* SparkleTestCodeSignApp.enc.dmg in Resources */,

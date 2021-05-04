@@ -60,7 +60,7 @@
         if (error != nil) {
             [self abortUpdateWithError:error];
         } else {
-            [self.coreDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders inBackground:YES includesSkippedUpdates:NO requiresSilentInstall:YES];
+            [self.coreDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders inBackground:YES requiresSilentInstall:YES];
         }
     }];
 }
