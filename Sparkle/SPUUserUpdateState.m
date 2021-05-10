@@ -12,6 +12,10 @@
 
 #include "AppKitPrevention.h"
 
+#define SPUUserUpdateStateStageKey @"SPUUserUpdateStateStage"
+#define SPUUserUpdateStateUserInitiatedKey @"SPUUserUpdateStateUserInitiated"
+#define SPUUserUpdateStateMajorUpgradeKey @"SPUUserUpdateStateMajorUpgrade"
+
 @implementation SPUUserUpdateState
 
 @synthesize stage = _stage;
@@ -27,6 +31,27 @@
         _majorUpgrade = majorUpgrade;
     }
     return self;
+}
+
+- (void)encodeWithCoder:(NSCoder *)encoder
+{
+    [encoder encodeInteger:self.stage forKey:SPUUserUpdateStateStageKey];
+    [encoder encodeBool:self.userInitiated forKey:SPUUserUpdateStateUserInitiatedKey];
+    [encoder encodeBool:self.majorUpgrade forKey:SPUUserUpdateStateMajorUpgradeKey];
+}
+
+- (instancetype)initWithCoder:(NSCoder *)decoder
+{
+    SPUUserUpdateStage stage = [decoder decodeIntegerForKey:SPUUserUpdateStateStageKey];
+    BOOL userInitiated = [decoder decodeBoolForKey:SPUUserUpdateStateUserInitiatedKey];
+    BOOL majorUpgrade = [decoder decodeBoolForKey:SPUUserUpdateStateMajorUpgradeKey];
+    
+    return [self initWithStage:stage userInitiated:userInitiated majorUpgrade:majorUpgrade];
+}
+
++ (BOOL)supportsSecureCoding
+{
+    return YES;
 }
 
 @end

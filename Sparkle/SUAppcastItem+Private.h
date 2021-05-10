@@ -20,7 +20,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface SUAppcastItem (Private)
+@interface SUAppcastItem (Private) <NSSecureCoding>
 
 // Initializes with data from a dictionary provided by the RSS class.
 - (nullable instancetype)initWithDictionary:(NSDictionary *)dict relativeToURL:(NSURL * _Nullable)appcastURL failureReason:(NSString * _Nullable __autoreleasing *_Nullable)error;
