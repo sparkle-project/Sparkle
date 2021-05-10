@@ -98,6 +98,9 @@
 	without a download but with a URL. */
 "Learn More..." = "Learn More…";
 
+/* When the update to download or install is a major (usually paid) one */
+"Skip Major Upgrade" = "Skip Major Upgrade";
+
 /* the unit for megabytes */
 "MB" = "MB";
 
