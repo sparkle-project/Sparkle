@@ -42,6 +42,7 @@
         [components addObject:minimumAutoupdateVersion];
     }
     
+    // We encode the version and minimum autoupdate version in a human readable form with our own separator
     return [components componentsJoinedByString:SKIPPED_UPDATE_TAG_SEPARATOR];
 }
 
@@ -68,10 +69,12 @@
 {
     id skippedVersions = [host objectForUserDefaultsKey:SUSkippedVersionKey];
     if ([(NSObject *)skippedVersions isKindOfClass:[NSString class]]) {
+        // Handle legacy skipped version format with just a single skipped version
         SPUSkippedUpdate *skippedUpdate = [SPUSkippedUpdate decodeSkippedUpdateFromString:skippedVersions];
         
         return (skippedUpdate != nil) ? @[skippedUpdate] : @[];
     } else if ([(NSObject *)skippedVersions isKindOfClass:[NSArray class]]) {
+        // Handle array of skipped updates
         NSMutableArray *skippedUpdates = [NSMutableArray array];
         for (id skippedUpdateObject in skippedVersions) {
             SPUSkippedUpdate *skippedUpdate = [SPUSkippedUpdate decodeSkippedUpdateFromString:skippedUpdateObject];

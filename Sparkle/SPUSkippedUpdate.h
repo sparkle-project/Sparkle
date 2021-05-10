@@ -12,6 +12,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class SUHost, SUAppcastItem;
 
+/*
+ A skipped update tracks the version and minimum autoupdate version the user skipped.
+ Each minimum autoupdate version is tracked as a separate release / train.
+ The intent is that a user choosing to skip a future major update chooses to skip that train's updates,
+ but a user choosing to skip a minor update only chooses to skip updates equal or preceding that update.
+ */
 @interface SPUSkippedUpdate : NSObject
 
 - (instancetype)initWithVersion:(NSString *)version minimumAutoupdateVersion:(nullable NSString *)minimumAutoupdateVersion;
