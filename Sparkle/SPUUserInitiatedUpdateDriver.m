@@ -51,33 +51,15 @@
                 [self abortUpdateWithError:error];
             } else {
                 self.showingUserInitiatedProgress = YES;
+                self.showingUpdate = YES;
                 
-                void (^cancelUpdateCheck)(void) = ^{
+                [self.userDriver showUserInitiatedUpdateCheckWithCancellation:^{
                     dispatch_async(dispatch_get_main_queue(), ^{
                         if (self.showingUserInitiatedProgress) {
                             [self abortUpdate];
                         }
                     });
-                };
-                
-                self.showingUpdate = YES;
-                
-                if ([self.userDriver respondsToSelector:@selector(showUserInitiatedUpdateCheckWithCancellation:)]) {
-                    [self.userDriver showUserInitiatedUpdateCheckWithCancellation:cancelUpdateCheck];
-                } else {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-                    [self.userDriver showUserInitiatedUpdateCheckWithCompletion:^(SPUUserInitiatedCheckStatus completionStatus) {
-#pragma clang diagnostic pop
-                        switch (completionStatus) {
-                            case SPUUserInitiatedCheckDone:
-                                break;
-                            case SPUUserInitiatedCheckCanceled:
-                                cancelUpdateCheck();
-                                break;
-                        }
-                    }];
-                }
+                }];
                 
                 [self.uiDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders inBackground:NO];
             }
