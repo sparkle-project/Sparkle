@@ -101,6 +101,9 @@
 /* When the update to download or install is a major (usually paid) one */
 "Skip Major Upgrade" = "Skip Major Upgrade";
 
+/* When the update to download or install is a major (usually paid) one */
+"Install Upgrade" = "Install Upgrade";
+
 /* the unit for megabytes */
 "MB" = "MB";
 
