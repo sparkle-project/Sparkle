@@ -92,7 +92,7 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
         _completionBlock = [block copy];
         
         SPUUpdaterSettings *updaterSettings = [[SPUUpdaterSettings alloc] initWithHostBundle:host.bundle];
-        _allowsAutomaticUpdates = updaterSettings.allowsAutomaticUpdates && !item.isInformationOnlyUpdate;
+        _allowsAutomaticUpdates = updaterSettings.allowsAutomaticUpdates && state.stage != SPUUserUpdateStageInformational;
         [self setShouldCascadeWindows:NO];
     }
     return self;
@@ -328,7 +328,7 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
         [self.window setLevel:NSFloatingWindowLevel]; // This means the window will float over all other apps, if our app is switched out ?!
     }
 
-    if (self.updateItem.isInformationOnlyUpdate) {
+    if (self.state.stage == SPUUserUpdateStageInformational) {
         [self.installButton setTitle:SULocalizedString(@"Learn More...", @"Alternate title for 'Install Update' button when there's no download in RSS feed.")];
         [self.installButton setAction:@selector(openInfoURL:)];
     }
@@ -425,7 +425,7 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
     // We display a different summary depending on if it's an "info-only" item, or a "critical update" item, or if we've already downloaded the update and just need to relaunch
     NSString *finalString = nil;
 
-    if (self.updateItem.isInformationOnlyUpdate) {
+    if (self.state.stage == SPUUserUpdateStageInformational) {
         finalString = [NSString stringWithFormat:SULocalizedString(@"%@ %@ is now available--you have %@. Would you like to learn more about this update on the web?", @"Description text for SUUpdateAlert when the update informational with no download."), self.host.name, updateItemVersion, hostVersion];
     } else if ([self.updateItem isCriticalUpdate]) {
         if (self.state.stage == SPUUserUpdateStageNotDownloaded) {
