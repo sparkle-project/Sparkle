@@ -17,6 +17,7 @@
 #import "SPUDownloadData.h"
 #import "SPUResumableUpdate.h"
 #import "SPUDownloadDriver.h"
+#import "SPUSkippedUpdate.h"
 
 
 #include "AppKitPrevention.h"
@@ -174,6 +175,10 @@
             state = SPUUserUpdateStateNotDownloaded;
         }
         
+        if (self.userInitiated) {
+            [SPUSkippedUpdate clearSkippedUpdatesForHost:self.host];
+        }
+        
         [self.userDriver showUpdateFoundWithAppcastItem:updateItem userInitiated:self.userInitiated state:state reply:^(SPUUserUpdateChoice userChoice) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 
@@ -187,8 +192,6 @@
                 
                 switch (validatedChoice) {
                     case SPUUserUpdateChoiceInstall: {
-                        [self.host setObject:nil forUserDefaultsKey:SUSkippedVersionKey];
-                        
                         switch (state) {
                             case SPUUserUpdateStateDownloaded:
                                 [self.coreDriver extractDownloadedUpdate];
@@ -206,7 +209,7 @@
                         break;
                     }
                     case SPUUserUpdateChoiceSkip: {
-                        [self.host setObject:[updateItem versionString] forUserDefaultsKey:SUSkippedVersionKey];
+                        [SPUSkippedUpdate skipUpdate:updateItem host:self.host];
                         
                         if ([self.updaterDelegate respondsToSelector:@selector(updater:userDidSkipThisVersion:)]) {
                             [self.updaterDelegate updater:self.updater userDidSkipThisVersion:updateItem];
@@ -233,8 +236,6 @@
                         break;
                     }
                     case SPUUserUpdateChoiceDismiss: {
-                        [self.host setObject:nil forUserDefaultsKey:SUSkippedVersionKey];
-                        
                         switch (state) {
                             case SPUUserUpdateStateDownloaded:
                             case SPUUserUpdateStateNotDownloaded:
