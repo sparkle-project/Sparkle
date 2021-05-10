@@ -2626,6 +2626,7 @@
 				724BB3681D31D0B7005D534A /* Sources */,
 				724BB3691D31D0B7005D534A /* Frameworks */,
 				724BB36A1D31D0B7005D534A /* Resources */,
+				7269E49E264919CD0088C213 /* Run Script: Set Git Version Info */,
 			);
 			buildRules = (
 			);
@@ -2643,6 +2644,7 @@
 				724BB38F1D333832005D534A /* Sources */,
 				724BB3901D333832005D534A /* Frameworks */,
 				724BB3911D333832005D534A /* Resources */,
+				7269E49F264919D40088C213 /* Run Script: Set Git Version Info */,
 			);
 			buildRules = (
 			);
@@ -2678,6 +2680,7 @@
 				726E07A91CAF08D6001A286B /* Sources */,
 				726E07AA1CAF08D6001A286B /* Frameworks */,
 				721D8A711D4950910032E472 /* Copy Tools */,
+				7269E49D264919C20088C213 /* Run Script: Set Git Version Info */,
 			);
 			buildRules = (
 			);
@@ -2697,6 +2700,7 @@
 				726E07EB1CAF37BD001A286B /* Sources */,
 				726E07EC1CAF37BD001A286B /* Frameworks */,
 				726E07ED1CAF37BD001A286B /* Resources */,
+				7269E4A0264919D90088C213 /* Run Script: Set Git Version Info */,
 			);
 			buildRules = (
 			);
@@ -3206,6 +3210,78 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"$SRCROOT/Configurations/link-tools.sh\"\n";
+		};
+		7269E49D264919C20088C213 /* Run Script: Set Git Version Info */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Run Script: Set Git Version Info";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"$SRCROOT/Configurations/set-git-version-info.sh\"\n";
+		};
+		7269E49E264919CD0088C213 /* Run Script: Set Git Version Info */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Run Script: Set Git Version Info";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"$SRCROOT/Configurations/set-git-version-info.sh\"\n";
+		};
+		7269E49F264919D40088C213 /* Run Script: Set Git Version Info */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Run Script: Set Git Version Info";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"$SRCROOT/Configurations/set-git-version-info.sh\"\n";
+		};
+		7269E4A0264919D90088C213 /* Run Script: Set Git Version Info */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Run Script: Set Git Version Info";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"$SRCROOT/Configurations/set-git-version-info.sh\"\n";
 		};
 		72A5D5F11D692C860009E5AC /* Run Script: Set Git Version Info */ = {
 			isa = PBXShellScriptBuildPhase;

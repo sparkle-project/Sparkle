@@ -268,6 +268,14 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         }
     }
     
+    // Check XPC Services are functional
+    NSBundle *sparkleBundle = [NSBundle bundleForClass:[self class]];
+    for (NSString *xpcServiceID in @[@INSTALLER_LAUNCHER_BUNDLE_ID, @DOWNLOADER_BUNDLE_ID, @INSTALLER_CONNECTION_BUNDLE_ID, @INSTALLER_STATUS_BUNDLE_ID]) {
+        if (!SPUXPCValidateServiceIfBundleExists(xpcServiceID, sparkleBundle, error)) {
+            return NO;
+        }
+    }
+    
     return YES;
 }
 
