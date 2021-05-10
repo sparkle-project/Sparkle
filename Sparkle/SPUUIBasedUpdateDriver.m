@@ -180,7 +180,7 @@
         stage = SPUUserUpdateStageNotDownloaded;
     }
     
-    SPUUserUpdateState *state = [[SPUUserUpdateState alloc] initWithStage:stage userInitiated:self.userInitiated majorUpdate:preventsAutoupdate];
+    SPUUserUpdateState *state = [[SPUUserUpdateState alloc] initWithStage:stage userInitiated:self.userInitiated majorUpgrade:preventsAutoupdate];
     
     [self.userDriver showUpdateFoundWithAppcastItem:updateItem state:state reply:^(SPUUserUpdateChoice userChoice) {
         dispatch_async(dispatch_get_main_queue(), ^{

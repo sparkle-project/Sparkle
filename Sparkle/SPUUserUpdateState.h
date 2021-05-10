@@ -39,7 +39,7 @@ SU_EXPORT @interface SPUUserUpdateState : NSObject
 
 @property (nonatomic, readonly) SPUUserUpdateStage stage;
 @property (nonatomic, readonly) BOOL userInitiated;
-@property (nonatomic, readonly) BOOL majorUpdate;
+@property (nonatomic, readonly) BOOL majorUpgrade;
 
 @end
 

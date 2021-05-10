@@ -68,7 +68,7 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  *  SPUUserUpdateStateInformational - Update is only informational and has no download. You can direct the user to the infoURL property of the appcastItem in their web browser. Use this to check if an update is informational, instead of using the informationOnlyUpdate property of the appcast item.
  *
  *  state.userInitiated indicates if the update was initiated by the user or if it was automatically scheduled in the background.
- *  state.majorUpdate indicates if the update is a major or paid upgrade.
+ *  state.majorUpgrade indicates if the update is a major or paid upgrade.
  *
  * Additionally, you may want to check the criticalUpdate property of the appcastItem to let the user know if the update is critical.
  *
@@ -81,7 +81,7 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  * If the state.stage is SPUUserUpdateStateInstalling, the installing update is also preserved after dismissing. In this state however, the update will also still be installed after the application is terminated.
  *
  * A reply of SPUUserUpdateChoiceSkip skips this particular version and won't notify the user again, unless they initiate an update check themselves.
- * If state.majorUpdate is YES, the major update and any minor updates to that major release are skipped.
+ * If state.majorUpgrade is YES, the major update and any minor updates to that major release are skipped.
  * If the state.stage is SPUUserUpdateStateInstalling, the installation is also canceled when the update is skipped.
  */
 - (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem state:(SPUUserUpdateState *)state reply:(void (^)(SPUUserUpdateChoice))reply;

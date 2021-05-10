@@ -16,15 +16,15 @@
 
 @synthesize stage = _stage;
 @synthesize userInitiated = _userInitiated;
-@synthesize majorUpdate = _majorUpdate;
+@synthesize majorUpgrade = _majorUpgrade;
 
-- (instancetype)initWithStage:(SPUUserUpdateStage)stage userInitiated:(BOOL)userInitiated majorUpdate:(BOOL)majorUpdate
+- (instancetype)initWithStage:(SPUUserUpdateStage)stage userInitiated:(BOOL)userInitiated majorUpgrade:(BOOL)majorUpgrade
 {
     self = [super init];
     if (self != nil) {
         _stage = stage;
         _userInitiated = userInitiated;
-        _majorUpdate = majorUpdate;
+        _majorUpgrade = majorUpgrade;
     }
     return self;
 }
