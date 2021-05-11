@@ -12,6 +12,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 BOOL SPUXPCServiceExists(NSString *bundleName);
 
+BOOL SPUXPCValidateServiceIfBundleExists(NSString *bundleName, NSBundle *sparkleBundle, NSError * __autoreleasing *error);
+
 NSBundle * _Nullable SPUXPCServiceBundle(NSString *bundleName);
 
 NS_ASSUME_NONNULL_END
