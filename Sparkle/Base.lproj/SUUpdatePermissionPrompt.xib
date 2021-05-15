@@ -119,7 +119,7 @@ Gw
                         </connections>
                     </imageView>
                     <button focusRingType="none" horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="71">
-                        <rect key="frame" x="75" y="50" width="26" height="26"/>
+                        <rect key="frame" x="75" y="48" width="26" height="26"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="26" id="eR6-Ke-3T2"/>
                             <constraint firstAttribute="width" constant="26" id="t6L-62-lh1"/>
@@ -141,6 +141,7 @@ Gw
                 <constraints>
                     <constraint firstAttribute="trailing" secondItem="33" secondAttribute="trailing" constant="21" id="2fg-xP-ZhF"/>
                     <constraint firstAttribute="trailing" secondItem="13" secondAttribute="trailing" constant="21" id="5a8-wt-t4J"/>
+                    <constraint firstItem="71" firstAttribute="centerY" secondItem="34" secondAttribute="centerY" id="6WD-RT-iFS"/>
                     <constraint firstItem="37" firstAttribute="top" secondItem="6" secondAttribute="top" constant="20" symbolic="YES" id="72E-wD-p07"/>
                     <constraint firstAttribute="bottom" secondItem="13" secondAttribute="bottom" constant="19" id="BhX-rq-hra"/>
                     <constraint firstItem="34" firstAttribute="leading" secondItem="71" secondAttribute="trailing" constant="4" id="BjI-zC-WKY"/>
@@ -150,7 +151,6 @@ Gw
                     <constraint firstItem="71" firstAttribute="leading" secondItem="6" secondAttribute="leading" constant="75" id="TT1-ES-OPF"/>
                     <constraint firstItem="37" firstAttribute="leading" secondItem="6" secondAttribute="leading" constant="23" id="X4R-Ta-ZQh"/>
                     <constraint firstItem="14" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="6" secondAttribute="leading" constant="152" id="X7H-S1-Myb"/>
-                    <constraint firstItem="71" firstAttribute="top" secondItem="37" secondAttribute="bottom" constant="8" symbolic="YES" id="YLb-Rb-ZDT"/>
                     <constraint firstItem="13" firstAttribute="leading" secondItem="14" secondAttribute="trailing" constant="14" id="ZIp-UR-Qjj"/>
                     <constraint firstItem="34" firstAttribute="top" secondItem="33" secondAttribute="bottom" constant="13" id="bAz-gC-fjB"/>
                     <constraint firstItem="14" firstAttribute="top" secondItem="34" secondAttribute="bottom" constant="15" id="dqb-wG-ZSF"/>
