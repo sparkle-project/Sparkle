@@ -56,7 +56,10 @@
         // We could invoke SMJobCopyDictionary() first to see if the job exists, but I'd rather avoid
         // using it because the headers indicate it may be removed one day without any replacement
         CFErrorRef removeError = NULL;
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
         if (!SMJobRemove(domain, (__bridge CFStringRef)(label), auth, true, &removeError)) {
+#pragma clang diagnostic pop
             if (removeError != NULL) {
                 // It's normal for a job to not be found, so this is not an interesting error
                 if (CFErrorGetCode(removeError) != kSMErrorJobNotFound) {
@@ -77,7 +80,12 @@
         jobDictionary[@"MachServices"] = @{SPUStatusInfoServiceNameForBundleIdentifier(hostBundleIdentifier) : @YES};
         
         CFErrorRef submitError = NULL;
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+        // SMJobSubmit is deprecated but is the only way to submit a non-permanent
+        // helper and allows us to submit to user domain without requiring authorization
         submittedJob = SMJobSubmit(domain, (__bridge CFDictionaryRef)(jobDictionary), auth, &submitError);
+#pragma clang diagnostic pop
         if (!submittedJob) {
             if (submitError != NULL) {
                 SULog(SULogLevelError, @"Submit progress error: %@", submitError);
@@ -239,7 +247,10 @@
         // We could invoke SMJobCopyDictionary() first to see if the job exists, but I'd rather avoid
         // using it because the headers indicate it may be removed one day without any replacement
         CFErrorRef removeError = NULL;
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
         if (!SMJobRemove(domain, (__bridge CFStringRef)(label), auth, true, &removeError)) {
+#pragma clang diagnostic pop
             if (removeError != NULL) {
                 // It's normal for a job to not be found, so this is not an interesting error
                 if (CFErrorGetCode(removeError) != kSMErrorJobNotFound) {
@@ -252,7 +263,12 @@
         NSDictionary *jobDictionary = @{@"Label" : label, @"ProgramArguments" : arguments, @"EnableTransactions" : @NO, @"KeepAlive" : @{@"SuccessfulExit" : @NO}, @"RunAtLoad" : @NO, @"Nice" : @0, @"LaunchOnlyOnce": @YES, @"MachServices" : @{SPUInstallerServiceNameForBundleIdentifier(hostBundleIdentifier) : @YES, SPUProgressAgentServiceNameForBundleIdentifier(hostBundleIdentifier) : @YES}};
         
         CFErrorRef submitError = NULL;
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+        // SMJobSubmit is deprecated but is the only way to submit a non-permanent
+        // helper and allows us to submit to user domain without requiring authorization
         submittedJob = SMJobSubmit(domain, (__bridge CFDictionaryRef)(jobDictionary), auth, &submitError);
+#pragma clang diagnostic pop
         if (!submittedJob) {
             if (submitError != NULL) {
                 SULog(SULogLevelError, @"Submit error: %@", submitError);
