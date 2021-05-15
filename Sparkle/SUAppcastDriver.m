@@ -338,7 +338,7 @@
         
         BOOL hostPassesSkippedMinimumAutoupdateVersion = [self isItemMinimumAutoupdateVersionOK:skippedMinimumAutoupdateVersion hostVersion:hostVersion versionComparator:versionComparator];
         
-        if (!hostPassesSkippedMinimumAutoupdateVersion && itemMinimumAutoupdateVersion != nil && [skippedMinimumAutoupdateVersion isEqualToString:itemMinimumAutoupdateVersion]) {
+        if (!hostPassesSkippedMinimumAutoupdateVersion && [SPUSkippedUpdate minimumAutoupdateVersion:itemMinimumAutoupdateVersion isEqual:skippedMinimumAutoupdateVersion]) {
             // Skipped update is on same train as item and we fail minimum autoupdate test
             // So we skip all updates with the same minimum autoupdate version that we failed
             return YES;

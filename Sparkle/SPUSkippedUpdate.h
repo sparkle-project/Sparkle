@@ -26,6 +26,8 @@ NS_ASSUME_NONNULL_BEGIN
 + (void)clearSkippedUpdatesForHost:(SUHost *)host;
 + (void)skipUpdate:(SUAppcastItem *)updateItem host:(SUHost *)host;
 
++ (BOOL)minimumAutoupdateVersion:(NSString * _Nullable)minimumAutoupdateVersion isEqual:(NSString * _Nullable)minimumAutoupdateVersion2;
+
 @property (nonatomic, readonly) NSString *version;
 @property (nonatomic, readonly, nullable) NSString *minimumAutoupdateVersion;
 

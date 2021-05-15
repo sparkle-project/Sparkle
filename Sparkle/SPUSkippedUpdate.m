@@ -94,6 +94,22 @@
     [host setObject:nil forUserDefaultsKey:SUSkippedVersionKey];
 }
 
++ (BOOL)minimumAutoupdateVersion:(NSString * _Nullable)minimumAutoupdateVersion isEqual:(NSString * _Nullable)minimumAutoupdateVersion2
+{
+    // Both are not provided
+    if (minimumAutoupdateVersion == nil && minimumAutoupdateVersion2 == nil) {
+        return YES;
+    }
+    
+    // One of them is not provided
+    if (minimumAutoupdateVersion == nil || minimumAutoupdateVersion2 == nil) {
+        return NO;
+    }
+    
+    // Both are provided
+    return [minimumAutoupdateVersion isEqualToString:(NSString * _Nonnull)minimumAutoupdateVersion2];
+}
+
 + (void)skipUpdate:(SUAppcastItem *)updateItem host:(SUHost *)host
 {
     NSArray<SPUSkippedUpdate *> *currentSkippedUpdates = [self skippedUpdatesForHost:host];
@@ -104,7 +120,7 @@
     for (SPUSkippedUpdate *skippedUpdate in currentSkippedUpdates) {
         NSString *skippedUpdateMinimumAutoupdateVersion = skippedUpdate.minimumAutoupdateVersion;
         
-        if ((updateItemMinimumAutoupdateVersion == nil && skippedUpdateMinimumAutoupdateVersion == nil) || (skippedUpdateMinimumAutoupdateVersion != nil && [updateItemMinimumAutoupdateVersion isEqualToString:skippedUpdateMinimumAutoupdateVersion])) {
+        if ([self minimumAutoupdateVersion:updateItemMinimumAutoupdateVersion isEqual:skippedUpdateMinimumAutoupdateVersion]) {
             // On same train, skip adding this old update
             // It will be replaced by the new skipped update we will be adding
             continue;
