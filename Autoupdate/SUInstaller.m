@@ -135,7 +135,7 @@
                 *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Found guided package installer but '%@=%@' was probably missing in the appcast item enclosure", SUAppcastAttributeInstallationType, SPUInstallationTypeGuidedPackage] }];
             }
         } else {
-            installer = [[SUGuidedPackageInstaller alloc] initWithPackagePath:newDownloadPath installationPath:host.bundlePath];
+            installer = [[SUGuidedPackageInstaller alloc] initWithPackagePath:newDownloadPath];
         }
     } else if (isPackage) {
         if (![expectedInstallationType isEqualToString:SPUInstallationTypeInteractivePackage]) {
@@ -143,7 +143,7 @@
                 *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Found package installer but '%@=%@' was probably missing in the appcast item enclosure", SUAppcastAttributeInstallationType, SPUInstallationTypeInteractivePackage] }];
             }
         } else {
-            installer = [[SUPackageInstaller alloc] initWithPackagePath:newDownloadPath installationPath:host.bundlePath];
+            installer = [[SUPackageInstaller alloc] initWithPackagePath:newDownloadPath];
         }
     } else {
         if (![expectedInstallationType isEqualToString:SPUInstallationTypeApplication]) {
