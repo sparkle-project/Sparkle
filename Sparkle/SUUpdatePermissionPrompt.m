@@ -32,6 +32,9 @@ static NSString *const SUUpdatePermissionPromptTouchBarIndentifier = @"" SPARKLE
 @property (nonatomic) IBOutlet NSView *responseView;
 @property (nonatomic) IBOutlet NSView *infoChoiceView;
 
+@property (nonatomic) IBOutlet NSTextField *titleTextField;
+@property (nonatomic) IBOutlet NSTextField *descriptionTextField;
+@property (nonatomic) IBOutlet NSButton *moreInfoButton;
 @property (nonatomic) IBOutlet NSButton *cancelButton;
 @property (nonatomic) IBOutlet NSButton *checkButton;
 
@@ -50,6 +53,9 @@ static NSString *const SUUpdatePermissionPromptTouchBarIndentifier = @"" SPARKLE
 @synthesize moreInfoView = _moreInfoView;
 @synthesize responseView = _responseView;
 @synthesize infoChoiceView = _infoChoiceView;
+@synthesize titleTextField = _titleTextField;
+@synthesize descriptionTextField = _descriptionTextField;
+@synthesize moreInfoButton = _moreInfoButton;
 @synthesize cancelButton = _cancelButton;
 @synthesize checkButton = _checkButton;
 
@@ -77,6 +83,14 @@ static NSString *const SUUpdatePermissionPromptTouchBarIndentifier = @"" SPARKLE
 - (void)windowDidLoad
 {
     [self.window center];
+    
+    self.titleTextField.stringValue = SULocalizedString(@"Check for updates automatically?", nil);
+    self.checkButton.title = SULocalizedString(@"Check Automatically", nil);
+    self.cancelButton.title = SULocalizedString(@"Don't Check", nil);
+    
+    self.moreInfoButton.title = SULocalizedString(@"Include anonymous system profile", nil);
+    
+    self.descriptionTextField.stringValue = SULocalizedString(@"Anonymous system profile information is used to help us plan future development work. Please contact us if you have any questions about this.\n\nThis is the information that would be sent:", nil);
     
     self.infoChoiceView.hidden = ![self shouldAskAboutProfile];
     

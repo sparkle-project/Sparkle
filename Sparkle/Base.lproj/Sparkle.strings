@@ -1,3 +1,13 @@
+"Check for updates automatically?" = "Check for updates automatically?";
+
+"Include anonymous system profile" = "Include anonymous system profile";
+
+"Anonymous system profile information is used to help us plan future development work. Please contact us if you have any questions about this.\n\nThis is the information that would be sent:" = "Anonymous system profile information is used to help us plan future development work. Please contact us if you have any questions about this.\n\nThis is the information that would be sent:";
+
+"Check Automatically" = "Check Automatically";
+
+"Don't Check" = "Don't Check";
+
 "%1$@ %2$@ has been downloaded and is ready to use! This is an important update; would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ has been downloaded and is ready to use! This is an important update; would you like to install it and relaunch %1$@ now?";
 
 "%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?";

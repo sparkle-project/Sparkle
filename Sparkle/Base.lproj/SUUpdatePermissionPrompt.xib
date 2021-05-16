@@ -12,12 +12,12 @@
                 <outlet property="checkButton" destination="sMh-ha-r7R" id="2O6-G4-etk"/>
                 <outlet property="descriptionTextField" destination="46" id="PhX-sS-raB"/>
                 <outlet property="infoChoiceView" destination="ov1-yV-Uol" id="A1X-Y9-Hnh"/>
-                <outlet property="moreInfoButton" destination="JW6-0z-Ud3" id="cjT-ue-EvT"/>
+                <outlet property="moreInfoButton" destination="a90-Iq-FgS" id="eIg-sh-Oe3"/>
                 <outlet property="moreInfoView" destination="39" id="127"/>
-                <outlet property="profileTableView" destination="41" id="187"/>
                 <outlet property="promptView" destination="Yrl-Dt-Qvb" id="2a4-nD-uDx"/>
                 <outlet property="responseView" destination="0CP-x7-YFK" id="fE5-5k-8Uf"/>
                 <outlet property="stackView" destination="qNw-uD-4Bg" id="DxM-SL-1Xl"/>
+                <outlet property="titleTextField" destination="IgD-Pj-pc8" id="RGI-Ra-6dN"/>
                 <outlet property="window" destination="5" id="126"/>
             </connections>
         </customObject>
@@ -75,7 +75,7 @@
                     <constraints>
                         <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="34" id="J49-m7-iIa"/>
                     </constraints>
-                    <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Check for updates automatically?" id="gmh-T4-BO0">
+                    <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="CHECK_FOR_UPDATES_AUTOMATICALLY" id="gmh-T4-BO0">
                         <font key="font" metaFont="systemBold"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -133,9 +133,9 @@
                     </constraints>
                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" id="183">
                         <font key="font" metaFont="smallSystem"/>
-                        <string key="title">Anonymous system profile information is used to help us plan future development work. Please contact us if you have any questions about this.
+                        <string key="title">ANON_SYSTEM_PROFILE_INFO_IS_USED_TO_HELP...
 
-This is the information that would be sent:</string>
+THIS_IS_THE_INFO_THAT..</string>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
@@ -227,7 +227,7 @@ This is the information that would be sent:</string>
                             <constraints>
                                 <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="150" id="gon-Nu-M8r"/>
                             </constraints>
-                            <buttonCell key="cell" type="push" title="Check Automatically" bezelStyle="rounded" alignment="center" state="on" borderStyle="border" tag="1" inset="2" id="OhZ-1K-DmA">
+                            <buttonCell key="cell" type="push" title="CHECK_AUTOMATIC" bezelStyle="rounded" alignment="center" state="on" borderStyle="border" tag="1" inset="2" id="OhZ-1K-DmA">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                 <font key="font" metaFont="system"/>
                                 <string key="keyEquivalent" base64-UTF8="YES">
@@ -239,11 +239,11 @@ DQ
                             </connections>
                         </button>
                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="cFC-wV-H3j">
-                            <rect key="frame" x="145" y="13" width="115" height="32"/>
+                            <rect key="frame" x="138" y="13" width="122" height="32"/>
                             <constraints>
                                 <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="101" id="Fta-eR-U3P"/>
                             </constraints>
-                            <buttonCell key="cell" type="push" title="Don’t Check" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="cCJ-V0-aTi">
+                            <buttonCell key="cell" type="push" title="DONT_CHECK" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="cCJ-V0-aTi">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                 <font key="font" metaFont="system"/>
                                 <string key="keyEquivalent" base64-UTF8="YES">
@@ -287,16 +287,11 @@ Gw
                                 <constraint firstAttribute="height" constant="14" id="MvK-K5-kxt"/>
                                 <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="14" id="STF-87-eYy"/>
                             </constraints>
-                            <buttonCell key="cell" type="check" title="Include anonymous system profile" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" focusRingType="none" inset="2" id="gz7-LM-gNf">
+                            <buttonCell key="cell" type="check" title="INCLUDE_ANON_SYSTEM_INFO" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" focusRingType="none" inset="2" id="gz7-LM-gNf">
                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                 <font key="font" metaFont="smallSystem"/>
                             </buttonCell>
                             <connections>
-                                <binding destination="-2" name="hidden" keyPath="shouldAskAboutProfile" id="PdO-Hb-CVJ">
-                                    <dictionary key="options">
-                                        <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                    </dictionary>
-                                </binding>
                                 <binding destination="-2" name="value" keyPath="shouldSendProfile" id="HPm-tg-NCZ">
                                     <dictionary key="options">
                                         <integer key="NSNullPlaceholder" value="1"/>
