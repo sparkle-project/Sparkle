@@ -215,7 +215,7 @@ This is the information that would be sent:</string>
             </constraints>
             <point key="canvasLocation" x="-621" y="194"/>
         </customView>
-        <customView misplaced="YES" id="0CP-x7-YFK" userLabel="Response View">
+        <customView id="0CP-x7-YFK" userLabel="Response View">
             <rect key="frame" x="0.0" y="0.0" width="437" height="55"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
@@ -282,7 +282,7 @@ Gw
                     <rect key="frame" x="0.0" y="-26" width="437" height="66"/>
                     <subviews>
                         <button focusRingType="none" translatesAutoresizingMaskIntoConstraints="NO" id="a90-Iq-FgS" userLabel="IncludeInfoButton">
-                            <rect key="frame" x="94" y="25" width="323" height="16"/>
+                            <rect key="frame" x="104" y="25" width="313" height="16"/>
                             <constraints>
                                 <constraint firstAttribute="height" constant="14" id="MvK-K5-kxt"/>
                                 <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="14" id="STF-87-eYy"/>
@@ -306,7 +306,7 @@ Gw
                             </connections>
                         </button>
                         <button focusRingType="none" horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="JW6-0z-Ud3">
-                            <rect key="frame" x="75" y="25" width="16" height="16"/>
+                            <rect key="frame" x="85" y="25" width="16" height="16"/>
                             <constraints>
                                 <constraint firstAttribute="height" constant="16" id="HMA-GI-C0a"/>
                                 <constraint firstAttribute="width" constant="16" id="Qxo-Ga-nVP"/>
@@ -327,9 +327,10 @@ Gw
                     </subviews>
                     <constraints>
                         <constraint firstItem="a90-Iq-FgS" firstAttribute="centerY" secondItem="JW6-0z-Ud3" secondAttribute="centerY" id="BNJ-xV-faQ"/>
-                        <constraint firstItem="JW6-0z-Ud3" firstAttribute="leading" secondItem="a0k-dW-Jhx" secondAttribute="leading" constant="75" id="M0h-GY-nx4"/>
+                        <constraint firstItem="a90-Iq-FgS" firstAttribute="leading" secondItem="a0k-dW-Jhx" secondAttribute="leading" constant="105" id="ILg-Qu-R6M"/>
                         <constraint firstItem="a90-Iq-FgS" firstAttribute="top" secondItem="a0k-dW-Jhx" secondAttribute="top" constant="26" id="Mh6-5L-xqM"/>
                         <constraint firstAttribute="trailing" secondItem="a90-Iq-FgS" secondAttribute="trailing" constant="20" id="U4G-Eh-HPu"/>
+                        <constraint firstItem="JW6-0z-Ud3" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="a0k-dW-Jhx" secondAttribute="leading" constant="20" symbolic="YES" id="V3P-iz-aJ9"/>
                         <constraint firstItem="a90-Iq-FgS" firstAttribute="leading" secondItem="JW6-0z-Ud3" secondAttribute="trailing" constant="4" id="axA-s0-uGg"/>
                         <constraint firstAttribute="width" constant="437" id="iUc-Zs-h9S"/>
                         <constraint firstAttribute="bottom" secondItem="a90-Iq-FgS" secondAttribute="bottom" constant="26" id="qij-uH-6Yl"/>
