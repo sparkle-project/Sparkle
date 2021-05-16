@@ -11,7 +11,6 @@
                 <outlet property="cancelButton" destination="cFC-wV-H3j" id="L2P-Ux-4Vn"/>
                 <outlet property="checkButton" destination="sMh-ha-r7R" id="2O6-G4-etk"/>
                 <outlet property="descriptionTextField" destination="46" id="PhX-sS-raB"/>
-                <outlet property="moreInfoButton" destination="JOq-ft-4XB" id="8hG-fh-zYl"/>
                 <outlet property="moreInfoView" destination="39" id="127"/>
                 <outlet property="profileTableView" destination="41" id="187"/>
                 <outlet property="window" destination="5" id="126"/>
@@ -63,11 +62,11 @@
             </declaredKeys>
         </userDefaultsController>
         <view id="Yrl-Dt-Qvb" userLabel="Prompt View">
-            <rect key="frame" x="0.0" y="0.0" width="437" height="114"/>
+            <rect key="frame" x="0.0" y="0.0" width="437" height="87"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="IgD-Pj-pc8">
-                    <rect key="frame" x="104" y="60" width="315" height="34"/>
+                    <rect key="frame" x="104" y="33" width="315" height="34"/>
                     <constraints>
                         <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="34" id="J49-m7-iIa"/>
                     </constraints>
@@ -78,7 +77,7 @@
                     </textFieldCell>
                 </textField>
                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="tgW-Jp-Aia">
-                    <rect key="frame" x="104" y="27" width="315" height="42"/>
+                    <rect key="frame" x="104" y="0.0" width="315" height="42"/>
                     <constraints>
                         <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="42" id="HfG-Lg-91D"/>
                         <constraint firstAttribute="width" constant="311" id="lNZ-C1-ceR"/>
@@ -92,31 +91,8 @@
                         <binding destination="-2" name="value" keyPath="promptDescription" id="dvR-Lp-2jl"/>
                     </connections>
                 </textField>
-                <button focusRingType="none" translatesAutoresizingMaskIntoConstraints="NO" id="JOq-ft-4XB">
-                    <rect key="frame" x="104" y="-1" width="313" height="16"/>
-                    <constraints>
-                        <constraint firstAttribute="height" constant="14" id="sed-ZE-sIR"/>
-                    </constraints>
-                    <buttonCell key="cell" type="check" title="Include anonymous system profile" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" focusRingType="none" inset="2" id="kp1-Nv-Rtr">
-                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                        <font key="font" metaFont="smallSystem"/>
-                    </buttonCell>
-                    <connections>
-                        <binding destination="-2" name="hidden" keyPath="shouldAskAboutProfile" id="9Oj-fn-gh4">
-                            <dictionary key="options">
-                                <string key="NSValueTransformerName">NSNegateBoolean</string>
-                            </dictionary>
-                        </binding>
-                        <binding destination="-2" name="value" keyPath="shouldSendProfile" id="gyR-Yz-Tav">
-                            <dictionary key="options">
-                                <integer key="NSNullPlaceholder" value="1"/>
-                                <bool key="NSValidatesImmediately" value="YES"/>
-                            </dictionary>
-                        </binding>
-                    </connections>
-                </button>
                 <imageView translatesAutoresizingMaskIntoConstraints="NO" id="NBn-FN-XAx">
-                    <rect key="frame" x="23" y="30" width="64" height="64"/>
+                    <rect key="frame" x="23" y="3" width="64" height="64"/>
                     <constraints>
                         <constraint firstAttribute="width" constant="64" id="KbC-i0-ZyN"/>
                         <constraint firstAttribute="height" constant="64" id="Osy-kb-JTR"/>
@@ -126,41 +102,17 @@
                         <binding destination="-2" name="value" keyPath="icon" id="JD9-MU-vwB"/>
                     </connections>
                 </imageView>
-                <button focusRingType="none" horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="6F7-wu-1BO">
-                    <rect key="frame" x="75" y="-6" width="26" height="26"/>
-                    <constraints>
-                        <constraint firstAttribute="width" constant="26" id="AC0-S4-tEu"/>
-                        <constraint firstAttribute="height" constant="26" id="Quu-fl-v8g"/>
-                    </constraints>
-                    <buttonCell key="cell" type="disclosureTriangle" bezelStyle="disclosure" imagePosition="overlaps" alignment="center" borderStyle="border" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="QOQ-93-DjC">
-                        <behavior key="behavior" pushIn="YES" changeBackground="YES" changeGray="YES" lightByContents="YES"/>
-                        <font key="font" metaFont="system"/>
-                    </buttonCell>
-                    <connections>
-                        <action selector="toggleMoreInfo:" target="-2" id="41G-d8-z3K"/>
-                        <binding destination="-2" name="hidden" keyPath="shouldAskAboutProfile" id="5zo-eJ-5PT">
-                            <dictionary key="options">
-                                <string key="NSValueTransformerName">NSNegateBoolean</string>
-                            </dictionary>
-                        </binding>
-                    </connections>
-                </button>
             </subviews>
             <constraints>
-                <constraint firstAttribute="bottom" secondItem="JOq-ft-4XB" secondAttribute="bottom" id="BGf-Po-CXE"/>
-                <constraint firstItem="6F7-wu-1BO" firstAttribute="centerY" secondItem="JOq-ft-4XB" secondAttribute="centerY" id="DpZ-g9-7Oj"/>
                 <constraint firstAttribute="trailing" secondItem="tgW-Jp-Aia" secondAttribute="trailing" constant="20" symbolic="YES" id="Fwc-c2-DDZ"/>
                 <constraint firstAttribute="trailing" secondItem="IgD-Pj-pc8" secondAttribute="trailing" constant="20" symbolic="YES" id="HXU-lh-GWa"/>
-                <constraint firstItem="JOq-ft-4XB" firstAttribute="leading" secondItem="6F7-wu-1BO" secondAttribute="trailing" constant="4" id="HYt-NC-o40"/>
-                <constraint firstItem="JOq-ft-4XB" firstAttribute="top" secondItem="tgW-Jp-Aia" secondAttribute="bottom" constant="13" id="MEM-wr-zws"/>
                 <constraint firstItem="IgD-Pj-pc8" firstAttribute="top" secondItem="Yrl-Dt-Qvb" secondAttribute="top" constant="20" symbolic="YES" id="Wl8-N0-skJ"/>
                 <constraint firstItem="NBn-FN-XAx" firstAttribute="leading" secondItem="Yrl-Dt-Qvb" secondAttribute="leading" constant="23" id="Xku-5M-xMC"/>
-                <constraint firstItem="6F7-wu-1BO" firstAttribute="leading" secondItem="Yrl-Dt-Qvb" secondAttribute="leading" constant="75" id="cII-C8-Mc0"/>
                 <constraint firstItem="tgW-Jp-Aia" firstAttribute="leading" secondItem="NBn-FN-XAx" secondAttribute="trailing" constant="19" id="fPB-MW-Oc2"/>
                 <constraint firstItem="NBn-FN-XAx" firstAttribute="top" secondItem="Yrl-Dt-Qvb" secondAttribute="top" constant="20" symbolic="YES" id="fad-TA-xIj"/>
                 <constraint firstItem="tgW-Jp-Aia" firstAttribute="top" secondItem="IgD-Pj-pc8" secondAttribute="bottom" constant="-9" id="nN4-jN-Fdn"/>
                 <constraint firstItem="IgD-Pj-pc8" firstAttribute="leading" secondItem="NBn-FN-XAx" secondAttribute="trailing" constant="19" id="s7w-Aw-JQY"/>
-                <constraint firstAttribute="trailing" secondItem="JOq-ft-4XB" secondAttribute="trailing" constant="20" symbolic="YES" id="xIZ-7y-15I"/>
+                <constraint firstAttribute="bottom" secondItem="tgW-Jp-Aia" secondAttribute="bottom" id="uS1-FX-kSX"/>
             </constraints>
             <point key="canvasLocation" x="-241" y="-37"/>
         </view>
@@ -315,9 +267,74 @@ Gw
             <point key="canvasLocation" x="-241" y="445"/>
         </customView>
         <customView id="ov1-yV-Uol" userLabel="Anonymous Info View">
-            <rect key="frame" x="0.0" y="0.0" width="163" height="96"/>
+            <rect key="frame" x="0.0" y="0.0" width="437" height="27"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-            <point key="canvasLocation" x="-255" y="113"/>
+            <subviews>
+                <customView translatesAutoresizingMaskIntoConstraints="NO" id="a0k-dW-Jhx" userLabel="View">
+                    <rect key="frame" x="0.0" y="-26" width="437" height="66"/>
+                    <subviews>
+                        <button focusRingType="none" translatesAutoresizingMaskIntoConstraints="NO" id="a90-Iq-FgS" userLabel="IncludeInfoButton">
+                            <rect key="frame" x="49" y="25" width="368" height="16"/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="14" id="MvK-K5-kxt"/>
+                                <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="14" id="STF-87-eYy"/>
+                            </constraints>
+                            <buttonCell key="cell" type="check" title="Include anonymous system profile" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" focusRingType="none" inset="2" id="gz7-LM-gNf">
+                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                <font key="font" metaFont="smallSystem"/>
+                            </buttonCell>
+                            <connections>
+                                <binding destination="-2" name="hidden" keyPath="shouldAskAboutProfile" id="PdO-Hb-CVJ">
+                                    <dictionary key="options">
+                                        <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                    </dictionary>
+                                </binding>
+                                <binding destination="-2" name="value" keyPath="shouldSendProfile" id="HPm-tg-NCZ">
+                                    <dictionary key="options">
+                                        <integer key="NSNullPlaceholder" value="1"/>
+                                        <bool key="NSValidatesImmediately" value="YES"/>
+                                    </dictionary>
+                                </binding>
+                            </connections>
+                        </button>
+                        <button focusRingType="none" horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="JW6-0z-Ud3">
+                            <rect key="frame" x="20" y="20" width="26" height="26"/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="26" id="HMA-GI-C0a"/>
+                                <constraint firstAttribute="width" constant="26" id="Qxo-Ga-nVP"/>
+                            </constraints>
+                            <buttonCell key="cell" type="disclosureTriangle" bezelStyle="disclosure" imagePosition="overlaps" alignment="center" borderStyle="border" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="yd4-Id-v7q">
+                                <behavior key="behavior" pushIn="YES" changeBackground="YES" changeGray="YES" lightByContents="YES"/>
+                                <font key="font" metaFont="system"/>
+                            </buttonCell>
+                            <connections>
+                                <action selector="toggleMoreInfo:" target="-2" id="AqY-Mp-X0q"/>
+                                <binding destination="-2" name="hidden" keyPath="shouldAskAboutProfile" id="IJh-ox-Lrn">
+                                    <dictionary key="options">
+                                        <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                    </dictionary>
+                                </binding>
+                            </connections>
+                        </button>
+                    </subviews>
+                    <constraints>
+                        <constraint firstItem="a90-Iq-FgS" firstAttribute="centerY" secondItem="JW6-0z-Ud3" secondAttribute="centerY" id="BNJ-xV-faQ"/>
+                        <constraint firstItem="JW6-0z-Ud3" firstAttribute="leading" secondItem="a0k-dW-Jhx" secondAttribute="leading" constant="20" id="M0h-GY-nx4"/>
+                        <constraint firstItem="a90-Iq-FgS" firstAttribute="top" secondItem="a0k-dW-Jhx" secondAttribute="top" constant="26" id="Mh6-5L-xqM"/>
+                        <constraint firstAttribute="trailing" secondItem="a90-Iq-FgS" secondAttribute="trailing" constant="20" id="U4G-Eh-HPu"/>
+                        <constraint firstItem="a90-Iq-FgS" firstAttribute="leading" secondItem="JW6-0z-Ud3" secondAttribute="trailing" constant="4" id="axA-s0-uGg"/>
+                        <constraint firstAttribute="width" constant="437" id="iUc-Zs-h9S"/>
+                        <constraint firstAttribute="bottom" secondItem="a90-Iq-FgS" secondAttribute="bottom" constant="26" id="qij-uH-6Yl"/>
+                    </constraints>
+                </customView>
+            </subviews>
+            <constraints>
+                <constraint firstItem="a0k-dW-Jhx" firstAttribute="leading" secondItem="ov1-yV-Uol" secondAttribute="leading" id="dE2-R0-ENa"/>
+                <constraint firstItem="a0k-dW-Jhx" firstAttribute="top" secondItem="ov1-yV-Uol" secondAttribute="top" constant="-13" id="ibf-cg-DNR"/>
+                <constraint firstAttribute="trailing" secondItem="a0k-dW-Jhx" secondAttribute="trailing" id="rAn-bJ-Mp6"/>
+                <constraint firstAttribute="bottom" secondItem="a0k-dW-Jhx" secondAttribute="bottom" constant="-26" id="xw5-bj-VOd"/>
+            </constraints>
+            <point key="canvasLocation" x="-113" y="145.5"/>
         </customView>
     </objects>
     <resources>
