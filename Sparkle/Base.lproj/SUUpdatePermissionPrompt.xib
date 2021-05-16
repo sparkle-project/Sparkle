@@ -126,10 +126,10 @@
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="46" userLabel="SystemProfileInfo">
-                    <rect key="frame" x="104" y="123" width="315" height="70"/>
+                    <rect key="frame" x="107" y="123" width="312" height="70"/>
                     <constraints>
                         <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="70" id="Csk-S6-dh4"/>
-                        <constraint firstAttribute="width" constant="311" id="iAG-SY-yVp"/>
+                        <constraint firstAttribute="width" constant="308" id="iAG-SY-yVp"/>
                     </constraints>
                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" id="183">
                         <font key="font" metaFont="smallSystem"/>
@@ -141,13 +141,13 @@ This is the information that would be sent:</string>
                     </textFieldCell>
                 </textField>
                 <scrollView autohidesScrollers="YES" horizontalLineScroll="16" horizontalPageScroll="0.0" verticalLineScroll="16" verticalPageScroll="0.0" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="40" userLabel="ScrollView">
-                    <rect key="frame" x="106" y="0.0" width="311" height="115"/>
+                    <rect key="frame" x="109" y="0.0" width="308" height="115"/>
                     <clipView key="contentView" id="sbp-rk-wxX">
-                        <rect key="frame" x="1" y="1" width="309" height="113"/>
+                        <rect key="frame" x="1" y="1" width="306" height="113"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" multipleSelection="NO" autosaveColumns="NO" typeSelect="NO" rowHeight="14" id="41">
-                                <rect key="frame" x="0.0" y="0.0" width="309" height="113"/>
+                                <rect key="frame" x="0.0" y="0.0" width="306" height="113"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <size key="intercellSpacing" width="3" height="2"/>
                                 <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -208,8 +208,8 @@ This is the information that would be sent:</string>
                 <constraint firstItem="40" firstAttribute="trailing" secondItem="46" secondAttribute="trailing" id="5Ze-wu-AsK"/>
                 <constraint firstItem="40" firstAttribute="width" secondItem="46" secondAttribute="width" id="AfJ-OK-Apa"/>
                 <constraint firstItem="40" firstAttribute="leading" secondItem="46" secondAttribute="leading" id="Qg9-kp-Lzl"/>
-                <constraint firstItem="46" firstAttribute="leading" secondItem="39" secondAttribute="leading" constant="106" id="TMg-61-Tbj"/>
-                <constraint firstAttribute="trailing" secondItem="46" secondAttribute="trailing" constant="20" symbolic="YES" id="fYg-If-EVL"/>
+                <constraint firstItem="46" firstAttribute="leading" secondItem="39" secondAttribute="leading" constant="109" id="TMg-61-Tbj"/>
+                <constraint firstAttribute="trailing" secondItem="46" secondAttribute="trailing" constant="20" id="fYg-If-EVL"/>
                 <constraint firstAttribute="bottom" secondItem="40" secondAttribute="bottom" id="o4Y-3j-NmQ"/>
                 <constraint firstItem="40" firstAttribute="top" secondItem="46" secondAttribute="bottom" constant="8" symbolic="YES" id="seb-Gl-jtw"/>
             </constraints>
