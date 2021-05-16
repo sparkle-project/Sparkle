@@ -215,12 +215,12 @@ This is the information that would be sent:</string>
             </constraints>
             <point key="canvasLocation" x="-621" y="194"/>
         </customView>
-        <customView id="0CP-x7-YFK" userLabel="Response View">
-            <rect key="frame" x="0.0" y="0.0" width="437" height="60"/>
+        <customView misplaced="YES" id="0CP-x7-YFK" userLabel="Response View">
+            <rect key="frame" x="0.0" y="0.0" width="437" height="55"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
                 <customView translatesAutoresizingMaskIntoConstraints="NO" id="ilj-QP-33p" userLabel="View">
-                    <rect key="frame" x="0.0" y="0.0" width="437" height="60"/>
+                    <rect key="frame" x="0.0" y="0.0" width="437" height="55"/>
                     <subviews>
                         <button verticalHuggingPriority="750" tag="1" translatesAutoresizingMaskIntoConstraints="NO" id="sMh-ha-r7R">
                             <rect key="frame" x="260" y="13" width="164" height="32"/>
@@ -257,7 +257,7 @@ Gw
                     </subviews>
                     <constraints>
                         <constraint firstAttribute="bottom" secondItem="cFC-wV-H3j" secondAttribute="bottom" constant="20" id="B76-mf-2m9"/>
-                        <constraint firstItem="cFC-wV-H3j" firstAttribute="top" secondItem="ilj-QP-33p" secondAttribute="top" constant="20" id="Fyr-gv-3TM"/>
+                        <constraint firstItem="cFC-wV-H3j" firstAttribute="top" secondItem="ilj-QP-33p" secondAttribute="top" constant="15" id="Fyr-gv-3TM"/>
                         <constraint firstItem="sMh-ha-r7R" firstAttribute="leading" secondItem="cFC-wV-H3j" secondAttribute="trailing" constant="14" id="Gse-h5-ctH"/>
                         <constraint firstAttribute="width" constant="437" id="KXc-Kv-G8j"/>
                         <constraint firstAttribute="trailing" secondItem="sMh-ha-r7R" secondAttribute="trailing" constant="20" symbolic="YES" id="PWc-tb-dWV"/>
@@ -282,7 +282,7 @@ Gw
                     <rect key="frame" x="0.0" y="-26" width="437" height="66"/>
                     <subviews>
                         <button focusRingType="none" translatesAutoresizingMaskIntoConstraints="NO" id="a90-Iq-FgS" userLabel="IncludeInfoButton">
-                            <rect key="frame" x="104" y="25" width="313" height="16"/>
+                            <rect key="frame" x="94" y="25" width="323" height="16"/>
                             <constraints>
                                 <constraint firstAttribute="height" constant="14" id="MvK-K5-kxt"/>
                                 <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="14" id="STF-87-eYy"/>
@@ -306,10 +306,10 @@ Gw
                             </connections>
                         </button>
                         <button focusRingType="none" horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="JW6-0z-Ud3">
-                            <rect key="frame" x="75" y="20" width="26" height="26"/>
+                            <rect key="frame" x="75" y="25" width="16" height="16"/>
                             <constraints>
-                                <constraint firstAttribute="height" constant="26" id="HMA-GI-C0a"/>
-                                <constraint firstAttribute="width" constant="26" id="Qxo-Ga-nVP"/>
+                                <constraint firstAttribute="height" constant="16" id="HMA-GI-C0a"/>
+                                <constraint firstAttribute="width" constant="16" id="Qxo-Ga-nVP"/>
                             </constraints>
                             <buttonCell key="cell" type="disclosureTriangle" bezelStyle="disclosure" imagePosition="overlaps" alignment="center" borderStyle="border" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="yd4-Id-v7q">
                                 <behavior key="behavior" pushIn="YES" changeBackground="YES" changeGray="YES" lightByContents="YES"/>
