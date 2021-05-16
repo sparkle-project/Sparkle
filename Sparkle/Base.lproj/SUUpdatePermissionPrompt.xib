@@ -10,11 +10,8 @@
             <connections>
                 <outlet property="cancelButton" destination="cFC-wV-H3j" id="L2P-Ux-4Vn"/>
                 <outlet property="checkButton" destination="sMh-ha-r7R" id="2O6-G4-etk"/>
-                <outlet property="descriptionTextField" destination="46" id="PhX-sS-raB"/>
                 <outlet property="infoChoiceView" destination="ov1-yV-Uol" id="A1X-Y9-Hnh"/>
-                <outlet property="moreInfoButton" destination="JW6-0z-Ud3" id="cjT-ue-EvT"/>
                 <outlet property="moreInfoView" destination="39" id="127"/>
-                <outlet property="profileTableView" destination="41" id="187"/>
                 <outlet property="promptView" destination="Yrl-Dt-Qvb" id="2a4-nD-uDx"/>
                 <outlet property="responseView" destination="0CP-x7-YFK" id="fE5-5k-8Uf"/>
                 <outlet property="stackView" destination="qNw-uD-4Bg" id="DxM-SL-1Xl"/>
