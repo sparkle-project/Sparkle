@@ -2883,7 +2883,7 @@
 			attributes = {
 				CLASSPREFIX = SU;
 				LastSwiftUpdateCheck = 1020;
-				LastUpgradeCheck = 1200;
+				LastUpgradeCheck = 1250;
 				ORGANIZATIONNAME = "Sparkle Project";
 				TargetAttributes = {
 					612279D80DB5470200AB99EA = {
@@ -4152,7 +4152,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = EA1E286822B664FD004AA304 /* CommandLineTool-Debug.xcconfig */;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "-";
 			};
 			name = Debug;
 		};
@@ -4160,7 +4159,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = EA1E286722B664FD004AA304 /* CommandLineTool-Release.xcconfig */;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "-";
 			};
 			name = Coverage;
 		};
@@ -4168,7 +4166,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = EA1E286722B664FD004AA304 /* CommandLineTool-Release.xcconfig */;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "-";
 			};
 			name = Release;
 		};

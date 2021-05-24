@@ -1,4 +1,2 @@
 // Test Application Helper Debug
 #include "ConfigTestAppHelper.xcconfig"
-
-CODE_SIGN_IDENTITY = -
