@@ -289,11 +289,6 @@ Gw
                                 <font key="font" metaFont="smallSystem"/>
                             </buttonCell>
                             <connections>
-                                <binding destination="-2" name="hidden" keyPath="shouldAskAboutProfile" id="PdO-Hb-CVJ">
-                                    <dictionary key="options">
-                                        <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                    </dictionary>
-                                </binding>
                                 <binding destination="-2" name="value" keyPath="shouldSendProfile" id="HPm-tg-NCZ">
                                     <dictionary key="options">
                                         <integer key="NSNullPlaceholder" value="1"/>
