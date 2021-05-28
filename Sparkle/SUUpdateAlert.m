@@ -368,13 +368,10 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
         
         // We should be explicit that the update will be installed on quit
         self.laterButton.title = SULocalizedString(@"Install on Quit", @"Alternate title for 'Remind Me Later' button when downloaded updates can be resumed");
-    } else if (self.state.majorUpgrade) {
-        // Use "upgrade" instead of "update" to signify a major change
-        self.installButton.title = SULocalizedString(@"Install Upgrade", nil);
     }
     
     if (self.state.majorUpgrade) {
-        self.skipButton.title = SULocalizedString(@"Skip Major Upgrade", nil);
+        self.skipButton.title = SULocalizedString(@"Skip Major Update", nil);
     }
 
     if ([self.updateItem isCriticalUpdate]) {
