@@ -54,7 +54,7 @@ class ArchiveItem: CustomStringConvertible {
         self.version = version
         self._shortVersion = shortVersion
         self.feedURL = feedURL
-        self.minimumSystemVersion = minimumSystemVersion ?? "10.9"
+        self.minimumSystemVersion = minimumSystemVersion ?? "10.11"
         self.archivePath = archivePath
         self.appPath = appPath
         self.supportsDSA = supportsDSA
