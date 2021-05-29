@@ -8,10 +8,13 @@
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="SUUpdatePermissionPrompt">
             <connections>
+                <outlet property="anonymousInfoDisclosureButton" destination="JW6-0z-Ud3" id="8Ac-kJ-T5e"/>
                 <outlet property="cancelButton" destination="cFC-wV-H3j" id="L2P-Ux-4Vn"/>
                 <outlet property="checkButton" destination="sMh-ha-r7R" id="2O6-G4-etk"/>
                 <outlet property="infoChoiceView" destination="ov1-yV-Uol" id="A1X-Y9-Hnh"/>
                 <outlet property="moreInfoView" destination="39" id="127"/>
+                <outlet property="placeholderHeightLayoutConstraint" destination="yis-HR-OIe" id="odJ-KG-SRB"/>
+                <outlet property="placeholderView" destination="AGr-V0-0al" id="piB-Wg-PJx"/>
                 <outlet property="promptView" destination="Yrl-Dt-Qvb" id="2a4-nD-uDx"/>
                 <outlet property="responseView" destination="0CP-x7-YFK" id="fE5-5k-8Uf"/>
                 <outlet property="stackView" destination="qNw-uD-4Bg" id="DxM-SL-1Xl"/>
@@ -269,7 +272,7 @@ Gw
                 <constraint firstItem="ilj-QP-33p" firstAttribute="leading" secondItem="0CP-x7-YFK" secondAttribute="leading" id="d3g-7o-f52"/>
                 <constraint firstAttribute="trailing" secondItem="ilj-QP-33p" secondAttribute="trailing" id="jzr-jk-sQQ"/>
             </constraints>
-            <point key="canvasLocation" x="-241" y="445"/>
+            <point key="canvasLocation" x="-291" y="554"/>
         </customView>
         <customView id="ov1-yV-Uol" userLabel="Anonymous Info View">
             <rect key="frame" x="0.0" y="0.0" width="437" height="27"/>
@@ -336,6 +339,14 @@ Gw
                 <constraint firstAttribute="bottom" secondItem="a0k-dW-Jhx" secondAttribute="bottom" constant="-26" id="xw5-bj-VOd"/>
             </constraints>
             <point key="canvasLocation" x="-113" y="145.5"/>
+        </customView>
+        <customView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="AGr-V0-0al" userLabel="Placeholder View">
+            <rect key="frame" x="0.0" y="0.0" width="437" height="205"/>
+            <constraints>
+                <constraint firstAttribute="width" constant="437" id="4p7-cJ-U8Z"/>
+                <constraint firstAttribute="height" constant="205" id="yis-HR-OIe"/>
+            </constraints>
+            <point key="canvasLocation" x="-643" y="495"/>
         </customView>
     </objects>
     <resources>

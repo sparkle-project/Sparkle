@@ -29,11 +29,15 @@ static NSString *const SUUpdatePermissionPromptTouchBarIndentifier = @"" SPARKLE
 @property (nonatomic) IBOutlet NSStackView *stackView;
 @property (nonatomic) IBOutlet NSView *promptView;
 @property (nonatomic) IBOutlet NSView *moreInfoView;
+@property (nonatomic) IBOutlet NSView *placeholderView;
 @property (nonatomic) IBOutlet NSView *responseView;
 @property (nonatomic) IBOutlet NSView *infoChoiceView;
 
 @property (nonatomic) IBOutlet NSButton *cancelButton;
 @property (nonatomic) IBOutlet NSButton *checkButton;
+@property (nonatomic) IBOutlet NSButton *anonymousInfoDisclosureButton;
+
+@property (nonatomic) IBOutlet NSLayoutConstraint *placeholderHeightLayoutConstraint;
 
 @property (nonatomic, readonly) void (^reply)(SUUpdatePermissionResponse *);
 
@@ -48,10 +52,13 @@ static NSString *const SUUpdatePermissionPromptTouchBarIndentifier = @"" SPARKLE
 @synthesize stackView = _stackView;
 @synthesize promptView = _promtView;
 @synthesize moreInfoView = _moreInfoView;
+@synthesize placeholderView = _placeholderView;
 @synthesize responseView = _responseView;
 @synthesize infoChoiceView = _infoChoiceView;
 @synthesize cancelButton = _cancelButton;
 @synthesize checkButton = _checkButton;
+@synthesize anonymousInfoDisclosureButton = _anonymousInfoDisclosureButton;
+@synthesize placeholderHeightLayoutConstraint = _placeholderHeightLayoutConstraint;
 
 - (instancetype)initPromptWithHost:(SUHost *)theHost request:(SPUUpdatePermissionRequest *)request reply:(void (^)(SUUpdatePermissionResponse *))reply
 {
@@ -82,6 +89,7 @@ static NSString *const SUUpdatePermissionPromptTouchBarIndentifier = @"" SPARKLE
     
     [self.stackView addArrangedSubview:self.promptView];
     [self.stackView addArrangedSubview:self.infoChoiceView];
+    [self.stackView addArrangedSubview:self.placeholderView];
     [self.stackView addArrangedSubview:self.moreInfoView];
     [self.stackView addArrangedSubview:self.responseView];
 }
@@ -99,9 +107,40 @@ static NSString *const SUUpdatePermissionPromptTouchBarIndentifier = @"" SPARKLE
     return [NSString stringWithFormat:SULocalizedString(@"Should %1$@ automatically check for updates? You can always check for updates manually from the %1$@ menu.", nil), [self.host name]];
 }
 
-- (IBAction)toggleMoreInfo:(id)__unused sender
+- (IBAction)toggleMoreInfo:(id)sender
 {
-    self.moreInfoView.hidden = !self.moreInfoView.hidden;
+    // Use a placeholder view to unhide/hide before putting the more info view in place
+    // This allows us to animate resizing the more info view in place more easily
+    
+    static const CGFloat TOGGLE_INFO_ANIMATION_DURATION = 0.2;
+    
+    BOOL disclosingInfo = (self.anonymousInfoDisclosureButton.state == NSControlStateValueOn);
+    
+    if (disclosingInfo) {
+        self.placeholderHeightLayoutConstraint.constant = 0.0;
+        self.placeholderView.hidden = NO;
+        
+        [NSAnimationContext runAnimationGroup:^(NSAnimationContext * _Nonnull context) {
+            context.duration = TOGGLE_INFO_ANIMATION_DURATION;
+            
+            self.placeholderHeightLayoutConstraint.animator.constant = self.moreInfoView.frame.size.height;
+        } completionHandler:^{
+            self.placeholderView.hidden = YES;
+            self.moreInfoView.hidden = NO;
+        }];
+    } else {
+        self.placeholderHeightLayoutConstraint.constant = self.moreInfoView.frame.size.height;
+        self.moreInfoView.hidden = YES;
+        self.placeholderView.hidden = NO;
+        
+        [NSAnimationContext runAnimationGroup:^(NSAnimationContext * _Nonnull context) {
+            context.duration = TOGGLE_INFO_ANIMATION_DURATION;
+            
+            self.placeholderHeightLayoutConstraint.animator.constant = 0.0;
+        } completionHandler:^{
+            self.placeholderView.hidden = YES;
+        }];
+    }
 }
 
 - (IBAction)finishPrompt:(NSButton *)sender
