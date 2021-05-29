@@ -138,7 +138,23 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 
 - (IBAction)skipThisVersion:(id)__unused sender
 {
-    [self endWithSelection:SPUUserUpdateChoiceSkip];
+    if (self.state.majorUpgrade) {
+        NSAlert *alert = [[NSAlert alloc] init];
+        alert.alertStyle = NSAlertStyleInformational;
+        alert.informativeText = SULocalizedString(@"Skipping this major upgrade will opt out of notifications for future updates.", nil);
+        alert.messageText = SULocalizedString(@"Do you want to Skip this Upgrade?", nil);
+        
+        [alert addButtonWithTitle:SULocalizedString(@"Skip Upgrade", nil)];
+        [alert addButtonWithTitle:SULocalizedString(@"Don't Skip", nil)];
+        
+        [alert beginSheetModalForWindow:(NSWindow * _Nonnull)self.window completionHandler:^(NSModalResponse response) {
+            if (response == NSAlertFirstButtonReturn) {
+                [self endWithSelection:SPUUserUpdateChoiceSkip];
+            }
+        }];
+    } else {
+        [self endWithSelection:SPUUserUpdateChoiceSkip];
+    }
 }
 
 - (IBAction)remindMeLater:(id)__unused sender
@@ -368,10 +384,6 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
         
         // We should be explicit that the update will be installed on quit
         self.laterButton.title = SULocalizedString(@"Install on Quit", @"Alternate title for 'Remind Me Later' button when downloaded updates can be resumed");
-    }
-    
-    if (self.state.majorUpgrade) {
-        self.skipButton.title = SULocalizedString(@"Skip Major Update", nil);
     }
 
     if ([self.updateItem isCriticalUpdate]) {

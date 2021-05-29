@@ -91,15 +91,24 @@
 /* Take care not to overflow the status window. */
 "Installing update..." = "Installing update…";
 
+/* Title confirmation for skipping major upgrade and future updates */
+"Do you want to Skip this Upgrade?" = "Do you want to Skip this Upgrade?";
+
+/* Confirmation message for skipping major upgrade and future updates */
+"Skipping this major upgrade will opt out of notifications for future updates." = "Skipping this major upgrade will opt out of notifications for future updates.";
+
+/* Skipping major upgrade */
+"Skip Upgrade" = "Skip Upgrade";
+
+/* Not skipping a major upgrade */
+"Don't Skip" = "Don't Skip";
+
 /* the unit for kilobytes */
 "KB" = "KB";
 
 /* Alternative name for "Install" button if we have a paid update or other update
 	without a download but with a URL. */
 "Learn More..." = "Learn More…";
-
-/* When the update to download or install is a major (usually paid) one */
-"Skip Major Update" = "Skip Major Update";
 
 /* the unit for megabytes */
 "MB" = "MB";
