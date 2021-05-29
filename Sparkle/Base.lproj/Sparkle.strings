@@ -95,7 +95,7 @@
 "Are you sure you want to skip this upgrade?" = "Are you sure you want to skip this upgrade?";
 
 /* Confirmation message for skipping major upgrade and future updates */
-"Skipping this major upgrade will opt out of notifications for future updates." = "Skipping this major upgrade will opt out of notifications for future updates.";
+"Skipping this major upgrade will opt out of alerts for future updates." = "Skipping this major upgrade will opt out of alerts for future updates.";
 
 /* Skipping major upgrade */
 "Skip Upgrade" = "Skip Upgrade";

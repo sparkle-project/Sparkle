@@ -141,7 +141,7 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
     if (self.state.majorUpgrade) {
         NSAlert *alert = [[NSAlert alloc] init];
         alert.alertStyle = NSAlertStyleInformational;
-        alert.informativeText = SULocalizedString(@"Skipping this major upgrade will opt out of notifications for future updates.", nil);
+        alert.informativeText = SULocalizedString(@"Skipping this major upgrade will opt out of alerts for future updates.", nil);
         alert.messageText = SULocalizedString(@"Are you sure you want to skip this upgrade?", nil);
         
         [alert addButtonWithTitle:SULocalizedString(@"Skip Upgrade", nil)];
