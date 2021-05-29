@@ -164,7 +164,7 @@
 - (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)updateItem secondaryAppcastItem:(SUAppcastItem *)secondaryUpdateItem preventsAutoupdate:(BOOL)preventsAutoupdate
 {
     if (self.userInitiated) {
-        [SPUSkippedUpdate clearSkippedUpdatesForHost:self.host];
+        [SPUSkippedUpdate clearSkippedUpdateForHost:self.host];
     }
     
     id <SPUUpdaterDelegate> updaterDelegate = self.updaterDelegate;
@@ -180,7 +180,9 @@
         stage = SPUUserUpdateStageNotDownloaded;
     }
     
-    SPUUserUpdateState *state = [[SPUUserUpdateState alloc] initWithStage:stage userInitiated:self.userInitiated majorUpgrade:preventsAutoupdate];
+    BOOL majorUpgrade = preventsAutoupdate;
+    
+    SPUUserUpdateState *state = [[SPUUserUpdateState alloc] initWithStage:stage userInitiated:self.userInitiated majorUpgrade:majorUpgrade];
     
     [self.userDriver showUpdateFoundWithAppcastItem:updateItem state:state reply:^(SPUUserUpdateChoice userChoice) {
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -212,7 +214,7 @@
                     break;
                 }
                 case SPUUserUpdateChoiceSkip: {
-                    [SPUSkippedUpdate skipUpdate:updateItem host:self.host];
+                    [SPUSkippedUpdate skipUpdate:updateItem host:self.host majorUpgrade:majorUpgrade];
                     
                     if ([self.updaterDelegate respondsToSelector:@selector(updater:userDidSkipThisVersion:)]) {
                         [self.updaterDelegate updater:self.updater userDidSkipThisVersion:updateItem];

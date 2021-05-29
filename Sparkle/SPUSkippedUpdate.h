@@ -13,23 +13,22 @@ NS_ASSUME_NONNULL_BEGIN
 @class SUHost, SUAppcastItem;
 
 /*
- A skipped update tracks the version and minimum autoupdate version the user skipped.
- Each minimum autoupdate version is tracked as a separate release / train.
- The intent is that a user choosing to skip a future major update chooses to skip that train's updates,
- but a user choosing to skip a minor update only chooses to skip updates equal or preceding that update.
+ A skipped update tracks an optional minor version and an optional major version the user may skip.
+ The minor and major versions are independent versions, so the user can choose to skip at most two separate versions.
+ The intent is when the user is faced with a major upgrade, they can skip a major version.
+ Otherwise they can choose to skip a minor version.
  */
 @interface SPUSkippedUpdate : NSObject
 
-- (instancetype)initWithVersion:(NSString *)version minimumAutoupdateVersion:(nullable NSString *)minimumAutoupdateVersion;
++ (nullable SPUSkippedUpdate *)skippedUpdateForHost:(SUHost *)host;
 
-+ (NSArray<SPUSkippedUpdate *> *)skippedUpdatesForHost:(SUHost *)host;
-+ (void)clearSkippedUpdatesForHost:(SUHost *)host;
-+ (void)skipUpdate:(SUAppcastItem *)updateItem host:(SUHost *)host;
++ (void)clearSkippedUpdateForHost:(SUHost *)host;
 
-+ (BOOL)minimumAutoupdateVersion:(NSString * _Nullable)minimumAutoupdateVersion isEqual:(NSString * _Nullable)minimumAutoupdateVersion2;
++ (void)skipUpdate:(SUAppcastItem *)updateItem host:(SUHost *)host majorUpgrade:(BOOL)majorUpgrade;
 
-@property (nonatomic, readonly) NSString *version;
-@property (nonatomic, readonly, nullable) NSString *minimumAutoupdateVersion;
+// At least one of these version properties will be non-nil
+@property (nonatomic, readonly, nullable) NSString *minorVersion;
+@property (nonatomic, readonly, nullable) NSString *majorVersion;
 
 @end
 

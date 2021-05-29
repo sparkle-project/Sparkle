@@ -169,13 +169,13 @@
     
     NSNumber *phasedUpdateGroup = background ? @([SUPhasedUpdateGroupInfo updateGroupForHost:self.host]) : nil;
     
-    NSArray<SPUSkippedUpdate *> *skippedUpdates = background ? [SPUSkippedUpdate skippedUpdatesForHost:self.host] : @[];
+    SPUSkippedUpdate *skippedUpdate = background ? [SPUSkippedUpdate skippedUpdateForHost:self.host] : nil;
     
     // First filter out min/max OS version and see if there's an update that passes
     // the minimum autoupdate version. We filter out updates that fail the minimum
     // autoupdate version test because we have a preference over minor updates that can be
     // downloaded and installed with less disturbance
-    SUAppcast *passesMinimumAutoupdateAppcast = [[self class] filterSupportedAppcast:macOSAppcast phasedUpdateGroup:phasedUpdateGroup skippedUpdates:skippedUpdates hostVersion:self.host.version versionComparator:applicationVersionComparator testOSVersion:YES testMinimumAutoupdateVersion:YES];
+    SUAppcast *passesMinimumAutoupdateAppcast = [[self class] filterSupportedAppcast:macOSAppcast phasedUpdateGroup:phasedUpdateGroup skippedUpdate:skippedUpdate hostVersion:self.host.version versionComparator:applicationVersionComparator testOSVersion:YES testMinimumAutoupdateVersion:YES];
     
     SUAppcastItem *secondaryItemPassesMinimumAutoupdate = nil;
     SUAppcastItem *primaryItemPassesMinimumAutoupdate = [self retrieveBestAppcastItemFromAppcast:passesMinimumAutoupdateAppcast versionComparator:applicationVersionComparator secondaryUpdate:&secondaryItemPassesMinimumAutoupdate];
@@ -185,7 +185,7 @@
     SUAppcastItem *finalPrimaryItem;
     SUAppcastItem *finalSecondaryItem = nil;
     if (![self isItemNewer:primaryItemPassesMinimumAutoupdate]) {
-        SUAppcast *failsMinimumAutoupdateAppcast = [[self class] filterSupportedAppcast:macOSAppcast phasedUpdateGroup:phasedUpdateGroup skippedUpdates:skippedUpdates hostVersion:self.host.version versionComparator:applicationVersionComparator testOSVersion:YES testMinimumAutoupdateVersion:NO];
+        SUAppcast *failsMinimumAutoupdateAppcast = [[self class] filterSupportedAppcast:macOSAppcast phasedUpdateGroup:phasedUpdateGroup skippedUpdate:skippedUpdate hostVersion:self.host.version versionComparator:applicationVersionComparator testOSVersion:YES testMinimumAutoupdateVersion:NO];
         
         finalPrimaryItem = [self retrieveBestAppcastItemFromAppcast:failsMinimumAutoupdateAppcast versionComparator:applicationVersionComparator secondaryUpdate:&finalSecondaryItem];
     } else {
@@ -228,9 +228,11 @@
 }
 
 // This method is used by unit tests
-+ (SUAppcast *)filterSupportedAppcast:(SUAppcast *)appcast phasedUpdateGroup:(NSNumber * _Nullable)phasedUpdateGroup skippedUpdates:(NSArray<SPUSkippedUpdate *> *)skippedUpdates hostVersion:(NSString * _Nullable)hostVersion versionComparator:(id<SUVersionComparison> _Nullable)versionComparator testOSVersion:(BOOL)testOSVersion testMinimumAutoupdateVersion:(BOOL)testMinimumAutoupdateVersion
++ (SUAppcast *)filterSupportedAppcast:(SUAppcast *)appcast phasedUpdateGroup:(NSNumber * _Nullable)phasedUpdateGroup skippedUpdate:(SPUSkippedUpdate * _Nullable)skippedUpdate hostVersion:(NSString * _Nullable)hostVersion versionComparator:(id<SUVersionComparison> _Nullable)versionComparator testOSVersion:(BOOL)testOSVersion testMinimumAutoupdateVersion:(BOOL)testMinimumAutoupdateVersion
 {
     NSDate *currentDate = [NSDate date];
+    
+    BOOL hostPassesSkippedMajorVersion = [self isItemMinimumAutoupdateVersionOK:skippedUpdate.majorVersion hostVersion:hostVersion versionComparator:versionComparator];
     
     return [appcast copyByFilteringItems:^(SUAppcastItem *item) {
         BOOL passesOSVersion = (!testOSVersion || [self isItemMinimumAndMaximumOperatingSystemVersionOK:item]);
@@ -239,7 +241,7 @@
         
         BOOL passesMinimumAutoupdateVersion = (!testMinimumAutoupdateVersion || hostVersion == nil || versionComparator == nil || [self isItemMinimumAutoupdateVersionOK:item.minimumAutoupdateVersion hostVersion:hostVersion versionComparator:versionComparator]);
         
-        BOOL passesSkippedUpdates = (versionComparator == nil || hostVersion == nil || ![self item:item containsSkippedUpdates:skippedUpdates hostVersion:hostVersion versionComparator:versionComparator]);
+        BOOL passesSkippedUpdates = (versionComparator == nil || hostVersion == nil || ![self item:item containsSkippedUpdate:skippedUpdate hostPassesSkippedMajorVersion:hostPassesSkippedMajorVersion versionComparator:versionComparator]);
         
         return (BOOL)(passesOSVersion && passesPhasedRollout && passesMinimumAutoupdateVersion && passesSkippedUpdates);
     }];
@@ -328,26 +330,22 @@
     return ui != nil && [[self versionComparator] compareVersion:self.host.version toVersion:ui.versionString] == NSOrderedAscending;
 }
 
-+ (BOOL)item:(SUAppcastItem *)ui containsSkippedUpdates:(NSArray<SPUSkippedUpdate *> *)skippedUpdates hostVersion:(NSString *)hostVersion versionComparator:(id<SUVersionComparison>)versionComparator
++ (BOOL)item:(SUAppcastItem *)ui containsSkippedUpdate:(SPUSkippedUpdate * _Nullable)skippedUpdate hostPassesSkippedMajorVersion:(BOOL)hostPassesSkippedMajorVersion versionComparator:(id<SUVersionComparison>)versionComparator
 {
-    NSString *itemVersion = ui.versionString;
-    NSString *itemMinimumAutoupdateVersion = ui.minimumAutoupdateVersion;
+    NSString *skippedMajorVersion = skippedUpdate.majorVersion;
     
-    for (SPUSkippedUpdate *skippedUpdate in skippedUpdates) {
-        NSString *skippedMinimumAutoupdateVersion = skippedUpdate.minimumAutoupdateVersion;
-        
-        BOOL hostPassesSkippedMinimumAutoupdateVersion = [self isItemMinimumAutoupdateVersionOK:skippedMinimumAutoupdateVersion hostVersion:hostVersion versionComparator:versionComparator];
-        
-        if (!hostPassesSkippedMinimumAutoupdateVersion && [SPUSkippedUpdate minimumAutoupdateVersion:itemMinimumAutoupdateVersion isEqual:skippedMinimumAutoupdateVersion]) {
-            // Skipped update is on same train as item and we fail minimum autoupdate test
-            // So we skip all updates with the same minimum autoupdate version that we failed
-            return YES;
-        }
-        
-        if (hostPassesSkippedMinimumAutoupdateVersion && [versionComparator compareVersion:skippedUpdate.version toVersion:itemVersion] != NSOrderedAscending) {
-            // If host passes train of this skipped version and skipped version >= item version, then skip the update
-            return YES;
-        }
+    if (!hostPassesSkippedMajorVersion && skippedMajorVersion != nil && [versionComparator compareVersion:skippedMajorVersion toVersion:ui.versionString] != NSOrderedDescending) {
+        // Item is on a greater or equal version than a major version we've skipped
+        // So we skip this item
+        return YES;
+    }
+    
+    NSString *skippedMinorVersion = skippedUpdate.minorVersion;
+    
+    if (skippedMinorVersion != nil && [versionComparator compareVersion:skippedMinorVersion toVersion:ui.versionString] != NSOrderedAscending) {
+        // Item is on a less or equal version than a minor version we've skipped
+        // So we skip this item
+        return YES;
     }
     
     return NO;
