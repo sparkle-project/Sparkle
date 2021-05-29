@@ -92,7 +92,7 @@
 "Installing update..." = "Installing update…";
 
 /* Title confirmation for skipping major upgrade and future updates */
-"Do you want to Skip this Upgrade?" = "Do you want to Skip this Upgrade?";
+"Are you sure you want to skip this upgrade?" = "Are you sure you want to skip this upgrade?";
 
 /* Confirmation message for skipping major upgrade and future updates */
 "Skipping this major upgrade will opt out of notifications for future updates." = "Skipping this major upgrade will opt out of notifications for future updates.";
