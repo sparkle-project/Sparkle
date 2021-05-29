@@ -25,6 +25,8 @@
     if (self != nil) {
         _minorVersion = [minorVersion copy];
         _majorVersion = [majorVersion copy];
+        
+        assert(_minorVersion != nil || _majorVersion != nil);
     }
     return self;
 }

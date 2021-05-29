@@ -45,7 +45,7 @@ class SUAppcastTest: XCTestCase {
             XCTAssertFalse(items[3].isCriticalUpdate)
 
             // Test best appcast item & a delta update item
-            let supportedAppcast = SUAppcastDriver.filterSupportedAppcast(appcast, phasedUpdateGroup: nil, skippedUpdates: [], hostVersion: nil, versionComparator: nil, testOSVersion: true, testMinimumAutoupdateVersion: false)
+            let supportedAppcast = SUAppcastDriver.filterSupportedAppcast(appcast, phasedUpdateGroup: nil, skippedUpdate: nil, hostVersion: nil, versionComparator: nil, testOSVersion: true, testMinimumAutoupdateVersion: false)
             
             let supportedAppcastItems = supportedAppcast.items
             
@@ -88,7 +88,7 @@ class SUAppcastTest: XCTestCase {
             do {
                 let hostVersion = "1.0"
                 
-                let supportedAppcast = SUAppcastDriver.filterSupportedAppcast(appcast, phasedUpdateGroup: nil, skippedUpdates: [], hostVersion: hostVersion, versionComparator: versionComparator, testOSVersion: true, testMinimumAutoupdateVersion: true)
+                let supportedAppcast = SUAppcastDriver.filterSupportedAppcast(appcast, phasedUpdateGroup: nil, skippedUpdate: nil, hostVersion: hostVersion, versionComparator: versionComparator, testOSVersion: true, testMinimumAutoupdateVersion: true)
                 
                 XCTAssertEqual(1, supportedAppcast.items.count)
                 
@@ -101,7 +101,7 @@ class SUAppcastTest: XCTestCase {
             do {
                 let hostVersion = "2.0"
                 
-                let supportedAppcast = SUAppcastDriver.filterSupportedAppcast(appcast, phasedUpdateGroup: nil, skippedUpdates: [], hostVersion: hostVersion, versionComparator: versionComparator, testOSVersion: true, testMinimumAutoupdateVersion: true)
+                let supportedAppcast = SUAppcastDriver.filterSupportedAppcast(appcast, phasedUpdateGroup: nil, skippedUpdate: nil, hostVersion: hostVersion, versionComparator: versionComparator, testOSVersion: true, testMinimumAutoupdateVersion: true)
                 
                 XCTAssertEqual(2, supportedAppcast.items.count)
                 
@@ -114,7 +114,7 @@ class SUAppcastTest: XCTestCase {
             do {
                 let hostVersion = "2.5"
                 
-                let supportedAppcast = SUAppcastDriver.filterSupportedAppcast(appcast, phasedUpdateGroup: nil, skippedUpdates: [], hostVersion: hostVersion, versionComparator: versionComparator, testOSVersion: true, testMinimumAutoupdateVersion: true)
+                let supportedAppcast = SUAppcastDriver.filterSupportedAppcast(appcast, phasedUpdateGroup: nil, skippedUpdate: nil, hostVersion: hostVersion, versionComparator: versionComparator, testOSVersion: true, testMinimumAutoupdateVersion: true)
                 
                 XCTAssertEqual(2, supportedAppcast.items.count)
                 
@@ -129,18 +129,18 @@ class SUAppcastTest: XCTestCase {
                 
                 // There should be no items if 2.0 is skipped from 1.0 and 3.0 fails minimum autoupdate version
                 do {
-                    let skippedUpdate = SPUSkippedUpdate(version: "2.0", minimumAutoupdateVersion: nil)
+                    let skippedUpdate = SPUSkippedUpdate(minorVersion: "2.0", majorVersion: nil)
                     
-                    let supportedAppcast = SUAppcastDriver.filterSupportedAppcast(appcast, phasedUpdateGroup: nil, skippedUpdates: [skippedUpdate], hostVersion: hostVersion, versionComparator: versionComparator, testOSVersion: true, testMinimumAutoupdateVersion: true)
+                    let supportedAppcast = SUAppcastDriver.filterSupportedAppcast(appcast, phasedUpdateGroup: nil, skippedUpdate: skippedUpdate, hostVersion: hostVersion, versionComparator: versionComparator, testOSVersion: true, testMinimumAutoupdateVersion: true)
                 
                     XCTAssertEqual(0, supportedAppcast.items.count)
                 }
                 
                 // Try again but allowing minimum autoupdate version to fail
                 do {
-                    let skippedUpdate = SPUSkippedUpdate(version: "2.0", minimumAutoupdateVersion: nil)
+                    let skippedUpdate = SPUSkippedUpdate(minorVersion: "2.0", majorVersion: nil)
                     
-                    let supportedAppcast = SUAppcastDriver.filterSupportedAppcast(appcast, phasedUpdateGroup: nil, skippedUpdates: [skippedUpdate], hostVersion: hostVersion, versionComparator: versionComparator, testOSVersion: true, testMinimumAutoupdateVersion: false)
+                    let supportedAppcast = SUAppcastDriver.filterSupportedAppcast(appcast, phasedUpdateGroup: nil, skippedUpdate: skippedUpdate, hostVersion: hostVersion, versionComparator: versionComparator, testOSVersion: true, testMinimumAutoupdateVersion: false)
                 
                     XCTAssertEqual(1, supportedAppcast.items.count)
                     
@@ -151,9 +151,9 @@ class SUAppcastTest: XCTestCase {
                 
                 // Allow minimum autoupdate version to fail and only skip 3.0
                 do {
-                    let skippedUpdate = SPUSkippedUpdate(version: "3.0", minimumAutoupdateVersion: "2.0")
+                    let skippedUpdate = SPUSkippedUpdate(minorVersion: nil, majorVersion: "3.0")
                     
-                    let supportedAppcast = SUAppcastDriver.filterSupportedAppcast(appcast, phasedUpdateGroup: nil, skippedUpdates: [skippedUpdate], hostVersion: hostVersion, versionComparator: versionComparator, testOSVersion: true, testMinimumAutoupdateVersion: false)
+                    let supportedAppcast = SUAppcastDriver.filterSupportedAppcast(appcast, phasedUpdateGroup: nil, skippedUpdate: skippedUpdate, hostVersion: hostVersion, versionComparator: versionComparator, testOSVersion: true, testMinimumAutoupdateVersion: false)
                 
                     XCTAssertEqual(1, supportedAppcast.items.count)
                     
@@ -164,48 +164,19 @@ class SUAppcastTest: XCTestCase {
                 
                 // Allow minimum autoupdate version to fail skipping both 2.0 and 3.0
                 do {
-                    let skippedUpdate = SPUSkippedUpdate(version: "3.0", minimumAutoupdateVersion: "2.0")
-                    let skippedUpdate2 = SPUSkippedUpdate(version: "2.0", minimumAutoupdateVersion: nil)
+                    let skippedUpdate = SPUSkippedUpdate(minorVersion: "2.0", majorVersion: "3.0")
                     
-                    let supportedAppcast = SUAppcastDriver.filterSupportedAppcast(appcast, phasedUpdateGroup: nil, skippedUpdates: [skippedUpdate, skippedUpdate2], hostVersion: hostVersion, versionComparator: versionComparator, testOSVersion: true, testMinimumAutoupdateVersion: false)
+                    let supportedAppcast = SUAppcastDriver.filterSupportedAppcast(appcast, phasedUpdateGroup: nil, skippedUpdate: skippedUpdate, hostVersion: hostVersion, versionComparator: versionComparator, testOSVersion: true, testMinimumAutoupdateVersion: false)
                 
                     XCTAssertEqual(0, supportedAppcast.items.count)
-                }
-                
-                // Allow minimum autoupdate version to fail and only skip "2.99.9" which we will treat as same train on 3.0
-                // This should implicitly only skip 3.0
-                do {
-                    let skippedUpdate = SPUSkippedUpdate(version: "2.99.9", minimumAutoupdateVersion: "2.0")
-                    
-                    let supportedAppcast = SUAppcastDriver.filterSupportedAppcast(appcast, phasedUpdateGroup: nil, skippedUpdates: [skippedUpdate], hostVersion: hostVersion, versionComparator: versionComparator, testOSVersion: true, testMinimumAutoupdateVersion: false)
-                
-                    XCTAssertEqual(1, supportedAppcast.items.count)
-                    
-                    let bestAppcastItem = SUAppcastDriver.bestItem(fromAppcastItems: supportedAppcast.items, getDeltaItem: nil, withHostVersion: hostVersion, comparator: versionComparator)
-                    
-                    XCTAssertEqual(bestAppcastItem.versionString, "2.0")
-                }
-                
-                // Allow minimum autoupdate version to fail and only skip "3.1" which we will treat as same train on 3.0
-                // This should implicitly only skip 3.0
-                do {
-                    let skippedUpdate = SPUSkippedUpdate(version: "3.1", minimumAutoupdateVersion: "2.0")
-                    
-                    let supportedAppcast = SUAppcastDriver.filterSupportedAppcast(appcast, phasedUpdateGroup: nil, skippedUpdates: [skippedUpdate], hostVersion: hostVersion, versionComparator: versionComparator, testOSVersion: true, testMinimumAutoupdateVersion: false)
-                
-                    XCTAssertEqual(1, supportedAppcast.items.count)
-                    
-                    let bestAppcastItem = SUAppcastDriver.bestItem(fromAppcastItems: supportedAppcast.items, getDeltaItem: nil, withHostVersion: hostVersion, comparator: versionComparator)
-                    
-                    XCTAssertEqual(bestAppcastItem.versionString, "2.0")
                 }
                 
                 // Allow minimum autoupdate version to fail and only skip "2.5"
                 // This should implicitly only skip 2.0
                 do {
-                    let skippedUpdate = SPUSkippedUpdate(version: "2.5", minimumAutoupdateVersion: nil)
+                    let skippedUpdate = SPUSkippedUpdate(minorVersion: "2.5", majorVersion: nil)
                     
-                    let supportedAppcast = SUAppcastDriver.filterSupportedAppcast(appcast, phasedUpdateGroup: nil, skippedUpdates: [skippedUpdate], hostVersion: hostVersion, versionComparator: versionComparator, testOSVersion: true, testMinimumAutoupdateVersion: false)
+                    let supportedAppcast = SUAppcastDriver.filterSupportedAppcast(appcast, phasedUpdateGroup: nil, skippedUpdate: skippedUpdate, hostVersion: hostVersion, versionComparator: versionComparator, testOSVersion: true, testMinimumAutoupdateVersion: false)
                 
                     XCTAssertEqual(1, supportedAppcast.items.count)
                     
@@ -216,9 +187,9 @@ class SUAppcastTest: XCTestCase {
                 
                 // This should not skip anything but require passing minimum autoupdate version
                 do {
-                    let skippedUpdate = SPUSkippedUpdate(version: "1.5", minimumAutoupdateVersion: nil)
+                    let skippedUpdate = SPUSkippedUpdate(minorVersion: "1.5", majorVersion: nil)
                     
-                    let supportedAppcast = SUAppcastDriver.filterSupportedAppcast(appcast, phasedUpdateGroup: nil, skippedUpdates: [skippedUpdate], hostVersion: hostVersion, versionComparator: versionComparator, testOSVersion: true, testMinimumAutoupdateVersion: true)
+                    let supportedAppcast = SUAppcastDriver.filterSupportedAppcast(appcast, phasedUpdateGroup: nil, skippedUpdate: skippedUpdate, hostVersion: hostVersion, versionComparator: versionComparator, testOSVersion: true, testMinimumAutoupdateVersion: true)
                 
                     XCTAssertEqual(1, supportedAppcast.items.count)
                     
@@ -229,9 +200,9 @@ class SUAppcastTest: XCTestCase {
                 
                 // This should not skip anything but allow failing minimum autoupdate version
                 do {
-                    let skippedUpdate = SPUSkippedUpdate(version: "1.5", minimumAutoupdateVersion: nil)
+                    let skippedUpdate = SPUSkippedUpdate(minorVersion: "1.5", majorVersion: nil)
                     
-                    let supportedAppcast = SUAppcastDriver.filterSupportedAppcast(appcast, phasedUpdateGroup: nil, skippedUpdates: [skippedUpdate], hostVersion: hostVersion, versionComparator: versionComparator, testOSVersion: true, testMinimumAutoupdateVersion: false)
+                    let supportedAppcast = SUAppcastDriver.filterSupportedAppcast(appcast, phasedUpdateGroup: nil, skippedUpdate: skippedUpdate, hostVersion: hostVersion, versionComparator: versionComparator, testOSVersion: true, testMinimumAutoupdateVersion: false)
                 
                     XCTAssertEqual(2, supportedAppcast.items.count)
                     
@@ -242,9 +213,9 @@ class SUAppcastTest: XCTestCase {
                 
                 // This should not skip anything but require passing minimum autoupdate version
                 do {
-                    let skippedUpdate = SPUSkippedUpdate(version: "1.5", minimumAutoupdateVersion: "1.0")
+                    let skippedUpdate = SPUSkippedUpdate(minorVersion: "1.5", majorVersion: "1.0")
                     
-                    let supportedAppcast = SUAppcastDriver.filterSupportedAppcast(appcast, phasedUpdateGroup: nil, skippedUpdates: [skippedUpdate], hostVersion: hostVersion, versionComparator: versionComparator, testOSVersion: true, testMinimumAutoupdateVersion: true)
+                    let supportedAppcast = SUAppcastDriver.filterSupportedAppcast(appcast, phasedUpdateGroup: nil, skippedUpdate: skippedUpdate, hostVersion: hostVersion, versionComparator: versionComparator, testOSVersion: true, testMinimumAutoupdateVersion: true)
                 
                     XCTAssertEqual(1, supportedAppcast.items.count)
                     
@@ -255,9 +226,9 @@ class SUAppcastTest: XCTestCase {
                 
                 // This should not skip anything but allow failing minimum autoupdate version
                 do {
-                    let skippedUpdate = SPUSkippedUpdate(version: "1.5", minimumAutoupdateVersion: "1.0")
+                    let skippedUpdate = SPUSkippedUpdate(minorVersion: "1.5", majorVersion: "1.0")
                     
-                    let supportedAppcast = SUAppcastDriver.filterSupportedAppcast(appcast, phasedUpdateGroup: nil, skippedUpdates: [skippedUpdate], hostVersion: hostVersion, versionComparator: versionComparator, testOSVersion: true, testMinimumAutoupdateVersion: false)
+                    let supportedAppcast = SUAppcastDriver.filterSupportedAppcast(appcast, phasedUpdateGroup: nil, skippedUpdate: skippedUpdate, hostVersion: hostVersion, versionComparator: versionComparator, testOSVersion: true, testMinimumAutoupdateVersion: false)
                 
                     XCTAssertEqual(2, supportedAppcast.items.count)
                     
