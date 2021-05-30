@@ -91,6 +91,18 @@
 /* Take care not to overflow the status window. */
 "Installing update..." = "アップデートをインストールしています…";
 
+/* Title confirmation for skipping major upgrade and future updates */
+"Are you sure you want to skip this upgrade?" = "このアップグレードをスキップしてもよろしいですか?";
+
+/* Confirmation message for skipping major upgrade and future updates */
+"Skipping this major upgrade will opt out of alerts for future updates." = "このメジャーアップグレードをスキップすると、今後のアップデートも通知されなくなります。";
+
+/* Skipping major upgrade */
+"Skip Upgrade" = "アップグレードをスキップ";
+
+/* Not skipping a major upgrade */
+"Don't Skip" = "スキップしない";
+
 /* the unit for kilobytes */
 "KB" = "KB";
 
