@@ -33,9 +33,6 @@ NS_ASSUME_NONNULL_BEGIN
 // Should be thread safe
 - (BOOL)canInstallSilently;
 
-// The destination and installation path of the bundle being updated
-- (NSString *)installationPath;
-
 @end
 
 NS_ASSUME_NONNULL_END

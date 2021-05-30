@@ -28,6 +28,7 @@
 * System profiler privacy and transparency (#1690) (Martin Pilkington)
 * Support getting app icon from asset catalog (#1694) (Charles Srstka)
 * Don't hide update alert window now on deactivation (#1804) (Zorg)
+* Raise minimum system version to 10.11 (Zorg)
 * Special thanks to developers using early builds of this release in production and contributors for keeping this running (Kornel, Jonas Zaugg, Gwynne Raskind, Jordan Rose, Tony Arnold, Bryan Jones, Christian Tietze, Jakob Egger, and many more)
 
 Please visit [Sparkle's website](http://sparkle-project.org) for more information on documentation and migration.

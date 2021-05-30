@@ -3,4 +3,3 @@
 #include "ConfigSwift.xcconfig"
 
 SWIFT_OBJC_BRIDGING_HEADER = $(PRODUCT_NAME)/Bridging-Header.h
-MACOSX_DEPLOYMENT_TARGET = 10.11

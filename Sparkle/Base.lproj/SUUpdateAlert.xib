@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="17701" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="18122" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17701"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="18122"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -25,7 +25,7 @@
             <windowCollectionBehavior key="collectionBehavior" fullScreenAuxiliary="YES"/>
             <windowPositionMask key="initialPositionMask" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="746" y="229" width="620" height="370"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1415"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="875"/>
             <value key="minSize" type="size" width="550" height="150"/>
             <view key="contentView" id="6">
                 <rect key="frame" x="0.0" y="0.0" width="620" height="370"/>
@@ -114,6 +114,7 @@
                         </subviews>
                         <constraints>
                             <constraint firstItem="89" firstAttribute="top" secondItem="17" secondAttribute="bottom" constant="6" id="1H8-33-yNF"/>
+                            <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="17" secondAttribute="trailing" constant="408" id="5ym-81-wbN"/>
                             <constraint firstAttribute="trailing" secondItem="89" secondAttribute="trailing" id="Bv8-Jz-SXd"/>
                             <constraint firstAttribute="bottom" secondItem="89" secondAttribute="bottom" id="E4h-VA-0Xt"/>
                             <constraint firstItem="17" firstAttribute="top" secondItem="fKC-QA-GZa" secondAttribute="top" id="P9G-6a-y7j"/>

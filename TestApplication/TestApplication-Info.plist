@@ -26,6 +26,8 @@
 	<string>NSApplication</string>
 	<key>SUEnableSystemProfiling</key>
 	<true/>
+	<key>LSMinimumSystemVersion</key>
+	<string>$(MACOSX_DEPLOYMENT_TARGET)</string>
 	<key>SUFeedURL</key>
 	<string>http://localhost:1337/sparkletestcast.xml</string>
 	<key>SUPublicEDKey</key>

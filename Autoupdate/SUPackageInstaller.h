@@ -14,6 +14,6 @@
 
 @interface SUPackageInstaller : NSObject <SUInstallerProtocol>
 
-- (instancetype)initWithPackagePath:(NSString *)packagePath installationPath:(NSString *)installationPath;
+- (instancetype)initWithPackagePath:(NSString *)packagePath;
 
 @end

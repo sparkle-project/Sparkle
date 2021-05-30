@@ -777,10 +777,9 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 }
 
 static NSString *escapeURLComponent(NSString *str) {
-    return [[[[str stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]
-             stringByReplacingOccurrencesOfString:@"=" withString:@"%3d"]
-             stringByReplacingOccurrencesOfString:@"&" withString:@"%26"]
-             stringByReplacingOccurrencesOfString:@"+" withString:@"%2b"];
+    NSString *escapedString = [str stringByAddingPercentEncodingWithAllowedCharacters:NSCharacterSet.URLQueryAllowedCharacterSet];
+    
+    return [[[escapedString stringByReplacingOccurrencesOfString:@"=" withString:@"%3d"] stringByReplacingOccurrencesOfString:@"&" withString:@"%26"] stringByReplacingOccurrencesOfString:@"+" withString:@"%2b"];
 }
 
 // Precondition: The feed URL should be valid
