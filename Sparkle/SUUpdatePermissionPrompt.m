@@ -107,7 +107,7 @@ static NSString *const SUUpdatePermissionPromptTouchBarIndentifier = @"" SPARKLE
     return [NSString stringWithFormat:SULocalizedString(@"Should %1$@ automatically check for updates? You can always check for updates manually from the %1$@ menu.", nil), [self.host name]];
 }
 
-- (IBAction)toggleMoreInfo:(id)sender
+- (IBAction)toggleMoreInfo:(id)__unused sender
 {
     // Use a placeholder view to unhide/hide before putting the more info view in place
     // This allows us to animate resizing the more info view in place more easily
