@@ -115,7 +115,7 @@
 
 #pragma mark Update Found
 
-- (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem userInitiated:(BOOL)userInitiated state:(SPUUserUpdateState)state reply:(void (^)(SPUUserUpdateChoice))reply
+- (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem state:(SPUUserUpdateState *)state reply:(void (^)(SPUUserUpdateChoice))reply
 {
     assert(NSThread.isMainThread);
     
@@ -132,7 +132,7 @@
         weakSelf.activeUpdateAlert = nil;
     }];
     
-    [self setUpFocusForActiveUpdateAlertWithUserInitiation:userInitiated];
+    [self setUpFocusForActiveUpdateAlertWithUserInitiation:state.userInitiated];
 }
 
 - (void)showUpdateReleaseNotesWithDownloadData:(SPUDownloadData *)downloadData

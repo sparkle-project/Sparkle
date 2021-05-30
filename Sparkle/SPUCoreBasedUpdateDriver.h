@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "SPUStatusCompletionResults.h"
+#import "SPUUserUpdateState.h"
 #import "SPUUpdateDriver.h"
 
 NS_ASSUME_NONNULL_BEGIN

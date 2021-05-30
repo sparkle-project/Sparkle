@@ -36,7 +36,7 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 @property (strong) SUHost *host;
 @property (nonatomic) BOOL allowsAutomaticUpdates;
 @property (nonatomic, copy, nullable) void(^completionBlock)(SPUUserUpdateChoice);
-@property (nonatomic) SPUUserUpdateState state;
+@property (nonatomic) SPUUserUpdateState *state;
 
 @property (strong) NSProgressIndicator *releaseNotesSpinner;
 
@@ -80,7 +80,7 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 
 @synthesize webView = _webView;
 
-- (instancetype)initWithAppcastItem:(SUAppcastItem *)item state:(SPUUserUpdateState)state host:(SUHost *)aHost versionDisplayer:(id <SUVersionDisplay>)aVersionDisplayer completionBlock:(void (^)(SPUUserUpdateChoice))block
+- (instancetype)initWithAppcastItem:(SUAppcastItem *)item state:(SPUUserUpdateState *)state host:(SUHost *)aHost versionDisplayer:(id <SUVersionDisplay>)aVersionDisplayer completionBlock:(void (^)(SPUUserUpdateChoice))block
 {
     self = [super initWithWindowNibName:@"SUUpdateAlert"];
     if (self != nil) {
@@ -92,7 +92,7 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
         _completionBlock = [block copy];
         
         SPUUpdaterSettings *updaterSettings = [[SPUUpdaterSettings alloc] initWithHostBundle:host.bundle];
-        _allowsAutomaticUpdates = updaterSettings.allowsAutomaticUpdates && !item.isInformationOnlyUpdate;
+        _allowsAutomaticUpdates = updaterSettings.allowsAutomaticUpdates && state.stage != SPUUserUpdateStageInformational;
         [self setShouldCascadeWindows:NO];
     }
     return self;
@@ -138,7 +138,23 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 
 - (IBAction)skipThisVersion:(id)__unused sender
 {
-    [self endWithSelection:SPUUserUpdateChoiceSkip];
+    if (self.state.majorUpgrade) {
+        NSAlert *alert = [[NSAlert alloc] init];
+        alert.alertStyle = NSAlertStyleInformational;
+        alert.informativeText = SULocalizedString(@"Skipping this major upgrade will opt out of alerts for future updates.", nil);
+        alert.messageText = SULocalizedString(@"Are you sure you want to skip this upgrade?", nil);
+        
+        [alert addButtonWithTitle:SULocalizedString(@"Skip Upgrade", nil)];
+        [alert addButtonWithTitle:SULocalizedString(@"Don't Skip", nil)];
+        
+        [alert beginSheetModalForWindow:(NSWindow * _Nonnull)self.window completionHandler:^(NSModalResponse response) {
+            if (response == NSAlertFirstButtonReturn) {
+                [self endWithSelection:SPUUserUpdateChoiceSkip];
+            }
+        }];
+    } else {
+        [self endWithSelection:SPUUserUpdateChoiceSkip];
+    }
 }
 
 - (IBAction)remindMeLater:(id)__unused sender
@@ -328,7 +344,7 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
         [self.window setLevel:NSFloatingWindowLevel]; // This means the window will float over all other apps, if our app is switched out ?!
     }
 
-    if (self.updateItem.isInformationOnlyUpdate) {
+    if (self.state.stage == SPUUserUpdateStageInformational) {
         [self.installButton setTitle:SULocalizedString(@"Learn More...", @"Alternate title for 'Install Update' button when there's no download in RSS feed.")];
         [self.installButton setAction:@selector(openInfoURL:)];
     }
@@ -362,7 +378,7 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
         }
     }
     
-    if (self.state == SPUUserUpdateStateInstalling) {
+    if (self.state.stage == SPUUserUpdateStageInstalling) {
         // We're going to be relaunching pretty instantaneously
         self.installButton.title = SULocalizedString(@"Install and Relaunch", nil);
         
@@ -370,7 +386,7 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
         self.laterButton.title = SULocalizedString(@"Install on Quit", @"Alternate title for 'Remind Me Later' button when downloaded updates can be resumed");
     }
 
-    if ([self.updateItem isCriticalUpdate]) {
+    if ([self.updateItem isCriticalUpdate] && !self.state.majorUpgrade) {
         self.skipButton.hidden = YES;
         self.laterButton.hidden = YES;
     }
@@ -400,7 +416,7 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
     {
         return [NSString stringWithFormat:SULocalizedString(@"An important update to %@ is ready to install", nil), [self.host name]];
     }
-    else if (self.state == SPUUserUpdateStateDownloaded || self.state == SPUUserUpdateStateInstalling)
+    else if (self.state.stage == SPUUserUpdateStageDownloaded || self.state.stage == SPUUserUpdateStageInstalling)
     {
         return [NSString stringWithFormat:SULocalizedString(@"A new version of %@ is ready to install!", nil), [self.host name]];
     }
@@ -425,16 +441,16 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
     // We display a different summary depending on if it's an "info-only" item, or a "critical update" item, or if we've already downloaded the update and just need to relaunch
     NSString *finalString = nil;
 
-    if (self.updateItem.isInformationOnlyUpdate) {
+    if (self.state.stage == SPUUserUpdateStageInformational) {
         finalString = [NSString stringWithFormat:SULocalizedString(@"%@ %@ is now available--you have %@. Would you like to learn more about this update on the web?", @"Description text for SUUpdateAlert when the update informational with no download."), self.host.name, updateItemVersion, hostVersion];
     } else if ([self.updateItem isCriticalUpdate]) {
-        if (self.state == SPUUserUpdateStateNotDownloaded) {
+        if (self.state.stage == SPUUserUpdateStageNotDownloaded) {
             finalString = [NSString stringWithFormat:SULocalizedString(@"%@ %@ is now available--you have %@. This is an important update; would you like to download it now?", @"Description text for SUUpdateAlert when the critical update is downloadable."), self.host.name, updateItemVersion, hostVersion];
         } else {
             finalString = [NSString stringWithFormat:SULocalizedString(@"%1$@ %2$@ has been downloaded and is ready to use! This is an important update; would you like to install it and relaunch %1$@ now?", @"Description text for SUUpdateAlert when the critical update has already been downloaded and ready to install."), self.host.name, updateItemVersion];
         }
     } else {
-        if (self.state == SPUUserUpdateStateNotDownloaded) {
+        if (self.state.stage == SPUUserUpdateStageNotDownloaded) {
             finalString = [NSString stringWithFormat:SULocalizedString(@"%@ %@ is now available--you have %@. Would you like to download it now?", @"Description text for SUUpdateAlert when the update is downloadable."), self.host.name, updateItemVersion, hostVersion];
         } else {
             finalString = [NSString stringWithFormat:SULocalizedString(@"%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?", @"Description text for SUUpdateAlert when the update has already been downloaded and ready to install."), self.host.name, updateItemVersion];

@@ -15,7 +15,7 @@
 #import <Foundation/Foundation.h>
 #endif
 
-#import "SPUStatusCompletionResults.h"
+#import "SPUUserUpdateState.h"
 #import "SUExport.h"
 
 NS_ASSUME_NONNULL_BEGIN
@@ -60,28 +60,31 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  *
  * @param appcastItem The Appcast Item containing information that reflects the new update.
  *
- * @param userInitiated A flag indicating whether or not a user initiated this update check
- *
  * @param state The current state of the update.
+ *  The state.stage values are:
  *  SPUUserUpdateStateNotDownloaded - Update has not been downloaded yet.
  *  SPUUserUpdateStateDownloaded - Update has already been downloaded but not started installing yet.
  *  SPUUserUpdateStateInstalling - Update has been downloaded and already started installing.
- *  SPUUserUpdateStateInformational - Update is only informational and has no download. You can direct the user to the the infoURL property of the appcastItem in their web browser. The informationOnlyUpdate property of the appcastItem will be YES.
+ *  SPUUserUpdateStateInformational - Update is only informational and has no download. You can direct the user to the infoURL property of the appcastItem in their web browser. Use this to check if an update is informational, instead of using the informationOnlyUpdate property of the appcast item.
+ *
+ *  state.userInitiated indicates if the update was initiated by the user or if it was automatically scheduled in the background.
+ *  state.majorUpgrade indicates if the update is a major or paid upgrade.
  *
  * Additionally, you may want to check the criticalUpdate property of the appcastItem to let the user know if the update is critical.
  *
  * @param reply
  * A reply of SPUUserUpdateChoiceInstall begins or resumes downloading or installing the update.
- * If the state is SPUUserUpdateStateInstalling, this may send a quit event to the application and relaunch it immediately (in this state, this behaves as a fast "install and Relaunch").
+ * If the state.stage is SPUUserUpdateStateInstalling, this may send a quit event to the application and relaunch it immediately (in this state, this behaves as a fast "install and Relaunch").
  *
  * A reply of SPUUserUpdateChoiceDismiss dismisses the update for the time being. The user may be reminded of the update at a later point.
- * If the state is SPUUserUpdateStateDownloaded, the downloaded update is kept after dismissing until the next time an update is shown to the user.
- * If the state is SPUUserUpdateStateInstalling, the installing update is also preserved after dismissing. In this state however, the update will also still be installed after the application is terminated.
+ * If the state.stage is SPUUserUpdateStateDownloaded, the downloaded update is kept after dismissing until the next time an update is shown to the user.
+ * If the state.stage is SPUUserUpdateStateInstalling, the installing update is also preserved after dismissing. In this state however, the update will also still be installed after the application is terminated.
  *
  * A reply of SPUUserUpdateChoiceSkip skips this particular version and won't notify the user again, unless they initiate an update check themselves.
- * If the state is SPUUserUpdateStateInstalling, the installation is also canceled when the update is skipped.
+ * If state.majorUpgrade is YES, the major update and any minor updates to that major release are skipped.
+ * If the state.stage is SPUUserUpdateStateInstalling, the installation is also canceled when the update is skipped.
  */
-- (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem userInitiated:(BOOL)userInitiated state:(SPUUserUpdateState)state reply:(void (^)(SPUUserUpdateChoice))reply;
+- (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem state:(SPUUserUpdateState *)state reply:(void (^)(SPUUserUpdateChoice))reply;
 
 /*!
  * Show the user the release notes for the new update
@@ -256,23 +259,11 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
 @optional
 
 // Clients should move to non-deprecated methods
-// Deprecated methods are only (temporarily) kept around for binary compatibility reasons
-
-- (void)showUserInitiatedUpdateCheckWithCompletion:(void (^)(SPUUserInitiatedCheckStatus))updateCheckStatusCompletion __deprecated_msg("Implement -showUserInitiatedUpdateCheckWithCancellation: instead");
-
-- (void)showDownloadInitiatedWithCompletion:(void (^)(SPUDownloadUpdateStatus))downloadUpdateStatusCompletion __deprecated_msg("Implement -showDownloadInitiatedWithCancellation: instead");
+// Deprecated methods are only (temporarily) kept around for compatibility reasons
 
 - (void)showUpdateNotFoundWithAcknowledgement:(void (^)(void))acknowledgement __deprecated_msg("Implement -showUpdateNotFoundWithError:acknowledgement: instead");
 
 - (void)showUpdateInstallationDidFinishWithAcknowledgement:(void (^)(void))acknowledgement __deprecated_msg("Implement -showUpdateInstalledAndRelaunched:acknowledgement: instead");
-
-- (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem userInitiated:(BOOL)userInitiated reply:(void (^)(SPUUpdateAlertChoice))reply __deprecated_msg("Implement -showUpdateFoundWithAppcastItem:userInitiated:state:reply: instead");
-
-- (void)showDownloadedUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem userInitiated:(BOOL)userInitiated reply:(void (^)(SPUUpdateAlertChoice))reply __deprecated_msg("Implement -showUpdateFoundWithAppcastItem:userInitiated:state:reply: instead");
-
-- (void)showResumableUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem userInitiated:(BOOL)userInitiated reply:(void (^)(SPUUserUpdateChoice))reply __deprecated_msg("Implement -showUpdateFoundWithAppcastItem:userInitiated:state:reply: instead");
-
-- (void)showInformationalUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem userInitiated:(BOOL)userInitiated reply:(void (^)(SPUInformationalUpdateAlertChoice))reply __deprecated_msg("Implement -showUpdateFoundWithAppcastItem:userInitiated:state:reply: instead");
 
 - (void)dismissUserInitiatedUpdateCheck __deprecated_msg("Transition to new UI appropriately when a new update is shown, when no update is found, or when an update error occurs.");;
 
