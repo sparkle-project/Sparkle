@@ -29,7 +29,9 @@ NS_ASSUME_NONNULL_BEGIN
 // Initializes with data from a dictionary provided by the RSS class and state resolver
 - (nullable instancetype)initWithDictionary:(NSDictionary *)dict relativeToURL:(NSURL * _Nullable)appcastURL stateResolver:(SPUAppcastItemStateResolver *)stateResolver failureReason:(NSString * _Nullable __autoreleasing *_Nullable)error;
 
-@property (nullable, nonatomic, readonly) NSDictionary *criticalUpdateDictionary;
+// Convenience wrapper properties (such as isCriticalUpdate) should be added to SUAppcastItem rather than
+// exposing the state as public API
+@property (nonatomic, readonly) SPUAppcastItemState *state;
 
 @end
 

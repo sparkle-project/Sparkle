@@ -49,8 +49,6 @@ SU_EXPORT @interface SUAppcastItem : NSObject<NSSecureCoding>
 @property (getter=isMacOsUpdate, readonly) BOOL macOsUpdate;
 @property (getter=isInformationOnlyUpdate, readonly) BOOL informationOnlyUpdate;
 
-@property (nonatomic, readonly) SPUAppcastItemState *state;
-
 // Returns the dictionary representing the appcast item; this might be useful later for extensions.
 @property (readonly, copy) NSDictionary *propertiesDictionary;
 

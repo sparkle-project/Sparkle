@@ -10,6 +10,7 @@
 #import "SUAppcast.h"
 #import "SUAppcast+Private.h"
 #import "SUAppcastItem.h"
+#import "SUAppcastItem+Private.h"
 #import "SUVersionComparisonProtocol.h"
 #import "SUStandardVersionComparator.h"
 #import "SUOperatingSystem.h"
@@ -243,7 +244,7 @@
         
         BOOL passesPhasedRollout = [self itemIsReadyForPhasedRollout:item phasedUpdateGroup:phasedUpdateGroup currentDate:currentDate hostVersion:hostVersion versionComparator:versionComparator];
         
-        BOOL passesMinimumAutoupdateVersion = (!testMinimumAutoupdateVersion || !item.majorUpgrade);
+        BOOL passesMinimumAutoupdateVersion = (!testMinimumAutoupdateVersion || !item.state.majorUpgrade);
         
         BOOL passesSkippedUpdates = (versionComparator == nil || hostVersion == nil || ![self item:item containsSkippedUpdate:skippedUpdate hostPassesSkippedMajorVersion:hostPassesSkippedMajorVersion versionComparator:versionComparator]);
         

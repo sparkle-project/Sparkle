@@ -35,6 +35,12 @@ static NSString *SUAppcastItemPropertiesKey = @"propertiesDictionary";
 static NSString *SUAppcastItemInstallationTypeKey = @"SUAppcastItemInstallationType";
 static NSString *SUAppcastItemStateKey = @"SUAppcastItemState";
 
+@interface SUAppcastItem ()
+
+@property (nonatomic, readonly) SPUAppcastItemState *state;
+
+@end
+
 @implementation SUAppcastItem
 
 @synthesize dateString = _dateString;
