@@ -6,8 +6,8 @@
 //  Copyright © 2016 Sparkle Project. All rights reserved.
 //
 
-#ifndef SPUUpdateState_h
-#define SPUUpdateState_h
+#ifndef SPUUserUpdateState_h
+#define SPUUserUpdateState_h
 
 #if __has_feature(modules)
 #if __has_warning("-Watimport-in-framework-header")

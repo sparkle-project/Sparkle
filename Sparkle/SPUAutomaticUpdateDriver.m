@@ -21,7 +21,6 @@
 
 @interface SPUAutomaticUpdateDriver () <SPUCoreBasedUpdateDriverDelegate>
 
-@property (nonatomic, readonly) SUHost *host;
 @property (nonatomic, readonly, weak) id updater;
 @property (nonatomic, readonly, weak) id<SPUUserDriver> userDriver;
 @property (nonatomic, readonly, weak, nullable) id updaterDelegate;
@@ -33,7 +32,6 @@
 
 @implementation SPUAutomaticUpdateDriver
 
-@synthesize host = _host;
 @synthesize updater = _updater;
 @synthesize userDriver = _userDriver;
 @synthesize updaterDelegate = _updaterDelegate;
@@ -45,7 +43,6 @@
 {
     self = [super init];
     if (self != nil) {
-        _host = host;
         _updater = updater;
         // The user driver is only used for a termination callback
         _userDriver = userDriver;
