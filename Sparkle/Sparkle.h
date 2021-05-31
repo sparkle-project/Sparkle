@@ -30,7 +30,7 @@
 #import "SPUUpdatePermissionRequest.h"
 #import "SUUpdatePermissionResponse.h"
 #import "SPUUserDriver.h"
-#import "SPUUpdateState.h"
+#import "SPUUserUpdateState.h"
 #import "SPUStandardUserDriver.h"
 #import "SPUStandardUserDriverDelegate.h"
 #import "SPUDownloadData.h"

@@ -15,12 +15,12 @@
 #import <Foundation/Foundation.h>
 #endif
 
-#import "SPUUserUpdateChoice.h"
+#import "SPUUserUpdateState.h"
 #import "SUExport.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class SPUUpdatePermissionRequest, SUUpdatePermissionResponse, SUAppcastItem, SPUDownloadData, SPUUpdateState;
+@class SPUUpdatePermissionRequest, SUUpdatePermissionResponse, SUAppcastItem, SPUDownloadData;
 
 /*!
  The API in Sparkle for controlling the user interaction.
@@ -83,7 +83,7 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  * If state.majorUpgrade is YES, the major update and any minor updates to that major release are skipped.
  * If the state.stage is SPUUpdateStateInstalling, the installation is also canceled when the update is skipped.
  */
-- (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem state:(SPUUpdateState *)state reply:(void (^)(SPUUserUpdateChoice))reply;
+- (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem state:(SPUUserUpdateState *)state reply:(void (^)(SPUUserUpdateChoice))reply;
 
 /*!
  * Show the user the release notes for the new update

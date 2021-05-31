@@ -17,7 +17,7 @@
 #import "SULocalizations.h"
 #import "SUApplicationInfo.h"
 #import "SUOperatingSystem.h"
-#import "SPUUpdateState.h"
+#import "SPUUserUpdateState.h"
 
 @interface SPUStandardUserDriver ()
 
@@ -116,7 +116,7 @@
 
 #pragma mark Update Found
 
-- (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem state:(SPUUpdateState *)state reply:(void (^)(SPUUserUpdateChoice))reply
+- (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem state:(SPUUserUpdateState *)state reply:(void (^)(SPUUserUpdateChoice))reply
 {
     assert(NSThread.isMainThread);
     

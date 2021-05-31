@@ -133,10 +133,10 @@
     }];
 }
 
-- (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem state:(SPUUpdateState *)state reply:(void (^)(SPUUserUpdateChoice))reply
+- (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem state:(SPUUserUpdateState *)state reply:(void (^)(SPUUserUpdateChoice))reply
 {
     switch (state.stage) {
-        case SPUUpdateStageInformational:
+        case SPUUserUpdateStageInformational:
             // Todo: show user interface for this
             NSLog(@"Found info URL: %@", appcastItem.infoURL);
             
@@ -146,9 +146,9 @@
             reply(SPUUserUpdateChoiceDismiss);
             
             break;
-        case SPUUpdateStageNotDownloaded:
-        case SPUUpdateStageDownloaded:
-        case SPUUpdateStageInstalling:
+        case SPUUserUpdateStageNotDownloaded:
+        case SPUUserUpdateStageDownloaded:
+        case SPUUserUpdateStageInstalling:
             [self showUpdateWithAppcastItem:appcastItem reply:reply];
             break;
     }

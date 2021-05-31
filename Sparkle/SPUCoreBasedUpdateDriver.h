@@ -7,9 +7,8 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "SPUUpdateState.h"
 #import "SPUUpdateDriver.h"
-#import "SPUUserUpdateChoice.h"
+#import "SPUUserUpdateState.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
