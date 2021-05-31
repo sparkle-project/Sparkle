@@ -19,6 +19,8 @@
 
 #include "AppKitPrevention.h"
 
+// Returns the critical update version string if available, otherwise returns
+// a result (in isCriticalWithoutVersion) if the update is critical (without a version specified)
 static NSString * _Nullable SPUAppcastItemCriticalUpdateVersion(SUAppcastItem *appcastItem, BOOL *isCriticalWithoutVersion)
 {
     NSDictionary *criticalUpdateDictionary = appcastItem.criticalUpdateDictionary;
@@ -36,6 +38,7 @@ static NSString * _Nullable SPUAppcastItemCriticalUpdateVersion(SUAppcastItem *a
     return criticalVersion;
 }
 
+// Given a host version, is this update version considered critical?
 static BOOL SPUCriticalUpdateTest(id<SUVersionComparison> versionComparator, NSString *hostVersion, NSString *criticalVersion)
 {
     return ([versionComparator compareVersion:hostVersion toVersion:criticalVersion] == NSOrderedAscending);
