@@ -20,6 +20,7 @@
 #import "SPUSkippedUpdate.h"
 #import "SUSignatures.h"
 #import "SPUInstallationType.h"
+#import "SPUAppcastItemSelection.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

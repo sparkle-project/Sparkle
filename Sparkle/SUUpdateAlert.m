@@ -380,7 +380,7 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
         self.laterButton.title = SULocalizedString(@"Install on Quit", @"Alternate title for 'Remind Me Later' button when downloaded updates can be resumed");
     }
 
-    if ([self.updateItem isCriticalUpdate] && !self.state.majorUpgrade) {
+    if (self.state.criticalUpdate && !self.state.majorUpgrade) {
         self.skipButton.hidden = YES;
         self.laterButton.hidden = YES;
     }
@@ -406,7 +406,7 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 
 - (NSString *)titleText
 {
-    if ([self.updateItem isCriticalUpdate])
+    if (self.state.criticalUpdate)
     {
         return [NSString stringWithFormat:SULocalizedString(@"An important update to %@ is ready to install", nil), [self.host name]];
     }
@@ -437,7 +437,7 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 
     if (self.state.stage == SPUUserUpdateStageInformational) {
         finalString = [NSString stringWithFormat:SULocalizedString(@"%@ %@ is now available--you have %@. Would you like to learn more about this update on the web?", @"Description text for SUUpdateAlert when the update informational with no download."), self.host.name, updateItemVersion, hostVersion];
-    } else if ([self.updateItem isCriticalUpdate]) {
+    } else if (self.state.criticalUpdate) {
         if (self.state.stage == SPUUserUpdateStageNotDownloaded) {
             finalString = [NSString stringWithFormat:SULocalizedString(@"%@ %@ is now available--you have %@. This is an important update; would you like to download it now?", @"Description text for SUUpdateAlert when the critical update is downloadable."), self.host.name, updateItemVersion, hostVersion];
         } else {

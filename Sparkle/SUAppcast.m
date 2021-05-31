@@ -119,10 +119,10 @@
 
         for (NSString *name in nodesDict) {
             node = [self bestNodeInNodes:[nodesDict objectForKey:name]];
-            if ([name isEqualToString:SURSSElementEnclosure]) {
-                // enclosure is flattened as a separate dictionary for some reason
-                NSDictionary *encDict = [self attributesOfNode:(NSXMLElement *)node];
-                [dict setObject:encDict forKey:name];
+            if ([name isEqualToString:SURSSElementEnclosure] || [name isEqualToString:SUAppcastElementCriticalUpdate]) {
+                // These are flattened as a separate dictionary for some reason
+                NSDictionary *innerDict = [self attributesOfNode:(NSXMLElement *)node];
+                [dict setObject:innerDict forKey:name];
 			}
             else if ([name isEqualToString:SURSSElementPubDate]) {
                 // We don't want to parse and create a NSDate instance -

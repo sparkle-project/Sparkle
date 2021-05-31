@@ -7,7 +7,7 @@
         <description>desc</description>
         <pubDate>Sat, 26 Jul 2014 15:20:11 +0000</pubDate>
         <enclosure url="http://localhost:1337/Sparkle_Test_App.zip" sparkle:version="2.0" />
-        <sparkle:tags> <sparkle:criticalUpdate /> </sparkle:tags>
+        <sparkle:criticalUpdate sparkle:version="1.5" />
     </item>
     <!-- The best chosen release -->
     <item>

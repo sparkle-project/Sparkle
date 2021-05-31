@@ -21,28 +21,35 @@ class SUAppcastTest: XCTestCase {
             let items = appcast.items
 
             XCTAssertEqual(4, items.count)
+            
+            let standardComparator = SUStandardVersionComparator()
 
             XCTAssertEqual("Version 2.0", items[0].title)
             XCTAssertEqual("desc", items[0].itemDescription)
             XCTAssertEqual("Sat, 26 Jul 2014 15:20:11 +0000", items[0].dateString)
-            XCTAssertTrue(items[0].isCriticalUpdate)
+            XCTAssertTrue(SPUAppcastItemIsCriticalWithComparator(items[0], "1.0", standardComparator))
+            XCTAssertFalse(SPUAppcastItemIsCriticalWithComparator(items[0], "1.5", standardComparator))
+            XCTAssertFalse(SPUAppcastItemIsCriticalWithComparator(items[0], "2.0", standardComparator))
 
             // This is the best release matching our system version
             XCTAssertEqual("Version 3.0", items[1].title)
             XCTAssertNil(items[1].itemDescription)
             XCTAssertNil(items[1].dateString)
-            XCTAssertFalse(items[1].isCriticalUpdate)
+            XCTAssertFalse(SPUAppcastItemIsCriticalWithComparator(items[1], "1.0", standardComparator))
+            XCTAssertFalse(SPUAppcastItemIsCriticalWithComparator(items[1], "2.0", standardComparator))
             XCTAssertEqual(items[1].phasedRolloutInterval, 86400)
 
             XCTAssertEqual("Version 4.0", items[2].title)
             XCTAssertNil(items[2].itemDescription)
             XCTAssertEqual("Sat, 26 Jul 2014 15:20:13 +0000", items[2].dateString)
-            XCTAssertFalse(items[2].isCriticalUpdate)
+            XCTAssertFalse(SPUAppcastItemIsCriticalWithComparator(items[2], "1.0", standardComparator))
+            XCTAssertFalse(SPUAppcastItemIsCriticalWithComparator(items[2], "2.0", standardComparator))
 
             XCTAssertEqual("Version 5.0", items[3].title)
             XCTAssertNil(items[3].itemDescription)
             XCTAssertNil(items[3].dateString)
-            XCTAssertFalse(items[3].isCriticalUpdate)
+            XCTAssertFalse(SPUAppcastItemIsCriticalWithComparator(items[3], "1.0", standardComparator))
+            XCTAssertFalse(SPUAppcastItemIsCriticalWithComparator(items[3], "2.0", standardComparator))
 
             // Test best appcast item & a delta update item
             let supportedAppcast = SUAppcastDriver.filterSupportedAppcast(appcast, phasedUpdateGroup: nil, skippedUpdate: nil, hostVersion: nil, versionComparator: nil, testOSVersion: true, testMinimumAutoupdateVersion: false)

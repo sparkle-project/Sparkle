@@ -15,12 +15,14 @@
 #import "SUAppcastItem.h"
 #import "SPUUserDriver.h"
 #import "SUErrors.h"
+#import "SPUAppcastItemSelection.h"
 
 
 #include "AppKitPrevention.h"
 
 @interface SPUAutomaticUpdateDriver () <SPUCoreBasedUpdateDriverDelegate>
 
+@property (nonatomic, readonly) SUHost *host;
 @property (nonatomic, readonly, weak) id updater;
 @property (nonatomic, readonly, weak) id<SPUUserDriver> userDriver;
 @property (nonatomic, readonly, weak, nullable) id updaterDelegate;
@@ -32,6 +34,7 @@
 
 @implementation SPUAutomaticUpdateDriver
 
+@synthesize host = _host;
 @synthesize updater = _updater;
 @synthesize userDriver = _userDriver;
 @synthesize updaterDelegate = _updaterDelegate;
@@ -43,6 +46,7 @@
 {
     self = [super init];
     if (self != nil) {
+        _host = host;
         _updater = updater;
         // The user driver is only used for a termination callback
         _userDriver = userDriver;
@@ -133,7 +137,8 @@
 
 - (void)abortUpdateWithError:(NSError *)error
 {
-    BOOL showNextUpdateImmediately = (error == nil || error.code == SUInstallationAuthorizeLaterError) && (!self.willInstallSilently || self.updateItem.isCriticalUpdate || self.updateItem.isInformationOnlyUpdate);
+    BOOL showNextUpdateImmediately = (error == nil || error.code == SUInstallationAuthorizeLaterError) && (!self.willInstallSilently || SPUAppcastItemIsCritical(self.updateItem, self.host.version, self.updater, self.updaterDelegate) || self.updateItem.isInformationOnlyUpdate);
+    
     [self.coreDriver abortUpdateAndShowNextUpdateImmediately:showNextUpdateImmediately error:error];
 }
 

@@ -188,7 +188,28 @@ static NSString *SUAppcastItemInstallationTypeKey = @"SUAppcastItemInstallationT
 
 - (BOOL)isCriticalUpdate
 {
-    return [(NSArray *)[self.propertiesDictionary objectForKey:SUAppcastElementTags] containsObject:SUAppcastElementCriticalUpdate];
+    return self.criticalUpdateDictionary != nil;
+}
+
+- (NSDictionary * _Nullable)criticalUpdateDictionary
+{
+    NSDictionary *criticalUpdateDictionary = self.propertiesDictionary[SUAppcastElementCriticalUpdate];
+    if (criticalUpdateDictionary != nil) {
+        return criticalUpdateDictionary;
+    }
+    
+    NSArray *tags = [self.propertiesDictionary objectForKey:SUAppcastElementTags];
+    if ([tags isKindOfClass:[NSArray class]] && [tags containsObject:SUAppcastElementCriticalUpdate]) {
+        return @{};
+    }
+    
+    return nil;
+}
+
+- (BOOL)containsCriticalUpdateTag
+{
+    NSArray *tags = [self.propertiesDictionary objectForKey:SUAppcastElementTags];
+    return [tags isKindOfClass:[NSArray class]] && [tags containsObject:SUAppcastElementCriticalUpdate];
 }
 
 - (BOOL)isMacOsUpdate

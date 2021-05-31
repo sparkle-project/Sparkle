@@ -25,6 +25,8 @@ NS_ASSUME_NONNULL_BEGIN
 // Initializes with data from a dictionary provided by the RSS class.
 - (nullable instancetype)initWithDictionary:(NSDictionary *)dict relativeToURL:(NSURL * _Nullable)appcastURL failureReason:(NSString * _Nullable __autoreleasing *_Nullable)error;
 
+@property (nullable, nonatomic, readonly) NSDictionary *criticalUpdateDictionary;
+
 @end
 
 NS_ASSUME_NONNULL_END

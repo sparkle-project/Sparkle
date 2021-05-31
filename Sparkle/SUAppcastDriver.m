@@ -23,6 +23,7 @@
 #import "SPUDownloadData.h"
 #import "SULocalizations.h"
 #import "SUErrors.h"
+#import "SPUAppcastItemSelection.h"
 
 
 #include "AppKitPrevention.h"
@@ -30,7 +31,7 @@
 @interface SUAppcastDriver () <SPUDownloadDriverDelegate>
 
 @property (nonatomic, readonly) SUHost *host;
-@property (nullable, nonatomic, readonly, weak) id updater;
+@property (nonatomic, readonly, weak) id updater;
 @property (nullable, nonatomic, readonly, weak) id <SPUUpdaterDelegate> updaterDelegate;
 @property (nullable, nonatomic, readonly, weak) id <SUAppcastDriverDelegate> delegate;
 @property (nonatomic) SPUDownloadDriver *downloadDriver;
@@ -237,7 +238,7 @@
     return [appcast copyByFilteringItems:^(SUAppcastItem *item) {
         BOOL passesOSVersion = (!testOSVersion || [self isItemMinimumAndMaximumOperatingSystemVersionOK:item]);
         
-        BOOL passesPhasedRollout = [self itemIsReadyForPhasedRollout:item phasedUpdateGroup:phasedUpdateGroup currentDate:currentDate];
+        BOOL passesPhasedRollout = [self itemIsReadyForPhasedRollout:item phasedUpdateGroup:phasedUpdateGroup currentDate:currentDate hostVersion:hostVersion versionComparator:versionComparator];
         
         BOOL passesMinimumAutoupdateVersion = (!testMinimumAutoupdateVersion || hostVersion == nil || versionComparator == nil || [self isItemMinimumAutoupdateVersionOK:item.minimumAutoupdateVersion hostVersion:hostVersion versionComparator:versionComparator]);
         
@@ -310,19 +311,7 @@
 
 - (id<SUVersionComparison>)versionComparator
 {
-    id<SUVersionComparison> comparator = nil;
-    
-    // Give the delegate a chance to provide a custom version comparator
-    if ([self.updaterDelegate respondsToSelector:@selector((versionComparatorForUpdater:))]) {
-        comparator = [self.updaterDelegate versionComparatorForUpdater:(id _Nonnull)self.updater];
-    }
-    
-    // If we don't get a comparator from the delegate, use the default comparator
-    if (!comparator) {
-        comparator = [[SUStandardVersionComparator alloc] init];
-    }
-    
-    return comparator;
+    return SPUVersionComparator(self.updater, self.updaterDelegate);
 }
 
 - (BOOL)isItemNewer:(SUAppcastItem *)ui
@@ -351,9 +340,9 @@
     return NO;
 }
 
-+ (BOOL)itemIsReadyForPhasedRollout:(SUAppcastItem *)ui phasedUpdateGroup:(NSNumber * _Nullable)phasedUpdateGroup currentDate:(NSDate *)currentDate
++ (BOOL)itemIsReadyForPhasedRollout:(SUAppcastItem *)ui phasedUpdateGroup:(NSNumber * _Nullable)phasedUpdateGroup currentDate:(NSDate *)currentDate hostVersion:(NSString *)hostVersion versionComparator:(id<SUVersionComparison>)versionComparator
 {
-    if (phasedUpdateGroup == nil || [ui isCriticalUpdate]) {
+    if (phasedUpdateGroup == nil || SPUAppcastItemIsCriticalWithComparator(ui, hostVersion, versionComparator)) {
         return YES;
     }
     
