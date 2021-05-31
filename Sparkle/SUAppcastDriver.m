@@ -209,24 +209,16 @@
         // We only need to do this if an update is being checked by the user manually
         SUAppcastItem *notFoundPrimaryItem;
         NSComparisonResult hostToLatestAppcastItemComparisonResult;
-        BOOL passesMinOSVersion;
-        BOOL passesMaxOSVersion;
         if (!background) {
             notFoundPrimaryItem = [self retrieveBestAppcastItemFromAppcast:macOSAppcast versionComparator:applicationVersionComparator secondaryUpdate:nil];
             
             hostToLatestAppcastItemComparisonResult = [applicationVersionComparator compareVersion:self.host.version toVersion:notFoundPrimaryItem.versionString];
-            
-            passesMinOSVersion = notFoundPrimaryItem.state.minimumOperatingSystemVersionIsOK;
-            
-            passesMaxOSVersion = notFoundPrimaryItem.state.maximumOperatingSystemVersionIsOK;
         } else {
             notFoundPrimaryItem = nil;
             hostToLatestAppcastItemComparisonResult = 0;
-            passesMinOSVersion = YES;
-            passesMaxOSVersion = YES;
         }
         
-        [self.delegate didNotFindUpdateWithLatestAppcastItem:notFoundPrimaryItem hostToLatestAppcastItemComparisonResult:hostToLatestAppcastItemComparisonResult passesMinOSVersion:passesMinOSVersion passesMaxOSVersion:passesMaxOSVersion];
+        [self.delegate didNotFindUpdateWithLatestAppcastItem:notFoundPrimaryItem hostToLatestAppcastItemComparisonResult:hostToLatestAppcastItemComparisonResult];
     }
 }
 

@@ -18,6 +18,8 @@
 #import "SPUProbeInstallStatus.h"
 #import "SPUInstallationInfo.h"
 #import "SPUResumableUpdate.h"
+#import "SPUAppcastItemState.h"
+#import "SUAppcastItem+Private.h"
 
 
 #include "AppKitPrevention.h"
@@ -157,7 +159,7 @@
     [self notifyFoundValidUpdateWithAppcastItem:updateItem secondaryAppcastItem:secondaryAppcastItem preventsAutoupdate:preventsAutoupdate systemDomain:nil];
 }
 
-- (void)didNotFindUpdateWithLatestAppcastItem:(nullable SUAppcastItem *)latestAppcastItem hostToLatestAppcastItemComparisonResult:(NSComparisonResult)hostToLatestAppcastItemComparisonResult passesMinOSVersion:(BOOL)passesMinOSVersion passesMaxOSVersion:(BOOL)passesMaxOSVersion
+- (void)didNotFindUpdateWithLatestAppcastItem:(nullable SUAppcastItem *)latestAppcastItem hostToLatestAppcastItemComparisonResult:(NSComparisonResult)hostToLatestAppcastItemComparisonResult
 {
     if (!self.aborted) {
         if ([self.updaterDelegate respondsToSelector:@selector((updaterDidNotFindUpdate:))]) {
@@ -185,11 +187,11 @@
                     break;
                 case NSOrderedAscending:
                     // This means a new update doesn't match the OS requirements
-                    if (!passesMinOSVersion) {
+                    if (!latestAppcastItem.state.minimumOperatingSystemVersionIsOK) {
                         localizedDescription = SULocalizedString(@"Your macOS version is too old", nil);
                         
                         recoverySuggestion = [NSString stringWithFormat:SULocalizedString(@"%1$@ %2$@ is available but your macOS version is too old to install it. At least macOS %3$@ is required.", nil), [self.host name], latestAppcastItem.versionString, latestAppcastItem.minimumSystemVersion];
-                    } else if (!passesMaxOSVersion) {
+                    } else if (!latestAppcastItem.state.maximumOperatingSystemVersionIsOK) {
                         localizedDescription = SULocalizedString(@"Your macOS version is too new", nil);
                         
                         recoverySuggestion = [NSString stringWithFormat:SULocalizedString(@"%1$@ %2$@ is available but your macOS version is too new for this update. This update only supports up to macOS %3$@.", nil), [self.host name], latestAppcastItem.versionString, latestAppcastItem.maximumSystemVersion];
