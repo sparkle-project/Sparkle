@@ -11,16 +11,16 @@
 
 #import <Cocoa/Cocoa.h>
 #import "SUVersionDisplayProtocol.h"
-#import "SPUUserUpdateState.h"
+#import "SPUUpdateState.h"
 
 @protocol SUUpdateAlertDelegate;
 
-@class SUAppcastItem, SPUDownloadData, SUHost;
+@class SUAppcastItem, SPUDownloadData, SUHost, SPUUpdateState;
 @interface SUUpdateAlert : NSWindowController
 
 @property (nonatomic, weak, readonly) id <SUVersionDisplay> versionDisplayer;
 
-- (instancetype)initWithAppcastItem:(SUAppcastItem *)item state:(SPUUserUpdateState *)state host:(SUHost *)aHost versionDisplayer:(id <SUVersionDisplay>)aVersionDisplayer completionBlock:(void (^)(SPUUserUpdateChoice))block;
+- (instancetype)initWithAppcastItem:(SUAppcastItem *)item state:(SPUUpdateState *)state host:(SUHost *)aHost versionDisplayer:(id <SUVersionDisplay>)aVersionDisplayer completionBlock:(void (^)(SPUUserUpdateChoice))block;
 
 - (void)showUpdateReleaseNotesWithDownloadData:(SPUDownloadData *)downloadData;
 - (void)showReleaseNotesFailedToDownload;

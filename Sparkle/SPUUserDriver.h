@@ -15,7 +15,7 @@
 #import <Foundation/Foundation.h>
 #endif
 
-#import "SPUUserUpdateState.h"
+#import "SPUUpdateState.h"
 #import "SUExport.h"
 
 NS_ASSUME_NONNULL_BEGIN
@@ -62,15 +62,14 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  *
  * @param state The current state of the update.
  *  The state.stage values are:
- *  SPUUserUpdateStateNotDownloaded - Update has not been downloaded yet.
- *  SPUUserUpdateStateDownloaded - Update has already been downloaded but not started installing yet.
- *  SPUUserUpdateStateInstalling - Update has been downloaded and already started installing.
- *  SPUUserUpdateStateInformational - Update is only informational and has no download. You can direct the user to the infoURL property of the appcastItem in their web browser. Use this to check if an update is informational, instead of using the informationOnlyUpdate property of the appcast item.
+ *  SPUUpdateStateNotDownloaded - Update has not been downloaded yet.
+ *  SPUUpdateStateDownloaded - Update has already been downloaded but not started installing yet.
+ *  SPUUpdateStateInstalling - Update has been downloaded and already started installing.
+ *  SPUUpdateStateInformational - Update is only informational and has no download. You can direct the user to the infoURL property of the appcastItem in their web browser. Use this to check if an update is informational, instead of using the informationOnlyUpdate property of the appcast item.
  *
  *  state.userInitiated indicates if the update was initiated by the user or if it was automatically scheduled in the background.
  *  state.majorUpgrade indicates if the update is a major or paid upgrade.
- *
- * Additionally, you may want to check the criticalUpdate property of the appcastItem to let the user know if the update is critical.
+ *  state.criticalUpdate indicates if the update is a critical update.
  *
  * @param reply
  * A reply of SPUUserUpdateChoiceInstall begins or resumes downloading or installing the update.
@@ -82,9 +81,9 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  *
  * A reply of SPUUserUpdateChoiceSkip skips this particular version and won't notify the user again, unless they initiate an update check themselves.
  * If state.majorUpgrade is YES, the major update and any minor updates to that major release are skipped.
- * If the state.stage is SPUUserUpdateStateInstalling, the installation is also canceled when the update is skipped.
+ * If the state.stage is SPUUpdateStateInstalling, the installation is also canceled when the update is skipped.
  */
-- (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem state:(SPUUserUpdateState *)state reply:(void (^)(SPUUserUpdateChoice))reply;
+- (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem state:(SPUUpdateState *)state reply:(void (^)(SPUUserUpdateChoice))reply;
 
 /*!
  * Show the user the release notes for the new update

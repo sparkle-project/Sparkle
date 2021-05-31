@@ -6,8 +6,8 @@
 //  Copyright © 2021 Sparkle Project. All rights reserved.
 //
 
-#import "SPUUserUpdateState.h"
-#import "SPUUserUpdateState+Private.h"
+#import "SPUUpdateState.h"
+#import "SPUUpdateState+Private.h"
 
 
 #include "AppKitPrevention.h"
@@ -17,14 +17,14 @@
 #define SPUUserUpdateStateMajorUpgradeKey @"SPUUserUpdateStateMajorUpgrade"
 #define SPUUserUpdateStateCriticalUpdateKey @"SPUUserUpdateStateCriticalUpdate"
 
-@implementation SPUUserUpdateState
+@implementation SPUUpdateState
 
 @synthesize stage = _stage;
 @synthesize userInitiated = _userInitiated;
 @synthesize majorUpgrade = _majorUpgrade;
 @synthesize criticalUpdate = _criticalUpdate;
 
-- (instancetype)initWithStage:(SPUUserUpdateStage)stage userInitiated:(BOOL)userInitiated majorUpgrade:(BOOL)majorUpgrade criticalUpdate:(BOOL)criticalUpdate
+- (instancetype)initWithStage:(SPUUpdateStage)stage userInitiated:(BOOL)userInitiated majorUpgrade:(BOOL)majorUpgrade criticalUpdate:(BOOL)criticalUpdate
 {
     self = [super init];
     if (self != nil) {
@@ -46,7 +46,7 @@
 
 - (instancetype)initWithCoder:(NSCoder *)decoder
 {
-    SPUUserUpdateStage stage = [decoder decodeIntegerForKey:SPUUserUpdateStateStageKey];
+    SPUUpdateStage stage = [decoder decodeIntegerForKey:SPUUserUpdateStateStageKey];
     BOOL userInitiated = [decoder decodeBoolForKey:SPUUserUpdateStateUserInitiatedKey];
     BOOL majorUpgrade = [decoder decodeBoolForKey:SPUUserUpdateStateMajorUpgradeKey];
     BOOL criticalUpdate = [decoder decodeBoolForKey:SPUUserUpdateStateCriticalUpdateKey];

@@ -1,13 +1,13 @@
 //
-//  SPUUserUpdateState.h
+//  SPUUpdateState.h
 //  Sparkle
 //
 //  Created by Mayur Pawashe on 2/29/16.
 //  Copyright © 2016 Sparkle Project. All rights reserved.
 //
 
-#ifndef SPUUserUpdateState_h
-#define SPUUserUpdateState_h
+#ifndef SPUUpdateState_h
+#define SPUUpdateState_h
 
 #if __has_feature(modules)
 #if __has_warning("-Watimport-in-framework-header")
@@ -28,16 +28,16 @@ typedef NS_ENUM(NSInteger, SPUUserUpdateChoice) {
     SPUUserUpdateChoiceDismiss,
 };
 
-typedef NS_ENUM(NSInteger, SPUUserUpdateStage) {
-    SPUUserUpdateStageNotDownloaded,
-    SPUUserUpdateStageDownloaded,
-    SPUUserUpdateStageInstalling,
-    SPUUserUpdateStageInformational
+typedef NS_ENUM(NSInteger, SPUUpdateStage) {
+    SPUUpdateStageNotDownloaded,
+    SPUUpdateStageDownloaded,
+    SPUUpdateStageInstalling,
+    SPUUpdateStageInformational
 };
 
-SU_EXPORT @interface SPUUserUpdateState : NSObject
+SU_EXPORT @interface SPUUpdateState : NSObject
 
-@property (nonatomic, readonly) SPUUserUpdateStage stage;
+@property (nonatomic, readonly) SPUUpdateStage stage;
 @property (nonatomic, readonly) BOOL userInitiated;
 @property (nonatomic, readonly) BOOL majorUpgrade;
 @property (nonatomic, readonly) BOOL criticalUpdate;
@@ -46,4 +46,4 @@ SU_EXPORT @interface SPUUserUpdateState : NSObject
 
 NS_ASSUME_NONNULL_END
 
-#endif /* SPUUserUpdateState_h */
+#endif /* SPUUpdateState_h */

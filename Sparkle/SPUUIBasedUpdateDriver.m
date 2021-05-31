@@ -18,7 +18,7 @@
 #import "SPUResumableUpdate.h"
 #import "SPUDownloadDriver.h"
 #import "SPUSkippedUpdate.h"
-#import "SPUUserUpdateState+Private.h"
+#import "SPUUpdateState+Private.h"
 #import "SPUAppcastItemSelection.h"
 
 
@@ -170,28 +170,28 @@
     
     id <SPUUpdaterDelegate> updaterDelegate = self.updaterDelegate;
     
-    SPUUserUpdateStage stage;
+    SPUUpdateStage stage;
     if (updateItem.isInformationOnlyUpdate) {
-        stage = SPUUserUpdateStageInformational;
+        stage = SPUUpdateStageInformational;
     } else if (self.resumingDownloadedUpdate) {
-        stage = SPUUserUpdateStageDownloaded;
+        stage = SPUUpdateStageDownloaded;
     } else if (self.resumingInstallingUpdate) {
-        stage = SPUUserUpdateStageInstalling;
+        stage = SPUUpdateStageInstalling;
     } else {
-        stage = SPUUserUpdateStageNotDownloaded;
+        stage = SPUUpdateStageNotDownloaded;
     }
     
     BOOL majorUpgrade = preventsAutoupdate;
     BOOL criticalUpdate = SPUAppcastItemIsCritical(updateItem, self.host.version, self.updater, self.updaterDelegate);
     
-    SPUUserUpdateState *state = [[SPUUserUpdateState alloc] initWithStage:stage userInitiated:self.userInitiated majorUpgrade:majorUpgrade criticalUpdate:criticalUpdate];
+    SPUUpdateState *state = [[SPUUpdateState alloc] initWithStage:stage userInitiated:self.userInitiated majorUpgrade:majorUpgrade criticalUpdate:criticalUpdate];
     
     [self.userDriver showUpdateFoundWithAppcastItem:updateItem state:state reply:^(SPUUserUpdateChoice userChoice) {
         dispatch_async(dispatch_get_main_queue(), ^{
             
             // Rule out invalid choices
             SPUUserUpdateChoice validatedChoice;
-            if (stage == SPUUserUpdateStageInformational && userChoice == SPUUserUpdateChoiceInstall) {
+            if (stage == SPUUpdateStageInformational && userChoice == SPUUserUpdateChoiceInstall) {
                 validatedChoice = SPUUserUpdateChoiceDismiss;
             } else {
                 validatedChoice = userChoice;
@@ -200,16 +200,16 @@
             switch (validatedChoice) {
                 case SPUUserUpdateChoiceInstall: {
                     switch (stage) {
-                        case SPUUserUpdateStageDownloaded:
+                        case SPUUpdateStageDownloaded:
                             [self.coreDriver extractDownloadedUpdate];
                             break;
-                        case SPUUserUpdateStageInstalling:
+                        case SPUUpdateStageInstalling:
                             [self.coreDriver finishInstallationWithResponse:validatedChoice displayingUserInterface:!self.preventsInstallerInteraction];
                             break;
-                        case SPUUserUpdateStageNotDownloaded:
+                        case SPUUpdateStageNotDownloaded:
                             [self.coreDriver downloadUpdateFromAppcastItem:updateItem secondaryAppcastItem:secondaryUpdateItem inBackground:NO];
                             break;
-                        case SPUUserUpdateStageInformational:
+                        case SPUUpdateStageInformational:
                             assert(false);
                             break;
                     }
@@ -223,9 +223,9 @@
                     }
                     
                     switch (stage) {
-                        case SPUUserUpdateStageDownloaded:
-                        case SPUUserUpdateStageNotDownloaded:
-                        case SPUUserUpdateStageInformational:
+                        case SPUUpdateStageDownloaded:
+                        case SPUUpdateStageNotDownloaded:
+                        case SPUUpdateStageInformational:
                             // Informational updates can be resumed too, so make sure we check
                             // self.resumingDownloadedUpdate instead of the stage we pass to user driver
                             if (self.resumingDownloadedUpdate) {
@@ -235,7 +235,7 @@
                             [self.delegate uiDriverIsRequestingAbortUpdateWithError:nil];
                             
                             break;
-                        case SPUUserUpdateStageInstalling:
+                        case SPUUpdateStageInstalling:
                             [self.coreDriver finishInstallationWithResponse:validatedChoice displayingUserInterface:!self.preventsInstallerInteraction];
                             break;
                     }
@@ -244,13 +244,13 @@
                 }
                 case SPUUserUpdateChoiceDismiss: {
                     switch (stage) {
-                        case SPUUserUpdateStageDownloaded:
-                        case SPUUserUpdateStageNotDownloaded:
-                        case SPUUserUpdateStageInformational: {
+                        case SPUUpdateStageDownloaded:
+                        case SPUUpdateStageNotDownloaded:
+                        case SPUUpdateStageInformational: {
                             [self.delegate uiDriverIsRequestingAbortUpdateWithError:nil];
                             break;
                         }
-                        case SPUUserUpdateStageInstalling: {
+                        case SPUUpdateStageInstalling: {
                             [self.coreDriver finishInstallationWithResponse:validatedChoice displayingUserInterface:!self.preventsInstallerInteraction];
                             break;
                         }
