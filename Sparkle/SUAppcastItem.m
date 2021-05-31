@@ -198,6 +198,8 @@ static NSString *SUAppcastItemInstallationTypeKey = @"SUAppcastItemInstallationT
         return criticalUpdateDictionary;
     }
     
+    // Check legacy / deprecated path where critical update used to be a tag
+    // This path does not support specifying which version became critical
     NSArray *tags = [self.propertiesDictionary objectForKey:SUAppcastElementTags];
     if ([tags isKindOfClass:[NSArray class]] && [tags containsObject:SUAppcastElementCriticalUpdate]) {
         return @{};
