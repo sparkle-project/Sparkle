@@ -200,9 +200,7 @@
     
     if ([self isItemNewer:finalPrimaryItem]) {
         // We found a suitable update
-        BOOL preventsAutoupdate = finalPrimaryItem.majorUpgrade;
-        
-        [self.delegate didFindValidUpdateWithAppcastItem:finalPrimaryItem secondaryAppcastItem:finalSecondaryItem preventsAutoupdate:preventsAutoupdate];
+        [self.delegate didFindValidUpdateWithAppcastItem:finalPrimaryItem secondaryAppcastItem:finalSecondaryItem];
     } else {
         // Find the latest appcast item even if it fails min/max OS test
         // We want to inform the user if an update requires a different OS version

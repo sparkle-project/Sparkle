@@ -148,7 +148,7 @@
 {
     // Informational downloads shouldn't be presented as updates to be downloaded
     // Neither should items that prevent auto updating
-    if (!resumableUpdate.updateItem.isInformationOnlyUpdate && !resumableUpdate.preventsAutoupdate) {
+    if (!resumableUpdate.updateItem.isInformationOnlyUpdate && !resumableUpdate.updateItem.majorUpgrade) {
         self.resumingDownloadedUpdate = YES;
     }
     [self.coreDriver resumeUpdate:resumableUpdate completion:completionBlock];
@@ -161,7 +161,7 @@
     }
 }
 
-- (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)updateItem secondaryAppcastItem:(SUAppcastItem *)secondaryUpdateItem preventsAutoupdate:(BOOL)preventsAutoupdate
+- (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)updateItem secondaryAppcastItem:(SUAppcastItem *)secondaryUpdateItem
 {
     if (self.userInitiated) {
         [SPUSkippedUpdate clearSkippedUpdateForHost:self.host];
