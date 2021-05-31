@@ -30,7 +30,6 @@
 #import "SPUUpdaterTimer.h"
 #import "SPUResumableUpdate.h"
 #import "SUSignatures.h"
-#import "SPUAppcastItemSelection.h"
 
 
 #include "AppKitPrevention.h"
@@ -885,7 +884,7 @@ static NSString *escapeURLComponent(NSString *str) {
                 // Proceed as normal if there's no resumable updates
                 completionHandler(regularCheckInterval);
             } else {
-                if (!installationInfo.canSilentlyInstall || SPUAppcastItemIsCritical(((SPUInstallationInfo * _Nonnull)installationInfo).appcastItem, self.host.version, self, self.delegate) || [installationInfo.appcastItem isInformationOnlyUpdate]) {
+                if (!installationInfo.canSilentlyInstall || [installationInfo.appcastItem isCriticalUpdate] || [installationInfo.appcastItem isInformationOnlyUpdate]) {
                     completionHandler(MIN(regularCheckInterval, SUImpatientUpdateCheckInterval));
                 } else {
                     completionHandler(MAX(regularCheckInterval, SUImpatientUpdateCheckInterval));

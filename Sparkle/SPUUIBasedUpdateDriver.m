@@ -19,7 +19,6 @@
 #import "SPUDownloadDriver.h"
 #import "SPUSkippedUpdate.h"
 #import "SPUUpdateState+Private.h"
-#import "SPUAppcastItemSelection.h"
 
 
 #include "AppKitPrevention.h"
@@ -182,7 +181,7 @@
     }
     
     BOOL majorUpgrade = preventsAutoupdate;
-    BOOL criticalUpdate = SPUAppcastItemIsCritical(updateItem, self.host.version, self.updater, self.updaterDelegate);
+    BOOL criticalUpdate = updateItem.isCriticalUpdate;
     
     SPUUpdateState *state = [[SPUUpdateState alloc] initWithStage:stage userInitiated:self.userInitiated majorUpgrade:majorUpgrade criticalUpdate:criticalUpdate];
     

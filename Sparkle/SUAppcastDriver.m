@@ -23,7 +23,8 @@
 #import "SPUDownloadData.h"
 #import "SULocalizations.h"
 #import "SUErrors.h"
-#import "SPUAppcastItemSelection.h"
+#import "SPUAppcastItemStateResolver.h"
+#import "SPUAppcastItemState.h"
 
 
 #include "AppKitPrevention.h"
@@ -73,8 +74,10 @@
 
 - (void)downloadDriverDidDownloadData:(SPUDownloadData *)downloadData
 {
+    SPUAppcastItemStateResolver *stateResolver = [[SPUAppcastItemStateResolver alloc] initWithHostVersion:self.host.version applicationVersionComparator:[self versionComparator] standardVersionComparator:[SUStandardVersionComparator defaultComparator]];
+ 
     NSError *appcastError = nil;
-    SUAppcast *appcast = [[SUAppcast alloc] initWithXMLData:downloadData.data relativeToURL:downloadData.URL error:&appcastError];
+    SUAppcast *appcast = [[SUAppcast alloc] initWithXMLData:downloadData.data relativeToURL:downloadData.URL stateResolver:stateResolver error:&appcastError];
     
     if (appcast == nil) {
         NSMutableDictionary *userInfo = [NSMutableDictionary dictionaryWithObject:SULocalizedString(@"An error occurred while parsing the update feed.", nil) forKey:NSLocalizedDescriptionKey];
@@ -196,7 +199,7 @@
     
     if ([self isItemNewer:finalPrimaryItem]) {
         // We found a suitable update
-        BOOL preventsAutoupdate = ![[self class] isItemMinimumAutoupdateVersionOK:finalPrimaryItem.minimumAutoupdateVersion hostVersion:self.host.version versionComparator:applicationVersionComparator];
+        BOOL preventsAutoupdate = finalPrimaryItem.majorUpgrade;
         
         [self.delegate didFindValidUpdateWithAppcastItem:finalPrimaryItem secondaryAppcastItem:finalSecondaryItem preventsAutoupdate:preventsAutoupdate];
     } else {
@@ -229,18 +232,18 @@
 }
 
 // This method is used by unit tests
-+ (SUAppcast *)filterSupportedAppcast:(SUAppcast *)appcast phasedUpdateGroup:(NSNumber * _Nullable)phasedUpdateGroup skippedUpdate:(SPUSkippedUpdate * _Nullable)skippedUpdate hostVersion:(NSString * _Nullable)hostVersion versionComparator:(id<SUVersionComparison> _Nullable)versionComparator testOSVersion:(BOOL)testOSVersion testMinimumAutoupdateVersion:(BOOL)testMinimumAutoupdateVersion
++ (SUAppcast *)filterSupportedAppcast:(SUAppcast *)appcast phasedUpdateGroup:(NSNumber * _Nullable)phasedUpdateGroup skippedUpdate:(SPUSkippedUpdate * _Nullable)skippedUpdate hostVersion:(NSString *)hostVersion versionComparator:(id<SUVersionComparison>)versionComparator testOSVersion:(BOOL)testOSVersion testMinimumAutoupdateVersion:(BOOL)testMinimumAutoupdateVersion
 {
     NSDate *currentDate = [NSDate date];
     
-    BOOL hostPassesSkippedMajorVersion = [self isItemMinimumAutoupdateVersionOK:skippedUpdate.majorVersion hostVersion:hostVersion versionComparator:versionComparator];
+    BOOL hostPassesSkippedMajorVersion = [SPUAppcastItemStateResolver isMinimumAutoupdateVersionOK:skippedUpdate.majorVersion hostVersion:hostVersion versionComparator:versionComparator];
     
     return [appcast copyByFilteringItems:^(SUAppcastItem *item) {
-        BOOL passesOSVersion = (!testOSVersion || [self isItemMinimumAndMaximumOperatingSystemVersionOK:item]);
+        BOOL passesOSVersion = (!testOSVersion || (item.state.minimumOperatingSystemVersionIsOK && item.state.maximumOperatingSystemVersionIsOK));
         
         BOOL passesPhasedRollout = [self itemIsReadyForPhasedRollout:item phasedUpdateGroup:phasedUpdateGroup currentDate:currentDate hostVersion:hostVersion versionComparator:versionComparator];
         
-        BOOL passesMinimumAutoupdateVersion = (!testMinimumAutoupdateVersion || hostVersion == nil || versionComparator == nil || [self isItemMinimumAutoupdateVersionOK:item.minimumAutoupdateVersion hostVersion:hostVersion versionComparator:versionComparator]);
+        BOOL passesMinimumAutoupdateVersion = (!testMinimumAutoupdateVersion || !item.majorUpgrade);
         
         BOOL passesSkippedUpdates = (versionComparator == nil || hostVersion == nil || ![self item:item containsSkippedUpdate:skippedUpdate hostPassesSkippedMajorVersion:hostPassesSkippedMajorVersion versionComparator:versionComparator]);
         
@@ -297,21 +300,21 @@
     return maximumVersionOK;
 }
 
-+ (BOOL)isItemMinimumAndMaximumOperatingSystemVersionOK:(SUAppcastItem *)ui
-{
-    SUStandardVersionComparator *versionComparator = [[SUStandardVersionComparator alloc] init];
-    
-    return [self isItemMinimumOperatingSystemVersionOK:ui versionComparator:versionComparator] && [self isItemMaximumOperatingSystemVersionOK:ui versionComparator:versionComparator];
-}
-
-+ (BOOL)isItemMinimumAutoupdateVersionOK:(NSString * _Nullable)minimumAutoupdateVersion hostVersion:(NSString *)hostVersion versionComparator:(id<SUVersionComparison>)versionComparator
- {
-     return (minimumAutoupdateVersion.length == 0 || ([versionComparator compareVersion:hostVersion toVersion:(NSString * _Nonnull)minimumAutoupdateVersion] != NSOrderedAscending));
- }
-
 - (id<SUVersionComparison>)versionComparator
 {
-    return SPUVersionComparator(self.updater, self.updaterDelegate);
+    id<SUVersionComparison> comparator = nil;
+    
+    // Give the delegate a chance to provide a custom version comparator
+    if ([self.updaterDelegate respondsToSelector:@selector((versionComparatorForUpdater:))]) {
+        comparator = [self.updaterDelegate versionComparatorForUpdater:self.updater];
+    }
+    
+    // If we don't get a comparator from the delegate, use the default comparator
+    if (comparator == nil) {
+        comparator = [SUStandardVersionComparator defaultComparator];
+    }
+    
+    return comparator;
 }
 
 - (BOOL)isItemNewer:(SUAppcastItem *)ui
@@ -342,7 +345,7 @@
 
 + (BOOL)itemIsReadyForPhasedRollout:(SUAppcastItem *)ui phasedUpdateGroup:(NSNumber * _Nullable)phasedUpdateGroup currentDate:(NSDate *)currentDate hostVersion:(NSString *)hostVersion versionComparator:(id<SUVersionComparison>)versionComparator
 {
-    if (phasedUpdateGroup == nil || SPUAppcastItemIsCriticalWithComparator(ui, hostVersion, versionComparator)) {
+    if (phasedUpdateGroup == nil || ui.criticalUpdate) {
         return YES;
     }
     

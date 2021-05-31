@@ -13,6 +13,8 @@
 #import "SUConstants.h"
 #import "SUSignatures.h"
 #import "SPUInstallationType.h"
+#import "SPUAppcastItemState.h"
+#import "SPUAppcastItemStateResolver.h"
 
 
 #include "AppKitPrevention.h"
@@ -31,6 +33,7 @@ static NSString *SUAppcastItemTitleKey = @"title";
 static NSString *SUAppcastItemVersionStringKey = @"versionString";
 static NSString *SUAppcastItemPropertiesKey = @"propertiesDictionary";
 static NSString *SUAppcastItemInstallationTypeKey = @"SUAppcastItemInstallationType";
+static NSString *SUAppcastItemStateKey = @"SUAppcastItemState";
 
 @implementation SUAppcastItem
 
@@ -52,6 +55,7 @@ static NSString *SUAppcastItemInstallationTypeKey = @"SUAppcastItemInstallationT
 @synthesize installationType = _installationType;
 @synthesize minimumAutoupdateVersion = _minimumAutoupdateVersion;
 @synthesize phasedRolloutInterval = _phasedRolloutInterval;
+@synthesize state = _state;
 
 + (BOOL)supportsSecureCoding
 {
@@ -79,6 +83,12 @@ static NSString *SUAppcastItemInstallationTypeKey = @"SUAppcastItemInstallationT
         if (!SPUValidInstallationType(installationType)) {
             return nil;
         }
+        
+        SPUAppcastItemState *state = [decoder decodeObjectOfClass:[SPUAppcastItemState class] forKey:SUAppcastItemStateKey];
+        if (state == nil) {
+            return nil;
+        }
+        _state = state;
         
         _installationType = [installationType copy];
         
@@ -151,6 +161,8 @@ static NSString *SUAppcastItemInstallationTypeKey = @"SUAppcastItemInstallationT
         [encoder encodeObject:self.minimumAutoupdateVersion forKey:SUAppcastElementMinimumAutoupdateVersion];
     }
     
+    [encoder encodeObject:self.state forKey:SUAppcastItemStateKey];
+    
     if (self.releaseNotesURL != nil) {
         [encoder encodeObject:self.releaseNotesURL forKey:SUAppcastItemReleaseNotesURLKey];
     }
@@ -188,30 +200,12 @@ static NSString *SUAppcastItemInstallationTypeKey = @"SUAppcastItemInstallationT
 
 - (BOOL)isCriticalUpdate
 {
-    return self.criticalUpdateDictionary != nil;
+    return self.state.criticalUpdate;
 }
 
-- (NSDictionary * _Nullable)criticalUpdateDictionary
+- (BOOL)isMajorUpgrade
 {
-    NSDictionary *criticalUpdateDictionary = self.propertiesDictionary[SUAppcastElementCriticalUpdate];
-    if (criticalUpdateDictionary != nil) {
-        return criticalUpdateDictionary;
-    }
-    
-    // Check legacy / deprecated path where critical update used to be a tag
-    // This path does not support specifying which version became critical
-    NSArray *tags = [self.propertiesDictionary objectForKey:SUAppcastElementTags];
-    if ([tags isKindOfClass:[NSArray class]] && [tags containsObject:SUAppcastElementCriticalUpdate]) {
-        return @{};
-    }
-    
-    return nil;
-}
-
-- (BOOL)containsCriticalUpdateTag
-{
-    NSArray *tags = [self.propertiesDictionary objectForKey:SUAppcastElementTags];
-    return [tags isKindOfClass:[NSArray class]] && [tags containsObject:SUAppcastElementCriticalUpdate];
+    return self.state.majorUpgrade;
 }
 
 - (BOOL)isMacOsUpdate
@@ -238,12 +232,17 @@ static NSString *SUAppcastItemInstallationTypeKey = @"SUAppcastItemInstallationT
     return self.infoURL && !self.fileURL;
 }
 
-- (instancetype)initWithDictionary:(NSDictionary *)dict
+- (instancetype)initWithDictionary:(NSDictionary *)dict state:(SPUAppcastItemState *)state
 {
-    return [self initWithDictionary:dict relativeToURL:nil failureReason:nil];
+    return [self initWithDictionary:dict relativeToURL:nil stateResolver:nil resolvedState:state failureReason:nil];
 }
 
-- (nullable instancetype)initWithDictionary:(NSDictionary *)dict relativeToURL:(NSURL * _Nullable)appcastURL failureReason:(NSString *__autoreleasing *)error
+- (nullable instancetype)initWithDictionary:(NSDictionary *)dict relativeToURL:(NSURL * _Nullable)appcastURL stateResolver:(SPUAppcastItemStateResolver *)stateResolver failureReason:(NSString *__autoreleasing *)error
+{
+    return [self initWithDictionary:dict relativeToURL:appcastURL stateResolver:stateResolver resolvedState:nil failureReason:error];
+}
+
+- (nullable instancetype)initWithDictionary:(NSDictionary *)dict relativeToURL:(NSURL * _Nullable)appcastURL stateResolver:(SPUAppcastItemStateResolver * _Nullable)stateResolver resolvedState:(SPUAppcastItemState * _Nullable)resolvedState failureReason:(NSString *__autoreleasing *)error
 {
     self = [super init];
     if (self) {
@@ -343,6 +342,26 @@ static NSString *SUAppcastItemInstallationTypeKey = @"SUAppcastItemInstallationT
         _maximumSystemVersion = [(NSString *)[dict objectForKey:SUAppcastElementMaximumSystemVersion] copy];
         _minimumAutoupdateVersion = [(NSString *)[dict objectForKey:SUAppcastElementMinimumAutoupdateVersion] copy];
         
+        if (stateResolver != nil) {
+            NSDictionary * _Nullable criticalUpdateDictionaryFromAppcast = (NSDictionary *)[dict objectForKey:SUAppcastElementCriticalUpdate];
+            NSArray *tags = [dict objectForKey:SUAppcastElementTags];
+            
+            NSDictionary * _Nullable criticalUpdateDictionary;
+            if (criticalUpdateDictionaryFromAppcast != nil) {
+                criticalUpdateDictionary = criticalUpdateDictionaryFromAppcast;
+            } else if ([tags isKindOfClass:[NSArray class]] && [tags containsObject:SUAppcastElementCriticalUpdate]) {
+                // Legacy path where critical update used to be a tag without a specified version
+                criticalUpdateDictionary = @{};
+            } else {
+                criticalUpdateDictionary = nil;
+            }
+            
+            _state = [(SPUAppcastItemStateResolver * _Nonnull)stateResolver resolveStateWithMinimumOperatingSystemVersion:_minimumSystemVersion maximumOperatingSystemVersion:_maximumSystemVersion minimumAutoupdateVersion:_minimumAutoupdateVersion criticalUpdateDictionary:criticalUpdateDictionary];
+        } else {
+            assert(resolvedState != nil);
+            _state = (SPUAppcastItemState * _Nonnull)resolvedState;
+        }
+        
         NSString* rolloutIntervalString = [(NSString *)[dict objectForKey:SUAppcastElementPhasedRolloutInterval] copy];
         if (rolloutIntervalString != nil) {
             _phasedRolloutInterval = @(rolloutIntervalString.integerValue);
@@ -415,7 +434,7 @@ static NSString *SUAppcastItemInstallationTypeKey = @"SUAppcastItemInstallationT
                 NSMutableDictionary *fakeAppCastDict = [dict mutableCopy];
                 [fakeAppCastDict removeObjectForKey:SUAppcastElementDeltas];
                 [fakeAppCastDict setObject:deltaDictionary forKey:SURSSElementEnclosure];
-                SUAppcastItem *deltaItem = [[SUAppcastItem alloc] initWithDictionary:fakeAppCastDict];
+                SUAppcastItem *deltaItem = [[SUAppcastItem alloc] initWithDictionary:fakeAppCastDict state:_state];
 
                 if (deltaItem != nil) {
                     [deltas setObject:deltaItem forKey:deltaFrom];

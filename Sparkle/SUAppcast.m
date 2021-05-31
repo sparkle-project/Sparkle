@@ -9,6 +9,7 @@
 #import "SUExport.h"
 #import "SUAppcast.h"
 #import "SUAppcast+Private.h"
+#import "SPUAppcastItemState.h"
 #import "SUAppcastItem.h"
 #import "SUAppcastItem+Private.h"
 #import "SUVersionComparisonProtocol.h"
@@ -30,11 +31,11 @@
 
 @synthesize items = _items;
 
-- (nullable instancetype)initWithXMLData:(NSData *)xmlData relativeToURL:(NSURL * _Nullable)relativeURL error:(NSError * __autoreleasing *)error
+- (nullable instancetype)initWithXMLData:(NSData *)xmlData relativeToURL:(NSURL * _Nullable)relativeURL stateResolver:(SPUAppcastItemStateResolver *)stateResolver error:(NSError * __autoreleasing *)error
 {
     self = [super init];
     if (self != nil) {
-        _items = [self parseAppcastItemsFromXMLData:xmlData relativeToURL:relativeURL error:error];
+        _items = [self parseAppcastItemsFromXMLData:xmlData relativeToURL:relativeURL stateResolver:stateResolver error:error];
         if (_items == nil) {
             return nil;
         }
@@ -72,7 +73,7 @@
     }
 }
 
--(NSArray *)parseAppcastItemsFromXMLData:(NSData *)appcastData relativeToURL:(NSURL * _Nullable)appcastURL error:(NSError *__autoreleasing*)errorp {
+-(NSArray *)parseAppcastItemsFromXMLData:(NSData *)appcastData relativeToURL:(NSURL * _Nullable)appcastURL stateResolver:(SPUAppcastItemStateResolver *)stateResolver error:(NSError *__autoreleasing*)errorp {
     if (errorp) {
         *errorp = nil;
     }
@@ -164,7 +165,8 @@
         }
 
         NSString *errString;
-        SUAppcastItem *anItem = [[SUAppcastItem alloc] initWithDictionary:dict relativeToURL:appcastURL failureReason:&errString];
+        SUAppcastItem *anItem = [[SUAppcastItem alloc] initWithDictionary:dict relativeToURL:appcastURL stateResolver:stateResolver failureReason:&errString];
+        
         if (anItem) {
             [appcastItems addObject:anItem];
 		}

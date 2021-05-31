@@ -18,12 +18,16 @@
 #import <Foundation/Foundation.h>
 #endif
 
+#import "SUAppcastItem.h"
+
 NS_ASSUME_NONNULL_BEGIN
+
+@class SPUAppcastItemState, SPUAppcastItemStateResolver;
 
 @interface SUAppcastItem (Private) <NSSecureCoding>
 
-// Initializes with data from a dictionary provided by the RSS class.
-- (nullable instancetype)initWithDictionary:(NSDictionary *)dict relativeToURL:(NSURL * _Nullable)appcastURL failureReason:(NSString * _Nullable __autoreleasing *_Nullable)error;
+// Initializes with data from a dictionary provided by the RSS class and state resolver
+- (nullable instancetype)initWithDictionary:(NSDictionary *)dict relativeToURL:(NSURL * _Nullable)appcastURL stateResolver:(SPUAppcastItemStateResolver *)stateResolver failureReason:(NSString * _Nullable __autoreleasing *_Nullable)error;
 
 @property (nullable, nonatomic, readonly) NSDictionary *criticalUpdateDictionary;
 

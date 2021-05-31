@@ -15,7 +15,6 @@
 #import "SUAppcastItem.h"
 #import "SPUUserDriver.h"
 #import "SUErrors.h"
-#import "SPUAppcastItemSelection.h"
 
 
 #include "AppKitPrevention.h"
@@ -137,7 +136,7 @@
 
 - (void)abortUpdateWithError:(NSError *)error
 {
-    BOOL showNextUpdateImmediately = (error == nil || error.code == SUInstallationAuthorizeLaterError) && (!self.willInstallSilently || SPUAppcastItemIsCritical(self.updateItem, self.host.version, self.updater, self.updaterDelegate) || self.updateItem.isInformationOnlyUpdate);
+    BOOL showNextUpdateImmediately = (error == nil || error.code == SUInstallationAuthorizeLaterError) && (!self.willInstallSilently || self.updateItem.isCriticalUpdate || self.updateItem.isInformationOnlyUpdate);
     
     [self.coreDriver abortUpdateAndShowNextUpdateImmediately:showNextUpdateImmediately error:error];
 }
