@@ -180,10 +180,7 @@
         stage = SPUUpdateStageNotDownloaded;
     }
     
-    BOOL majorUpgrade = preventsAutoupdate;
-    BOOL criticalUpdate = updateItem.isCriticalUpdate;
-    
-    SPUUpdateState *state = [[SPUUpdateState alloc] initWithStage:stage userInitiated:self.userInitiated majorUpgrade:majorUpgrade criticalUpdate:criticalUpdate];
+    SPUUpdateState *state = [[SPUUpdateState alloc] initWithStage:stage userInitiated:self.userInitiated];
     
     [self.userDriver showUpdateFoundWithAppcastItem:updateItem state:state reply:^(SPUUserUpdateChoice userChoice) {
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -215,7 +212,7 @@
                     break;
                 }
                 case SPUUserUpdateChoiceSkip: {
-                    [SPUSkippedUpdate skipUpdate:updateItem host:self.host majorUpgrade:majorUpgrade];
+                    [SPUSkippedUpdate skipUpdate:updateItem host:self.host];
                     
                     if ([self.updaterDelegate respondsToSelector:@selector(updater:userDidSkipThisVersion:)]) {
                         [self.updaterDelegate updater:self.updater userDidSkipThisVersion:updateItem];

@@ -49,9 +49,9 @@
     [host setObject:nil forUserDefaultsKey:SUSkippedMajorVersionKey];
 }
 
-+ (void)skipUpdate:(SUAppcastItem *)updateItem host:(SUHost *)host majorUpgrade:(BOOL)majorUpgrade
++ (void)skipUpdate:(SUAppcastItem *)updateItem host:(SUHost *)host
 {
-    if (majorUpgrade) {
+    if (updateItem.majorUpgrade) {
         NSString *majorVersion = updateItem.minimumAutoupdateVersion;
         assert(majorVersion != nil);
         

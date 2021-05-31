@@ -139,7 +139,7 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 
 - (IBAction)skipThisVersion:(id)__unused sender
 {
-    if (self.state.majorUpgrade) {
+    if (self.updateItem.majorUpgrade) {
         NSAlert *alert = [[NSAlert alloc] init];
         alert.alertStyle = NSAlertStyleInformational;
         alert.informativeText = SULocalizedString(@"Skipping this major upgrade will opt out of alerts for future updates.", nil);
@@ -381,7 +381,7 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
         self.laterButton.title = SULocalizedString(@"Install on Quit", @"Alternate title for 'Remind Me Later' button when downloaded updates can be resumed");
     }
 
-    if (self.state.criticalUpdate && !self.state.majorUpgrade) {
+    if (self.updateItem.criticalUpdate && !self.updateItem.majorUpgrade) {
         self.skipButton.hidden = YES;
         self.laterButton.hidden = YES;
     }
@@ -407,7 +407,7 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 
 - (NSString *)titleText
 {
-    if (self.state.criticalUpdate)
+    if (self.updateItem.criticalUpdate)
     {
         return [NSString stringWithFormat:SULocalizedString(@"An important update to %@ is ready to install", nil), [self.host name]];
     }
@@ -438,7 +438,7 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 
     if (self.state.stage == SPUUpdateStageInformational) {
         finalString = [NSString stringWithFormat:SULocalizedString(@"%@ %@ is now available--you have %@. Would you like to learn more about this update on the web?", @"Description text for SUUpdateAlert when the update informational with no download."), self.host.name, updateItemVersion, hostVersion];
-    } else if (self.state.criticalUpdate) {
+    } else if (self.updateItem.criticalUpdate) {
         if (self.state.stage == SPUUpdateStageNotDownloaded) {
             finalString = [NSString stringWithFormat:SULocalizedString(@"%@ %@ is now available--you have %@. This is an important update; would you like to download it now?", @"Description text for SUUpdateAlert when the critical update is downloadable."), self.host.name, updateItemVersion, hostVersion];
         } else {

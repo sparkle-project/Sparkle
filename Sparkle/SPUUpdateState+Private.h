@@ -13,7 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface SPUUpdateState (Private)
 
-- (instancetype)initWithStage:(SPUUpdateStage)stage userInitiated:(BOOL)userInitiated majorUpgrade:(BOOL)majorUpgrade criticalUpdate:(BOOL)criticalUpdate;
+- (instancetype)initWithStage:(SPUUpdateStage)stage userInitiated:(BOOL)userInitiated;
 
 @end
 

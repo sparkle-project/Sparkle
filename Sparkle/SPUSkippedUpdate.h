@@ -24,7 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (void)clearSkippedUpdateForHost:(SUHost *)host;
 
-+ (void)skipUpdate:(SUAppcastItem *)updateItem host:(SUHost *)host majorUpgrade:(BOOL)majorUpgrade;
++ (void)skipUpdate:(SUAppcastItem *)updateItem host:(SUHost *)host;
 
 // At least one of minorVersion or majorVersion should be non-nil
 - (instancetype)initWithMinorVersion:(nullable NSString *)minorVersion majorVersion:(nullable NSString *)majorVersion;
