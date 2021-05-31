@@ -35,7 +35,7 @@ class SUAppcastTest: XCTestCase {
             XCTAssertEqual("Version 3.0", items[1].title)
             XCTAssertNil(items[1].itemDescription)
             XCTAssertNil(items[1].dateString)
-            XCTAssertFalse(items[1].isCriticalUpdate)
+            XCTAssertTrue(items[1].isCriticalUpdate)
             XCTAssertEqual(items[1].phasedRolloutInterval, 86400)
 
             XCTAssertEqual("Version 4.0", items[2].title)
@@ -70,6 +70,46 @@ class SUAppcastTest: XCTestCase {
             SUAppcastDriver.bestItem(fromAppcastItems: supportedAppcastItems, getDeltaItem: &nonexistantDeltaItem, withHostVersion: "2.1", comparator: SUStandardVersionComparator())
 
             XCTAssertNil(nonexistantDeltaItem)
+        } catch let err as NSError {
+            NSLog("%@", err)
+            XCTFail(err.localizedDescription)
+        }
+    }
+    
+    func testCriticalUpdateVersion() {
+        let testURL = Bundle(for: SUAppcastTest.self).url(forResource: "testappcast", withExtension: "xml")!
+        
+        do {
+            let testData = try Data(contentsOf: testURL)
+            
+            let versionComparator = SUStandardVersionComparator.default()
+            
+            // If critical update version is 1.5 and host version is 1.0, update should be marked critical
+            do {
+                let hostVersion = "1.0"
+                let stateResolver = SPUAppcastItemStateResolver(hostVersion: hostVersion, applicationVersionComparator: versionComparator, standardVersionComparator: versionComparator)
+                
+                let appcast = try SUAppcast(xmlData: testData, relativeTo: nil, stateResolver: stateResolver)
+                XCTAssertTrue(appcast.items[0].isCriticalUpdate)
+            }
+            
+            // If critical update version is 1.5 and host version is 1.5, update should not be marked critical
+            do {
+                let hostVersion = "1.5"
+                let stateResolver = SPUAppcastItemStateResolver(hostVersion: hostVersion, applicationVersionComparator: versionComparator, standardVersionComparator: versionComparator)
+                
+                let appcast = try SUAppcast(xmlData: testData, relativeTo: nil, stateResolver: stateResolver)
+                XCTAssertFalse(appcast.items[0].isCriticalUpdate)
+            }
+            
+            // If critical update version is 1.5 and host version is 1.6, update should not be marked critical
+            do {
+                let hostVersion = "1.6"
+                let stateResolver = SPUAppcastItemStateResolver(hostVersion: hostVersion, applicationVersionComparator: versionComparator, standardVersionComparator: versionComparator)
+                
+                let appcast = try SUAppcast(xmlData: testData, relativeTo: nil, stateResolver: stateResolver)
+                XCTAssertFalse(appcast.items[0].isCriticalUpdate)
+            }
         } catch let err as NSError {
             NSLog("%@", err)
             XCTFail(err.localizedDescription)
