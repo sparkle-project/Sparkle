@@ -11,7 +11,7 @@
 
 #import <Cocoa/Cocoa.h>
 #import "SUVersionDisplayProtocol.h"
-#import "SPUUpdateState.h"
+#import "SPUUserUpdateChoice.h"
 
 @protocol SUUpdateAlertDelegate;
 

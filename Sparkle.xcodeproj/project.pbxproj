@@ -327,6 +327,8 @@
 		729E1D17266490FE00BF3EFB /* SPUAppcastItemSelection.h in Headers */ = {isa = PBXBuildFile; fileRef = 729E1D14266490FE00BF3EFB /* SPUAppcastItemSelection.h */; };
 		729E1D18266490FE00BF3EFB /* SPUAppcastItemSelection.m in Sources */ = {isa = PBXBuildFile; fileRef = 729E1D15266490FE00BF3EFB /* SPUAppcastItemSelection.m */; };
 		729E1D19266490FE00BF3EFB /* SPUAppcastItemSelection.m in Sources */ = {isa = PBXBuildFile; fileRef = 729E1D15266490FE00BF3EFB /* SPUAppcastItemSelection.m */; };
+		729E1D1B2664C2C500BF3EFB /* SPUUserUpdateChoice.h in Headers */ = {isa = PBXBuildFile; fileRef = 729E1D1A2664C1F800BF3EFB /* SPUUserUpdateChoice.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		729E1D1C2664C34000BF3EFB /* SPUUserUpdateChoice.h in Headers */ = {isa = PBXBuildFile; fileRef = 729E1D1A2664C1F800BF3EFB /* SPUUserUpdateChoice.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		72A1C2631CD6849C004CD282 /* SUUpdatePermissionPrompt.h in Headers */ = {isa = PBXBuildFile; fileRef = 612DCBAD0D488BC60015DBEA /* SUUpdatePermissionPrompt.h */; };
 		72A450531C69A68900D67EEA /* SUUpdatePermissionResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = 72A450511C69A68900D67EEA /* SUUpdatePermissionResponse.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		72A450541C69A68900D67EEA /* SUUpdatePermissionResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 72A450521C69A68900D67EEA /* SUUpdatePermissionResponse.m */; };
@@ -1300,6 +1302,7 @@
 		729BB3D11D503826007C4276 /* org.sparkle-project.Downloader.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = "org.sparkle-project.Downloader.entitlements"; path = "Downloader/org.sparkle-project.Downloader.entitlements"; sourceTree = SOURCE_ROOT; };
 		729E1D14266490FE00BF3EFB /* SPUAppcastItemSelection.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SPUAppcastItemSelection.h; sourceTree = "<group>"; };
 		729E1D15266490FE00BF3EFB /* SPUAppcastItemSelection.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SPUAppcastItemSelection.m; sourceTree = "<group>"; };
+		729E1D1A2664C1F800BF3EFB /* SPUUserUpdateChoice.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SPUUserUpdateChoice.h; sourceTree = "<group>"; };
 		729F10FD1C65A9B500DFCCC5 /* ConfigUITest.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigUITest.xcconfig; sourceTree = "<group>"; };
 		729F10FE1C65A9B500DFCCC5 /* ConfigUITestCoverage.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigUITestCoverage.xcconfig; sourceTree = "<group>"; };
 		72A450511C69A68900D67EEA /* SUUpdatePermissionResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUUpdatePermissionResponse.h; sourceTree = "<group>"; };
@@ -2160,6 +2163,7 @@
 				725CB9591C7121830064365A /* SPUStandardUserDriver.m */,
 				726E4A361C89116000C57C6A /* SPUStandardUserDriverDelegate.h */,
 				725CB9561C7120410064365A /* SPUUserDriver.h */,
+				729E1D1A2664C1F800BF3EFB /* SPUUserUpdateChoice.h */,
 			);
 			name = "User Driver";
 			sourceTree = "<group>";
@@ -2408,6 +2412,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				729E1D17266490FE00BF3EFB /* SPUAppcastItemSelection.h in Headers */,
+				729E1D1C2664C34000BF3EFB /* SPUUserUpdateChoice.h in Headers */,
 				7269E495264798200088C213 /* SPUSkippedUpdate.h in Headers */,
 				72A5D5DE1D692ACC0009E5AC /* SparkleCore.h in Headers */,
 				72B3DECE1E23479000457642 /* SPUInformationalUpdate.h in Headers */,
@@ -2439,6 +2444,7 @@
 				72B767D61C9C8B5C00A07552 /* SPUBasicUpdateDriver.h in Headers */,
 				72B767E21C9CE90A00A07552 /* SPUCoreBasedUpdateDriver.h in Headers */,
 				72F9EC441D5E9ED8004AC8B6 /* SPUDownloadData.h in Headers */,
+				729E1D1B2664C2C500BF3EFB /* SPUUserUpdateChoice.h in Headers */,
 				7229E1BD1C98EFF200CB50D0 /* SPUDownloadDriver.h in Headers */,
 				7267E5FD1D3DD1B700D1BF90 /* SPUResumableUpdate.h in Headers */,
 				7267E5B61D3D8AEE00D1BF90 /* SPUInstallationInfo.h in Headers */,

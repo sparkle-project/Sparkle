@@ -22,12 +22,6 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef NS_ENUM(NSInteger, SPUUserUpdateChoice) {
-    SPUUserUpdateChoiceSkip,
-    SPUUserUpdateChoiceInstall,
-    SPUUserUpdateChoiceDismiss,
-};
-
 typedef NS_ENUM(NSInteger, SPUUpdateStage) {
     SPUUpdateStageNotDownloaded,
     SPUUpdateStageDownloaded,

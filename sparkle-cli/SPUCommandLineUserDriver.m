@@ -97,18 +97,18 @@
     }
 }
 
-- (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem userInitiated:(BOOL)userInitiated state:(SPUUserUpdateState *)state reply:(void (^)(SPUUserUpdateChoice))reply
+- (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem state:(SPUUpdateState *)state reply:(void (^)(SPUUserUpdateChoice))reply
 {
     switch (state.stage) {
-        case SPUUserUpdateStageNotDownloaded:
+        case SPUUpdateStageNotDownloaded:
             [self showUpdateWithAppcastItem:appcastItem updateAdjective:@"new"];
             reply(SPUUserUpdateChoiceInstall);
             break;
-        case SPUUserUpdateStageDownloaded:
+        case SPUUpdateStageDownloaded:
             [self showUpdateWithAppcastItem:appcastItem updateAdjective:@"downloaded"];
             reply(SPUUserUpdateChoiceInstall);
             break;
-        case SPUUserUpdateStageInstalling:
+        case SPUUpdateStageInstalling:
             if (self.deferInstallation) {
                 if (self.verbose) {
                     fprintf(stderr, "Deferring Installation.\n");
@@ -118,7 +118,7 @@
                 reply(SPUUserUpdateChoiceInstall);
             }
             break;
-        case SPUUserUpdateStageInformational:
+        case SPUUpdateStageInformational:
             fprintf(stderr, "Found information for new update: %s\n", appcastItem.infoURL.absoluteString.UTF8String);
             reply(SPUUserUpdateChoiceDismiss);
             break;

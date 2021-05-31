@@ -15,12 +15,12 @@
 #import <Foundation/Foundation.h>
 #endif
 
-#import "SPUUpdateState.h"
+#import "SPUUserUpdateChoice.h"
 #import "SUExport.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class SPUUpdatePermissionRequest, SUUpdatePermissionResponse, SUAppcastItem, SPUDownloadData;
+@class SPUUpdatePermissionRequest, SUUpdatePermissionResponse, SUAppcastItem, SPUDownloadData, SPUUpdateState;
 
 /*!
  The API in Sparkle for controlling the user interaction.

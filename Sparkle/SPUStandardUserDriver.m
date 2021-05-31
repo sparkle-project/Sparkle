@@ -17,6 +17,7 @@
 #import "SULocalizations.h"
 #import "SUApplicationInfo.h"
 #import "SUOperatingSystem.h"
+#import "SPUUpdateState.h"
 
 @interface SPUStandardUserDriver ()
 
