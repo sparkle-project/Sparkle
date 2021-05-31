@@ -60,27 +60,29 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  *
  * @param appcastItem The Appcast Item containing information that reflects the new update.
  *
- * @param state The current state of the update.
+ * @param state The current state of the user update.
  *  The state.stage values are:
  *  SPUUpdateStateNotDownloaded - Update has not been downloaded yet.
  *  SPUUpdateStateDownloaded - Update has already been downloaded but not started installing yet.
  *  SPUUpdateStateInstalling - Update has been downloaded and already started installing.
- *  SPUUpdateStateInformational - Update is only informational and has no download. You can direct the user to the infoURL property of the appcastItem in their web browser. Use this to check if an update is informational, instead of using the informationOnlyUpdate property of the appcast item.
  *
  *  state.userInitiated indicates if the update was initiated by the user or if it was automatically scheduled in the background.
- *  state.majorUpgrade indicates if the update is a major or paid upgrade.
- *  state.criticalUpdate indicates if the update is a critical update.
+ *
+ *  Additionally, these two properties on the appcastItem may be of importance:
+ *  appcastItem.informationOnlyUpdate indicates if the update is only informational. These updates cannot be installed because they have no download. You can direct the user to the infoURL property of the appcastItem in their web browser.
+ *  appcastItem.majorUpgrade indicates if the update is a major or paid upgrade.
+ *  appcastItem.criticalUpdate indicates if the update is a critical update.
  *
  * @param reply
  * A reply of SPUUserUpdateChoiceInstall begins or resumes downloading or installing the update.
- * If the state.stage is SPUUserUpdateStateInstalling, this may send a quit event to the application and relaunch it immediately (in this state, this behaves as a fast "install and Relaunch").
+ * If the state.stage is SPUUserUpdateStateInstalling, this may send a quit event to the application and relaunch it immediately (in this state, this behaves as a fast "install and Relaunch"). Do not use this reply if appcastItem.informationOnlyUpdate is YES.
  *
  * A reply of SPUUserUpdateChoiceDismiss dismisses the update for the time being. The user may be reminded of the update at a later point.
  * If the state.stage is SPUUserUpdateStateDownloaded, the downloaded update is kept after dismissing until the next time an update is shown to the user.
  * If the state.stage is SPUUserUpdateStateInstalling, the installing update is also preserved after dismissing. In this state however, the update will also still be installed after the application is terminated.
  *
  * A reply of SPUUserUpdateChoiceSkip skips this particular version and won't notify the user again, unless they initiate an update check themselves.
- * If state.majorUpgrade is YES, the major update and any minor updates to that major release are skipped.
+ * If appcastItem.majorUpgrade is YES, the major update and any future minor updates to that major release are skipped.
  * If the state.stage is SPUUpdateStateInstalling, the installation is also canceled when the update is skipped.
  */
 - (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem state:(SPUUserUpdateState *)state reply:(void (^)(SPUUserUpdateChoice))reply;

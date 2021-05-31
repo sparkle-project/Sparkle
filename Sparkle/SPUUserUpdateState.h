@@ -31,8 +31,7 @@ typedef NS_ENUM(NSInteger, SPUUserUpdateChoice) {
 typedef NS_ENUM(NSInteger, SPUUserUpdateStage) {
     SPUUserUpdateStageNotDownloaded,
     SPUUserUpdateStageDownloaded,
-    SPUUserUpdateStageInstalling,
-    SPUUserUpdateStageInformational
+    SPUUserUpdateStageInstalling
 };
 
 SU_EXPORT @interface SPUUserUpdateState : NSObject

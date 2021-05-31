@@ -170,9 +170,7 @@
     id <SPUUpdaterDelegate> updaterDelegate = self.updaterDelegate;
     
     SPUUserUpdateStage stage;
-    if (updateItem.isInformationOnlyUpdate) {
-        stage = SPUUserUpdateStageInformational;
-    } else if (self.resumingDownloadedUpdate) {
+    if (self.resumingDownloadedUpdate) {
         stage = SPUUserUpdateStageDownloaded;
     } else if (self.resumingInstallingUpdate) {
         stage = SPUUserUpdateStageInstalling;
@@ -187,7 +185,7 @@
             
             // Rule out invalid choices
             SPUUserUpdateChoice validatedChoice;
-            if (stage == SPUUserUpdateStageInformational && userChoice == SPUUserUpdateChoiceInstall) {
+            if (updateItem.isInformationOnlyUpdate && userChoice == SPUUserUpdateChoiceInstall) {
                 validatedChoice = SPUUserUpdateChoiceDismiss;
             } else {
                 validatedChoice = userChoice;
@@ -205,9 +203,6 @@
                         case SPUUserUpdateStageNotDownloaded:
                             [self.coreDriver downloadUpdateFromAppcastItem:updateItem secondaryAppcastItem:secondaryUpdateItem inBackground:NO];
                             break;
-                        case SPUUserUpdateStageInformational:
-                            assert(false);
-                            break;
                     }
                     break;
                 }
@@ -221,7 +216,6 @@
                     switch (stage) {
                         case SPUUserUpdateStageDownloaded:
                         case SPUUserUpdateStageNotDownloaded:
-                        case SPUUserUpdateStageInformational:
                             // Informational updates can be resumed too, so make sure we check
                             // self.resumingDownloadedUpdate instead of the stage we pass to user driver
                             if (self.resumingDownloadedUpdate) {
@@ -241,8 +235,7 @@
                 case SPUUserUpdateChoiceDismiss: {
                     switch (stage) {
                         case SPUUserUpdateStageDownloaded:
-                        case SPUUserUpdateStageNotDownloaded:
-                        case SPUUserUpdateStageInformational: {
+                        case SPUUserUpdateStageNotDownloaded: {
                             [self.delegate uiDriverIsRequestingAbortUpdateWithError:nil];
                             break;
                         }
