@@ -216,11 +216,9 @@
             
             hostToLatestAppcastItemComparisonResult = [applicationVersionComparator compareVersion:self.host.version toVersion:notFoundPrimaryItem.versionString];
             
-            SUStandardVersionComparator *standardVersionComparator = [[SUStandardVersionComparator alloc] init];
+            passesMinOSVersion = notFoundPrimaryItem.state.minimumOperatingSystemVersionIsOK;
             
-            passesMinOSVersion = [[self class] isItemMinimumOperatingSystemVersionOK:notFoundPrimaryItem versionComparator:standardVersionComparator];
-            
-            passesMaxOSVersion = [[self class] isItemMaximumOperatingSystemVersionOK:notFoundPrimaryItem versionComparator:standardVersionComparator];
+            passesMaxOSVersion = notFoundPrimaryItem.state.maximumOperatingSystemVersionIsOK;
         } else {
             notFoundPrimaryItem = nil;
             hostToLatestAppcastItemComparisonResult = 0;
@@ -278,27 +276,6 @@
         *deltaItem = [self deltaUpdateFromAppcastItem:item hostVersion:hostVersion];
     }
     return item;
-}
-
-+ (BOOL)isItemMinimumOperatingSystemVersionOK:(SUAppcastItem *)ui versionComparator:(SUStandardVersionComparator *)versionComparator
-{
-    BOOL minimumVersionOK = YES;
-    NSString *minimumSystemVersion = ui.minimumSystemVersion;
-    if (minimumSystemVersion != nil && ![minimumSystemVersion isEqualToString:@""]) {
-        minimumVersionOK = [versionComparator compareVersion:minimumSystemVersion toVersion:[SUOperatingSystem systemVersionString]] != NSOrderedDescending;
-    }
-    return minimumVersionOK;
-}
-
-// We don't want to use delegate's comparator for comparing OS versions
-+ (BOOL)isItemMaximumOperatingSystemVersionOK:(SUAppcastItem *)ui versionComparator:(SUStandardVersionComparator *)versionComparator
-{
-    BOOL maximumVersionOK = YES;
-    NSString *maximumSystemVersion = ui.maximumSystemVersion;
-    if (maximumSystemVersion != nil && ![maximumSystemVersion isEqualToString:@""]) {
-        maximumVersionOK = [versionComparator compareVersion:maximumSystemVersion toVersion:[SUOperatingSystem systemVersionString]] != NSOrderedAscending;
-    }
-    return maximumVersionOK;
 }
 
 - (id<SUVersionComparison>)versionComparator
