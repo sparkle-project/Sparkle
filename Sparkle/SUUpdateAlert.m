@@ -92,7 +92,7 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
         _completionBlock = [block copy];
         
         SPUUpdaterSettings *updaterSettings = [[SPUUpdaterSettings alloc] initWithHostBundle:host.bundle];
-        _allowsAutomaticUpdates = updaterSettings.allowsAutomaticUpdates && state.stage != SPUUserUpdateStageInformational;
+        _allowsAutomaticUpdates = updaterSettings.allowsAutomaticUpdates && updaterSettings.automaticallyChecksForUpdates && state.stage != SPUUserUpdateStageInformational;
         [self setShouldCascadeWindows:NO];
     }
     return self;
