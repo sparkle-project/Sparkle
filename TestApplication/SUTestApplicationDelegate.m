@@ -53,7 +53,7 @@ static NSString * const UPDATED_VERSION = @"2.0";
     // Apple's file manager may not work well over the network (on macOS 10.11.4 as of writing this), but at the same time
     // I don't want to have to export SUFileManager in release mode. The test app is primarily
     // aimed to be used in debug mode, so I think this is a good compromise
-#ifdef DEBUG
+#if DEBUG
     SUFileManager *fileManager = [[SUFileManager alloc] init];
 #else
     NSFileManager *fileManager = [NSFileManager defaultManager];
