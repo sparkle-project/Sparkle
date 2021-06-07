@@ -6,6 +6,8 @@
 //  Copyright © 2020 Sparkle Project. All rights reserved.
 //
 
+#if SPARKLE_BUILD_UI_BITS
+
 #import "SUWebViewCommon.h"
 
 
@@ -21,3 +23,5 @@ BOOL SUWebViewIsSafeURL(NSURL *url, BOOL *isAboutBlankURL)
     
     return whitelistedSafe;
 }
+
+#endif

@@ -6,6 +6,8 @@
 //  Copyright © 2020 Sparkle Project. All rights reserved.
 //
 
+#if SPARKLE_BUILD_UI_BITS
+
 #import "SULegacyWebView.h"
 #import "SUWebViewCommon.h"
 #import "SULog.h"
@@ -159,3 +161,5 @@
 }
 
 @end
+
+#endif
