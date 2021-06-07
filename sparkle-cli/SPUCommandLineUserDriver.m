@@ -97,7 +97,7 @@
     }
 }
 
-- (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem userInitiated:(BOOL)userInitiated state:(SPUUserUpdateState *)state reply:(void (^)(SPUUserUpdateChoice))reply
+- (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem state:(SPUUserUpdateState *)state reply:(void (^)(SPUUserUpdateChoice))reply
 {
     switch (state.stage) {
         case SPUUserUpdateStageNotDownloaded:
