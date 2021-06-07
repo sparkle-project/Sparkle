@@ -18,7 +18,7 @@
 #import <Foundation/Foundation.h>
 #endif
 
-#ifdef BUILDING_SPARKLE_TOOL
+#if defined(BUILDING_SPARKLE_TOOL) || defined(BUILDING_SPARKLE_TESTS)
 // Ignore incorrect warning
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wquoted-include-in-framework-header"
