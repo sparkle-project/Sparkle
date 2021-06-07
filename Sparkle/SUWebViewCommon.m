@@ -8,6 +8,9 @@
 
 #import "SUWebViewCommon.h"
 
+
+#include "AppKitPrevention.h"
+
 BOOL SUWebViewIsSafeURL(NSURL *url, BOOL *isAboutBlankURL)
 {
     NSString *scheme = url.scheme;
