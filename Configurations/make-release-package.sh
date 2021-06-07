@@ -34,8 +34,6 @@ if [ "$ACTION" = "" ] ; then
     cp -R "$CONFIGURATION_BUILD_DIR/sparkle.app" "$CONFIGURATION_BUILD_DIR/staging-spm"
     cp -R "$CONFIGURATION_BUILD_DIR/Sparkle.framework" "$CONFIGURATION_BUILD_DIR/staging"
     cp -R "$CONFIGURATION_BUILD_DIR/Sparkle.xcframework" "$CONFIGURATION_BUILD_DIR/staging-spm"
-    cp -R "$CONFIGURATION_BUILD_DIR/SparkleCore.framework" "$CONFIGURATION_BUILD_DIR/staging"
-    cp -R "$CONFIGURATION_BUILD_DIR/SparkleCore.xcframework" "$CONFIGURATION_BUILD_DIR/staging-spm"
 
     mkdir -p "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
 
@@ -60,7 +58,6 @@ if [ "$ACTION" = "" ] ; then
         cp -R "$CONFIGURATION_BUILD_DIR/sparkle.app.dSYM" "$CONFIGURATION_BUILD_DIR/staging"
         cp -R "$CONFIGURATION_BUILD_DIR/sparkle.app.dSYM" "$CONFIGURATION_BUILD_DIR/staging-spm"
         cp -R "$CONFIGURATION_BUILD_DIR/Sparkle.framework.dSYM" "$CONFIGURATION_BUILD_DIR/staging"
-        cp -R "$CONFIGURATION_BUILD_DIR/SparkleCore.framework.dSYM" "$CONFIGURATION_BUILD_DIR/staging"
 
         cp -R "$CONFIGURATION_BUILD_DIR/$INSTALLER_LAUNCHER_BUNDLE_ID.xpc.dSYM" "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
         cp -R "$CONFIGURATION_BUILD_DIR/$DOWNLOADER_BUNDLE_ID.xpc.dSYM" "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
@@ -101,7 +98,6 @@ if [ "$ACTION" = "" ] ; then
     # Test code signing validity of the extracted products
     # This guards against our archives being corrupt / created incorrectly
     codesign --verify -vvv --deep "/tmp/sparkle-extract/Sparkle.framework"
-    codesign --verify -vvv --deep "/tmp/sparkle-extract/SparkleCore.framework"
     codesign --verify -vvv --deep "/tmp/sparkle-extract/XPCServices/org.sparkle-project.Downloader.xpc"
     codesign --verify -vvv --deep "/tmp/sparkle-extract/XPCServices/org.sparkle-project.InstallerConnection.xpc"
     codesign --verify -vvv --deep "/tmp/sparkle-extract/XPCServices/org.sparkle-project.InstallerLauncher.xpc"

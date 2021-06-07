@@ -17,7 +17,7 @@
 #else
 #import <Foundation/Foundation.h>
 #endif
-#import "SUExport.h"
+#import <Sparkle/SUExport.h>
 @class SUSignatures;
 
 NS_ASSUME_NONNULL_BEGIN

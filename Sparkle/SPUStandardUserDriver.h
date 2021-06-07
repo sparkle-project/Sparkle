@@ -14,8 +14,8 @@
 #else
 #import <Cocoa/Cocoa.h>
 #endif
-#import "SPUUserDriver.h"
-#import "SUExport.h"
+#import <Sparkle/SPUUserDriver.h>
+#import <Sparkle/SUExport.h>
 
 NS_ASSUME_NONNULL_BEGIN
 

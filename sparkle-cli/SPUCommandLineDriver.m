@@ -7,7 +7,7 @@
 //
 
 #import "SPUCommandLineDriver.h"
-#import <SparkleCore/SparkleCore.h>
+#import <Sparkle/Sparkle.h>
 #import "SPUCommandLineUserDriver.h"
 
 @interface SPUCommandLineDriver () <SPUUpdaterDelegate>
