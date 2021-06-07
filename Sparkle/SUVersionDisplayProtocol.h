@@ -19,7 +19,7 @@
 /*!
     Applies special display formatting to version numbers.
 */
-@protocol SUVersionDisplay
+SU_EXPORT @protocol SUVersionDisplay
 
 /*!
     Formats two version strings.

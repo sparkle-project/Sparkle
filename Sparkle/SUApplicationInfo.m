@@ -6,9 +6,12 @@
 //  Copyright © 2016 Sparkle Project. All rights reserved.
 //
 
+#if SPARKLE_BUILD_UI_BITS || !BUILDING_SPARKLE
+
 #import "SUApplicationInfo.h"
 #import "SUBundleIcon.h"
 #import "SUHost.h"
+#import <AppKit/AppKit.h>
 
 @implementation SUApplicationInfo
 
@@ -41,3 +44,5 @@
 }
 
 @end
+
+#endif

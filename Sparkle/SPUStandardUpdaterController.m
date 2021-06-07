@@ -6,12 +6,15 @@
 //  Copyright © 2016 Sparkle Project. All rights reserved.
 //
 
+#if SPARKLE_BUILD_UI_BITS
+
 #import "SPUStandardUpdaterController.h"
 #import "SPUUpdater.h"
 #import "SUHost.h"
 #import "SPUStandardUserDriver.h"
 #import "SUConstants.h"
 #import "SULog.h"
+#import <AppKit/AppKit.h>
 
 static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObservationContext";
 
@@ -95,3 +98,5 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
 }
 
 @end
+
+#endif

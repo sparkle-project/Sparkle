@@ -6,6 +6,8 @@
 //  Copyright 2006 Andy Matuschak. All rights reserved.
 //
 
+#if SPARKLE_BUILD_UI_BITS
+
 #ifndef SUUPDATEALERT_H
 #define SUUPDATEALERT_H
 
@@ -32,5 +34,7 @@
 - (void)setInstallButtonFocus:(BOOL)focus;
 
 @end
+
+#endif
 
 #endif

@@ -45,8 +45,10 @@ static NSString * const UPDATED_VERSION = @"2.0";
         [[NSApplication sharedApplication] terminate:nil];
     }
     
+#if SPARKLE_BUILD_UI_BITS
     // Detect as early as possible if the shift key is held down
     BOOL shiftKeyHeldDown = ([NSEvent modifierFlags] & NSShiftKeyMask) != 0;
+#endif
     
     // Apple's file manager may not work well over the network (on macOS 10.11.4 as of writing this), but at the same time
     // I don't want to have to export SUFileManager in release mode. The test app is primarily
@@ -208,11 +210,15 @@ static NSString * const UPDATED_VERSION = @"2.0";
                 NSBundle *applicationBundle = hostBundle;
                 
                 id<SPUUserDriver> userDriver;
+#if SPARKLE_BUILD_UI_BITS
                 if (shiftKeyHeldDown) {
                     userDriver = [[SUPopUpTitlebarUserDriver alloc] initWithWindow:settingsWindow];
                 } else {
                     userDriver = [[SPUStandardUserDriver alloc] initWithHostBundle:hostBundle delegate:nil];
                 }
+#else
+                userDriver = [[SUPopUpTitlebarUserDriver alloc] initWithWindow:settingsWindow];
+#endif
                 
                 SPUUpdater *updater = [[SPUUpdater alloc] initWithHostBundle:hostBundle applicationBundle:applicationBundle userDriver:userDriver delegate:nil];
                 

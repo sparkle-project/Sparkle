@@ -6,11 +6,13 @@
 //  Copyright © 2016 Sparkle Project. All rights reserved.
 //
 
-#import <Cocoa/Cocoa.h>
+#if SPARKLE_BUILD_UI_BITS || !BUILDING_SPARKLE
+
+#import <Foundation/Foundation.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class SUHost;
+@class SUHost, NSImage, NSApplication;
 
 @interface SUApplicationInfo : NSObject
 
@@ -21,3 +23,5 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 NS_ASSUME_NONNULL_END
+
+#endif
