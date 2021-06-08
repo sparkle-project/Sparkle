@@ -17,7 +17,17 @@
 #else
 #import <Foundation/Foundation.h>
 #endif
+
+#ifdef BUILDING_SPARKLE_TESTS
+// Ignore incorrect warning
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wquoted-include-in-framework-header"
 #import "SUExport.h"
+#pragma clang diagnostic pop
+#else
+#import <Sparkle/SUExport.h>
+#endif
+
 @class SUSignatures;
 
 NS_ASSUME_NONNULL_BEGIN

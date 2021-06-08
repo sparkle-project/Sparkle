@@ -8,7 +8,7 @@
 
 #import "SPUCommandLineUserDriver.h"
 #import <AppKit/AppKit.h>
-#import <SparkleCore/SparkleCore.h>
+#import <Sparkle/Sparkle.h>
 
 #define SCHEDULED_UPDATE_TIMER_THRESHOLD 2.0 // seconds
 
@@ -97,7 +97,7 @@
     }
 }
 
-- (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem userInitiated:(BOOL)userInitiated state:(SPUUserUpdateState *)state reply:(void (^)(SPUUserUpdateChoice))reply
+- (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem state:(SPUUserUpdateState *)state reply:(void (^)(SPUUserUpdateChoice))reply
 {
     switch (state.stage) {
         case SPUUserUpdateStageNotDownloaded:

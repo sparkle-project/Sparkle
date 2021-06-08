@@ -6,6 +6,8 @@
 //  Copyright © 2017 Sparkle Project. All rights reserved.
 //
 
+#if SPARKLE_BUILD_UI_BITS || !BUILDING_SPARKLE
+
 #import <Cocoa/Cocoa.h>
 
 NS_ASSUME_NONNULL_BEGIN
@@ -19,3 +21,5 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 NS_ASSUME_NONNULL_END
+
+#endif

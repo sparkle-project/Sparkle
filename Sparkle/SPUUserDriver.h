@@ -15,8 +15,8 @@
 #import <Foundation/Foundation.h>
 #endif
 
-#import "SPUUserUpdateState.h"
-#import "SUExport.h"
+#import <Sparkle/SPUUserUpdateState.h>
+#import <Sparkle/SUExport.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
