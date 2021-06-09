@@ -94,14 +94,10 @@ GCC_WARN_UNUSED_VARIABLE = YES
 // These should be removed once the conversion to ARC is complete
 WARNING_CFLAGS_EXTRA = -Wno-custom-atomic-properties -Wno-implicit-atomic-properties
 
-// Disable warnings that came up in Xcode 12 about the use positional arguments
-// e.g. for NSLocalizedString format strings.
-WARNING_CFLAGS_DISABLE_POSITIONAL_WARNINGS = -Wno-format-non-iso
-
-// Disable warnings that flag our use of @import in framework headers, even though their
-// use is gated by feature tests for modules. I filed FB7566046 requesting that warnings
-// should not be generated in that scenario.
-WARNING_CFLAGS_ALLOW_MODULE_IMPORTS = -Wno-atimport-in-framework-header
+// New in Xcode 13 - yields several warnings in Sparkle that I just want to suppress for now.
+WARNING_CFLAGS_ALLOW_COMPLETION_HANDLER_MISUSE = -Wno-completion-handler
 
 // Turn on all warnings, then disable a few which are almost impossible to avoid
-WARNING_CFLAGS = -Wall -Weverything -Wno-unused-macros -Wno-gnu-statement-expression -Wno-arc-repeated-use-of-weak -Wno-auto-import -Wno-gnu-zero-variadic-macro-arguments -Wno-format-non-iso $(WARNING_CFLAGS_EXTRA)
+WARNING_CFLAGS = -Wall -Weverything -Wno-unused-macros -Wno-gnu-statement-expression -Wno-arc-repeated-use-of-weak -Wno-auto-import -Wno-gnu-zero-variadic-macro-arguments -Wno-format-non-iso $(WARNING_CFLAGS_EXTRA) $(WARNING_CFLAGS_ALLOW_COMPLETION_HANDLER_MISUSE)
+
+
