@@ -100,4 +100,5 @@ WARNING_CFLAGS_ALLOW_COMPLETION_HANDLER_MISUSE = -Wno-completion-handler
 // Turn on all warnings, then disable a few which are almost impossible to avoid
 WARNING_CFLAGS = -Wall -Weverything -Wno-unused-macros -Wno-gnu-statement-expression -Wno-arc-repeated-use-of-weak -Wno-auto-import -Wno-gnu-zero-variadic-macro-arguments -Wno-format-non-iso $(WARNING_CFLAGS_EXTRA) $(WARNING_CFLAGS_ALLOW_COMPLETION_HANDLER_MISUSE)
 
-
+// Disable Copy Phase Strip to avoid warnings at build time because of already signed code
+COPY_PHASE_STRIP = NO
