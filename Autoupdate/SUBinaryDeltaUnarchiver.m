@@ -33,7 +33,7 @@
     return [[path pathExtension] isEqualToString:@"delta"];
 }
 
-+ (BOOL)unsafeIfArchiveIsNotValidated
++ (BOOL)mustValidateBeforeExtraction
 {
     return YES;
 }

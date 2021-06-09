@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <Sparkle/SUExport.h>
+#import "SUExport.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -60,6 +60,19 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)moveItemAtURL:(NSURL *)sourceURL toURL:(NSURL *)destinationURL error:(NSError **)error;
 
 /**
+ * Replaces an original item with a new item atomically.
+ * @param originalItemURL A URL pointing to the original item to replace. The item at this URL must exist.
+ * @param newItemURL A URL pointing to the new item that will replace the original item.
+ * @param error If an error occurs, upon returns contains an NSError object that describes the problem. If you are not interested in possible errors, you may pass in NULL.
+ * @return YES if the original item was replaced with the new item successfully, otherwise NO along with a populated error object
+ *
+ * originalItemURL and newItemURL must reside on the same volume. If the operation succeeds, this will be be an atomic operation.
+ * Otherwise on failure you may need to re-try using move operations. This operation will fail on non-apfs volumes or volumes that don't support rename swapping.
+ * Both originalItemURL and newItemURL must exist.
+ */
+- (BOOL)replaceItemAtURL:(NSURL *)originalItemURL withItemAtURL:(NSURL *)newItemURL error:(NSError **)error __OSX_AVAILABLE(10.13);
+
+/**
  * Copies an item from a source to a destination
  * @param sourceURL A URL pointing to the item to move. The item at this URL must exist.
  * @param destinationURL A URL pointing to the destination the item will be moved at. An item must not already exist at this URL.
@@ -90,6 +103,7 @@ NS_ASSUME_NONNULL_BEGIN
  * If the owner and group IDs match on the root items of targetURL and matchURL, this method stops and assumes that nothing needs to be done.
  * Otherwise this method recursively changes the IDs if the target is a directory. If an item in the directory is encountered that is unable to be changed,
  * then this method stops and returns NO.
+ * While this method will try to change the group ID, being unable to change the group ID does not result in a failure if the owner ID can be changed or matched.
  *
  * This is not an atomic operation.
  */

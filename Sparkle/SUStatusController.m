@@ -6,6 +6,8 @@
 //  Copyright 2006 Andy Matuschak. All rights reserved.
 //
 
+#if SPARKLE_BUILD_UI_BITS || !BUILDING_SPARKLE
+
 #import "SUStatusController.h"
 #import "SUHost.h"
 #import "SUApplicationInfo.h"
@@ -158,3 +160,5 @@ static NSString *const SUStatusControllerTouchBarIndentifier = @"" SPARKLE_BUNDL
 }
 
 @end
+
+#endif

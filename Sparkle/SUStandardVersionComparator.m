@@ -6,8 +6,8 @@
 //  Copyright 2007 Andy Matuschak. All rights reserved.
 //
 
-#import <Sparkle/SUVersionComparisonProtocol.h>
-#import <Sparkle/SUStandardVersionComparator.h>
+#import "SUVersionComparisonProtocol.h"
+#import "SUStandardVersionComparator.h"
 
 
 #include "AppKitPrevention.h"
@@ -33,12 +33,15 @@ typedef NS_ENUM(NSInteger, SUCharacterType) {
     kNumberType,
     kStringType,
     kSeparatorType,
+    kDashType,
 };
 
 - (SUCharacterType)typeOfCharacter:(NSString *)character
 {
     if ([character isEqualToString:@"."]) {
         return kSeparatorType;
+    } else if ([character isEqualToString:@"-"]) {
+        return kDashType;
     } else if ([[NSCharacterSet decimalDigitCharacterSet] characterIsMember:[character characterAtIndex:0]]) {
         return kNumberType;
     } else if ([[NSCharacterSet whitespaceAndNewlineCharacterSet] characterIsMember:[character characterAtIndex:0]]) {
@@ -67,6 +70,9 @@ typedef NS_ENUM(NSInteger, SUCharacterType) {
     for (i = 1; i <= n; ++i) {
         character = [version substringWithRange:NSMakeRange(i, 1)];
         newType = [self typeOfCharacter:character];
+        if (newType == kDashType) {
+            break;
+        }
         if (oldType != newType || oldType == kSeparatorType) {
             // We've reached a new segment
             NSString *aPart = [[NSString alloc] initWithString:s];

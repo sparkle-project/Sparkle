@@ -1,14 +1,18 @@
 "%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ er hentet og klar til brug! Vil du installere og genstarte %1$@ nu?";
 
-"%1$@ can't be updated, because it was opened from a read-only or a temporary location. Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "%1$@ kan ikke opdateres når det køres fra en kun læsbar enhed. Flyt %1$@ til mappen Programmer, genstart derfra og prøv igen.";
+"%1$@ can't be updated, because it was opened from a read-only or a temporary location." = "%1$@ kan ikke opdateres når det køres fra en kun læsbar enhed.";
+
+"Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "Flyt %1$@ til mappen Programmer, genstart derfra og prøv igen.";
 
 "%@ %@ is currently the newest version available." = "%1$@ %2$@ er den aktuelle version.";
+
+"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%1$@ %2$@ er den aktuelle version.\n(Du kører lige nu version %3$@.)";
 
 /* Description text for SUUpdateAlert when the update is downloadable. */
 "%@ %@ is now available--you have %@. Would you like to download it now?" = "%1$@ %2$@ er tilgængelig! Du har %3$@. Skal den hentes nu?";
 
 /* Description text for SUUpdateAlert when the update informational with no download. */
-"%@ %@ is now available--you have %@. Would you like to learn more about this update on the web?" = "%1$@ %2$@ is now available--you have %3$@. Would you like to learn more about this update on the web?";
+"%@ %@ is now available--you have %@. Would you like to learn more about this update on the web?" = "%1$@ %2$@ er tilgængelig--du har %3$@. Vil du lære mere om denne opdatering på web?";
 
 "%@ downloaded" = "%@ hentet";
 
@@ -26,7 +30,7 @@
 
 "An error occurred while installing the update. Please try again later." = "Opdateringen kunne ikke installeres. Prøv igen senere.";
 
-"An error occurred while parsing the update feed." = "An error occurred while parsing the update feed.";
+"An error occurred while parsing the update feed." = "En fejl opstod under læsning af opdaterings-feed.";
 
 "An error occurred while relaunching %1$@, but the new version will be available next time you run %1$@." = "%1$@ kunne ikke genstartes. Den nye version vil være tilgængelig, næste gang %1$@ startes.";
 

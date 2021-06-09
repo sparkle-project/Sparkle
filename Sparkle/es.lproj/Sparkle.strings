@@ -2,9 +2,13 @@
 
 "%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "¡%1$@ %2$@ se ha descargado y está lista para usarse! ¿Te gustaría instalarla y volver a abrir %1$@ ahora?";
 
-"%1$@ can't be updated, because it was opened from a read-only or a temporary location. Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "%1$@ no se puede actualizar porque fue abierta desde una ubicación temporal o de solo lectura. Usa Finder para copiar %1$@ a la carpeta Aplicaciones, vuélvela a abrir desde ahí e inténtalo de nuevo.";
+"%1$@ can't be updated, because it was opened from a read-only or a temporary location." = "%1$@ no se puede actualizar porque fue abierta desde una ubicación temporal o de solo lectura.";
+
+"Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "Usa Finder para copiar %1$@ a la carpeta Aplicaciones, vuélvela a abrir desde ahí e inténtalo de nuevo.";
 
 "%@ %@ is currently the newest version available." = "%1$@ %2$@ es la versión más nueva disponible.";
+
+"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%1$@ %2$@ es la versión más nueva disponible.\n(You are currently running version %3$@.)";
 
 /* Description text for SUUpdateAlert when the update is downloadable. */
 "%@ %@ is now available--you have %@. Would you like to download it now?" = "%1$@ %2$@ ya está disponible (tienes la %3$@). ¿Quisieras descargarla ahora?";

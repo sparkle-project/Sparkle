@@ -1,10 +1,14 @@
 "%@ of %@" = "%1$@ de %2$@";
 
-"%1$@ can't be updated when it's running from a disk image. Move %1$@ to your Applications folder, relaunch it, and try again." = "%1$@ no es pot actualitzar quan funciona des d'un disc d'imatge. Moveu %1$@ al vostre directori Aplicacions, reinicieu-lo, i torneu a provar-ho.";
+"%1$@ can't be updated, because it was opened from a read-only or a temporary location." = "%1$@ no es pot actualitzar quan funciona des d'un disc d'imatge.";
+
+"Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "Moveu %1$@ al vostre directori Aplicacions, reinicieu-lo, i torneu a provar-ho.";
 
 "%@ %@ has been installed and will be ready to use next time %@ starts! Would you like to relaunch now?" = "%@ %@ ha estat instal·lat i estarà llest per a ser utilitzat la propera vegada que s'iniciï %@! Voleu reiniciar ara?";
 
 "%@ %@ is currently the newest version available." = "%@ %@ és la versió disponible més actual.";
+
+"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%@ %@ és la versió disponible més actual.\n(You are currently running version %@.)";
 
 /* Description text for SUUpdateAlert when the update is downloadable. */
 "%@ %@ is now available--you have %@. Would you like to download it now?" = "%@ %@ està disponible (ara teniu %@). Voleu actualitzar?";
@@ -37,6 +41,8 @@
 "Extracting update..." = "Extraient l'actualització…";
 
 "Install and Relaunch" = "Instal·la i reinicia";
+
+"Install on Quit" = "Reinicia el programa més tard";
 
 "Installing update..." = "Instal·lant l'actualització…";
 

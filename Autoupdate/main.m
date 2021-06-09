@@ -23,7 +23,7 @@ int main(int __unused argc, const char __unused *argv[])
         
         dispatch_source_t sigtermSource = dispatch_source_create(DISPATCH_SOURCE_TYPE_SIGNAL, SIGTERM, 0, dispatch_get_main_queue());
         dispatch_source_set_event_handler(sigtermSource, ^{
-            [appInstaller cleanupAndExitWithStatus:SIGTERM];
+            [appInstaller cleanupAndExitWithStatus:SIGTERM error:nil];
         });
         dispatch_resume(sigtermSource);
         

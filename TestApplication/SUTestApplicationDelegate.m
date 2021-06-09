@@ -11,16 +11,21 @@
 #import "SUFileManager.h"
 #import "SUTestWebServer.h"
 #import "TestAppHelperProtocol.h"
+#import "ed25519.h" // Run `git submodule update --init` if you get an error here
+#import <Sparkle/Sparkle.h>
+#import "SUPopUpTitlebarUserDriver.h"
 
 @interface SUTestApplicationDelegate ()
 
-@property (nonatomic) NSWindowController *updateSettingsWindowController;
+@property (nonatomic) SPUUpdater *updater;
+@property (nonatomic) SUUpdateSettingsWindowController *updateSettingsWindowController;
 @property (nonatomic) SUTestWebServer *webServer;
 
 @end
 
 @implementation SUTestApplicationDelegate
 
+@synthesize updater = _updater;
 @synthesize updateSettingsWindowController = _updateSettingsWindowController;
 @synthesize webServer = _webServer;
 
@@ -40,13 +45,15 @@ static NSString * const UPDATED_VERSION = @"2.0";
         [[NSApplication sharedApplication] terminate:nil];
     }
     
+#if SPARKLE_BUILD_UI_BITS
     // Detect as early as possible if the shift key is held down
     BOOL shiftKeyHeldDown = ([NSEvent modifierFlags] & NSShiftKeyMask) != 0;
+#endif
     
     // Apple's file manager may not work well over the network (on macOS 10.11.4 as of writing this), but at the same time
     // I don't want to have to export SUFileManager in release mode. The test app is primarily
     // aimed to be used in debug mode, so I think this is a good compromise
-#ifdef DEBUG
+#if DEBUG
     SUFileManager *fileManager = [[SUFileManager alloc] init];
 #else
     NSFileManager *fileManager = [NSFileManager defaultManager];
@@ -128,30 +135,18 @@ static NSString * const UPDATED_VERSION = @"2.0";
             
             // Don't ever do this at home, kids (seriously)
             // (that is, including the private key inside of your application)
-            NSString *privateKeyPath = [mainBundle pathForResource:@"test_app_only_dsa_priv_dont_ever_do_this_for_real" ofType:@"pem"];
-            assert(privateKeyPath != nil);
-            
-            // Sign our update
-            NSTask *signUpdateTask = [[NSTask alloc] init];
-            NSString *signUpdatePath = [mainBundle pathForResource:@"sign_update" ofType:@""];
-            assert(signUpdatePath != nil);
-            signUpdateTask.launchPath = signUpdatePath;
-            
+            const unsigned char self_sign_demo_only_insecure_hack[64] = {200, 238, 135, 84, 10, 189, 3, 193, 61, 208, 203, 30, 133, 47, 12, 22, 19, 52, 252, 99, 110, 205, 209, 94, 215, 144, 201, 70, 27, 162, 163, 108, 0, 164, 68, 184, 226, 93, 121, 199, 172, 17, 26, 64, 89, 68, 232, 41, 2, 26, 245, 175, 158, 165, 42, 55, 5, 97, 8, 243, 251, 164, 93, 9};
+            // in normal app this goes to Info.plist
+            const unsigned char public_key[32] = {121, 17, 79, 45, 155, 141, 51, 169, 188, 110, 91, 102, 182, 147, 215, 225, 252, 202, 110, 231, 200, 215, 62, 171, 40, 145, 237, 128, 130, 44, 150, 89};
+            unsigned char signature[64];
+
             NSURL *archiveURL = [serverDirectoryURL URLByAppendingPathComponent:zipName];
-            signUpdateTask.arguments = @[(NSString *)archiveURL.path, privateKeyPath];
-            
-            NSPipe *outputPipe = [NSPipe pipe];
-            signUpdateTask.standardOutput = outputPipe;
-            
-            [signUpdateTask launch];
-            [signUpdateTask waitUntilExit];
-            
-            assert(signUpdateTask.terminationStatus == 0);
-            
-            NSData *signatureData = [outputPipe.fileHandleForReading readDataToEndOfFile];
-            NSString *signature = [[[NSString alloc] initWithData:signatureData encoding:NSUTF8StringEncoding] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-            
-            assert(signature != nil);
+            NSData *archive = [NSData dataWithContentsOfURL:archiveURL];
+            assert(archive != nil);
+
+            ed25519_sign(signature, archive.bytes, archive.length, public_key, self_sign_demo_only_insecure_hack);
+
+            NSString *signatureString = [[NSData dataWithBytes:signature length:64] base64EncodedStringWithOptions:0];
             
             // Obtain the file attributes to get the file size of our update later
             NSError *fileAttributesError = nil;
@@ -188,7 +183,7 @@ static NSString * const UPDATED_VERSION = @"2.0";
             NSUInteger numberOfLengthReplacements = [appcastContents replaceOccurrencesOfString:@"$INSERT_ARCHIVE_LENGTH" withString:[NSString stringWithFormat:@"%llu", archiveFileAttributes.fileSize] options:NSLiteralSearch range:NSMakeRange(0, appcastContents.length)];
             assert(numberOfLengthReplacements == 1);
             
-            NSUInteger numberOfSignatureReplacements = [appcastContents replaceOccurrencesOfString:@"$INSERT_DSA_SIGNATURE" withString:signature options:NSLiteralSearch range:NSMakeRange(0, appcastContents.length)];
+            NSUInteger numberOfSignatureReplacements = [appcastContents replaceOccurrencesOfString:@"$INSERT_EDDSA_SIGNATURE" withString:signatureString options:NSLiteralSearch range:NSMakeRange(0, appcastContents.length)];
             assert(numberOfSignatureReplacements == 1);
             
             NSError *writeAppcastError = nil;
@@ -205,17 +200,50 @@ static NSString * const UPDATED_VERSION = @"2.0";
             }
             self.webServer = webServer;
             
-            // Show the Settings window
-            self.updateSettingsWindowController = [[SUUpdateSettingsWindowController alloc] initWithCustomUserDriver:shiftKeyHeldDown];
-            
-            [self.updateSettingsWindowController showWindow:nil];
+            // Set up updater and the updater settings window
+            {
+                self.updateSettingsWindowController = [[SUUpdateSettingsWindowController alloc] init];
+                
+                NSWindow *settingsWindow = self.updateSettingsWindowController.window;
+                
+                NSBundle *hostBundle = [NSBundle mainBundle];
+                NSBundle *applicationBundle = hostBundle;
+                
+                id<SPUUserDriver> userDriver;
+#if SPARKLE_BUILD_UI_BITS
+                if (shiftKeyHeldDown) {
+                    userDriver = [[SUPopUpTitlebarUserDriver alloc] initWithWindow:settingsWindow];
+                } else {
+                    userDriver = [[SPUStandardUserDriver alloc] initWithHostBundle:hostBundle delegate:nil];
+                }
+#else
+                userDriver = [[SUPopUpTitlebarUserDriver alloc] initWithWindow:settingsWindow];
+#endif
+                
+                SPUUpdater *updater = [[SPUUpdater alloc] initWithHostBundle:hostBundle applicationBundle:applicationBundle userDriver:userDriver delegate:nil];
+                
+                self.updater = updater;
+                self.updateSettingsWindowController.updater = updater;
+                
+                NSError *updaterError = nil;
+                if (![updater startUpdater:&updaterError]) {
+                    NSLog(@"Failed to start updater with error: %@", updaterError);
+                    
+                    NSAlert *alert = [[NSAlert alloc] init];
+                    alert.messageText = @"Updater Error";
+                    alert.informativeText = @"The Updater failed to start. For detailed error information, check the Console.app log.";
+                    [alert addButtonWithTitle:@"OK"];
+                    [alert runModal];
+                }
+                
+                [self.updateSettingsWindowController showWindow:nil];
+            }
         });
     }];
 }
 
 - (void)signApplicationIfRequiredAtPath:(NSString *)applicationPath completion:(void (^)(void))completionBlock
 {
-#ifdef DEBUG
     // This is unfortunately necessary for testing sandboxing
     NSXPCConnection *codeSignConnection = [[NSXPCConnection alloc] initWithServiceName:@"org.sparkle-project.TestAppHelper"];
     codeSignConnection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(TestAppHelperProtocol)];
@@ -227,15 +255,24 @@ static NSString * const UPDATED_VERSION = @"2.0";
         
         completionBlock();
     }];
-#else
-    (void)(applicationPath); // ignore unused warning
-    completionBlock();
-#endif
 }
 
 - (void)applicationWillTerminate:(NSNotification * __unused)notification
 {
     [self.webServer close];
+}
+
+- (IBAction)checkForUpdates:(id __unused)sender
+{
+    [self.updater checkForUpdates];
+}
+
+- (BOOL)validateMenuItem:(NSMenuItem *)menuItem
+{
+    if (menuItem.action == @selector(checkForUpdates:)) {
+        return self.updater.canCheckForUpdates;
+    }
+    return YES;
 }
 
 @end

@@ -17,8 +17,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)didFailToFetchAppcastWithError:(NSError *)error;
 - (void)didFinishLoadingAppcast:(SUAppcast *)appcast;
-- (void)didFindValidUpdateWithAppcastItem:(SUAppcastItem *)appcastItem;
-- (void)didNotFindUpdate;
+- (void)didFindValidUpdateWithAppcastItem:(SUAppcastItem *)appcastItem secondaryAppcastItem:(SUAppcastItem *)secondaryAppcastItem preventsAutoupdate:(BOOL)preventsAutoupdate;
+- (void)didNotFindUpdateWithLatestAppcastItem:(nullable SUAppcastItem *)latestAppcastItem hostToLatestAppcastItemComparisonResult:(NSComparisonResult)hostToLatestAppcastItemComparisonResult passesMinOSVersion:(BOOL)passesMinOSVersion passesMaxOSVersion:(BOOL)passesMaxOSVersion;
 
 @end
 
@@ -26,9 +26,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithHost:(SUHost *)host updater:(id)updater updaterDelegate:(nullable id <SPUUpdaterDelegate>)updaterDelegate delegate:(nullable id <SUAppcastDriverDelegate>)delegate;
 
-- (void)loadAppcastFromURL:(NSURL *)appcastURL userAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background includesSkippedUpdates:(BOOL)includesSkippedUpdates;
+- (void)loadAppcastFromURL:(NSURL *)appcastURL userAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background;
 
-@property (nullable, nonatomic, readonly) SUAppcastItem *nonDeltaUpdateItem;
+- (void)cleanup:(void (^)(void))completionHandler;
 
 @end
 

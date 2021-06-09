@@ -17,18 +17,25 @@
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>1.5</string>
+	<string>1.5.1</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.5</string>
+	<string>1.5.1</string>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
 	<key>SUEnableSystemProfiling</key>
 	<true/>
+	<key>LSMinimumSystemVersion</key>
+	<string>$(MACOSX_DEPLOYMENT_TARGET)</string>
 	<key>SUFeedURL</key>
 	<string>http://localhost:1337/sparkletestcast.xml</string>
-	<key>SUPublicDSAKeyFile</key>
-	<string>test_app_only_dsa_pub.pem</string>
+	<key>SUPublicEDKey</key>
+	<string>eRFPLZuNM6m8bltmtpPX4fzKbufI1z6rKJHtgIIsllk=</string>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+	</dict>
 </dict>
 </plist>

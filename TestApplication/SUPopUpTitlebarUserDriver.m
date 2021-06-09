@@ -8,12 +8,12 @@
 
 #import "SUPopUpTitlebarUserDriver.h"
 #import "SUInstallUpdateViewController.h"
+#import <AppKit/AppKit.h>
 
 @interface SUPopUpTitlebarUserDriver()
 
 @property (nonatomic, readonly) NSWindow *window;
 @property (nonatomic, nullable) SUInstallUpdateViewController *installUpdateViewController;
-@property (nonatomic, readonly) SPUUserDriverCoreComponent *coreComponent;
 @property (nonatomic) NSTitlebarAccessoryViewController *accessoryViewController;
 @property (nonatomic) BOOL addedAccessory;
 @property (nonatomic) NSButton *updateButton;
@@ -27,7 +27,6 @@
 
 @synthesize window = _window;
 @synthesize installUpdateViewController = _installUpdateViewController;
-@synthesize coreComponent = _coreComponent;
 @synthesize accessoryViewController = _accessoryViewController;
 @synthesize addedAccessory = _addedAccessory;
 @synthesize updateButton = _updateButton;
@@ -40,7 +39,6 @@
     self = [super init];
     if (self != nil) {
         _window = window;
-        _coreComponent = [[SPUUserDriverCoreComponent alloc] init];
     }
     return self;
 }
@@ -99,34 +97,18 @@
     self.updateButtonAction = nil;
 }
 
-#pragma mark Can Check for Updates?
-
-- (void)showCanCheckForUpdates:(BOOL)canCheckForUpdates
-{
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self.coreComponent showCanCheckForUpdates:canCheckForUpdates];
-    });
-}
-
-- (BOOL)canCheckForUpdates
-{
-    return self.coreComponent.canCheckForUpdates;
-}
-
 #pragma mark Update Permission
 
 - (void)showUpdatePermissionRequest:(SPUUpdatePermissionRequest *)__unused request reply:(void (^)(SUUpdatePermissionResponse *))reply
 {
     // Just make a decision..
-    dispatch_async(dispatch_get_main_queue(), ^{
-        SUUpdatePermissionResponse *response = [[SUUpdatePermissionResponse alloc] initWithAutomaticUpdateChecks:YES sendSystemProfile:NO];
-        reply(response);
-    });
+    SUUpdatePermissionResponse *response = [[SUUpdatePermissionResponse alloc] initWithAutomaticUpdateChecks:YES sendSystemProfile:NO];
+    reply(response);
 }
 
 #pragma mark Update Found
 
-- (void)showUpdateWithAppcastItem:(SUAppcastItem *)appcastItem skippable:(BOOL)skippable reply:(void (^)(SPUUpdateAlertChoice))reply
+- (void)showUpdateWithAppcastItem:(SUAppcastItem *)appcastItem reply:(void (^)(SPUUserUpdateChoice))reply
 {
     NSPopover *popover = [[NSPopover alloc] init];
     popover.behavior = NSPopoverBehaviorTransient;
@@ -134,7 +116,7 @@
     __weak SUPopUpTitlebarUserDriver *weakSelf = self;
     __block NSButton *actionButton = nil;
     
-    SUInstallUpdateViewController *viewController = [[SUInstallUpdateViewController alloc] initWithAppcastItem:appcastItem skippable:skippable reply:^(SPUUpdateAlertChoice choice) {
+    SUInstallUpdateViewController *viewController = [[SUInstallUpdateViewController alloc] initWithAppcastItem:appcastItem reply:^(SPUUserUpdateChoice choice) {
         reply(choice);
         
         [popover close];
@@ -152,46 +134,25 @@
     }];
 }
 
-- (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem userInitiated:(BOOL)__unused userInitiated reply:(void (^)(SPUUpdateAlertChoice))reply
+- (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem state:(SPUUserUpdateState *)state reply:(void (^)(SPUUserUpdateChoice))reply
 {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self showUpdateWithAppcastItem:appcastItem skippable:YES reply:reply];
-    });
-}
-
-- (void)showDownloadedUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem userInitiated:(BOOL)__unused userInitiated reply:(void (^)(SPUUpdateAlertChoice))reply
-{
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self showUpdateWithAppcastItem:appcastItem skippable:YES reply:reply];
-    });
-}
-
-- (void)showResumableUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem userInitiated:(BOOL)__unused userInitiated reply:(void (^)(SPUInstallUpdateStatus))reply
-{
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self showUpdateWithAppcastItem:appcastItem skippable:NO reply:^(SPUUpdateAlertChoice choice) {
-            switch (choice) {
-                case SPUInstallUpdateChoice:
-                    reply(SPUInstallAndRelaunchUpdateNow);
-                    break;
-                case SPUInstallLaterChoice:
-                    reply(SPUDismissUpdateInstallation);
-                    break;
-                case SPUSkipThisVersionChoice:
-                    abort();
-            }
-        }];
-    });
-}
-
-- (void)showInformationalUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem userInitiated:(BOOL)__unused userInitiated reply:(void (^)(SPUInformationalUpdateAlertChoice))reply
-{
-    // Todo: show user interface for this
-    dispatch_async(dispatch_get_main_queue(), ^{
-        NSLog(@"Found info URL: %@", appcastItem.infoURL);
-        
-        reply(SPUDismissInformationalNoticeChoice);
-    });
+    switch (state.stage) {
+        case SPUUserUpdateStageInformational:
+            // Todo: show user interface for this
+            NSLog(@"Found info URL: %@", appcastItem.infoURL);
+            
+            // Remove UI from user initiated check
+            [self removeUpdateButton];
+            
+            reply(SPUUserUpdateChoiceDismiss);
+            
+            break;
+        case SPUUserUpdateStageNotDownloaded:
+        case SPUUserUpdateStageDownloaded:
+        case SPUUserUpdateStageInstalling:
+            [self showUpdateWithAppcastItem:appcastItem reply:reply];
+            break;
+    }
 }
 
 - (void)showUpdateReleaseNotesWithDownloadData:(SPUDownloadData *)downloadData
@@ -203,165 +164,122 @@
 {
 }
 
+- (void)showUpdateInFocus
+{
+    [self.window makeKeyAndOrderFront:nil];
+    
+    if (self.updateButton.enabled) {
+        // Not the proper way to do things but ignoring warnings in Test App.
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wobjc-messaging-id"
+#pragma clang diagnostic ignored "-Warc-performSelector-leaks"
+        [self.updateButton.target performSelector:self.updateButton.action withObject:self.updateButton];
+#pragma clang diagnostic pop
+    }
+}
+
 #pragma mark Install & Relaunch Update
 
-- (void)showReadyToInstallAndRelaunch:(void (^)(SPUInstallUpdateStatus))installUpdateHandler
+- (void)showReadyToInstallAndRelaunch:(void (^)(SPUUserUpdateChoice))installUpdateHandler
 {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self.coreComponent registerInstallUpdateHandler:installUpdateHandler];
-        
-        __weak SUPopUpTitlebarUserDriver *weakSelf = self;
-        [self addUpdateButtonWithTitle:@"Install & Relaunch" action:^(NSButton *__unused button) {
-            [weakSelf.coreComponent installUpdateWithChoice:SPUInstallAndRelaunchUpdateNow];
-        }];
-    });
+    [self addUpdateButtonWithTitle:@"Install & Relaunch" action:^(NSButton *__unused button) {
+        installUpdateHandler(SPUUserUpdateChoiceInstall);
+    }];
 }
 
 #pragma mark Check for Updates
 
-- (void)showUserInitiatedUpdateCheckWithCompletion:(void (^)(SPUUserInitiatedCheckStatus))updateCheckStatusCompletion
+- (void)showUserInitiatedUpdateCheckWithCancellation:(void (^)(void))__unused cancellation
 {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self.coreComponent registerUpdateCheckStatusHandler:updateCheckStatusCompletion];
-        
-        [self addUpdateButtonWithTitle:@"Checking for Updates…"];
-    });
-}
-
-- (void)dismissUserInitiatedUpdateCheck
-{
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self.coreComponent completeUpdateCheckStatus];
-        [self removeUpdateButton];
-    });
+    [self addUpdateButtonWithTitle:@"Checking for Updates…"];
 }
 
 #pragma mark Update Errors
 
-- (void)acceptAcknowledgementAfterDelay
+- (void)acceptAcknowledgementAfterDelay:(void (^)(void))acknowledgement
 {
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         // Installation will be dismissed shortly after this
-        [self.coreComponent acceptAcknowledgement];
+        acknowledgement();
     });
 }
 
 - (void)showUpdaterError:(NSError *)error acknowledgement:(void (^)(void))acknowledgement
 {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self.coreComponent registerAcknowledgement:acknowledgement];
-        
-        NSLog(@"Error: %@", error);
-        [self addUpdateButtonWithTitle:@"Update Errored!" action:nil];
-        
-        [self acceptAcknowledgementAfterDelay];
-    });
+    NSLog(@"Error: %@", error);
+    [self addUpdateButtonWithTitle:@"Update Errored!" action:nil];
+    
+    [self acceptAcknowledgementAfterDelay:acknowledgement];
 }
 
-- (void)showUpdateNotFoundWithAcknowledgement:(void (^)(void))acknowledgement
+- (void)showUpdateNotFoundWithError:(NSError *)error acknowledgement:(void (^)(void))acknowledgement
 {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self.coreComponent registerAcknowledgement:acknowledgement];
-        
-        [self addUpdateButtonWithTitle:@"No Update Available" action:nil];
-        
-        [self acceptAcknowledgementAfterDelay];
-    });
+    [self addUpdateButtonWithTitle:@"No Update Available" action:nil];
+    
+    [self acceptAcknowledgementAfterDelay:acknowledgement];
 }
 
 #pragma mark Download & Install Updates
 
-- (void)showDownloadInitiatedWithCompletion:(void (^)(SPUDownloadUpdateStatus))downloadUpdateStatusCompletion
+- (void)showDownloadInitiatedWithCancellation:(void (^)(void))__unused cancellation
 {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self.coreComponent registerDownloadStatusHandler:downloadUpdateStatusCompletion];
-    });
 }
 
 - (void)showDownloadDidReceiveExpectedContentLength:(uint64_t)expectedContentLength
 {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self addUpdateButtonWithTitle:@"Downloading…"];
-        self.contentLengthDownloaded = 0;
-        self.expectedContentLength = expectedContentLength;
-    });
+    [self addUpdateButtonWithTitle:@"Downloading…"];
+    self.contentLengthDownloaded = 0;
+    self.expectedContentLength = expectedContentLength;
 }
 
 - (void)showDownloadDidReceiveDataOfLength:(uint64_t)length
 {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        self.contentLengthDownloaded += length;
-        
-        // In case our expected content length was incorrect
-        if (self.contentLengthDownloaded > self.expectedContentLength) {
-            self.expectedContentLength = self.contentLengthDownloaded;
-        }
-        
-        if (self.expectedContentLength > 0) {
-            double progress = (double)self.contentLengthDownloaded / self.expectedContentLength;
-            [self addUpdateButtonWithTitle:[NSString stringWithFormat:@"Downloading (%0.0f%%)", progress * 100] action:nil];
-        }
-    });
+    self.contentLengthDownloaded += length;
+    
+    // In case our expected content length was incorrect
+    if (self.contentLengthDownloaded > self.expectedContentLength) {
+        self.expectedContentLength = self.contentLengthDownloaded;
+    }
+    
+    if (self.expectedContentLength > 0) {
+        double progress = (double)self.contentLengthDownloaded / self.expectedContentLength;
+        [self addUpdateButtonWithTitle:[NSString stringWithFormat:@"Downloading (%0.0f%%)", progress * 100] action:nil];
+    }
 }
 
 - (void)showDownloadDidStartExtractingUpdate
 {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self.coreComponent completeDownloadStatus];
-        [self addUpdateButtonWithTitle:@"Extracting…"];
-    });
+    [self addUpdateButtonWithTitle:@"Extracting…"];
 }
 
 - (void)showExtractionReceivedProgress:(double)progress
 {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self addUpdateButtonWithTitle:[NSString stringWithFormat:@"Extracting (%d%%)…", (int)(progress * 100)]];
-    });
+    [self addUpdateButtonWithTitle:[NSString stringWithFormat:@"Extracting (%d%%)…", (int)(progress * 100)]];
 }
 
 - (void)showInstallingUpdate
 {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self addUpdateButtonWithTitle:@"Installing…"];
-    });
+    [self addUpdateButtonWithTitle:@"Installing…"];
 }
 
 - (void)showSendingTerminationSignal
 {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        // In case our termination request fails or is delayed
-        [self removeUpdateButton];
-    });
+    // In case our termination request fails or is delayed
+    [self removeUpdateButton];
 }
 
-- (void)showUpdateInstallationDidFinishWithAcknowledgement:(void (^)(void))acknowledgement
+- (void)showUpdateInstalledAndRelaunched:(BOOL)__unused relaunched acknowledgement:(void (^)(void))acknowledgement
 {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self.coreComponent registerAcknowledgement:acknowledgement];
-        
-        [self addUpdateButtonWithTitle:@"Installation Finished!"];
-        
-        [self acceptAcknowledgementAfterDelay];
-    });
+    [self addUpdateButtonWithTitle:@"Installation Finished!"];
+    
+    [self acceptAcknowledgementAfterDelay:acknowledgement];
 }
 
 #pragma mark Aborting Everything
 
-- (void)_dismissUpdateInstallation
-{
-    // Make sure everything we call here does not dispatch async to main queue
-    // because we are already on the main queue (and I've been bitten in the past by this before)
-    
-    [self.coreComponent dismissUpdateInstallation];
-    
-    [self removeUpdateButton];
-}
-
 - (void)dismissUpdateInstallation
 {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self _dismissUpdateInstallation];
-    });
+    [self removeUpdateButton];
 }
 
 @end

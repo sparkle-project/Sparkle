@@ -6,12 +6,15 @@
 //  Copyright 2006 Andy Matuschak. All rights reserved.
 //
 
-#import <Sparkle/SUUpdater.h>
-#import <Sparkle/SPUUpdater.h>
-#import <Sparkle/SPUStandardUserDriver.h>
-#import <Sparkle/SPUStandardUserDriverDelegate.h>
-#import <Sparkle/SPUUpdaterDelegate.h>
+#if SPARKLE_BUILD_UI_BITS
+
+#import "SUUpdater.h"
+#import "SPUUpdater.h"
+#import "SPUStandardUserDriver.h"
+#import "SPUStandardUserDriverDelegate.h"
+#import "SPUUpdaterDelegate.h"
 #import "SULog.h"
+#import <AppKit/AppKit.h>
 
 @interface SUUpdater () <SPUUpdaterDelegate, SPUStandardUserDriverDelegate>
 
@@ -79,11 +82,10 @@ static NSMutableDictionary *sharedUpdaters = nil;
         // See -[SUUpdater _standardUserDriverRequestsPathToRelaunch] and -[SUUpdater _pathToRelaunchForUpdater:] implemented below which resolves this
         _userDriver = [[SPUStandardUserDriver alloc] initWithHostBundle:bundle delegate:self];
         _updater = [[SPUUpdater alloc] initWithHostBundle:bundle applicationBundle:bundle userDriver:_userDriver delegate:self];
-
+        
         NSError *updaterError = nil;
-        if (![_updater startUpdater:&updaterError]) {
+        if (![self.updater startUpdater:&updaterError]) {
             SULog(SULogLevelError, @"Error: Failed to start updater with error: %@", updaterError);
-            abort();
         }
     }
     return self;
@@ -92,7 +94,7 @@ static NSMutableDictionary *sharedUpdaters = nil;
 // This will be used when the updater is instantiated in a nib such as MainMenu
 - (instancetype)init
 {
-    SULog(SULogLevelDefault, @"DEPRECATION: SUUpdater is now deprecated. Please use SPUStandardUpdaterController as a nib instantiated replacement, or SPUUpdater.");
+    SULog(SULogLevelDefault, @"DEPRECATION: SUUpdater is deprecated in Sparkle 2 but functional for transitional purposes. Please migrate to SPUStandardUpdaterController as a nib instantiated replacement, or SPUUpdater.");
     return [self initForBundle:[NSBundle mainBundle]];
 }
 
@@ -189,7 +191,7 @@ static NSMutableDictionary *sharedUpdaters = nil;
 - (BOOL)validateMenuItem:(NSMenuItem *)item
 {
     if ([item action] == @selector(checkForUpdates:)) {
-        return self.userDriver.canCheckForUpdates;
+        return self.updater.canCheckForUpdates;
     }
     return YES;
 }
@@ -211,7 +213,9 @@ static NSMutableDictionary *sharedUpdaters = nil;
 
 - (BOOL)updateInProgress
 {
-    return !self.userDriver.canCheckForUpdates;
+    // This is not quite true -- we may be able to check / resume an update if one is in progress
+    // But this is a close enough approximation for 1.x updater API
+    return self.updater.sessionInProgress;
 }
 
 // Not implemented properly at the moment - leaning towards it not be in the future
@@ -321,11 +325,25 @@ static NSMutableDictionary *sharedUpdaters = nil;
     }
 }
 
+- (void)updater:(SPUUpdater *)__unused updater userDidSkipThisVersion:(nonnull SUAppcastItem *)item
+{
+    if ([self.delegate respondsToSelector:@selector(updater:userDidSkipThisVersion:)]) {
+        [self.delegate updater:self userDidSkipThisVersion:item];
+    }
+}
+
 - (void)updater:(SPUUpdater *)__unused updater willDownloadUpdate:(SUAppcastItem *)item withRequest:(NSMutableURLRequest *)request
 {
     if ([self.delegate respondsToSelector:@selector(updater:willDownloadUpdate:withRequest:)]) {
         [self.delegate updater:self willDownloadUpdate:item withRequest:request];
-        }
+    }
+}
+
+- (void)updater:(SPUUpdater *)__unused updater didDownloadUpdate:(SUAppcastItem *)item
+{
+    if ([self.delegate respondsToSelector:@selector(updater:didDownloadUpdate:)]) {
+        [self.delegate updater:self didDownloadUpdate:item];
+    }
 }
 
 - (void)updater:(SPUUpdater *)__unused updater failedToDownloadUpdate:(SUAppcastItem *)item error:(NSError *)error
@@ -339,6 +357,20 @@ static NSMutableDictionary *sharedUpdaters = nil;
 {
     if ([self.delegate respondsToSelector:@selector(userDidCancelDownload:)]) {
         [self.delegate userDidCancelDownload:self];
+    }
+}
+
+- (void)updater:(SPUUpdater *)updater willExtractUpdate:(SUAppcastItem *)item
+{
+    if ([self.delegate respondsToSelector:@selector(updater:willExtractUpdate:)]) {
+        [self.delegate updater:self willExtractUpdate:item];
+    }
+}
+
+- (void)updater:(SPUUpdater *)updater didExtractUpdate:(SUAppcastItem *)item
+{
+    if ([self.delegate respondsToSelector:@selector(updater:didExtractUpdate:)]) {
+        [self.delegate updater:self didExtractUpdate:item];
     }
 }
 
@@ -372,6 +404,9 @@ static NSMutableDictionary *sharedUpdaters = nil;
         self.postponedInstallHandler = installHandler;
 
         shouldPostponeRelaunch = [self.delegate updater:self shouldPostponeRelaunchForUpdate:item untilInvoking:invocation];
+    } else if ([self.delegate respondsToSelector:@selector(updater:shouldPostponeRelaunchForUpdate:)]) {
+        // This API should really take a block, but not fixing a 1.x mishap now
+        shouldPostponeRelaunch = [self.delegate updater:self shouldPostponeRelaunchForUpdate:item];
     }
     
     return shouldPostponeRelaunch;
@@ -429,7 +464,13 @@ static NSMutableDictionary *sharedUpdaters = nil;
 {
     BOOL installationHandledByDelegate = NO;
     
-    if ([self.delegate respondsToSelector:@selector(updater:willInstallUpdateOnQuit:immediateInstallationInvocation:)]) {
+    if ([self.delegate respondsToSelector:@selector((updater:willInstallUpdateOnQuit:immediateInstallationBlock:))]) {
+        [self.delegate updater:self willInstallUpdateOnQuit:item immediateInstallationBlock:immediateInstallHandler];
+        
+        // We have to assume they will handle the installation since they implement this method
+        // Not ideal, but this is why this delegate callback is deprecated
+        installationHandledByDelegate = YES;
+    } else if ([self.delegate respondsToSelector:@selector(updater:willInstallUpdateOnQuit:immediateInstallationInvocation:)]) {
         NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[[self class] instanceMethodSignatureForSelector:@selector(finishSilentInstallation)]];
         
         // This invocation will retain self, but this instance is kept alive forever by our singleton pattern anyway
@@ -455,3 +496,5 @@ static NSMutableDictionary *sharedUpdaters = nil;
 }
 
 @end
+
+#endif

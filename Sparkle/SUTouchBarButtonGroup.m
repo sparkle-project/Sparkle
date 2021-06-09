@@ -6,6 +6,8 @@
 //  Copyright © 2017 Sparkle Project. All rights reserved.
 //
 
+#if SPARKLE_BUILD_UI_BITS || !BUILDING_SPARKLE
+
 #import "SUTouchBarButtonGroup.h"
 
 #if __MAC_OS_X_VERSION_MAX_ALLOWED < 101200
@@ -73,3 +75,5 @@
 }
 
 @end
+
+#endif

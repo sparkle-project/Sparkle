@@ -1,0 +1,34 @@
+---
+name: Sparkle 2.x doesn't work in my app
+about: Problems with using the beta version of Sparkle 2
+title: ''
+labels: '2.x'
+assignees: ''
+
+---
+
+<!-- 
+
+The answer to your issue is probably already in Console.app on your computer.
+Please use Console.app and search for Sparkle.
+
+Please try troubleshooting steps:
+https://github.com/sparkle-project/Sparkle#troubleshooting
+
+-->
+
+### Description of the problem
+
+
+### Do you use Sandboxing in your app?
+
+### Version of `Sparkle.framework` in the latest version of your app
+
+### Version of `Sparkle.framework` in the old version of app that your users have (or N/A)
+
+### Sparkle's output from Console.app
+```
+
+```
+
+### Steps to reproduce the behavior

@@ -14,20 +14,28 @@
 
 static NSString *SUAppcastItemKey = @"SUAppcastItem";
 static NSString *SUCanSilentlyInstallKey = @"SUCanSilentlyInstall";
+static NSString *SUSystemDomainKey = @"SUSystemDomain";
 
 @implementation SPUInstallationInfo
 
 @synthesize appcastItem = _appcastItem;
 @synthesize canSilentlyInstall = _canSilentlyInstall;
+@synthesize systemDomain = _systemDomain;
 
-- (instancetype)initWithAppcastItem:(SUAppcastItem *)appcastItem canSilentlyInstall:(BOOL)canSilentlyInstall
+- (instancetype)initWithAppcastItem:(SUAppcastItem *)appcastItem canSilentlyInstall:(BOOL)canSilentlyInstall systemDomain:(BOOL)systemDomain
 {
     self = [super init];
     if (self != nil) {
         _appcastItem = appcastItem;
         _canSilentlyInstall = canSilentlyInstall;
+        _systemDomain = systemDomain;
     }
     return self;
+}
+
+- (instancetype)initWithAppcastItem:(SUAppcastItem *)appcastItem canSilentlyInstall:(BOOL)canSilentlyInstall
+{
+    return [self initWithAppcastItem:appcastItem canSilentlyInstall:canSilentlyInstall systemDomain:NO];
 }
 
 - (nullable instancetype)initWithCoder:(NSCoder *)decoder
@@ -38,13 +46,15 @@ static NSString *SUCanSilentlyInstallKey = @"SUCanSilentlyInstall";
     }
     
     BOOL canSilentlyInstall = [decoder decodeBoolForKey:SUCanSilentlyInstallKey];
-    return [self initWithAppcastItem:appcastItem canSilentlyInstall:canSilentlyInstall];
+    BOOL systemDomain = [decoder decodeBoolForKey:SUSystemDomainKey];
+    return [self initWithAppcastItem:appcastItem canSilentlyInstall:canSilentlyInstall systemDomain:systemDomain];
 }
 
 - (void)encodeWithCoder:(NSCoder *)coder
 {
     [coder encodeObject:self.appcastItem forKey:SUAppcastItemKey];
     [coder encodeBool:self.canSilentlyInstall forKey:SUCanSilentlyInstallKey];
+    [coder encodeBool:self.systemDomain forKey:SUSystemDomainKey];
 }
 
 + (BOOL)supportsSecureCoding

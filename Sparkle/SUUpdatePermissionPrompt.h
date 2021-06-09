@@ -6,6 +6,8 @@
 //  Copyright 2008 Andy Matuschak. All rights reserved.
 //
 
+#if SPARKLE_BUILD_UI_BITS
+
 #ifndef SUUPDATEPERMISSIONPROMPT_H
 #define SUUPDATEPERMISSIONPROMPT_H
 
@@ -15,10 +17,10 @@
 
 @interface SUUpdatePermissionPrompt : NSWindowController
 
-+ (void)promptWithHost:(SUHost *)host request:(SPUUpdatePermissionRequest *)request reply:(void (^)(SUUpdatePermissionResponse *))reply;
+- (instancetype)initPromptWithHost:(SUHost *)theHost request:(SPUUpdatePermissionRequest *)request reply:(void (^)(SUUpdatePermissionResponse *))reply;
 
-- (IBAction)toggleMoreInfo:(id)sender;
-- (IBAction)finishPrompt:(NSButton *)sender;
 @end
+
+#endif
 
 #endif

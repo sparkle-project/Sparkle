@@ -10,32 +10,46 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class SUAppcastItem, SUHost, SPUDownloadedUpdate;
+@class SUAppcastItem, SUHost, SPUDownloadedUpdate, SPUDownloadData;
 
 @protocol SPUDownloadDriverDelegate <NSObject>
 
+- (void)downloadDriverDidFailToDownloadFileWithError:(NSError *)error;
+
+@optional
+
 - (void)downloadDriverWillBeginDownload;
 
-- (void)downloadDriverDidReceiveExpectedContentLength:(uint64_t)expectedContentLength;
-
-- (void)downloadDriverDidReceiveDataOfLength:(uint64_t)length;
-
+// For persitent update downloads
 - (void)downloadDriverDidDownloadUpdate:(SPUDownloadedUpdate *)downloadedUpdate;
 
-- (void)downloadDriverDidFailToDownloadUpdateWithError:(NSError *)error;
+// For temporary downloads
+- (void)downloadDriverDidDownloadData:(SPUDownloadData *)downloadData;
+
+// Only for persistent downloads
+- (void)downloadDriverDidReceiveExpectedContentLength:(uint64_t)expectedContentLength;
+
+// Only for persistent downloads
+- (void)downloadDriverDidReceiveDataOfLength:(uint64_t)length;
 
 @end
 
 @interface SPUDownloadDriver : NSObject
 
-- (instancetype)initWithUpdateItem:(SUAppcastItem *)updateItem host:(SUHost *)host userAgent:(NSString *)userAgent inBackground:(BOOL)background delegate:(id<SPUDownloadDriverDelegate>)delegate;
+- (instancetype)initWithRequestURL:(NSURL *)requestURL host:(SUHost *)host userAgent:(NSString * _Nullable)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background delegate:(id<SPUDownloadDriverDelegate>)delegate;
 
-- (void)downloadUpdate;
+- (instancetype)initWithUpdateItem:(SUAppcastItem *)updateItem secondaryUpdateItem:(SUAppcastItem * _Nullable)secondaryUpdateItem host:(SUHost *)host userAgent:(NSString * _Nullable)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background delegate:(id<SPUDownloadDriverDelegate>)delegate;
+
+- (instancetype)initWithHost:(SUHost *)host;
+
+- (void)downloadFile;
+
+- (void)removeDownloadedUpdate:(SPUDownloadedUpdate *)downloadedUpdate;
 
 @property (nonatomic, readonly) NSMutableURLRequest *request;
 @property (nonatomic, readonly) BOOL inBackground;
 
-- (void)cleanup;
+- (void)cleanup:(void (^)(void))completionHandler;
 
 @end
 

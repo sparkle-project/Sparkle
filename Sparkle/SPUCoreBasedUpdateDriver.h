@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <Sparkle/SPUStatusCompletionResults.h>
+#import "SPUUserUpdateState.h"
 #import "SPUUpdateDriver.h"
 
 NS_ASSUME_NONNULL_BEGIN
@@ -17,7 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol SPUCoreBasedUpdateDriverDelegate <NSObject>
 
-- (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)updateItem;
+- (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)updateItem secondaryAppcastItem:(SUAppcastItem *)secondaryAppcastItem preventsAutoupdate:(BOOL)preventsAutoupdate;
 
 - (void)installerDidFinishPreparationAndWillInstallImmediately:(BOOL)willInstallImmediately silently:(BOOL)willInstallSilently;
 
@@ -43,7 +43,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)installerIsSendingAppTerminationSignal;
 
-- (void)installerDidFinishInstallationWithAcknowledgement:(void(^)(void))acknowledgement;
+- (void)installerDidFinishInstallationAndRelaunched:(BOOL)relaunched acknowledgement:(void(^)(void))acknowledgement;
 
 @end
 
@@ -55,21 +55,21 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)preflightForUpdatePermissionPreventingInstallerInteraction:(BOOL)preventsInstallerInteraction reply:(void (^)(NSError * _Nullable))reply;
 
-- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background includesSkippedUpdates:(BOOL)includesSkippedUpdates requiresSilentInstall:(BOOL)silentInstall;
+- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background requiresSilentInstall:(BOOL)silentInstall;
 
 - (void)resumeInstallingUpdateWithCompletion:(SPUUpdateDriverCompletion)completionBlock;
 
 - (void)resumeUpdate:(id<SPUResumableUpdate>)resumableUpdate completion:(SPUUpdateDriverCompletion)completionBlock;
 
-- (void)downloadUpdateFromAppcastItem:(SUAppcastItem *)updateItem inBackground:(BOOL)background;
+- (void)downloadUpdateFromAppcastItem:(SUAppcastItem *)updateItem secondaryAppcastItem:(SUAppcastItem * _Nullable)secondaryUpdateItem inBackground:(BOOL)background;
 
-- (void)deferInformationalUpdate:(SUAppcastItem *)updateItem;
+- (void)deferInformationalUpdate:(SUAppcastItem *)updateItem secondaryUpdate:(SUAppcastItem *)secondaryUpdateItem preventsAutoupdate:(BOOL)preventsAutoupdate;
 
 - (void)extractDownloadedUpdate;
 
 - (void)clearDownloadedUpdate;
 
-- (void)finishInstallationWithResponse:(SPUInstallUpdateStatus)installUpdateStatus displayingUserInterface:(BOOL)displayingUserInterface;
+- (void)finishInstallationWithResponse:(SPUUserUpdateChoice)installUpdateStatus displayingUserInterface:(BOOL)displayingUserInterface;
 
 - (void)abortUpdateAndShowNextUpdateImmediately:(BOOL)shouldShowUpdateImmediately error:(nullable NSError *)error;
 

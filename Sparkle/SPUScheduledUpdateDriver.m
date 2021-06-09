@@ -8,9 +8,9 @@
 
 #import "SPUScheduledUpdateDriver.h"
 #import "SUHost.h"
-#import <Sparkle/SUErrors.h>
+#import "SUErrors.h"
 #import "SPUUpdaterDelegate.h"
-#import <Sparkle/SPUUserDriver.h>
+#import "SPUUserDriver.h"
 
 
 #include "AppKitPrevention.h"
@@ -18,12 +18,14 @@
 @interface SPUScheduledUpdateDriver() <SPUUIBasedUpdateDriverDelegate>
 
 @property (nonatomic, readonly) SPUUIBasedUpdateDriver *uiDriver;
+@property (nonatomic) BOOL showedUpdate;
 
 @end
 
 @implementation SPUScheduledUpdateDriver
 
 @synthesize uiDriver = _uiDriver;
+@synthesize showedUpdate = _showedUpdate;
 
 - (instancetype)initWithHost:(SUHost *)host applicationBundle:(NSBundle *)applicationBundle sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater userDriver:(id <SPUUserDriver>)userDriver updaterDelegate:(nullable id <SPUUpdaterDelegate>)updaterDelegate
 {
@@ -43,7 +45,7 @@
             // Don't tell the user about the permission error for scheduled update checks
             [self abortUpdateWithError:nil];
         } else {
-            [self.uiDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders inBackground:YES includesSkippedUpdates:NO];
+            [self.uiDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders inBackground:YES];
         }
     }];
 }
@@ -58,16 +60,26 @@
     [self.uiDriver resumeUpdate:resumableUpdate completion:completionBlock];
 }
 
-- (void)basicDriverIsRequestingAbortUpdateWithError:(nullable NSError *)__unused error
+- (void)uiDriverDidShowUpdate
 {
-    // Don't tell the user that no update was found or some appcast fetch error occurred for scheduled update checks
-    [self abortUpdateWithError:nil];
+    self.showedUpdate = YES;
 }
 
-- (void)coreDriverIsRequestingAbortUpdateWithError:(nullable NSError *)__unused error
+- (BOOL)showingUpdate
 {
-    // Don't tell the user that a non-UI update error occurred for scheduled update checks
-    [self abortUpdateWithError:nil];
+    return self.showedUpdate;
+}
+
+- (void)basicDriverIsRequestingAbortUpdateWithError:(nullable NSError *) error
+{
+    // Don't tell the user that no update was found or some appcast fetch error occurred for scheduled update checks if we haven't shown the update
+    [self abortUpdateWithError:self.showedUpdate ? error : nil];
+}
+
+- (void)coreDriverIsRequestingAbortUpdateWithError:(nullable NSError *) error
+{
+    // Don't tell the user that an update error occurred for scheduled update checks if we haven't shown the update
+    [self abortUpdateWithError:self.showedUpdate ? error : nil];
 }
 
 - (void)uiDriverIsRequestingAbortUpdateWithError:(nullable NSError *)error

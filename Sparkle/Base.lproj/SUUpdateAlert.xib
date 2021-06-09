@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11542" systemVersion="16G29" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="18122" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
-        <development version="7000" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11542"/>
-        <plugIn identifier="com.apple.WebKitIBPlugin" version="11542"/>
-        <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
-        <capability name="Constraints with non-1.0 multipliers" minToolsVersion="5.1"/>
-        <capability name="box content view" minToolsVersion="7.0"/>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="18122"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="SUUpdateAlert">
@@ -15,21 +12,21 @@
                 <outlet property="descriptionField" destination="101" id="9oA-2S-eXN"/>
                 <outlet property="installButton" destination="76" id="176"/>
                 <outlet property="laterButton" destination="22" id="177"/>
+                <outlet property="releaseNotesBoxView" destination="89" id="FhX-K4-uzH"/>
                 <outlet property="releaseNotesContainerView" destination="fKC-QA-GZa" id="BYw-MA-Z5h"/>
-                <outlet property="releaseNotesView" destination="18" id="32"/>
                 <outlet property="skipButton" destination="23" id="178"/>
                 <outlet property="window" destination="5" id="69"/>
             </connections>
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
-        <window identifier="SUUpdateAlert" title="Software Update" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" hidesOnDeactivate="YES" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="SUUpdateAlert" animationBehavior="default" id="5" userLabel="Update Alert (release notes)">
+        <window identifier="SUUpdateAlert" title="Software Update" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="SUUpdateAlert" animationBehavior="default" id="5" userLabel="Update Alert (release notes)">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
+            <windowCollectionBehavior key="collectionBehavior" fullScreenAuxiliary="YES"/>
             <windowPositionMask key="initialPositionMask" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="746" y="229" width="620" height="370"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1280" height="778"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="875"/>
             <value key="minSize" type="size" width="550" height="150"/>
-            <value key="maxSize" type="size" width="700" height="600"/>
             <view key="contentView" id="6">
                 <rect key="frame" x="0.0" y="0.0" width="620" height="370"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -76,34 +73,15 @@
                         </connections>
                     </textField>
                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="fKC-QA-GZa" userLabel="Container to hide release notes">
-                        <rect key="frame" x="108" y="74" width="492" height="234"/>
+                        <rect key="frame" x="108" y="73" width="492" height="235"/>
                         <subviews>
                             <box boxType="oldStyle" borderType="line" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="89">
-                                <rect key="frame" x="0.0" y="0.0" width="492" height="214"/>
+                                <rect key="frame" x="0.0" y="0.0" width="492" height="215"/>
                                 <view key="contentView" id="hbB-V1-Bf6">
-                                    <rect key="frame" x="1" y="1" width="490" height="212"/>
+                                    <rect key="frame" x="1" y="1" width="490" height="213"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                    <subviews>
-                                        <webView maintainsBackForwardList="NO" translatesAutoresizingMaskIntoConstraints="NO" id="18">
-                                            <rect key="frame" x="0.0" y="-2" width="492" height="214"/>
-                                            <webPreferences key="preferences" defaultFontSize="12" defaultFixedFontSize="12" minimumFontSize="7" plugInsEnabled="NO" javaEnabled="NO" javaScriptCanOpenWindowsAutomatically="NO">
-                                                <nil key="identifier"/>
-                                            </webPreferences>
-                                            <connections>
-                                                <binding destination="-2" name="hidden" keyPath="showsReleaseNotes" id="161">
-                                                    <dictionary key="options">
-                                                        <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                                    </dictionary>
-                                                </binding>
-                                            </connections>
-                                        </webView>
-                                    </subviews>
                                 </view>
                                 <constraints>
-                                    <constraint firstItem="18" firstAttribute="top" secondItem="89" secondAttribute="top" constant="1" id="3ps-Yo-uZA"/>
-                                    <constraint firstAttribute="trailing" secondItem="18" secondAttribute="trailing" constant="-1" id="5W0-Eb-Snn"/>
-                                    <constraint firstAttribute="bottom" secondItem="18" secondAttribute="bottom" constant="-1" id="NOY-VJ-z4I"/>
-                                    <constraint firstItem="18" firstAttribute="leading" secondItem="89" secondAttribute="leading" constant="1" id="kSE-Xj-CRB"/>
                                     <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="100" id="pvn-8k-9Ev"/>
                                 </constraints>
                                 <font key="titleFont" size="11" name="LucidaGrande"/>
@@ -116,7 +94,7 @@
                                 </connections>
                             </box>
                             <textField verticalHuggingPriority="1000" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="17">
-                                <rect key="frame" x="-2" y="220" width="88" height="14"/>
+                                <rect key="frame" x="-2" y="221" width="88" height="14"/>
                                 <constraints>
                                     <constraint firstAttribute="width" relation="greaterThanOrEqual" priority="100" constant="100" id="gkn-FW-9aC"/>
                                 </constraints>
@@ -136,6 +114,7 @@
                         </subviews>
                         <constraints>
                             <constraint firstItem="89" firstAttribute="top" secondItem="17" secondAttribute="bottom" constant="6" id="1H8-33-yNF"/>
+                            <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="17" secondAttribute="trailing" constant="408" id="5ym-81-wbN"/>
                             <constraint firstAttribute="trailing" secondItem="89" secondAttribute="trailing" id="Bv8-Jz-SXd"/>
                             <constraint firstAttribute="bottom" secondItem="89" secondAttribute="bottom" id="E4h-VA-0Xt"/>
                             <constraint firstItem="17" firstAttribute="top" secondItem="fKC-QA-GZa" secondAttribute="top" id="P9G-6a-y7j"/>
@@ -144,7 +123,7 @@
                         </constraints>
                     </customView>
                     <button horizontalHuggingPriority="150" verticalHuggingPriority="750" horizontalCompressionResistancePriority="997" translatesAutoresizingMaskIntoConstraints="NO" id="22">
-                        <rect key="frame" x="331" y="12" width="143" height="32"/>
+                        <rect key="frame" x="338" y="12" width="137" height="32"/>
                         <constraints>
                             <constraint firstAttribute="width" relation="greaterThanOrEqual" priority="222" constant="90" id="2Zy-5G-GBj"/>
                         </constraints>
@@ -160,7 +139,7 @@ Gw
                         </connections>
                     </button>
                     <button verticalHuggingPriority="750" horizontalCompressionResistancePriority="998" translatesAutoresizingMaskIntoConstraints="NO" id="23">
-                        <rect key="frame" x="103" y="12" width="145" height="32"/>
+                        <rect key="frame" x="102" y="12" width="139" height="32"/>
                         <buttonCell key="cell" type="push" title="Skip This Version" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="172">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
@@ -170,7 +149,7 @@ Gw
                         </connections>
                     </button>
                     <button horizontalHuggingPriority="20" verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="76">
-                        <rect key="frame" x="474" y="12" width="132" height="32"/>
+                        <rect key="frame" x="473" y="12" width="134" height="32"/>
                         <constraints>
                             <constraint firstAttribute="width" relation="greaterThanOrEqual" priority="222" constant="120" id="N94-uf-6oP"/>
                         </constraints>
@@ -186,7 +165,7 @@ DQ
                         </connections>
                     </button>
                     <button translatesAutoresizingMaskIntoConstraints="NO" id="117">
-                        <rect key="frame" x="106" y="49" width="495" height="20"/>
+                        <rect key="frame" x="108" y="50" width="491" height="16"/>
                         <constraints>
                             <constraint firstAttribute="height" relation="lessThanOrEqual" constant="28" id="0AI-ue-a0r"/>
                             <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="14" id="yM1-TA-HfP"/>
@@ -196,11 +175,6 @@ DQ
                             <font key="font" metaFont="smallSystem"/>
                         </buttonCell>
                         <connections>
-                            <binding destination="-2" name="hidden" keyPath="allowsAutomaticUpdates" id="141">
-                                <dictionary key="options">
-                                    <string key="NSValueTransformerName">NSNegateBoolean</string>
-                                </dictionary>
-                            </binding>
                             <binding destination="93" name="value" keyPath="values.SUAutomaticallyUpdate" id="135"/>
                         </connections>
                     </button>
@@ -242,6 +216,6 @@ DQ
         <userDefaultsController representsSharedInstance="YES" id="93" userLabel="Shared Defaults"/>
     </objects>
     <resources>
-        <image name="NSApplicationIcon" width="128" height="128"/>
+        <image name="NSApplicationIcon" width="32" height="32"/>
     </resources>
 </document>

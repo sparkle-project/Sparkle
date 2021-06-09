@@ -13,8 +13,8 @@
 #import "SPUCoreBasedUpdateDriver.h"
 #import "SULog.h"
 #import "SUAppcastItem.h"
-#import <Sparkle/SPUUserDriver.h>
-#import <Sparkle/SUErrors.h>
+#import "SPUUserDriver.h"
+#import "SUErrors.h"
 
 
 #include "AppKitPrevention.h"
@@ -60,35 +60,38 @@
         if (error != nil) {
             [self abortUpdateWithError:error];
         } else {
-            [self.coreDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders inBackground:YES includesSkippedUpdates:NO requiresSilentInstall:YES];
+            [self.coreDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders inBackground:YES requiresSilentInstall:YES];
         }
     }];
 }
 
-- (void)resumeInstallingUpdateWithCompletion:(SPUUpdateDriverCompletion)__unused completionBlock __attribute__((noreturn))
+- (void)resumeInstallingUpdateWithCompletion:(SPUUpdateDriverCompletion)__unused completionBlock
 {
     // Nothing really to do here.. this shouldn't be called.
     SULog(SULogLevelError, @"Error: resumeInstallingUpdateWithCompletion: called on SPUAutomaticUpdateDriver");
-    abort();
 }
 
-- (void)resumeUpdate:(id<SPUResumableUpdate>)__unused resumableUpdate completion:(SPUUpdateDriverCompletion)__unused completionBlock __attribute__((noreturn))
+- (void)resumeUpdate:(id<SPUResumableUpdate>)__unused resumableUpdate completion:(SPUUpdateDriverCompletion)__unused completionBlock
 {
     // Nothing really to do here.. this shouldn't be called.
     SULog(SULogLevelError, @"Error: resumeDownloadedUpdate:completion: called on SPUAutomaticUpdateDriver");
-    abort();
 }
 
-- (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)updateItem
+- (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)updateItem secondaryAppcastItem:(SUAppcastItem *)secondaryUpdateItem preventsAutoupdate:(BOOL)preventsAutoupdate
 {
     self.updateItem = updateItem;
     
-    if (updateItem.isInformationOnlyUpdate) {
-        [self.coreDriver deferInformationalUpdate:updateItem];
+    if (updateItem.isInformationOnlyUpdate || preventsAutoupdate) {
+        [self.coreDriver deferInformationalUpdate:updateItem secondaryUpdate:secondaryUpdateItem preventsAutoupdate:preventsAutoupdate];
         [self abortUpdate];
     } else {
-        [self.coreDriver downloadUpdateFromAppcastItem:updateItem inBackground:YES];
+        [self.coreDriver downloadUpdateFromAppcastItem:updateItem secondaryAppcastItem:secondaryUpdateItem inBackground:YES];
     }
+}
+
+- (BOOL)showingUpdate
+{
+    return NO;
 }
 
 - (void)installerDidFinishPreparationAndWillInstallImmediately:(BOOL)willInstallImmediately silently:(BOOL)willInstallSilently
@@ -101,7 +104,7 @@
         if (self.willInstallSilently && [updaterDelegate respondsToSelector:@selector(updater:willInstallUpdateOnQuit:immediateInstallationBlock:)]) {
             __weak SPUAutomaticUpdateDriver *weakSelf = self;
             installationHandledByDelegate = [updaterDelegate updater:self.updater willInstallUpdateOnQuit:self.updateItem immediateInstallationBlock:^{
-                [weakSelf.coreDriver finishInstallationWithResponse:SPUInstallAndRelaunchUpdateNow displayingUserInterface:NO];
+                [weakSelf.coreDriver finishInstallationWithResponse:SPUUserUpdateChoiceInstall displayingUserInterface:NO];
             }];
         }
         

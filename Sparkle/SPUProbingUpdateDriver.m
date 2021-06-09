@@ -39,7 +39,7 @@
     
     [self.basicDriver prepareCheckForUpdatesWithCompletion:completionBlock];
     
-    [self.basicDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders inBackground:YES includesSkippedUpdates:NO];
+    [self.basicDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders inBackground:YES];
 }
 
 - (void)resumeInstallingUpdateWithCompletion:(SPUUpdateDriverCompletion)completionBlock
@@ -54,10 +54,15 @@
     [self.basicDriver resumeUpdate:resumableUpdate completion:completionBlock];
 }
 
-- (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)__unused appcastItem
+- (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)__unused appcastItem secondaryAppcastItem:(SUAppcastItem *)__unused secondaryAppcastItem preventsAutoupdate:(BOOL)__unused preventsAutoupdate systemDomain:(NSNumber * _Nullable)__unused systemDomain
 {
     // Stop as soon as we have an answer
     [self abortUpdate];
+}
+
+- (BOOL)showingUpdate
+{
+    return NO;
 }
 
 - (void)basicDriverIsRequestingAbortUpdateWithError:(nullable NSError *)error

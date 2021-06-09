@@ -28,6 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, readonly, nullable) id<SPUInstallerAgentProtocol> agent;
 @property (nonatomic, readonly) BOOL connected;
+@property (nonatomic, nullable) NSError *invalidationError;
 
 @end
 

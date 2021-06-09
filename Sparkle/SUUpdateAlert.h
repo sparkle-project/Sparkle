@@ -6,12 +6,14 @@
 //  Copyright 2006 Andy Matuschak. All rights reserved.
 //
 
+#if SPARKLE_BUILD_UI_BITS
+
 #ifndef SUUPDATEALERT_H
 #define SUUPDATEALERT_H
 
 #import <Cocoa/Cocoa.h>
-#import <Sparkle/SUVersionDisplayProtocol.h>
-#import <Sparkle/SPUStatusCompletionResults.h>
+#import "SUVersionDisplayProtocol.h"
+#import "SPUUserUpdateState.h"
 
 @protocol SUUpdateAlertDelegate;
 
@@ -20,11 +22,7 @@
 
 @property (nonatomic, weak, readonly) id <SUVersionDisplay> versionDisplayer;
 
-- (instancetype)initWithAppcastItem:(SUAppcastItem *)item alreadyDownloaded:(BOOL)alreadyDownloaded host:(SUHost *)aHost versionDisplayer:(id <SUVersionDisplay>)aVersionDisplayer completionBlock:(void (^)(SPUUpdateAlertChoice))block;
-
-- (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost versionDisplayer:(id <SUVersionDisplay>)aVersionDisplayer resumableCompletionBlock:(void (^)(SPUInstallUpdateStatus))block;
-
-- (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost versionDisplayer:(id <SUVersionDisplay>)aVersionDisplayer informationalCompletionBlock:(void (^)(SPUInformationalUpdateAlertChoice))block;
+- (instancetype)initWithAppcastItem:(SUAppcastItem *)item state:(SPUUserUpdateState *)state host:(SUHost *)aHost versionDisplayer:(id <SUVersionDisplay>)aVersionDisplayer completionBlock:(void (^)(SPUUserUpdateChoice))block;
 
 - (void)showUpdateReleaseNotesWithDownloadData:(SPUDownloadData *)downloadData;
 - (void)showReleaseNotesFailedToDownload;
@@ -32,8 +30,11 @@
 - (IBAction)installUpdate:sender;
 - (IBAction)skipThisVersion:sender;
 - (IBAction)remindMeLater:sender;
-- (void)disableKeyboardShortcutForInstallButton;
+
+- (void)setInstallButtonFocus:(BOOL)focus;
 
 @end
+
+#endif
 
 #endif

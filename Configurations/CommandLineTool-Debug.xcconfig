@@ -1,0 +1,4 @@
+// Generate Appcast Debug
+
+#include "CommandLineTool-Shared.xcconfig"
+#include "ConfigSwiftDebug.xcconfig"

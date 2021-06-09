@@ -11,7 +11,7 @@
 
 @protocol SUInstallerLauncherProtocol
 
-- (void)launchInstallerWithHostBundlePath:(NSString *)hostBundlePath authorizationPrompt:(NSString *)authorizationPrompt installationType:(NSString *)installationType allowingDriverInteraction:(BOOL)allowingDriverInteraction allowingUpdaterInteraction:(BOOL)allowingUpdaterInteraction completion:(void (^)(SUInstallerLauncherStatus))completionHandler;
+- (void)launchInstallerWithHostBundlePath:(NSString *)hostBundlePath updaterIdentifier:(NSString *)updaterBundleIdentifier authorizationPrompt:(NSString *)authorizationPrompt installationType:(NSString *)installationType allowingDriverInteraction:(BOOL)allowingDriverInteraction allowingUpdaterInteraction:(BOOL)allowingUpdaterInteraction completion:(void (^)(SUInstallerLauncherStatus, BOOL))completionHandler;
 
 - (void)checkIfApplicationInstallationRequiresAuthorizationWithHostBundlePath:(NSString *)hostBundlePath reply:(void(^)(BOOL requiresAuthorization))reply;
     

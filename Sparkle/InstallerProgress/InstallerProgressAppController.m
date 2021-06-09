@@ -10,11 +10,17 @@
 #import "InstallerProgressDelegate.h"
 #import "SPUMessageTypes.h"
 #import "SULog.h"
+#import "SULog+NSError.h"
 #import "SUApplicationInfo.h"
 #import "SPUInstallerAgentProtocol.h"
 #import "SUInstallerAgentInitiationProtocol.h"
 #import "StatusInfo.h"
 #import "SUHost.h"
+#import "SUErrors.h"
+#import "SUNormalization.h"
+#import "SUConstants.h"
+#import "SPUSecureCoding.h"
+#import "SPUInstallationInfo.h"
 
 /*!
  * Terminate the application after a delay from launching the new update to avoid OS activation issues
@@ -30,12 +36,16 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
 @property (nonatomic, readonly) NSXPCConnection *connection;
 @property (nonatomic) BOOL connected;
 @property (nonatomic) BOOL repliedToRegistration;
-@property (nonatomic, readonly) NSBundle *hostBundle;
+@property (nonatomic, readonly) SUHost *oldHost;
+@property (nonatomic, readonly) BOOL shouldRelaunchHostBundle;
+@property (nonatomic, readonly) NSString *oldHostBundlePath;
+@property (nonatomic, readonly) BOOL systemDomain;
 @property (nonatomic) StatusInfo *statusInfo;
 @property (nonatomic) BOOL submittedLauncherJob;
 @property (nonatomic) BOOL willTerminate;
 @property (nonatomic) BOOL applicationInitiallyAlive;
 @property (nonatomic) NSBundle *applicationBundle;
+@property (nonatomic) NSString *normalizedPath;
 
 @end
 
@@ -48,12 +58,16 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
 @synthesize connection = _connection;
 @synthesize connected = _connected;
 @synthesize repliedToRegistration = _repliedToRegistration;
-@synthesize hostBundle = _hostBundle;
+@synthesize oldHost = _oldHost;
+@synthesize shouldRelaunchHostBundle = _shouldRelaunchHostBundle;
+@synthesize oldHostBundlePath = _oldHostBundlePath;
+@synthesize systemDomain = _systemDomain;
 @synthesize statusInfo = _statusInfo;
 @synthesize submittedLauncherJob = _submittedLauncherJob;
 @synthesize willTerminate = _willTerminate;
 @synthesize applicationInitiallyAlive = _applicationInitiallyAlive;
 @synthesize applicationBundle = _applicationBundle;
+@synthesize normalizedPath = _normalizedPath;
 
 - (instancetype)initWithApplication:(NSApplication *)application arguments:(NSArray<NSString *> *)arguments delegate:(id<InstallerProgressDelegate>)delegate
 {
@@ -61,33 +75,41 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
     if (self != nil) {
         if (arguments.count != 3) {
             SULog(SULogLevelError, @"Error: Invalid number of arguments supplied: %@", arguments);
-            [self cleanupAndExitWithStatus:EXIT_FAILURE];
+            [self cleanupAndExitWithStatus:EXIT_FAILURE error:nil];
         }
         
         NSString *hostBundlePath = arguments[1];
         if (hostBundlePath.length == 0) {
             SULog(SULogLevelError, @"Error: Host bundle path length is 0");
-            [self cleanupAndExitWithStatus:EXIT_FAILURE];
+            [self cleanupAndExitWithStatus:EXIT_FAILURE error:nil];
         }
         
-        _hostBundle = [NSBundle bundleWithPath:hostBundlePath];
-        if (_hostBundle == nil) {
+        NSBundle *hostBundle = [NSBundle bundleWithPath:hostBundlePath];
+        if (hostBundle == nil) {
             SULog(SULogLevelError, @"Error: Host bundle for target is nil");
-            [self cleanupAndExitWithStatus:EXIT_FAILURE];
+            [self cleanupAndExitWithStatus:EXIT_FAILURE error:nil];
         }
         
-        NSString *hostBundleIdentifier = _hostBundle.bundleIdentifier;
+        NSString *hostBundleIdentifier = hostBundle.bundleIdentifier;
         if (hostBundleIdentifier == nil) {
             SULog(SULogLevelError, @"Error: Host bundle identifier for target is nil");
-            [self cleanupAndExitWithStatus:EXIT_FAILURE];
+            [self cleanupAndExitWithStatus:EXIT_FAILURE error:nil];
             return nil; // just to silence analyzer warnings later about hostBundleIdentifier being nil
         }
+        
+        SUHost *host = [[SUHost alloc] initWithBundle:hostBundle];
+        _shouldRelaunchHostBundle = [host boolForInfoDictionaryKey:SURelaunchHostBundleKey];
+        _oldHostBundlePath = host.bundlePath;
+        
+        _oldHost = host;
         
         // Note that we are connecting to the installer rather than the installer connecting to us
         // This difference is significant. We shouldn't have a model where the 'server' tries to connect to a 'client',
         // nor have a model where a process that runs at the highest level (the installer can run as root) tries to connect to a user level agent or process
         BOOL systemDomain = arguments[2].boolValue;
         NSXPCConnectionOptions connectionOptions = systemDomain ? NSXPCConnectionPrivileged : 0;
+        
+        _systemDomain = systemDomain;
         _connection = [[NSXPCConnection alloc] initWithMachServiceName:SPUProgressAgentServiceNameForBundleIdentifier(hostBundleIdentifier) options:connectionOptions];
         
         _statusInfo = [[StatusInfo alloc] initWithHostBundleIdentifier:hostBundleIdentifier];
@@ -112,11 +134,14 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
                 InstallerProgressAppController *strongSelf = weakSelf;
                 if (strongSelf != nil) {
                     int exitStatus = (strongSelf.repliedToRegistration ? EXIT_SUCCESS : EXIT_FAILURE);
+                    NSError *registrationError;
                     if (!strongSelf.repliedToRegistration) {
-                        SULog(SULogLevelError, @"Error: Agent Invalidating without having the chance to reply to installer");
+                        registrationError = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAgentInvalidationError userInfo:@{ NSLocalizedDescriptionKey: @"Error: Agent Invalidating without having the chance to reply to installer" }];
+                    } else {
+                        registrationError = nil;
                     }
                     if (!strongSelf.willTerminate) {
-                        [strongSelf cleanupAndExitWithStatus:exitStatus];
+                        [strongSelf cleanupAndExitWithStatus:exitStatus error:registrationError];
                     }
                 }
             });
@@ -144,7 +169,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(CONNECTION_ACKNOWLEDGEMENT_TIMEOUT * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         if (!self.connected) {
             SULog(SULogLevelError, @"Timeout error: failed to receive acknowledgement from installer");
-            [self cleanupAndExitWithStatus:EXIT_FAILURE];
+            [self cleanupAndExitWithStatus:EXIT_FAILURE error:nil];
         }
     });
 }
@@ -154,15 +179,35 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
     [self startConnection];
 }
 
-- (void)cleanupAndExitWithStatus:(int)status __attribute__((noreturn))
+- (void)cleanupAndExitWithStatus:(int)status error:(NSError * _Nullable)error __attribute__((noreturn))
 {
+    if (error != nil) {
+        SULog(SULogLevelError, @"Agent failed..");
+        SULogError(error);
+        
+        [(id<SUInstallerAgentInitiationProtocol>)self.connection.remoteObjectProxy connectionWillInvalidateWithError:error];
+    }
+    
     [self.statusInfo invalidate];
     [self.connection invalidate];
     
     // Remove the agent bundle; it is assumed this bundle is in a temporary/cache/support directory
     NSError *theError = nil;
-    if (![[NSFileManager defaultManager] removeItemAtPath:[[NSBundle mainBundle] bundlePath] error:&theError]) {
+    NSString *bundlePath = [[NSBundle mainBundle] bundlePath];
+    
+    if (![[NSFileManager defaultManager] removeItemAtPath:bundlePath error:&theError]) {
         SULog(SULogLevelError, @"Couldn't remove agent bundle: %@.", theError);
+    } else {
+        // There should be nothing else in the parent temporary directory given to us,
+        // so let us try to remove it. Note rmdir() will fail if there are unexpectably other
+        // items present
+        NSString *parentDirectory = bundlePath.stringByDeletingLastPathComponent;
+        const char *fileSystemRepresentation = parentDirectory.fileSystemRepresentation;
+        if (fileSystemRepresentation != NULL) {
+            if (rmdir(fileSystemRepresentation) != 0) {
+                SULog(SULogLevelError, @"Failed to remove parent agent bundle directory: %@: %d", parentDirectory, errno);
+            }
+        }
     }
     
     exit(status);
@@ -200,8 +245,19 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
         if (applicationBundlePath != nil && !self.willTerminate) {
             NSBundle *applicationBundle = [NSBundle bundleWithPath:applicationBundlePath];
             if (applicationBundle == nil) {
-                SULog(SULogLevelError, @"Error: Encountered invalid path for waiting termination: %@", applicationBundlePath);
-                [self cleanupAndExitWithStatus:EXIT_FAILURE];
+                [self cleanupAndExitWithStatus:EXIT_FAILURE error:[NSError errorWithDomain:SUSparkleErrorDomain code:SUAgentInvalidationError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Error: Encountered invalid path for waiting termination: %@", applicationBundlePath] }]];
+            }
+            
+            // Compute normalized path that we may use later for relaunching the application
+            // We compute normalized path from progress agent instead of trusting or having the installer
+            // pass it to us
+            if (SPARKLE_NORMALIZE_INSTALLED_APPLICATION_NAME && [applicationBundle.bundlePath isEqualToString:self.oldHostBundlePath]) {
+                NSString *normalizedPath = SUNormalizedInstallationPath(self.oldHost);
+                // We only use normalized path if it doesn't already exist
+                // Check the installer which has the same logic
+                if (![[NSFileManager defaultManager] fileExistsAtPath:normalizedPath]) {
+                    self.normalizedPath = SUNormalizedInstallationPath(self.oldHost);
+                }
             }
             
             NSArray<NSRunningApplication *> *runningApplications = [self runningApplicationsWithBundle:applicationBundle];
@@ -227,8 +283,15 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
 - (void)registerInstallationInfoData:(NSData *)installationInfoData
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        if (self.statusInfo.installationInfoData == nil) {
-            self.statusInfo.installationInfoData = installationInfoData;
+        if (self.statusInfo.installationInfoData == nil && installationInfoData != nil) {
+            SPUInstallationInfo *installationInfo = (SPUInstallationInfo *)SPUUnarchiveRootObjectSecurely(installationInfoData, [SPUInstallationInfo class]);
+            
+            if (installationInfo != nil) {
+                installationInfo.systemDomain = self.systemDomain;
+                self.statusInfo.installationInfoData = SPUArchiveRootObjectSecurely(installationInfo);
+            } else {
+                SULog(SULogLevelError, @"Error: Failed to decode initial installation info from installer: %@", installationInfoData);
+            }
         }
     });
 }
@@ -245,28 +308,27 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
     });
 }
 
-- (void)relaunchPath:(NSString *)requestedPathToRelaunch
+- (void)relaunchApplication
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         if (!self.willTerminate && self.applicationBundle != nil && self.applicationInitiallyAlive) {
-            // If the normalized setting is not enabled, we shouldn't trust the relaunch path input that is being passed to us
-            // because we already have the application path to relaunch, and we verified that it was running before
             NSString *pathToRelaunch;
-            if (SPARKLE_NORMALIZE_INSTALLED_APPLICATION_NAME) {
-                pathToRelaunch = requestedPathToRelaunch;
+            if (self.normalizedPath != nil) {
+                pathToRelaunch = self.normalizedPath;
+            } else if (self.shouldRelaunchHostBundle) {
+                // Use self.oldHostBundlePath because it was computed before self.oldHost could have been removed
+                pathToRelaunch = self.oldHostBundlePath;
             } else {
                 pathToRelaunch = self.applicationBundle.bundlePath;
             }
             
-            // We should at least make sure we're opening a bundle however
+            // We should at least make sure we're opening a bundle
             NSBundle *relaunchBundle = [NSBundle bundleWithPath:pathToRelaunch];
             if (relaunchBundle == nil) {
-                SULog(SULogLevelError, @"Error: Encountered invalid path to relaunch: %@", pathToRelaunch);
-                [self cleanupAndExitWithStatus:EXIT_FAILURE];
+                [self cleanupAndExitWithStatus:EXIT_FAILURE error:[NSError errorWithDomain:SUSparkleErrorDomain code:SUAgentInvalidationError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Error: Encountered invalid path to relaunch: %@", pathToRelaunch] }]];
             }
             
-            // We only launch applications, but I'm not sure how reliable -launchApplicationAtURL:options:config: is so we're not using it
-            // Eg: http://www.openradar.me/10952677
+            // Note: we can launch application bundles or open plug-in bundles
             if (![[NSWorkspace sharedWorkspace] openFile:pathToRelaunch]) {
                 SULog(SULogLevelError, @"Error: Failed to relaunch bundle at %@", pathToRelaunch);
             }
@@ -276,7 +338,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
             
             self.willTerminate = YES;
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(SUTerminationTimeDelay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                [self cleanupAndExitWithStatus:EXIT_SUCCESS];
+                [self cleanupAndExitWithStatus:EXIT_SUCCESS error:nil];
             });
         }
     });
@@ -291,13 +353,12 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
             TransformProcessType(&psn, kProcessTransformToForegroundApplication);
             
             // Note: the application icon needs to be set after showing the icon in the dock
-            SUHost *host = [[SUHost alloc] initWithBundle:self.hostBundle];
-            self.application.applicationIconImage = [SUApplicationInfo bestIconForHost:host];
+            self.application.applicationIconImage = [SUApplicationInfo bestIconForHost:self.oldHost];
             
             // Activate ourselves otherwise we will probably be in the background
             [self.application activateIgnoringOtherApps:YES];
             
-            [self.delegate installerProgressShouldDisplayWithHost:host];
+            [self.delegate installerProgressShouldDisplayWithHost:self.oldHost];
         }
     });
 }

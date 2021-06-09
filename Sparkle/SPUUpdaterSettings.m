@@ -60,7 +60,7 @@
 
 - (BOOL)automaticallyDownloadsUpdates
 {
-    return [self.host boolForUserDefaultsKey:SUAutomaticallyUpdateKey];
+    return [self.host boolForKey:SUAutomaticallyUpdateKey];
 }
 
 - (BOOL)sendsSystemProfile

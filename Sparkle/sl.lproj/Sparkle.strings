@@ -1,8 +1,12 @@
 "%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ je bil uspešno prenešen s spleta in je pripravljen na namestitev. Ga želite namestiti in ponovno zagnati takoj?";
 
-"%1$@ can't be updated, because it was opened from a read-only or a temporary location. Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "Programa %1$@ ni mogoče posodobiti, ker ga poganjate iz lokacije, kamor pisanje ni dovoljeno (pogosto je to slika diska dmg ali optična enota). Poskusite %1$@ premakniti v direktorij z aplikacijami (Applications), ga ponovno zagnati in šele nato posodobiti.";
+"%1$@ can't be updated, because it was opened from a read-only or a temporary location." = "Programa %1$@ ni mogoče posodobiti, ker ga poganjate iz lokacije, kamor pisanje ni dovoljeno (pogosto je to slika diska dmg ali optična enota).";
+
+"Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "Poskusite %1$@ premakniti v direktorij z aplikacijami (Applications), ga ponovno zagnati in šele nato posodobiti.";
 
 "%@ %@ is currently the newest version available." = "%1$@ %2$@ je najnovejša verzija programa.";
+
+"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%1$@ %2$@ je najnovejša verzija programa.\n(You are currently running version %3$@.)";
 
 /* Description text for SUUpdateAlert when the update is downloadable. */
 "%@ %@ is now available--you have %@. Would you like to download it now?" = "Na voljo je %1$@ %2$@ — vi imate %3$@. Ga želite prenesti s spleta sedaj?";

@@ -10,7 +10,6 @@
 #import "SUFileManager.h"
 #import "SULog.h"
 #import "SPUMessageTypes.h"
-#import "SPUSystemAuthorization.h"
 #import "SUBundleIcon.h"
 #import "SPULocalCacheDirectory.h"
 #import "SPUInstallationType.h"
@@ -57,7 +56,10 @@
         // We could invoke SMJobCopyDictionary() first to see if the job exists, but I'd rather avoid
         // using it because the headers indicate it may be removed one day without any replacement
         CFErrorRef removeError = NULL;
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
         if (!SMJobRemove(domain, (__bridge CFStringRef)(label), auth, true, &removeError)) {
+#pragma clang diagnostic pop
             if (removeError != NULL) {
                 // It's normal for a job to not be found, so this is not an interesting error
                 if (CFErrorGetCode(removeError) != kSMErrorJobNotFound) {
@@ -78,7 +80,12 @@
         jobDictionary[@"MachServices"] = @{SPUStatusInfoServiceNameForBundleIdentifier(hostBundleIdentifier) : @YES};
         
         CFErrorRef submitError = NULL;
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+        // SMJobSubmit is deprecated but is the only way to submit a non-permanent
+        // helper and allows us to submit to user domain without requiring authorization
         submittedJob = SMJobSubmit(domain, (__bridge CFDictionaryRef)(jobDictionary), auth, &submitError);
+#pragma clang diagnostic pop
         if (!submittedJob) {
             if (submitError != NULL) {
                 SULog(SULogLevelError, @"Submit progress error: %@", submitError);
@@ -92,7 +99,7 @@
     return (submittedJob == true);
 }
 
-- (SUInstallerLauncherStatus)submitInstallerAtPath:(NSString *)installerPath withHostBundle:(NSBundle *)hostBundle authorizationPrompt:(NSString *)authorizationPrompt inSystemDomain:(BOOL)systemDomain
+- (SUInstallerLauncherStatus)submitInstallerAtPath:(NSString *)installerPath withHostBundle:(NSBundle *)hostBundle updaterIdentifier:(NSString *)updaterIdentifier authorizationPrompt:(NSString *)authorizationPrompt inSystemDomain:(BOOL)systemDomain
 {
     SUFileManager *fileManager = [[SUFileManager alloc] init];
     
@@ -122,8 +129,19 @@
         // https://developer.apple.com/library/mac/technotes/tn2095/_index.html#//apple_ref/doc/uid/DTS10003110-CH1-SECTION7
         // We can set a custom right name for authenticating as an administrator
         // Using this right rather than using something like kSMRightModifySystemDaemons allows us to present a better worded prompt
+        // Note the right name is cached, so if we want to change the authorization
+        // prompt, we may need to change the right name. I have found no good way around this :|
+        NSString *sparkleAuthTag = @"sparkle2-auth"; // this needs to change if auth wording changes
+        NSString *rightNameString;
+        if ([hostBundleIdentifier isEqualToString:updaterIdentifier]) {
+            // Application bundle is likely updating itself
+            rightNameString = [NSString stringWithFormat:@"%@.%@", hostBundleIdentifier, sparkleAuthTag];
+        } else {
+            // Updater is likely updating a bundle that is not itself
+            rightNameString = [NSString stringWithFormat:@"%@.%@.%@", updaterIdentifier, hostBundleIdentifier, sparkleAuthTag];
+        }
         
-        const char *rightName = [[NSString stringWithFormat:@"%@.sparkle-auth", hostBundleIdentifier] UTF8String];
+        const char *rightName = rightNameString.UTF8String;
         assert(rightName != NULL);
         
         OSStatus getRightResult = AuthorizationRightGet(rightName, NULL);
@@ -229,7 +247,10 @@
         // We could invoke SMJobCopyDictionary() first to see if the job exists, but I'd rather avoid
         // using it because the headers indicate it may be removed one day without any replacement
         CFErrorRef removeError = NULL;
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
         if (!SMJobRemove(domain, (__bridge CFStringRef)(label), auth, true, &removeError)) {
+#pragma clang diagnostic pop
             if (removeError != NULL) {
                 // It's normal for a job to not be found, so this is not an interesting error
                 if (CFErrorGetCode(removeError) != kSMErrorJobNotFound) {
@@ -242,7 +263,12 @@
         NSDictionary *jobDictionary = @{@"Label" : label, @"ProgramArguments" : arguments, @"EnableTransactions" : @NO, @"KeepAlive" : @{@"SuccessfulExit" : @NO}, @"RunAtLoad" : @NO, @"Nice" : @0, @"LaunchOnlyOnce": @YES, @"MachServices" : @{SPUInstallerServiceNameForBundleIdentifier(hostBundleIdentifier) : @YES, SPUProgressAgentServiceNameForBundleIdentifier(hostBundleIdentifier) : @YES}};
         
         CFErrorRef submitError = NULL;
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+        // SMJobSubmit is deprecated but is the only way to submit a non-permanent
+        // helper and allows us to submit to user domain without requiring authorization
         submittedJob = SMJobSubmit(domain, (__bridge CFDictionaryRef)(jobDictionary), auth, &submitError);
+#pragma clang diagnostic pop
         if (!submittedJob) {
             if (submitError != NULL) {
                 SULog(SULogLevelError, @"Submit error: %@", submitError);
@@ -266,44 +292,93 @@
     return status;
 }
 
-// First we check if the tool is in an auxiliary directory. If that fails, we then check if it is in a resources directory
 - (NSString *)pathForBundledTool:(NSString *)toolName extension:(NSString *)extension inBundle:(NSBundle *)bundle
 {
-    NSString *resultPath = nil;
     // If the path extension is empty, we don't want to add a "." at the end
-    NSString *pathWithExtension = (extension.length > 0) ? [toolName stringByAppendingPathExtension:extension] : toolName;
-    assert(pathWithExtension != nil);
-    NSString *auxiliaryPath = [bundle pathForAuxiliaryExecutable:pathWithExtension];
-    if (auxiliaryPath == nil || ![[NSFileManager defaultManager] fileExistsAtPath:auxiliaryPath]) {
-        resultPath = [bundle pathForResource:toolName ofType:extension];
-    } else {
-        resultPath = auxiliaryPath;
-    }
-    return resultPath;
+    NSString *nameWithExtension = (extension.length > 0) ? [toolName stringByAppendingPathExtension:extension] : toolName;
+    assert(nameWithExtension != nil);
+    
+    NSURL *auxiliaryToolURL = [bundle URLForAuxiliaryExecutable:nameWithExtension];
+    assert(auxiliaryToolURL != nil);
+    
+    NSURL *resolvedAuxiliaryToolURL = [auxiliaryToolURL URLByResolvingSymlinksInPath];
+    assert(resolvedAuxiliaryToolURL != nil);
+    
+    return resolvedAuxiliaryToolURL.path;
 }
 
+static BOOL SPUNeedsSystemAuthorizationAccess(NSString *path, NSString *installationType)
+{
+    BOOL needsAuthorization;
+    if ([installationType isEqualToString:SPUInstallationTypeGuidedPackage]) {
+        needsAuthorization = YES;
+    } else if ([installationType isEqualToString:SPUInstallationTypeInteractivePackage]) {
+        needsAuthorization = NO;
+    } else {
+        NSFileManager *fileManager = [NSFileManager defaultManager];
+        BOOL hasWritability = [fileManager isWritableFileAtPath:path] && [fileManager isWritableFileAtPath:[path stringByDeletingLastPathComponent]];
+        if (!hasWritability) {
+            needsAuthorization = YES;
+        } else {
+            // Just because we have writability access does not mean we can set the correct owner/group
+            // Test if we can set the owner/group on a temporarily created file
+            // If we can, then we can probably perform an update without authorization
+            
+            NSString *tempFilename = @"permission_test" ;
+            
+            SUFileManager *suFileManager = [[SUFileManager alloc] init];
+            NSURL *tempDirectoryURL = [suFileManager makeTemporaryDirectoryWithPreferredName:tempFilename appropriateForDirectoryURL:[NSURL fileURLWithPath:NSTemporaryDirectory()] error:NULL];
+            
+            if (tempDirectoryURL == nil) {
+                // I don't imagine this ever happening but in case it does, requesting authorization may be the better option
+                needsAuthorization = YES;
+            } else {
+                NSURL *tempFileURL = [tempDirectoryURL URLByAppendingPathComponent:tempFilename];
+                if (![[NSData data] writeToURL:tempFileURL atomically:NO]) {
+                    // Obvious indicator we may need authorization
+                    needsAuthorization = YES;
+                } else {
+                    needsAuthorization = ![suFileManager changeOwnerAndGroupOfItemAtRootURL:tempFileURL toMatchURL:[NSURL fileURLWithPath:path] error:NULL];
+                }
+                
+                [suFileManager removeItemAtURL:tempDirectoryURL error:NULL];
+            }
+        }
+    }
+    return needsAuthorization;
+}
+
+
 // Note: do not pass untrusted information such as paths to the installer and progress agent tools, when we can find them ourselves here
-- (void)launchInstallerWithHostBundlePath:(NSString *)hostBundlePath authorizationPrompt:(NSString *)authorizationPrompt installationType:(NSString *)installationType allowingDriverInteraction:(BOOL)allowingDriverInteraction allowingUpdaterInteraction:(BOOL)allowingUpdaterInteraction completion:(void (^)(SUInstallerLauncherStatus))completionHandler
+- (void)launchInstallerWithHostBundlePath:(NSString *)hostBundlePath updaterIdentifier:(NSString *)updaterIdentifier authorizationPrompt:(NSString *)authorizationPrompt installationType:(NSString *)installationType allowingDriverInteraction:(BOOL)allowingDriverInteraction allowingUpdaterInteraction:(BOOL)allowingUpdaterInteraction completion:(void (^)(SUInstallerLauncherStatus, BOOL))completionHandler
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        NSBundle *hostBundle = [NSBundle bundleWithPath:hostBundlePath];
         BOOL needsSystemAuthorization = SPUNeedsSystemAuthorizationAccess(hostBundlePath, installationType);
+        
+        NSBundle *hostBundle = [NSBundle bundleWithPath:hostBundlePath];
+        if (hostBundle == nil) {
+            SULog(SULogLevelError, @"InstallerLauncher failed to create bundle at %@", hostBundlePath);
+            SULog(SULogLevelError, @"Please make sure InstallerLauncher is not sandboxed and do not sign your app by passing --deep. Check: codesign -d --entitlements :- \"%@\"", NSBundle.mainBundle.bundlePath);
+            SULog(SULogLevelError, @"More information regarding sandboxing: https://sparkle-project.org/documentation/sandboxing/");
+            completionHandler(SUInstallerLauncherFailure, needsSystemAuthorization);
+            return;
+        }
         
         if (needsSystemAuthorization && !allowingUpdaterInteraction) {
             SULog(SULogLevelError, @"Updater is not allowing interaction to the launcher.");
-            completionHandler(SUInstallerLauncherFailure);
+            completionHandler(SUInstallerLauncherFailure, needsSystemAuthorization);
             return;
         }
         
         if (!allowingUpdaterInteraction && [installationType isEqualToString:SPUInstallationTypeInteractivePackage]) {
             SULog(SULogLevelError, @"Updater is not allowing interaction to the launcher for performing an interactive type package installation.");
-            completionHandler(SUInstallerLauncherFailure);
+            completionHandler(SUInstallerLauncherFailure, needsSystemAuthorization);
             return;
         }
         
         // if we need to use the system domain and we aren't allowed interaction, then try sometime later when interaction is allowed
         if (needsSystemAuthorization && !allowingDriverInteraction) {
-            completionHandler(SUInstallerLauncherAuthorizeLater);
+            completionHandler(SUInstallerLauncherAuthorizeLater, needsSystemAuthorization);
             return;
         }
         
@@ -318,7 +393,7 @@
         NSString *installerPath = [self pathForBundledTool:@""SPARKLE_RELAUNCH_TOOL_NAME extension:@"" inBundle:ourBundle];
         if (installerPath == nil) {
             SULog(SULogLevelError, @"Error: Cannot submit installer because the installer could not be located");
-            completionHandler(SUInstallerLauncherFailure);
+            completionHandler(SUInstallerLauncherFailure, needsSystemAuthorization);
             return;
         }
         
@@ -327,7 +402,7 @@
         
         if (progressToolResourcePath == nil) {
             SULog(SULogLevelError, @"Error: Cannot submit progress tool because the progress tool could not be located");
-            completionHandler(SUInstallerLauncherFailure);
+            completionHandler(SUInstallerLauncherFailure, needsSystemAuthorization);
             return;
         }
         
@@ -343,7 +418,7 @@
         NSString *launcherCachePath = [SPULocalCacheDirectory createUniqueDirectoryInDirectory:rootLauncherCachePath];
         if (launcherCachePath == nil) {
             SULog(SULogLevelError, @"Failed to create cache directory for progress tool in %@", rootLauncherCachePath);
-            completionHandler(SUInstallerLauncherFailure);
+            completionHandler(SUInstallerLauncherFailure, needsSystemAuthorization);
             return;
         }
         
@@ -353,11 +428,11 @@
         // SUFileManager is more reliable for copying files around
         if (![[[SUFileManager alloc] init] copyItemAtURL:[NSURL fileURLWithPath:progressToolResourcePath] toURL:[NSURL fileURLWithPath:progressToolPath] error:&copyError]) {
             SULog(SULogLevelError, @"Failed to copy progress tool to cache: %@", copyError);
-            completionHandler(SUInstallerLauncherFailure);
+            completionHandler(SUInstallerLauncherFailure, needsSystemAuthorization);
             return;
         }
         
-        SUInstallerLauncherStatus installerStatus = [self submitInstallerAtPath:installerPath withHostBundle:hostBundle authorizationPrompt:authorizationPrompt inSystemDomain:needsSystemAuthorization];
+        SUInstallerLauncherStatus installerStatus = [self submitInstallerAtPath:installerPath withHostBundle:hostBundle updaterIdentifier:updaterIdentifier authorizationPrompt:authorizationPrompt inSystemDomain:needsSystemAuthorization];
         
         BOOL submittedProgressTool = NO;
         if (installerStatus == SUInstallerLauncherSuccess) {
@@ -368,12 +443,13 @@
             }
         } else if (installerStatus == SUInstallerLauncherFailure) {
             SULog(SULogLevelError, @"Failed to submit installer job");
+            SULog(SULogLevelError, @"If your application is sandboxed please follow steps at: https://sparkle-project.org/documentation/sandboxing/");
         }
         
         if (installerStatus == SUInstallerLauncherCanceled) {
-            completionHandler(installerStatus);
+            completionHandler(installerStatus, needsSystemAuthorization);
         } else {
-            completionHandler(submittedProgressTool ? SUInstallerLauncherSuccess : SUInstallerLauncherFailure);
+            completionHandler(submittedProgressTool ? SUInstallerLauncherSuccess : SUInstallerLauncherFailure, needsSystemAuthorization);
         }
     });
 }

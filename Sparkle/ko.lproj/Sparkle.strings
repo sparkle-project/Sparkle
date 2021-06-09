@@ -1,8 +1,12 @@
 "%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@이(가) 다운로드 되었습니다. 프로그램을 업데이트하고 재실행 하시겠습니까?";
 
-"%1$@ can't be updated, because it was opened from a read-only or a temporary location. Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "%1$@이(가) 디스크 이미지나 CD 드라이브 같은 읽기 전용 볼륨에서 실행되고 있으므로 업데이트 할 수 없습니다. %1$@을(를) 응용프로그램 폴더로 이동하여 다시 실행해 주십시오.";
+"%1$@ can't be updated, because it was opened from a read-only or a temporary location." = "%1$@이(가) 디스크 이미지나 CD 드라이브 같은 읽기 전용 볼륨에서 실행되고 있으므로 업데이트 할 수 없습니다.";
+
+"Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "%1$@을(를) 응용프로그램 폴더로 이동하여 다시 실행해 주십시오.";
 
 "%@ %@ is currently the newest version available." = "%1$@ %2$@이(가) 현재 최신 버전입니다.";
+
+"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%1$@ %2$@이(가) 현재 최신 버전입니다.\n(You are currently running version %3$@.)";
 
 /* Description text for SUUpdateAlert when the update is downloadable. */
 "%@ %@ is now available--you have %@. Would you like to download it now?" = "%1$@ %2$@이(가) 업데이트 되었습니다. (현재 버전 : %3$@) 다운로드 하시겠습니까?";

@@ -9,7 +9,9 @@
 #import <Foundation/Foundation.h>
 #import <Sparkle/Sparkle.h>
 
-@interface SUPopUpTitlebarUserDriver : NSObject <SPUUserDriver, SPUStandardUserDriverProtocol>
+@class NSWindow;
+
+@interface SUPopUpTitlebarUserDriver : NSObject <SPUUserDriver>
 
 - (instancetype)initWithWindow:(NSWindow *)window;
 

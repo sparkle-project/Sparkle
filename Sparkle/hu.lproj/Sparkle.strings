@@ -2,9 +2,13 @@
 
 "%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "A %1$@ %2$@ verziója letöltődött és készen áll a telepítésre! Szeretné most telepíteni, majd újraindítani a %1$@ alkalmazást?";
 
-"%1$@ can't be updated, because it was opened from a read-only or a temporary location. Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "A programot nem lehet frissíteni, amikor egy csak olvasható kötetből (pl. lemezképfájl vagy optikai meghajtó) futtatja. Mozgassa a %1$@ alkalmazást az Alkalmazások mappába, indítsa újra onnan, majd próbálja újra a frissítést.";
+"%1$@ can't be updated, because it was opened from a read-only or a temporary location." = "A programot nem lehet frissíteni, amikor egy csak olvasható kötetből (pl. lemezképfájl vagy optikai meghajtó) futtatja.";
+
+"Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "Mozgassa a %1$@ alkalmazást az Alkalmazások mappába, indítsa újra onnan, majd próbálja újra a frissítést.";
 
 "%@ %@ is currently the newest version available." = "A %1$@ %2$@ a jelenleg elérhető legfrissebb verzió.";
+
+"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "A %1$@ %2$@ a jelenleg elérhető legfrissebb verzió.\n(You are currently running version %3$@.)";
 
 /* Description text for SUUpdateAlert when the update is downloadable. */
 "%@ %@ is now available--you have %@. Would you like to download it now?" = "A %1$@ %2$@ verziója már elérhető — az Ön jelenlegi verziója a %3$@. Szeretné most letölteni?";

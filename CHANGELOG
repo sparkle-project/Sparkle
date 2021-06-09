@@ -1,3 +1,171 @@
+# 2.0.0
+
+* Support for Sandboxed Applications (Zorg)
+* Support for writing custom user interfaces (Zorg)
+* Support for updating external Sparkle-based bundles (Zorg)
+  * Added command line utility to update Sparkle-based bundles (Zorg)
+* More modern architecture
+  * Moves extraction, validation, and installation into a submitted launchd agent/daemon with XPC communication (Zorg)
+  * Features faster installs with shorter update/relaunch times (Zorg)
+  * Provides more robust installs that need to request user authorization (Zorg)
+  * Adoption of atomic-safe bundle replacing updates leveraging APFS (#1801) (Zorg)
+* API Changes
+  * Introduced new SPUStandardUpdaterController, SPUUpdater, SPUUserDriver classes/protocols (Zorg)
+  * Decoupled AppKit and UI logic in the framework from core functionality (Zorg)
+  * Ensure (most) API / ABI compatibility with Sparkle 1.x; you can likely test Sparkle 2 in an existing app without any changes (Zorg)
+  * Deprecated SUUpdater, albeit it is still functional for testing and transitional purposes (Zorg)
+  * Delegation methods may have been removed or added to the newer updater API. Please review `SPUUpdaterDelegate` if using `SPUUpdater`. (Zorg)
+* Updater Changes
+  * Automatic silent and manual update alert prompts are now merged together
+  * Updates will attempt to install even if the user quits the application without relaunching the application update explicitly (Zorg)
+  * Updates can be downloaded in the background automatically but later prompt the user to install them, particularly if Sparkle doesn't have sufficient permission to install them without the user's permission (Zorg)
+  * Authorization now occurs before launching the installer and before terminating the application, which can be canceled by the user cleanly (Zorg)
+  * Sparkle uses the icon of the bundle to update for its authorization dialog. A 32x32 image representation of the icon is needed. (Zorg)
+  * Sudden termination for silent automatic updates isn't disabled anymore (Zorg)
+* Policy Changes
+  * Distributing updates without EdDSA signing the archives is now deprecated (Zorg)
+  * Package based updates that are zipped or archived must add sparkle:installationType="package" to the appcast item enclosure (Zorg)
+* System profiler privacy and transparency (#1690) (Martin Pilkington)
+* Support getting app icon from asset catalog (#1694) (Charles Srstka)
+* Don't hide update alert window now on deactivation (#1804) (Zorg)
+* Raise minimum system version to 10.11 (Zorg)
+* Special thanks to developers using early builds of this release in production and contributors for keeping this running (Kornel, Jonas Zaugg, Gwynne Raskind, Jordan Rose, Tony Arnold, Bryan Jones, Christian Tietze, Jakob Egger, and many more)
+
+Please visit [Sparkle's website](http://sparkle-project.org) for more information on documentation and migration.
+
+# 1.26.0
+
+ * Flat package support from #1745 (Zorg)
+ * Correct generate_appcast -s command line argument usage help (Lance Lovette)
+ * Fix -f command line argument handling (Lance Lovette)
+ * Fix progress for guided pkg install (Zorg)
+ * Fix XQuartz update failing because NSLog caused issues (Zorg)
+ * Update localization (Vojtěch Koňařík)
+ * Various fixes to SPM logic (Jonas Zaugg)
+
+# 1.25.0
+
+ * Raise minimum system version to 10.9 (Kornel)
+ * Allow an appcast to prevent the new version from being installed automatically (#1688) (pierswalter)
+ * UI fixes
+   * Show check for updates button only when automatic updates are enabled (Lorena Rangel)
+   * Don't initialize the webview if we don't show release notes (Tobias Fonfara)
+   * Keep skip button available if there is a minimum autoupdate version (Zorg)
+   * Fix automatic updates checkbox state when not showing release notes (Zorg)
+   * Fix edge cases with hiding alert buttons and using "Install Later" (Zorg)
+   * Re-add setting WebUIDelegate fix for legacy web view (Zorg)
+   * Adopt WKWebView for 1.x (Zorg)
+   * Add auto layout constraints to SUAutomaticUpdateAlert window (Zorg)
+   * Made buttons wide enough to display the full text. Made window wide enough to display the widened buttons (el, fi, ru, uk) (Piers Uso Walter)
+   * Remove max size from update alert. (George Nachman)
+ * Integrate generate_keys export/import options changes from #1730 (Zorg)
+ * Add `—release-notes-url-prefix` support to localized release notes (Adam Tharani)
+ * Translations
+   * Enable base internalization for alert xibs (Zorg)
+   * Capitalizes french translation of "Vous utilisez actuellement..." ("You are currently running...") (Micah Moore)
+   * Fix and cleanup Hebrew, Catalan, Finnish localizations (Zorg)
+   * Remove non-english localizations from TestApplication (Zorg)
+ * Fix catch-22 Swift Package Manager binary target (Jonas Zaugg)
+ * Add explicit dependencies to fix Xcode linking errors (Kornel)
+ * Add phased rollouts feature to automatic update driver too (Zorg)
+ * Remove hiding skip button and retitling later button (Zorg)
+ * Deprecate installUpdatesIfAvailable (Zorg)
+ * Apply custom headers to app download (Geraint White)
+
+ # 1.24.0
+
+ * Prioritize UserDefaults when fetching value for EnableAutomaticChecks (Nicolas Bosi)
+ * Improve best appcast item selection handling (Ian Bytchek)
+ * Create lockfile for improved compatibility with 3rd party updaters (CoreCode)
+ * Enable SPM support via binary target (Jonas Zaugg)
+ * `generate_appcast` improvements:
+     * follow symbolic links (Denis Dzyubenko)
+     * update the release notes element’s URL when required (Brad Andalman)
+     * Added output filename option to generate_appcast (Brad Andalman)
+     * Added —release-notes-url-prefix to generate_appcast (Brad Andalman)
+     * Command line option to provide a download url prefix is now parsed and set on each archive item (Dominik H)
+     * Added help command line option (Dominik H)
+ * Locale updates:
+     * Update zh_CN localization (柳东原 · Dongyuan Liu)
+     * Update Sparkle.strings (Vojtěch Koňařík)
+     * Update Croatian (#1603) (milotype)
+     * Update SUUpdateAlert.xib (DanielFirlej)
+ * fix: read SUAutomaticallyUpdate from Info.plist (Trevor DeVore)
+ * Fix casting Boolean to BOOL on Apple Silicon (Kevin Wojniak)
+ * Use build matrix to test on multiple Xcode versions (Rajiv Shah)
+ * Set UpdateAlert and AutomaticUpdateAlert window's fullscreen collectionBehavior to NSWindowCollectionBehaviorFullScreenAuxiliary to allow them to present on top of the Main App's window if it's fullscreen. (Micah Moore)
+ * Fixed error about "about:blank" release notes (Louis Pontoise)
+ * Support App Store URL scheme in release note webview (Bi11)
+ * Use the SHA-256 hash of the archive as the cache path (Nate Weaver)
+ * Don't return an optional from the FileHandle method (Nate Weaver)
+ * Added URL+Hashing (Nate Weaver)
+
+# 1.23.0
+
+ * Support generating appcast with localizations (#1499) (Alik Vovkotrub)
+ * Support versions with git commit SHA (#1504) (Alec Larson)
+ * Hide "Skip..." and "Remind..." buttons when they're not relevant (#1480) (Kenneth Johnsen)
+ * Preserve Finder tags while updating apps (#1512) (CoreCode)
+ * Read-only update alert dialog formatting improvements (#1515) (Quinn Taylor)
+ * Check if `SUBundleName` is set before normalizing (Jake Fenton)
+ * `NSInteger` cast warning on Xcode 11 (Marga Keuvelaar)
+ * Correct appcast file extension (Tom Vos)
+ * Update Sparkle.strings (Emir Sarı)
+ * Fix spelling (#1508) (Frank Chiarulli Jr)
+
+# 1.22.0
+
+ * Enabled "Hardened Runtime" build option for Apple's notarization requirement
+ * Add delegate methods to suppress update alerts (George Nachman)
+ * Improved error when running from translocated location (Michael Buckley)
+ * Add phased rollout feature (#1381) (Fabian Jäger)
+ * Ignore non-standard permissions in delta updates instead of failing the build (Kornel Lesiński)
+ * Notify user when installed version is newer than the latest in the appcast (CoreCode)
+ * Reset timers after computer sleep (CoreCode)
+ * Block-based alternatives to `NSInvocation`-based delegate methods (Fabian Jäger)
+ * Add delegate `userDidSkipThisVersion` (BobZombie, Leo Natan, bono yusuke)
+ * Pass item to updaterShouldShowUpdateAlertForScheduledUpdate delegate method (George Nachman)
+ * Support providing private key as argument in `generate_appcast` (Yakuhzi, marchyang)
+ * Separate the ed25519 sources into a new static library (Tony Arnold)
+ * Disambiguate signing error messages (Nate Weaver)
+ * Use `XMLNode.Options.nodePrettyPrint` in `generate_appcast` instead of trying to add whitespace manually (fumoboy007)
+ * Annotate SUHost for nullability (Michael Buckley)
+ * Use SUAVAILABLE macro (Christiaan Hofman)
+ * Fix warnings when using modules (nivekkagicom)
+ * Correction of Czech localization inconsistency (#1403) (vojtakonarik)
+ * BR locale fix (BR Lingo)
+ * Update Japanese localization (fujisoft)
+ * French Sparkle.strings (Jean-Baptiste)
+
+# 1.21.3
+
+ * Losslessly reduced the size of PNG (Barijaona Ramaholimihaso)
+ * Catch exceptions from subcommands (Julian Mayer)
+ * `generate_appcast` can sign any bundles instead of just apps (Nate Weaver)
+ * Check that effectiveAppearance is being observed before calling removeObserver (Pierluigi)
+
+# 1.21.2
+
+ * Allow EdDSA for delta updates, too (Kornel)
+ * Warning fixes (Brian Bergstrand)
+ * Improvements to release notes view context menu and dark mode (Bi11)
+
+# 1.21.0
+
+ * Added support EdDSA (ed25519) signatures (Kornel)
+    * DSA signatures are considered outdated, and Apple's `Security.framework` only supports weaker SHA-1-based DSA.
+    * Both old DSA and new EdDSA are still supported (and one app can use both), but new applications should use EdDSA only, and we recommend migrating away from DSA signatures.
+ * `generate_keys` is now a Swift tool that stores EdDSA private keys in the Keychain
+    * Existing apps can continue using their old DSA keys, but we've dropped support for generation of old DSA keys
+ * `sign_update` is now a Swift tool that signs using EdDSA from private keys in the Keychain
+    * The old DSA-based signing script has been moved to `bin/old_dsa_scripts`
+    * The old DSA-based signing script has been fixed to work on pre-10.13 systems (Thomas Tempelmann)
+ * `generate_appcast` has been updated to support EdDSA signatures
+    * It can sign both DSA (if `dsa_priv.pem` file is specified) and EdDSA (from Keychain)
+    * The tool now uses Caches directory and doesn't generate unnecessary delta files
+ * Fixed verification of delta updates on filesystems that change permissions of symlinks
+ * Fixed `NSURLSession` leak (Michael Ehrmann)
+
 # 1.20.0
 
  * `generate_appcast` option to read private key directly from the keychain (Tamás Lustyik)

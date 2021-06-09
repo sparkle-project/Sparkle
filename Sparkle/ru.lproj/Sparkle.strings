@@ -1,8 +1,12 @@
 "%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ загружен и готов к использованию! Хотите установить и перезапустить %1$@?";
 
-"%1$@ can't be updated, because it was opened from a read-only or a temporary location. Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "Во время работы %1$@ с тома, предназначенного только для чтения, как например, образа диска или накопителя на оптических дисках, его невозможно обновить. Переместите %1$@ в Папку приложений, перезапустите его оттуда и повторите попытку.";
+"%1$@ can't be updated, because it was opened from a read-only or a temporary location." = "Во время работы %1$@ с тома, предназначенного только для чтения, как например, образа диска или накопителя на оптических дисках, его невозможно обновить.";
+
+"Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "Переместите %1$@ в Папку приложений, перезапустите его оттуда и повторите попытку.";
 
 "%@ %@ is currently the newest version available." = "В настоящий момент %1$@ %2$@ является новейшей версией.";
+
+"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "В настоящий момент %1$@ %2$@ является новейшей версией.\n(You are currently running version %3$@.)";
 
 /* Description text for SUUpdateAlert when the update is downloadable. */
 "%@ %@ is now available--you have %@. Would you like to download it now?" = "%1$@ %2$@ теперь доступен – вы имеете %3$@. Хотите загрузить его сейчас?";

@@ -1,8 +1,12 @@
 "%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ ได้ถูกดาวน์โหลดและพร้อมใช้งานแล้ว คุณต้องการติดตั้งและเริ่ม %1$@ ใหม่เดี๋ยวนี้หรือไม่";
 
-"%1$@ can't be updated, because it was opened from a read-only or a temporary location. Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "%1$@ ไม่สามารถรับการอัพเดทได้เมื่อถูกเรียกจากดิสก์แบบอ่านอย่างเดียวหรือซีดีรอม ย้าย %1$@ ไปยังโฟลเดอร์แอปพลิเคชัน และเรียกใช้งาน จากนั้นลองใหม่อีกครั้ง";
+"%1$@ can't be updated, because it was opened from a read-only or a temporary location." = "%1$@ ไม่สามารถรับการอัพเดทได้เมื่อถูกเรียกจากดิสก์แบบอ่านอย่างเดียวหรือซีดีรอม ย้าย";
+
+"Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "%1$@ ไปยังโฟลเดอร์แอปพลิเคชัน และเรียกใช้งาน จากนั้นลองใหม่อีกครั้ง";
 
 "%@ %@ is currently the newest version available." = "%1$@ %2$@ เป็นเวอร์ชั่นใหม่ล่าสุดแล้ว";
+
+"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%1$@ %2$@ เป็นเวอร์ชั่นใหม่ล่าสุดแล้ว\n(You are currently running version %3$@.)";
 
 /* Description text for SUUpdateAlert when the update is downloadable. */
 "%@ %@ is now available--you have %@. Would you like to download it now?" = "%1$@ %2$@ พร้อมให้ดาวน์โหลดแล้ว (คุณมีเวอร์ชั่น %3$@) ต้องการดาวน์โหลดเลยหรือไม่";

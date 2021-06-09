@@ -1,8 +1,12 @@
 "%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "تم تنزيل %1$@ %2$@ وهو جاهز للاستخدام، هل ترغب بتثبيت التحديث وإعادة تشغيل %1$@ الآن؟";
 
-"%1$@ can't be updated, because it was opened from a read-only or a temporary location. Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "لا يمكن تحديث %1$@ إذا شُغّل من وحدة تخزين للقراءة فقط كصورة قرص أو قارئ الأقراص الضوئية. انقل %1$@ إلى مجلد التطبيقات وأعد تشغيله من هناك ثم حاول مجددًا.";
+"%1$@ can't be updated, because it was opened from a read-only or a temporary location." = "لا يمكن تحديث %1$@ إذا شُغّل من وحدة تخزين للقراءة فقط كصورة قرص أو قارئ الأقراص الضوئية.";
+
+"Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "انقل %1$@ إلى مجلد التطبيقات وأعد تشغيله من هناك ثم حاول مجددًا.";
 
 "%@ %@ is currently the newest version available." = "الإصدار %2$@ هو أحدث إصدار متوفر حاليًا لتطبيق %1$@";
+
+"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "الإصدار %2$@ هو أحدث إصدار متوفر حاليًا لتطبيق %1$@\n(You are currently running version %@.)";
 
 /* Description text for SUUpdateAlert when the update is downloadable. */
 "%@ %@ is now available--you have %@. Would you like to download it now?" = "لديك الإصدار %3$@ من تطبيق %1$@، هل ترغب بتزيل الإصدار %2$@ الآن";

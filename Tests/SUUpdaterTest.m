@@ -8,9 +8,9 @@
 
 #import <XCTest/XCTest.h>
 #import "SUConstants.h"
-#import <Sparkle/SPUUpdater.h>
-#import <Sparkle/SPUStandardUserDriver.h>
-#import <Sparkle/SPUUpdaterDelegate.h>
+#import "SPUUpdater.h"
+#import "SPUStandardUserDriver.h"
+#import "SPUUpdaterDelegate.h"
 
 @interface SUUpdaterTest : XCTestCase <SPUUpdaterDelegate>
 @property (strong) SPUUpdater *updater;

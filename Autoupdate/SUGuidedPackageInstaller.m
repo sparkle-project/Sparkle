@@ -8,7 +8,7 @@
 
 #import <sys/stat.h>
 #import "SUGuidedPackageInstaller.h"
-#import <Sparkle/SUErrors.h>
+#import "SUErrors.h"
 
 
 #include "AppKitPrevention.h"
@@ -16,21 +16,18 @@
 @interface SUGuidedPackageInstaller ()
 
 @property (nonatomic, readonly, copy) NSString *packagePath;
-@property (nonatomic, readonly, copy) NSString *installationPath;
 
 @end
 
 @implementation SUGuidedPackageInstaller
 
 @synthesize packagePath = _packagePath;
-@synthesize installationPath = _installationPath;
 
-- (instancetype)initWithPackagePath:(NSString *)packagePath installationPath:(NSString *)installationPath
+- (instancetype)initWithPackagePath:(NSString *)packagePath
 {
     self = [super init];
     if (self != nil) {
         _packagePath = [packagePath copy];
-        _installationPath = [installationPath copy];
     }
     return self;
 }
@@ -68,6 +65,10 @@
         }
     }
     return success;
+}
+
+- (void)performCleanup
+{
 }
 
 - (BOOL)canInstallSilently

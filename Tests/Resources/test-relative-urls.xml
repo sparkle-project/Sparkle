@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
+  <channel>
+    <title>For unit test only</title>
+    <item>
+        <title>Version 3.0</title>
+        <pubDate>Sat, 26 Jul 2014 15:20:12 +0000</pubDate>
+        <sparkle:releaseNotesLink>notes/relnote-3.0.txt</sparkle:releaseNotesLink>
+        <enclosure url="release-3.0.zip" sparkle:version="3.0" length="1346234" />
+    </item>
+    <item>
+        <title>Version 2.0</title>
+        <description>desc</description>
+        <pubDate>Sat, 26 Jul 2014 15:20:11 +0000</pubDate>
+        <sparkle:version>2.0</sparkle:version>
+        <link>/info/info-2.0.txt</link>
+    </item>
+  </channel>
+</rss>

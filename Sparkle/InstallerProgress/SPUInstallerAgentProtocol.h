@@ -22,7 +22,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)stopProgress;
 
-- (void)relaunchPath:(NSString *)pathToRelaunch;
+- (void)relaunchApplication;
 
 @end
 

@@ -10,12 +10,25 @@
 #define SUSTANDARDVERSIONCOMPARATOR_H
 
 #if __has_feature(modules)
+#if __has_warning("-Watimport-in-framework-header")
+#pragma clang diagnostic ignored "-Watimport-in-framework-header"
+#endif
 @import Foundation;
 #else
 #import <Foundation/Foundation.h>
 #endif
+
+#ifdef BUILDING_SPARKLE_TOOL
+// Ignore incorrect warning
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wquoted-include-in-framework-header"
+#import "SUExport.h"
+#import "SUVersionComparisonProtocol.h"
+#pragma clang diagnostic pop
+#else
 #import <Sparkle/SUExport.h>
 #import <Sparkle/SUVersionComparisonProtocol.h>
+#endif
 
 NS_ASSUME_NONNULL_BEGIN
 

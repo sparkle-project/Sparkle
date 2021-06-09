@@ -7,7 +7,7 @@
 //
 
 #import "SPUCommandLineDriver.h"
-#import <SparkleCore/SparkleCore.h>
+#import <Sparkle/Sparkle.h>
 #import "SPUCommandLineUserDriver.h"
 
 @interface SPUCommandLineDriver () <SPUUpdaterDelegate>
@@ -57,32 +57,25 @@
     return self;
 }
 
-// Because the user driver dispatches to the main queue asynchronously, we should do so here too
-// to preserve the order of handled events
-
-- (void)updater:(SPUUpdater *)__unused updater willScheduleUpdateCheckAfterDelay:(NSTimeInterval)delay
+- (void)updater:(SPUUpdater *)__unused updater willScheduleUpdateCheckAfterDelay:(NSTimeInterval)delay __attribute__((noreturn))
 {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if (self.verbose) {
-            fprintf(stderr, "Last update check occurred too soon. Try again after %0.0f second(s).", delay);
-        }
-        exit(EXIT_SUCCESS);
-    });
+    if (self.verbose) {
+        fprintf(stderr, "Last update check occurred too soon. Try again after %0.0f second(s).", delay);
+    }
+    exit(EXIT_SUCCESS);
 }
 
-- (void)updaterWillIdleSchedulingUpdates:(SPUUpdater *)__unused updater
+- (void)updaterWillIdleSchedulingUpdates:(SPUUpdater *)__unused updater __attribute__((noreturn))
 {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if (self.verbose) {
-            fprintf(stderr, "Automatic update checks are disabled. Exiting.\n");
-        }
-        exit(EXIT_SUCCESS);
-    });
+    if (self.verbose) {
+        fprintf(stderr, "Automatic update checks are disabled. Exiting.\n");
+    }
+    exit(EXIT_SUCCESS);
 }
 
 // If the installation is interactive, we can show an authorization prompt for requesting additional privileges,
 // along with allowing the installer to show UI when installing
-- (BOOL)updater:(SPUUpdater *)__unused updater shouldAllowInstallerInteractionForScheduledChecks:(SPUUpdateCheck)updateCheck
+- (BOOL)updater:(SPUUpdater *)__unused updater shouldAllowInstallerInteractionForUpdateCheck:(SPUUpdateCheck)updateCheck
 {
     switch (updateCheck) {
         case SPUUpdateCheckUserInitiated:
@@ -99,24 +92,20 @@
 // In case we find an update during probing, otherwise we leave this to the user driver
 - (void)updater:(SPUUpdater *)__unused updater didFindValidUpdate:(SUAppcastItem *)__unused item
 {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if (self.probingForUpdates) {
-            if (self.verbose) {
-                fprintf(stderr, "Update available!\n");
-            }
-            exit(EXIT_SUCCESS);
+    if (self.probingForUpdates) {
+        if (self.verbose) {
+            fprintf(stderr, "Update available!\n");
         }
-    });
+        exit(EXIT_SUCCESS);
+    }
 }
 
-- (void)updaterDidNotFindUpdate:(SPUUpdater *)__unused updater
+- (void)updaterDidNotFindUpdate:(SPUUpdater *)__unused updater __attribute__((noreturn))
 {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if (self.verbose) {
-            fprintf(stderr, "No update available!\n");
-        }
-        exit(EXIT_FAILURE);
-    });
+    if (self.verbose) {
+        fprintf(stderr, "No update available!\n");
+    }
+    exit(EXIT_FAILURE);
 }
 
 - (void)updater:(SPUUpdater *)__unused updater didAbortWithError:(NSError *)error
@@ -145,20 +134,21 @@
 
 - (void)runAndCheckForUpdatesNow:(BOOL)checkForUpdatesNow
 {
+    [self startUpdater];
+    
     if (checkForUpdatesNow) {
         // When we start the updater, this scheduled check will start afterwards too
         [self.updater checkForUpdates];
     }
-    
-    [self startUpdater];
 }
 
 - (void)probeForUpdates
 {
+    [self startUpdater];
+    
     // When we start the updater, this info check will start afterwards too
     self.probingForUpdates = YES;
     [self.updater checkForUpdateInformation];
-    [self startUpdater];
 }
 
 @end

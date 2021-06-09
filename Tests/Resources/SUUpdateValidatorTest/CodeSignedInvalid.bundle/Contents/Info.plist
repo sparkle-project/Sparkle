@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundlePackageType</key>
+	<string>BNDL</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleVersion</key>
+	<string>1.0</string>
+	<key>SUPublicEDKey</key>
+	<string>rhHib+w769W2/6/t+oM1ZxgjBB93BfBKMLO0Qo1etQs=</string>
+	<key>SUPublicDSAKeyFile</key>
+	<string>test-pubkey.pem</string>
+	<key>CFBundleIdentifier</key>
+	<string>org.sparkle-project.Sparkle.SUUpdateValidatorTestBundle.CodeSignedInvalid</string>
+</dict>
+</plist>

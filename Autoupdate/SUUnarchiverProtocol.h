@@ -14,7 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (BOOL)canUnarchivePath:(NSString *)path;
 
-+ (BOOL)unsafeIfArchiveIsNotValidated;
++ (BOOL)mustValidateBeforeExtraction;
 
 - (void)unarchiveWithCompletionBlock:(void (^)(NSError * _Nullable))completionBlock progressBlock:(void (^ _Nullable)(double))progressBlock;
 

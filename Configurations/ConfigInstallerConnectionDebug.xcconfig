@@ -1,5 +1,3 @@
 // InstallerConnection Debug
 
 #include "ConfigInstallerConnection.xcconfig"
-
-CODE_SIGN_IDENTITY = -

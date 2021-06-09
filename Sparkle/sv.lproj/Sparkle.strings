@@ -1,8 +1,12 @@
 "%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ har hämtats och är klar att använda! Vill du installera det och starta om %1$@ nu?";
 
-"%1$@ can't be updated, because it was opened from a read-only or a temporary location. Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "%1$@ kan inte uppdateras när det körs från en skrivskyddad volym som en skivavbild eller en optisk enhet. Flytta %1$@ till mappen Program, starta om det därifrån, och försök igen.";
+"%1$@ can't be updated, because it was opened from a read-only or a temporary location. " = "%1$@ kan inte uppdateras när det körs från en skrivskyddad volym som en skivavbild eller en optisk enhet.";
+
+"Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "Flytta %1$@ till mappen Program, starta om det därifrån, och försök igen.";
 
 "%@ %@ is currently the newest version available." = "%1$@ %2$@ är för närvarande den senaste tillgängliga versionen.";
+
+"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%1$@ %2$@ är för närvarande den senaste tillgängliga versionen.\n(You are currently running version %3$@.)";
 
 /* Description text for SUUpdateAlert when the update is downloadable. */
 "%@ %@ is now available--you have %@. Would you like to download it now?" = "%1$@ %2$@ finns nu tillgänglig—du har %3$@. Vill hämta uppdateringen nu?";

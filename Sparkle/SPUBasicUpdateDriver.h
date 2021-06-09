@@ -16,7 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol SPUBasicUpdateDriverDelegate <NSObject>
 
-- (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)appcastItem;
+- (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)appcastItem secondaryAppcastItem:(SUAppcastItem *)secondaryAppcastItem preventsAutoupdate:(BOOL)preventsAutoupdate systemDomain:(NSNumber * _Nullable)systemDomain;
 
 - (void)basicDriverIsRequestingAbortUpdateWithError:(nullable NSError *)error;
 
@@ -32,13 +32,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)prepareCheckForUpdatesWithCompletion:(SPUUpdateDriverCompletion)completionBlock;
 
-- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background includesSkippedUpdates:(BOOL)includesSkippedUpdates;
+- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background;
 
 - (void)resumeInstallingUpdateWithCompletion:(SPUUpdateDriverCompletion)completionBlock;
 
 - (void)resumeUpdate:(id<SPUResumableUpdate>)resumableUpdate completion:(SPUUpdateDriverCompletion)completionBlock;
-
-@property (nullable, nonatomic, readonly) SUAppcastItem *nonDeltaUpdateItem;
 
 - (void)abortUpdateAndShowNextUpdateImmediately:(BOOL)shouldSignalShowingUpdate resumableUpdate:(id<SPUResumableUpdate> _Nullable)resumableUpdate error:(nullable NSError *)error;
 

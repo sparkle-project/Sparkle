@@ -1,0 +1,4 @@
+// Generate Appcast Release
+
+#include "CommandLineTool-Shared.xcconfig"
+#include "ConfigSwiftRelease.xcconfig"

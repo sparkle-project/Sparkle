@@ -16,11 +16,12 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol SPUInstallerDriverDelegate <NSObject>
 
 - (void)installerDidStartInstalling;
+- (void)installerDidStartExtracting;
 - (void)installerDidExtractUpdateWithProgress:(double)progress;
 - (void)installerDidFinishPreparationAndWillInstallImmediately:(BOOL)willInstallImmediately silently:(BOOL)willInstallSilently;
 - (void)installerIsSendingAppTerminationSignal;
 - (void)installerWillFinishInstallationAndRelaunch:(BOOL)relaunch;
-- (void)installerDidFinishInstallationWithAcknowledgement:(void(^)(void))acknowledgement;
+- (void)installerDidFinishInstallationAndRelaunched:(BOOL)relaunch acknowledgement:(void(^)(void))acknowledgement;
 
 - (void)installerIsRequestingAbortInstallWithError:(nullable NSError *)error;
 - (void)installerDidFailToApplyDeltaUpdate;
@@ -31,13 +32,15 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithHost:(SUHost *)host applicationBundle:(NSBundle *)applicationBundle sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater updaterDelegate:(nullable id<SPUUpdaterDelegate>)updaterDelegate delegate:(nullable id<SPUInstallerDriverDelegate>)delegate;
 
-- (void)resumeInstallingUpdateWithUpdateItem:(SUAppcastItem *)updateItem;
+- (void)resumeInstallingUpdateWithUpdateItem:(SUAppcastItem *)updateItem systemDomain:(BOOL)systemDomain;
 
 - (void)checkIfApplicationInstallationRequiresAuthorizationWithReply:(void (^)(BOOL requiresAuthorization))reply;
 
 - (void)extractDownloadedUpdate:(SPUDownloadedUpdate *)downloadedUpdate silently:(BOOL)silently preventsInstallerInteraction:(BOOL)preventsInstallerInteraction completion:(void (^)(NSError * _Nullable))completionHandler;
 
 - (void)installWithToolAndRelaunch:(BOOL)relaunch displayingUserInterface:(BOOL)showUI;
+
+- (void)cancelUpdate;
 
 - (void)abortInstall;
 

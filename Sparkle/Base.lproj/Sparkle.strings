@@ -1,0 +1,149 @@
+"%1$@ %2$@ has been downloaded and is ready to use! This is an important update; would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ has been downloaded and is ready to use! This is an important update; would you like to install it and relaunch %1$@ now?";
+
+"%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?";
+
+"%1$@ can't be updated, because it was opened from a read-only or a temporary location." = "%1$@ can't be updated, because it was opened from a read-only or a temporary location.";
+
+"Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again.";
+
+"Quit %1$@, move it into your Applications folder, relaunch it from there and try again." = "Quit %1$@, move it into your Applications folder, relaunch it from there and try again.";
+
+"%1$@ can’t be updated if it’s running from the location it was downloaded to." = "%1$@ can’t be updated if it’s running from the location it was downloaded to.";
+
+"%@ %@ is currently the newest version available." = "%1$@ %2$@ is currently the newest version available.";
+
+"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%1$@ %2$@ is currently the newest version available.\n(You are currently running version %3$@.)";
+
+/* An appcast feed error when checking for updates and no appcast items are retrieved */
+"No valid update information could be loaded." = "No valid update information could be loaded.";
+
+"An error occurred while running the updater. Please try again later." = "An error occurred while running the updater. Please try again later.";
+
+"An error occurred while starting the installer. Please try again later." = "An error occurred while starting the installer. Please try again later.";
+
+"An error occurred while connecting to the installer. Please try again later." = "An error occurred while connecting to the installer. Please try again later.";
+
+"An error occurred while launching the installer. Please try again later." = "An error occurred while launching the installer. Please try again later.";
+
+"Update Installed" = "Update Installed";
+
+"%@ is now updated to version %@!" = "%@ is now updated to version %@!";
+
+"%@ is now updated!" = "%@ is now updated!";
+
+/* Description text for SUUpdateAlert when the update is downloadable. */
+"%@ %@ is now available--you have %@. Would you like to download it now?" = "%1$@ %2$@ is now available (you have %3$@). Would you like to install it now?";
+
+/* Description text for SUUpdateAlert when the update informational with no download. */
+"%@ %@ is now available--you have %@. Would you like to learn more about this update on the web?" = "%1$@ %2$@ is now available (you have %3$@). Would you like to learn more about this update on the web?";
+
+/* Critical downloadable update */
+"%@ %@ is now available--you have %@. This is an important update; would you like to download it now?" = "%1$@ %2$@ is now available--you have %3$@. This is an important update; would you like to download it now?";
+
+"%@ downloaded" = "%@ downloaded";
+
+"%@ of %@" = "%1$@ of %2$@";
+
+"A new version of %@ is available!" = "An updated version of %@ is available.";
+
+"A new version of %@ is ready to install!" = "An updated version of %@ is ready to install.";
+
+"An error occurred in retrieving update information. Please try again later." = "An error occurred while checking for updates. Please try again later.";
+
+"An error occurred while downloading the update. Please try again later." = "An error occurred while downloading the update. Please try again later.";
+
+"An error occurred while extracting the archive. Please try again later." = "An error occurred while extracting the archive. Please try again later.";
+
+"An error occurred while installing the update. Please try again later." = "An error occurred while installing the update. Please try again later.";
+
+"An error occurred while parsing the update feed." = "An error occurred while processing update information. Please update to the latest version of this application by visiting our web page.";
+
+"An error occurred while downloading the update feed." = "An error occurred while downloading the update feed.";
+
+"Failed to resume installing update." = "Failed to resume installing update.";
+
+"An error occurred while relaunching %1$@, but the new version will be available next time you run %1$@." = "An error occurred while reopening %1$@, but the new version will be available next time you open %1$@.";
+
+"An important update to %@ is ready to install" = "An important update to %@ is ready to install";
+
+/* the unit for bytes */
+"B" = "B";
+
+"Cancel" = "Cancel";
+
+"Cancel Update" = "Cancel Update";
+
+"Checking for updates..." = "Checking for updates…";
+
+/* Take care not to overflow the status window. */
+"Downloading update..." = "Downloading update…";
+
+/* Take care not to overflow the status window. */
+"Extracting update..." = "Extracting update…";
+
+/* the unit for gigabytes */
+"GB" = "GB";
+
+"Install and Relaunch" = "Install and Relaunch";
+
+"Install on Quit" = "Install on Quit";
+
+/* Take care not to overflow the status window. */
+"Installing update..." = "Installing update…";
+
+/* Title confirmation for skipping major upgrade and future updates */
+"Are you sure you want to skip this upgrade?" = "Are you sure you want to skip this upgrade?";
+
+/* Confirmation message for skipping major upgrade and future updates */
+"Skipping this major upgrade will opt out of alerts for future updates." = "Skipping this major upgrade will opt out of alerts for future updates.";
+
+/* Skipping major upgrade */
+"Skip Upgrade" = "Skip Upgrade";
+
+/* Not skipping a major upgrade */
+"Don't Skip" = "Don't Skip";
+
+/* the unit for kilobytes */
+"KB" = "KB";
+
+/* Alternative name for "Install" button if we have a paid update or other update
+	without a download but with a URL. */
+"Learn More..." = "Learn More…";
+
+/* the unit for megabytes */
+"MB" = "MB";
+
+/* OK button. */
+"OK" = "OK";
+
+/* Status message on progress window once download has finished. */
+"Ready to Install" = "Ready to Install";
+
+/* Message that is optionally shown at startup to allow users to turn on/off update checks. */
+"Should %1$@ automatically check for updates? You can always check for updates manually from the %1$@ menu." = "Should %1$@ automatically check for updates? You can always check for updates manually from the %1$@ menu.";
+
+"The update is improperly signed." = "The update is improperly signed.";
+
+"Update Error!" = "Update Error";
+
+"Updating %@" = "Updating %@";
+
+/* 'Error' message when the user checks for updates but is already current or the feed doesn't contain any updates. (not necessarily shown in UI) */
+"You already have the newest version of %@." = "You already have the newest version of %@.";
+
+/* Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates. */
+"You're up-to-date!" = "You’re up to date.";
+
+"Your macOS version is too old" = "Your version of macOS is too old";
+
+"%1$@ %2$@ is available but your macOS version is too old to install it. At least macOS %3$@ is required." = "%1$@ %2$@ is available but your version of macOS is too old to install it. macOS %3$@ or later is required.";
+
+"Your macOS version is too new" = "Your version of macOS is too new";
+
+"%1$@ %2$@ is available but your macOS version is too new for this update. This update only supports up to macOS %3$@." = "%1$@ %2$@ is available but your version of macOS is too new to install it. This update only supports macOS %3$@ or earlier.";
+
+/* Authorization message shown when app wants permission to update itself. */
+"%1$@ wants permission to update." = "%1$@ wants permission to update.";
+
+/* Authorization message shown when app wants permission to update another app / bundle. */
+"%1$@ wants permission to update %2$@." = "%1$@ wants permission to update %2$@.";

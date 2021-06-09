@@ -62,9 +62,9 @@
     }];
 }
 
-- (void)setServiceName:(NSString *)serviceName hostPath:(NSString *)hostPath installationType:(NSString *)installationType
+- (void)setServiceName:(NSString *)serviceName systemDomain:(BOOL)systemDomain
 {
-    [(id<SUInstallerConnectionProtocol>)self.connection.remoteObjectProxy setServiceName:serviceName hostPath:hostPath installationType:installationType];
+    [(id<SUInstallerConnectionProtocol>)self.connection.remoteObjectProxy setServiceName:serviceName systemDomain:systemDomain];
 }
 
 - (void)handleMessageWithIdentifier:(int32_t)identifier data:(NSData *)data

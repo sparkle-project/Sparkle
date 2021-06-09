@@ -30,7 +30,7 @@
     return [[path pathExtension] isEqualToString:@"dmg"];
 }
 
-+ (BOOL)unsafeIfArchiveIsNotValidated
++ (BOOL)mustValidateBeforeExtraction
 {
     return NO;
 }

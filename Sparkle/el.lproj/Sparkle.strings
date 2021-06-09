@@ -1,8 +1,12 @@
 "%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "Το %1$@ %2$@ έχει ληφθεί και είναι έτοιμο προς χρήση! Θα θέλατε να το εγκαταστήσετε και να επανεκκινήσετε το %1$@ τώρα;";
 
-"%1$@ can't be updated, because it was opened from a read-only or a temporary location. Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "Το %1$@ δεν μπορεί να ενημερωθεί όσο τρέχει από έναν δίσκο ανάγνωσης-μόνο ή έναν οπτικό δίσκο. Μεταφέρετε το %1$@ στον φάκελο εφαρμογών σας, επανεκκινήστε το από εκεί, και ξαναδοκιμάστε.";
+"%1$@ can't be updated, because it was opened from a read-only or a temporary location." = "Το %1$@ δεν μπορεί να ενημερωθεί όσο τρέχει από έναν δίσκο ανάγνωσης-μόνο ή έναν οπτικό δίσκο.";
+
+"Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "Μεταφέρετε το %1$@ στον φάκελο εφαρμογών σας, επανεκκινήστε το από εκεί, και ξαναδοκιμάστε.";
 
 "%@ %@ is currently the newest version available." = "Το %1$@ %2$@ είναι η τελευταία διαθέσιμη έκδοση.";
+
+"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "Το %1$@ %2$@ είναι η τελευταία διαθέσιμη έκδοση.\n(Die derzeit installierte Version ist %3$@.)";
 
 /* Description text for SUUpdateAlert when the update is downloadable. */
 "%@ %@ is now available--you have %@. Would you like to download it now?" = "Το %1$@ %2$@ είναι πλέον διαθέσιμο--έχετε το %3$@. Θέλετε να το κατεβάσετε τώρα;";

@@ -19,20 +19,21 @@
 #import <Sparkle/SPUUpdater.h>
 #import <Sparkle/SPUUpdaterDelegate.h>
 #import <Sparkle/SPUUpdaterSettings.h>
-#import <Sparkle/SPUStandardUpdaterController.h>
 #import <Sparkle/SUVersionComparisonProtocol.h>
 #import <Sparkle/SUVersionDisplayProtocol.h>
 #import <Sparkle/SUErrors.h>
 #import <Sparkle/SPUUpdatePermissionRequest.h>
 #import <Sparkle/SUUpdatePermissionResponse.h>
 #import <Sparkle/SPUUserDriver.h>
-#import <Sparkle/SPUStandardUserDriver.h>
-#import <Sparkle/SPUStandardUserDriverDelegate.h>
-#import <Sparkle/SPUUserDriverCoreComponent.h>
 #import <Sparkle/SPUDownloadData.h>
 
-#import <Sparkle/SUUpdater.h> // deprecated
-#import <Sparkle/SUUpdaterDelegate.h> // deprecated
+// UI bits
+#import <Sparkle/SPUStandardUpdaterController.h>
+#import <Sparkle/SPUStandardUserDriver.h>
+#import <Sparkle/SPUStandardUserDriverDelegate.h>
 
+// Deprecated bits
+#import <Sparkle/SUUpdater.h>
+#import <Sparkle/SUUpdaterDelegate.h>
 
 #endif

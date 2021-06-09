@@ -8,12 +8,18 @@
 #import "SUPipedUnarchiver.h"
 #import "SUBinaryDeltaCommon.h"
 #import "SUFileManager.h"
-#import <Sparkle/SUExport.h>
+#import "SUExport.h"
 #import "SUAppcast.h"
-#import <Sparkle/SUAppcastItem.h>
+#import "SUAppcast+Private.h"
+#import "SUAppcastItem.h"
 #import "SUAppcastDriver.h"
-#import <Sparkle/SUVersionComparisonProtocol.h>
-#import <Sparkle/SUStandardVersionComparator.h>
+#import "SUVersionComparisonProtocol.h"
+#import "SUStandardVersionComparator.h"
+#import "SUUpdateValidator.h"
+#import "SUHost.h"
+#import "SPUSkippedUpdate.h"
+#import "SUSignatures.h"
+#import "SPUInstallationType.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -33,12 +39,7 @@ static const char *SUAppleQuarantineIdentifier = "com.apple.quarantine";
 
 + (SUAppcastItem *)bestItemFromAppcastItems:(NSArray *)appcastItems getDeltaItem:(SUAppcastItem *_Nullable __autoreleasing *_Nullable)deltaItem withHostVersion:(NSString *)hostVersion comparator:(id<SUVersionComparison>)comparator;
 
-@end
-
-
-@interface SUAppcast (Private)
-
--(NSArray * _Nullable)parseAppcastItemsFromXMLData:(NSData *)appcastData error:(NSError *__autoreleasing*)errorp;
++ (SUAppcast *)filterSupportedAppcast:(SUAppcast *)appcast phasedUpdateGroup:(NSNumber * _Nullable)phasedUpdateGroup skippedUpdate:(SPUSkippedUpdate * _Nullable)skippedUpdate hostVersion:(NSString * _Nullable)hostVersion versionComparator:(id<SUVersionComparison> _Nullable)versionComparator testOSVersion:(BOOL)testOSVersion testMinimumAutoupdateVersion:(BOOL)testMinimumAutoupdateVersion;
 
 @end
 

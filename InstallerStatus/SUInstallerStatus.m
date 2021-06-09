@@ -7,7 +7,6 @@
 //
 
 #import "SUInstallerStatus.h"
-#import "SPUSystemAuthorization.h"
 
 
 #include "AppKitPrevention.h"

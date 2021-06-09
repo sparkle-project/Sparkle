@@ -6,7 +6,7 @@
 //  Copyright 2008 Andy Matuschak. All rights reserved.
 //
 
-#import <Sparkle/SUStandardVersionComparator.h>
+#import <Sparkle/Sparkle.h>
 
 #import <XCTest/XCTest.h>
 
@@ -31,6 +31,15 @@
     SUAssertDescending(comparator, @"0.1", @"0.0.1");
     //SUAssertDescending(comparator, @".1", @"0.0.1"); Known bug, but I'm not sure I care.
     SUAssertAscending(comparator, @"0.1", @"0.1.2");
+}
+
+- (void)testCommitSHAs
+{
+    SUStandardVersionComparator *comparator = [[SUStandardVersionComparator alloc] init];
+    
+    SUAssertAscending(comparator, @"1.5.5-335d3e2", @"1.5.6-b252311");
+    SUAssertEqual(comparator, @"1.5.5-335d3e2", @"1.5.5-a655360");
+    SUAssertDescending(comparator, @"1.5.6-b252311", @"1.5.5-335d3e2");
 }
 
 - (void)testPrereleases

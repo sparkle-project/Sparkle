@@ -31,6 +31,7 @@
 @synthesize agent = _agent;
 @synthesize delegate = _delegate;
 @synthesize connected = _connected;
+@synthesize invalidationError = _invalidationError;
 
 - (instancetype)initWithHostBundleIdentifier:(NSString *)bundleIdentifier delegate:(id<AgentConnectionDelegate>)delegate
 {
@@ -103,6 +104,13 @@
     });
     
     acknowledgement();
+}
+
+- (void)connectionWillInvalidateWithError:(NSError *)error
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self.invalidationError = error;
+    });
 }
 
 @end

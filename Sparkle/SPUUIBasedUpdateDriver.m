@@ -8,18 +8,72 @@
 
 #import "SPUUIBasedUpdateDriver.h"
 #import "SPUCoreBasedUpdateDriver.h"
-#import <Sparkle/SPUUserDriver.h>
+#import "SPUUserDriver.h"
 #import "SUHost.h"
 #import "SUConstants.h"
 #import "SPUUpdaterDelegate.h"
 #import "SUAppcastItem.h"
-#import <Sparkle/SUErrors.h>
-#import "SPUURLDownload.h"
-#import <Sparkle/SPUDownloadData.h>
+#import "SUErrors.h"
+#import "SPUDownloadData.h"
 #import "SPUResumableUpdate.h"
+#import "SPUDownloadDriver.h"
+#import "SPUSkippedUpdate.h"
+#import "SPUUserUpdateState+Private.h"
 
 
 #include "AppKitPrevention.h"
+
+// Private class for downloading release notes
+@interface SPUReleaseNotesDriver: NSObject <SPUDownloadDriverDelegate>
+
+@property (nonatomic, readonly) SPUDownloadDriver *downloadDriver;
+@property (nonatomic) void (^completionHandler)(SPUDownloadData * _Nullable, NSError  * _Nullable );
+
+@end
+
+@implementation SPUReleaseNotesDriver
+
+@synthesize downloadDriver = _downloadDriver;
+@synthesize completionHandler = _completionHandler;
+
+- (instancetype)initWithReleaseNotesURL:(NSURL *)releaseNotesURL host:(SUHost *)host completionHandler:(void (^)(SPUDownloadData * _Nullable, NSError * _Nullable))completionHandler
+{
+    self = [super init];
+    if (self != nil) {
+        _downloadDriver = [[SPUDownloadDriver alloc] initWithRequestURL:releaseNotesURL host:host userAgent:nil httpHeaders:nil inBackground:NO delegate:self];
+        _completionHandler = [completionHandler copy];
+    }
+    return self;
+}
+
+- (void)startDownload
+{
+    [self.downloadDriver downloadFile];
+}
+
+- (void)downloadDriverDidDownloadData:(SPUDownloadData *)downloadData
+{
+    if (self.completionHandler != nil) {
+        self.completionHandler(downloadData, nil);
+        self.completionHandler = nil;
+    }
+}
+
+- (void)downloadDriverDidFailToDownloadFileWithError:(nonnull NSError *)error
+{
+    if (self.completionHandler != nil) {
+        self.completionHandler(nil, error);
+        self.completionHandler = nil;
+    }
+}
+
+- (void)cleanup:(void (^)(void))cleanupHandler
+{
+    self.completionHandler = nil;
+    [self.downloadDriver cleanup:cleanupHandler];
+}
+
+@end
 
 @interface SPUUIBasedUpdateDriver() <SPUCoreBasedUpdateDriverDelegate>
 
@@ -30,6 +84,7 @@
 @property (weak, nonatomic, readonly) id<SPUUpdaterDelegate> updaterDelegate;
 @property (nonatomic, weak, readonly) id<SPUUIBasedUpdateDriverDelegate> delegate;
 @property (nonatomic, readonly) id<SPUUserDriver> userDriver;
+@property (nonatomic) SPUReleaseNotesDriver *releaseNotesDriver;
 @property (nonatomic) BOOL resumingInstallingUpdate;
 @property (nonatomic) BOOL resumingDownloadedUpdate;
 @property (nonatomic) BOOL preventsInstallerInteraction;
@@ -44,6 +99,7 @@
 @synthesize userInitiated = _userInitiated;
 @synthesize updaterDelegate = _updaterDelegate;
 @synthesize userDriver = _userDriver;
+@synthesize releaseNotesDriver = _releaseNotesDriver;
 @synthesize delegate = _delegate;
 @synthesize resumingInstallingUpdate = _resumingInstallingUpdate;
 @synthesize resumingDownloadedUpdate = _resumingDownloadedUpdate;
@@ -77,9 +133,9 @@
     [self.coreDriver preflightForUpdatePermissionPreventingInstallerInteraction:preventsInstallerInteraction reply:reply];
 }
 
-- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background includesSkippedUpdates:(BOOL)includesSkippedUpdates
+- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background
 {
-    [self.coreDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders inBackground:background includesSkippedUpdates:includesSkippedUpdates requiresSilentInstall:NO];
+    [self.coreDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders inBackground:background requiresSilentInstall:NO];
 }
 
 - (void)resumeInstallingUpdateWithCompletion:(SPUUpdateDriverCompletion)completionBlock
@@ -91,7 +147,8 @@
 - (void)resumeUpdate:(id<SPUResumableUpdate>)resumableUpdate completion:(SPUUpdateDriverCompletion)completionBlock
 {
     // Informational downloads shouldn't be presented as updates to be downloaded
-    if (!resumableUpdate.updateItem.isInformationOnlyUpdate) {
+    // Neither should items that prevent auto updating
+    if (!resumableUpdate.updateItem.isInformationOnlyUpdate && !resumableUpdate.preventsAutoupdate) {
         self.resumingDownloadedUpdate = YES;
     }
     [self.coreDriver resumeUpdate:resumableUpdate completion:completionBlock];
@@ -104,100 +161,139 @@
     }
 }
 
-- (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)updateItem
+- (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)updateItem secondaryAppcastItem:(SUAppcastItem *)secondaryUpdateItem preventsAutoupdate:(BOOL)preventsAutoupdate
 {
-    if (updateItem.isInformationOnlyUpdate) {
-        assert(!self.resumingDownloadedUpdate);
-        assert(!self.resumingInstallingUpdate);
-        
-        [self.userDriver showInformationalUpdateFoundWithAppcastItem:updateItem userInitiated:self.userInitiated reply:^(SPUInformationalUpdateAlertChoice choice) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                switch (choice) {
-                    case SPUSkipThisInformationalVersionChoice:
-                        [self.host setObject:[updateItem versionString] forUserDefaultsKey:SUSkippedVersionKey];
-                        // Fall through
-                    case SPUDismissInformationalNoticeChoice:
-                        [self.delegate uiDriverIsRequestingAbortUpdateWithError:nil];
-                        break;
-                }
-            });
-        }];
-    } else if (self.resumingDownloadedUpdate) {
-        [self.userDriver showDownloadedUpdateFoundWithAppcastItem:updateItem userInitiated:self.userInitiated reply:^(SPUUpdateAlertChoice choice) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [self.host setObject:nil forUserDefaultsKey:SUSkippedVersionKey];
-                switch (choice) {
-                    case SPUInstallUpdateChoice:
-                        [self.coreDriver extractDownloadedUpdate];
-                        break;
-                    case SPUSkipThisVersionChoice:
-                        [self.coreDriver clearDownloadedUpdate];
-                        [self.host setObject:[updateItem versionString] forUserDefaultsKey:SUSkippedVersionKey];
-                        // Fall through
-                    case SPUInstallLaterChoice:
-                        [self.delegate uiDriverIsRequestingAbortUpdateWithError:nil];
-                        break;
-                }
-            });
-        }];
-    } else if (!self.resumingInstallingUpdate) {
-        [self.userDriver showUpdateFoundWithAppcastItem:updateItem userInitiated:self.userInitiated reply:^(SPUUpdateAlertChoice choice) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [self.host setObject:nil forUserDefaultsKey:SUSkippedVersionKey];
-                switch (choice) {
-                    case SPUInstallUpdateChoice:
-                        [self.coreDriver downloadUpdateFromAppcastItem:updateItem inBackground:NO];
-                        break;
-                    case SPUSkipThisVersionChoice:
-                        [self.host setObject:[updateItem versionString] forUserDefaultsKey:SUSkippedVersionKey];
-                        // Fall through
-                    case SPUInstallLaterChoice:
-                        [self.delegate uiDriverIsRequestingAbortUpdateWithError:nil];
-                        break;
-                }
-            });
-        }];
-    } else {
-        [self.userDriver showResumableUpdateFoundWithAppcastItem:updateItem userInitiated:self.userInitiated reply:^(SPUInstallUpdateStatus choice) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [self.host setObject:nil forUserDefaultsKey:SUSkippedVersionKey];
-                [self.coreDriver finishInstallationWithResponse:choice displayingUserInterface:!self.preventsInstallerInteraction];
-            });
-        }];
+    if (self.userInitiated) {
+        [SPUSkippedUpdate clearSkippedUpdateForHost:self.host];
     }
     
     id <SPUUpdaterDelegate> updaterDelegate = self.updaterDelegate;
+    
+    SPUUserUpdateStage stage;
+    if (updateItem.isInformationOnlyUpdate) {
+        stage = SPUUserUpdateStageInformational;
+    } else if (self.resumingDownloadedUpdate) {
+        stage = SPUUserUpdateStageDownloaded;
+    } else if (self.resumingInstallingUpdate) {
+        stage = SPUUserUpdateStageInstalling;
+    } else {
+        stage = SPUUserUpdateStageNotDownloaded;
+    }
+    
+    BOOL majorUpgrade = preventsAutoupdate;
+    
+    SPUUserUpdateState *state = [[SPUUserUpdateState alloc] initWithStage:stage userInitiated:self.userInitiated majorUpgrade:majorUpgrade];
+    
+    [self.userDriver showUpdateFoundWithAppcastItem:updateItem state:state reply:^(SPUUserUpdateChoice userChoice) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            
+            // Rule out invalid choices
+            SPUUserUpdateChoice validatedChoice;
+            if (stage == SPUUserUpdateStageInformational && userChoice == SPUUserUpdateChoiceInstall) {
+                validatedChoice = SPUUserUpdateChoiceDismiss;
+            } else {
+                validatedChoice = userChoice;
+            }
+            
+            switch (validatedChoice) {
+                case SPUUserUpdateChoiceInstall: {
+                    switch (stage) {
+                        case SPUUserUpdateStageDownloaded:
+                            [self.coreDriver extractDownloadedUpdate];
+                            break;
+                        case SPUUserUpdateStageInstalling:
+                            [self.coreDriver finishInstallationWithResponse:validatedChoice displayingUserInterface:!self.preventsInstallerInteraction];
+                            break;
+                        case SPUUserUpdateStageNotDownloaded:
+                            [self.coreDriver downloadUpdateFromAppcastItem:updateItem secondaryAppcastItem:secondaryUpdateItem inBackground:NO];
+                            break;
+                        case SPUUserUpdateStageInformational:
+                            assert(false);
+                            break;
+                    }
+                    break;
+                }
+                case SPUUserUpdateChoiceSkip: {
+                    [SPUSkippedUpdate skipUpdate:updateItem host:self.host majorUpgrade:majorUpgrade];
+                    
+                    if ([self.updaterDelegate respondsToSelector:@selector(updater:userDidSkipThisVersion:)]) {
+                        [self.updaterDelegate updater:self.updater userDidSkipThisVersion:updateItem];
+                    }
+                    
+                    switch (stage) {
+                        case SPUUserUpdateStageDownloaded:
+                        case SPUUserUpdateStageNotDownloaded:
+                        case SPUUserUpdateStageInformational:
+                            // Informational updates can be resumed too, so make sure we check
+                            // self.resumingDownloadedUpdate instead of the stage we pass to user driver
+                            if (self.resumingDownloadedUpdate) {
+                                [self.coreDriver clearDownloadedUpdate];
+                            }
+                            
+                            [self.delegate uiDriverIsRequestingAbortUpdateWithError:nil];
+                            
+                            break;
+                        case SPUUserUpdateStageInstalling:
+                            [self.coreDriver finishInstallationWithResponse:validatedChoice displayingUserInterface:!self.preventsInstallerInteraction];
+                            break;
+                    }
+                    
+                    break;
+                }
+                case SPUUserUpdateChoiceDismiss: {
+                    switch (stage) {
+                        case SPUUserUpdateStageDownloaded:
+                        case SPUUserUpdateStageNotDownloaded:
+                        case SPUUserUpdateStageInformational: {
+                            [self.delegate uiDriverIsRequestingAbortUpdateWithError:nil];
+                            break;
+                        }
+                        case SPUUserUpdateStageInstalling: {
+                            [self.coreDriver finishInstallationWithResponse:validatedChoice displayingUserInterface:!self.preventsInstallerInteraction];
+                            break;
+                        }
+                    }
+                    
+                    break;
+                }
+            }
+        });
+    }];
+    
+    if ([self.delegate respondsToSelector:@selector(uiDriverDidShowUpdate)]) {
+        [self.delegate uiDriverDidShowUpdate];
+    }
+    
     if (updateItem.releaseNotesURL != nil && (![updaterDelegate respondsToSelector:@selector(updaterShouldDownloadReleaseNotes:)] || [updaterDelegate updaterShouldDownloadReleaseNotes:self.updater])) {
-        NSURLRequest *request = [NSURLRequest requestWithURL:updateItem.releaseNotesURL cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30];
         
-        id <SPUUserDriver> userDriver = self.userDriver;
-        SPUDownloadURLWithRequest(request, ^(SPUDownloadData * _Nullable downloadData, NSError * _Nullable error) {
+        __weak __typeof__(self) weakSelf = self;
+        self.releaseNotesDriver = [[SPUReleaseNotesDriver alloc] initWithReleaseNotesURL:updateItem.releaseNotesURL host:self.host completionHandler:^(SPUDownloadData * _Nullable downloadData, NSError * _Nullable error) {
+            __typeof__(self) strongSelf = weakSelf;
+            id <SPUUserDriver> userDriver = strongSelf.userDriver;
             if (downloadData != nil) {
                 [userDriver showUpdateReleaseNotesWithDownloadData:(SPUDownloadData * _Nonnull)downloadData];
             } else {
                 [userDriver showUpdateReleaseNotesFailedToDownloadWithError:(NSError * _Nonnull)error];
             }
-        });
+        }];
+        
+        [self.releaseNotesDriver startDownload];
     }
 }
 
 - (void)downloadDriverWillBeginDownload
 {
-    [self.userDriver showDownloadInitiatedWithCompletion:^(SPUDownloadUpdateStatus downloadCompletionStatus) {
-        switch (downloadCompletionStatus) {
-            case SPUDownloadUpdateDone:
-                break;
-            case SPUDownloadUpdateCanceled:
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    if ([self.updaterDelegate respondsToSelector:@selector(userDidCancelDownload:)]) {
-                        [self.updaterDelegate userDidCancelDownload:self.updater];
-                    }
-                    
-                    [self.delegate uiDriverIsRequestingAbortUpdateWithError:nil];
-                });
-                break;
-        }
-    }];
+    void (^cancelDownload)(void) = ^{
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if ([self.updaterDelegate respondsToSelector:@selector((userDidCancelDownload:))]) {
+                [self.updaterDelegate userDidCancelDownload:self.updater];
+            }
+            
+            [self.delegate uiDriverIsRequestingAbortUpdateWithError:nil];
+        });
+    };
+    
+    [self.userDriver showDownloadInitiatedWithCancellation:cancelDownload];
 }
 
 - (void)downloadDriverDidReceiveExpectedContentLength:(uint64_t)expectedContentLength
@@ -228,9 +324,9 @@
 - (void)installerDidFinishPreparationAndWillInstallImmediately:(BOOL)willInstallImmediately silently:(BOOL)__unused willInstallSilently
 {
     if (!willInstallImmediately) {
-        [self.userDriver showReadyToInstallAndRelaunch:^(SPUInstallUpdateStatus installUpdateStatus) {
+        [self.userDriver showReadyToInstallAndRelaunch:^(SPUUserUpdateChoice choice) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                [self.coreDriver finishInstallationWithResponse:installUpdateStatus displayingUserInterface:!self.preventsInstallerInteraction];
+                [self.coreDriver finishInstallationWithResponse:choice displayingUserInterface:!self.preventsInstallerInteraction];
             });
         }];
     }
@@ -241,9 +337,16 @@
     [self.userDriver showSendingTerminationSignal];
 }
 
-- (void)installerDidFinishInstallationWithAcknowledgement:(void(^)(void))acknowledgement
+- (void)installerDidFinishInstallationAndRelaunched:(BOOL)relaunched acknowledgement:(void(^)(void))acknowledgement
 {
-    [self.userDriver showUpdateInstallationDidFinishWithAcknowledgement:acknowledgement];
+    if ([self.userDriver respondsToSelector:@selector(showUpdateInstalledAndRelaunched:acknowledgement:)]) {
+        [self.userDriver showUpdateInstalledAndRelaunched:relaunched acknowledgement:acknowledgement];
+    } else {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+        [self.userDriver showUpdateInstallationDidFinishWithAcknowledgement:acknowledgement];
+#pragma clang diagnostic pop
+    }
 }
 
 - (void)basicDriverIsRequestingAbortUpdateWithError:(nullable NSError *)error
@@ -258,7 +361,7 @@
     [self.delegate coreDriverIsRequestingAbortUpdateWithError:error];
 }
 
-- (void)abortUpdateWithError:(nullable NSError *)error
+- (void)_abortUpdateWithError:(nullable NSError *)error
 {
     void (^abortUpdate)(void) = ^{
         [self.userDriver dismissUpdateInstallation];
@@ -269,11 +372,23 @@
         NSError *nonNullError = error;
         
         if (error.code == SUNoUpdateError) {
-            [self.userDriver showUpdateNotFoundWithAcknowledgement:^{
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    abortUpdate();
-                });
-            }];
+            if ([self.userDriver respondsToSelector:@selector(showUpdateNotFoundWithError:acknowledgement:)]) {
+                [self.userDriver showUpdateNotFoundWithError:(NSError * _Nonnull)error acknowledgement:^{
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        abortUpdate();
+                    });
+                }];
+            } else if ([self.userDriver respondsToSelector:@selector(showUpdateNotFoundWithAcknowledgement:)]) {
+                // Eventually we should remove this fallback once clients adopt -showUpdateNotFoundWithError:acknowledgement:
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+                [self.userDriver showUpdateNotFoundWithAcknowledgement:^{
+#pragma clang diagnostic pop
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        abortUpdate();
+                    });
+                }];
+            }
         } else if (error.code == SUInstallationCanceledError || error.code == SUInstallationAuthorizeLaterError) {
             abortUpdate();
         } else {
@@ -285,6 +400,17 @@
         }
     } else {
         abortUpdate();
+    }
+}
+
+- (void)abortUpdateWithError:(nullable NSError *)error
+{
+    if (self.releaseNotesDriver != nil) {
+        [self.releaseNotesDriver cleanup:^{
+            [self _abortUpdateWithError:error];
+        }];
+    } else {
+        [self _abortUpdateWithError:error];
     }
 }
 

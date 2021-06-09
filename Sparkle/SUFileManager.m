@@ -7,7 +7,7 @@
 //
 
 #import "SUFileManager.h"
-#import <Sparkle/SUErrors.h>
+#import "SUErrors.h"
 
 #include <sys/xattr.h>
 #include <sys/errno.h>
@@ -16,6 +16,8 @@
 
 
 #include "AppKitPrevention.h"
+
+extern int renamex_np(const char *, const char *, unsigned int) __attribute__((weak_import));
 
 static char SUAppleQuarantineIdentifier[] = "com.apple.quarantine";
 
@@ -158,7 +160,7 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
     // Even if we fail removing the quarantine from the root item or any single item in the directory, we will continue trying to remove the quarantine.
     // This is because often it may not be a fatal error from the caller to not remove the quarantine of an item
     NSDictionary *rootAttributes = [_fileManager attributesOfItemAtPath:rootURLPath error:nil];
-    NSString *rootType = [rootAttributes objectForKey:NSFileType]; // 10.7 can't subscript this
+    NSString *rootType = rootAttributes[NSFileType];
     
     if ([rootType isEqualToString:NSFileTypeDirectory]) {
         // The NSDirectoryEnumerator will avoid recursing into any contained
@@ -309,6 +311,35 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
     return [_fileManager moveItemAtURL:sourceURL toURL:destinationURL error:error];
 }
 
+- (BOOL)replaceItemAtURL:(NSURL *)originalItemURL withItemAtURL:(NSURL *)newItemURL error:(NSError * __autoreleasing *)error __OSX_AVAILABLE(10.13)
+{
+    char originalPath[PATH_MAX] = {0};
+    if (![originalItemURL.path getFileSystemRepresentation:originalPath maxLength:sizeof(originalPath)]) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Original item %@ to replace cannot be represented as a valid file name", originalItemURL.lastPathComponent] }];
+        }
+        return NO;
+    }
+    
+    char newPath[PATH_MAX] = {0};
+    if (![newItemURL.path getFileSystemRepresentation:newPath maxLength:sizeof(newPath)]) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"New item %@ to replace cannot be represented as a valid file name", newItemURL.lastPathComponent] }];
+        }
+        return NO;
+    }
+    
+    int status = renamex_np(newPath, originalPath, RENAME_SWAP);
+    if (status != 0) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to replace %@ with %@.", originalItemURL.lastPathComponent, newItemURL.lastPathComponent] }];
+        }
+        return NO;
+    }
+    
+    return YES;
+}
+
 - (BOOL)_changeOwnerAndGroupOfItemAtURL:(NSURL *)targetURL ownerID:(NSNumber *)ownerID groupID:(NSNumber *)groupID error:(NSError * __autoreleasing *)error
 {
     char path[PATH_MAX] = {0};
@@ -403,15 +434,30 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
         // Speeds up the common case
         return YES;
     }
-
-    if (![self _changeOwnerAndGroupOfItemAtURL:targetURL ownerID:ownerID groupID:groupID error:error]) {
-        return NO;
+    
+    // If we can't change both the new owner & group, try to only change the owner
+    // If this works, this is sufficient enough for performing the update
+    NSNumber *groupIDToUse;
+    if (![self _changeOwnerAndGroupOfItemAtURL:targetURL ownerID:ownerID groupID:groupID error:NULL]) {
+        if ((targetOwnerID != nil && [ownerID isEqualToNumber:targetOwnerID])) {
+            // Assume they're the same even if we don't check every file recursively
+            // Speeds up the common case like above
+            return YES;
+        }
+        
+        if (![self _changeOwnerAndGroupOfItemAtURL:targetURL ownerID:ownerID groupID:targetGroupID error:error]) {
+            return NO;
+        }
+        
+        groupIDToUse = targetGroupID;
+    } else {
+        groupIDToUse = groupID;
     }
 
     if (isTargetADirectory) {
         NSDirectoryEnumerator *directoryEnumerator = [_fileManager enumeratorAtURL:targetURL includingPropertiesForKeys:nil options:(NSDirectoryEnumerationOptions)0 errorHandler:nil];
         for (NSURL *url in directoryEnumerator) {
-            if (![self _changeOwnerAndGroupOfItemAtURL:url ownerID:ownerID groupID:groupID error:error]) {
+            if (![self _changeOwnerAndGroupOfItemAtURL:url ownerID:ownerID groupID:groupIDToUse error:error]) {
                 return NO;
             }
         }

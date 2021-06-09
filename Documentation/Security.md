@@ -14,11 +14,9 @@ This fork puts a huge emphasis on splitting Sparkle into several components to a
 * Progress Agent (Application; AppKit permitted)
 * Installer (Agent and Daemon safe)
 
-These achieve privilege separation, because at least theoretically, they can all be placed into different processes from one another.
+These achieve privilege separation, because at least theoretically, they can all be placed into different processes from one another, although in practice the user driver and updater framework will likely be in the same process.
 
-In practice, the user driver and updater framework will likely be in the same process, but leaving this possibility speaks well for the quality of the architecture. This is why for instance all the methods on the user driver are not assumed to be executed on the main thread, if one decided to use NSXPC to drive them.
-
-For XPC Services, it's significant to understand that their purpose is not only for sandboxing. The services can be used regardless of whether an application is sandboxed or not. Besides privilege separation, they also have an impact on fault tolerance and termination.
+For XPC Services, it's significant to understand they can be used independent of sandboxing (although I wouldn't recommend this personally). Besides privilege separation, they also have an impact on fault tolerance and termination.
 
 XPC Services also act inside an application bundle namespace, which is one of many reasons why they aren't bundled inside the framework. We have code that detects whether or not services are available inside the main bundle. This is simpler and more efficient than attempting to create a connection and wait for a timeout. We don't have *any* checks for seeing if the "current process" is sandboxed; doing so is a rather broken behavior. The XPC Services are important, not the sandboxing.
 

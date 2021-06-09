@@ -10,9 +10,12 @@
 #import "SUConstants.h"
 #include <sys/mount.h> // For statfs for isRunningOnReadOnlyVolume
 #import "SULog.h"
+#import "SUSignatures.h"
 
 
 #include "AppKitPrevention.h"
+
+NS_ASSUME_NONNULL_BEGIN
 
 // This class should not rely on AppKit and should also be process independent
 // For example, it should not have code that tests writabilty to somewhere on disk,
@@ -24,8 +27,9 @@
 
 @property (strong, readwrite) NSBundle *bundle;
 @property (nonatomic, readonly) BOOL isMainBundle;
-@property (copy) NSString *defaultsDomain;
+@property (copy, nullable) NSString *defaultsDomain;
 @property (assign) BOOL usesStandardUserDefaults;
+@property (readonly, copy, nullable) NSString *publicDSAKey;
 
 @end
 
@@ -105,7 +109,8 @@
     NSString *version = [self _version];
     if (version == nil) {
         SULog(SULogLevelError, @"This host (%@) has no %@! This attribute is required.", [self bundlePath], (__bridge NSString *)kCFBundleVersionKey);
-        abort();
+        // Instead of abort()-ing, return an empty string to satisfy the _Nonnull contract.
+        return @"";
     }
     return version;
 }
@@ -124,6 +129,17 @@
     struct statfs statfs_info;
     statfs([[self.bundle bundlePath] fileSystemRepresentation], &statfs_info);
     return (statfs_info.f_flags & MNT_RDONLY) != 0;
+}
+
+- (BOOL)isRunningTranslocated
+{
+    NSString *path = [self.bundle bundlePath];
+    return [path rangeOfString:@"/AppTranslocation/"].location != NSNotFound;
+}
+
+- (NSString *_Nullable)publicEDKey
+{
+    return [self objectForInfoDictionaryKey:SUPublicEDKeyKey];
 }
 
 - (NSString *_Nullable)publicDSAKey
@@ -152,12 +168,17 @@
     return key;
 }
 
-- (NSString * _Nullable)publicDSAKeyFileKey
+- (SUPublicKeys *)publicKeys
 {
-    return [self objectForInfoDictionaryKey:SUPublicDSAKeyFileKey];;
+    return [[SUPublicKeys alloc] initWithDsa:[self publicDSAKey] ed:[self publicEDKey]];
 }
 
-- (id)objectForInfoDictionaryKey:(NSString *)key
+- (NSString * _Nullable)publicDSAKeyFileKey
+{
+    return [self objectForInfoDictionaryKey:SUPublicDSAKeyFileKey];
+}
+
+- (nullable id)objectForInfoDictionaryKey:(NSString *)key
 {
     if (self.isMainBundle) {
         // Common fast path - if we're updating the main bundle, that means our updater and host bundle's lifetime is the same
@@ -181,7 +202,7 @@
     return [(NSNumber *)[self objectForInfoDictionaryKey:key] boolValue];
 }
 
-- (id)objectForUserDefaultsKey:(NSString *)defaultName
+- (nullable id)objectForUserDefaultsKey:(NSString *)defaultName
 {
     if (!defaultName || !self.defaultsDomain) {
         return nil;
@@ -199,7 +220,7 @@
 }
 
 // Note this handles nil being passed for defaultName, in which case the user default will be removed
-- (void)setObject:(id)value forUserDefaultsKey:(NSString *)defaultName
+- (void)setObject:(nullable id)value forUserDefaultsKey:(NSString *)defaultName
 {
 	if (self.usesStandardUserDefaults)
 	{
@@ -225,7 +246,7 @@
 	}
 	else
 	{
-        value = CFBooleanGetValue((CFBooleanRef)plr) != false;
+        value = CFBooleanGetValue((CFBooleanRef)plr) ? YES : NO;
         CFRelease(plr);
     }
     return value;
@@ -244,7 +265,7 @@
     }
 }
 
-- (id)objectForKey:(NSString *)key {
+- (nullable id)objectForKey:(NSString *)key {
     return [self objectForUserDefaultsKey:key] ? [self objectForUserDefaultsKey:key] : [self objectForInfoDictionaryKey:key];
 }
 
@@ -253,3 +274,5 @@
 }
 
 @end
+
+NS_ASSUME_NONNULL_END

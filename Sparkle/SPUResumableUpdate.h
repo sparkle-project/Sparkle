@@ -15,6 +15,8 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol SPUResumableUpdate <NSObject>
 
 @property (nonatomic, readonly) SUAppcastItem *updateItem;
+@property (nonatomic, readonly, nullable) SUAppcastItem *secondaryUpdateItem;
+@property (nonatomic, readonly) BOOL preventsAutoupdate;
 
 @end
 
