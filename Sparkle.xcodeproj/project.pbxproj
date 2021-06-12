@@ -29,6 +29,7 @@
 				895C5DC524D78E460058A82D /* ShellScript */,
 			);
 			dependencies = (
+				72EF30B926747E39008CE987 /* PBXTargetDependency */,
 			);
 			name = XCFrameworks;
 			productName = Sparkle.xcframework;
@@ -607,6 +608,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = 72D9549D1CBB415B006F28BD;
 			remoteInfo = "sparkle-cli";
+		};
+		72EF30B826747E39008CE987 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8DC2EF4F0486A6940098B216;
+			remoteInfo = Sparkle;
 		};
 		72F94F611CC48669002DEE68 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -3615,6 +3623,11 @@
 			isa = PBXTargetDependency;
 			target = 72D9549D1CBB415B006F28BD /* sparkle-cli */;
 			targetProxy = 72DBA3791D5FDE95002594A8 /* PBXContainerItemProxy */;
+		};
+		72EF30B926747E39008CE987 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8DC2EF4F0486A6940098B216 /* Sparkle */;
+			targetProxy = 72EF30B826747E39008CE987 /* PBXContainerItemProxy */;
 		};
 		72F94F621CC48669002DEE68 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
