@@ -14,8 +14,8 @@
 #import "SPULocalCacheDirectory.h"
 #import "SPUInstallationType.h"
 #import "SUHost.h"
+#import <ImageIO/ImageIO.h>
 #import <ServiceManagement/ServiceManagement.h>
-
 
 #include "AppKitPrevention.h"
 
