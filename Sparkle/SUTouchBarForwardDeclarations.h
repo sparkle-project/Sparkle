@@ -6,6 +6,8 @@
 //  Copyright © 2017 Sparkle Project. All rights reserved.
 //
 
+#if SPARKLE_BUILD_UI_BITS
+
 // Once Sparkle no longer supports OSX 10.12.0, this file can be deleted.
 
 #import <Foundation/Foundation.h>
@@ -87,5 +89,7 @@ NS_ASSUME_NONNULL_END
 @protocol NSTouchBarDelegate;
 @class NSTouchBarItem;
 @class NSCustomTouchBarItem;
+
+#endif
 
 #endif

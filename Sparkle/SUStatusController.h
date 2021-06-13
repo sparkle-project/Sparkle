@@ -6,6 +6,8 @@
 //  Copyright 2006 Andy Matuschak. All rights reserved.
 //
 
+#if SPARKLE_BUILD_UI_BITS || !BUILDING_SPARKLE
+
 #ifndef SUSTATUSCONTROLLER_H
 #define SUSTATUSCONTROLLER_H
 
@@ -32,5 +34,7 @@
 - (void)setButtonTitle:(NSString *)buttonTitle target:(id)target action:(SEL)action isDefault:(BOOL)isDefault;
 
 @end
+
+#endif
 
 #endif

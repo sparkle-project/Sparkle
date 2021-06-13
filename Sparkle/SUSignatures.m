@@ -10,6 +10,9 @@
 #import <assert.h>
 #import "SULog.h"
 
+
+#include "AppKitPrevention.h"
+
 static NSString *SUDSASignatureKey = @"SUDSASignature";
 static NSString *SUDSASignatureStatusKey = @"SUDSASignatureStatus";
 static NSString *SUEDSignatureKey = @"SUEDSignature";

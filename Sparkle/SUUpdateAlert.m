@@ -10,6 +10,8 @@
 //	Headers:
 // -----------------------------------------------------------------------------
 
+#if SPARKLE_BUILD_UI_BITS
+
 #import "SUUpdateAlert.h"
 
 #import "SUHost.h"
@@ -474,3 +476,5 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 }
 
 @end
+
+#endif

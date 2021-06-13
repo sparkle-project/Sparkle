@@ -6,12 +6,15 @@
 //  Copyright 2006 Andy Matuschak. All rights reserved.
 //
 
+#if SPARKLE_BUILD_UI_BITS
+
 #import "SUUpdater.h"
 #import "SPUUpdater.h"
 #import "SPUStandardUserDriver.h"
 #import "SPUStandardUserDriverDelegate.h"
 #import "SPUUpdaterDelegate.h"
 #import "SULog.h"
+#import <AppKit/AppKit.h>
 
 @interface SUUpdater () <SPUUpdaterDelegate, SPUStandardUserDriverDelegate>
 
@@ -493,3 +496,5 @@ static NSMutableDictionary *sharedUpdaters = nil;
 }
 
 @end
+
+#endif

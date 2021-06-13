@@ -6,6 +6,8 @@
 //  Copyright 2008 Andy Matuschak. All rights reserved.
 //
 
+#if SPARKLE_BUILD_UI_BITS
+
 #import "SUUpdatePermissionPrompt.h"
 #import "SPUUpdatePermissionRequest.h"
 #import "SUUpdatePermissionResponse.h"
@@ -171,3 +173,5 @@ static NSString *const SUUpdatePermissionPromptTouchBarIndentifier = @"" SPARKLE
 }
 
 @end
+
+#endif

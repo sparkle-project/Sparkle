@@ -6,6 +6,8 @@
 //  Copyright © 2020 Sparkle Project. All rights reserved.
 //
 
+#if SPARKLE_BUILD_UI_BITS
+
 #import "SUWKWebView.h"
 #import "SUWebViewCommon.h"
 #import "SULog.h"
@@ -203,3 +205,5 @@ static WKUserScript *_userScriptWithInjectedStyleSource(NSString *styleSource)
 }
 
 @end
+
+#endif

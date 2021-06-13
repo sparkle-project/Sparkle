@@ -8,6 +8,7 @@
 
 #import "SUPopUpTitlebarUserDriver.h"
 #import "SUInstallUpdateViewController.h"
+#import <AppKit/AppKit.h>
 
 @interface SUPopUpTitlebarUserDriver()
 

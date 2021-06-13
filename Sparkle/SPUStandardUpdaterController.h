@@ -10,16 +10,17 @@
 #if __has_warning("-Watimport-in-framework-header")
 #pragma clang diagnostic ignored "-Watimport-in-framework-header"
 #endif
-@import Cocoa;
+@import Foundation;
 #else
-#import <Cocoa/Cocoa.h>
+#import <Foundation/Foundation.h>
 #endif
-#import "SUExport.h"
+#import <Sparkle/SUExport.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
 @class SPUUpdater;
 @class SPUStandardUserDriver;
+@class NSMenuItem;
 @protocol SPUUserDriver, SPUUpdaterDelegate, SPUStandardUserDriverDelegate;
 
 /*!

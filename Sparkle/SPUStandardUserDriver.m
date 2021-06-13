@@ -6,6 +6,8 @@
 //  Copyright © 2016 Sparkle Project. All rights reserved.
 //
 
+#if SPARKLE_BUILD_UI_BITS
+
 #import "SPUStandardUserDriver.h"
 #import "SPUStandardUserDriverDelegate.h"
 #import "SUAppcastItem.h"
@@ -18,6 +20,8 @@
 #import "SUApplicationInfo.h"
 #import "SUOperatingSystem.h"
 #import "SPUUserUpdateState.h"
+
+#import <AppKit/AppKit.h>
 
 @interface SPUStandardUserDriver ()
 
@@ -476,3 +480,5 @@
 }
 
 @end
+
+#endif
