@@ -10,7 +10,6 @@
 #import "SUAppcast.h"
 #import "SUAppcast+Private.h"
 #import "SUAppcastItem.h"
-#import "SUAppcastItem+Private.h"
 #import "SUVersionComparisonProtocol.h"
 #import "SUConstants.h"
 #import "SULog.h"

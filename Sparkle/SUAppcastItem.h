@@ -60,6 +60,9 @@ SU_EXPORT @interface SUAppcastItem : NSObject<NSSecureCoding>
 // Returns the dictionary representing the appcast item; this might be useful later for extensions.
 @property (readonly, copy) NSDictionary *propertiesDictionary;
 
+// Initializes with data from a dictionary provided by the RSS class.
+- (nullable instancetype)initWithDictionary:(NSDictionary *)dict relativeToURL:(NSURL * _Nullable)appcastURL failureReason:(NSString * _Nullable __autoreleasing *_Nullable)error;
+
 @end
 
 NS_ASSUME_NONNULL_END

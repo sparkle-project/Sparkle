@@ -7,7 +7,6 @@
 //
 
 #import "SUAppcastItem.h"
-#import "SUAppcastItem+Private.h"
 #import "SUVersionComparisonProtocol.h"
 #import "SULog.h"
 #import "SUConstants.h"
