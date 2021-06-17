@@ -72,6 +72,8 @@ static NSString *const SUUpdatePermissionPromptTouchBarIndentifier = @"" SPARKLE
         _shouldSendProfile = [self shouldAskAboutProfile];
         _systemProfileInformationArray = request.systemProfile;
         [self setShouldCascadeWindows:NO];
+    } else {
+        assert(false);
     }
     return self;
 }

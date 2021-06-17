@@ -65,13 +65,19 @@
     }];
 }
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wcompletion-handler"
 - (void)resumeInstallingUpdateWithCompletion:(SPUUpdateDriverCompletion)__unused completionBlock
+#pragma clang diagnostic pop
 {
     // Nothing really to do here.. this shouldn't be called.
     SULog(SULogLevelError, @"Error: resumeInstallingUpdateWithCompletion: called on SPUAutomaticUpdateDriver");
 }
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wcompletion-handler"
 - (void)resumeUpdate:(id<SPUResumableUpdate>)__unused resumableUpdate completion:(SPUUpdateDriverCompletion)__unused completionBlock
+#pragma clang diagnostic pop
 {
     // Nothing really to do here.. this shouldn't be called.
     SULog(SULogLevelError, @"Error: resumeDownloadedUpdate:completion: called on SPUAutomaticUpdateDriver");
