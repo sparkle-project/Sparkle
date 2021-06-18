@@ -49,6 +49,9 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 
 @property (nonatomic) id<SUWebView> webView;
 
+@property (nonatomic) NSDictionary *httpHeaders;
+@property (nonatomic) NSString *userAgent;
+
 @end
 
 @implementation SUUpdateAlert
@@ -74,7 +77,10 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 
 @synthesize webView = _webView;
 
-- (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost completionBlock:(void (^)(SUUpdateAlertChoice))block
+@synthesize httpHeaders = _httpHeaders;
+@synthesize userAgent = _userAgent;
+
+- (instancetype)initWithAppcastItem:(SUAppcastItem *)item httpHeaders:(NSDictionary *)httpHeaders userAgent:(NSString *)userAgent host:(SUHost *)aHost completionBlock:(void (^)(SUUpdateAlertChoice))block
 {
     self = [super initWithWindowNibName:@"SUUpdateAlert"];
     if (self)
@@ -82,6 +88,8 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
         self.completionBlock = block;
         host = aHost;
         updateItem = item;
+        _httpHeaders = httpHeaders;
+        _userAgent = userAgent;
         [self setShouldCascadeWindows:NO];
     }
     return self;
@@ -145,8 +153,21 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
     // If there's a release notes URL, load it; otherwise, just stick the contents of the description into the web view.
     if ([self.updateItem releaseNotesURL])
     {
+        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[self.updateItem releaseNotesURL] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30];
+        
+        if (self.userAgent) {
+            [request setValue:self.userAgent forHTTPHeaderField:@"User-Agent"];
+        }
+
+        if (self.httpHeaders) {
+            for (NSString *key in self.httpHeaders) {
+                NSString *value = [self.httpHeaders objectForKey:key];
+                [request setValue:value forHTTPHeaderField:key];
+            }
+        }
+        
         __weak __typeof__(self) weakSelf = self;
-        [self.webView loadRequest:[NSURLRequest requestWithURL:[self.updateItem releaseNotesURL] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30] completionHandler:^(NSError * _Nullable error) {
+        [self.webView loadRequest:request completionHandler:^(NSError * _Nullable error) {
             if (error != nil) {
                 SULog(SULogLevelError, @"Failed to load URL request from web view: %@", error);
             }
