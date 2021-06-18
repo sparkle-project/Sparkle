@@ -219,6 +219,11 @@ static NSString *SUAppcastItemInstallationTypeKey = @"SUAppcastItemInstallationT
     return [self initWithDictionary:dict relativeToURL:nil failureReason:nil];
 }
 
+- (instancetype)initWithDictionary:(NSDictionary *)dict failureReason:(NSString *__autoreleasing *)error
+{
+    return [self initWithDictionary:dict relativeToURL:nil failureReason:error];
+}
+
 - (nullable instancetype)initWithDictionary:(NSDictionary *)dict relativeToURL:(NSURL * _Nullable)appcastURL failureReason:(NSString *__autoreleasing *)error
 {
     self = [super init];
