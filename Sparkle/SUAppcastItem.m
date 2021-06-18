@@ -7,7 +7,6 @@
 //
 
 #import "SUAppcastItem.h"
-#import "SUAppcastItem+Private.h"
 #import "SUVersionComparisonProtocol.h"
 #import "SULog.h"
 #import "SUConstants.h"
@@ -37,7 +36,13 @@ static NSString *SUAppcastItemStateKey = @"SUAppcastItemState";
 
 @interface SUAppcastItem ()
 
-@property (nonatomic, readonly) SPUAppcastItemState *state;
+// Auxillary appcast item state that needs to be evaluated based on the host state
+// This may be nil if the client creates an SUAppcastItem with a deprecated initializer
+// In that case we will need to fallback to safe behavior
+@property (nonatomic, readonly, nullable) SPUAppcastItemState *state;
+
+// Indicates if we have any critical information. Used as a fallback if state is nil
+@property (nonatomic, readonly) BOOL hasCriticalInformation;
 
 @end
 
@@ -62,6 +67,7 @@ static NSString *SUAppcastItemStateKey = @"SUAppcastItemState";
 @synthesize minimumAutoupdateVersion = _minimumAutoupdateVersion;
 @synthesize phasedRolloutInterval = _phasedRolloutInterval;
 @synthesize state = _state;
+@synthesize hasCriticalInformation = _hasCriticalInformation;
 
 + (BOOL)supportsSecureCoding
 {
@@ -91,9 +97,6 @@ static NSString *SUAppcastItemStateKey = @"SUAppcastItemState";
         }
         
         SPUAppcastItemState *state = [decoder decodeObjectOfClass:[SPUAppcastItemState class] forKey:SUAppcastItemStateKey];
-        if (state == nil) {
-            return nil;
-        }
         _state = state;
         
         _installationType = [installationType copy];
@@ -167,7 +170,9 @@ static NSString *SUAppcastItemStateKey = @"SUAppcastItemState";
         [encoder encodeObject:self.minimumAutoupdateVersion forKey:SUAppcastElementMinimumAutoupdateVersion];
     }
     
-    [encoder encodeObject:self.state forKey:SUAppcastItemStateKey];
+    if (self.state != nil) {
+        [encoder encodeObject:self.state forKey:SUAppcastItemStateKey];
+    }
     
     if (self.releaseNotesURL != nil) {
         [encoder encodeObject:self.releaseNotesURL forKey:SUAppcastItemReleaseNotesURLKey];
@@ -206,12 +211,38 @@ static NSString *SUAppcastItemStateKey = @"SUAppcastItemState";
 
 - (BOOL)isCriticalUpdate
 {
-    return self.state.criticalUpdate;
+    if (self.state != nil) {
+        return self.state.criticalUpdate;
+    } else {
+        return self.hasCriticalInformation;
+    }
 }
 
 - (BOOL)isMajorUpgrade
 {
-    return self.state.majorUpgrade;
+    if (self.state != nil) {
+        return self.state.majorUpgrade;
+    } else {
+        return NO;
+    }
+}
+
+- (BOOL)minimumOperatingSystemVersionIsOK
+{
+    if (self.state != nil) {
+        return self.state.minimumOperatingSystemVersionIsOK;
+    } else {
+        return YES;
+    }
+}
+
+- (BOOL)maximumOperatingSystemVersionIsOK
+{
+    if (self.state != nil) {
+        return self.state.maximumOperatingSystemVersionIsOK;
+    } else {
+        return YES;
+    }
 }
 
 - (BOOL)isMacOsUpdate
@@ -238,14 +269,34 @@ static NSString *SUAppcastItemStateKey = @"SUAppcastItemState";
     return self.infoURL && !self.fileURL;
 }
 
-- (instancetype)initWithDictionary:(NSDictionary *)dict state:(SPUAppcastItemState *)state
+// Used for making delta items
+- (nullable instancetype)initWithDictionary:(NSDictionary *)dict relativeToURL:(NSURL * _Nullable)appcastURL state:(SPUAppcastItemState *)state
 {
     return [self initWithDictionary:dict relativeToURL:nil stateResolver:nil resolvedState:state failureReason:nil];
 }
 
+// Deprecated
 - (nullable instancetype)initWithDictionary:(NSDictionary *)dict relativeToURL:(NSURL * _Nullable)appcastURL stateResolver:(SPUAppcastItemStateResolver *)stateResolver failureReason:(NSString *__autoreleasing *)error
 {
     return [self initWithDictionary:dict relativeToURL:appcastURL stateResolver:stateResolver resolvedState:nil failureReason:error];
+}
+
+// Deprecated
+- (nullable instancetype)initWithDictionary:(NSDictionary *)dict
+{
+    return [self initWithDictionary:dict relativeToURL:nil stateResolver:nil resolvedState:nil failureReason:nil];
+}
+
+// Deprecated
+- (instancetype)initWithDictionary:(NSDictionary *)dict failureReason:(NSString *__autoreleasing *)error
+{
+    return [self initWithDictionary:dict relativeToURL:nil stateResolver:nil resolvedState:nil failureReason:error];
+}
+
+// Deprecated
+- (nullable instancetype)initWithDictionary:(NSDictionary *)dict relativeToURL:(NSURL * _Nullable)appcastURL failureReason:(NSString *__autoreleasing *)error
+{
+    return [self initWithDictionary:dict relativeToURL:appcastURL stateResolver:nil resolvedState:nil failureReason:error];
 }
 
 - (nullable instancetype)initWithDictionary:(NSDictionary *)dict relativeToURL:(NSURL * _Nullable)appcastURL stateResolver:(SPUAppcastItemStateResolver * _Nullable)stateResolver resolvedState:(SPUAppcastItemState * _Nullable)resolvedState failureReason:(NSString *__autoreleasing *)error
@@ -362,10 +413,12 @@ static NSString *SUAppcastItemStateKey = @"SUAppcastItemState";
                 criticalUpdateDictionary = nil;
             }
             
+            _hasCriticalInformation = (criticalUpdateDictionary != nil);
+            
             _state = [(SPUAppcastItemStateResolver * _Nonnull)stateResolver resolveStateWithMinimumOperatingSystemVersion:_minimumSystemVersion maximumOperatingSystemVersion:_maximumSystemVersion minimumAutoupdateVersion:_minimumAutoupdateVersion criticalUpdateDictionary:criticalUpdateDictionary];
         } else {
-            assert(resolvedState != nil);
-            _state = (SPUAppcastItemState * _Nonnull)resolvedState;
+            // Note state still may be nil if a deprecated initializer is used
+            _state = resolvedState;
         }
         
         NSString* rolloutIntervalString = [(NSString *)[dict objectForKey:SUAppcastElementPhasedRolloutInterval] copy];
@@ -440,7 +493,7 @@ static NSString *SUAppcastItemStateKey = @"SUAppcastItemState";
                 NSMutableDictionary *fakeAppCastDict = [dict mutableCopy];
                 [fakeAppCastDict removeObjectForKey:SUAppcastElementDeltas];
                 [fakeAppCastDict setObject:deltaDictionary forKey:SURSSElementEnclosure];
-                SUAppcastItem *deltaItem = [[SUAppcastItem alloc] initWithDictionary:fakeAppCastDict state:_state];
+                SUAppcastItem *deltaItem = [[SUAppcastItem alloc] initWithDictionary:fakeAppCastDict relativeToURL:appcastURL state:_state];
 
                 if (deltaItem != nil) {
                     [deltas setObject:deltaItem forKey:deltaFrom];

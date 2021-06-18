@@ -59,8 +59,16 @@ SU_EXPORT @interface SUAppcastItem : NSObject<NSSecureCoding>
 @property (getter=isMacOsUpdate, readonly) BOOL macOsUpdate;
 @property (getter=isInformationOnlyUpdate, readonly) BOOL informationOnlyUpdate;
 
+@property (nonatomic, readonly) BOOL minimumOperatingSystemVersionIsOK;
+@property (nonatomic, readonly) BOOL maximumOperatingSystemVersionIsOK;
+
 // Returns the dictionary representing the appcast item; this might be useful later for extensions.
 @property (readonly, copy) NSDictionary *propertiesDictionary;
+
+// Deprecated initializers
+- (nullable instancetype)initWithDictionary:(NSDictionary *)dict __deprecated_msg("Extended properties that depend on the system or application version are not supported when used with this deprecated initializer. Please adopt supported APIs instead or contact us to describue your use case.");
+- (nullable instancetype)initWithDictionary:(NSDictionary *)dict failureReason:(NSString * _Nullable __autoreleasing *_Nullable)error __deprecated_msg("Extended properties that depend on the system or application version are not supported when used with this deprecated initializer. Please adopt supported APIs instead or contact us to describue your use case.");
+- (nullable instancetype)initWithDictionary:(NSDictionary *)dict relativeToURL:(NSURL * _Nullable)appcastURL failureReason:(NSString * _Nullable __autoreleasing *_Nullable)error __deprecated_msg("Extended properties that depend on the system or application version are not supported when used with this deprecated initializer. Please adopt supported APIs instead or contact us to describue your use case.");
 
 @end
 

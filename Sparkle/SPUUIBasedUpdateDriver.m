@@ -42,6 +42,8 @@
     if (self != nil) {
         _downloadDriver = [[SPUDownloadDriver alloc] initWithRequestURL:releaseNotesURL host:host userAgent:nil httpHeaders:nil inBackground:NO delegate:self];
         _completionHandler = [completionHandler copy];
+    } else {
+        assert(false);
     }
     return self;
 }

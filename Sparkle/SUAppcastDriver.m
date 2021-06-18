@@ -228,7 +228,7 @@
     BOOL hostPassesSkippedMajorVersion = [SPUAppcastItemStateResolver isMinimumAutoupdateVersionOK:skippedUpdate.majorVersion hostVersion:hostVersion versionComparator:versionComparator];
     
     return [appcast copyByFilteringItems:^(SUAppcastItem *item) {
-        BOOL passesOSVersion = (!testOSVersion || (item.state.minimumOperatingSystemVersionIsOK && item.state.maximumOperatingSystemVersionIsOK));
+        BOOL passesOSVersion = (!testOSVersion || (item.minimumOperatingSystemVersionIsOK && item.maximumOperatingSystemVersionIsOK));
         
         BOOL passesPhasedRollout = [self itemIsReadyForPhasedRollout:item phasedUpdateGroup:phasedUpdateGroup currentDate:currentDate hostVersion:hostVersion versionComparator:versionComparator];
         

@@ -22,16 +22,12 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class SPUAppcastItemState, SPUAppcastItemStateResolver;
+@class SPUAppcastItemStateResolver;
 
 @interface SUAppcastItem (Private) <NSSecureCoding>
 
 // Initializes with data from a dictionary provided by the RSS class and state resolver
 - (nullable instancetype)initWithDictionary:(NSDictionary *)dict relativeToURL:(NSURL * _Nullable)appcastURL stateResolver:(SPUAppcastItemStateResolver *)stateResolver failureReason:(NSString * _Nullable __autoreleasing *_Nullable)error;
-
-// Convenience wrapper properties (such as isCriticalUpdate) should be added to SUAppcastItem rather than
-// exposing the state as public API
-@property (nonatomic, readonly) SPUAppcastItemState *state;
 
 @end
 

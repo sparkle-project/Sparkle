@@ -32,6 +32,8 @@
     if (self != nil) {
         _appcastItem = appcastItem;
         self.reply = reply;
+    } else {
+        assert(false);
     }
     return self;
 }
