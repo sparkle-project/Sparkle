@@ -83,7 +83,7 @@
         return;
     }
 
-    self.updateAlert = [[SUUpdateAlert alloc] initWithAppcastItem:updateItem host:self.host completionBlock:^(SUUpdateAlertChoice choice) {
+    self.updateAlert = [[SUUpdateAlert alloc] initWithAppcastItem:updateItem httpHeaders:updater.httpHeaders userAgent:updater.userAgentString host:self.host completionBlock:^(SUUpdateAlertChoice choice) {
         [self updateAlertFinishedWithChoice:choice forItem:updateItem];
     }];
 

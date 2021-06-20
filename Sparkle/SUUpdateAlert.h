@@ -26,7 +26,7 @@ typedef NS_ENUM(NSInteger, SUUpdateAlertChoice) {
 
 @property (weak) id<SUVersionDisplay> versionDisplayer;
 
-- (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)host completionBlock:(void(^)(SUUpdateAlertChoice))c;
+- (instancetype)initWithAppcastItem:(SUAppcastItem *)item httpHeaders:(NSDictionary *)httpHeaders userAgent:(NSString *)userAgent host:(SUHost *)host completionBlock:(void(^)(SUUpdateAlertChoice))c;
 
 - (IBAction)installUpdate:sender;
 - (IBAction)skipThisVersion:sender;
