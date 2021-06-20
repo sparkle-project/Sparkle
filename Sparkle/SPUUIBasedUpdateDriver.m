@@ -36,11 +36,11 @@
 @synthesize downloadDriver = _downloadDriver;
 @synthesize completionHandler = _completionHandler;
 
-- (instancetype)initWithReleaseNotesURL:(NSURL *)releaseNotesURL host:(SUHost *)host completionHandler:(void (^)(SPUDownloadData * _Nullable, NSError * _Nullable))completionHandler
+- (instancetype)initWithReleaseNotesURL:(NSURL *)releaseNotesURL httpHeaders:(NSDictionary * _Nullable)httpHeaders userAgent:(NSString * _Nullable)userAgent host:(SUHost *)host completionHandler:(void (^)(SPUDownloadData * _Nullable, NSError * _Nullable))completionHandler
 {
     self = [super init];
     if (self != nil) {
-        _downloadDriver = [[SPUDownloadDriver alloc] initWithRequestURL:releaseNotesURL host:host userAgent:nil httpHeaders:nil inBackground:NO delegate:self];
+        _downloadDriver = [[SPUDownloadDriver alloc] initWithRequestURL:releaseNotesURL host:host userAgent:userAgent httpHeaders:httpHeaders inBackground:NO delegate:self];
         _completionHandler = [completionHandler copy];
     } else {
         assert(false);
@@ -90,6 +90,8 @@
 @property (nonatomic) BOOL resumingInstallingUpdate;
 @property (nonatomic) BOOL resumingDownloadedUpdate;
 @property (nonatomic) BOOL preventsInstallerInteraction;
+@property (nonatomic, nullable) NSDictionary *httpHeaders;
+@property (nonatomic, nullable) NSString *userAgent;
 
 @end
 
@@ -106,6 +108,8 @@
 @synthesize resumingInstallingUpdate = _resumingInstallingUpdate;
 @synthesize resumingDownloadedUpdate = _resumingDownloadedUpdate;
 @synthesize preventsInstallerInteraction = _preventsInstallerInteraction;
+@synthesize httpHeaders = _httpHeaders;
+@synthesize userAgent = _userAgent;
 
 - (instancetype)initWithHost:(SUHost *)host applicationBundle:(NSBundle *)applicationBundle sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater userDriver:(id <SPUUserDriver>)userDriver userInitiated:(BOOL)userInitiated updaterDelegate:(nullable id <SPUUpdaterDelegate>)updaterDelegate delegate:(id<SPUUIBasedUpdateDriverDelegate>)delegate
 {
@@ -137,6 +141,9 @@
 
 - (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background
 {
+    self.httpHeaders = httpHeaders;
+    self.userAgent = userAgent;
+    
     [self.coreDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders inBackground:background requiresSilentInstall:NO];
 }
 
@@ -269,7 +276,7 @@
     if (updateItem.releaseNotesURL != nil && (![updaterDelegate respondsToSelector:@selector(updaterShouldDownloadReleaseNotes:)] || [updaterDelegate updaterShouldDownloadReleaseNotes:self.updater])) {
         
         __weak __typeof__(self) weakSelf = self;
-        self.releaseNotesDriver = [[SPUReleaseNotesDriver alloc] initWithReleaseNotesURL:updateItem.releaseNotesURL host:self.host completionHandler:^(SPUDownloadData * _Nullable downloadData, NSError * _Nullable error) {
+        self.releaseNotesDriver = [[SPUReleaseNotesDriver alloc] initWithReleaseNotesURL:updateItem.releaseNotesURL httpHeaders:self.httpHeaders userAgent:self.userAgent host:self.host completionHandler:^(SPUDownloadData * _Nullable downloadData, NSError * _Nullable error) {
             __typeof__(self) strongSelf = weakSelf;
             id <SPUUserDriver> userDriver = strongSelf.userDriver;
             if (downloadData != nil) {
