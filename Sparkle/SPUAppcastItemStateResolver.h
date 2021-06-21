@@ -25,6 +25,8 @@ NS_ASSUME_NONNULL_BEGIN
 // Class used to resolve Appcast Item properties that rely on external factors such as a host
 SU_EXPORT @interface SPUAppcastItemStateResolver : NSObject
 
+- (instancetype)init NS_UNAVAILABLE;
+
 - (instancetype)initWithHostVersion:(NSString *)hostVersion applicationVersionComparator:(id<SUVersionComparison>)applicationVersionComparator standardVersionComparator:(SUStandardVersionComparator *)standardVersionComparator;
 
 @end

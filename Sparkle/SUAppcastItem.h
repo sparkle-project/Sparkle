@@ -65,6 +65,8 @@ SU_EXPORT @interface SUAppcastItem : NSObject<NSSecureCoding>
 // Returns the dictionary representing the appcast item; this might be useful later for extensions.
 @property (readonly, copy) NSDictionary *propertiesDictionary;
 
+- (instancetype)init NS_UNAVAILABLE;
+
 // Deprecated initializers
 - (nullable instancetype)initWithDictionary:(NSDictionary *)dict __deprecated_msg("Extended properties that depend on the system or application version are not supported when used with this deprecated initializer. Please adopt supported APIs instead or contact us to describe your use case.");
 - (nullable instancetype)initWithDictionary:(NSDictionary *)dict failureReason:(NSString * _Nullable __autoreleasing *_Nullable)error __deprecated_msg("Extended properties that depend on the system or application version are not supported when used with this deprecated initializer. Please adopt supported APIs instead or contact us to describe your use case.");
