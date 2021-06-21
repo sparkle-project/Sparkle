@@ -365,7 +365,7 @@
 		72EB87EA1CB8798800C37F42 /* ShowInstallerProgress.m in Sources */ = {isa = PBXBuildFile; fileRef = 72EB87E91CB8798800C37F42 /* ShowInstallerProgress.m */; };
 		72EB87EB1CB8859100C37F42 /* Updater.app in Copy Tools */ = {isa = PBXBuildFile; fileRef = 721C24451CB753E6005440CB /* Updater.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		72EB87EC1CB8887E00C37F42 /* SUStatus.xib in Resources */ = {isa = PBXBuildFile; fileRef = 55C14BD8136EF00C00649790 /* SUStatus.xib */; };
-		72EF30BE2675CF38008CE987 /* SPUAppcastItemStateResolver.h in Headers */ = {isa = PBXBuildFile; fileRef = 72EF30BA2675CF38008CE987 /* SPUAppcastItemStateResolver.h */; };
+		72EF30BE2675CF38008CE987 /* SPUAppcastItemStateResolver.h in Headers */ = {isa = PBXBuildFile; fileRef = 72EF30BA2675CF38008CE987 /* SPUAppcastItemStateResolver.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		72EF30BF2675CF38008CE987 /* SPUAppcastItemState.m in Sources */ = {isa = PBXBuildFile; fileRef = 72EF30BB2675CF38008CE987 /* SPUAppcastItemState.m */; };
 		72EF30C02675CF38008CE987 /* SPUAppcastItemStateResolver.m in Sources */ = {isa = PBXBuildFile; fileRef = 72EF30BC2675CF38008CE987 /* SPUAppcastItemStateResolver.m */; };
 		72EF30C12675CF38008CE987 /* SPUAppcastItemState.h in Headers */ = {isa = PBXBuildFile; fileRef = 72EF30BD2675CF38008CE987 /* SPUAppcastItemState.h */; };
@@ -373,7 +373,7 @@
 		72EF30C32675CF67008CE987 /* SPUAppcastItemStateResolver.m in Sources */ = {isa = PBXBuildFile; fileRef = 72EF30BC2675CF38008CE987 /* SPUAppcastItemStateResolver.m */; };
 		72EF30C42675CFA1008CE987 /* SPUAppcastItemState.m in Sources */ = {isa = PBXBuildFile; fileRef = 72EF30BB2675CF38008CE987 /* SPUAppcastItemState.m */; };
 		72EF30C52675CFA1008CE987 /* SPUAppcastItemStateResolver.m in Sources */ = {isa = PBXBuildFile; fileRef = 72EF30BC2675CF38008CE987 /* SPUAppcastItemStateResolver.m */; };
-		72EF30C7267C716A008CE987 /* SUAppcastItem+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 72EF30C6267C716A008CE987 /* SUAppcastItem+Private.h */; };
+		72EF30C7267C716A008CE987 /* SUAppcastItem+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 72EF30C6267C716A008CE987 /* SUAppcastItem+Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		72F94F581CC44DE1002DEE68 /* SPUXPCServiceInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 72F94F561CC44DE1002DEE68 /* SPUXPCServiceInfo.h */; };
 		72F94F591CC44DE1002DEE68 /* SPUXPCServiceInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 72F94F571CC44DE1002DEE68 /* SPUXPCServiceInfo.m */; };
 		72F94F5A1CC450DE002DEE68 /* SUInstallerLauncher.m in Sources */ = {isa = PBXBuildFile; fileRef = 726E07B11CAF08D6001A286B /* SUInstallerLauncher.m */; };
@@ -959,6 +959,7 @@
 		7223E7611AD1AEFF008E3161 /* sais.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sais.c; sourceTree = "<group>"; };
 		7223E7621AD1AEFF008E3161 /* sais.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sais.h; sourceTree = "<group>"; };
 		722545B526805FF80036465C /* testappcast_info_updates.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = testappcast_info_updates.xml; sourceTree = "<group>"; };
+		722545B72680699D0036465C /* SPUAppcastItemStateResolver+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SPUAppcastItemStateResolver+Private.h"; sourceTree = "<group>"; };
 		722589B51E0A24B9005EA0B9 /* Security.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = Security.md; sourceTree = "<group>"; };
 		722589B61E0A24C6005EA0B9 /* Design Practices.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "Design Practices.md"; sourceTree = "<group>"; };
 		7229E1B51C97C91100CB50D0 /* SPUUpdateDriver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPUUpdateDriver.h; sourceTree = "<group>"; };
@@ -1789,6 +1790,7 @@
 				72EF30BD2675CF38008CE987 /* SPUAppcastItemState.h */,
 				72EF30BB2675CF38008CE987 /* SPUAppcastItemState.m */,
 				72EF30BA2675CF38008CE987 /* SPUAppcastItemStateResolver.h */,
+				722545B72680699D0036465C /* SPUAppcastItemStateResolver+Private.h */,
 				72EF30BC2675CF38008CE987 /* SPUAppcastItemStateResolver.m */,
 				721D588B25BE59F900D23BEA /* SUPhasedUpdateGroupInfo.h */,
 				721D588C25BE59F900D23BEA /* SUPhasedUpdateGroupInfo.m */,
@@ -2332,18 +2334,18 @@
 				7246E0A31C83B685003B4E75 /* SPUStandardUpdaterController.h in Headers */,
 				725CB95A1C7121830064365A /* SPUStandardUserDriver.h in Headers */,
 				726E4A371C89116000C57C6A /* SPUStandardUserDriverDelegate.h in Headers */,
+				72EF30BE2675CF38008CE987 /* SPUAppcastItemStateResolver.h in Headers */,
+				72EF30C7267C716A008CE987 /* SUAppcastItem+Private.h in Headers */,
 				726DF88E1C84277600188804 /* SPUUserUpdateState.h in Headers */,
 				72B767DA1C9CD2E400A07552 /* SPUUIBasedUpdateDriver.h in Headers */,
 				7229E1B61C97C91100CB50D0 /* SPUUpdateDriver.h in Headers */,
 				72DBA37D1D60CC34002594A8 /* SPUUpdatePermissionRequest.h in Headers */,
 				61B5F8ED09C4CE3C00B25A18 /* SPUUpdater.h in Headers */,
-				72EF30BE2675CF38008CE987 /* SPUAppcastItemStateResolver.h in Headers */,
 				720E217B1D0D00BF003A311C /* SPUUpdaterCycle.h in Headers */,
 				72F9EC481D5EA904004AC8B6 /* SPUUpdaterDelegate.h in Headers */,
 				726E078D1CA891E9001A286B /* SPUUpdaterSettings.h in Headers */,
 				72F9EC3F1D5E823F004AC8B6 /* SPUUpdaterTimer.h in Headers */,
 				7269E494264798200088C213 /* SPUSkippedUpdate.h in Headers */,
-				72EF30C7267C716A008CE987 /* SUAppcastItem+Private.h in Headers */,
 				723ABFC4259D4CB300BDB4FA /* SUWKWebView.h in Headers */,
 				7293A1AE1CEE933800B957A7 /* SPUURLRequest.h in Headers */,
 				725CB9571C7120410064365A /* SPUUserDriver.h in Headers */,

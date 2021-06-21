@@ -6,7 +6,16 @@
 //  Copyright © 2021 Sparkle Project. All rights reserved.
 //
 
+#if __has_feature(modules)
+#if __has_warning("-Watimport-in-framework-header")
+#pragma clang diagnostic ignored "-Watimport-in-framework-header"
+#endif
+@import Foundation;
+#else
 #import <Foundation/Foundation.h>
+#endif
+
+#import <Sparkle/SUExport.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -14,13 +23,9 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol SUVersionComparison;
 
 // Class used to resolve Appcast Item properties that rely on external factors such as a host
-@interface SPUAppcastItemStateResolver : NSObject
+SU_EXPORT @interface SPUAppcastItemStateResolver : NSObject
 
 - (instancetype)initWithHostVersion:(NSString *)hostVersion applicationVersionComparator:(id<SUVersionComparison>)applicationVersionComparator standardVersionComparator:(SUStandardVersionComparator *)standardVersionComparator;
-
-- (SPUAppcastItemState *)resolveStateWithInformationalUpdateVersions:(NSSet<NSString *> * _Nullable)informationalUpdateVersions minimumOperatingSystemVersion:(NSString * _Nullable)minimumOperatingSystemVersion maximumOperatingSystemVersion:(NSString * _Nullable)maximumOperatingSystemVersion minimumAutoupdateVersion:(NSString * _Nullable)minimumAutoupdateVersion criticalUpdateDictionary:(NSDictionary * _Nullable)criticalUpdateDictionary;
-
-+ (BOOL)isMinimumAutoupdateVersionOK:(NSString * _Nullable)minimumAutoupdateVersion hostVersion:(NSString *)hostVersion versionComparator:(id<SUVersionComparison>)versionComparator;
 
 @end
 

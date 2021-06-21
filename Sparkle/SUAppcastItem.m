@@ -14,6 +14,7 @@
 #import "SPUInstallationType.h"
 #import "SPUAppcastItemState.h"
 #import "SPUAppcastItemStateResolver.h"
+#import "SPUAppcastItemStateResolver+Private.h"
 
 
 #include "AppKitPrevention.h"
