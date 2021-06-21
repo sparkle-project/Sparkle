@@ -44,6 +44,9 @@ static NSString *SUAppcastItemStateKey = @"SUAppcastItemState";
 // Indicates if we have any critical information. Used as a fallback if state is nil
 @property (nonatomic, readonly) BOOL hasCriticalInformation;
 
+// Indicates the versions we update from that are informational-only
+@property (nonatomic, readonly, nullable) NSSet<NSString *> *informationalUpdateVersions;
+
 @end
 
 @implementation SUAppcastItem
@@ -68,6 +71,7 @@ static NSString *SUAppcastItemStateKey = @"SUAppcastItemState";
 @synthesize phasedRolloutInterval = _phasedRolloutInterval;
 @synthesize state = _state;
 @synthesize hasCriticalInformation = _hasCriticalInformation;
+@synthesize informationalUpdateVersions = _informationalUpdateVersions;
 
 + (BOOL)supportsSecureCoding
 {
@@ -266,7 +270,11 @@ static NSString *SUAppcastItemStateKey = @"SUAppcastItemState";
 
 - (BOOL)isInformationOnlyUpdate
 {
-    return self.infoURL && !self.fileURL;
+    if (self.state != nil) {
+        return self.state.informationalUpdate;
+    } else {
+        return (self.informationalUpdateVersions != nil && self.informationalUpdateVersions.count == 0);
+    }
 }
 
 // Used for making delta items
@@ -362,6 +370,15 @@ static NSString *SUAppcastItemStateKey = @"SUAppcastItemState";
             }
             return nil;
         }
+        
+        if (theInfoURL != nil) {
+            // If enclosure doesn't exist, the update must be an informational update
+            // Otherwise check presence of informational update element
+            _informationalUpdateVersions = (enclosure != nil) ? [dict objectForKey:SUAppcastElementInformationalUpdate] : [NSSet set];
+        } else {
+            // Not an informational update
+            _informationalUpdateVersions = nil;
+        }
 
         NSString *enclosureURLString = [enclosure objectForKey:SURSSAttributeURL];
         if (!enclosureURLString && !theInfoURL) {
@@ -415,7 +432,7 @@ static NSString *SUAppcastItemStateKey = @"SUAppcastItemState";
             
             _hasCriticalInformation = (criticalUpdateDictionary != nil);
             
-            _state = [(SPUAppcastItemStateResolver * _Nonnull)stateResolver resolveStateWithMinimumOperatingSystemVersion:_minimumSystemVersion maximumOperatingSystemVersion:_maximumSystemVersion minimumAutoupdateVersion:_minimumAutoupdateVersion criticalUpdateDictionary:criticalUpdateDictionary];
+            _state = [(SPUAppcastItemStateResolver * _Nonnull)stateResolver resolveStateWithInformationalUpdateVersions:_informationalUpdateVersions minimumOperatingSystemVersion:_minimumSystemVersion maximumOperatingSystemVersion:_maximumSystemVersion minimumAutoupdateVersion:_minimumAutoupdateVersion criticalUpdateDictionary:criticalUpdateDictionary];
         } else {
             // Note state still may be nil if a deprecated initializer is used
             _state = resolvedState;

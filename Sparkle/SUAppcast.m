@@ -155,6 +155,19 @@
                 }
                 [dict setObject:tags forKey:name];
             }
+            else if ([name isEqualToString:SUAppcastElementInformationalUpdate]) {
+                NSMutableSet *informationalUpdateVersions = [NSMutableSet set];
+                NSEnumerator *childEnum = [[node children] objectEnumerator];
+                for (NSXMLNode *child in childEnum) {
+                    if ([child.name isEqualToString:SUAppcastAttributeVersion]) {
+                        NSString *version = child.stringValue;
+                        if (version != nil) {
+                            [informationalUpdateVersions addObject:version];
+                        }
+                    }
+                }
+                [dict setObject:[informationalUpdateVersions copy] forKey:name];
+            }
 			else if (name != nil) {
                 // add all other values as strings
                 NSString *theValue = [[node stringValue] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];

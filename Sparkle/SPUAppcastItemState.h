@@ -15,10 +15,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)init NS_UNAVAILABLE;
 
-- (instancetype)initWithMajorUpgrade:(BOOL)majorUpgrade criticalUpdate:(BOOL)criticalUpdate minimumOperatingSystemVersionIsOK:(BOOL)minimumOperatingSystemVersionIsOK maximumOperatingSystemVersionIsOK:(BOOL)maximumOperatingSystemVersionIsOK;
+- (instancetype)initWithMajorUpgrade:(BOOL)majorUpgrade criticalUpdate:(BOOL)criticalUpdate informationalUpdate:(BOOL)informationalUpdate minimumOperatingSystemVersionIsOK:(BOOL)minimumOperatingSystemVersionIsOK maximumOperatingSystemVersionIsOK:(BOOL)maximumOperatingSystemVersionIsOK;
 
 @property (nonatomic, readonly) BOOL majorUpgrade;
 @property (nonatomic, readonly) BOOL criticalUpdate;
+@property (nonatomic, readonly) BOOL informationalUpdate;
 @property (nonatomic, readonly) BOOL minimumOperatingSystemVersionIsOK;
 @property (nonatomic, readonly) BOOL maximumOperatingSystemVersionIsOK;
 

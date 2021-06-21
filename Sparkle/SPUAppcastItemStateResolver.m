@@ -86,8 +86,25 @@
     return ([self.applicationVersionComparator compareVersion:self.hostVersion toVersion:criticalVersion] == NSOrderedAscending);
 }
 
-- (SPUAppcastItemState *)resolveStateWithMinimumOperatingSystemVersion:(NSString * _Nullable)minimumOperatingSystemVersion maximumOperatingSystemVersion:(NSString * _Nullable)maximumOperatingSystemVersion minimumAutoupdateVersion:(NSString * _Nullable)minimumAutoupdateVersion criticalUpdateDictionary:(NSDictionary * _Nullable)criticalUpdateDictionary
+- (BOOL)isInformationalUpdateWithInformationalUpdateVersions:(NSSet<NSString *> * _Nullable)informationalUpdateVersions
 {
+    if (informationalUpdateVersions == nil) {
+        return NO;
+    }
+    
+    // Informational only update regardless of version the app is updating from
+    if (informationalUpdateVersions.count == 0) {
+        return YES;
+    }
+    
+    // Informational update only for a set of host versions we're updating from
+    return [informationalUpdateVersions containsObject:self.hostVersion];
+}
+
+- (SPUAppcastItemState *)resolveStateWithInformationalUpdateVersions:(NSSet<NSString *> * _Nullable)informationalUpdateVersions minimumOperatingSystemVersion:(NSString * _Nullable)minimumOperatingSystemVersion maximumOperatingSystemVersion:(NSString * _Nullable)maximumOperatingSystemVersion minimumAutoupdateVersion:(NSString * _Nullable)minimumAutoupdateVersion criticalUpdateDictionary:(NSDictionary * _Nullable)criticalUpdateDictionary
+{
+    BOOL informationalUpdate = [self isInformationalUpdateWithInformationalUpdateVersions:informationalUpdateVersions];
+    
     BOOL minimumOperatingSystemVersionIsOK = [self isMinimumOperatingSystemVersionOK:minimumOperatingSystemVersion];
     
     BOOL maximumOperatingSystemVersionIsOK = [self isMaximumOperatingSystemVersionOK:maximumOperatingSystemVersion];;
@@ -96,7 +113,7 @@
     
     BOOL criticalUpdate = [self isCriticalUpdateWithCriticalUpdateDictionary:criticalUpdateDictionary];
     
-    return [[SPUAppcastItemState alloc] initWithMajorUpgrade:majorUpgrade criticalUpdate:criticalUpdate minimumOperatingSystemVersionIsOK:minimumOperatingSystemVersionIsOK maximumOperatingSystemVersionIsOK:maximumOperatingSystemVersionIsOK];
+    return [[SPUAppcastItemState alloc] initWithMajorUpgrade:majorUpgrade criticalUpdate:criticalUpdate informationalUpdate:informationalUpdate minimumOperatingSystemVersionIsOK:minimumOperatingSystemVersionIsOK maximumOperatingSystemVersionIsOK:maximumOperatingSystemVersionIsOK];
 }
 
 @end

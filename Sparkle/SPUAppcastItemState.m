@@ -13,6 +13,7 @@
 
 #define SPUAppcastItemStateMajorUpgradeKey @"SPUAppcastItemStateMajorUpgrade"
 #define SPUAppcastItemStateCriticalUpdateKey @"SPUAppcastItemStateCriticalUpdate"
+#define SPUAppcastItemStateInformationalUpdateKey @"SPUAppcastItemStateInformationalUpdate"
 #define SPUAppcastItemStateMinimumOperatingSystemVersionIsOKKey @"SPUAppcastItemStateMinimumOperatingSystemVersionIsOK"
 #define SPUAppcastItemStateMaximumOperatingSystemVersionIsOKKey @"SPUAppcastItemStateMaximumOperatingSystemVersionIsOK"
 
@@ -23,15 +24,17 @@
 
 @synthesize majorUpgrade = _majorUpgrade;
 @synthesize criticalUpdate = _criticalUpdate;
+@synthesize informationalUpdate = _informationalUpdate;
 @synthesize minimumOperatingSystemVersionIsOK = _minimumOperatingSystemVersionIsOK;
 @synthesize maximumOperatingSystemVersionIsOK = _maximumOperatingSystemVersionIsOK;
 
-- (instancetype)initWithMajorUpgrade:(BOOL)majorUpgrade criticalUpdate:(BOOL)criticalUpdate minimumOperatingSystemVersionIsOK:(BOOL)minimumOperatingSystemVersionIsOK maximumOperatingSystemVersionIsOK:(BOOL)maximumOperatingSystemVersionIsOK
+- (instancetype)initWithMajorUpgrade:(BOOL)majorUpgrade criticalUpdate:(BOOL)criticalUpdate informationalUpdate:(BOOL)informationalUpdate minimumOperatingSystemVersionIsOK:(BOOL)minimumOperatingSystemVersionIsOK maximumOperatingSystemVersionIsOK:(BOOL)maximumOperatingSystemVersionIsOK
 {
     self = [super init];
     if (self != nil) {
         _majorUpgrade = majorUpgrade;
         _criticalUpdate = criticalUpdate;
+        _informationalUpdate = informationalUpdate;
         _minimumOperatingSystemVersionIsOK = minimumOperatingSystemVersionIsOK;
         _maximumOperatingSystemVersionIsOK = maximumOperatingSystemVersionIsOK;
     }
@@ -47,6 +50,7 @@
 {
     [encoder encodeBool:self.majorUpgrade forKey:SPUAppcastItemStateMajorUpgradeKey];
     [encoder encodeBool:self.criticalUpdate forKey:SPUAppcastItemStateCriticalUpdateKey];
+    [encoder encodeBool:self.informationalUpdate forKey:SPUAppcastItemStateInformationalUpdateKey];
     [encoder encodeBool:self.minimumOperatingSystemVersionIsOK forKey:SPUAppcastItemStateMinimumOperatingSystemVersionIsOKKey];
     [encoder encodeBool:self.maximumOperatingSystemVersionIsOK forKey:SPUAppcastItemStateMaximumOperatingSystemVersionIsOKKey];
 }
@@ -55,10 +59,11 @@
 {
     BOOL majorUpgrade = [decoder decodeBoolForKey:SPUAppcastItemStateMajorUpgradeKey];
     BOOL criticalUpdate = [decoder decodeBoolForKey:SPUAppcastItemStateCriticalUpdateKey];
+    BOOL informationalUpdate = [decoder decodeBoolForKey:SPUAppcastItemStateInformationalUpdateKey];
     BOOL minimumOperatingSystemVersionIsOK = [decoder decodeBoolForKey:SPUAppcastItemStateMinimumOperatingSystemVersionIsOKKey];
     BOOL maximumOperatingSystemVersionIsOK = [decoder decodeBoolForKey:SPUAppcastItemStateMaximumOperatingSystemVersionIsOKKey];
     
-    return [self initWithMajorUpgrade:majorUpgrade criticalUpdate:criticalUpdate minimumOperatingSystemVersionIsOK:minimumOperatingSystemVersionIsOK maximumOperatingSystemVersionIsOK:maximumOperatingSystemVersionIsOK];
+    return [self initWithMajorUpgrade:majorUpgrade criticalUpdate:criticalUpdate informationalUpdate:informationalUpdate minimumOperatingSystemVersionIsOK:minimumOperatingSystemVersionIsOK maximumOperatingSystemVersionIsOK:maximumOperatingSystemVersionIsOK];
 }
 
 @end
