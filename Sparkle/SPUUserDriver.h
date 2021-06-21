@@ -69,7 +69,7 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  *  state.userInitiated indicates if the update was initiated by the user or if it was automatically scheduled in the background.
  *
  *  Additionally, these properties on the appcastItem are of importance:
- *  appcastItem.informationOnlyUpdate indicates if the update is only informational. These updates cannot be installed because they have no download. You can direct the user to the infoURL property of the appcastItem in their web browser. Sometimes information only updates are used as a fallback in case a bad update is shipped, so you'll want to support this case.
+ *  appcastItem.informationOnlyUpdate indicates if the update is only informational and should not be downloaded. You can direct the user to the infoURL property of the appcastItem in their web browser. Sometimes information only updates are used as a fallback in case a bad update is shipped, so you'll want to support this case.
  *  appcastItem.majorUpgrade indicates if the update is a major or paid upgrade.
  *  appcastItem.criticalUpdate indicates if the update is a critical update.
  *
