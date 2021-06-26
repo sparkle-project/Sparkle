@@ -2,20 +2,30 @@
 <rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
   <channel>
     <title>For unit test only</title>
+    <!-- Release with enclosure download -->
     <item>
         <title>Version 2.0</title>
         <description>desc</description>
         <pubDate>Sat, 26 Jul 2014 15:20:11 +0000</pubDate>
         <enclosure url="http://localhost:1337/Sparkle_Test_App.zip" sparkle:version="2.0" />
-        <sparkle:criticalUpdate sparkle:version="1.5" />
     </item>
-    <!-- The best chosen release -->
+    <!-- Release that is informational updating from 2.4 and 2.5 -->
     <item>
         <title>Version 3.0</title>
-        <sparkle:phasedRolloutInterval>86400</sparkle:phasedRolloutInterval>
-        <!-- Test legacy critical update tag -->
-        <sparkle:tags><sparkle:criticalUpdate /></sparkle:tags>
         <enclosure url="http://localhost:1337/Sparkle_Test_App.zip" sparkle:version="3.0" length="1346234" />
+        <sparkle:informationalUpdate>
+            <sparkle:version>2.5</sparkle:version>
+            <sparkle:version>2.4</sparkle:version>
+        </sparkle:informationalUpdate>
+        <link>http://sparkle-project.org</link>
+    </item>
+    <!-- Release that is always informational -->
+    <item>
+        <title>Version 4.0</title>
+        <pubDate>Sat, 26 Jul 2014 15:20:13 +0000</pubDate>
+        <enclosure url="http://localhost:1337/Sparkle_Test_App.zip" sparkle:version="4.0" length="1346234" />
+        <sparkle:informationalUpdate></sparkle:informationalUpdate>
+        <link>http://sparkle-project.org</link>
         <sparkle:deltas>
             <enclosure url="http://localhost:1337/3.0_from_2.0.patch"
             sparkle:version="3.0"
@@ -32,18 +42,11 @@
             sparkle:edSignature="..." />
         </sparkle:deltas>
     </item>
-    <!-- A release testing minimumSystemVersion -->
-    <item>
-        <title>Version 4.0</title>
-        <pubDate>Sat, 26 Jul 2014 15:20:13 +0000</pubDate>
-        <enclosure url="http://localhost:1337/Sparkle_Test_App.zip" sparkle:version="4.0" length="1346234" />
-        <sparkle:minimumSystemVersion>17.0.0</sparkle:minimumSystemVersion>
-    </item>
-    <!-- A joke release testing maximumSystemVersion -->
+    <!-- Release that is always informational (implicitly without enclosure item) -->
     <item>
         <title>Version 5.0</title>
-        <enclosure url="http://localhost:1337/Sparkle_Test_App.zip" sparkle:version="5.0" length="1346234" />
-        <sparkle:maximumSystemVersion>2.0.0</sparkle:maximumSystemVersion>
+        <sparkle:version>5.0</sparkle:version>
+        <link>http://sparkle-project.org</link>
     </item>
   </channel>
 </rss>

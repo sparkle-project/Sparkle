@@ -17,7 +17,11 @@ class SUAppcastTest: XCTestCase {
         do {
             let testData = try Data(contentsOf: testURL)
             
-            let appcast = try SUAppcast(xmlData: testData, relativeTo: nil)
+            let versionComparator = SUStandardVersionComparator.default()
+            let hostVersion = "1.0"
+            let stateResolver = SPUAppcastItemStateResolver(hostVersion: hostVersion, applicationVersionComparator: versionComparator, standardVersionComparator: versionComparator)
+            
+            let appcast = try SUAppcast(xmlData: testData, relativeTo: nil, stateResolver: stateResolver)
             let items = appcast.items
 
             XCTAssertEqual(4, items.count)
@@ -31,7 +35,7 @@ class SUAppcastTest: XCTestCase {
             XCTAssertEqual("Version 3.0", items[1].title)
             XCTAssertNil(items[1].itemDescription)
             XCTAssertNil(items[1].dateString)
-            XCTAssertFalse(items[1].isCriticalUpdate)
+            XCTAssertTrue(items[1].isCriticalUpdate)
             XCTAssertEqual(items[1].phasedRolloutInterval, 86400)
 
             XCTAssertEqual("Version 4.0", items[2].title)
@@ -45,7 +49,7 @@ class SUAppcastTest: XCTestCase {
             XCTAssertFalse(items[3].isCriticalUpdate)
 
             // Test best appcast item & a delta update item
-            let supportedAppcast = SUAppcastDriver.filterSupportedAppcast(appcast, phasedUpdateGroup: nil, skippedUpdate: nil, hostVersion: nil, versionComparator: nil, testOSVersion: true, testMinimumAutoupdateVersion: false)
+            let supportedAppcast = SUAppcastDriver.filterSupportedAppcast(appcast, phasedUpdateGroup: nil, skippedUpdate: nil, hostVersion: hostVersion, versionComparator: versionComparator, testOSVersion: true, testMinimumAutoupdateVersion: false)
             
             let supportedAppcastItems = supportedAppcast.items
             
@@ -72,21 +76,134 @@ class SUAppcastTest: XCTestCase {
         }
     }
     
+    func testCriticalUpdateVersion() {
+        let testURL = Bundle(for: SUAppcastTest.self).url(forResource: "testappcast", withExtension: "xml")!
+        
+        do {
+            let testData = try Data(contentsOf: testURL)
+            
+            let versionComparator = SUStandardVersionComparator.default()
+            
+            // If critical update version is 1.5 and host version is 1.0, update should be marked critical
+            do {
+                let hostVersion = "1.0"
+                let stateResolver = SPUAppcastItemStateResolver(hostVersion: hostVersion, applicationVersionComparator: versionComparator, standardVersionComparator: versionComparator)
+                
+                let appcast = try SUAppcast(xmlData: testData, relativeTo: nil, stateResolver: stateResolver)
+                XCTAssertTrue(appcast.items[0].isCriticalUpdate)
+            }
+            
+            // If critical update version is 1.5 and host version is 1.5, update should not be marked critical
+            do {
+                let hostVersion = "1.5"
+                let stateResolver = SPUAppcastItemStateResolver(hostVersion: hostVersion, applicationVersionComparator: versionComparator, standardVersionComparator: versionComparator)
+                
+                let appcast = try SUAppcast(xmlData: testData, relativeTo: nil, stateResolver: stateResolver)
+                XCTAssertFalse(appcast.items[0].isCriticalUpdate)
+            }
+            
+            // If critical update version is 1.5 and host version is 1.6, update should not be marked critical
+            do {
+                let hostVersion = "1.6"
+                let stateResolver = SPUAppcastItemStateResolver(hostVersion: hostVersion, applicationVersionComparator: versionComparator, standardVersionComparator: versionComparator)
+                
+                let appcast = try SUAppcast(xmlData: testData, relativeTo: nil, stateResolver: stateResolver)
+                XCTAssertFalse(appcast.items[0].isCriticalUpdate)
+            }
+        } catch let err as NSError {
+            NSLog("%@", err)
+            XCTFail(err.localizedDescription)
+        }
+    }
+    
+    func testInformationalUpdateVersions() {
+        let testURL = Bundle(for: SUAppcastTest.self).url(forResource: "testappcast_info_updates", withExtension: "xml")!
+        
+        do {
+            let testData = try Data(contentsOf: testURL)
+            
+            let versionComparator = SUStandardVersionComparator.default()
+            
+            // Test informational updates from version 1.0
+            do {
+                let hostVersion = "1.0"
+                let stateResolver = SPUAppcastItemStateResolver(hostVersion: hostVersion, applicationVersionComparator: versionComparator, standardVersionComparator: versionComparator)
+                
+                let appcast = try SUAppcast(xmlData: testData, relativeTo: nil, stateResolver: stateResolver)
+                
+                XCTAssertFalse(appcast.items[0].isInformationOnlyUpdate)
+                XCTAssertFalse(appcast.items[1].isInformationOnlyUpdate)
+                XCTAssertTrue(appcast.items[2].isInformationOnlyUpdate)
+                XCTAssertTrue(appcast.items[3].isInformationOnlyUpdate)
+                
+                // Test delta updates inheriting informational only updates
+                do {
+                    let deltaUpdate = appcast.items[2].deltaUpdates!["2.0"] as! SUAppcastItem
+                    XCTAssertTrue(deltaUpdate.isInformationOnlyUpdate)
+                }
+            }
+            
+            // Test informational updates from version 2.4
+            do {
+                let hostVersion = "2.4"
+                let stateResolver = SPUAppcastItemStateResolver(hostVersion: hostVersion, applicationVersionComparator: versionComparator, standardVersionComparator: versionComparator)
+                
+                let appcast = try SUAppcast(xmlData: testData, relativeTo: nil, stateResolver: stateResolver)
+                
+                XCTAssertTrue(appcast.items[1].isInformationOnlyUpdate)
+            }
+            
+            // Test informational updates from version 2.5
+            do {
+                let hostVersion = "2.5"
+                let stateResolver = SPUAppcastItemStateResolver(hostVersion: hostVersion, applicationVersionComparator: versionComparator, standardVersionComparator: versionComparator)
+                
+                let appcast = try SUAppcast(xmlData: testData, relativeTo: nil, stateResolver: stateResolver)
+                
+                XCTAssertTrue(appcast.items[1].isInformationOnlyUpdate)
+            }
+            
+            // Test informational updates from version 2.6
+            do {
+                let hostVersion = "2.6"
+                let stateResolver = SPUAppcastItemStateResolver(hostVersion: hostVersion, applicationVersionComparator: versionComparator, standardVersionComparator: versionComparator)
+                
+                let appcast = try SUAppcast(xmlData: testData, relativeTo: nil, stateResolver: stateResolver)
+                
+                XCTAssertFalse(appcast.items[1].isInformationOnlyUpdate)
+            }
+            
+        } catch let err as NSError {
+            NSLog("%@", err)
+            XCTFail(err.localizedDescription)
+        }
+    }
+    
     func testMinimumAutoupdateVersion() {
         let testURL = Bundle(for: SUAppcastTest.self).url(forResource: "testappcast_minimumAutoupdateVersion", withExtension: "xml")!
         
         do {
             let testData = try Data(contentsOf: testURL)
             
-            let appcast = try SUAppcast(xmlData: testData, relativeTo: nil)
-            
-            XCTAssertEqual(2, appcast.items.count)
-            
             let versionComparator = SUStandardVersionComparator()
+            
+            do {
+                // Test appcast without a filter
+                
+                let hostVersion = "1.0"
+                
+                let stateResolver = SPUAppcastItemStateResolver(hostVersion: hostVersion, applicationVersionComparator: versionComparator, standardVersionComparator: versionComparator)
+                let appcast = try SUAppcast(xmlData: testData, relativeTo: nil, stateResolver: stateResolver)
+                
+                XCTAssertEqual(2, appcast.items.count)
+            }
             
             // Because 3.0 has minimum autoupdate version of 2.0, we should be offered 2.0
             do {
                 let hostVersion = "1.0"
+                
+                let stateResolver = SPUAppcastItemStateResolver(hostVersion: hostVersion, applicationVersionComparator: versionComparator, standardVersionComparator: versionComparator)
+                let appcast = try SUAppcast(xmlData: testData, relativeTo: nil, stateResolver: stateResolver)
                 
                 let supportedAppcast = SUAppcastDriver.filterSupportedAppcast(appcast, phasedUpdateGroup: nil, skippedUpdate: nil, hostVersion: hostVersion, versionComparator: versionComparator, testOSVersion: true, testMinimumAutoupdateVersion: true)
                 
@@ -101,6 +218,9 @@ class SUAppcastTest: XCTestCase {
             do {
                 let hostVersion = "2.0"
                 
+                let stateResolver = SPUAppcastItemStateResolver(hostVersion: hostVersion, applicationVersionComparator: versionComparator, standardVersionComparator: versionComparator)
+                let appcast = try SUAppcast(xmlData: testData, relativeTo: nil, stateResolver: stateResolver)
+                
                 let supportedAppcast = SUAppcastDriver.filterSupportedAppcast(appcast, phasedUpdateGroup: nil, skippedUpdate: nil, hostVersion: hostVersion, versionComparator: versionComparator, testOSVersion: true, testMinimumAutoupdateVersion: true)
                 
                 XCTAssertEqual(2, supportedAppcast.items.count)
@@ -114,6 +234,9 @@ class SUAppcastTest: XCTestCase {
             do {
                 let hostVersion = "2.5"
                 
+                let stateResolver = SPUAppcastItemStateResolver(hostVersion: hostVersion, applicationVersionComparator: versionComparator, standardVersionComparator: versionComparator)
+                let appcast = try SUAppcast(xmlData: testData, relativeTo: nil, stateResolver: stateResolver)
+                
                 let supportedAppcast = SUAppcastDriver.filterSupportedAppcast(appcast, phasedUpdateGroup: nil, skippedUpdate: nil, hostVersion: hostVersion, versionComparator: versionComparator, testOSVersion: true, testMinimumAutoupdateVersion: true)
                 
                 XCTAssertEqual(2, supportedAppcast.items.count)
@@ -126,6 +249,9 @@ class SUAppcastTest: XCTestCase {
             // Because 3.0 has minimum autoupdate version of 2.0, we would be be offered 2.0, but not if it has been skipped
             do {
                 let hostVersion = "1.0"
+                
+                let stateResolver = SPUAppcastItemStateResolver(hostVersion: hostVersion, applicationVersionComparator: versionComparator, standardVersionComparator: versionComparator)
+                let appcast = try SUAppcast(xmlData: testData, relativeTo: nil, stateResolver: stateResolver)
                 
                 // There should be no items if 2.0 is skipped from 1.0 and 3.0 fails minimum autoupdate version
                 do {
@@ -249,9 +375,12 @@ class SUAppcastTest: XCTestCase {
         let testFileUrl = URL(fileURLWithPath: testFile)
         XCTAssertNotNil(testFileUrl)
 
-         do {
+        do {
             let testFileData = try Data(contentsOf: testFileUrl)
-            let appcast = try SUAppcast(xmlData: testFileData, relativeTo: testFileUrl)
+            
+            let stateResolver = SPUAppcastItemStateResolver(hostVersion: "1.0", applicationVersionComparator: SUStandardVersionComparator.default(), standardVersionComparator: SUStandardVersionComparator.default())
+            
+            let appcast = try SUAppcast(xmlData: testFileData, relativeTo: testFileUrl, stateResolver: stateResolver)
             let items = appcast.items
             XCTAssertEqual("https://sparkle-project.org/#localized_notes_link_works", items[0].releaseNotesURL!.absoluteString)
         } catch let err as NSError {
@@ -265,7 +394,9 @@ class SUAppcastTest: XCTestCase {
         let testData = NSData(contentsOfFile: testFile)!
 
         do {
-            let appcast = try SUAppcast(xmlData: testData as Data, relativeTo: nil)
+            let stateResolver = SPUAppcastItemStateResolver(hostVersion: "1.0", applicationVersionComparator: SUStandardVersionComparator.default(), standardVersionComparator: SUStandardVersionComparator.default())
+            
+            let appcast = try SUAppcast(xmlData: testData as Data, relativeTo: nil, stateResolver: stateResolver)
             let items = appcast.items
 
             XCTAssertEqual(2, items.count)
@@ -287,7 +418,9 @@ class SUAppcastTest: XCTestCase {
         do {
             let baseURL = URL(string: "https://fake.sparkle-project.org/updates/index.xml")!
             
-            let appcast = try SUAppcast(xmlData: testData as Data, relativeTo: baseURL)
+            let stateResolver = SPUAppcastItemStateResolver(hostVersion: "1.0", applicationVersionComparator: SUStandardVersionComparator.default(), standardVersionComparator: SUStandardVersionComparator.default())
+            
+            let appcast = try SUAppcast(xmlData: testData as Data, relativeTo: baseURL, stateResolver: stateResolver)
             let items = appcast.items
 
             XCTAssertEqual(2, items.count)

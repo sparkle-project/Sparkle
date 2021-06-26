@@ -31,15 +31,15 @@ typedef NS_ENUM(NSInteger, SPUUserUpdateChoice) {
 typedef NS_ENUM(NSInteger, SPUUserUpdateStage) {
     SPUUserUpdateStageNotDownloaded,
     SPUUserUpdateStageDownloaded,
-    SPUUserUpdateStageInstalling,
-    SPUUserUpdateStageInformational
+    SPUUserUpdateStageInstalling
 };
 
 SU_EXPORT @interface SPUUserUpdateState : NSObject
 
+- (instancetype)init NS_UNAVAILABLE;
+
 @property (nonatomic, readonly) SPUUserUpdateStage stage;
 @property (nonatomic, readonly) BOOL userInitiated;
-@property (nonatomic, readonly) BOOL majorUpgrade;
 
 @end
 
