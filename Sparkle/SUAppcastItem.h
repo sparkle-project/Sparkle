@@ -68,9 +68,9 @@ SU_EXPORT @interface SUAppcastItem : NSObject<NSSecureCoding>
 - (instancetype)init NS_UNAVAILABLE;
 
 // Deprecated initializers
-- (nullable instancetype)initWithDictionary:(NSDictionary *)dict __deprecated_msg("Extended properties that depend on the system or application version are not supported when used with this deprecated initializer. Please adopt supported APIs instead or contact us to describe your use case.");
-- (nullable instancetype)initWithDictionary:(NSDictionary *)dict failureReason:(NSString * _Nullable __autoreleasing *_Nullable)error __deprecated_msg("Extended properties that depend on the system or application version are not supported when used with this deprecated initializer. Please adopt supported APIs instead or contact us to describe your use case.");
-- (nullable instancetype)initWithDictionary:(NSDictionary *)dict relativeToURL:(NSURL * _Nullable)appcastURL failureReason:(NSString * _Nullable __autoreleasing *_Nullable)error __deprecated_msg("Extended properties that depend on the system or application version are not supported when used with this deprecated initializer. Please adopt supported APIs instead or contact us to describe your use case.");
+- (nullable instancetype)initWithDictionary:(NSDictionary *)dict __deprecated_msg("Properties that depend on the system or application version are not supported when used with this initializer. The designated initializer is available in SUAppcastItem+Private.h. Please first explore other APIs or contact us to describe your use case.");
+- (nullable instancetype)initWithDictionary:(NSDictionary *)dict failureReason:(NSString * _Nullable __autoreleasing *_Nullable)error __deprecated_msg("Properties that depend on the system or application version are not supported when used with this initializer. The designated initializer is available in SUAppcastItem+Private.h. Please first explore other APIs or contact us to describe your use case.");
+- (nullable instancetype)initWithDictionary:(NSDictionary *)dict relativeToURL:(NSURL * _Nullable)appcastURL failureReason:(NSString * _Nullable __autoreleasing *_Nullable)error __deprecated_msg("Properties that depend on the system or application version are not supported when used with this initializer. The designated initializer is available in SUAppcastItem+Private.h. Please first explore other APIs or contact us to describe your use case.");
 
 @end
 
