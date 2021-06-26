@@ -214,12 +214,12 @@ static NSString *SUAppcastItemInstallationTypeKey = @"SUAppcastItemInstallationT
     return self.infoURL && !self.fileURL;
 }
 
-- (instancetype)initWithDictionary:(NSDictionary *)dict
+- (nullable instancetype)initWithDictionary:(NSDictionary *)dict
 {
     return [self initWithDictionary:dict relativeToURL:nil failureReason:nil];
 }
 
-- (instancetype)initWithDictionary:(NSDictionary *)dict failureReason:(NSString *__autoreleasing *)error
+- (nullable instancetype)initWithDictionary:(NSDictionary *)dict failureReason:(NSString *__autoreleasing *)error
 {
     return [self initWithDictionary:dict relativeToURL:nil failureReason:error];
 }
