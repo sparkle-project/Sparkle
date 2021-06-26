@@ -17,30 +17,32 @@
 #import "SULocalizations.h"
 #import <AppKit/AppKit.h>
 
-static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObservationContext";
-
-@interface SPUStandardUpdaterController ()
-
-@property (nonatomic) SPUUpdater *updater;
-@property (nonatomic) SPUStandardUserDriver *userDriver;
-@property (nonatomic) BOOL initializedUpdater;
-
-@end
-
 @implementation SPUStandardUpdaterController
 
 @synthesize updater = _updater;
 @synthesize userDriver = _userDriver;
 @synthesize updaterDelegate = _updaterDelegate;
 @synthesize userDriverDelegate = _userDriverDelegate;
-@synthesize initializedUpdater = _initializedUpdater;
+
+- (instancetype)init
+{
+    // Updater will be later started in -awakeFromNib
+    // Our updater delegate and user driver delegate outlets will be connected by then too.
+    // For now we can make sure the updater/userDriver are accessible
+    return [self initWithStartingUpdater:NO updaterDelegate:nil userDriverDelegate:nil];
+}
 
 - (void)awakeFromNib
 {
-    // awakeFromNib might be called more than once; guard against that
+    // Note: awakeFromNib might be called more than once but -startUpdate handles that
     // We have to use awakeFromNib otherwise the delegate outlets may not be connected yet,
     // and we aren't a proper window or view controller, so we don't have a proper "did load" point
-    [self initializeUpdaterAndStartUpdater:YES];
+    [self startUpdater];
+}
+
+- (instancetype)initWithUpdaterDelegate:(nullable id<SPUUpdaterDelegate>)updaterDelegate userDriverDelegate:(nullable id<SPUStandardUserDriverDelegate>)userDriverDelegate
+{
+    return [self initWithStartingUpdater:YES updaterDelegate:updaterDelegate userDriverDelegate:userDriverDelegate];
 }
 
 - (instancetype)initWithStartingUpdater:(BOOL)startUpdater updaterDelegate:(nullable id<SPUUpdaterDelegate>)updaterDelegate userDriverDelegate:(nullable id<SPUStandardUserDriverDelegate>)userDriverDelegate
@@ -49,36 +51,17 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
         _updaterDelegate = updaterDelegate;
         _userDriverDelegate = userDriverDelegate;
 
-        [self initializeUpdaterAndStartUpdater:startUpdater];
-    }
-    return self;
-}
-
-- (instancetype)initWithUpdaterDelegate:(nullable id<SPUUpdaterDelegate>)updaterDelegate userDriverDelegate:(nullable id<SPUStandardUserDriverDelegate>)userDriverDelegate
-{
-    if ((self = [super init])) {
-        _updaterDelegate = updaterDelegate;
-        _userDriverDelegate = userDriverDelegate;
-
-        [self initializeUpdaterAndStartUpdater:YES];
-    }
-    return self;
-}
-
-- (void)initializeUpdaterAndStartUpdater:(BOOL)startUpdater
-{
-    if (!self.initializedUpdater) {
-        self.initializedUpdater = YES;
-        
         NSBundle *hostBundle = [NSBundle mainBundle];
-        SPUStandardUserDriver *userDriver = [[SPUStandardUserDriver alloc] initWithHostBundle:hostBundle delegate:self.userDriverDelegate];
-        self.updater = [[SPUUpdater alloc] initWithHostBundle:hostBundle applicationBundle:hostBundle userDriver:userDriver delegate:self.updaterDelegate];
-        self.userDriver = userDriver;
+        SPUStandardUserDriver *userDriver = [[SPUStandardUserDriver alloc] initWithHostBundle:hostBundle delegate:userDriverDelegate];
+        
+        _updater = [[SPUUpdater alloc] initWithHostBundle:hostBundle applicationBundle:hostBundle userDriver:userDriver delegate:updaterDelegate];
+        _userDriver = userDriver;
         
         if (startUpdater) {
             [self startUpdater];
         }
     }
+    return self;
 }
 
 - (void)startUpdater
@@ -97,7 +80,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
     }
 }
 
-- (IBAction)checkForUpdates:(id)__unused sender
+- (IBAction)checkForUpdates:(nullable id)__unused sender
 {
     [self.updater checkForUpdates];
 }
