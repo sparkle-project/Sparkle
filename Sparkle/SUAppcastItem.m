@@ -278,13 +278,13 @@ static NSString *SUAppcastItemStateKey = @"SUAppcastItemState";
     }
 }
 
-// Used for making delta items
+// Initializer used for making delta items
 - (nullable instancetype)initWithDictionary:(NSDictionary *)dict relativeToURL:(NSURL * _Nullable)appcastURL state:(SPUAppcastItemState * _Nullable)state
 {
     return [self initWithDictionary:dict relativeToURL:nil stateResolver:nil resolvedState:state failureReason:nil];
 }
 
-// Deprecated
+// Exported public initializer
 - (nullable instancetype)initWithDictionary:(NSDictionary *)dict relativeToURL:(NSURL * _Nullable)appcastURL stateResolver:(SPUAppcastItemStateResolver *)stateResolver failureReason:(NSString *__autoreleasing *)error
 {
     return [self initWithDictionary:dict relativeToURL:appcastURL stateResolver:stateResolver resolvedState:nil failureReason:error];
@@ -297,7 +297,7 @@ static NSString *SUAppcastItemStateKey = @"SUAppcastItemState";
 }
 
 // Deprecated
-- (instancetype)initWithDictionary:(NSDictionary *)dict failureReason:(NSString *__autoreleasing *)error
+- (nullable instancetype)initWithDictionary:(NSDictionary *)dict failureReason:(NSString *__autoreleasing *)error
 {
     return [self initWithDictionary:dict relativeToURL:nil stateResolver:nil resolvedState:nil failureReason:error];
 }

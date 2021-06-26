@@ -93,12 +93,12 @@ NS_ASSUME_NONNULL_BEGIN
     return [self isValidVersion:[self _version]];
 }
 
-- (BOOL)isValidVersion:(NSString *)version
+- (BOOL)isValidVersion:(NSString * _Nullable)version
 {
     return (version != nil && version.length != 0);
 }
 
-- (NSString *)_version
+- (NSString * _Nullable)_version
 {
     NSString *version = [self objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey];
     return ([self isValidVersion:version] ? version : nil);

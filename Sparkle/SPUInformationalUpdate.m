@@ -18,7 +18,7 @@
 @synthesize updateItem = _updateItem;
 @synthesize secondaryUpdateItem = _secondaryUpdateItem;
 
-- (instancetype)initWithAppcastItem:(SUAppcastItem *)updateItem secondaryAppcastItem:(SUAppcastItem *)secondaryUpdateItem
+- (instancetype)initWithAppcastItem:(SUAppcastItem *)updateItem secondaryAppcastItem:(SUAppcastItem * _Nullable)secondaryUpdateItem
 {
     self = [super init];
     if (self != nil) {
