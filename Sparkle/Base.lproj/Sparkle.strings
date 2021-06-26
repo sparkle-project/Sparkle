@@ -66,6 +66,10 @@
 
 "An important update to %@ is ready to install" = "An important update to %@ is ready to install";
 
+"Unable to Check For Updates" = "Unable to Check For Updates";
+
+"The update checker failed to start correctly. You should contact the app developer to report this issue and verify that you have the latest version" = "The update checker failed to start correctly. You should contact the app developer to report this issue and verify that you have the latest version";
+
 /* the unit for bytes */
 "B" = "B";
 

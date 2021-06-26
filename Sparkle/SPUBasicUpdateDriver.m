@@ -79,7 +79,7 @@
     }
 }
 
-- (void)notifyResumableUpdateItem:(SUAppcastItem *)updateItem secondaryUpdateItem:(SUAppcastItem *)secondaryUpdateItem systemDomain:(NSNumber * _Nullable)systemDomain
+- (void)notifyResumableUpdateItem:(SUAppcastItem *)updateItem secondaryUpdateItem:(SUAppcastItem * _Nullable)secondaryUpdateItem systemDomain:(NSNumber * _Nullable)systemDomain
 {
     if (updateItem == nil) {
         [self.delegate basicDriverIsRequestingAbortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUResumeAppcastError userInfo:@{ NSLocalizedDescriptionKey: SULocalizedString(@"Failed to resume installing update.", nil) }]];
@@ -137,7 +137,7 @@
     }
 }
 
-- (void)notifyFoundValidUpdateWithAppcastItem:(SUAppcastItem *)updateItem secondaryAppcastItem:(SUAppcastItem *)secondaryUpdateItem preventsAutoupdate:(BOOL)preventsAutoupdate systemDomain:(NSNumber * _Nullable)systemDomain
+- (void)notifyFoundValidUpdateWithAppcastItem:(SUAppcastItem *)updateItem secondaryAppcastItem:(SUAppcastItem * _Nullable)secondaryUpdateItem preventsAutoupdate:(BOOL)preventsAutoupdate systemDomain:(NSNumber * _Nullable)systemDomain
 {
     if (!self.aborted) {
         [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidFindValidUpdateNotification
@@ -152,7 +152,7 @@
     }
 }
 
-- (void)didFindValidUpdateWithAppcastItem:(SUAppcastItem *)updateItem secondaryAppcastItem:(SUAppcastItem *)secondaryAppcastItem preventsAutoupdate:(BOOL)preventsAutoupdate
+- (void)didFindValidUpdateWithAppcastItem:(SUAppcastItem *)updateItem secondaryAppcastItem:(SUAppcastItem * _Nullable)secondaryAppcastItem preventsAutoupdate:(BOOL)preventsAutoupdate
 {
     [self notifyFoundValidUpdateWithAppcastItem:updateItem secondaryAppcastItem:secondaryAppcastItem preventsAutoupdate:preventsAutoupdate systemDomain:nil];
 }
