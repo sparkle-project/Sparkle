@@ -136,22 +136,16 @@
 
 - (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem state:(SPUUserUpdateState *)state reply:(void (^)(SPUUserUpdateChoice))reply
 {
-    switch (state.stage) {
-        case SPUUserUpdateStageInformational:
-            // Todo: show user interface for this
-            NSLog(@"Found info URL: %@", appcastItem.infoURL);
-            
-            // Remove UI from user initiated check
-            [self removeUpdateButton];
-            
-            reply(SPUUserUpdateChoiceDismiss);
-            
-            break;
-        case SPUUserUpdateStageNotDownloaded:
-        case SPUUserUpdateStageDownloaded:
-        case SPUUserUpdateStageInstalling:
-            [self showUpdateWithAppcastItem:appcastItem reply:reply];
-            break;
+    if (appcastItem.informationOnlyUpdate) {
+        // Todo: show user interface for this
+        NSLog(@"Found info URL: %@", appcastItem.infoURL);
+        
+        // Remove UI from user initiated check
+        [self removeUpdateButton];
+        
+        reply(SPUUserUpdateChoiceDismiss);
+    } else {
+        [self showUpdateWithAppcastItem:appcastItem reply:reply];
     }
 }
 

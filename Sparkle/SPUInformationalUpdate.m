@@ -17,15 +17,13 @@
 // because the property is declared in a protocol
 @synthesize updateItem = _updateItem;
 @synthesize secondaryUpdateItem = _secondaryUpdateItem;
-@synthesize preventsAutoupdate = _preventsAutoupdate;
 
-- (instancetype)initWithAppcastItem:(SUAppcastItem *)updateItem secondaryAppcastItem:(SUAppcastItem *)secondaryUpdateItem preventsAutoupdate:(BOOL)preventsAutoupdate
+- (instancetype)initWithAppcastItem:(SUAppcastItem *)updateItem secondaryAppcastItem:(SUAppcastItem * _Nullable)secondaryUpdateItem
 {
     self = [super init];
     if (self != nil) {
         _updateItem = updateItem;
         _secondaryUpdateItem = secondaryUpdateItem;
-        _preventsAutoupdate = preventsAutoupdate;
     }
     return self;
 }

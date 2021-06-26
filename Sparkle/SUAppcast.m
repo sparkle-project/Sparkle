@@ -9,7 +9,9 @@
 #import "SUExport.h"
 #import "SUAppcast.h"
 #import "SUAppcast+Private.h"
+#import "SPUAppcastItemState.h"
 #import "SUAppcastItem.h"
+#import "SUAppcastItem+Private.h"
 #import "SUVersionComparisonProtocol.h"
 #import "SUConstants.h"
 #import "SULog.h"
@@ -29,11 +31,11 @@
 
 @synthesize items = _items;
 
-- (nullable instancetype)initWithXMLData:(NSData *)xmlData relativeToURL:(NSURL * _Nullable)relativeURL error:(NSError * __autoreleasing *)error
+- (nullable instancetype)initWithXMLData:(NSData *)xmlData relativeToURL:(NSURL * _Nullable)relativeURL stateResolver:(SPUAppcastItemStateResolver *)stateResolver error:(NSError * __autoreleasing *)error
 {
     self = [super init];
     if (self != nil) {
-        _items = [self parseAppcastItemsFromXMLData:xmlData relativeToURL:relativeURL error:error];
+        _items = [self parseAppcastItemsFromXMLData:xmlData relativeToURL:relativeURL stateResolver:stateResolver error:error];
         if (_items == nil) {
             return nil;
         }
@@ -71,7 +73,7 @@
     }
 }
 
--(NSArray *)parseAppcastItemsFromXMLData:(NSData *)appcastData relativeToURL:(NSURL * _Nullable)appcastURL error:(NSError *__autoreleasing*)errorp {
+-(NSArray *)parseAppcastItemsFromXMLData:(NSData *)appcastData relativeToURL:(NSURL * _Nullable)appcastURL stateResolver:(SPUAppcastItemStateResolver *)stateResolver error:(NSError *__autoreleasing*)errorp {
     if (errorp) {
         *errorp = nil;
     }
@@ -118,10 +120,10 @@
 
         for (NSString *name in nodesDict) {
             node = [self bestNodeInNodes:[nodesDict objectForKey:name]];
-            if ([name isEqualToString:SURSSElementEnclosure]) {
-                // enclosure is flattened as a separate dictionary for some reason
-                NSDictionary *encDict = [self attributesOfNode:(NSXMLElement *)node];
-                [dict setObject:encDict forKey:name];
+            if ([name isEqualToString:SURSSElementEnclosure] || [name isEqualToString:SUAppcastElementCriticalUpdate]) {
+                // These are flattened as a separate dictionary for some reason
+                NSDictionary *innerDict = [self attributesOfNode:(NSXMLElement *)node];
+                [dict setObject:innerDict forKey:name];
 			}
             else if ([name isEqualToString:SURSSElementPubDate]) {
                 // We don't want to parse and create a NSDate instance -
@@ -153,6 +155,19 @@
                 }
                 [dict setObject:tags forKey:name];
             }
+            else if ([name isEqualToString:SUAppcastElementInformationalUpdate]) {
+                NSMutableSet *informationalUpdateVersions = [NSMutableSet set];
+                NSEnumerator *childEnum = [[node children] objectEnumerator];
+                for (NSXMLNode *child in childEnum) {
+                    if ([child.name isEqualToString:SUAppcastAttributeVersion]) {
+                        NSString *version = child.stringValue;
+                        if (version != nil) {
+                            [informationalUpdateVersions addObject:version];
+                        }
+                    }
+                }
+                [dict setObject:[informationalUpdateVersions copy] forKey:name];
+            }
 			else if (name != nil) {
                 // add all other values as strings
                 NSString *theValue = [[node stringValue] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
@@ -163,7 +178,8 @@
         }
 
         NSString *errString;
-        SUAppcastItem *anItem = [[SUAppcastItem alloc] initWithDictionary:dict relativeToURL:appcastURL failureReason:&errString];
+        SUAppcastItem *anItem = [[SUAppcastItem alloc] initWithDictionary:dict relativeToURL:appcastURL stateResolver:stateResolver failureReason:&errString];
+        
         if (anItem) {
             [appcastItems addObject:anItem];
 		}

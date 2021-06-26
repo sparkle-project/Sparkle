@@ -19,6 +19,7 @@
 #import "SULocalizations.h"
 #import "SUApplicationInfo.h"
 #import "SUOperatingSystem.h"
+#import "SPUUserUpdateState.h"
 
 #import <AppKit/AppKit.h>
 
