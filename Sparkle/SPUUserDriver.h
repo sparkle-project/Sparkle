@@ -116,6 +116,14 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  * Before this point, -showUserInitiatedUpdateCheckWithCancellation: may be called.
  *
  * @param error The error associated with why a new update was not found.
+ *  There are various reasons a new update is unavailable and can't be installed.
+ *  This error object is populated with recovery and suggestion strings suitable to be shown in an alert.
+ *
+ *  The userInfo dictionary is also populated with two keys:
+ *  SPULatestAppcastItemFoundKey: if available, this may provide the latest SUAppcastItem that was found.
+ *  SPUNoUpdateFoundReasonKey: if available, this will provide the SUNoUpdateFoundReason. For example the reason could be because
+ *  the latest version in the feed requires a newer OS version or could be because the user is already on the latest version.
+ *
  * @param acknowledgement Acknowledge to the updater that no update found error was shown.
  */
 - (void)showUpdateNotFoundWithError:(NSError *)error acknowledgement:(void (^)(void))acknowledgement;
