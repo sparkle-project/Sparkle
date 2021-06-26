@@ -26,16 +26,15 @@ NS_ASSUME_NONNULL_BEGIN
 /*!
  A controller class that instantiates a SPUUpdater and allows binding UI to it.
  
- This class can be instantiated in a nib or created using initWithUpdaterDelegate:userDriverDelegate:. The controller's updater targets the application's main bundle
- and uses Sparkle's standard user interface. Typically, this class is used by sticking it as a custom NSObject subclass in an Interface Builder nib (probably in MainMenu).
+ This class can be instantiated in a nib or created programatically using initWithUpdaterDelegate:userDriverDelegate: or initWithStartingUpdater:updaterDelegate:userDriverDelegate:.
+ 
+ The controller's updater targets the application's main bundle and uses Sparkle's standard user interface.
+ Typically, this class is used by sticking it as a custom NSObject subclass in an Interface Builder nib (probably in MainMenu) but it works well programatically too.
  
  The controller creates an SPUUpdater instance and allows hooking up the check for updates action and menu item validation. It also allows hooking
  up the updater's and user driver's delegates.
  
- This controller class may not be valuable to you if:
- * You want to control or defer starting the SPUUpdater, or don't want to be tied into a nib's instantiation, or don't want to use a nib
- * You want to target a bundle that's not the main bundle
- * You want to provide a custom user interface (SPUUserDriver), or perhaps one that provides little-to-none
+ If you need more control over what bundle you want to update or you want to provide a custom user interface (via SPUUserDriver), please use SPUUpdater directly instead.
   */
 SU_EXPORT @interface SPUStandardUpdaterController : NSObject
 
@@ -70,14 +69,34 @@ SU_EXPORT @interface SPUStandardUpdaterController : NSObject
 @property (nonatomic, readonly, nullable) SPUStandardUserDriver *userDriver;
 
 /*!
- Use initWithUpdaterDelegate:userDriverDelegate: instead.
+ Use initWithUpdaterDelegate:userDriverDelegate: or initWithStartingUpdater:updaterDelegate:userDriverDelegate: instead.
  */
 - (instancetype)init NS_UNAVAILABLE;
 
 /*!
  Create a new SPUStandardUpdaterController programmatically.
+ 
+ The updater is started automatically. See -[SPUStandardUpdaterController startUpdater]  for more information.
  */
 - (instancetype)initWithUpdaterDelegate:(nullable id<SPUUpdaterDelegate>)updaterDelegate userDriverDelegate:(nullable id<SPUStandardUserDriverDelegate>)userDriverDelegate;
+
+/*!
+ Create a new SPUStandardUpdaterController programmatically.
+ 
+ You can specify whether or not you want to start the updater immediately. If you do not start the updater, you
+ must invoke -[SPUStandardUpdaterController startUpdater] at a later time to start it.
+ */
+- (instancetype)initWithStartingUpdater:(BOOL)startUpdater updaterDelegate:(nullable id<SPUUpdaterDelegate>)updaterDelegate userDriverDelegate:(nullable id<SPUStandardUserDriverDelegate>)userDriverDelegate;
+
+/*!
+ Starts the updater if it has not already been started.
+ 
+ You should only call this method yourself if you chose not to start the updater on initialization.
+ 
+ This invokes  -[SPUUpdater startUpdater:]. If an error is returned, the error is logged and an alert is shown to the user (after a few seconds) to contact the developer.
+ If you want more control over this behavior, you can create your own SPUUpdater instead.
+ */
+- (void)startUpdater;
 
 /*!
  Explicitly checks for updates and displays a progress dialog while doing so.

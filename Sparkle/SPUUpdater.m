@@ -144,6 +144,10 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 
 - (BOOL)startUpdater:(NSError * __autoreleasing *)error
 {
+    if (self.startedUpdater) {
+        return YES;
+    }
+    
     if (![self checkIfConfiguredProperlyAndRequireFeedURL:NO error:error]) {
         return NO;
     }
