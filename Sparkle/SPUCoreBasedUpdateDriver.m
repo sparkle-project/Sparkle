@@ -32,7 +32,7 @@
 @property (nonatomic, readonly) SPUInstallerDriver *installerDriver;
 @property (nonatomic, weak, readonly) id<SPUCoreBasedUpdateDriverDelegate> delegate;
 @property (nonatomic) SUAppcastItem *updateItem;
-@property (nonatomic) SUAppcastItem *secondaryUpdateItem;
+@property (nonatomic, nullable) SUAppcastItem *secondaryUpdateItem;
 @property (nonatomic) id<SPUResumableUpdate> resumableUpdate;
 @property (nonatomic) SPUDownloadedUpdate *downloadedUpdateForRemoval;
 
@@ -149,7 +149,7 @@
     }
 }
 
-- (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)updateItem secondaryAppcastItem:(SUAppcastItem *)secondaryUpdateItem preventsAutoupdate:(BOOL)preventsAutoupdate systemDomain:(NSNumber * _Nullable)systemDomain
+- (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)updateItem secondaryAppcastItem:(SUAppcastItem * _Nullable)secondaryUpdateItem preventsAutoupdate:(BOOL)preventsAutoupdate systemDomain:(NSNumber * _Nullable)systemDomain
 {
     self.updateItem = updateItem;
     self.secondaryUpdateItem = secondaryUpdateItem;
@@ -225,7 +225,7 @@
     [self extractUpdate:downloadedUpdate];
 }
 
-- (void)deferInformationalUpdate:(SUAppcastItem *)updateItem secondaryUpdate:(SUAppcastItem *)secondaryUpdateItem preventsAutoupdate:(BOOL)preventsAutoupdate
+- (void)deferInformationalUpdate:(SUAppcastItem *)updateItem secondaryUpdate:(SUAppcastItem * _Nullable)secondaryUpdateItem preventsAutoupdate:(BOOL)preventsAutoupdate
 {
     self.resumableUpdate = [[SPUInformationalUpdate alloc] initWithAppcastItem:updateItem secondaryAppcastItem:secondaryUpdateItem preventsAutoupdate:preventsAutoupdate];
 }

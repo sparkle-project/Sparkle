@@ -170,7 +170,7 @@
     }
 }
 
-- (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)updateItem secondaryAppcastItem:(SUAppcastItem *)secondaryUpdateItem preventsAutoupdate:(BOOL)preventsAutoupdate
+- (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)updateItem secondaryAppcastItem:(SUAppcastItem * _Nullable)secondaryUpdateItem preventsAutoupdate:(BOOL)preventsAutoupdate
 {
     if (self.userInitiated) {
         [SPUSkippedUpdate clearSkippedUpdateForHost:self.host];

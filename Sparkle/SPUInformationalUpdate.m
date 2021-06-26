@@ -19,7 +19,7 @@
 @synthesize secondaryUpdateItem = _secondaryUpdateItem;
 @synthesize preventsAutoupdate = _preventsAutoupdate;
 
-- (instancetype)initWithAppcastItem:(SUAppcastItem *)updateItem secondaryAppcastItem:(SUAppcastItem *)secondaryUpdateItem preventsAutoupdate:(BOOL)preventsAutoupdate
+- (instancetype)initWithAppcastItem:(SUAppcastItem *)updateItem secondaryAppcastItem:(SUAppcastItem * _Nullable)secondaryUpdateItem preventsAutoupdate:(BOOL)preventsAutoupdate
 {
     self = [super init];
     if (self != nil) {

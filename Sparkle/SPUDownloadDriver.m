@@ -28,7 +28,7 @@
 @property (nonatomic) id<SPUDownloaderProtocol> downloader;
 @property (nonatomic) NSXPCConnection *connection;
 @property (nonatomic, readonly) SUAppcastItem *updateItem;
-@property (nonatomic, readonly) SUAppcastItem *secondaryUpdateItem;
+@property (nonatomic, readonly, nullable) SUAppcastItem *secondaryUpdateItem;
 @property (nonatomic, readonly) SUHost *host;
 @property (nonatomic, copy) NSString *temporaryDirectory;
 @property (nonatomic, copy) NSString *downloadName;
