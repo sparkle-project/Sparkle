@@ -279,7 +279,7 @@ static NSString *SUAppcastItemStateKey = @"SUAppcastItemState";
 }
 
 // Used for making delta items
-- (nullable instancetype)initWithDictionary:(NSDictionary *)dict relativeToURL:(NSURL * _Nullable)appcastURL state:(SPUAppcastItemState *)state
+- (nullable instancetype)initWithDictionary:(NSDictionary *)dict relativeToURL:(NSURL * _Nullable)appcastURL state:(SPUAppcastItemState * _Nullable)state
 {
     return [self initWithDictionary:dict relativeToURL:nil stateResolver:nil resolvedState:state failureReason:nil];
 }
@@ -417,22 +417,24 @@ static NSString *SUAppcastItemStateKey = @"SUAppcastItemState";
         _maximumSystemVersion = [(NSString *)[dict objectForKey:SUAppcastElementMaximumSystemVersion] copy];
         _minimumAutoupdateVersion = [(NSString *)[dict objectForKey:SUAppcastElementMinimumAutoupdateVersion] copy];
         
+        // Grab critical update information
+        NSDictionary * _Nullable criticalUpdateDictionaryFromAppcast = (NSDictionary *)[dict objectForKey:SUAppcastElementCriticalUpdate];
+        NSArray *tags = [dict objectForKey:SUAppcastElementTags];
+        
+        NSDictionary * _Nullable criticalUpdateDictionary;
+        if (criticalUpdateDictionaryFromAppcast != nil) {
+            criticalUpdateDictionary = criticalUpdateDictionaryFromAppcast;
+        } else if ([tags isKindOfClass:[NSArray class]] && [tags containsObject:SUAppcastElementCriticalUpdate]) {
+            // Legacy path where critical update used to be a tag without a specified version
+            criticalUpdateDictionary = @{};
+        } else {
+            // No critical info present
+            criticalUpdateDictionary = nil;
+        }
+        
+        _hasCriticalInformation = (criticalUpdateDictionary != nil);
+        
         if (stateResolver != nil) {
-            NSDictionary * _Nullable criticalUpdateDictionaryFromAppcast = (NSDictionary *)[dict objectForKey:SUAppcastElementCriticalUpdate];
-            NSArray *tags = [dict objectForKey:SUAppcastElementTags];
-            
-            NSDictionary * _Nullable criticalUpdateDictionary;
-            if (criticalUpdateDictionaryFromAppcast != nil) {
-                criticalUpdateDictionary = criticalUpdateDictionaryFromAppcast;
-            } else if ([tags isKindOfClass:[NSArray class]] && [tags containsObject:SUAppcastElementCriticalUpdate]) {
-                // Legacy path where critical update used to be a tag without a specified version
-                criticalUpdateDictionary = @{};
-            } else {
-                criticalUpdateDictionary = nil;
-            }
-            
-            _hasCriticalInformation = (criticalUpdateDictionary != nil);
-            
             _state = [(SPUAppcastItemStateResolver * _Nonnull)stateResolver resolveStateWithInformationalUpdateVersions:_informationalUpdateVersions minimumOperatingSystemVersion:_minimumSystemVersion maximumOperatingSystemVersion:_maximumSystemVersion minimumAutoupdateVersion:_minimumAutoupdateVersion criticalUpdateDictionary:criticalUpdateDictionary];
         } else {
             // Note state still may be nil if a deprecated initializer is used
