@@ -161,6 +161,35 @@ typedef NS_ENUM(NSInteger, SPUUpdateCheck)
 - (void)updater:(SPUUpdater *)updater didFinishLoadingAppcast:(SUAppcast *)appcast;
 
 /*!
+ Returns the set of Sparkle channels the updater is allowed to find new updates from.
+ 
+ An appcast item can specify a set of channels its update is posted to. Without specifying any channels, appcast items are posted to the default channel.
+ For instance:
+ <item>
+    <sparkle:version>2.0 Beta 1</sparkle:version>
+    <sparkle:channels>
+      <sparkle:beta/>
+    </sparkle:channels>
+ </item>
+ 
+ This example posts an update to the sparkle:beta channel, so only updaters that are allowed to use the sparkle:beta channel can find this update.
+ 
+ If the <sparkle:channels> is empty or not present, the update item is posted to the default channel and can be found by any complying updater.
+ 
+ Sparkle allows you to use the 'sparkle:beta' channel name (SUAppcastElementBetaChannel) for distributing beta updates to your own applications.
+ 
+ Otherwise you can use any other name you'd like; however, for other names you will need to use and define your own XML namespace tailored for your app.
+ To define your own namespace, add an attribute to rss element like xmlns:myapp="https://myappwebsite.net"
+ 
+ Note to use this feature, all app versions that your users may update from in your feed must use a version of Sparkle that supports this feature.
+ This feature was added in Sparkle 2.
+ 
+ \return The set of channel names the updater is allowed to find new updates in. An empty set is the default behavior,
+         which means the updater will only look for updates in the default channel.
+ */
+- (NSSet<NSString *> *)allowedChannelsForUpdater:(SPUUpdater *)updater;
+
+/*!
  Returns the item in the appcast corresponding to the update that should be installed.
  
  If you're using special logic or extensions in your appcast,

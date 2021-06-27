@@ -81,7 +81,7 @@
 		5D1AF5900FD767AD0065DB48 /* libxml2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D1AF58F0FD767AD0065DB48 /* libxml2.dylib */; };
 		5D1AF59A0FD767E50065DB48 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D1AF5990FD767E50065DB48 /* libz.dylib */; };
 		5F1510A21C96E591006E1629 /* testnamespaces.xml in Resources */ = {isa = PBXBuildFile; fileRef = 5F1510A11C96E591006E1629 /* testnamespaces.xml */; };
-		61299A5C09CA6D4500B7442F /* SUConstants.h in Headers */ = {isa = PBXBuildFile; fileRef = 61299A5B09CA6D4500B7442F /* SUConstants.h */; settings = {ATTRIBUTES = (); }; };
+		61299A5C09CA6D4500B7442F /* SUConstants.h in Headers */ = {isa = PBXBuildFile; fileRef = 61299A5B09CA6D4500B7442F /* SUConstants.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		61299A6009CA6EB100B7442F /* SUConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 61299A5F09CA6EB100B7442F /* SUConstants.m */; };
 		61299B3609CB04E000B7442F /* Sparkle.h in Headers */ = {isa = PBXBuildFile; fileRef = 61299B3509CB04E000B7442F /* Sparkle.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		612DCBB00D488BC60015DBEA /* SUUpdatePermissionPrompt.m in Sources */ = {isa = PBXBuildFile; fileRef = 612DCBAE0D488BC60015DBEA /* SUUpdatePermissionPrompt.m */; };
@@ -2313,6 +2313,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				61299A5C09CA6D4500B7442F /* SUConstants.h in Headers */,
 				61299B3609CB04E000B7442F /* Sparkle.h in Headers */,
 				72B767E61C9CFD7200A07552 /* SPUAutomaticUpdateDriver.h in Headers */,
 				72B767D61C9C8B5C00A07552 /* SPUBasicUpdateDriver.h in Headers */,
@@ -2357,7 +2358,6 @@
 				725602D51C83551C00DAA70E /* SUApplicationInfo.h in Headers */,
 				7214B8811D456A8500CB5CED /* SUBundleIcon.h in Headers */,
 				720767D31E2EE9C200F9A850 /* SUTouchBarForwardDeclarations.h in Headers */,
-				61299A5C09CA6D4500B7442F /* SUConstants.h in Headers */,
 				55E6F33319EC9F6C00005E76 /* SUErrors.h in Headers */,
 				14652F8419A978C200959E44 /* SUExport.h in Headers */,
 				7267E5E51D3D90AA00D1BF90 /* SUFileManager.h in Headers */,

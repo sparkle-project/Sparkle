@@ -73,6 +73,7 @@ static NSString *SUAppcastItemStateKey = @"SUAppcastItemState";
 @synthesize state = _state;
 @synthesize hasCriticalInformation = _hasCriticalInformation;
 @synthesize informationalUpdateVersions = _informationalUpdateVersions;
+@synthesize channels = _channels;
 
 + (BOOL)supportsSecureCoding
 {
@@ -343,6 +344,13 @@ static NSString *SUAppcastItemStateKey = @"SUAppcastItemState";
                 *error = [NSString stringWithFormat:@"Feed item lacks %@ attribute, and version couldn't be deduced from file name (would have used last component of a file name like AppName_1.3.4.zip)", SUAppcastAttributeVersion];
             }
             return nil;
+        }
+        
+        NSArray<NSString *> *channels = [dict objectForKey:SUAppcastElementChannels];
+        if (channels == nil) {
+            _channels = [NSSet set];
+        } else {
+            _channels = [NSSet setWithArray:channels];
         }
 
         _propertiesDictionary = [[NSDictionary alloc] initWithDictionary:dict];

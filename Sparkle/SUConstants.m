@@ -80,6 +80,8 @@ NSString *const SUAppcastElementReleaseNotesLink = @"sparkle:releaseNotesLink";
 NSString *const SUAppcastElementTags = @"sparkle:tags";
 NSString *const SUAppcastElementPhasedRolloutInterval = @"sparkle:phasedRolloutInterval";
 NSString *const SUAppcastElementInformationalUpdate = @"sparkle:informationalUpdate";
+NSString *const SUAppcastElementChannels = @"sparkle:channels";
+NSString *const SUAppcastElementBetaChannel = @"sparkle:beta";
 
 NSString *const SURSSAttributeURL = @"url";
 NSString *const SURSSAttributeLength = @"length";

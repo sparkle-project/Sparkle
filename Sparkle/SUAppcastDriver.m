@@ -166,9 +166,28 @@
     NSDictionary *userInfo = @{ SUUpdaterAppcastNotificationKey: loadedAppcast };
     [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidFinishLoadingAppCastNotification object:self.updater userInfo:userInfo];
     
-    // We will never care about other OS's
+    NSSet<NSString *> *allowedChannels;
+    if ([self.updaterDelegate respondsToSelector:@selector(allowedChannelsForUpdater:)]) {
+        allowedChannels = [self.updaterDelegate allowedChannelsForUpdater:self.updater];
+    } else {
+        allowedChannels = [NSSet set];
+    }
+    
     SUAppcast *macOSAppcast = [loadedAppcast copyByFilteringItems:^(SUAppcastItem *item) {
-        return (BOOL)[item isMacOsUpdate];
+        // We will never care about other OS's
+        BOOL macOSUpdate = [item isMacOsUpdate];
+        if (!macOSUpdate) {
+            return NO;
+        }
+        
+        NSSet<NSString *> *channels = item.channels;
+        if (channels.count == 0) {
+            // Item is on the default channel
+            return YES;
+        }
+        
+        // Item channels and allowed channels must have one channel in common
+        return [channels intersectsSet:allowedChannels];
     }];
     
     id<SUVersionComparison> applicationVersionComparator = [self versionComparator];
