@@ -345,7 +345,7 @@ static NSString *SUAppcastItemStateKey = @"SUAppcastItemState";
 
         if (!newVersion) {
             if (error) {
-                *error = [NSString stringWithFormat:@"Feed item lacks %@ attribute, and version couldn't be deduced from file name (would have used last component of a file name like AppName_1.3.4.zip)", SUAppcastAttributeVersion];
+                *error = [NSString stringWithFormat:@"Feed item lacks %@ element, and version couldn't be deduced from file name (would have used last component of a file name like AppName_1.3.4.zip)", SUAppcastElementVersion];
             }
             return nil;
         }
