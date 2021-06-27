@@ -203,16 +203,16 @@
                     }
                     break;
             }
-            
-            recoveryOption = @"OK";
         } else {
             // When no updates are found in the appcast, or latest appcast item info
             // was not provided (i.e, for a background update check)
-            // In the case no info was provided for a background check, the error isn't shown anywhere
-            localizedDescription = SULocalizedString(@"Update Error!", nil);
-            recoverySuggestion = SULocalizedString(@"No valid update information could be loaded.", nil);
-            recoveryOption = SULocalizedString(@"Cancel Update", nil);
+            // We will need to assume the user is up to date if the feed doen't have any applicable update items
+            // There could be update items on channels the updater is not subscribed to for example. But we can't tell the user about them.
+            localizedDescription = SULocalizedString(@"You're up-to-date!", "Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates.");
+            recoverySuggestion = [NSString stringWithFormat:SULocalizedString(@"%@ %@ is currently the newest version available.", nil), [self.host name], [self.host displayVersion]];
         }
+        
+        recoveryOption = SULocalizedString(@"OK", nil);
         
         NSError *notFoundError =
         [NSError
