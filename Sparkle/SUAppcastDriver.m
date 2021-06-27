@@ -173,22 +173,7 @@
         allowedChannels = [NSSet set];
     }
     
-    SUAppcast *macOSAppcast = [loadedAppcast copyByFilteringItems:^(SUAppcastItem *item) {
-        // We will never care about other OS's
-        BOOL macOSUpdate = [item isMacOsUpdate];
-        if (!macOSUpdate) {
-            return NO;
-        }
-        
-        NSSet<NSString *> *channels = item.channels;
-        if (channels.count == 0) {
-            // Item is on the default channel
-            return YES;
-        }
-        
-        // Item channels and allowed channels must have one channel in common
-        return [channels intersectsSet:allowedChannels];
-    }];
+    SUAppcast *macOSAppcast = [[self class] filterAppcast:loadedAppcast forMacOSAndAllowedChannels:allowedChannels];
     
     id<SUVersionComparison> applicationVersionComparator = [self versionComparator];
     
@@ -238,6 +223,27 @@
         
         [self.delegate didNotFindUpdateWithLatestAppcastItem:notFoundPrimaryItem hostToLatestAppcastItemComparisonResult:hostToLatestAppcastItemComparisonResult];
     }
+}
+
+// This method is used by unit tests
++ (SUAppcast *)filterAppcast:(SUAppcast *)appcast forMacOSAndAllowedChannels:(NSSet<NSString *> *)allowedChannels
+{
+    return [appcast copyByFilteringItems:^(SUAppcastItem *item) {
+        // We will never care about other OS's
+        BOOL macOSUpdate = [item isMacOsUpdate];
+        if (!macOSUpdate) {
+            return NO;
+        }
+        
+        NSSet<NSString *> *channels = item.channels;
+        if (channels.count == 0) {
+            // Item is on the default channel
+            return YES;
+        }
+        
+        // Item channels and allowed channels must have one channel in common
+        return [channels intersectsSet:allowedChannels];
+    }];
 }
 
 // This method is used by unit tests

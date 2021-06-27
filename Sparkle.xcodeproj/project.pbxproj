@@ -188,6 +188,7 @@
 		723C8A541E2D60DB00C14942 /* SUTouchBarButtonGroup.h in Headers */ = {isa = PBXBuildFile; fileRef = 723C8A521E2D60DB00C14942 /* SUTouchBarButtonGroup.h */; };
 		723C8A551E2D60DB00C14942 /* SUTouchBarButtonGroup.m in Sources */ = {isa = PBXBuildFile; fileRef = 723C8A531E2D60DB00C14942 /* SUTouchBarButtonGroup.m */; };
 		723C8A561E2D60DB00C14942 /* SUTouchBarButtonGroup.m in Sources */ = {isa = PBXBuildFile; fileRef = 723C8A531E2D60DB00C14942 /* SUTouchBarButtonGroup.m */; };
+		723EDC3F26885A8E000BCBA4 /* testappcast_channels.xml in Resources */ = {isa = PBXBuildFile; fileRef = 723EDC3E26885A8E000BCBA4 /* testappcast_channels.xml */; };
 		72464F701E1F31E000FB341C /* SUOperatingSystem.m in Sources */ = {isa = PBXBuildFile; fileRef = 726F2CE41BC9C33D001971A4 /* SUOperatingSystem.m */; };
 		72464F711E1F326A00FB341C /* SUOperatingSystem.m in Sources */ = {isa = PBXBuildFile; fileRef = 726F2CE41BC9C33D001971A4 /* SUOperatingSystem.m */; };
 		72464F721E1F327C00FB341C /* SUOperatingSystem.m in Sources */ = {isa = PBXBuildFile; fileRef = 726F2CE41BC9C33D001971A4 /* SUOperatingSystem.m */; };
@@ -1082,6 +1083,7 @@
 		723B5DA51CF7AB0100365F95 /* SPUDownloaderProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SPUDownloaderProtocol.h; path = Downloader/SPUDownloaderProtocol.h; sourceTree = SOURCE_ROOT; };
 		723C8A521E2D60DB00C14942 /* SUTouchBarButtonGroup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUTouchBarButtonGroup.h; sourceTree = "<group>"; };
 		723C8A531E2D60DB00C14942 /* SUTouchBarButtonGroup.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUTouchBarButtonGroup.m; sourceTree = "<group>"; };
+		723EDC3E26885A8E000BCBA4 /* testappcast_channels.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = testappcast_channels.xml; sourceTree = "<group>"; };
 		7246E0A11C83B685003B4E75 /* SPUStandardUpdaterController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPUStandardUpdaterController.h; sourceTree = "<group>"; };
 		7246E0A21C83B685003B4E75 /* SPUStandardUpdaterController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SPUStandardUpdaterController.m; sourceTree = "<group>"; };
 		724BB36C1D31D0B7005D534A /* org.sparkle-project.InstallerConnection.xpc */ = {isa = PBXFileReference; explicitFileType = "wrapper.xpc-service"; includeInIndex = 0; path = "org.sparkle-project.InstallerConnection.xpc"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1685,6 +1687,7 @@
 				14958C6C19AEBC610061B14F /* test-pubkey.pem */,
 				5AF6C74E1AEA46D10014A3AB /* test.pkg */,
 				5AD0FA7E1C73F2E2004BCEFF /* testappcast.xml */,
+				723EDC3E26885A8E000BCBA4 /* testappcast_channels.xml */,
 				725B3A81263FBF0C0041AB8E /* testappcast_minimumAutoupdateVersion.xml */,
 				722545B526805FF80036465C /* testappcast_info_updates.xml */,
 				5F1510A11C96E591006E1629 /* testnamespaces.xml */,
@@ -2936,6 +2939,7 @@
 			files = (
 				725B3A82263FBF0C0041AB8E /* testappcast_minimumAutoupdateVersion.xml in Resources */,
 				14958C6E19AEBC950061B14F /* signed-test-file.txt in Resources */,
+				723EDC3F26885A8E000BCBA4 /* testappcast_channels.xml in Resources */,
 				72AC6B2E1B9B218C00F62325 /* SparkleTestCodeSignApp.dmg in Resources */,
 				C23E885B1BE7B24F0050BB73 /* SparkleTestCodeSignApp.enc.dmg in Resources */,
 				72AC6B281B9AAD6700F62325 /* SparkleTestCodeSignApp.tar in Resources */,

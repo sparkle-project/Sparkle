@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
+  <channel>
+    <title>For unit test only</title>
+    <!-- Implicitly no channels -->
+    <item>
+        <title>Version 2.0</title>
+        <description>desc</description>
+        <pubDate>Sat, 26 Jul 2014 15:20:11 +0000</pubDate>
+        <enclosure url="http://localhost:1337/Sparkle_Test_App.zip" sparkle:version="2.0" />
+        <sparkle:criticalUpdate sparkle:version="1.5" />
+    </item>
+    <!-- Explicitly no channels -->
+    <item>
+        <title>Version 3.0</title>
+        <sparkle:phasedRolloutInterval>86400</sparkle:phasedRolloutInterval>
+        <sparkle:tags><sparkle:criticalUpdate /></sparkle:tags>
+        <enclosure url="http://localhost:1337/Sparkle_Test_App.zip" sparkle:version="3.0" length="1346234" />
+        <sparkle:deltas>
+            <enclosure url="http://localhost:1337/3.0_from_2.0.patch"
+            sparkle:version="3.0"
+            sparkle:deltaFrom="2.0"
+            length="1235"
+            type="application/octet-stream"
+            sparkle:edSignature="..." />
+            
+            <enclosure url="http://localhost:1337/3.0_from_1.0.patch"
+            sparkle:version="3.0"
+            sparkle:deltaFrom="1.0"
+            length="1485"
+            type="application/octet-stream"
+            sparkle:edSignature="..." />
+        </sparkle:deltas>
+        
+        <sparkle:channels>
+        </sparkle:channels>
+    </item>
+    <!-- Beta channel -->
+    <item>
+        <title>Version 4.0</title>
+        <sparkle:version>4.0</sparkle:version>
+        <pubDate>Sat, 26 Jul 2014 15:20:13 +0000</pubDate>
+        <enclosure url="http://localhost:1337/Sparkle_Test_App.zip" length="1346234" />
+        <sparkle:channels>
+            <sparkle:beta/>
+        </sparkle:channels>
+    </item>
+    <!-- Beta and nightly channel -->
+    <item>
+        <title>Version 5.0</title>
+        <sparkle:version>5.0</sparkle:version>
+        <enclosure url="http://localhost:1337/Sparkle_Test_App.zip" length="1346234" />
+        <sparkle:channels>
+            <sparkle:beta/>
+            <sparkle:nightly/>
+        </sparkle:channels>
+    </item>
+    <!-- A Windows release -->
+    <item>
+        <title>Version 6.0</title>
+        <sparkle:version>6.0</sparkle:version>
+        <enclosure url="http://localhost:1337/Sparkle_Test_App.zip" length="1346234" sparkle:os="windows" />
+        <sparkle:channels>
+            <sparkle:beta/>
+            <sparkle:nightly/>
+        </sparkle:channels>
+    </item>
+  </channel>
+</rss>
