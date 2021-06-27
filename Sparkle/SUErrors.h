@@ -78,4 +78,15 @@ typedef NS_ENUM(OSStatus, SUError) {
     SUIncorrectAPIUsageError = 5000
 };
 
+typedef NS_ENUM(OSStatus, SPUNoUpdateFoundReason) {
+    SPUNoUpdateFoundReasonUnknown,
+    SPUNoUpdateFoundReasonOnLatestVersion,
+    SPUNoUpdateFoundReasonOnNewerThanLatestVersion,
+    SPUNoUpdateFoundReasonSystemIsTooOld,
+    SPUNoUpdateFoundReasonSystemIsTooNew
+};
+
+SU_EXPORT extern NSString *const SPUNoUpdateFoundReasonKey;
+SU_EXPORT extern NSString *const SPULatestAppcastItemFoundKey;
+
 #endif
