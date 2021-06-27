@@ -71,7 +71,13 @@ func writeAppcast(appcastDestPath: URL, updates: [ArchiveItem]) throws {
     var numItems = 0
     for update in updates {
         var item: XMLElement
-        let existingItems = try channel.nodes(forXPath: "item[enclosure[@sparkle:version=\"\(update.version)\"]]")
+        
+        var existingItems = try channel.nodes(forXPath: "item[enclosure[@\(SUAppcastAttributeVersion)=\"\(update.version)\"]]")
+        if existingItems.count == 0 {
+            // Fall back to see if any items are using the element version variant
+            existingItems = try channel.nodes(forXPath: "item[\(SUAppcastElementVersion)=\"\(update.version)\"]")
+        }
+        
         let createNewItem = existingItems.count == 0
 
         // Update all old items, but aim for less than 5 in new feeds
@@ -93,6 +99,20 @@ func writeAppcast(appcastDestPath: URL, updates: [ArchiveItem]) throws {
         if nil == findElement(name: "pubDate", parent: item) {
             item.addChild(XMLElement.element(withName: "pubDate", stringValue: update.pubDate) as! XMLElement)
         }
+        
+        var versionElement = findElement(name: SUAppcastElementVersion, parent: item)
+        if nil == versionElement {
+            versionElement = XMLElement.element(withName: SUAppcastElementVersion, uri: sparkleNS) as? XMLElement
+            item.addChild(versionElement!)
+        }
+        versionElement?.setChildren([text(update.version)])
+        
+        var shortVersionElement = findElement(name: SUAppcastElementShortVersionString, parent: item)
+        if nil == shortVersionElement {
+            shortVersionElement = XMLElement.element(withName: SUAppcastElementShortVersionString, uri: sparkleNS) as? XMLElement
+            item.addChild(shortVersionElement!)
+        }
+        shortVersionElement?.setChildren([text(update.shortVersion)])
 
         if let html = update.releaseNotesHTML {
             let descElement = findOrCreateElement(name: "description", parent: item)
@@ -157,8 +177,6 @@ func writeAppcast(appcastDestPath: URL, updates: [ArchiveItem]) throws {
         }
         var attributes = [
             XMLNode.attribute(withName: "url", stringValue: archiveURL) as! XMLNode,
-            XMLNode.attribute(withName: SUAppcastAttributeVersion, uri: sparkleNS, stringValue: update.version) as! XMLNode,
-            XMLNode.attribute(withName: SUAppcastAttributeShortVersionString, uri: sparkleNS, stringValue: update.shortVersion) as! XMLNode,
             XMLNode.attribute(withName: "length", stringValue: String(update.fileSize)) as! XMLNode,
             XMLNode.attribute(withName: "type", stringValue: update.mimeType) as! XMLNode,
         ]
@@ -181,8 +199,6 @@ func writeAppcast(appcastDestPath: URL, updates: [ArchiveItem]) throws {
             for delta in update.deltas {
                 var attributes = [
                     XMLNode.attribute(withName: "url", stringValue: URL(string: delta.archivePath.lastPathComponent.addingPercentEncoding(withAllowedCharacters: CharacterSet.urlPathAllowed)!, relativeTo: update.archiveURL)!.absoluteString) as! XMLNode,
-                    XMLNode.attribute(withName: SUAppcastAttributeVersion, uri: sparkleNS, stringValue: update.version) as! XMLNode,
-                    XMLNode.attribute(withName: SUAppcastAttributeShortVersionString, uri: sparkleNS, stringValue: update.shortVersion) as! XMLNode,
                     XMLNode.attribute(withName: SUAppcastAttributeDeltaFrom, uri: sparkleNS, stringValue: delta.fromVersion) as! XMLNode,
                     XMLNode.attribute(withName: "length", stringValue: String(delta.fileSize)) as! XMLNode,
                     XMLNode.attribute(withName: "type", stringValue: "application/octet-stream") as! XMLNode,

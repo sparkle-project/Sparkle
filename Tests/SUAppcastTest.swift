@@ -30,6 +30,7 @@ class SUAppcastTest: XCTestCase {
             XCTAssertEqual("desc", items[0].itemDescription)
             XCTAssertEqual("Sat, 26 Jul 2014 15:20:11 +0000", items[0].dateString)
             XCTAssertTrue(items[0].isCriticalUpdate)
+            XCTAssertEqual(items[0].versionString, "2.0")
 
             // This is the best release matching our system version
             XCTAssertEqual("Version 3.0", items[1].title)
@@ -37,6 +38,7 @@ class SUAppcastTest: XCTestCase {
             XCTAssertNil(items[1].dateString)
             XCTAssertTrue(items[1].isCriticalUpdate)
             XCTAssertEqual(items[1].phasedRolloutInterval, 86400)
+            XCTAssertEqual(items[1].versionString, "3.0")
 
             XCTAssertEqual("Version 4.0", items[2].title)
             XCTAssertNil(items[2].itemDescription)
@@ -58,6 +60,7 @@ class SUAppcastTest: XCTestCase {
 
             XCTAssertEqual(bestAppcastItem, items[1])
             XCTAssertEqual(deltaItem!.fileURL!.lastPathComponent, "3.0_from_1.0.patch")
+            XCTAssertEqual(deltaItem!.versionString, "3.0")
 
             // Test latest delta update item available
             var latestDeltaItem: SUAppcastItem?
