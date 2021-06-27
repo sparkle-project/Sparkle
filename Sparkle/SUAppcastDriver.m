@@ -239,14 +239,14 @@
             return NO;
         }
         
-        NSSet<NSString *> *channels = item.channels;
-        if (channels.count == 0) {
+        NSString *channel = item.channel;
+        if (channel == nil) {
             // Item is on the default channel
             return YES;
         }
         
         // Item channels and allowed channels must have one channel in common
-        return [channels intersectsSet:allowedChannels];
+        return [allowedChannels containsObject:channel];
     }];
 }
 

@@ -90,7 +90,7 @@ class SUAppcastTest: XCTestCase {
             XCTAssertEqual(5, appcast.items.count)
             
             do {
-                let filteredAppcast = SUAppcastDriver.filterAppcast(appcast, forMacOSAndAllowedChannels: ["sparkle:beta", "sparkle:nightly"])
+                let filteredAppcast = SUAppcastDriver.filterAppcast(appcast, forMacOSAndAllowedChannels: ["beta", "nightly"])
                 XCTAssertEqual(4, filteredAppcast.items.count)
                 
                 XCTAssertEqual("2.0", filteredAppcast.items[0].versionString)
@@ -107,16 +107,15 @@ class SUAppcastTest: XCTestCase {
             }
             
             do {
-                let filteredAppcast = SUAppcastDriver.filterAppcast(appcast, forMacOSAndAllowedChannels: ["sparkle:beta"])
-                XCTAssertEqual(4, filteredAppcast.items.count)
+                let filteredAppcast = SUAppcastDriver.filterAppcast(appcast, forMacOSAndAllowedChannels: ["beta"])
+                XCTAssertEqual(3, filteredAppcast.items.count)
                 XCTAssertEqual("2.0", filteredAppcast.items[0].versionString)
                 XCTAssertEqual("3.0", filteredAppcast.items[1].versionString)
                 XCTAssertEqual("4.0", filteredAppcast.items[2].versionString)
-                XCTAssertEqual("5.0", filteredAppcast.items[3].versionString)
             }
             
             do {
-                let filteredAppcast = SUAppcastDriver.filterAppcast(appcast, forMacOSAndAllowedChannels: ["sparkle:nightly"])
+                let filteredAppcast = SUAppcastDriver.filterAppcast(appcast, forMacOSAndAllowedChannels: ["nightly"])
                 XCTAssertEqual(3, filteredAppcast.items.count)
                 XCTAssertEqual("2.0", filteredAppcast.items[0].versionString)
                 XCTAssertEqual("3.0", filteredAppcast.items[1].versionString)
@@ -124,7 +123,7 @@ class SUAppcastTest: XCTestCase {
             }
             
             do {
-                let filteredAppcast = SUAppcastDriver.filterAppcast(appcast, forMacOSAndAllowedChannels: ["sparkle:madeup"])
+                let filteredAppcast = SUAppcastDriver.filterAppcast(appcast, forMacOSAndAllowedChannels: ["madeup"])
                 XCTAssertEqual("2.0", filteredAppcast.items[0].versionString)
                 XCTAssertEqual("3.0", filteredAppcast.items[1].versionString)
                 XCTAssertEqual(2, filteredAppcast.items.count)

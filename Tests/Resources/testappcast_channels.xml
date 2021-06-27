@@ -10,7 +10,7 @@
         <enclosure url="http://localhost:1337/Sparkle_Test_App.zip" sparkle:version="2.0" />
         <sparkle:criticalUpdate sparkle:version="1.5" />
     </item>
-    <!-- Explicitly no channels -->
+    <!-- Invalid channel name -->
     <item>
         <title>Version 3.0</title>
         <sparkle:phasedRolloutInterval>86400</sparkle:phasedRolloutInterval>
@@ -32,8 +32,7 @@
             sparkle:edSignature="..." />
         </sparkle:deltas>
         
-        <sparkle:channels>
-        </sparkle:channels>
+        <sparkle:channel></sparkle:channel>
     </item>
     <!-- Beta channel -->
     <item>
@@ -41,29 +40,20 @@
         <sparkle:version>4.0</sparkle:version>
         <pubDate>Sat, 26 Jul 2014 15:20:13 +0000</pubDate>
         <enclosure url="http://localhost:1337/Sparkle_Test_App.zip" length="1346234" />
-        <sparkle:channels>
-            <sparkle:beta/>
-        </sparkle:channels>
+        <sparkle:channel>beta</sparkle:channel>
     </item>
-    <!-- Beta and nightly channel -->
+    <!-- Nightly channel -->
     <item>
         <title>Version 5.0</title>
         <sparkle:version>5.0</sparkle:version>
         <enclosure url="http://localhost:1337/Sparkle_Test_App.zip" length="1346234" />
-        <sparkle:channels>
-            <sparkle:beta/>
-            <sparkle:nightly/>
-        </sparkle:channels>
+        <sparkle:channel>nightly</sparkle:channel>
     </item>
     <!-- A Windows release -->
     <item>
         <title>Version 6.0</title>
         <sparkle:version>6.0</sparkle:version>
         <enclosure url="http://localhost:1337/Sparkle_Test_App.zip" length="1346234" sparkle:os="windows" />
-        <sparkle:channels>
-            <sparkle:beta/>
-            <sparkle:nightly/>
-        </sparkle:channels>
     </item>
   </channel>
 </rss>

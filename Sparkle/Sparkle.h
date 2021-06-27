@@ -22,7 +22,6 @@
 #import <Sparkle/SUVersionComparisonProtocol.h>
 #import <Sparkle/SUVersionDisplayProtocol.h>
 #import <Sparkle/SUErrors.h>
-#import <Sparkle/SUExportedConstants.h>
 #import <Sparkle/SPUUpdatePermissionRequest.h>
 #import <Sparkle/SUUpdatePermissionResponse.h>
 #import <Sparkle/SPUUserDriver.h>

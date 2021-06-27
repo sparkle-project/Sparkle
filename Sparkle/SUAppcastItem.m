@@ -73,7 +73,7 @@ static NSString *SUAppcastItemStateKey = @"SUAppcastItemState";
 @synthesize state = _state;
 @synthesize hasCriticalInformation = _hasCriticalInformation;
 @synthesize informationalUpdateVersions = _informationalUpdateVersions;
-@synthesize channels = _channels;
+@synthesize channel = _channel;
 
 + (BOOL)supportsSecureCoding
 {
@@ -131,6 +131,8 @@ static NSString *SUAppcastItemStateKey = @"SUAppcastItemState";
         _propertiesDictionary = propertiesDictionary;
         
         _phasedRolloutInterval = [decoder decodeObjectOfClass:[NSNumber class] forKey:SUAppcastElementPhasedRolloutInterval];
+        
+        _channel = [(NSString *)[decoder decodeObjectOfClass:[NSString class] forKey:SUAppcastElementChannel] copy];
     }
     
     return self;
@@ -206,6 +208,10 @@ static NSString *SUAppcastItemStateKey = @"SUAppcastItemState";
     
     if (self.phasedRolloutInterval != nil) {
         [encoder encodeObject:self.phasedRolloutInterval forKey:SUAppcastElementPhasedRolloutInterval];
+    }
+    
+    if (self.channel != nil) {
+        [encoder encodeObject:self.channel forKey:SUAppcastElementChannel];
     }
 }
 
@@ -346,11 +352,11 @@ static NSString *SUAppcastItemStateKey = @"SUAppcastItemState";
             return nil;
         }
         
-        NSArray<NSString *> *channels = [dict objectForKey:SUAppcastElementChannels];
-        if (channels == nil) {
-            _channels = [NSSet set];
+        NSString *channel = [dict objectForKey:SUAppcastElementChannel];
+        if (channel.length == 0) {
+            _channel = nil;
         } else {
-            _channels = [NSSet setWithArray:channels];
+            _channel = channel;
         }
 
         _propertiesDictionary = [[NSDictionary alloc] initWithDictionary:dict];

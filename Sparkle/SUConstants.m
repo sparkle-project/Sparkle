@@ -8,7 +8,6 @@
 
 #import "SUConstants.h"
 #import "SUErrors.h"
-#import "SUExportedConstants.h"
 
 #ifndef DEBUG
 #define DEBUG 0
@@ -81,8 +80,7 @@ NSString *const SUAppcastElementReleaseNotesLink = @"sparkle:releaseNotesLink";
 NSString *const SUAppcastElementTags = @"sparkle:tags";
 NSString *const SUAppcastElementPhasedRolloutInterval = @"sparkle:phasedRolloutInterval";
 NSString *const SUAppcastElementInformationalUpdate = @"sparkle:informationalUpdate";
-NSString *const SUAppcastElementChannels = @"sparkle:channels";
-NSString *const SUAppcastElementBetaChannel = @"sparkle:beta";
+NSString *const SUAppcastElementChannel = @"sparkle:channel";
 
 NSString *const SURSSAttributeURL = @"url";
 NSString *const SURSSAttributeLength = @"length";

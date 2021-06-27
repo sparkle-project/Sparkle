@@ -144,7 +144,7 @@
                 }
                 [dict setObject:deltas forKey:name];
 			}
-            else if ([name isEqualToString:SUAppcastElementTags] || [name isEqualToString:SUAppcastElementChannels]) {
+            else if ([name isEqualToString:SUAppcastElementTags]) {
                 NSMutableArray *names = [NSMutableArray array];
                 NSEnumerator *childEnum = [[node children] objectEnumerator];
                 for (NSXMLNode *child in childEnum) {
