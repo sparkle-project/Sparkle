@@ -57,6 +57,8 @@ NSString *const SUEnableJavaScriptKey = @"SUEnableJavaScript";
 NSString *const SUFixedHTMLDisplaySizeKey = @"SUFixedHTMLDisplaySize";
 NSString *const SUDefaultsDomainKey = @"SUDefaultsDomain";
 NSString *const SUSparkleErrorDomain = @"SUSparkleErrorDomain";
+NSString *const SPUNoUpdateFoundReasonKey = @"SUNoUpdateFoundReason";
+NSString *const SPULatestAppcastItemFoundKey = @"SULatestAppcastItemFound";
 
 NSString *const SUAppendVersionNumberKey = @"SUAppendVersionNumber";
 NSString *const SUEnableAutomatedDowngradesKey = @"SUEnableAutomatedDowngrades";
@@ -71,6 +73,8 @@ NSString *const SUAppcastAttributeVersion = @"sparkle:version";
 NSString *const SUAppcastAttributeOsType = @"sparkle:os";
 NSString *const SUAppcastAttributeInstallationType = @"sparkle:installationType";
 
+NSString *const SUAppcastElementVersion = SUAppcastAttributeVersion;
+NSString *const SUAppcastElementShortVersionString = SUAppcastAttributeShortVersionString;
 NSString *const SUAppcastElementCriticalUpdate = @"sparkle:criticalUpdate";
 NSString *const SUAppcastElementDeltas = @"sparkle:deltas";
 NSString *const SUAppcastElementMinimumAutoupdateVersion = @"sparkle:minimumAutoupdateVersion";

@@ -77,6 +77,8 @@ extern NSString *const SUAppcastAttributeVersion;
 extern NSString *const SUAppcastAttributeOsType;
 extern NSString *const SUAppcastAttributeInstallationType;
 
+extern NSString *const SUAppcastElementVersion;
+extern NSString *const SUAppcastElementShortVersionString;
 extern NSString *const SUAppcastElementCriticalUpdate;
 extern NSString *const SUAppcastElementDeltas;
 extern NSString *const SUAppcastElementMinimumAutoupdateVersion;
