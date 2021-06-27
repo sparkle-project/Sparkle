@@ -192,6 +192,11 @@ typedef NS_ENUM(NSInteger, SPUUpdateCheck)
 /*!
  Returns the item in the appcast corresponding to the update that should be installed.
  
+ Please consider using or migrating to other supported features before adopting this method.
+ Specifically:
+ If you want to filter out certain tagged updates (like beta updates), consider -[SPUUpdaterDelegate allowedChannelsForUpdater:] instead.
+ If you want to treat certain updates as informational-only, consider supplying <sparkle:informationalUpdate> with a set of affected versions users are updating from.
+ 
  If you're using special logic or extensions in your appcast,
  implement this to use your own logic for finding a valid update, if any,
  in the given appcast.
