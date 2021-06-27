@@ -23,19 +23,18 @@
     <item>
         <title>Version 4.0</title>
         <pubDate>Sat, 26 Jul 2014 15:20:13 +0000</pubDate>
-        <enclosure url="http://localhost:1337/Sparkle_Test_App.zip" sparkle:version="4.0" length="1346234" />
+        <sparkle:version>4.0</sparkle:version>
+        <enclosure url="http://localhost:1337/Sparkle_Test_App.zip" length="1346234" />
         <sparkle:informationalUpdate></sparkle:informationalUpdate>
         <link>http://sparkle-project.org</link>
         <sparkle:deltas>
-            <enclosure url="http://localhost:1337/3.0_from_2.0.patch"
-            sparkle:version="3.0"
+            <enclosure url="http://localhost:1337/4.0_from_2.0.patch"
             sparkle:deltaFrom="2.0"
             length="1235"
             type="application/octet-stream"
             sparkle:edSignature="..." />
             
-            <enclosure url="http://localhost:1337/3.0_from_1.0.patch"
-            sparkle:version="3.0"
+            <enclosure url="http://localhost:1337/4.0_from_1.0.patch"
             sparkle:deltaFrom="1.0"
             length="1485"
             type="application/octet-stream"

@@ -312,23 +312,28 @@ static NSString *SUAppcastItemStateKey = @"SUAppcastItemState";
 {
     self = [super init];
     if (self) {
+        _title = [(NSString *)[dict objectForKey:SURSSElementTitle] copy];
+        
         NSDictionary *enclosure = [dict objectForKey:SURSSElementEnclosure];
 
         // Try to find a version string.
-        // Finding the new version number from the RSS feed is a little bit hacky. There are two ways:
+        // Finding the new version number from the RSS feed is a little bit hacky. There are a few ways:
         // 1. A "sparkle:version" attribute on the enclosure tag, an extension from the RSS spec.
-        // 2. If there isn't a version attribute, Sparkle will parse the path in the enclosure, expecting
+        // 2. If there isn't a version attribute, see if there is a version element (this is now the recommended path).
+        // 3. If there isn't a version element, Sparkle will parse the path in the enclosure, expecting
         //    that it will look like this: http://something.com/YourApp_0.5.zip. It'll read whatever's between the last
         //    underscore and the last period as the version number. So name your packages like this: APPNAME_VERSION.extension.
         //    The big caveat with this is that you can't have underscores in your version strings, as that'll confuse Sparkle.
         //    Feel free to change the separator string to a hyphen or something more suited to your needs if you like.
         NSString *newVersion = [enclosure objectForKey:SUAppcastAttributeVersion];
         if (newVersion == nil) {
-            newVersion = [dict objectForKey:SUAppcastAttributeVersion]; // Get version from the item, in case it's a download-less item (i.e. paid upgrade).
+            // Get version from the item
+            newVersion = [dict objectForKey:SUAppcastElementVersion];
         }
-        if (newVersion == nil) // no sparkle:version attribute anywhere?
+        if (newVersion == nil)
         {
-            SULog(SULogLevelError, @"warning: <%@> for URL '%@' is missing %@ attribute. Version comparison may be unreliable. Please always specify %@", SURSSElementEnclosure, [enclosure objectForKey:SURSSAttributeURL], SUAppcastAttributeVersion, SUAppcastAttributeVersion);
+            // No sparkle:version element/attribute anywhere?
+            SULog(SULogLevelError, @"warning: Item '%@' is missing '<%@>' element. Version comparison may be unreliable. Please always specify %@", _title, SUAppcastElementVersion, SUAppcastElementVersion);
 
             // Separate the url by underscores and take the last component, as that'll be closest to the end,
             // then we remove the extension. Hopefully, this will be the version.
@@ -340,13 +345,12 @@ static NSString *SUAppcastItemStateKey = @"SUAppcastItemState";
 
         if (!newVersion) {
             if (error) {
-                *error = [NSString stringWithFormat:@"Feed item lacks %@ attribute, and version couldn't be deduced from file name (would have used last component of a file name like AppName_1.3.4.zip)", SUAppcastAttributeVersion];
+                *error = [NSString stringWithFormat:@"Feed item lacks %@ element, and version couldn't be deduced from file name (would have used last component of a file name like AppName_1.3.4.zip)", SUAppcastElementVersion];
             }
             return nil;
         }
 
         _propertiesDictionary = [[NSDictionary alloc] initWithDictionary:dict];
-        _title = [(NSString *)[dict objectForKey:SURSSElementTitle] copy];
         _dateString = [(NSString *)[dict objectForKey:SURSSElementPubDate] copy];
         _itemDescription = [(NSString *)[dict objectForKey:SURSSElementDescription] copy];
 
