@@ -146,6 +146,9 @@
 
 "%1$@ %2$@ is available but your macOS version is too new for this update. This update only supports up to macOS %3$@." = "%1$@ %2$@ is available but your macOS version is too new for this update. This update only supports up to macOS %3$@.";
 
+/* Used when a new update is not found */
+"Version History" = "Version History";
+
 /* Authorization message shown when app wants permission to update itself. */
 "%1$@ wants permission to update." = "%1$@ wants permission to update.";
 
