@@ -169,6 +169,10 @@
     NSSet<NSString *> *allowedChannels;
     if ([self.updaterDelegate respondsToSelector:@selector(allowedChannelsForUpdater:)]) {
         allowedChannels = [self.updaterDelegate allowedChannelsForUpdater:self.updater];
+        if (allowedChannels == nil) {
+            SULog(SULogLevelError, @"Error: -allowedChannelsForUpdater: cannot return nil. Treating this as an empty set.");
+            allowedChannels = [NSSet set];
+        }
     } else {
         allowedChannels = [NSSet set];
     }
