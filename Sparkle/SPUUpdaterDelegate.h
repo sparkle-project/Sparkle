@@ -174,7 +174,7 @@ typedef NS_ENUM(NSInteger, SPUUpdateCheck)
  
  If the <sparkle:channel> is not present, the update item is posted to the default channel and can be found by any updater.
  
- You can pick any name you'd like for the channel.
+ You can pick any name you'd like for the channel. The valid characters for channel names are letters, numbers, dashes, underscores, and periods.
  
  Note to use this feature, all app versions that your users may update from in your feed must use a version of Sparkle that supports this feature.
  This feature was added in Sparkle 2.

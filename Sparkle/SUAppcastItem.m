@@ -356,13 +356,6 @@ static NSString *SUAppcastItemStateKey = @"SUAppcastItemState";
             }
             return nil;
         }
-        
-        NSString *channel = [dict objectForKey:SUAppcastElementChannel];
-        if (channel.length == 0) {
-            _channel = nil;
-        } else {
-            _channel = channel;
-        }
 
         _propertiesDictionary = [[NSDictionary alloc] initWithDictionary:dict];
         _dateString = [(NSString *)[dict objectForKey:SURSSElementPubDate] copy];
@@ -434,6 +427,24 @@ static NSString *SUAppcastItemStateKey = @"SUAppcastItemState";
         _minimumSystemVersion = [(NSString *)[dict objectForKey:SUAppcastElementMinimumSystemVersion] copy];
         _maximumSystemVersion = [(NSString *)[dict objectForKey:SUAppcastElementMaximumSystemVersion] copy];
         _minimumAutoupdateVersion = [(NSString *)[dict objectForKey:SUAppcastElementMinimumAutoupdateVersion] copy];
+        
+        NSString *channel = [dict objectForKey:SUAppcastElementChannel];
+        if (channel != nil) {
+            if (channel.length == 0) {
+                SULog(SULogLevelError, @"warning: Item with version '%@' has zero-length channel; this will be ignored.", newVersion);
+                _channel = nil;
+            } else {
+                // Reject characters in the channel name that may cause parsing problems in tools later
+                NSMutableCharacterSet *allowedCharacterSet = [NSMutableCharacterSet alphanumericCharacterSet];
+                [allowedCharacterSet addCharactersInString:@"_.-"];
+                if ([channel rangeOfCharacterFromSet:allowedCharacterSet.invertedSet].location != NSNotFound) {
+                    SULog(SULogLevelError, @"warning: Item with version '%@' has channel with invalid name. This channel will be ignored. Only [a-zA-Z0-9._-] is allowed.", newVersion);
+                    _channel = nil;
+                } else {
+                    _channel = [channel copy];
+                }
+            }
+        }
         
         // Grab critical update information
         NSDictionary * _Nullable criticalUpdateDictionaryFromAppcast = (NSDictionary *)[dict objectForKey:SUAppcastElementCriticalUpdate];
