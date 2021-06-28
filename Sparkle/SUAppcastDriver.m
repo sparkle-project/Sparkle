@@ -245,7 +245,6 @@
             return YES;
         }
         
-        // Item channels and allowed channels must have one channel in common
         return [allowedChannels containsObject:channel];
     }];
 }
