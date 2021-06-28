@@ -169,7 +169,6 @@
         
         NSString *localizedDescription;
         NSString *recoverySuggestion;
-        NSString *recoveryOption;
         
         SPUNoUpdateFoundReason reason;
         if (latestAppcastItem != nil) {
@@ -219,11 +218,14 @@
             // was not provided (i.e, for a background update check)
             // We will need to assume the user is up to date if the feed doen't have any applicable update items
             // There could be update items on channels the updater is not subscribed to for example. But we can't tell the user about them.
+            // There could also only be update items available for other platforms or none at all.
             localizedDescription = SULocalizedString(@"You're up-to-date!", "Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates.");
             recoverySuggestion = [NSString stringWithFormat:SULocalizedString(@"%@ %@ is currently the newest version available.", nil), [self.host name], [self.host displayVersion]];
             
-            reason = SPUNoUpdateFoundReasonUnknown;
+            reason = SPUNoUpdateFoundReasonOnLatestVersion;
         }
+        
+        NSString *recoveryOption = SULocalizedString(@"OK", nil);
         
         NSMutableDictionary *userInfo =
         [NSMutableDictionary dictionaryWithDictionary:@{
@@ -236,8 +238,6 @@
         if (latestAppcastItem != nil) {
             userInfo[SPULatestAppcastItemFoundKey] = latestAppcastItem;
         }
-        
-        recoveryOption = SULocalizedString(@"OK", nil);
         
         NSError *notFoundError =
         [NSError
