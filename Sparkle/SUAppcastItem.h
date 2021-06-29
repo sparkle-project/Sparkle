@@ -52,6 +52,7 @@ SU_EXPORT @interface SUAppcastItem : NSObject<NSSecureCoding>
 @property (copy, readonly, nullable) NSNumber* phasedRolloutInterval;
 @property (nonatomic, copy, readonly) NSString *installationType;
 @property (copy, readonly, nullable) NSString *minimumAutoupdateVersion;
+@property (nonatomic, readonly, nullable) NSString *channel;
 
 @property (getter=isDeltaUpdate, readonly) BOOL deltaUpdate;
 @property (getter=isCriticalUpdate, readonly) BOOL criticalUpdate;

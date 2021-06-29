@@ -166,10 +166,18 @@
     NSDictionary *userInfo = @{ SUUpdaterAppcastNotificationKey: loadedAppcast };
     [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidFinishLoadingAppCastNotification object:self.updater userInfo:userInfo];
     
-    // We will never care about other OS's
-    SUAppcast *macOSAppcast = [loadedAppcast copyByFilteringItems:^(SUAppcastItem *item) {
-        return (BOOL)[item isMacOsUpdate];
-    }];
+    NSSet<NSString *> *allowedChannels;
+    if ([self.updaterDelegate respondsToSelector:@selector(allowedChannelsForUpdater:)]) {
+        allowedChannels = [self.updaterDelegate allowedChannelsForUpdater:self.updater];
+        if (allowedChannels == nil) {
+            SULog(SULogLevelError, @"Error: -allowedChannelsForUpdater: cannot return nil. Treating this as an empty set.");
+            allowedChannels = [NSSet set];
+        }
+    } else {
+        allowedChannels = [NSSet set];
+    }
+    
+    SUAppcast *macOSAppcast = [[self class] filterAppcast:loadedAppcast forMacOSAndAllowedChannels:allowedChannels];
     
     id<SUVersionComparison> applicationVersionComparator = [self versionComparator];
     
@@ -219,6 +227,26 @@
         
         [self.delegate didNotFindUpdateWithLatestAppcastItem:notFoundPrimaryItem hostToLatestAppcastItemComparisonResult:hostToLatestAppcastItemComparisonResult];
     }
+}
+
+// This method is used by unit tests
++ (SUAppcast *)filterAppcast:(SUAppcast *)appcast forMacOSAndAllowedChannels:(NSSet<NSString *> *)allowedChannels
+{
+    return [appcast copyByFilteringItems:^(SUAppcastItem *item) {
+        // We will never care about other OS's
+        BOOL macOSUpdate = [item isMacOsUpdate];
+        if (!macOSUpdate) {
+            return NO;
+        }
+        
+        NSString *channel = item.channel;
+        if (channel == nil) {
+            // Item is on the default channel
+            return YES;
+        }
+        
+        return [allowedChannels containsObject:channel];
+    }];
 }
 
 // This method is used by unit tests

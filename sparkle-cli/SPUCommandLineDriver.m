@@ -16,6 +16,7 @@
 @property (nonatomic, readonly) BOOL verbose;
 @property (nonatomic) BOOL probingForUpdates;
 @property (nonatomic, readonly) BOOL interactive;
+@property (nonatomic, readonly) NSSet<NSString *> *allowedChannels;
 @property (nonatomic, copy, readonly, nullable) NSString *customFeedURL;
 
 @end
@@ -26,9 +27,10 @@
 @synthesize verbose = _verbose;
 @synthesize probingForUpdates = _probingForUpdates;
 @synthesize interactive = _interactive;
+@synthesize allowedChannels = _allowedChannels;
 @synthesize customFeedURL = _customFeedURL;
 
-- (instancetype)initWithUpdateBundlePath:(NSString *)updateBundlePath applicationBundlePath:(nullable NSString *)applicationBundlePath customFeedURL:(nullable NSString *)customFeedURL updatePermissionResponse:(nullable SUUpdatePermissionResponse *)updatePermissionResponse deferInstallation:(BOOL)deferInstallation interactiveInstallation:(BOOL)interactiveInstallation verbose:(BOOL)verbose
+- (instancetype)initWithUpdateBundlePath:(NSString *)updateBundlePath applicationBundlePath:(nullable NSString *)applicationBundlePath allowedChannels:(NSSet<NSString *> *)allowedChannels customFeedURL:(nullable NSString *)customFeedURL updatePermissionResponse:(nullable SUUpdatePermissionResponse *)updatePermissionResponse deferInstallation:(BOOL)deferInstallation interactiveInstallation:(BOOL)interactiveInstallation verbose:(BOOL)verbose
 {
     self = [super init];
     if (self != nil) {
@@ -49,6 +51,7 @@
         
         _verbose = verbose;
         _interactive = interactiveInstallation;
+        _allowedChannels = allowedChannels;
         _customFeedURL = [customFeedURL copy];
         
         id <SPUUserDriver> userDriver = [[SPUCommandLineUserDriver alloc] initWithUpdatePermissionResponse:updatePermissionResponse deferInstallation:deferInstallation verbose:verbose];
@@ -82,6 +85,11 @@
         case SPUUpdateCheckBackgroundScheduled:
             return self.interactive;
     }
+}
+
+- (NSSet<NSString *> *)allowedChannelsForUpdater:(SPUUpdater *)__unused updater
+{
+    return self.allowedChannels;
 }
 
 - (nullable NSString *)feedURLStringForUpdater:(SPUUpdater *)__unused updater

@@ -161,7 +161,36 @@ typedef NS_ENUM(NSInteger, SPUUpdateCheck)
 - (void)updater:(SPUUpdater *)updater didFinishLoadingAppcast:(SUAppcast *)appcast;
 
 /*!
+ Returns the set of Sparkle channels the updater is allowed to find new updates from.
+ 
+ An appcast item can specify a channel the update is posted to. Without specifying a channel, the appcast item is posted to the default channel.
+ For instance:
+ <item>
+    <sparkle:version>2.0 Beta 1</sparkle:version>
+    <sparkle:channel>beta</sparkle:channel>
+ </item>
+ 
+ This example posts an update to the 'beta' channel, so only updaters that are allowed to use the 'beta' channel can find this update.
+ 
+ If the <sparkle:channel> is not present, the update item is posted to the default channel and can be found by any updater.
+ 
+ You can pick any name you'd like for the channel. The valid characters for channel names are letters, numbers, dashes, underscores, and periods.
+ 
+ Note to use this feature, all app versions that your users may update from in your feed must use a version of Sparkle that supports this feature.
+ This feature was added in Sparkle 2.
+ 
+ \return The set of channel names the updater is allowed to find new updates in. An empty set is the default behavior,
+         which means the updater will only look for updates in the default channel.
+ */
+- (NSSet<NSString *> *)allowedChannelsForUpdater:(SPUUpdater *)updater;
+
+/*!
  Returns the item in the appcast corresponding to the update that should be installed.
+ 
+ Please consider using or migrating to other supported features before adopting this method.
+ Specifically:
+ If you want to filter out certain tagged updates (like beta updates), consider -[SPUUpdaterDelegate allowedChannelsForUpdater:] instead.
+ If you want to treat certain updates as informational-only, consider supplying <sparkle:informationalUpdate> with a set of affected versions users are updating from.
  
  If you're using special logic or extensions in your appcast,
  implement this to use your own logic for finding a valid update, if any,

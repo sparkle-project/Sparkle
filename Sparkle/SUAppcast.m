@@ -145,15 +145,15 @@
                 [dict setObject:deltas forKey:name];
 			}
             else if ([name isEqualToString:SUAppcastElementTags]) {
-                NSMutableArray *tags = [NSMutableArray array];
+                NSMutableArray *names = [NSMutableArray array];
                 NSEnumerator *childEnum = [[node children] objectEnumerator];
                 for (NSXMLNode *child in childEnum) {
                     NSString *childName = child.name;
                     if (childName) {
-                        [tags addObject:childName];
+                        [names addObject:childName];
                     }
                 }
-                [dict setObject:tags forKey:name];
+                [dict setObject:names forKey:name];
             }
             else if ([name isEqualToString:SUAppcastElementInformationalUpdate]) {
                 NSMutableSet *informationalUpdateVersions = [NSMutableSet set];
