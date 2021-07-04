@@ -209,9 +209,10 @@ typedef NS_ENUM(NSInteger, SPUUpdateCheck)
  
  \param appcast The appcast that was downloaded from the remote server.
  \param updater The updater instance.
- \return The best valid appcast item, or nil if you don't want to be delegated this task.
+ \return The best valid appcast item. Return NSNull.null if no appcast item is valid. Return nil if you don't want to be delegated this task and
+         want to let Sparkle handle picking the best valid update.
  */
-- (nullable SUAppcastItem *)bestValidUpdateInAppcast:(SUAppcast *)appcast forUpdater:(SPUUpdater *)updater;
+- (nullable id)bestValidUpdateInAppcast:(SUAppcast *)appcast forUpdater:(SPUUpdater *)updater;
 
 /*!
  Called when a valid update is found by the update driver.

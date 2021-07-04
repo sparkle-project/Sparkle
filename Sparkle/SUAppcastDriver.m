@@ -129,25 +129,38 @@
     // Find the best valid update in the appcast by asking the delegate
     // Don't ask the delegate if the appcast has no items though
     SUAppcastItem *regularItemFromDelegate;
+    BOOL delegateOptedOutOfSelection;
     if (appcast.items.count > 0 && [self.updaterDelegate respondsToSelector:@selector((bestValidUpdateInAppcast:forUpdater:))]) {
-        SUAppcastItem *candidateItem = [self.updaterDelegate bestValidUpdateInAppcast:appcast forUpdater:(id _Nonnull)self.updater];
+        id candidateItem = [self.updaterDelegate bestValidUpdateInAppcast:appcast forUpdater:(id _Nonnull)self.updater];
         
-        assert(!candidateItem.deltaUpdate);
-        if (candidateItem.deltaUpdate) {
-            // Client would have to go out of their way to examine the .deltaUpdates to return one
-            // This is very unlikely, and we need them to give us a regular update item back
-            SULog(SULogLevelError, @"Error: -bestValidUpdateInAppcast:forUpdater: cannot return a delta update item");
+        if ([(NSObject *)candidateItem isKindOfClass:[SUAppcastItem class]]) {
+            SUAppcastItem *candidateAppcastItem = candidateItem;
+            assert(!candidateAppcastItem.deltaUpdate);
+            if (candidateAppcastItem.deltaUpdate) {
+                // Client would have to go out of their way to examine the .deltaUpdates to return one
+                // We need them to give us a regular update item back instead..
+                SULog(SULogLevelError, @"Error: -bestValidUpdateInAppcast:forUpdater: cannot return a delta update item");
+                regularItemFromDelegate = nil;
+            } else {
+                regularItemFromDelegate = candidateAppcastItem;
+            }
+            
+            delegateOptedOutOfSelection = NO;
+        } else if (candidateItem == [NSNull null]) {
             regularItemFromDelegate = nil;
+            delegateOptedOutOfSelection = YES;
         } else {
-            regularItemFromDelegate = candidateItem;
+            regularItemFromDelegate = nil;
+            delegateOptedOutOfSelection = NO;
         }
     } else {
         regularItemFromDelegate = nil;
+        delegateOptedOutOfSelection = NO;
     }
     
     // Take care of finding best appcast item ourselves if delegate does not
     SUAppcastItem *regularItem;
-    if (regularItemFromDelegate == nil) {
+    if (regularItemFromDelegate == nil && !delegateOptedOutOfSelection) {
         regularItem = [[self class] bestItemFromAppcastItems:appcast.items comparator:versionComparator];
     } else {
         regularItem = regularItemFromDelegate;
