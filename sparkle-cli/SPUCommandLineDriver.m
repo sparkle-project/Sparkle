@@ -16,6 +16,7 @@
 @property (nonatomic, readonly) BOOL verbose;
 @property (nonatomic) BOOL probingForUpdates;
 @property (nonatomic, readonly) BOOL interactive;
+@property (nonatomic, readonly) BOOL allowMajorUpgrades;
 @property (nonatomic, readonly) NSSet<NSString *> *allowedChannels;
 @property (nonatomic, copy, readonly, nullable) NSString *customFeedURL;
 
@@ -27,10 +28,11 @@
 @synthesize verbose = _verbose;
 @synthesize probingForUpdates = _probingForUpdates;
 @synthesize interactive = _interactive;
+@synthesize allowMajorUpgrades = _allowMajorUpgrades;
 @synthesize allowedChannels = _allowedChannels;
 @synthesize customFeedURL = _customFeedURL;
 
-- (instancetype)initWithUpdateBundlePath:(NSString *)updateBundlePath applicationBundlePath:(nullable NSString *)applicationBundlePath allowedChannels:(NSSet<NSString *> *)allowedChannels customFeedURL:(nullable NSString *)customFeedURL updatePermissionResponse:(nullable SUUpdatePermissionResponse *)updatePermissionResponse deferInstallation:(BOOL)deferInstallation interactiveInstallation:(BOOL)interactiveInstallation verbose:(BOOL)verbose
+- (instancetype)initWithUpdateBundlePath:(NSString *)updateBundlePath applicationBundlePath:(nullable NSString *)applicationBundlePath allowedChannels:(NSSet<NSString *> *)allowedChannels customFeedURL:(nullable NSString *)customFeedURL updatePermissionResponse:(nullable SUUpdatePermissionResponse *)updatePermissionResponse deferInstallation:(BOOL)deferInstallation interactiveInstallation:(BOOL)interactiveInstallation allowMajorUpgrades:(BOOL)allowMajorUpgrades verbose:(BOOL)verbose
 {
     self = [super init];
     if (self != nil) {
@@ -51,6 +53,7 @@
         
         _verbose = verbose;
         _interactive = interactiveInstallation;
+        _allowMajorUpgrades = allowMajorUpgrades;
         _allowedChannels = allowedChannels;
         _customFeedURL = [customFeedURL copy];
         
@@ -98,9 +101,20 @@
 }
 
 // In case we find an update during probing, otherwise we leave this to the user driver
-- (void)updater:(SPUUpdater *)__unused updater didFindValidUpdate:(SUAppcastItem *)__unused item
+- (void)updater:(SPUUpdater *)__unused updater didFindValidUpdate:(SUAppcastItem *)item
 {
-    if (self.probingForUpdates) {
+    // If we encounter a major upgrade and not allowed to act on it, then exit(2)
+    if (item.majorUpgrade && !self.allowMajorUpgrades) {
+        if (self.verbose) {
+            fprintf(stderr, "Major upgrade available");
+            if (self.probingForUpdates) {
+                fprintf(stderr, "\n");
+            } else {
+                fprintf(stderr, " but not allowed to install it.\n");
+            }
+        }
+        exit(2);
+    } else if (self.probingForUpdates) {
         if (self.verbose) {
             fprintf(stderr, "Update available!\n");
         }
