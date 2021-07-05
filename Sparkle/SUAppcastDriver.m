@@ -131,26 +131,25 @@
     SUAppcastItem *regularItemFromDelegate;
     BOOL delegateOptedOutOfSelection;
     if (appcast.items.count > 0 && [self.updaterDelegate respondsToSelector:@selector((bestValidUpdateInAppcast:forUpdater:))]) {
-        id candidateItem = [self.updaterDelegate bestValidUpdateInAppcast:appcast forUpdater:(id _Nonnull)self.updater];
+        SUAppcastItem *candidateItem = [self.updaterDelegate bestValidUpdateInAppcast:appcast forUpdater:(id _Nonnull)self.updater];
         
-        if ([(NSObject *)candidateItem isKindOfClass:[SUAppcastItem class]]) {
-            SUAppcastItem *candidateAppcastItem = candidateItem;
-            assert(!candidateAppcastItem.deltaUpdate);
-            if (candidateAppcastItem.deltaUpdate) {
+        if (candidateItem == SUAppcastItem.emptyAppcastItem) {
+            regularItemFromDelegate = nil;
+            delegateOptedOutOfSelection = YES;
+        } else if (candidateItem == nil) {
+            regularItemFromDelegate = nil;
+            delegateOptedOutOfSelection = NO;
+        } else if (candidateItem != nil) {
+            assert(!candidateItem.deltaUpdate);
+            if (candidateItem.deltaUpdate) {
                 // Client would have to go out of their way to examine the .deltaUpdates to return one
                 // We need them to give us a regular update item back instead..
                 SULog(SULogLevelError, @"Error: -bestValidUpdateInAppcast:forUpdater: cannot return a delta update item");
                 regularItemFromDelegate = nil;
             } else {
-                regularItemFromDelegate = candidateAppcastItem;
+                regularItemFromDelegate = candidateItem;
             }
             
-            delegateOptedOutOfSelection = NO;
-        } else if (candidateItem == [NSNull null]) {
-            regularItemFromDelegate = nil;
-            delegateOptedOutOfSelection = YES;
-        } else {
-            regularItemFromDelegate = nil;
             delegateOptedOutOfSelection = NO;
         }
     } else {

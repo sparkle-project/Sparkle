@@ -68,6 +68,8 @@ SU_EXPORT @interface SUAppcastItem : NSObject<NSSecureCoding>
 
 - (instancetype)init NS_UNAVAILABLE;
 
++ (instancetype)emptyAppcastItem;
+
 // Deprecated initializers
 - (nullable instancetype)initWithDictionary:(NSDictionary *)dict __deprecated_msg("Properties that depend on the system or application version are not supported when used with this initializer. The designated initializer is available in SUAppcastItem+Private.h. Please first explore other APIs or contact us to describe your use case.");
 - (nullable instancetype)initWithDictionary:(NSDictionary *)dict failureReason:(NSString * _Nullable __autoreleasing *_Nullable)error __deprecated_msg("Properties that depend on the system or application version are not supported when used with this initializer. The designated initializer is available in SUAppcastItem+Private.h. Please first explore other APIs or contact us to describe your use case.");

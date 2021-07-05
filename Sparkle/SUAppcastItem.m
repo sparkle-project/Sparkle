@@ -285,6 +285,16 @@ static NSString *SUAppcastItemStateKey = @"SUAppcastItemState";
     }
 }
 
++ (instancetype)emptyAppcastItem
+{
+    static SUAppcastItem *emptyAppcastItem;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        emptyAppcastItem = [[SUAppcastItem alloc] init];
+    });
+    return emptyAppcastItem;
+}
+
 // Initializer used for making delta items
 - (nullable instancetype)initWithDictionary:(NSDictionary *)dict relativeToURL:(NSURL * _Nullable)appcastURL state:(SPUAppcastItemState * _Nullable)state
 {
