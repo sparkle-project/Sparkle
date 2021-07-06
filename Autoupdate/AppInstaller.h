@@ -13,7 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface AppInstaller : NSObject
 
-- (instancetype)initWithHostBundleIdentifier:(NSString *)hostBundleIdentifier;
+- (instancetype)initWithHostBundleIdentifier:(NSString *)hostBundleIdentifier homeDirectory:(NSString *)homeDirectory userName:(NSString *)userName;
 
 - (void)start;
 
