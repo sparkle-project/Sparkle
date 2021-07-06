@@ -139,7 +139,7 @@
         } else if (candidateItem == nil) {
             regularItemFromDelegate = nil;
             delegateOptedOutOfSelection = NO;
-        } else if (candidateItem != nil) {
+        } else {
             assert(!candidateItem.deltaUpdate);
             if (candidateItem.deltaUpdate) {
                 // Client would have to go out of their way to examine the .deltaUpdates to return one
