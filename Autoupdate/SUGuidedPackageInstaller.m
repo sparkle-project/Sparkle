@@ -16,18 +16,24 @@
 @interface SUGuidedPackageInstaller ()
 
 @property (nonatomic, readonly, copy) NSString *packagePath;
+@property (nonatomic, readonly, copy) NSString *homeDirectory;
+@property (nonatomic, readonly, copy) NSString *userName;
 
 @end
 
 @implementation SUGuidedPackageInstaller
 
 @synthesize packagePath = _packagePath;
+@synthesize homeDirectory = _homeDirectory;
+@synthesize userName = _userName;
 
-- (instancetype)initWithPackagePath:(NSString *)packagePath
+- (instancetype)initWithPackagePath:(NSString *)packagePath homeDirectory:(NSString *)homeDirectory userName:(NSString *)userName
 {
     self = [super init];
     if (self != nil) {
         _packagePath = [packagePath copy];
+        _homeDirectory = [homeDirectory copy];
+        _userName = [userName copy];
     }
     return self;
 }
@@ -45,6 +51,8 @@
     NSTask *task = [[NSTask alloc] init];
     task.launchPath = installerPath;
     task.arguments = @[@"-pkg", self.packagePath, @"-target", @"/"];
+    // Set the $HOME and $USER variables so pre/post install scripts reference the correct user environment
+    task.environment = @{@"HOME": self.homeDirectory, @"USER": self.userName};
     task.standardError = [NSPipe pipe];
     task.standardOutput = [NSPipe pipe];
     

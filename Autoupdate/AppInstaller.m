@@ -55,6 +55,8 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 @property (nonatomic) SUUpdateValidator *updateValidator;
 
 @property (nonatomic, readonly, copy) NSString *hostBundleIdentifier;
+@property (nonatomic, readonly) NSString *homeDirectory;
+@property (nonatomic, readonly) NSString *userName;
 @property (nonatomic) SUHost *host;
 @property (nonatomic, copy) NSString *updateDirectoryPath;
 @property (nonatomic, copy) NSString *downloadName;
@@ -86,6 +88,8 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 @synthesize agentConnection = _agentConnection;
 @synthesize receivedUpdaterPong = _receivedUpdaterPong;
 @synthesize hostBundleIdentifier = _hostBundleIdentifier;
+@synthesize homeDirectory = _homeDirectory;
+@synthesize userName = _userName;
 @synthesize terminationListener = _terminationListener;
 @synthesize updateValidator = _updateValidator;
 @synthesize host = _host;
@@ -107,13 +111,16 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 @synthesize finishedValidation = _finishedValidation;
 @synthesize agentInitiatedConnection = _agentInitiatedConnection;
 
-- (instancetype)initWithHostBundleIdentifier:(NSString *)hostBundleIdentifier
+- (instancetype)initWithHostBundleIdentifier:(NSString *)hostBundleIdentifier homeDirectory:(NSString *)homeDirectory userName:(NSString *)userName
 {
     if (!(self = [super init])) {
         return nil;
     }
     
     _hostBundleIdentifier = [hostBundleIdentifier copy];
+    
+    _homeDirectory = [homeDirectory copy];
+    _userName = [userName copy];
     
     _xpcListener = [[NSXPCListener alloc] initWithMachServiceName:SPUInstallerServiceNameForBundleIdentifier(hostBundleIdentifier)];
     _xpcListener.delegate = self;
@@ -454,7 +461,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     
     dispatch_async(self.installerQueue, ^{
         NSError *installerError = nil;
-        id <SUInstallerProtocol> installer = [SUInstaller installerForHost:self.host expectedInstallationType:self.installationType updateDirectory:self.updateDirectoryPath error:&installerError];
+        id <SUInstallerProtocol> installer = [SUInstaller installerForHost:self.host expectedInstallationType:self.installationType updateDirectory:self.updateDirectoryPath homeDirectory:self.homeDirectory userName:self.userName error:&installerError];
         
         if (installer == nil) {
             dispatch_async(dispatch_get_main_queue(), ^{
