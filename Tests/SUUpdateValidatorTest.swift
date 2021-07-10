@@ -96,7 +96,7 @@ class SUUpdateValidatorTest: XCTestCase {
             testPrevalidation(bundle: .none, signatures: signatureConfig, expectedResult: false)
             testPrevalidation(bundle: .dsaOnly, signatures: signatureConfig, expectedResult: signatureConfig.dsa == .valid)
             testPrevalidation(bundle: .edOnly, signatures: signatureConfig, expectedResult: signatureConfig.ed == .valid)
-            testPrevalidation(bundle: .both, signatures: signatureConfig, expectedResult: signatureConfig.dsa == .valid && signatureConfig.ed != .invalid)
+            testPrevalidation(bundle: .both, signatures: signatureConfig, expectedResult: signatureConfig.ed == .valid)
         }
     }
 
@@ -125,14 +125,14 @@ class SUUpdateValidatorTest: XCTestCase {
             testPostValidation(bundle: .none, signatures: signatureConfig, expectedResult: false)
             testPostValidation(bundle: .dsaOnly, signatures: signatureConfig, expectedResult: signatureConfig.dsa == .valid)
             testPostValidation(bundle: .edOnly, signatures: signatureConfig, expectedResult: signatureConfig.ed == .valid)
-            testPostValidation(bundle: .both, signatures: signatureConfig, expectedResult: signatureConfig.dsa == .valid && signatureConfig.ed != .invalid)
+            testPostValidation(bundle: .both, signatures: signatureConfig, expectedResult: signatureConfig.ed == .valid)
         }
     }
 
     func testPostValidationWithCodeSigning() {
         for signatureConfig in SignatureConfig.allCases {
             testPostValidation(bundle: .codeSignedOnly, signatures: signatureConfig, expectedResult: true)
-            testPostValidation(bundle: .codeSignedBoth, signatures: signatureConfig, expectedResult: signatureConfig.dsa == .valid && signatureConfig.ed != .invalid)
+            testPostValidation(bundle: .codeSignedBoth, signatures: signatureConfig, expectedResult: signatureConfig.ed == .valid)
 
             testPostValidation(bundle: .codeSignedInvalidOnly, signatures: signatureConfig, expectedResult: false)
             testPostValidation(bundle: .codeSignedInvalid, signatures: signatureConfig, expectedResult: false)
@@ -150,7 +150,7 @@ class SUUpdateValidatorTest: XCTestCase {
 
     func testPostValidationWithKeyRotation() {
         for signatureConfig in SignatureConfig.allCases {
-            let signatureIsValid = signatureConfig.dsa == .valid && (signatureConfig.ed == .valid || signatureConfig.ed == .none)
+            let signatureIsValid = signatureConfig.ed == .valid
 
             // It's okay to add DSA keys or add code signing.
             testPostValidation(oldBundle: .codeSignedOnly, newBundle: .codeSignedBoth, signatures: signatureConfig, expectedResult: signatureIsValid)
