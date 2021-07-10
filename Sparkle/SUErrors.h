@@ -88,5 +88,6 @@ typedef NS_ENUM(OSStatus, SPUNoUpdateFoundReason) {
 
 SU_EXPORT extern NSString *const SPUNoUpdateFoundReasonKey;
 SU_EXPORT extern NSString *const SPULatestAppcastItemFoundKey;
+SU_EXPORT extern NSString *const SPUNoUpdateFoundUserInitiatedKey;
 
 #endif

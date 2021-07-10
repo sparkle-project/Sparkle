@@ -159,14 +159,9 @@
     [self notifyFoundValidUpdateWithAppcastItem:updateItem secondaryAppcastItem:secondaryAppcastItem systemDomain:nil];
 }
 
-- (void)didNotFindUpdateWithLatestAppcastItem:(nullable SUAppcastItem *)latestAppcastItem hostToLatestAppcastItemComparisonResult:(NSComparisonResult)hostToLatestAppcastItemComparisonResult
+- (void)didNotFindUpdateWithLatestAppcastItem:(nullable SUAppcastItem *)latestAppcastItem hostToLatestAppcastItemComparisonResult:(NSComparisonResult)hostToLatestAppcastItemComparisonResult background:(BOOL)background
 {
     if (!self.aborted) {
-        if ([self.updaterDelegate respondsToSelector:@selector((updaterDidNotFindUpdate:))]) {
-            [self.updaterDelegate updaterDidNotFindUpdate:self.updater];
-        }
-        [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidNotFindUpdateNotification object:self.updater];
-        
         NSString *localizedDescription;
         NSString *recoverySuggestion;
         
@@ -190,7 +185,8 @@
                     reason = SPUNoUpdateFoundReasonOnLatestVersion;
                     break;
                 case NSOrderedAscending:
-                    // This means a new update doesn't match the OS requirements
+                    // A new update is available but cannot be installed
+                    
                     if (!latestAppcastItem.minimumOperatingSystemVersionIsOK) {
                         localizedDescription = SULocalizedString(@"Your macOS version is too old", nil);
                         
@@ -214,8 +210,7 @@
                     break;
             }
         } else {
-            // When no updates are found in the appcast, or latest appcast item info
-            // was not provided (i.e, for a background update check)
+            // When no updates are found in the appcast
             // We will need to assume the user is up to date if the feed doen't have any applicable update items
             // There could be update items on channels the updater is not subscribed to for example. But we can't tell the user about them.
             // There could also only be update items available for other platforms or none at all.
@@ -233,6 +228,7 @@
             NSLocalizedRecoverySuggestionErrorKey: recoverySuggestion,
             NSLocalizedRecoveryOptionsErrorKey: @[recoveryOption],
             SPUNoUpdateFoundReasonKey: @(reason),
+            SPUNoUpdateFoundUserInitiatedKey: @(!background),
         }];
         
         if (latestAppcastItem != nil) {
@@ -244,6 +240,15 @@
          errorWithDomain:SUSparkleErrorDomain
          code:SUNoUpdateError
          userInfo:[userInfo copy]];
+        
+        if ([self.updaterDelegate respondsToSelector:@selector((updaterDidNotFindUpdate:error:))]) {
+            [self.updaterDelegate updaterDidNotFindUpdate:self.updater error:notFoundError];
+        } else if ([self.updaterDelegate respondsToSelector:@selector((updaterDidNotFindUpdate:))]) {
+            [self.updaterDelegate updaterDidNotFindUpdate:self.updater];
+        }
+        
+        [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidNotFindUpdateNotification object:self.updater userInfo:userInfo];
+        
         [self.delegate basicDriverIsRequestingAbortUpdateWithError:notFoundError];
     }
 }

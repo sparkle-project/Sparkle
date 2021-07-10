@@ -58,6 +58,7 @@ NSString *const SUFixedHTMLDisplaySizeKey = @"SUFixedHTMLDisplaySize";
 NSString *const SUDefaultsDomainKey = @"SUDefaultsDomain";
 NSString *const SUSparkleErrorDomain = @"SUSparkleErrorDomain";
 NSString *const SPUNoUpdateFoundReasonKey = @"SUNoUpdateFoundReason";
+NSString *const SPUNoUpdateFoundUserInitiatedKey = @"SPUNoUpdateUserInitiated";
 NSString *const SPULatestAppcastItemFoundKey = @"SULatestAppcastItemFound";
 
 NSString *const SUAppendVersionNumberKey = @"SUAppendVersionNumber";

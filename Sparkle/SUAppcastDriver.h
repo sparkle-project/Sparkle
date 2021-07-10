@@ -18,7 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)didFailToFetchAppcastWithError:(NSError *)error;
 - (void)didFinishLoadingAppcast:(SUAppcast *)appcast;
 - (void)didFindValidUpdateWithAppcastItem:(SUAppcastItem *)appcastItem secondaryAppcastItem:(SUAppcastItem * _Nullable)secondaryAppcastItem;
-- (void)didNotFindUpdateWithLatestAppcastItem:(nullable SUAppcastItem *)latestAppcastItem hostToLatestAppcastItemComparisonResult:(NSComparisonResult)hostToLatestAppcastItemComparisonResult;
+- (void)didNotFindUpdateWithLatestAppcastItem:(nullable SUAppcastItem *)latestAppcastItem hostToLatestAppcastItemComparisonResult:(NSComparisonResult)hostToLatestAppcastItemComparisonResult background:(BOOL)background;
 
 @end
 

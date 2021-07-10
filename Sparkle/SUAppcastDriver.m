@@ -223,21 +223,21 @@
         // We found a suitable update
         [self.delegate didFindValidUpdateWithAppcastItem:finalPrimaryItem secondaryAppcastItem:finalSecondaryItem];
     } else {
-        // Find the latest appcast item even if it fails min/max OS test
-        // We want to inform the user if an update requires a different OS version
-        // We only need to do this if an update is being checked by the user manually
-        SUAppcastItem *notFoundPrimaryItem;
+        // Find the latest appcast item that we can report to the user and updater delegates
+        // This may include updates that fail due to OS version requirements.
+        // This excludes newer backgrounded updates that fail because they are skipped or not in current phased rollout group
+        SUAppcast *notFoundAppcast = [[self class] filterSupportedAppcast:macOSAppcast phasedUpdateGroup:phasedUpdateGroup skippedUpdate:skippedUpdate hostVersion:self.host.version versionComparator:applicationVersionComparator testOSVersion:NO testMinimumAutoupdateVersion:NO];
+        
+        SUAppcastItem *notFoundPrimaryItem = [self retrieveBestAppcastItemFromAppcast:notFoundAppcast versionComparator:applicationVersionComparator secondaryUpdate:nil];
+        
         NSComparisonResult hostToLatestAppcastItemComparisonResult;
-        if (!background) {
-            notFoundPrimaryItem = [self retrieveBestAppcastItemFromAppcast:macOSAppcast versionComparator:applicationVersionComparator secondaryUpdate:nil];
-            
+        if (notFoundPrimaryItem != nil) {
             hostToLatestAppcastItemComparisonResult = [applicationVersionComparator compareVersion:self.host.version toVersion:notFoundPrimaryItem.versionString];
         } else {
-            notFoundPrimaryItem = nil;
             hostToLatestAppcastItemComparisonResult = 0;
         }
         
-        [self.delegate didNotFindUpdateWithLatestAppcastItem:notFoundPrimaryItem hostToLatestAppcastItemComparisonResult:hostToLatestAppcastItemComparisonResult];
+        [self.delegate didNotFindUpdateWithLatestAppcastItem:notFoundPrimaryItem hostToLatestAppcastItemComparisonResult:hostToLatestAppcastItemComparisonResult background:background];
     }
 }
 
