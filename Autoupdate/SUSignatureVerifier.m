@@ -96,6 +96,8 @@
         return NO;
     }
 
+    //self.pubKeys == keys in the app
+    //signatures from the appcast
     switch (self.pubKeys.ed25519PubKeyStatus) {
     case SUSigningInputStatusAbsent:
         if (signatures.ed25519SignatureStatus != SUSigningInputStatusAbsent) {
@@ -128,11 +130,8 @@
             }
             if (ed25519_verify(signatures.ed25519Signature, data.bytes, data.length, self.pubKeys.ed25519PubKey)) {
                 SULog(SULogLevelDefault, @"OK: EdDSA signature is correct");
-                if (self.pubKeys.dsaPubKeyStatus == SUSigningInputStatusAbsent) {
-                    return YES;
-                } else {
-                    SULog(SULogLevelDefault, @"This app has a DSA public key, so a DSA signature is required too");
-                }
+                // No need to check DSA when EdDSA verification succeeded
+                return YES;
             } else {
                 SULog(SULogLevelError, @"EdDSA signature does not match. Data of the update file being checked is different than data that has been signed, or the public key and the private key are not from the same set.");
                 if (signatures.dsaSignatureStatus != SUSigningInputStatusAbsent) {
