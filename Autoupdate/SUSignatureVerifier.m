@@ -96,8 +96,6 @@
         return NO;
     }
 
-    //self.pubKeys == keys in the app
-    //signatures from the appcast
     switch (self.pubKeys.ed25519PubKeyStatus) {
     case SUSigningInputStatusAbsent:
         if (signatures.ed25519SignatureStatus != SUSigningInputStatusAbsent) {
