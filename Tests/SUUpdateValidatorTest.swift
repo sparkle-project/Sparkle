@@ -35,7 +35,7 @@ class SUUpdateValidatorTest: XCTestCase {
 
     struct SignatureConfig: CaseIterable, Equatable, CustomDebugStringConvertible {
         enum State: CaseIterable, Equatable {
-            case none, invalid, valid
+            case none, invalid, invalidFormat, valid
         }
 
         var dsa: State
@@ -63,6 +63,8 @@ class SUUpdateValidatorTest: XCTestCase {
         switch config.dsa {
         case .none: dsaSig = nil
         case .invalid: dsaSig = "ABwCFCIHCIYYkfZavNzTitTW5tlRp/k5AhQ40poFytqcVhIYdCxQznaXeJPJDQ=="
+        // Use some invalid base64 strings
+        case .invalidFormat: dsaSig = "%%wCFCIHCIYYkfZavNzTitTW5tlRp/k5AhQ40poFytqcVhIYdCxQznaXeJPJDQ=="
         case .valid: dsaSig = "MCwCFCIHCIYYkfZavNzTitTW5tlRp/k5AhQ40poFytqcVhIYdCxQznaXeJPJDQ=="
         }
 
@@ -70,6 +72,8 @@ class SUUpdateValidatorTest: XCTestCase {
         switch config.ed {
         case .none: edSig = nil
         case .invalid: edSig = "wTcpXCgWoa4NrJpsfzS61FXJIbv963//12U2ef9xstzVOLPHYK2N4/ojgpDV5N1/NGG1uWMBgK+kEWp0Z5zMDQ=="
+        // Use some invalid base64 strings
+        case .invalidFormat: edSig = "%%cpXCgWoa4NrJpsfzS61FXJIbv963//12U2ef9xstzVOLPHYK2N4/ojgpDV5N1/NGG1uWMBgK+kEWp0Z5zMDQ=="
         case .valid: edSig = "EIawm2YkDZ2gBfkEMF2+1VuuTeXnCGZOdnMdVgPPvDZioq7bvDayXqKkIIzSjKMmeFdcFJOHdnba5ZV60+gPBw=="
         }
 
@@ -94,8 +98,8 @@ class SUUpdateValidatorTest: XCTestCase {
         for signatureConfig in SignatureConfig.allCases {
             testPrevalidation(bundle: .none, signatures: signatureConfig, expectedResult: false)
             testPrevalidation(bundle: .dsaOnly, signatures: signatureConfig, expectedResult: signatureConfig.dsa == .valid)
-            testPrevalidation(bundle: .edOnly, signatures: signatureConfig, expectedResult: signatureConfig.ed == .valid)
-            testPrevalidation(bundle: .both, signatures: signatureConfig, expectedResult: signatureConfig.ed == .valid)
+            testPrevalidation(bundle: .edOnly, signatures: signatureConfig, expectedResult: signatureConfig.ed == .valid && signatureConfig.dsa != .invalidFormat)
+            testPrevalidation(bundle: .both, signatures: signatureConfig, expectedResult: signatureConfig.ed == .valid && signatureConfig.dsa != .invalidFormat)
         }
     }
 
@@ -123,15 +127,15 @@ class SUUpdateValidatorTest: XCTestCase {
         for signatureConfig in SignatureConfig.allCases {
             testPostValidation(bundle: .none, signatures: signatureConfig, expectedResult: false)
             testPostValidation(bundle: .dsaOnly, signatures: signatureConfig, expectedResult: signatureConfig.dsa == .valid)
-            testPostValidation(bundle: .edOnly, signatures: signatureConfig, expectedResult: signatureConfig.ed == .valid)
-            testPostValidation(bundle: .both, signatures: signatureConfig, expectedResult: signatureConfig.ed == .valid)
+            testPostValidation(bundle: .edOnly, signatures: signatureConfig, expectedResult: signatureConfig.ed == .valid && signatureConfig.dsa != .invalidFormat)
+            testPostValidation(bundle: .both, signatures: signatureConfig, expectedResult: signatureConfig.ed == .valid && signatureConfig.dsa != .invalidFormat)
         }
     }
 
     func testPostValidationWithCodeSigning() {
         for signatureConfig in SignatureConfig.allCases {
             testPostValidation(bundle: .codeSignedOnly, signatures: signatureConfig, expectedResult: true)
-            testPostValidation(bundle: .codeSignedBoth, signatures: signatureConfig, expectedResult: signatureConfig.ed == .valid)
+            testPostValidation(bundle: .codeSignedBoth, signatures: signatureConfig, expectedResult: signatureConfig.ed == .valid && signatureConfig.dsa != .invalidFormat)
 
             testPostValidation(bundle: .codeSignedInvalidOnly, signatures: signatureConfig, expectedResult: false)
             testPostValidation(bundle: .codeSignedInvalid, signatures: signatureConfig, expectedResult: false)
@@ -149,7 +153,7 @@ class SUUpdateValidatorTest: XCTestCase {
 
     func testPostValidationWithKeyRotation() {
         for signatureConfig in SignatureConfig.allCases {
-            let signatureIsValid = (signatureConfig.ed == .valid)
+            let signatureIsValid = (signatureConfig.ed == .valid && signatureConfig.dsa != .invalidFormat)
 
             // It's okay to add DSA keys or add code signing.
             testPostValidation(oldBundle: .codeSignedOnly, newBundle: .codeSignedBoth, signatures: signatureConfig, expectedResult: signatureIsValid)
