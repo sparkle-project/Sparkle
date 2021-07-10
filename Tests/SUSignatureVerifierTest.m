@@ -191,9 +191,9 @@
     XCTAssertFalse([v verifyFileAtPath:self.testFile
                             signatures:[[SUSignatures alloc] initWithDsa:dsaSig ed:@"lol"]],
                    @"Fail if the Ed25519 signature is invalid.");
-    XCTAssertTrue([v verifyFileAtPath:self.testFile
+    XCTAssertFalse([v verifyFileAtPath:self.testFile
                            signatures:[[SUSignatures alloc] initWithDsa:@"lol" ed:edSig]],
-                   @"Allow invalid DSA signature if EdDSA signature is good.");
+                   @"Fail if invalid DSA signature is used even if EdDSA signature is good.");
     
     XCTAssertTrue([v verifyFileAtPath:self.testFile
                            signatures:[[SUSignatures alloc] initWithDsa:nil ed:edSig]],

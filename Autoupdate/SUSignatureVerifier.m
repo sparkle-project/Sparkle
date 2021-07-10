@@ -128,8 +128,11 @@
             }
             if (ed25519_verify(signatures.ed25519Signature, data.bytes, data.length, self.pubKeys.ed25519PubKey)) {
                 SULog(SULogLevelDefault, @"OK: EdDSA signature is correct");
-                // No need to check DSA when EdDSA verification succeeded
-                return YES;
+                // No need to check DSA when EdDSA verification succeeded, unless a DSA signature is provided and it's
+                // erroneously invalid
+                if (signatures.dsaSignatureStatus != SUSigningInputStatusInvalid) {
+                    return YES;
+                }
             } else {
                 SULog(SULogLevelError, @"EdDSA signature does not match. Data of the update file being checked is different than data that has been signed, or the public key and the private key are not from the same set.");
                 if (signatures.dsaSignatureStatus != SUSigningInputStatusAbsent) {
