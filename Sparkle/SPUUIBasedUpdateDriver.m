@@ -139,22 +139,35 @@
     [self.coreDriver preflightForUpdatePermissionPreventingInstallerInteraction:preventsInstallerInteraction reply:reply];
 }
 
+- (void)_clearSkippedUpdatesIfUserInitiated
+{
+    if (self.userInitiated) {
+        [SPUSkippedUpdate clearSkippedUpdateForHost:self.host];
+    }
+}
+
 - (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background
 {
     self.httpHeaders = httpHeaders;
     self.userAgent = userAgent;
+    
+    [self _clearSkippedUpdatesIfUserInitiated];
     
     [self.coreDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders inBackground:background requiresSilentInstall:NO];
 }
 
 - (void)resumeInstallingUpdateWithCompletion:(SPUUpdateDriverCompletion)completionBlock
 {
+    [self _clearSkippedUpdatesIfUserInitiated];
+    
     self.resumingInstallingUpdate = YES;
     [self.coreDriver resumeInstallingUpdateWithCompletion:completionBlock];
 }
 
 - (void)resumeUpdate:(id<SPUResumableUpdate>)resumableUpdate completion:(SPUUpdateDriverCompletion)completionBlock
 {
+    [self _clearSkippedUpdatesIfUserInitiated];
+    
     // Informational downloads shouldn't be presented as updates to be downloaded
     // Neither should items that prevent auto updating
     if (!resumableUpdate.updateItem.isInformationOnlyUpdate && !resumableUpdate.updateItem.majorUpgrade) {
@@ -172,10 +185,6 @@
 
 - (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)updateItem secondaryAppcastItem:(SUAppcastItem * _Nullable)secondaryUpdateItem
 {
-    if (self.userInitiated) {
-        [SPUSkippedUpdate clearSkippedUpdateForHost:self.host];
-    }
-    
     id <SPUUpdaterDelegate> updaterDelegate = self.updaterDelegate;
     
     SPUUserUpdateStage stage;
