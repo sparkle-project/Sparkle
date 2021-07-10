@@ -113,8 +113,8 @@
     case SUSigningInputStatusPresent:
         switch (signatures.ed25519SignatureStatus) {
         case SUSigningInputStatusAbsent:
-            SULog(SULogLevelDefault, @"The update has an EdDSA signature, but it won't be used, because the old app doesn't have an EdDSA public key");
-            break;
+            SULog(SULogLevelError, @"The update has an EdDSA signature, but there is no EdDSA signature in the update.");
+            return NO;
         case SUSigningInputStatusInvalid:
             // We will have already logged an error for this failure when the signature was read in, so just do an informational log here.
             SULog(SULogLevelDefault, @"The update has an EdDSA signature, but it's invalid, so the update will automatically be rejected.");
