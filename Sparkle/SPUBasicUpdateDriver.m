@@ -159,7 +159,7 @@
     [self notifyFoundValidUpdateWithAppcastItem:updateItem secondaryAppcastItem:secondaryAppcastItem systemDomain:nil];
 }
 
-- (void)didNotFindUpdateWithLatestAppcastItem:(nullable SUAppcastItem *)latestAppcastItem hostToLatestAppcastItemComparisonResult:(NSComparisonResult)hostToLatestAppcastItemComparisonResult
+- (void)didNotFindUpdateWithLatestAppcastItem:(nullable SUAppcastItem *)latestAppcastItem hostToLatestAppcastItemComparisonResult:(NSComparisonResult)hostToLatestAppcastItemComparisonResult background:(BOOL)background
 {
     if (!self.aborted) {
         NSString *localizedDescription;
@@ -200,7 +200,7 @@
                         
                         reason = SPUNoUpdateFoundReasonSystemIsTooNew;
                     } else {
-                        // The new update may be skipped or not in the current phased rollout group
+                        // We shouldn't realistically get here
                         localizedDescription = SULocalizedString(@"You're up-to-date!", "Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates.");
                         
                         recoverySuggestion = [NSString stringWithFormat:SULocalizedString(@"%@ %@ is currently the newest version available.", nil), [self.host name], [self.host displayVersion]];
@@ -228,6 +228,7 @@
             NSLocalizedRecoverySuggestionErrorKey: recoverySuggestion,
             NSLocalizedRecoveryOptionsErrorKey: @[recoveryOption],
             SPUNoUpdateFoundReasonKey: @(reason),
+            SPUNoUpdateFoundUserInitiatedKey: @(!background),
         }];
         
         if (latestAppcastItem != nil) {

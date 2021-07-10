@@ -228,12 +228,11 @@ typedef NS_ENUM(NSInteger, SPUUpdateCheck)
  \param updater The updater instance.
  \param error An error containing information on why a new valid update was not found
     There are various reasons a new update is unavailable and can't be installed.
-    The userInfo dictionary on the error is also populated with two keys:
+    The userInfo dictionary on the error is also populated with three keys:
     SPULatestAppcastItemFoundKey: if available, this may provide the latest SUAppcastItem that was found.
     SPUNoUpdateFoundReasonKey: if available, this will provide the SUNoUpdateFoundReason.
     For example the reason could be because the latest version in the feed requires a newer OS version or could be because the user is already on the latest version.
-    If the reason is SPUNoUpdateFoundReasonUnknown, do not make any assumptions on the latest appcast item found.
-    For example ,this could actually include an update that is not ready to be notified to the user yet, or that the feed lacks update information.
+    SPUNoUpdateFoundUserInitiatedKey: A boolean that indicates if a new update was not found when the user intitiated an update check manually.
  */
 - (void)updaterDidNotFindUpdate:(SPUUpdater *)updater error:(NSError *)error;
 

@@ -224,13 +224,11 @@
         [self.delegate didFindValidUpdateWithAppcastItem:finalPrimaryItem secondaryAppcastItem:finalSecondaryItem];
     } else {
         // Find the latest appcast item that we can report to the user and updater delegates
-        // This excludes updates that are major upgrades. This may includes that fail due to OS version requirements.
-        // This may also include newer updates that fail because they are skipped or not in current phased rollout group
-        // Note if there is both a minor and major update are available, and neither are installable because
-        // of an OS requirement, we will want to prefer reporting the minor update.
-        SUAppcast *passesMinimumAutoupdateAndFailsOSAppcast = [[self class] filterSupportedAppcast:macOSAppcast phasedUpdateGroup:nil skippedUpdate:nil hostVersion:self.host.version versionComparator:applicationVersionComparator testOSVersion:NO testMinimumAutoupdateVersion:YES];
+        // This may include updates that fail due to OS version requirements.
+        // This excludes newer backgrounded updates that fail because they are skipped or not in current phased rollout group
+        SUAppcast *notFoundAppcast = [[self class] filterSupportedAppcast:macOSAppcast phasedUpdateGroup:phasedUpdateGroup skippedUpdate:skippedUpdate hostVersion:self.host.version versionComparator:applicationVersionComparator testOSVersion:NO testMinimumAutoupdateVersion:NO];
         
-        SUAppcastItem *notFoundPrimaryItem = [self retrieveBestAppcastItemFromAppcast:passesMinimumAutoupdateAndFailsOSAppcast versionComparator:applicationVersionComparator secondaryUpdate:nil];
+        SUAppcastItem *notFoundPrimaryItem = [self retrieveBestAppcastItemFromAppcast:notFoundAppcast versionComparator:applicationVersionComparator secondaryUpdate:nil];
         
         NSComparisonResult hostToLatestAppcastItemComparisonResult;
         if (notFoundPrimaryItem != nil) {
@@ -239,7 +237,7 @@
             hostToLatestAppcastItemComparisonResult = 0;
         }
         
-        [self.delegate didNotFindUpdateWithLatestAppcastItem:notFoundPrimaryItem hostToLatestAppcastItemComparisonResult:hostToLatestAppcastItemComparisonResult];
+        [self.delegate didNotFindUpdateWithLatestAppcastItem:notFoundPrimaryItem hostToLatestAppcastItemComparisonResult:hostToLatestAppcastItemComparisonResult background:background];
     }
 }
 
