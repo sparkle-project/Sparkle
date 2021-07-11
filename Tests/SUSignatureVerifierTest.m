@@ -121,13 +121,7 @@
     XCTAssertNotNil(dsaKey, @"Public key must be readable");
 
     SUPublicKeys *pubKeys = [[SUPublicKeys alloc] initWithDsa:dsaKey ed:self.pubEdKey];
-    
-    SUPublicKeys *pubKeysWithDSAOnly = [[SUPublicKeys alloc] initWithDsa:dsaKey ed:nil];
-    SUPublicKeys *pubKeysWithEdDSAOnly = [[SUPublicKeys alloc] initWithDsa:nil ed:self.pubEdKey];
-    
     SUSignatureVerifier *v = [[SUSignatureVerifier alloc] initWithPublicKeys:pubKeys];
-    SUSignatureVerifier *dsaOnlyVerifier = [[SUSignatureVerifier alloc] initWithPublicKeys:pubKeysWithDSAOnly];
-    SUSignatureVerifier *edDSAOnlyVerifier = [[SUSignatureVerifier alloc] initWithPublicKeys:pubKeysWithEdDSAOnly];
 
     XCTAssertFalse([v verifyFileAtPath:self.testFile
                             signatures:[[SUSignatures alloc] initWithDsa:nil ed:nil]],
@@ -144,38 +138,6 @@
     XCTAssertFalse([v verifyFileAtPath:self.testFile
                            signatures:[[SUSignatures alloc] initWithDsa:dsaSig ed:nil]],
                   @"EdDSA signature must be present if app has EdDSA key");
-    
-    XCTAssertTrue([dsaOnlyVerifier verifyFileAtPath:self.testFile
-                           signatures:[[SUSignatures alloc] initWithDsa:dsaSig ed:nil]],
-                  @"Allow good DSA signature on app that only has DSA");
-    
-    XCTAssertFalse([dsaOnlyVerifier verifyFileAtPath:self.testFile
-                           signatures:[[SUSignatures alloc] initWithDsa:@"lol" ed:nil]],
-                  @"Reject bad DSA signature on app that only has DSA");
-    
-    XCTAssertFalse([dsaOnlyVerifier verifyFileAtPath:self.testFile
-                           signatures:[[SUSignatures alloc] initWithDsa:nil ed:nil]],
-                  @"Fail on no DSA signature present on app that only has DSA");
-    
-    XCTAssertFalse([dsaOnlyVerifier verifyFileAtPath:self.testFile
-                           signatures:[[SUSignatures alloc] initWithDsa:nil ed:edSig]],
-                  @"Fail on no DSA signature present on app that only has DSA but has EdDSA");
-    
-    XCTAssertTrue([edDSAOnlyVerifier verifyFileAtPath:self.testFile
-                           signatures:[[SUSignatures alloc] initWithDsa:nil ed:edSig]],
-                  @"Pass valid EdDSA signature on app that only has EdDSA");
-    
-    XCTAssertFalse([edDSAOnlyVerifier verifyFileAtPath:self.testFile
-                           signatures:[[SUSignatures alloc] initWithDsa:nil ed:@"lol"]],
-                  @"Fail on invalid EdDSA signature on app that only has EdDSA");
-    
-    XCTAssertFalse([edDSAOnlyVerifier verifyFileAtPath:self.testFile
-                           signatures:[[SUSignatures alloc] initWithDsa:nil ed:nil]],
-                  @"Fail on no EdDSA signature on app that only has EdDSA");
-    
-    XCTAssertFalse([edDSAOnlyVerifier verifyFileAtPath:self.testFile
-                           signatures:[[SUSignatures alloc] initWithDsa:dsaSig ed:nil]],
-                  @"Fail on DSA signature on app that only has EdDSA");
     
     XCTAssertTrue([v verifyFileAtPath:self.testFile
                             signatures:[[SUSignatures alloc] initWithDsa:nil ed:edSig]],
@@ -194,10 +156,6 @@
     XCTAssertFalse([v verifyFileAtPath:self.testFile
                            signatures:[[SUSignatures alloc] initWithDsa:@"lol" ed:edSig]],
                    @"Fail if invalid DSA signature is used even if EdDSA signature is good.");
-    
-    XCTAssertTrue([v verifyFileAtPath:self.testFile
-                           signatures:[[SUSignatures alloc] initWithDsa:nil ed:edSig]],
-                   @"Allow no DSA signature if EdDSA signature is good.");
 
     XCTAssertTrue([v verifyFileAtPath:self.testFile
                            signatures:[[SUSignatures alloc] initWithDsa:dsaSig ed:edSig]],
