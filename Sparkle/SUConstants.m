@@ -28,6 +28,8 @@ const NSTimeInterval SUImpatientUpdateCheckInterval = DEBUG ? (60 * 2) : (60 * 6
 
 NSString *const SUBundleIdentifier = @SPARKLE_BUNDLE_IDENTIFIER;
 
+NSString *const SURelaunchedApplicationUpdateKey = @"SPARKLE_RELAUNCHED_APPLICATION_UPDATE";
+
 NSString *const SUAppcastAttributeValueMacOS = @"macos";
 
 NSString *const SUTechnicalErrorInformationKey = @"SUTechnicalErrorInformation";

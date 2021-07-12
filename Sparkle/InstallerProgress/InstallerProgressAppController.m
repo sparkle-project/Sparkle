@@ -331,8 +331,19 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
             }
             
             // Note: we can launch application bundles or open plug-in bundles
-            if (![[NSWorkspace sharedWorkspace] openFile:pathToRelaunch]) {
-                SULog(SULogLevelError, @"Error: Failed to relaunch bundle at %@", pathToRelaunch);
+            if ([pathToRelaunch.pathExtension isEqualToString:@"app"]) {
+                // Looks like an application bundle
+                // Launch application with environment variable letting the app know it's been relaunched due to an update
+                NSDictionary<NSWorkspaceLaunchConfigurationKey, id> *launchConfiguration = @{NSWorkspaceLaunchConfigurationEnvironment: @{SURelaunchedApplicationUpdateKey: @"1"}};
+                NSError *launchError = nil;
+                if ([[NSWorkspace sharedWorkspace] launchApplicationAtURL:[NSURL fileURLWithPath:pathToRelaunch] options:NSWorkspaceLaunchDefault configuration:launchConfiguration error:&launchError] == nil) {
+                    SULog(SULogLevelError, @"Error: Failed to relaunch application at %@ with error: %@", pathToRelaunch, launchError);
+                }
+            } else {
+                // Most likely a plug-in bundle
+                if (![[NSWorkspace sharedWorkspace] openFile:pathToRelaunch]) {
+                    SULog(SULogLevelError, @"Error: Failed to relaunch bundle at %@", pathToRelaunch);
+                }
             }
             
             // Delay termination for a little bit to better increase the chance the updated application when relaunched will be the frontmost application

@@ -23,6 +23,7 @@ extern const uint64_t SULeewayUpdateCheckInterval;
 extern const NSTimeInterval SUImpatientUpdateCheckInterval;
 
 extern NSString *const SUBundleIdentifier;
+extern NSString *const SURelaunchedApplicationUpdateKey;
 
 extern NSString *const SUAppcastAttributeValueMacOS;
 
