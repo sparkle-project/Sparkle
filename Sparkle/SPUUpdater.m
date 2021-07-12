@@ -913,4 +913,11 @@ static NSString *escapeURLComponent(NSString *str) {
 
 - (NSBundle *)hostBundle { return [self.host bundle]; }
 
++ (BOOL)mainBundleRelaunchedFromUpdate
+{
+    NSProcessInfo *processInfo = [NSProcessInfo processInfo];
+    NSString *relaunchedVariable = processInfo.environment[SURelaunchedApplicationUpdateKey];
+    return (relaunchedVariable != nil && relaunchedVariable.integerValue == 1);
+}
+
 @end

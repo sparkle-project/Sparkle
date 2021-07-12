@@ -109,11 +109,7 @@ typedef NS_ENUM(NSInteger, SPUUpdateCheck)
  
  \return An array of dictionaries with keys: "key", "value", "displayKey", "displayValue", the latter two being specifically for display to the user.
  */
-#if __has_feature(objc_generics)
 - (NSArray<NSDictionary<NSString *, NSString *> *> *)feedParametersForUpdater:(SPUUpdater *)updater sendingSystemProfile:(BOOL)sendingProfile;
-#else
-- (NSArray *)feedParametersForUpdater:(SPUUpdater *)updater sendingSystemProfile:(BOOL)sendingProfile;
-#endif
 
 /*!
  Returns a list of system profile keys to be appended to the appcast URL's query string.
@@ -124,11 +120,7 @@ typedef NS_ENUM(NSInteger, SPUUpdateCheck)
 
  \return An array of system profile keys to include in the appcast URL's query string. Elements must be one of the SUSystemProfiler*Key constants
  */
-#if __has_feature(objc_generics)
 - (NSArray<NSString *> *)allowedSystemProfileKeysForUpdater:(SPUUpdater *)updater;
-#else
-- (NSArray *)allowedSystemProfileKeysForUpdater:(SPUUpdater *)updater;
-#endif
 
 /*!
  Returns a custom appcast URL.

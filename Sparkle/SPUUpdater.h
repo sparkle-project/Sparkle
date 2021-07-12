@@ -218,11 +218,7 @@ SU_EXPORT @interface SPUUpdater : NSObject
  
  The keys of this dictionary are HTTP header fields (NSString) and values are corresponding values (NSString)
  */
-#if __has_feature(objc_generics)
 @property (nonatomic, copy, nullable) NSDictionary<NSString *, NSString *> *httpHeaders;
-#else
-@property (nonatomic, copy, nullable) NSDictionary *httpHeaders;
-#endif
 
 /*!
  A property indicating whether or not the user's system profile information is sent when checking for updates.
@@ -252,6 +248,16 @@ SU_EXPORT @interface SPUUpdater : NSObject
  The system profile information that is sent when checking for updates
  */
 @property (nonatomic, readonly, copy) NSArray<NSDictionary<NSString *, NSString *> *> *systemProfileArray;
+
+/*!
+ Specifies whether the main bundle was relanched from an update installed by Sparkle.
+ 
+ This property works by checking the presence of a Sparkle specific environment variable that Sparkle inserts on application re-launch.
+ 
+ Do not use this API in scenarios where you need to also take in account of application updates being installed by the user manually and not through Sparkle
+ (i.e, a user downloading an update from the web replacing the app bundle themselves)
+ */
+@property (nonatomic, class, readonly) BOOL mainBundleRelaunchedFromUpdate;
 
 @end
 

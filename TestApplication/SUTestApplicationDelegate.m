@@ -38,7 +38,14 @@ static NSString * const UPDATED_VERSION = @"2.0";
     // Check if we are already up to date
     if ([(NSString *)[mainBundle objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey] isEqualToString:UPDATED_VERSION]) {
         NSAlert *alreadyUpdatedAlert = [[NSAlert alloc] init];
-        alreadyUpdatedAlert.messageText = @"Update succeeded!";
+        if (SPUUpdater.mainBundleRelaunchedFromUpdate) {
+            // UI Tests expect this string
+            alreadyUpdatedAlert.messageText = @"Update succeeded!";
+        } else {
+            // If update was already installed another time, show a different message that
+            // the UI tests don't expect.
+            alreadyUpdatedAlert.messageText = @"Update was already installed!";
+        }
         alreadyUpdatedAlert.informativeText = @"This is the updated version of Sparkle Test App.\n\nDelete and rebuild the app to test updates again.";
         [alreadyUpdatedAlert runModal];
         

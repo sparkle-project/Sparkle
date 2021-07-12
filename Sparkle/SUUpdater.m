@@ -86,6 +86,13 @@ static NSMutableDictionary *sharedUpdaters = nil;
         NSError *updaterError = nil;
         if (![self.updater startUpdater:&updaterError]) {
             SULog(SULogLevelError, @"Error: Failed to start updater with error: %@", updaterError);
+        } else if ([bundle isEqual:NSBundle.mainBundle] && SPUUpdater.mainBundleRelaunchedFromUpdate) {
+            // Give another runloop cycle's chance for delegate to be set
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if ([self.delegate respondsToSelector:@selector(updaterDidRelaunchApplication:)]) {
+                    [self.delegate updaterDidRelaunchApplication:self];
+                }
+            });
         }
     }
     return self;
