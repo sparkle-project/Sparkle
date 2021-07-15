@@ -169,6 +169,12 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
             } else if (!servingOverHttps) {
                 [self showAlertText:SULocalizedString(@"Auto-update not configured", nil)
                     informativeText:[NSString stringWithFormat:SULocalizedString(@"For security reasons, updates to %@ need to be served over HTTPS and/or signed with an EdDSA key. See https://sparkle-project.org/documentation/ for more information.", nil), name]];
+            } else {
+                if (!self.loggedNoSecureKeyWarning) {
+                    SULog(SULogLevelError, @"Error: Serving updates without an EdDSA key and only using Apple Code Signing is deprecated and may be unsupported in a future release. Visit Sparkle's documentation for more information: https://sparkle-project.org/documentation/#3-segue-for-security-concerns");
+                    
+                    self.loggedNoSecureKeyWarning = YES;
+                }
             }
         }
     } else if (!hasEdDSAPublicKey) {
