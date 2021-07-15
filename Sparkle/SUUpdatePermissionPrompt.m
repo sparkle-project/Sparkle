@@ -67,6 +67,10 @@ static NSString *const SUUpdatePermissionPromptTouchBarIndentifier = @"" SPARKLE
         systemProfileInformationArray = profile;
         [self setShouldCascadeWindows:NO];
     }
+    else
+    {
+        assert(false);
+    }
     return self;
 }
 
@@ -79,7 +83,10 @@ static NSString *const SUUpdatePermissionPromptTouchBarIndentifier = @"" SPARKLE
         [[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
     }
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wcompletion-handler"
     if (![NSApp modalWindow]) { // do not prompt if there is is another modal window on screen
+#pragma clang diagnostic pop
         SUUpdatePermissionPrompt *prompt = [(SUUpdatePermissionPrompt *)[[self class] alloc] initWithHost:host systemProfile:profile reply:reply];
         NSWindow *window = [prompt window];
         if (window) {

@@ -31,6 +31,8 @@
     if (self != nil) {
         _completionBlock = [completionBlock copy];
         _progressBlock = [progressBlock copy];
+    } else {
+        assert(false);
     }
     return self;
 }
