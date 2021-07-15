@@ -103,7 +103,8 @@
     const unsigned char *edPubKey = self.pubKeys.ed25519PubKey;
 
     if (edPubKey && !edSignature) {
-        SULog(SULogLevelDefault, @"There is no EdDSA signature in the update, but the app is capable of verifying them");
+        SULog(SULogLevelError, @"The app has an EdDSA public key, but there is no EdDSA signature in the update, so the update will be rejected.");
+        return NO;
     } if (!edPubKey && edSignature) {
         SULog(SULogLevelDefault, @"The update has an EdDSA signature, but it won't be used, because the old app doesn't have an EdDSA public key");
     } else if (edPubKey && edSignature) {
@@ -114,12 +115,9 @@
             return NO;
         }
         if (ed25519_verify(edSignature, data.bytes, data.length, edPubKey)) {
+            // No need to check DSA when EdDSA verification succeeded
             SULog(SULogLevelDefault, @"OK: EdDSA signature is correct");
-            if (!dsaPubKey) {
-                return YES;
-            } else {
-                SULog(SULogLevelDefault, @"This app has a DSA public key, so a DSA signature is required too");
-            }
+            return YES;
         } else {
             SULog(SULogLevelError, @"EdDSA signature does not match. Data of the update file being checked is different than data that has been signed, or the public key and the private key are not from the same set.");
             if (dsaSignature) {
