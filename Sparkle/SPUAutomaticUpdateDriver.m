@@ -66,7 +66,9 @@
 }
 
 #pragma clang diagnostic push
+#if __has_warning("-Wcompletion-handler")
 #pragma clang diagnostic ignored "-Wcompletion-handler"
+#endif
 - (void)resumeInstallingUpdateWithCompletion:(SPUUpdateDriverCompletion)__unused completionBlock
 #pragma clang diagnostic pop
 {
@@ -75,7 +77,9 @@
 }
 
 #pragma clang diagnostic push
+#if __has_warning("-Wcompletion-handler")
 #pragma clang diagnostic ignored "-Wcompletion-handler"
+#endif
 - (void)resumeUpdate:(id<SPUResumableUpdate>)__unused resumableUpdate completion:(SPUUpdateDriverCompletion)__unused completionBlock
 #pragma clang diagnostic pop
 {
