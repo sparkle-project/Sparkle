@@ -15,7 +15,7 @@
   * Ensure (most) API / ABI compatibility with Sparkle 1.x; you can likely test Sparkle 2 in an existing app without any changes (Zorg)
   * Deprecated SUUpdater, albeit it is still functional for testing and transitional purposes (Zorg)
   * Delegation methods may have been removed or added to the newer updater API. Please review `SPUUpdaterDelegate` if using `SPUUpdater`. (Zorg)
-  * `-bestValidUpdateInAppcast:forUpdater:` delegate method behavior has been refined and discouraged for future use. Please review its updated header documentation in `SPUUpdaterDelegate.h` if you use this method. (#1838, #1862, #1879, #1880) (Zorg)
+  * `-bestValidUpdateInAppcast:forUpdater:` delegate method behavior has been refined and discouraged for some cases. Please review its updated header documentation in `SPUUpdaterDelegate.h` if you use this method. (#1838, #1862, #1879, #1880) (Zorg)
 * Updater Changes
   * Automatic silent and manual update alert prompts are now merged together (Zorg)
   * Updates will attempt to install even if the user quits the application without relaunching the application update explicitly (Zorg)
