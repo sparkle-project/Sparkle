@@ -26,11 +26,13 @@
 * Policy Changes
   * Distributing updates without EdDSA signing the archives is now deprecated (Zorg)
   * Package based updates that are zipped or archived must add sparkle:installationType="package" to the appcast item enclosure (Zorg)
+  * We now recommend using sparkle:version and sparkle:shortVersionString top level elements instead of enclosure attributes (#1878) (Zorg)
+  * The link element in an appcast item is now used for directing users to the product's website if they don't meet minimum system requirements (#1877) (Zorg)
 * Major/Paid Upgrades Enhancements
   * Latest minor updates are preferred over major updates (specified by sparkle:minimumAutoupdateVersion) (#1850) Zorg
   * Major updates can be skipped with a user confirmation (#1853) Zorg
 * Informational only and critical updates can be specified selectively by app version (#1862)
-* Expose why a new update is unavailable (#1877, #1886) (Zorg)
+* Expose why a new update is unavailable and direct user to prior release notes or website info (#1877, #1886) (Zorg)
 * Add support for posting updates only on specific channels (#1879) (Zorg)
 * System profiler privacy and transparency (#1690) (Martin Pilkington)
 * Support getting app icon from asset catalog (#1694) (Charles Srstka)
