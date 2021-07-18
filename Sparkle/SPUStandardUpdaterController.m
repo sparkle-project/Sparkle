@@ -17,6 +17,10 @@
 #import "SULocalizations.h"
 #import <AppKit/AppKit.h>
 
+@interface SPUStandardUpdaterController () <NSMenuItemValidation>
+
+@end
+
 @implementation SPUStandardUpdaterController
 
 @synthesize updater = _updater;

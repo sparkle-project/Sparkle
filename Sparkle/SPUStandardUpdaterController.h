@@ -31,7 +31,7 @@ NS_ASSUME_NONNULL_BEGIN
  The controller's updater targets the application's main bundle and uses Sparkle's standard user interface.
  Typically, this class is used by sticking it as a custom NSObject subclass in an Interface Builder nib (probably in MainMenu) but it works well programatically too.
  
- The controller creates an SPUUpdater instance and allows hooking up the check for updates action and menu item validation. It also allows hooking
+ The controller creates an SPUUpdater instance and allows hooking up the check for updates action and handling menu item validation. It also allows hooking
  up the updater's and user driver's delegates.
  
  If you need more control over what bundle you want to update or you want to provide a custom user interface (via SPUUserDriver), please use SPUUpdater directly instead.
@@ -103,20 +103,17 @@ SU_EXPORT @interface SPUStandardUpdaterController : NSObject
  Explicitly checks for updates and displays a progress dialog while doing so.
  
  This method is meant for a main menu item.
- Connect any menu item to this action in Interface Builder,
+ Connect any NSMenuItem to this action in Interface Builder or programmatically,
  and Sparkle will check for updates and report back its findings verbosely
  when it is invoked.
+ 
+ When the target/action of the menu item is set to this controller and this method,
+ this controller also handles enabling/disabling the menu item by checking
+ -[SPUUpdater canCheckForUpdates]
  
  This action checks updates by invoking -[SPUUpdater checkForUpdates]
  */
 - (IBAction)checkForUpdates:(nullable id)sender;
-
-/*!
- Validates if the menu item for checkForUpdates: can be invoked or not
- 
- This validates the menu item by checking -SPUUpdater.canCheckForUpdates
- */
-- (BOOL)validateMenuItem:(NSMenuItem *)item;
 
 @end
 
