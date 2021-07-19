@@ -40,6 +40,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 @property (strong) NSTimer *checkTimer;
 @property (assign) BOOL shouldRescheduleOnWake;
 @property (strong) NSBundle *sparkleBundle;
+@property (nonatomic) BOOL loggedNoSecureKeyWarning;
 
 - (instancetype)initForBundle:(NSBundle *)bundle;
 - (void)startUpdateCycle;
@@ -69,6 +70,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 @synthesize sparkleBundle;
 @synthesize decryptionPassword;
 @synthesize updateLastCheckedDate;
+@synthesize loggedNoSecureKeyWarning = _loggedNoSecureKeyWarning;
 
 static NSMutableDictionary *sharedUpdaters = nil;
 static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObservationContext";
@@ -147,7 +149,9 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
 }
 
 -(void)checkIfConfiguredProperly {
-    BOOL hasPublicKey = self.host.publicKeys.dsaPubKey != nil || self.host.publicKeys.ed25519PubKey != nil;
+    BOOL hasDSAPublicKey = (self.host.publicKeys.dsaPubKey != nil);
+    BOOL hasEdDSAPublicKey = (self.host.publicKeys.ed25519PubKey != nil);
+    BOOL hasPublicKey = (hasDSAPublicKey || hasEdDSAPublicKey);
     BOOL isMainBundle = [self.host.bundle isEqualTo:[NSBundle mainBundle]];
     BOOL hostIsCodeSigned = [SUCodeSigningVerifier bundleAtURLIsCodeSigned:self.host.bundle.bundleURL];
     NSURL *feedURL = [self feedURL];
@@ -165,7 +169,19 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
             } else if (!servingOverHttps) {
                 [self showAlertText:SULocalizedString(@"Auto-update not configured", nil)
                     informativeText:[NSString stringWithFormat:SULocalizedString(@"For security reasons, updates to %@ need to be served over HTTPS and/or signed with an EdDSA key. See https://sparkle-project.org/documentation/ for more information.", nil), name]];
+            } else {
+                if (!self.loggedNoSecureKeyWarning) {
+                    SULog(SULogLevelError, @"Error: Serving updates without an EdDSA key and only using Apple Code Signing is deprecated and may be unsupported in a future release. Visit Sparkle's documentation for more information: https://sparkle-project.org/documentation/#3-segue-for-security-concerns");
+                    
+                    self.loggedNoSecureKeyWarning = YES;
+                }
             }
+        }
+    } else if (!hasEdDSAPublicKey) {
+        if (!self.loggedNoSecureKeyWarning) {
+            SULog(SULogLevelError, @"Error: Serving updates without an EdDSA key is insecure and deprecated. DSA support may be removed in a future Sparkle release. Please migrate to using EdDSA (ed25519). Visit Sparkle's documentation for migration information: https://sparkle-project.org/documentation/#3-segue-for-security-concerns");
+            
+            self.loggedNoSecureKeyWarning = YES;
         }
     }
 
