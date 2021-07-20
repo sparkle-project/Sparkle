@@ -19,6 +19,8 @@
 #import "SULocalizations.h"
 #import "SUApplicationInfo.h"
 #import "SUOperatingSystem.h"
+#import "SPUUserUpdateState.h"
+#import "SUErrors.h"
 
 #import <AppKit/AppKit.h>
 
@@ -249,7 +251,7 @@
     alert.messageText = SULocalizedString(@"Update Error!", nil);
     alert.informativeText = [NSString stringWithFormat:@"%@", [error localizedDescription]];
     [alert addButtonWithTitle:SULocalizedString(@"Cancel Update", nil)];
-    [self showAlert:alert];
+    [self showAlert:alert secondaryAction:nil];
     
     acknowledgement();
 }
@@ -262,12 +264,49 @@
     
     NSAlert *alert = [NSAlert alertWithError:error];
     alert.alertStyle = NSAlertStyleInformational;
-    [self showAlert:alert];
+    
+    // Can we give more information to the user?
+    SPUNoUpdateFoundReason reason = (SPUNoUpdateFoundReason)[(NSNumber *)error.userInfo[SPUNoUpdateFoundReasonKey] integerValue];
+    
+    void (^secondaryAction)(void) = nil;
+    SUAppcastItem *latestAppcastItem = error.userInfo[SPULatestAppcastItemFoundKey];
+    if (latestAppcastItem != nil) {
+        switch (reason) {
+            case SPUNoUpdateFoundReasonOnLatestVersion:
+            case SPUNoUpdateFoundReasonOnNewerThanLatestVersion: {
+                if (latestAppcastItem.releaseNotesURL != nil) {
+                    // Show the user the past version history if available
+                    [alert addButtonWithTitle:SULocalizedString(@"Version History", nil)];
+                    
+                    secondaryAction = ^{
+                        [[NSWorkspace sharedWorkspace] openURL:(NSURL * _Nonnull)latestAppcastItem.releaseNotesURL];
+                    };
+                }
+                
+                break;
+            }
+            case SPUNoUpdateFoundReasonSystemIsTooOld:
+            case SPUNoUpdateFoundReasonSystemIsTooNew:
+                if (latestAppcastItem.infoURL != nil) {
+                    // Show the user the product's link if available
+                    [alert addButtonWithTitle:SULocalizedString(@"Learn More...", nil)];
+                    
+                    secondaryAction = ^{
+                        [[NSWorkspace sharedWorkspace] openURL:(NSURL * _Nonnull)latestAppcastItem.infoURL];
+                    };
+                }
+                break;
+            case SPUNoUpdateFoundReasonUnknown:
+                break;
+        }
+    }
+    
+    [self showAlert:alert secondaryAction:secondaryAction];
     
     acknowledgement();
 }
 
-- (void)showAlert:(NSAlert *)alert
+- (void)showAlert:(NSAlert *)alert secondaryAction:(void (^ _Nullable)(void))secondaryAction
 {
     id <SPUStandardUserDriverDelegate> delegate = self.delegate;
     
@@ -280,7 +319,11 @@
     if ([SUApplicationInfo isBackgroundApplication:[NSApplication sharedApplication]]) { [[NSApplication sharedApplication] activateIgnoringOtherApps:YES]; }
     
     [alert setIcon:[SUApplicationInfo bestIconForHost:self.host]];
-    [alert runModal];
+    
+    NSModalResponse response = [alert runModal];
+    if (response == NSAlertSecondButtonReturn && secondaryAction != nil) {
+        secondaryAction();
+    }
     
     if ([delegate respondsToSelector:@selector(standardUserDriverDidShowModalAlert)]) {
         [delegate standardUserDriverDidShowModalAlert];
@@ -434,7 +477,7 @@
         } else {
             alert.informativeText = [NSString stringWithFormat:SULocalizedString(@"%@ is now updated!", nil), hostName];
         }
-        [self showAlert:alert];
+        [self showAlert:alert secondaryAction:nil];
     }
     
     acknowledgement();

@@ -33,9 +33,4 @@
     return self;
 }
 
-- (BOOL)preventsAutoupdate
-{
-    return NO;
-}
-
 @end

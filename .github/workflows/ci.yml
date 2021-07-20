@@ -10,17 +10,17 @@ jobs:
   build:
     strategy:
       matrix:
-        xcode: ['xcode12.2', 'xcode11.7']
+        xcode: ['xcode12.5', 'xcode13']
         include:
-            - xcode: 'xcode12.2'
-              xcode-path: '/Applications/Xcode_12.2.app/Contents/Developer'
+            - xcode: 'xcode12.5'
+              xcode-path: '/Applications/Xcode_12.5.app/Contents/Developer'
               upload-dist: true
-            - xcode: 'xcode11.7'
-              xcode-path: '/Applications/Xcode_11.7.app/Contents/Developer'
-              upload-dist: false # No arm64 slice, so no upload
+            - xcode: 'xcode13'
+              xcode-path: '/Applications/Xcode_13.0.app/Contents/Developer'
+              upload-dist: false # In Beta, so no upload
             
     name: Build and Test Sparkle
-    runs-on: macos-10.15
+    runs-on: macos-11
 
     steps:
       - name: Checkout

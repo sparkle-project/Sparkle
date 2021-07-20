@@ -14,9 +14,6 @@
 
 "%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%1$@ %2$@ is currently the newest version available.\n(You are currently running version %3$@.)";
 
-/* An appcast feed error when checking for updates and no appcast items are retrieved */
-"No valid update information could be loaded." = "No valid update information could be loaded.";
-
 "An error occurred while running the updater. Please try again later." = "An error occurred while running the updater. Please try again later.";
 
 "An error occurred while starting the installer. Please try again later." = "An error occurred while starting the installer. Please try again later.";
@@ -65,6 +62,10 @@
 "An error occurred while relaunching %1$@, but the new version will be available next time you run %1$@." = "An error occurred while reopening %1$@, but the new version will be available next time you open %1$@.";
 
 "An important update to %@ is ready to install" = "An important update to %@ is ready to install";
+
+"Unable to Check For Updates" = "Unable to Check For Updates";
+
+"The update checker failed to start correctly. You should contact the app developer to report this issue and verify that you have the latest version" = "The update checker failed to start correctly. You should contact the app developer to report this issue and verify that you have the latest version";
 
 /* the unit for bytes */
 "B" = "B";
@@ -141,6 +142,9 @@
 "Your macOS version is too new" = "Your version of macOS is too new";
 
 "%1$@ %2$@ is available but your macOS version is too new for this update. This update only supports up to macOS %3$@." = "%1$@ %2$@ is available but your version of macOS is too new to install it. This update only supports macOS %3$@ or earlier.";
+
+/* Used when a new update is not found */
+"Version History" = "Version History";
 
 /* Authorization message shown when app wants permission to update itself. */
 "%1$@ wants permission to update." = "%1$@ wants permission to update.";

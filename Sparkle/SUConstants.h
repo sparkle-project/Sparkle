@@ -77,6 +77,8 @@ extern NSString *const SUAppcastAttributeVersion;
 extern NSString *const SUAppcastAttributeOsType;
 extern NSString *const SUAppcastAttributeInstallationType;
 
+extern NSString *const SUAppcastElementVersion;
+extern NSString *const SUAppcastElementShortVersionString;
 extern NSString *const SUAppcastElementCriticalUpdate;
 extern NSString *const SUAppcastElementDeltas;
 extern NSString *const SUAppcastElementMinimumAutoupdateVersion;
@@ -85,6 +87,8 @@ extern NSString *const SUAppcastElementMaximumSystemVersion;
 extern NSString *const SUAppcastElementReleaseNotesLink;
 extern NSString *const SUAppcastElementTags;
 extern NSString *const SUAppcastElementPhasedRolloutInterval;
+extern NSString *const SUAppcastElementInformationalUpdate;
+extern NSString *const SUAppcastElementChannel;
 
 extern NSString *const SURSSAttributeURL;
 extern NSString *const SURSSAttributeLength;

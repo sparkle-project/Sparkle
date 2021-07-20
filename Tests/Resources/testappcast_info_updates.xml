@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
+  <channel>
+    <title>For unit test only</title>
+    <!-- Release with enclosure download -->
+    <item>
+        <title>Version 2.0</title>
+        <description>desc</description>
+        <pubDate>Sat, 26 Jul 2014 15:20:11 +0000</pubDate>
+        <enclosure url="http://localhost:1337/Sparkle_Test_App.zip" sparkle:version="2.0" />
+    </item>
+    <!-- Release that is informational updating from 2.4 and 2.5 -->
+    <item>
+        <title>Version 3.0</title>
+        <enclosure url="http://localhost:1337/Sparkle_Test_App.zip" sparkle:version="3.0" length="1346234" />
+        <sparkle:informationalUpdate>
+            <sparkle:version>2.5</sparkle:version>
+            <sparkle:version>2.4</sparkle:version>
+        </sparkle:informationalUpdate>
+        <link>http://sparkle-project.org</link>
+    </item>
+    <!-- Release that is always informational -->
+    <item>
+        <title>Version 4.0</title>
+        <pubDate>Sat, 26 Jul 2014 15:20:13 +0000</pubDate>
+        <sparkle:version>4.0</sparkle:version>
+        <enclosure url="http://localhost:1337/Sparkle_Test_App.zip" length="1346234" />
+        <sparkle:informationalUpdate></sparkle:informationalUpdate>
+        <link>http://sparkle-project.org</link>
+        <sparkle:deltas>
+            <enclosure url="http://localhost:1337/4.0_from_2.0.patch"
+            sparkle:deltaFrom="2.0"
+            length="1235"
+            type="application/octet-stream"
+            sparkle:edSignature="..." />
+            
+            <enclosure url="http://localhost:1337/4.0_from_1.0.patch"
+            sparkle:deltaFrom="1.0"
+            length="1485"
+            type="application/octet-stream"
+            sparkle:edSignature="..." />
+        </sparkle:deltas>
+    </item>
+    <!-- Release that is always informational (implicitly without enclosure item) -->
+    <item>
+        <title>Version 5.0</title>
+        <sparkle:version>5.0</sparkle:version>
+        <link>http://sparkle-project.org</link>
+    </item>
+  </channel>
+</rss>

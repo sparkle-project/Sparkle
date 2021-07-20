@@ -38,7 +38,12 @@
     
     [installerStatus setInvalidationHandler:^{
         dispatch_async(dispatch_get_main_queue(), ^{
+#pragma clang diagnostic push
+#if __has_warning("-Wcompletion-handler")
+#pragma clang diagnostic ignored "-Wcompletion-handler"
+#endif
             if (!handledCompletion) {
+#pragma clang diagnostic pop
                 completionHandler(NO);
                 handledCompletion = YES;
             }
@@ -50,7 +55,12 @@
     
     [installerStatus probeStatusConnectivityWithReply:^{
         dispatch_async(dispatch_get_main_queue(), ^{
+#pragma clang diagnostic push
+#if __has_warning("-Wcompletion-handler")
+#pragma clang diagnostic ignored "-Wcompletion-handler"
+#endif
             if (!handledCompletion) {
+#pragma clang diagnostic pop
                 completionHandler(YES);
                 handledCompletion = YES;
             }
@@ -58,8 +68,13 @@
         [installerStatus invalidate];
     }];
     
+#pragma clang diagnostic push
+#if __has_warning("-Wcompletion-handler")
+#pragma clang diagnostic ignored "-Wcompletion-handler"
+#endif
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(PROBE_TIMEOUT * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         if (!handledCompletion) {
+#pragma clang diagnostic pop
             if (usesXPC) {
                 SULog(SULogLevelError, @"Timed out while probing installer progress. Please see https://sparkle-project.org/documentation/sandboxing/#testing for potential cause.");
             } else {
@@ -86,7 +101,12 @@
     
     [installerStatus setInvalidationHandler:^{
         dispatch_async(dispatch_get_main_queue(), ^{
+#pragma clang diagnostic push
+#if __has_warning("-Wcompletion-handler")
+#pragma clang diagnostic ignored "-Wcompletion-handler"
+#endif
             if (!handledCompletion) {
+#pragma clang diagnostic pop
                 completionHandler(nil);
                 handledCompletion = YES;
             }
@@ -103,7 +123,12 @@
         }
         
         dispatch_async(dispatch_get_main_queue(), ^{
+#pragma clang diagnostic push
+#if __has_warning("-Wcompletion-handler")
+#pragma clang diagnostic ignored "-Wcompletion-handler"
+#endif
             if (!handledCompletion) {
+#pragma clang diagnostic pop
                 completionHandler(installationInfo);
                 handledCompletion = YES;
             }
@@ -112,8 +137,13 @@
         [installerStatus invalidate];
     }];
     
+#pragma clang diagnostic push
+#if __has_warning("-Wcompletion-handler")
+#pragma clang diagnostic ignored "-Wcompletion-handler"
+#endif
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(PROBE_TIMEOUT * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         if (!handledCompletion) {
+#pragma clang diagnostic pop
             if (usesXPC) {
                 SULog(SULogLevelDefault, @"Timed out while probing installer info data. Please see https://sparkle-project.org/documentation/sandboxing/#testing for potential cause.");
             } else {

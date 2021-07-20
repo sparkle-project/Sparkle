@@ -112,7 +112,7 @@
     return newAppDownloadPath;
 }
 
-+ (nullable id<SUInstallerProtocol>)installerForHost:(SUHost *)host expectedInstallationType:(NSString *)expectedInstallationType updateDirectory:(NSString *)updateDirectory error:(NSError * __autoreleasing *)error
++ (nullable id<SUInstallerProtocol>)installerForHost:(SUHost *)host expectedInstallationType:(NSString *)expectedInstallationType updateDirectory:(NSString *)updateDirectory homeDirectory:(NSString *)homeDirectory userName:(NSString *)userName error:(NSError * __autoreleasing *)error
 {
     BOOL isPackage = NO;
     BOOL isGuided = NO;
@@ -135,7 +135,7 @@
                 *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Found guided package installer but '%@=%@' was probably missing in the appcast item enclosure", SUAppcastAttributeInstallationType, SPUInstallationTypeGuidedPackage] }];
             }
         } else {
-            installer = [[SUGuidedPackageInstaller alloc] initWithPackagePath:newDownloadPath];
+            installer = [[SUGuidedPackageInstaller alloc] initWithPackagePath:newDownloadPath homeDirectory:homeDirectory userName:userName];
         }
     } else if (isPackage) {
         if (![expectedInstallationType isEqualToString:SPUInstallationTypeInteractivePackage]) {

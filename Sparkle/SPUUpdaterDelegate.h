@@ -161,7 +161,36 @@ typedef NS_ENUM(NSInteger, SPUUpdateCheck)
 - (void)updater:(SPUUpdater *)updater didFinishLoadingAppcast:(SUAppcast *)appcast;
 
 /*!
+ Returns the set of Sparkle channels the updater is allowed to find new updates from.
+ 
+ An appcast item can specify a channel the update is posted to. Without specifying a channel, the appcast item is posted to the default channel.
+ For instance:
+ <item>
+    <sparkle:version>2.0 Beta 1</sparkle:version>
+    <sparkle:channel>beta</sparkle:channel>
+ </item>
+ 
+ This example posts an update to the 'beta' channel, so only updaters that are allowed to use the 'beta' channel can find this update.
+ 
+ If the <sparkle:channel> is not present, the update item is posted to the default channel and can be found by any updater.
+ 
+ You can pick any name you'd like for the channel. The valid characters for channel names are letters, numbers, dashes, underscores, and periods.
+ 
+ Note to use this feature, all app versions that your users may update from in your feed must use a version of Sparkle that supports this feature.
+ This feature was added in Sparkle 2.
+ 
+ \return The set of channel names the updater is allowed to find new updates in. An empty set is the default behavior,
+         which means the updater will only look for updates in the default channel.
+ */
+- (NSSet<NSString *> *)allowedChannelsForUpdater:(SPUUpdater *)updater;
+
+/*!
  Returns the item in the appcast corresponding to the update that should be installed.
+ 
+ Please consider using or migrating to other supported features before adopting this method.
+ Specifically:
+ If you want to filter out certain tagged updates (like beta updates), consider -[SPUUpdaterDelegate allowedChannelsForUpdater:] instead.
+ If you want to treat certain updates as informational-only, consider supplying <sparkle:informationalUpdate> with a set of affected versions users are updating from.
  
  If you're using special logic or extensions in your appcast,
  implement this to use your own logic for finding a valid update, if any,
@@ -180,7 +209,8 @@ typedef NS_ENUM(NSInteger, SPUUpdateCheck)
  
  \param appcast The appcast that was downloaded from the remote server.
  \param updater The updater instance.
- \return The best valid appcast item, or nil if you don't want to be delegated this task.
+ \return The best valid appcast item. Return SUAppcastItem.emptyAppcastItem if no appcast item is valid. Return nil if you don't want to be delegated this task and
+         want to let Sparkle handle picking the best valid update.
  */
 - (nullable SUAppcastItem *)bestValidUpdateInAppcast:(SUAppcast *)appcast forUpdater:(SPUUpdater *)updater;
 
@@ -191,6 +221,20 @@ typedef NS_ENUM(NSInteger, SPUUpdateCheck)
  \param item The appcast item corresponding to the update that is proposed to be installed.
  */
 - (void)updater:(SPUUpdater *)updater didFindValidUpdate:(SUAppcastItem *)item;
+
+/*!
+ Called when a valid update is not found.
+ 
+ \param updater The updater instance.
+ \param error An error containing information on why a new valid update was not found
+    There are various reasons a new update is unavailable and can't be installed.
+    The userInfo dictionary on the error is also populated with three keys:
+    SPULatestAppcastItemFoundKey: if available, this may provide the latest SUAppcastItem that was found. This will be nil if it's unavailable.
+    SPUNoUpdateFoundReasonKey: This will provide the SUNoUpdateFoundReason.
+    For example the reason could be because the latest version in the feed requires a newer OS version or could be because the user is already on the latest version.
+    SPUNoUpdateFoundUserInitiatedKey: A boolean that indicates if a new update was not found when the user intitiated an update check manually.
+ */
+- (void)updaterDidNotFindUpdate:(SPUUpdater *)updater error:(NSError *)error;
 
 /*!
  Called when a valid update is not found.

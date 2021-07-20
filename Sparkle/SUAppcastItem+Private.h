@@ -20,10 +20,18 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+// Available in SPUAppcastItemStateResolver.h (a private exposed header)
+@class SPUAppcastItemStateResolver;
+
 @interface SUAppcastItem (Private) <NSSecureCoding>
 
-// Initializes with data from a dictionary provided by the RSS class.
-- (nullable instancetype)initWithDictionary:(NSDictionary *)dict relativeToURL:(NSURL * _Nullable)appcastURL failureReason:(NSString * _Nullable __autoreleasing *_Nullable)error;
+/*!
+ Initializes with data from a dictionary provided by the RSS class and state resolver
+
+ This initializer method is intended to be marked "private" and discouraged from public usage.
+ This method is available however. Talk to us to describe your use case and if you need to construct appcast items yourself.
+ */
+- (nullable instancetype)initWithDictionary:(NSDictionary *)dict relativeToURL:(NSURL * _Nullable)appcastURL stateResolver:(SPUAppcastItemStateResolver *)stateResolver failureReason:(NSString * _Nullable __autoreleasing *_Nullable)error;
 
 @end
 

@@ -109,11 +109,19 @@
     NSString *hostBundleIdentifier = hostBundle.bundleIdentifier;
     assert(hostBundleIdentifier != nil);
     
+    NSString *homeDirectory = NSHomeDirectory();
+    assert(homeDirectory != nil);
+    
+    NSString *userName = NSUserName();
+    assert(userName != nil);
+    
     // The first argument has to be the path to the program, and the second is a host identifier so that the installer knows what mach services to host
+    // The third and forth arguments are for home directory and user name which only pkg installer scripts may need
     // We intentionally do not pass any more arguments. Anything else should be done via IPC.
     // This is compatible to SMJobBless() which does not allow arguments
     // Even though we aren't using that function for now, it'd be wise to not decrease compatibility to it
-    NSArray<NSString *> *arguments = @[installerPath, hostBundleIdentifier];
+    
+    NSArray<NSString *> *arguments = @[installerPath, hostBundleIdentifier, homeDirectory, userName];
     
     AuthorizationRef auth = NULL;
     OSStatus createStatus = AuthorizationCreate(NULL, kAuthorizationEmptyEnvironment, kAuthorizationFlagDefaults, &auth);

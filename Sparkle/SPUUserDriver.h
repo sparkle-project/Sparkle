@@ -60,29 +60,30 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  *
  * @param appcastItem The Appcast Item containing information that reflects the new update.
  *
- * @param state The current state of the update.
+ * @param state The current state of the user update.
  *  The state.stage values are:
- *  SPUUserUpdateStateNotDownloaded - Update has not been downloaded yet.
- *  SPUUserUpdateStateDownloaded - Update has already been downloaded but not started installing yet.
- *  SPUUserUpdateStateInstalling - Update has been downloaded and already started installing.
- *  SPUUserUpdateStateInformational - Update is only informational and has no download. You can direct the user to the infoURL property of the appcastItem in their web browser. Use this to check if an update is informational, instead of using the informationOnlyUpdate property of the appcast item.
+ *  SPUUpdateStateNotDownloaded - Update has not been downloaded yet.
+ *  SPUUpdateStateDownloaded - Update has already been downloaded but not started installing yet.
+ *  SPUUpdateStateInstalling - Update has been downloaded and already started installing.
  *
  *  state.userInitiated indicates if the update was initiated by the user or if it was automatically scheduled in the background.
- *  state.majorUpgrade indicates if the update is a major or paid upgrade.
  *
- * Additionally, you may want to check the criticalUpdate property of the appcastItem to let the user know if the update is critical.
+ *  Additionally, these properties on the appcastItem are of importance:
+ *  appcastItem.informationOnlyUpdate indicates if the update is only informational and should not be downloaded. You can direct the user to the infoURL property of the appcastItem in their web browser. Sometimes information only updates are used as a fallback in case a bad update is shipped, so you'll want to support this case.
+ *  appcastItem.majorUpgrade indicates if the update is a major or paid upgrade.
+ *  appcastItem.criticalUpdate indicates if the update is a critical update.
  *
  * @param reply
  * A reply of SPUUserUpdateChoiceInstall begins or resumes downloading or installing the update.
- * If the state.stage is SPUUserUpdateStateInstalling, this may send a quit event to the application and relaunch it immediately (in this state, this behaves as a fast "install and Relaunch").
+ * If the state.stage is SPUUserUpdateStateInstalling, this may send a quit event to the application and relaunch it immediately (in this state, this behaves as a fast "install and Relaunch"). Do not use this reply if appcastItem.informationOnlyUpdate is YES.
  *
  * A reply of SPUUserUpdateChoiceDismiss dismisses the update for the time being. The user may be reminded of the update at a later point.
  * If the state.stage is SPUUserUpdateStateDownloaded, the downloaded update is kept after dismissing until the next time an update is shown to the user.
  * If the state.stage is SPUUserUpdateStateInstalling, the installing update is also preserved after dismissing. In this state however, the update will also still be installed after the application is terminated.
  *
  * A reply of SPUUserUpdateChoiceSkip skips this particular version and won't notify the user again, unless they initiate an update check themselves.
- * If state.majorUpgrade is YES, the major update and any minor updates to that major release are skipped.
- * If the state.stage is SPUUserUpdateStateInstalling, the installation is also canceled when the update is skipped.
+ * If appcastItem.majorUpgrade is YES, the major update and any future minor updates to that major release are skipped.
+ * If the state.stage is SPUUpdateStateInstalling, the installation is also canceled when the update is skipped.
  */
 - (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem state:(SPUUserUpdateState *)state reply:(void (^)(SPUUserUpdateChoice))reply;
 
@@ -115,6 +116,14 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  * Before this point, -showUserInitiatedUpdateCheckWithCancellation: may be called.
  *
  * @param error The error associated with why a new update was not found.
+ *  There are various reasons a new update is unavailable and can't be installed.
+ *  This error object is populated with recovery and suggestion strings suitable to be shown in an alert.
+ *
+ *  The userInfo dictionary is also populated with two keys:
+ *  SPULatestAppcastItemFoundKey: if available, this may provide the latest SUAppcastItem that was found.
+ *  SPUNoUpdateFoundReasonKey: if available, this will provide the SUNoUpdateFoundReason. For example the reason could be because
+ *  the latest version in the feed requires a newer OS version or could be because the user is already on the latest version.
+ *
  * @param acknowledgement Acknowledge to the updater that no update found error was shown.
  */
 - (void)showUpdateNotFoundWithError:(NSError *)error acknowledgement:(void (^)(void))acknowledgement;

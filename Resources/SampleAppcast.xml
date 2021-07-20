@@ -6,32 +6,39 @@
         <language>en</language>
         <item>
             <title>Version 2.0 (2 bugs fixed; 3 new features)</title>
+            <link>https://sparkle-project.org</link>
+            <sparkle:version>2.0</sparkle:version>
             <sparkle:releaseNotesLink>
-                http://you.com/app/2.0.html
+                https://you.com/app/2.0.html
             </sparkle:releaseNotesLink>
             <pubDate>Wed, 09 Jan 2006 19:20:11 +0000</pubDate>
-            <enclosure url="http://you.com/app/Your%20Great%20App%202.0.zip" sparkle:version="2.0" length="1623481" type="application/octet-stream" sparkle:edSignature="WVyVJpOx+a5+vNWJVY79TRjFKveNk+VhGJf2iti4CZtJsJewIUGvh/1AKKEAFbH1qUwx+vro1ECuzOsMmumoBA==" />
+            <enclosure url="https://you.com/app/Your%20Great%20App%202.0.zip" length="1623481" type="application/octet-stream" sparkle:edSignature="WVyVJpOx+a5+vNWJVY79TRjFKveNk+VhGJf2iti4CZtJsJewIUGvh/1AKKEAFbH1qUwx+vro1ECuzOsMmumoBA==" />
             <sparkle:minimumSystemVersion>10.11</sparkle:minimumSystemVersion>
         </item>
 
         <item>
             <title>Version 1.5 (8 bugs fixed; 2 new features)</title>
+            <link>https://sparkle-project.org</link>
+            <sparkle:version>1.5</sparkle:version>
             <sparkle:releaseNotesLink>
-                http://you.com/app/1.5.html
+                https://you.com/app/1.5.html
             </sparkle:releaseNotesLink>
             <pubDate>Wed, 01 Jan 2006 12:20:11 +0000</pubDate>
-            <enclosure url="http://you.com/app/Your%20Great%20App%201.5.zip" sparkle:version="1.5" length="1472893" type="application/octet-stream" sparkle:edSignature="pNFd7KbcQSu+Mq7UYrbQXTPq82luht2ACXm/r2utp1u/Uv/5hWqctdT2jwQgMejW7DRoeV/hVr6J4VdZYdwWDw==" />
+            <enclosure url="https://you.com/app/Your%20Great%20App%201.5.zip" length="1472893" type="application/octet-stream" sparkle:edSignature="pNFd7KbcQSu+Mq7UYrbQXTPq82luht2ACXm/r2utp1u/Uv/5hWqctdT2jwQgMejW7DRoeV/hVr6J4VdZYdwWDw==" />
             <sparkle:minimumSystemVersion>10.11</sparkle:minimumSystemVersion>
         </item>
 
         <!-- Now here's an example of a version with a weird internal version number (like an SVN revision) but a human-readable external one. -->
         <item>
             <title>Version 1.4 (5 bugs fixed; 2 new features)</title>
+            <link>https://sparkle-project.org</link>
             <sparkle:releaseNotesLink>
-                http://you.com/app/1.4.html
+                https://you.com/app/1.4.html
             </sparkle:releaseNotesLink>
+            <sparkle:version>241</sparkle:version>
+            <sparkle:shortVersionString>1.4</sparkle:shortVersionString>
             <pubDate>Wed, 25 Dec 2005 12:20:11 +0000</pubDate>
-            <enclosure url="http://you.com/app/Your%20Great%20App%201.4.zip" sparkle:version="241" sparkle:shortVersionString="1.4" sparkle:edSignature="Ody3D/ybSMH4T+P/oNj3LN4F0SA8RJGLEr1TI4UemrBAiJ9aEcDnYV3u58P75AbcFjI13jPYmHDUHXMSTFQbDw==" length="1472349" type="application/octet-stream" />
+            <enclosure url="https://you.com/app/Your%20Great%20App%201.4.zip" sparkle:edSignature="Ody3D/ybSMH4T+P/oNj3LN4F0SA8RJGLEr1TI4UemrBAiJ9aEcDnYV3u58P75AbcFjI13jPYmHDUHXMSTFQbDw==" length="1472349" type="application/octet-stream" />
             <sparkle:minimumSystemVersion>10.11</sparkle:minimumSystemVersion>
         </item>
     </channel>

@@ -346,7 +346,12 @@
         
         launcherConnection.invalidationHandler = ^{
             dispatch_async(dispatch_get_main_queue(), ^{
+#pragma clang diagnostic push
+#if __has_warning("-Wcompletion-handler")
+#pragma clang diagnostic ignored "-Wcompletion-handler"
+#endif
                 if (!madeReply) {
+#pragma clang diagnostic pop
                     // If something went horribly wrong, just guess that we won't require authorization
                     reply(NO);
                     
@@ -367,7 +372,12 @@
     
     [installerLauncher checkIfApplicationInstallationRequiresAuthorizationWithHostBundlePath:self.host.bundlePath reply:^(BOOL requiresAuthorization) {
         dispatch_async(dispatch_get_main_queue(), ^{
+#pragma clang diagnostic push
+#if __has_warning("-Wcompletion-handler")
+#pragma clang diagnostic ignored "-Wcompletion-handler"
+#endif
             if (!madeReply) {
+#pragma clang diagnostic pop
                 madeReply = YES;
                 [launcherConnection invalidate];
                 
@@ -403,7 +413,12 @@
         
         launcherConnection.invalidationHandler = ^{
             dispatch_async(dispatch_get_main_queue(), ^{
+#pragma clang diagnostic push
+#if __has_warning("-Wcompletion-handler")
+#pragma clang diagnostic ignored "-Wcompletion-handler"
+#endif
                 if (!retrievedLaunchStatus) {
+#pragma clang diagnostic pop
                     NSError *error =
                     [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey:SULocalizedString(@"An error occurred while connecting to the installer. Please try again later.", nil) }];
                     

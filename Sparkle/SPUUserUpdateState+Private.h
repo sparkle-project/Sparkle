@@ -9,11 +9,13 @@
 #ifndef SPUUserUpdateState_Private_h
 #define SPUUserUpdateState_Private_h
 
+#import "SPUUserUpdateState.h"
+
 NS_ASSUME_NONNULL_BEGIN
 
 @interface SPUUserUpdateState (Private)
 
-- (instancetype)initWithStage:(SPUUserUpdateStage)stage userInitiated:(BOOL)userInitiated majorUpgrade:(BOOL)majorUpgrade;
+- (instancetype)initWithStage:(SPUUserUpdateStage)stage userInitiated:(BOOL)userInitiated;
 
 @end
 

@@ -6,8 +6,6 @@
 //  Copyright © 2021 Sparkle Project. All rights reserved.
 //
 
-NS_ASSUME_NONNULL_BEGIN
-
 #if __has_feature(modules)
 #if __has_warning("-Watimport-in-framework-header")
 #pragma clang diagnostic ignored "-Watimport-in-framework-header"
@@ -17,9 +15,13 @@ NS_ASSUME_NONNULL_BEGIN
 #import <Foundation/Foundation.h>
 #endif
 
+NS_ASSUME_NONNULL_BEGIN
+
+@class SPUAppcastItemStateResolver;
+
 @interface SUAppcast (Private)
 
-- (nullable instancetype)initWithXMLData:(NSData *)xmlData relativeToURL:(NSURL * _Nullable)relativeURL error:(NSError * __autoreleasing *)error;
+- (nullable instancetype)initWithXMLData:(NSData *)xmlData relativeToURL:(NSURL * _Nullable)relativeURL stateResolver:(SPUAppcastItemStateResolver *)stateResolver error:(NSError * __autoreleasing *)error;
 
 - (SUAppcast *)copyByFilteringItems:(BOOL (^)(SUAppcastItem *))filterBlock;
 

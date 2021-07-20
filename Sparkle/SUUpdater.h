@@ -34,7 +34,7 @@
  
  Note: This class is now deprecated and acts as a thin wrapper around SPUUpdater and SPUStandardUserDriver
  */
-__deprecated_msg("Deprecated in Sparkle 2. Use SPUStandardUpdaterController or SPUUpdater instead")
+__deprecated_msg("Deprecated in Sparkle 2. Use SPUStandardUpdaterController instead, or SPUUpdater if you need more control.")
 SU_EXPORT @interface SUUpdater : NSObject
 
 @property (unsafe_unretained, nonatomic) IBOutlet id<SUUpdaterDelegate> delegate;

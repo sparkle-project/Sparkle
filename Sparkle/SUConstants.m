@@ -57,6 +57,9 @@ NSString *const SUEnableJavaScriptKey = @"SUEnableJavaScript";
 NSString *const SUFixedHTMLDisplaySizeKey = @"SUFixedHTMLDisplaySize";
 NSString *const SUDefaultsDomainKey = @"SUDefaultsDomain";
 NSString *const SUSparkleErrorDomain = @"SUSparkleErrorDomain";
+NSString *const SPUNoUpdateFoundReasonKey = @"SUNoUpdateFoundReason";
+NSString *const SPUNoUpdateFoundUserInitiatedKey = @"SPUNoUpdateUserInitiated";
+NSString *const SPULatestAppcastItemFoundKey = @"SULatestAppcastItemFound";
 
 NSString *const SUAppendVersionNumberKey = @"SUAppendVersionNumber";
 NSString *const SUEnableAutomatedDowngradesKey = @"SUEnableAutomatedDowngrades";
@@ -71,6 +74,8 @@ NSString *const SUAppcastAttributeVersion = @"sparkle:version";
 NSString *const SUAppcastAttributeOsType = @"sparkle:os";
 NSString *const SUAppcastAttributeInstallationType = @"sparkle:installationType";
 
+NSString *const SUAppcastElementVersion = SUAppcastAttributeVersion;
+NSString *const SUAppcastElementShortVersionString = SUAppcastAttributeShortVersionString;
 NSString *const SUAppcastElementCriticalUpdate = @"sparkle:criticalUpdate";
 NSString *const SUAppcastElementDeltas = @"sparkle:deltas";
 NSString *const SUAppcastElementMinimumAutoupdateVersion = @"sparkle:minimumAutoupdateVersion";
@@ -79,6 +84,8 @@ NSString *const SUAppcastElementMaximumSystemVersion = @"sparkle:maximumSystemVe
 NSString *const SUAppcastElementReleaseNotesLink = @"sparkle:releaseNotesLink";
 NSString *const SUAppcastElementTags = @"sparkle:tags";
 NSString *const SUAppcastElementPhasedRolloutInterval = @"sparkle:phasedRolloutInterval";
+NSString *const SUAppcastElementInformationalUpdate = @"sparkle:informationalUpdate";
+NSString *const SUAppcastElementChannel = @"sparkle:channel";
 
 NSString *const SURSSAttributeURL = @"url";
 NSString *const SURSSAttributeLength = @"length";

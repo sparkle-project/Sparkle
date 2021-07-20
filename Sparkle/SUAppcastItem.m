@@ -7,12 +7,14 @@
 //
 
 #import "SUAppcastItem.h"
-#import "SUAppcastItem+Private.h"
 #import "SUVersionComparisonProtocol.h"
 #import "SULog.h"
 #import "SUConstants.h"
 #import "SUSignatures.h"
 #import "SPUInstallationType.h"
+#import "SPUAppcastItemState.h"
+#import "SPUAppcastItemStateResolver.h"
+#import "SPUAppcastItemStateResolver+Private.h"
 
 
 #include "AppKitPrevention.h"
@@ -31,6 +33,22 @@ static NSString *SUAppcastItemTitleKey = @"title";
 static NSString *SUAppcastItemVersionStringKey = @"versionString";
 static NSString *SUAppcastItemPropertiesKey = @"propertiesDictionary";
 static NSString *SUAppcastItemInstallationTypeKey = @"SUAppcastItemInstallationType";
+static NSString *SUAppcastItemStateKey = @"SUAppcastItemState";
+
+@interface SUAppcastItem ()
+
+// Auxillary appcast item state that needs to be evaluated based on the host state
+// This may be nil if the client creates an SUAppcastItem with a deprecated initializer
+// In that case we will need to fallback to safe behavior
+@property (nonatomic, readonly, nullable) SPUAppcastItemState *state;
+
+// Indicates if we have any critical information. Used as a fallback if state is nil
+@property (nonatomic, readonly) BOOL hasCriticalInformation;
+
+// Indicates the versions we update from that are informational-only
+@property (nonatomic, readonly, nullable) NSSet<NSString *> *informationalUpdateVersions;
+
+@end
 
 @implementation SUAppcastItem
 
@@ -52,6 +70,10 @@ static NSString *SUAppcastItemInstallationTypeKey = @"SUAppcastItemInstallationT
 @synthesize installationType = _installationType;
 @synthesize minimumAutoupdateVersion = _minimumAutoupdateVersion;
 @synthesize phasedRolloutInterval = _phasedRolloutInterval;
+@synthesize state = _state;
+@synthesize hasCriticalInformation = _hasCriticalInformation;
+@synthesize informationalUpdateVersions = _informationalUpdateVersions;
+@synthesize channel = _channel;
 
 + (BOOL)supportsSecureCoding
 {
@@ -80,6 +102,9 @@ static NSString *SUAppcastItemInstallationTypeKey = @"SUAppcastItemInstallationT
             return nil;
         }
         
+        SPUAppcastItemState *state = [decoder decodeObjectOfClass:[SPUAppcastItemState class] forKey:SUAppcastItemStateKey];
+        _state = state;
+        
         _installationType = [installationType copy];
         
         _itemDescription = [(NSString *)[decoder decodeObjectOfClass:[NSString class] forKey:SUAppcastItemDescriptionKey] copy];
@@ -106,6 +131,8 @@ static NSString *SUAppcastItemInstallationTypeKey = @"SUAppcastItemInstallationT
         _propertiesDictionary = propertiesDictionary;
         
         _phasedRolloutInterval = [decoder decodeObjectOfClass:[NSNumber class] forKey:SUAppcastElementPhasedRolloutInterval];
+        
+        _channel = [(NSString *)[decoder decodeObjectOfClass:[NSString class] forKey:SUAppcastElementChannel] copy];
     }
     
     return self;
@@ -151,6 +178,10 @@ static NSString *SUAppcastItemInstallationTypeKey = @"SUAppcastItemInstallationT
         [encoder encodeObject:self.minimumAutoupdateVersion forKey:SUAppcastElementMinimumAutoupdateVersion];
     }
     
+    if (self.state != nil) {
+        [encoder encodeObject:self.state forKey:SUAppcastItemStateKey];
+    }
+    
     if (self.releaseNotesURL != nil) {
         [encoder encodeObject:self.releaseNotesURL forKey:SUAppcastItemReleaseNotesURLKey];
     }
@@ -178,6 +209,10 @@ static NSString *SUAppcastItemInstallationTypeKey = @"SUAppcastItemInstallationT
     if (self.phasedRolloutInterval != nil) {
         [encoder encodeObject:self.phasedRolloutInterval forKey:SUAppcastElementPhasedRolloutInterval];
     }
+    
+    if (self.channel != nil) {
+        [encoder encodeObject:self.channel forKey:SUAppcastElementChannel];
+    }
 }
 
 - (BOOL)isDeltaUpdate
@@ -188,7 +223,38 @@ static NSString *SUAppcastItemInstallationTypeKey = @"SUAppcastItemInstallationT
 
 - (BOOL)isCriticalUpdate
 {
-    return [(NSArray *)[self.propertiesDictionary objectForKey:SUAppcastElementTags] containsObject:SUAppcastElementCriticalUpdate];
+    if (self.state != nil) {
+        return self.state.criticalUpdate;
+    } else {
+        return self.hasCriticalInformation;
+    }
+}
+
+- (BOOL)isMajorUpgrade
+{
+    if (self.state != nil) {
+        return self.state.majorUpgrade;
+    } else {
+        return NO;
+    }
+}
+
+- (BOOL)minimumOperatingSystemVersionIsOK
+{
+    if (self.state != nil) {
+        return self.state.minimumOperatingSystemVersionIsOK;
+    } else {
+        return YES;
+    }
+}
+
+- (BOOL)maximumOperatingSystemVersionIsOK
+{
+    if (self.state != nil) {
+        return self.state.maximumOperatingSystemVersionIsOK;
+    } else {
+        return YES;
+    }
 }
 
 - (BOOL)isMacOsUpdate
@@ -212,35 +278,79 @@ static NSString *SUAppcastItemInstallationTypeKey = @"SUAppcastItemInstallationT
 
 - (BOOL)isInformationOnlyUpdate
 {
-    return self.infoURL && !self.fileURL;
+    if (self.state != nil) {
+        return self.state.informationalUpdate;
+    } else {
+        return (self.informationalUpdateVersions != nil && self.informationalUpdateVersions.count == 0);
+    }
 }
 
-- (instancetype)initWithDictionary:(NSDictionary *)dict
++ (instancetype)emptyAppcastItem
 {
-    return [self initWithDictionary:dict relativeToURL:nil failureReason:nil];
+    static SUAppcastItem *emptyAppcastItem;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        emptyAppcastItem = [[SUAppcastItem alloc] init];
+    });
+    return emptyAppcastItem;
 }
 
+// Initializer used for making delta items
+- (nullable instancetype)initWithDictionary:(NSDictionary *)dict relativeToURL:(NSURL * _Nullable)appcastURL state:(SPUAppcastItemState * _Nullable)state
+{
+    return [self initWithDictionary:dict relativeToURL:nil stateResolver:nil resolvedState:state failureReason:nil];
+}
+
+// Exported public initializer
+- (nullable instancetype)initWithDictionary:(NSDictionary *)dict relativeToURL:(NSURL * _Nullable)appcastURL stateResolver:(SPUAppcastItemStateResolver *)stateResolver failureReason:(NSString *__autoreleasing *)error
+{
+    return [self initWithDictionary:dict relativeToURL:appcastURL stateResolver:stateResolver resolvedState:nil failureReason:error];
+}
+
+// Deprecated
+- (nullable instancetype)initWithDictionary:(NSDictionary *)dict
+{
+    return [self initWithDictionary:dict relativeToURL:nil stateResolver:nil resolvedState:nil failureReason:nil];
+}
+
+// Deprecated
+- (nullable instancetype)initWithDictionary:(NSDictionary *)dict failureReason:(NSString *__autoreleasing *)error
+{
+    return [self initWithDictionary:dict relativeToURL:nil stateResolver:nil resolvedState:nil failureReason:error];
+}
+
+// Deprecated
 - (nullable instancetype)initWithDictionary:(NSDictionary *)dict relativeToURL:(NSURL * _Nullable)appcastURL failureReason:(NSString *__autoreleasing *)error
+{
+    return [self initWithDictionary:dict relativeToURL:appcastURL stateResolver:nil resolvedState:nil failureReason:error];
+}
+
+- (nullable instancetype)initWithDictionary:(NSDictionary *)dict relativeToURL:(NSURL * _Nullable)appcastURL stateResolver:(SPUAppcastItemStateResolver * _Nullable)stateResolver resolvedState:(SPUAppcastItemState * _Nullable)resolvedState failureReason:(NSString *__autoreleasing *)error
 {
     self = [super init];
     if (self) {
+        _title = [(NSString *)[dict objectForKey:SURSSElementTitle] copy];
+        
         NSDictionary *enclosure = [dict objectForKey:SURSSElementEnclosure];
 
         // Try to find a version string.
-        // Finding the new version number from the RSS feed is a little bit hacky. There are two ways:
+        // Finding the new version number from the RSS feed is a little bit hacky. There are a few ways:
         // 1. A "sparkle:version" attribute on the enclosure tag, an extension from the RSS spec.
-        // 2. If there isn't a version attribute, Sparkle will parse the path in the enclosure, expecting
+        // 2. If there isn't a version attribute, see if there is a version element (this is now the recommended path).
+        // 3. If there isn't a version element, Sparkle will parse the path in the enclosure, expecting
         //    that it will look like this: http://something.com/YourApp_0.5.zip. It'll read whatever's between the last
         //    underscore and the last period as the version number. So name your packages like this: APPNAME_VERSION.extension.
         //    The big caveat with this is that you can't have underscores in your version strings, as that'll confuse Sparkle.
         //    Feel free to change the separator string to a hyphen or something more suited to your needs if you like.
         NSString *newVersion = [enclosure objectForKey:SUAppcastAttributeVersion];
         if (newVersion == nil) {
-            newVersion = [dict objectForKey:SUAppcastAttributeVersion]; // Get version from the item, in case it's a download-less item (i.e. paid upgrade).
+            // Get version from the item
+            newVersion = [dict objectForKey:SUAppcastElementVersion];
         }
-        if (newVersion == nil) // no sparkle:version attribute anywhere?
+        if (newVersion == nil)
         {
-            SULog(SULogLevelError, @"warning: <%@> for URL '%@' is missing %@ attribute. Version comparison may be unreliable. Please always specify %@", SURSSElementEnclosure, [enclosure objectForKey:SURSSAttributeURL], SUAppcastAttributeVersion, SUAppcastAttributeVersion);
+            // No sparkle:version element/attribute anywhere?
+            SULog(SULogLevelError, @"warning: Item '%@' is missing '<%@>' element. Version comparison may be unreliable. Please always specify %@", _title, SUAppcastElementVersion, SUAppcastElementVersion);
 
             // Separate the url by underscores and take the last component, as that'll be closest to the end,
             // then we remove the extension. Hopefully, this will be the version.
@@ -252,13 +362,12 @@ static NSString *SUAppcastItemInstallationTypeKey = @"SUAppcastItemInstallationT
 
         if (!newVersion) {
             if (error) {
-                *error = [NSString stringWithFormat:@"Feed item lacks %@ attribute, and version couldn't be deduced from file name (would have used last component of a file name like AppName_1.3.4.zip)", SUAppcastAttributeVersion];
+                *error = [NSString stringWithFormat:@"Feed item lacks %@ element, and version couldn't be deduced from file name (would have used last component of a file name like AppName_1.3.4.zip)", SUAppcastElementVersion];
             }
             return nil;
         }
 
         _propertiesDictionary = [[NSDictionary alloc] initWithDictionary:dict];
-        _title = [(NSString *)[dict objectForKey:SURSSElementTitle] copy];
         _dateString = [(NSString *)[dict objectForKey:SURSSElementPubDate] copy];
         _itemDescription = [(NSString *)[dict objectForKey:SURSSElementDescription] copy];
 
@@ -282,6 +391,15 @@ static NSString *SUAppcastItemInstallationTypeKey = @"SUAppcastItemInstallationT
                 *error = @"No enclosure in feed item";
             }
             return nil;
+        }
+        
+        if (theInfoURL != nil) {
+            // If enclosure doesn't exist, the update must be an informational update
+            // Otherwise check presence of informational update element
+            _informationalUpdateVersions = (enclosure != nil) ? [dict objectForKey:SUAppcastElementInformationalUpdate] : [NSSet set];
+        } else {
+            // Not an informational update
+            _informationalUpdateVersions = nil;
         }
 
         NSString *enclosureURLString = [enclosure objectForKey:SURSSAttributeURL];
@@ -319,6 +437,48 @@ static NSString *SUAppcastItemInstallationTypeKey = @"SUAppcastItemInstallationT
         _minimumSystemVersion = [(NSString *)[dict objectForKey:SUAppcastElementMinimumSystemVersion] copy];
         _maximumSystemVersion = [(NSString *)[dict objectForKey:SUAppcastElementMaximumSystemVersion] copy];
         _minimumAutoupdateVersion = [(NSString *)[dict objectForKey:SUAppcastElementMinimumAutoupdateVersion] copy];
+        
+        NSString *channel = [dict objectForKey:SUAppcastElementChannel];
+        if (channel != nil) {
+            if (channel.length == 0) {
+                SULog(SULogLevelError, @"warning: Item with version '%@' has zero-length channel; this will be ignored.", newVersion);
+                _channel = nil;
+            } else {
+                // Reject characters in the channel name that may cause parsing problems in tools later
+                NSMutableCharacterSet *allowedCharacterSet = [NSMutableCharacterSet alphanumericCharacterSet];
+                [allowedCharacterSet addCharactersInString:@"_.-"];
+                if ([channel rangeOfCharacterFromSet:allowedCharacterSet.invertedSet].location != NSNotFound) {
+                    SULog(SULogLevelError, @"warning: Item with version '%@' has channel with invalid name. This channel will be ignored. Only [a-zA-Z0-9._-] is allowed.", newVersion);
+                    _channel = nil;
+                } else {
+                    _channel = [channel copy];
+                }
+            }
+        }
+        
+        // Grab critical update information
+        NSDictionary * _Nullable criticalUpdateDictionaryFromAppcast = (NSDictionary *)[dict objectForKey:SUAppcastElementCriticalUpdate];
+        NSArray *tags = [dict objectForKey:SUAppcastElementTags];
+        
+        NSDictionary * _Nullable criticalUpdateDictionary;
+        if (criticalUpdateDictionaryFromAppcast != nil) {
+            criticalUpdateDictionary = criticalUpdateDictionaryFromAppcast;
+        } else if ([tags isKindOfClass:[NSArray class]] && [tags containsObject:SUAppcastElementCriticalUpdate]) {
+            // Legacy path where critical update used to be a tag without a specified version
+            criticalUpdateDictionary = @{};
+        } else {
+            // No critical info present
+            criticalUpdateDictionary = nil;
+        }
+        
+        _hasCriticalInformation = (criticalUpdateDictionary != nil);
+        
+        if (stateResolver != nil) {
+            _state = [(SPUAppcastItemStateResolver * _Nonnull)stateResolver resolveStateWithInformationalUpdateVersions:_informationalUpdateVersions minimumOperatingSystemVersion:_minimumSystemVersion maximumOperatingSystemVersion:_maximumSystemVersion minimumAutoupdateVersion:_minimumAutoupdateVersion criticalUpdateDictionary:criticalUpdateDictionary];
+        } else {
+            // Note state still may be nil if a deprecated initializer is used
+            _state = resolvedState;
+        }
         
         NSString* rolloutIntervalString = [(NSString *)[dict objectForKey:SUAppcastElementPhasedRolloutInterval] copy];
         if (rolloutIntervalString != nil) {
@@ -392,7 +552,7 @@ static NSString *SUAppcastItemInstallationTypeKey = @"SUAppcastItemInstallationT
                 NSMutableDictionary *fakeAppCastDict = [dict mutableCopy];
                 [fakeAppCastDict removeObjectForKey:SUAppcastElementDeltas];
                 [fakeAppCastDict setObject:deltaDictionary forKey:SURSSElementEnclosure];
-                SUAppcastItem *deltaItem = [[SUAppcastItem alloc] initWithDictionary:fakeAppCastDict];
+                SUAppcastItem *deltaItem = [[SUAppcastItem alloc] initWithDictionary:fakeAppCastDict relativeToURL:appcastURL state:_state];
 
                 if (deltaItem != nil) {
                     [deltas setObject:deltaItem forKey:deltaFrom];

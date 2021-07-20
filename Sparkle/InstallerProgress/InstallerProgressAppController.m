@@ -276,6 +276,8 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
             self.repliedToRegistration = YES;
             self.applicationBundle = applicationBundle;
             self.applicationInitiallyAlive = (processIdentifier != nil);
+        } else {
+            assert(false);
         }
     });
 }

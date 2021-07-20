@@ -65,24 +65,34 @@
     }];
 }
 
+#pragma clang diagnostic push
+#if __has_warning("-Wcompletion-handler")
+#pragma clang diagnostic ignored "-Wcompletion-handler"
+#endif
 - (void)resumeInstallingUpdateWithCompletion:(SPUUpdateDriverCompletion)__unused completionBlock
+#pragma clang diagnostic pop
 {
     // Nothing really to do here.. this shouldn't be called.
     SULog(SULogLevelError, @"Error: resumeInstallingUpdateWithCompletion: called on SPUAutomaticUpdateDriver");
 }
 
+#pragma clang diagnostic push
+#if __has_warning("-Wcompletion-handler")
+#pragma clang diagnostic ignored "-Wcompletion-handler"
+#endif
 - (void)resumeUpdate:(id<SPUResumableUpdate>)__unused resumableUpdate completion:(SPUUpdateDriverCompletion)__unused completionBlock
+#pragma clang diagnostic pop
 {
     // Nothing really to do here.. this shouldn't be called.
     SULog(SULogLevelError, @"Error: resumeDownloadedUpdate:completion: called on SPUAutomaticUpdateDriver");
 }
 
-- (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)updateItem secondaryAppcastItem:(SUAppcastItem *)secondaryUpdateItem preventsAutoupdate:(BOOL)preventsAutoupdate
+- (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)updateItem secondaryAppcastItem:(SUAppcastItem * _Nullable)secondaryUpdateItem
 {
     self.updateItem = updateItem;
     
-    if (updateItem.isInformationOnlyUpdate || preventsAutoupdate) {
-        [self.coreDriver deferInformationalUpdate:updateItem secondaryUpdate:secondaryUpdateItem preventsAutoupdate:preventsAutoupdate];
+    if (updateItem.isInformationOnlyUpdate || updateItem.majorUpgrade) {
+        [self.coreDriver deferInformationalUpdate:updateItem secondaryUpdate:secondaryUpdateItem];
         [self abortUpdate];
     } else {
         [self.coreDriver downloadUpdateFromAppcastItem:updateItem secondaryAppcastItem:secondaryUpdateItem inBackground:YES];
@@ -133,7 +143,8 @@
 
 - (void)abortUpdateWithError:(NSError *)error
 {
-    BOOL showNextUpdateImmediately = (error == nil || error.code == SUInstallationAuthorizeLaterError) && (!self.willInstallSilently || self.updateItem.isCriticalUpdate || self.updateItem.isInformationOnlyUpdate);
+    BOOL showNextUpdateImmediately = (error == nil || error.code == SUInstallationAuthorizeLaterError) && (!self.willInstallSilently || self.updateItem.criticalUpdate || self.updateItem.isInformationOnlyUpdate);
+    
     [self.coreDriver abortUpdateAndShowNextUpdateImmediately:showNextUpdateImmediately error:error];
 }
 

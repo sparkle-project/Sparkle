@@ -9,13 +9,15 @@ int main(int __unused argc, const char __unused *argv[])
     @autoreleasepool
     {
         NSArray<NSString *> *args = [[NSProcessInfo processInfo] arguments];
-        if (args.count != 2) {
+        if (args.count != 4) {
             return EXIT_FAILURE;
         }
         
         NSString *hostBundleIdentifier = args[1];
+        NSString *homeDirectory = args[2];
+        NSString *userName = args[3];
         
-        AppInstaller *appInstaller = [[AppInstaller alloc] initWithHostBundleIdentifier:hostBundleIdentifier];
+        AppInstaller *appInstaller = [[AppInstaller alloc] initWithHostBundleIdentifier:hostBundleIdentifier homeDirectory:homeDirectory userName:userName];
         [appInstaller start];
         
         // Ignore SIGTERM because we are going to catch it ourselves

@@ -14,9 +14,6 @@
 
 "%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%1$@ %2$@は現在入手できる最新バージョンです。\n（現在使用中のバージョンは%3$@です。）";
 
-/* An appcast feed error when checking for updates and no appcast items are retrieved */
-"No valid update information could be loaded." = "有効なアップデート情報が取得できませんでした。";
-
 "An error occurred while running the updater. Please try again later." = "アップデータを実行中にエラーが発生しました。あとでやり直してください。";
 
 "An error occurred while starting the installer. Please try again later." = "インストーラを始動中にエラーが発生しました。あとでやり直してください。";

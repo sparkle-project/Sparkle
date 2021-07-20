@@ -186,9 +186,11 @@ SU_EXPORT @interface SPUUpdater : NSObject
  
  Setting this property will persist in the host bundle's user defaults.
  To avoid this, you should consider instead implementing
- -[SPUUpdaterDelegate feedURLStringForUpdater:] or -[SPUUpdaterDelegate feedParametersForUpdater:sendingSystemProfile:]
+ -[SPUUpdaterDelegate feedURLStringForUpdater:]
  
  Passing nil will remove any feed URL that has been set in the host bundle's user defaults.
+ 
+ For beta updates, you may consider migrating to -[SPUUpdaterDelegate allowedChannelsForUpdater:] in the future.
  
  This method must be called on the main thread; calls from background threads will have no effect.
  */
