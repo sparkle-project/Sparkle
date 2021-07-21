@@ -141,6 +141,7 @@ class ArchiveItem: CustomStringConvertible {
     var pubDate: String {
         let date = self.archiveFileAttributes[.creationDate] as! Date
         let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
         formatter.dateFormat = "EEE, dd MMM yyyy HH:mm:ss ZZ"
         return formatter.string(from: date)
     }
