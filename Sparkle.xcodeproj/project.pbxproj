@@ -32,6 +32,7 @@
 				895C5DBD24D75F590058A82D /* ShellScript */,
 			);
 			dependencies = (
+				72DA9D4726A0273500B12BB2 /* PBXTargetDependency */,
 			);
 			name = XCFramework;
 			productName = Sparkle.xcframework;
@@ -543,6 +544,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = 61B5F90109C4CEE200B25A18;
 			remoteInfo = "Sparkle Test App";
+		};
+		72DA9D4626A0273500B12BB2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8DC2EF4F0486A6940098B216;
+			remoteInfo = Sparkle;
 		};
 		895C5DBE24D764DD0058A82D /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -2109,23 +2117,25 @@
 			attributes = {
 				CLASSPREFIX = SU;
 				LastSwiftUpdateCheck = 1000;
-				LastUpgradeCheck = 1230;
+				LastUpgradeCheck = 1300;
 				ORGANIZATIONNAME = "Sparkle Project";
 				TargetAttributes = {
 					5A5ADED6214EDE4900DF0099 = {
 						CreatedOnToolsVersion = 10.0;
+						LastSwiftMigration = 1300;
 						ProvisioningStyle = Automatic;
 					};
 					5AA96C541E0AE0DB00CA4346 = {
 						CreatedOnToolsVersion = 8.0;
-						LastSwiftMigration = 0900;
+						LastSwiftMigration = 1300;
 						ProvisioningStyle = Automatic;
 					};
 					5AB8F19E214DA72000A1187F = {
+						LastSwiftMigration = 1300;
 						ProvisioningStyle = Automatic;
 					};
 					612279D80DB5470200AB99EA = {
-						LastSwiftMigration = 0900;
+						LastSwiftMigration = 1300;
 						TestTargetID = 8DC2EF4F0486A6940098B216;
 					};
 					722954B31D04ADAF00ECF9CA = {
@@ -2298,14 +2308,13 @@
 			files = (
 			);
 			inputPaths = (
-				$BUILT_PRODUCTS_DIR/$INFOPLIST_PATH,
 			);
 			name = "Run Script: Set Git Version Info";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"$SRCROOT/Configurations/set-git-version-info.sh\"";
+			shellScript = "\"$SRCROOT/Configurations/set-git-version-info.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		6131B1910DDCDE32005215F0 /* Run Script: Set Git Version Info */ = {
@@ -2314,14 +2323,13 @@
 			files = (
 			);
 			inputPaths = (
-				$BUILT_PRODUCTS_DIR/$INFOPLIST_PATH,
 			);
 			name = "Run Script: Set Git Version Info";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"$SRCROOT/Configurations/set-git-version-info.sh\"";
+			shellScript = "\"$SRCROOT/Configurations/set-git-version-info.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		895C5DBD24D75F590058A82D /* ShellScript */ = {
@@ -2720,6 +2728,11 @@
 			isa = PBXTargetDependency;
 			target = 61B5F90109C4CEE200B25A18 /* Sparkle Test App */;
 			targetProxy = 726B2B621C645FC900388755 /* PBXContainerItemProxy */;
+		};
+		72DA9D4726A0273500B12BB2 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8DC2EF4F0486A6940098B216 /* Sparkle */;
+			targetProxy = 72DA9D4626A0273500B12BB2 /* PBXContainerItemProxy */;
 		};
 		895C5DBF24D764DD0058A82D /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
