@@ -4,6 +4,7 @@
  * Pass http headers and user agent when downloading release notes from #1873 (Zorg)
  * Fix project warnings from #1893 (Zorg)
  * Update sample appcast from #1895 (Zorg)
+ * Fix appcast pubDate tag generation in different locales from #1898 (Sungbin Jo)
 
 # 1.26.0
 
