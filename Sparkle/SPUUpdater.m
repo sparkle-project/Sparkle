@@ -258,6 +258,14 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
             return NO;
         }
     }
+    
+    // Don't allow invalid EdDSA public keys
+    if (publicKeys.ed25519PubKeyStatus == SUSigningInputStatusInvalid) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUNoPublicDSAFoundError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"The EdDSA public key is not valid for %@.", hostName] }];
+        }
+        return NO;
+    }
 
     if (!hasAnyPublicKey) {
         if ((feedURL != nil && !servingOverHttps) || ![SUCodeSigningVerifier bundleAtURLIsCodeSigned:[[self hostBundle] bundleURL]]) {
