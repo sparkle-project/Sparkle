@@ -45,7 +45,7 @@ int latestMinorVersionForMajorVersion(SUBinaryDeltaMajorVersion majorVersion)
         case SUAzureMajorVersion:
             return 1;
         case SUBeigeMajorVersion:
-            return 2;
+            return 3;
     }
     return 0;
 }

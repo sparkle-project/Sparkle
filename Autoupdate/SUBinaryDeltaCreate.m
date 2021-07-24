@@ -233,6 +233,52 @@ static BOOL shouldChangePermissions(NSDictionary *originalInfo, NSDictionary *ne
     return YES;
 }
 
+static xar_file_t _xarAddFile(NSMutableDictionary<NSString *, NSValue *> *fileTable, xar_t x, NSString *relativePath, NSString *filePath)
+{
+    NSArray<NSString *> *rootRelativePathComponents = relativePath.pathComponents;
+    // Relative path must at least have starting "/" component and one more path component
+    if (rootRelativePathComponents.count < 2) {
+        return NULL;
+    }
+    
+    NSArray<NSString *> *relativePathComponents = [rootRelativePathComponents subarrayWithRange:NSMakeRange(1, rootRelativePathComponents.count - 1)];
+    
+    NSUInteger relativePathComponentsCount = relativePathComponents.count;
+    
+    // Build parent files as needed until we get to our final file we want to add
+    // So if we get "Contents/Resources/foo.txt", we will first add "Contents" parent,
+    // then "Resources" parent, then "foo.txt" as the final entry we want to add
+    // We store every file we add into a fileTable for easy referencing
+    // Note if a diff has Contents/Resources/foo/ and Contents/Resources/foo/bar.txt,
+    // due to sorting order we will add the foo directory first and won't end up with
+    // mis-ordering bugs
+    xar_file_t lastParent = NULL;
+    for (NSUInteger componentIndex = 0; componentIndex < relativePathComponentsCount; componentIndex++) {
+        NSArray<NSString *> *subpathComponents = [relativePathComponents subarrayWithRange:NSMakeRange(0, componentIndex + 1)];
+        NSString *subpathKey = [subpathComponents componentsJoinedByString:@"/"];
+        
+        xar_file_t cachedFile = [fileTable[subpathKey] pointerValue];
+        if (cachedFile != NULL) {
+            lastParent = cachedFile;
+        } else {
+            xar_file_t newParent;
+            
+            BOOL atLastIndex = (componentIndex == relativePathComponentsCount - 1);
+            
+            NSString *lastPathComponent = subpathComponents.lastObject;
+            if (atLastIndex && filePath != nil) {
+                newParent = xar_add_frompath(x, lastParent, lastPathComponent.fileSystemRepresentation, filePath.fileSystemRepresentation);
+            } else {
+                newParent = xar_add_frombuffer(x, lastParent, lastPathComponent.fileSystemRepresentation, "", 1);
+            }
+            
+            lastParent = newParent;
+            fileTable[subpathKey] = [NSValue valueWithPointer:newParent];
+        }
+    }
+    return lastParent;
+}
+
 BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchFile, SUBinaryDeltaMajorVersion majorVersion, BOOL verbose, NSError *__autoreleasing *error)
 {
     assert(source);
@@ -489,11 +535,14 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
 
       return originalTreeState[key1] ? NSOrderedAscending : NSOrderedDescending;
     }];
+    
+    NSMutableDictionary<NSString *, NSValue *> *fileTable = [NSMutableDictionary dictionary];
+    
     for (NSString *key in keys) {
         id value = [newTreeState valueForKey:key];
 
         if ([(NSObject *)value isEqual:[NSNull null]]) {
-            xar_file_t newFile = xar_add_frombuffer(x, 0, [key fileSystemRepresentation], (char *)"", 1);
+            xar_file_t newFile = _xarAddFile(fileTable, x, key, NULL);
             assert(newFile);
             xar_prop_set(newFile, DELETE_KEY, "true");
 
@@ -508,7 +557,7 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
         if (shouldSkipDeltaCompression(originalInfo, newInfo)) {
             if (MAJOR_VERSION_IS_AT_LEAST(majorVersion, SUBeigeMajorVersion) && shouldSkipExtracting(originalInfo, newInfo)) {
                 if (shouldChangePermissions(originalInfo, newInfo)) {
-                    xar_file_t newFile = xar_add_frombuffer(x, 0, [key fileSystemRepresentation], (char *)"", 1);
+                    xar_file_t newFile = _xarAddFile(fileTable, x, key, NULL);
                     assert(newFile);
                     xar_prop_set(newFile, MODIFY_PERMISSIONS_KEY, [[NSString stringWithFormat:@"%u", [(NSNumber *)newInfo[INFO_PERMISSIONS_KEY] unsignedShortValue]] UTF8String]);
 
@@ -518,7 +567,7 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
                 }
             } else {
                 NSString *path = [destination stringByAppendingPathComponent:key];
-                xar_file_t newFile = xar_add_frompath(x, 0, [key fileSystemRepresentation], [path fileSystemRepresentation]);
+                xar_file_t newFile = _xarAddFile(fileTable, x, key, path);
                 assert(newFile);
 
                 if (shouldDeleteThenExtract(originalInfo, newInfo)) {
@@ -570,7 +619,7 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
             fprintf(stderr, "\n🔨  %s %s", VERBOSE_DIFFED, [[operation relativePath] fileSystemRepresentation]);
         }
 
-        xar_file_t newFile = xar_add_frompath(x, 0, [[operation relativePath] fileSystemRepresentation], [resultPath fileSystemRepresentation]);
+        xar_file_t newFile = _xarAddFile(fileTable, x, [operation relativePath], resultPath);
         assert(newFile);
         xar_prop_set(newFile, BINARY_DELTA_KEY, "true");
         unlink([resultPath fileSystemRepresentation]);
