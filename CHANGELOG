@@ -5,6 +5,7 @@
  * Fix project warnings from #1893 (Zorg)
  * Update sample appcast from #1895 (Zorg)
  * Fix appcast pubDate tag generation in different locales from #1898 (Sungbin Jo)
+ * Create valid xar archives for generating binary delta files from #1906 (Zorg)
 
 # 1.26.0
 
