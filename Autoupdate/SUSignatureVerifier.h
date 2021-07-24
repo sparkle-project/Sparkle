@@ -21,11 +21,11 @@
 
 @interface SUSignatureVerifier : NSObject
 
-+ (BOOL)validatePath:(NSString *)path withSignatures:(SUSignatures *)signatures withPublicKeys:(SUPublicKeys *)pkeys;
++ (BOOL)validatePath:(NSString *)path withSignatures:(SUSignatures *)signatures withPublicKeys:(SUPublicKeys *)pkeys error:(NSError * __autoreleasing *)error;
 
 - (instancetype)initWithPublicKeys:(SUPublicKeys *)pkeys;
 
-- (BOOL)verifyFileAtPath:(NSString *)path signatures:(SUSignatures *)signatures;
+- (BOOL)verifyFileAtPath:(NSString *)path signatures:(SUSignatures *)signatures error:(NSError * __autoreleasing *)error;
 
 @end
 
