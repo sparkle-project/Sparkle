@@ -66,25 +66,23 @@ extern int bsdiff(int argc, const char **argv);
 
 @end
 
-#define INFO_HASH_KEY @"hash"
+#define INFO_PATH_KEY @"path"
 #define INFO_TYPE_KEY @"type"
 #define INFO_PERMISSIONS_KEY @"permissions"
 #define INFO_SIZE_KEY @"size"
 
 static NSDictionary *infoForFile(FTSENT *ent)
 {
-    NSData *hash = hashOfFileContents(ent);
-    if (!hash) {
-        return nil;
-    }
-
     off_t size = (ent->fts_info != FTS_D) ? ent->fts_statp->st_size : 0;
 
     assert(ent->fts_statp != NULL);
 
     mode_t permissions = ent->fts_statp->st_mode & PERMISSION_FLAGS;
 
-    return @{ INFO_HASH_KEY: hash,
+    NSString *path = @(ent->fts_path);
+    assert(path != nil);
+    
+    return @{ INFO_PATH_KEY: path != nil ? path : @"",
               INFO_TYPE_KEY: @(ent->fts_info),
               INFO_PERMISSIONS_KEY: @(permissions),
               INFO_SIZE_KEY: @(size) };
@@ -174,12 +172,19 @@ static BOOL shouldSkipDeltaCompression(NSDictionary *originalInfo, NSDictionary 
         return YES;
     }
 
-    if ([(NSNumber *)originalInfo[INFO_TYPE_KEY] unsignedShortValue] != [(NSNumber *)newInfo[INFO_TYPE_KEY] unsignedShortValue]) {
+    unsigned short originalInfoType = [(NSNumber *)originalInfo[INFO_TYPE_KEY] unsignedShortValue];
+    unsigned short newInfoType = [(NSNumber *)newInfo[INFO_TYPE_KEY] unsignedShortValue];
+    if (originalInfoType != newInfoType) {
+        // File types are different
         return YES;
     }
 
-    if ([(NSData *)originalInfo[INFO_HASH_KEY] isEqual:(NSData *)newInfo[INFO_HASH_KEY]]) {
-        // this is possible if just the permissions have changed
+    NSString *originalPath = originalInfo[INFO_PATH_KEY];
+    NSString *newPath = newInfo[INFO_PATH_KEY];
+
+    // Skip delta if both entries are directories, or if the files/symlinks are equal in content
+    if (originalInfoType == FTS_D || [[NSFileManager defaultManager] contentsEqualAtPath:originalPath andPath:newPath]) {
+        // this is possible if just the permissions have changed but contents have not
         return YES;
     }
 
@@ -205,11 +210,21 @@ static BOOL shouldSkipExtracting(NSDictionary *originalInfo, NSDictionary *newIn
         return NO;
     }
 
-    if ([(NSNumber *)originalInfo[INFO_TYPE_KEY] unsignedShortValue] != [(NSNumber *)newInfo[INFO_TYPE_KEY] unsignedShortValue]) {
+    unsigned short originalInfoType = [(NSNumber *)originalInfo[INFO_TYPE_KEY] unsignedShortValue];
+    unsigned short newInfoType = [(NSNumber *)newInfo[INFO_TYPE_KEY] unsignedShortValue];
+    
+    if (originalInfoType != newInfoType) {
+        // File types are different
         return NO;
     }
 
-    if (![(NSData *)originalInfo[INFO_HASH_KEY] isEqual:(NSData *)newInfo[INFO_HASH_KEY]]) {
+    
+    NSString *originalPath = originalInfo[INFO_PATH_KEY];
+    NSString *newPath = newInfo[INFO_PATH_KEY];
+    
+    // Don't skip extract if files/symlinks entries are not equal in content
+    // (note if the entries are directories, they are equal)
+    if (originalInfoType != FTS_D && ![[NSFileManager defaultManager] contentsEqualAtPath:originalPath andPath:newPath]) {
         return NO;
     }
 

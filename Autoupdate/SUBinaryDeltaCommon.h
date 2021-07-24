@@ -61,7 +61,6 @@ typedef NS_ENUM(uint16_t, SUBinaryDeltaMajorVersion)
 #define LATEST_DELTA_DIFF_MAJOR_VERSION SUBeigeMajorVersion
 
 extern int compareFiles(const FTSENT **a, const FTSENT **b);
-extern NSData *hashOfFileContents(FTSENT *ent);
 extern NSString *hashOfTreeWithVersion(NSString *path, uint16_t majorVersion);
 extern NSString *hashOfTree(NSString *path);
 extern BOOL removeTree(NSString *path);

@@ -137,15 +137,6 @@ static BOOL _hashOfFileContents(unsigned char *hash, FTSENT *ent)
     return YES;
 }
 
-NSData *hashOfFileContents(FTSENT *ent)
-{
-    unsigned char fileHash[CC_SHA1_DIGEST_LENGTH];
-    if (!_hashOfFileContents(fileHash, ent)) {
-        return nil;
-    }
-    return [NSData dataWithBytes:fileHash length:CC_SHA1_DIGEST_LENGTH];
-}
-
 NSString *hashOfTreeWithVersion(NSString *path, uint16_t majorVersion)
 {
     char pathBuffer[PATH_MAX] = { 0 };
