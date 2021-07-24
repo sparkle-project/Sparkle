@@ -45,7 +45,7 @@ int latestMinorVersionForMajorVersion(SUBinaryDeltaMajorVersion majorVersion)
         case SUAzureMajorVersion:
             return 1;
         case SUBeigeMajorVersion:
-            return 2;
+            return 3;
     }
     return 0;
 }
@@ -135,15 +135,6 @@ static BOOL _hashOfFileContents(unsigned char *hash, FTSENT *ent)
         return NO;
     }
     return YES;
-}
-
-NSData *hashOfFileContents(FTSENT *ent)
-{
-    unsigned char fileHash[CC_SHA1_DIGEST_LENGTH];
-    if (!_hashOfFileContents(fileHash, ent)) {
-        return nil;
-    }
-    return [NSData dataWithBytes:fileHash length:CC_SHA1_DIGEST_LENGTH];
 }
 
 NSString *hashOfTreeWithVersion(NSString *path, uint16_t majorVersion)
