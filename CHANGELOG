@@ -1,3 +1,12 @@
+# 1.27.0
+
+ * Deprecate not using EdDSA and skip DSA verification when possible in #1892 (Zorg)
+ * Pass http headers and user agent when downloading release notes from #1873 (Zorg)
+ * Fix project warnings from #1893 (Zorg)
+ * Update sample appcast from #1895 (Zorg)
+ * Fix appcast pubDate tag generation in different locales from #1898 (Sungbin Jo)
+ * Create valid xar archives for generating binary delta files from #1906 (Zorg)
+
 # 1.26.0
 
  * Flat package support from #1745 (Zorg)
