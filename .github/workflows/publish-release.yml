@@ -1,5 +1,8 @@
 name: "Build & Publish Release"
 
+env:
+  BUILDDIR: "build"
+
 on:
   release:
     types: [prereleased, released]
@@ -20,33 +23,16 @@ jobs:
           submodules: true
           fetch-depth: 0
 
-      - name: "Archive release distribution"
-        run: |
-          xcodebuild archive -project Sparkle.xcodeproj \
-            -scheme Distribution \
-            -configuration Release \
-            -derivedDataPath build \
-            -archivePath build/XcodeArchives/Sparkle.xcarchive
-
-      - name: "Generate XCFramework"
-        run: |
-          xcodebuild \
-            -create-xcframework \
-            -framework "build/XcodeArchives/Sparkle.xcarchive/Products/Library/Frameworks/Sparkle.framework" \
-            -debug-symbols "build/XcodeArchives/Sparkle.xcarchive/dSYMs/Sparkle.framework.dSYM" \
-            -output "build/Sparkle.xcframework"
-
-      - name: "Compress XCFramework"
-        run: |
-          ditto -c -k --rsrc --keepParent build/Sparkle.xcframework build/Sparkle.xcframework.zip
-
-      - name: "Capture compressed XCFramework as an artifact"
-        uses: actions/upload-artifact@v2
-        with:
-          name: Sparkle.xcframework.zip
-          path: build/Sparkle.xcframework.zip
-
-      - name: "Publish captured artifacts to the release"
-        uses: skx/github-action-publish-binaries@master
+      - name: "Build release distribution"
+        run: make release
         env:
+          FORCE_MOVE_RELEASE_TAG: "YES"
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: "Publish built artifacts to the release"
+        uses: AButler/upload-release-assets@v2.0
+        with:
+          files: 'build/Build/Products/Release/Sparkle-*.tar.xz;build/Build/Products/Release/Sparkle-for-Swift-Package-Manager.zip'
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
