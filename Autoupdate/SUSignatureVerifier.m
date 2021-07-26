@@ -154,7 +154,13 @@
                 SULog(SULogLevelError, @"Failed to load file %@: %@", path, dataError);
                 
                 if (error != NULL) {
-                    *error = dataError;
+                    NSMutableDictionary *userInfo = [NSMutableDictionary dictionary];
+                    userInfo[NSLocalizedDescriptionKey] = [NSString stringWithFormat:@"Failed to load file: %@", path];
+                    if (dataError != nil) {
+                        userInfo[NSUnderlyingErrorKey] = dataError;
+                    }
+                    
+                    *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUValidationError userInfo:[userInfo copy]];
                 }
                 
                 return NO;
@@ -296,10 +302,17 @@
 #pragma clang diagnostic ignored "-Wdirect-ivar-access"
     dataVerifyTransform = SecVerifyTransformCreate(dsaPubKeySecKey, (__bridge CFDataRef)dsaSignature, &error);
 #pragma clang diagnostic pop
-    if (!dataVerifyTransform || error) {
+    if (!dataVerifyTransform) {
         SULog(SULogLevelError, @"Could not understand format of the signature: %@; Signature data: %@", error, dsaSignature);
         if (outError != NULL) {
-            *outError = [NSError errorWithDomain:SUSparkleErrorDomain code:SUValidationError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Could not understand format of the signature data %@", dsaSignature], NSUnderlyingErrorKey: (__bridge NSError *)error}];
+            NSError *underlyingError = (__bridge NSError *)error;
+            NSMutableDictionary *userInfo = [NSMutableDictionary dictionary];
+            userInfo[NSLocalizedDescriptionKey] = [NSString stringWithFormat:@"Could not understand format of the signature data %@", dsaSignature];
+            if (underlyingError != NULL) {
+                userInfo[NSUnderlyingErrorKey] = underlyingError;
+            }
+            
+            *outError = [NSError errorWithDomain:SUSparkleErrorDomain code:SUValidationError userInfo:[userInfo copy]];
         }
         
         return cleanup();
@@ -308,7 +321,7 @@
     SecTransformConnectTransforms(dataReadTransform, kSecTransformOutputAttributeName, dataDigestTransform, kSecTransformInputAttributeName, group, &error);
     if (error) {
         if (outError != NULL) {
-            *outError = (__bridge NSError *)error;
+            *outError = [NSError errorWithDomain:SUSparkleErrorDomain code:SUValidationError userInfo:@{NSLocalizedDescriptionKey : @"Failed to connect data read transform", NSUnderlyingErrorKey: (__bridge NSError *)error}];
         }
         
         return cleanup();
@@ -317,7 +330,7 @@
     SecTransformConnectTransforms(dataDigestTransform, kSecTransformOutputAttributeName, dataVerifyTransform, kSecTransformInputAttributeName, group, &error);
     if (error) {
         if (outError != NULL) {
-            *outError = (__bridge NSError *)error;
+            *outError = [NSError errorWithDomain:SUSparkleErrorDomain code:SUValidationError userInfo:@{NSLocalizedDescriptionKey : @"Failed to connect data digest transform", NSUnderlyingErrorKey: (__bridge NSError *)error}];
         }
         
         return cleanup();
