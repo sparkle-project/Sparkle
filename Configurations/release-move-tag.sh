@@ -35,7 +35,7 @@ function move_tag() {
             # We're running on GitHub Actions, so push the moved tag to the remote
             git push origin :refs/tags/$latest_git_tag
             git push
-            git push --tags
+            git push origin $latest_git_tag
             echo "Tag successfully moved on the remote server."
         fi
     else 
