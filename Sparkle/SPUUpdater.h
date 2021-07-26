@@ -67,6 +67,9 @@ SU_EXPORT @interface SPUUpdater : NSObject
 
  After starting the updater and before the next runloop cycle, one of -checkForUpdates, -checkForUpdatesInBackground, or -checkForUpdateInformation can be invoked.
  This may be useful if you want to check for updates immediately or without showing a permission prompt.
+ 
+ If the updater cannot be started (i.e, due to a configuration issue in the application), you may want to fall back appropriately.
+ For example, the standard updater controller (SPUStandardUpdaterController) alerts the user that the app is misconfigured and to contact the developer.
 
  This must be called on the main thread.
 
