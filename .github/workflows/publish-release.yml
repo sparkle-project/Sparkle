@@ -1,11 +1,14 @@
-name: "Build & Publish Release"
+name: "Build & Draft Release"
 
 env:
   BUILDDIR: "build"
 
 on:
-  release:
-    types: [prereleased, released]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to use for this release. Please use https://semver.org.'
+        required: true
 
 concurrency: 
   group: publish-release-${{ github.ref }}
@@ -31,8 +34,19 @@ jobs:
           GITHUB_REPOSITORY: ${{ github.repository }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: "Publish built artifacts to the release"
-        uses: AButler/upload-release-assets@v2.0
+      - name: "Commit and push updated Swift package description"
+        run: |
+            git add Package.swift
+            git commit -m "Update Package.swift for version ${{ github.event.inputs.tag }}"
+            git push
+
+      - name: "Draft a release"
+        uses: softprops/action-gh-release@v1
         with:
-          files: 'build/Build/Products/Release/Sparkle-*.tar.xz;build/Build/Products/Release/Sparkle-for-Swift-Package-Manager.zip'
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          draft: true
+          name: "Sparkle ${{ github.event.inputs.tag }}"
+          tag_name: ${{ github.event.inputs.tag }}
+          fail_on_unmatched_files: true
+          files: |
+            build/Build/Products/Release/Sparkle-*.tar.xz
+            build/Build/Products/Release/Sparkle-for-Swift-Package-Manager.zip
