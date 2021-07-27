@@ -1,4 +1,4 @@
-name: "Build & Draft Release"
+name: "Create Draft Release"
 
 env:
   BUILDDIR: "build"
