@@ -30,7 +30,6 @@ jobs:
       - name: "Build release distribution"
         run: make release
         env:
-          FORCE_MOVE_RELEASE_TAG: "YES"
           GITHUB_ACTOR: ${{ github.actor }}
           GITHUB_REPOSITORY: ${{ github.repository }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
