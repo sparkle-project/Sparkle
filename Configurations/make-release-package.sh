@@ -115,7 +115,7 @@ if [ "$ACTION" = "" ] ; then
     # Generate zip containing the xcframework for SPM
     cd "$CONFIGURATION_BUILD_DIR/staging-spm"
     #rm -rf "$CONFIGURATION_BUILD_DIR/Sparkle.xcarchive"
-    zip -rqyX -9 "../Sparkle-for-Swift-Package-Manager.zip" *
+    ditto -c -k --zlibCompressionLevel 9 --rsrc . "../Sparkle-for-Swift-Package-Manager.zip"
     
     # GitHub actions set the CI environment variable to true
     if [ "$CI" != true ]; then
