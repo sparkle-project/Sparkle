@@ -8,6 +8,7 @@
 
 import Foundation
 import Security
+import ArgumentParser
 
 let PRIVATE_KEY_LABEL = "Private key for signing Sparkle updates"
 
