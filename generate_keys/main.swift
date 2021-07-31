@@ -243,7 +243,7 @@ struct GenerateKeys: ParsableCommand {
                 failure("Imported key must be 96 bytes decoded. Instead it is \(privateAndPublicKey.count) bytes decoded.")
             }
             
-            print("Importing signing key..")
+            print("Importing signing key..\n")
             
             let publicKey = privateAndPublicKey[64...]
             let privateKey = privateAndPublicKey[0..<64]
