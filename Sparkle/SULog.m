@@ -65,10 +65,7 @@ void SULog(SULogLevel level, NSString *format, ...)
             }
 
             NSString *displayName = [[NSFileManager defaultManager] displayNameAtPath:mainBundle.bundlePath];
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
             client = asl_open([displayName stringByAppendingString:@" [Sparkle]"].UTF8String, SPARKLE_BUNDLE_IDENTIFIER, options);
-#pragma clang diagnostic pop
             queue = dispatch_queue_create(NULL, DISPATCH_QUEUE_SERIAL);
         }
     });
@@ -104,8 +101,6 @@ void SULog(SULogLevel level, NSString *format, ...)
         return;
     }
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
     // Otherwise use ASL
     // Make sure we do not async, because if we async, the log may not be delivered deterministically
     dispatch_sync(queue, ^{
@@ -134,5 +129,4 @@ void SULog(SULogLevel level, NSString *format, ...)
         
         asl_send(client, message);
     });
-#pragma clang diagnostic pop
 }

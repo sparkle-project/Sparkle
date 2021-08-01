@@ -33,9 +33,8 @@ Please visit [Sparkle's website](http://sparkle-project.org) for up to date docu
 
 ## Requirements
 
-* Framework: macOS 10.11 or greater
-* Swift Tools (generate_appcast, generate_keys, sign_update): macOS 10.15 or greater 
-* Build: Latest major Xcode (stable or beta, whichever is latest) and one major version less (reflected in our [CI](https://github.com/sparkle-project/Sparkle/blob/2.x/.github/workflows/ci.yml)))
+* Runtime: macOS 10.11 or greater
+* Build: Latest major Xcode (stable or beta, whichever is latest) and one major version less; at least Xcode 12 if using Swift Package Manager.
 * HTTPS server for serving updates (see [App Transport Security](http://sparkle-project.org/documentation/app-transport-security/))
 
 ## Usage
