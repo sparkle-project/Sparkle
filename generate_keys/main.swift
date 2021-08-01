@@ -8,6 +8,7 @@
 
 import Foundation
 import Security
+import ArgumentParser
 
 let PRIVATE_KEY_LABEL = "Private key for signing Sparkle updates"
 
@@ -155,133 +156,122 @@ func printNewPublicKeyUsage(_ publicKey: Data) {
         """)
 }
 
-/// Once it's safe to require Swift 5.3 and Xcode 12 for this code, rename this file to `generate_keys.swift` and
-/// replace this function with a class tagged with `@main`.
-func entryPoint() {
-    let arguments = CommandLine.arguments
-    let programName = arguments.first ?? "generate_keys"
+struct GenerateKeys: ParsableCommand {
+    @Flag(name: .customShort("p"), help: ArgumentHelp("Looks up and just prints the existing public key stored in the Keychain."))
+    var lookUpPublicKey: Bool = false
     
-    let mode = arguments.count > 1 ? arguments[1] : nil
-
-    /// If not in any mode, give an intro blurb.
-    if mode == nil {
-        print("""
-            Usage: \(programName) [-p] [-x private-key-file] [-f private-key-file]
-            
-            This tool generates a public & private keys and uses the macOS Keychain to store
-            the private key for signing app updates which will be distributed via Sparkle.
-            This key will be associated with your user account.
-            
-            Note: You only need one signing key, no matter how many apps you embed Sparkle in.
-            
-            The keychain may ask permission for this tool to access an existing key, if one
-            exists, or for permission to save the new key. You must allow access in order to
-            successfully proceed.
-
-            Additional Options:
-            -p
-                Looks up and just prints the existing public key stored in the Keychain.
-
-            -x private-key-file
-                Exports your private key from your login keychain and writes it to private-key-file. Note the contents of
-                this sensitive exported file are the same as the password to the \"\(PRIVATE_KEY_LABEL)\" item in
-                your keychain.
-            
-            -f private-key-file
-                Imports the private key from private-key-file into your keychain instead of generating a new key.
-                This file has likely been exported via -x option from another machine.
-                Any existing \"\(PRIVATE_KEY_LABEL)\" items listed in Keychain Access may need to be removed manually first before proceeding.
-
-            ----------------------------------------------------------------------------------------------------
-
-            """)
+    @Option(name: .customShort("x"), help: ArgumentHelp("Exports your private key from your login keychain and writes it to private-key-file. Note the contents of this sensitive exported file are the same as the password to the \"\(PRIVATE_KEY_LABEL)\" item in your keychain.", valueName: "private-key-file"))
+    var exportedPrivateKeyFile: String?
+    
+    @Option(name: .customShort("f"), help: ArgumentHelp("Imports the private key from private-key-file into your keychain instead of generating a new key. This file has likely been exported via -x option from another machine. Any existing \"\(PRIVATE_KEY_LABEL)\" items listed in Keychain Access may need to be removed manually first before proceeding.", valueName: "private-key-file"))
+    var importedPrivateKeyFile: String?
+    
+    static var configuration: CommandConfiguration = CommandConfiguration(
+        abstract: "Generate public & private keys for signing Sparkle based app updates.",
+        discussion: """
+        This tool generates a public & private keys and uses the macOS Keychain to store
+        the private key for signing app updates which will be distributed via Sparkle.
+        This key will be associated with your user account.
+        
+        Note: You only need one signing key, no matter how many apps you embed Sparkle in.
+        
+        The keychain may ask permission for this tool to access an existing key, if one
+        exists, or for permission to save the new key. You must allow access in order to
+        successfully proceed.
+        
+        In the default mode ran without any arguments, the public key and how it should be used
+        in your application's Info.plist will be printed. If a private key was already generated in your Keychain,
+        that key will be used and not overridden.
+        
+        You may additionally use options to only look up the existing public key for automation (-p),
+        export the private key from your Keychain to a file for transferring the key (-x), or
+        import the private key into your Keychain from a file (-f).
+        """)
+    
+    func validate() throws {
+        if lookUpPublicKey {
+            guard exportedPrivateKeyFile == nil && importedPrivateKeyFile == nil else {
+                throw ValidationError("-p option cannot be provided together with -x or -f.")
+            }
+        } else {
+            guard exportedPrivateKeyFile == nil || importedPrivateKeyFile == nil else {
+                throw ValidationError("Both -x and -f options cannot be provided together.")
+            }
+        }
     }
     
-    switch mode {
-    case .some("-p"):
-        /// Lookup mode - print just the pubkey and exit
-        if let keyPair = findKeyPair() {
-            let pubKey = keyPair[64...]
-            print(pubKey.base64EncodedString())
+    func run() throws {
+        if lookUpPublicKey {
+            /// Lookup mode - print just the pubkey and exit
+            if let keyPair = findKeyPair() {
+                let pubKey = keyPair[64...]
+                print(pubKey.base64EncodedString())
+            } else {
+                failure("No existing signing key found!")
+            }
+        } else if let exportedPrivateKeyFile = exportedPrivateKeyFile {
+            /// Export mode - export the key-pair file from the user's keychain
+            let exportURL = URL(fileURLWithPath: exportedPrivateKeyFile)
+            if let reachable = try? exportURL.checkResourceIsReachable(), reachable {
+                failure("private-key-file already exists: \(exportURL.path)")
+            }
+            
+            guard let keyPair = findKeyPair() else {
+                failure("No existing signing key found!")
+            }
+            
+            do {
+                try keyPair.base64EncodedString().write(to: exportURL, atomically: true, encoding: .utf8)
+            } catch {
+                failure("Failed to write exported file: \(error)")
+            }
+        } else if let importedPrivateKeyFile = importedPrivateKeyFile {
+            /// Import mode - import the specifed key-pair file
+            let privateAndPublicBase64KeyFile = importedPrivateKeyFile
+            let privateAndPublicBase64Key: String
+            do {
+                privateAndPublicBase64Key = try String(contentsOfFile: privateAndPublicBase64KeyFile)
+            } catch {
+                failure("Failed to read private-key-file: \(error)")
+            }
+            
+            guard let privateAndPublicKey = Data(base64Encoded: privateAndPublicBase64Key.trimmingCharacters(in: .whitespacesAndNewlines), options: .init()) else {
+                failure("Failed to decode base64 encoded key data from: \(privateAndPublicBase64Key)")
+            }
+            
+            guard privateAndPublicKey.count == 64 + 32 else {
+                failure("Imported key must be 96 bytes decoded. Instead it is \(privateAndPublicKey.count) bytes decoded.")
+            }
+            
+            print("Importing signing key..\n")
+            
+            let publicKey = privateAndPublicKey[64...]
+            let privateKey = privateAndPublicKey[0..<64]
+            
+            storeKeyPair(publicEdKey: publicKey, privateEdKey: privateKey)
+            
+            printNewPublicKeyUsage(publicKey)
         } else {
-            failure("No existing signing key found!")
-        }
-    case .some("-f"):
-        /// Import mode - import the specifed key-pair file
-        guard arguments.count > 2 else {
-            failure("private-key-file was not specified")
-        }
-        
-        let privateAndPublicBase64KeyFile = arguments[2]
-        let privateAndPublicBase64Key: String
-        do {
-            privateAndPublicBase64Key = try String(contentsOfFile: privateAndPublicBase64KeyFile)
-        } catch {
-            failure("Failed to read private-key-file: \(error)")
-        }
-        
-        guard let privateAndPublicKey = Data(base64Encoded: privateAndPublicBase64Key.trimmingCharacters(in: .whitespacesAndNewlines), options: .init()) else {
-            failure("Failed to decode base64 encoded key data from: \(privateAndPublicBase64Key)")
-        }
-        
-        guard privateAndPublicKey.count == 64 + 32 else {
-            failure("Imported key must be 96 bytes decoded. Instead it is \(privateAndPublicKey.count) bytes decoded.")
-        }
-        
-        print("Importing signing key..")
-        
-        let publicKey = privateAndPublicKey[64...]
-        let privateKey = privateAndPublicKey[0..<64]
-        
-        storeKeyPair(publicEdKey: publicKey, privateEdKey: privateKey)
-        
-        printNewPublicKeyUsage(publicKey)
-        
-    case .some("-x"):
-        /// Export mode - export the key-pair file from the user's keychain
-        guard arguments.count > 2 else {
-            failure("private-key-file was not specified")
-        }
-        
-        let exportURL = URL(fileURLWithPath: arguments[2])
-        if let reachable = try? exportURL.checkResourceIsReachable(), reachable {
-            failure("private-key-file already exists: \(exportURL.path)")
-        }
-        
-        guard let keyPair = findKeyPair() else {
-            failure("No existing signing key found!")
-        }
-        
-        do {
-            try keyPair.base64EncodedString().write(to: exportURL, atomically: true, encoding: .utf8)
-        } catch {
-            failure("Failed to write exported file: \(error)")
-        }
-        
-    case .some(let unknownOption):
-        failure("Unknown option: \(unknownOption)")
-    
-    case nil:
-        /// Default mode - find an existing public key and print its usage, or generate new keys
-        if let keyPair = findKeyPair() {
-            let pubKey = keyPair[64...]
-            print("""
-                A pre-existing signing key was found. This is how it should appear in your Info.plist:
+            /// Default mode - find an existing public key and print its usage, or generate new keys
+            if let keyPair = findKeyPair() {
+                let pubKey = keyPair[64...]
+                print("""
+                    A pre-existing signing key was found. This is how it should appear in your Info.plist:
 
-                    <key>SUPublicEDKey</key>
-                    <string>\(pubKey.base64EncodedString())</string>
-                    
-                """)
-        } else {
-            print("Generating a new signing key. This may take a moment, depending on your machine.")
-            
-            let (pubKey, privKey) = generateKeyPair()
-            storeKeyPair(publicEdKey: pubKey, privateEdKey: privKey)
-            
-            printNewPublicKeyUsage(pubKey)
+                        <key>SUPublicEDKey</key>
+                        <string>\(pubKey.base64EncodedString())</string>
+                        
+                    """)
+            } else {
+                print("Generating a new signing key. This may take a moment, depending on your machine.")
+                
+                let (pubKey, privKey) = generateKeyPair()
+                storeKeyPair(publicEdKey: pubKey, privateEdKey: privKey)
+                
+                printNewPublicKeyUsage(pubKey)
+            }
         }
     }
 }
 
-// Dispatch to a function because `@main` isn't stable yet at the time of this writing and top-level code is finicky.
-entryPoint()
+GenerateKeys.main()
