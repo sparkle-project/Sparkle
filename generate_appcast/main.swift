@@ -99,14 +99,6 @@ struct GenerateAppcast: ParsableCommand {
     }
     
     func run() throws {
-        DispatchQueue.global().async(execute: {
-            generateAppcast()
-            CFRunLoopStop(CFRunLoopGetMain())
-        })
-        CFRunLoopRun()
-    }
-    
-    func generateAppcast() {
         // Extract the keys
         let privateDSAKey : SecKey?
         if let privateDSAKeyURL = privateDSAKeyURL {
@@ -114,14 +106,14 @@ struct GenerateAppcast: ParsableCommand {
                 privateDSAKey = try loadPrivateDSAKey(at: privateDSAKeyURL)
             } catch {
                 print("Unable to load DSA private key from", privateDSAKeyURL.path, "\n", error)
-                Darwin.exit(1)
+                throw ExitCode(1)
             }
         } else if let keychainURL = keychainURL, let privateDSAKeyName = privateDSAKeyName {
             do {
                 privateDSAKey = try loadPrivateDSAKey(named: privateDSAKeyName, fromKeychainAt: keychainURL)
             } catch {
                 print("Unable to load DSA private key '\(privateDSAKeyName)' from keychain at", keychainURL.path, "\n", error)
-                Darwin.exit(1)
+                throw ExitCode(1)
             }
         } else {
             privateDSAKey = nil
@@ -151,7 +143,7 @@ struct GenerateAppcast: ParsableCommand {
             if let outputPathURL = outputPathURL,
                 allUpdates.count > 1 {
                 print("Cannot write to \(outputPathURL.path): multiple appcasts found")
-                Darwin.exit(1)
+                throw ExitCode(1)
             }
             
             for (appcastFile, updates) in allUpdates {
@@ -169,9 +161,13 @@ struct GenerateAppcast: ParsableCommand {
             }
         } catch {
             print("Error generating appcast from directory", archivesSourceDir.path, "\n", error)
-            Darwin.exit(1)
+            throw ExitCode(1)
         }
     }
 }
 
-GenerateAppcast.main()
+DispatchQueue.global().async(execute: {
+    GenerateAppcast.main()
+    CFRunLoopStop(CFRunLoopGetMain())
+})
+CFRunLoopRun()
