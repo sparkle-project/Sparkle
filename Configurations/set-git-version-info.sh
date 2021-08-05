@@ -22,8 +22,8 @@ if [ -z "$gitversion" ] ; then
     exit 0
 fi
 
-# remove everything before the first "-" to keep the hash part only
-versionsuffix=${gitversion#*-};
+# remove everything before the last "-" to keep the hash part only
+versionsuffix=${gitversion##*-};
 if [ "$versionsuffix" != "$gitversion" ]; then
     version="$version $versionsuffix"
 fi
