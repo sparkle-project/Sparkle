@@ -5,11 +5,7 @@ env:
   DEVELOPER_DIR: "/Applications/Xcode_12.5.1.app/Contents/Developer"
 
 on:
-  workflow_dispatch:
-    inputs:
-      tag:
-        description: 'Tag to use for this release. Please use https://semver.org.'
-        required: true
+  workflow_dispatch
 
 concurrency: 
   group: publish-release-${{ github.ref }}
@@ -34,18 +30,23 @@ jobs:
           GITHUB_REPOSITORY: ${{ github.repository }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: "Extract version information from project"
+        run: |
+          MARKETING_VERSION=$(xcrun xcodebuild -showBuildSettings -project Sparkle.xcodeproj | grep MARKETING_VERSION | cut -f 7 -d ' ')
+          echo ::set-env name=MARKETING_VERSION::${MARKETING_VERSION}
+
       - name: "Commit and push updated Swift package description"
         run: |
             git add Package.swift
-            git commit -m "Update Package.swift for version ${{ github.event.inputs.tag }}"
+            git commit -m "Update Package.swift for version ${{ env.MARKETING_VERSION }}"
             git push
 
       - name: "Draft a release"
         uses: softprops/action-gh-release@v1
         with:
           draft: true
-          name: "Sparkle ${{ github.event.inputs.tag }}"
-          tag_name: ${{ github.event.inputs.tag }}
+          name: "Sparkle ${{ env.MARKETING_VERSION }}"
+          tag_name: ${{ env.MARKETING_VERSION }}
           fail_on_unmatched_files: true
           files: |
             build/Build/Products/Release/Sparkle-*.tar.xz
