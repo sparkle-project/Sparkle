@@ -35,6 +35,15 @@ jobs:
           MARKETING_VERSION=$(xcrun xcodebuild -showBuildSettings -project Sparkle.xcodeproj | grep MARKETING_VERSION | cut -f 7 -d ' ')
           echo ::set-env name=MARKETING_VERSION::${MARKETING_VERSION}
 
+      - name: "Determine if this is a pre-release version"
+        run: |
+          SPARKLE_VERSION_SUFFIX=$(xcrun xcodebuild -showBuildSettings -project Sparkle.xcodeproj | grep SPARKLE_VERSION_SUFFIX | cut -f 7 -d ' ')
+          if [[ -z "$SPARKLE_VERSION_SUFFIX" ]]; then
+            echo ::set-env name=PRERELEASE_VERSION::true
+          else
+            echo ::set-env name=PRERELEASE_VERSION::false
+          fi
+
       - name: "Commit and push updated Swift package description"
         run: |
             git add Package.swift
@@ -45,6 +54,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           draft: true
+          prerelease: ${{ env.PRERELEASE_VERSION }}
           name: "Sparkle ${{ env.MARKETING_VERSION }}"
           tag_name: ${{ env.MARKETING_VERSION }}
           fail_on_unmatched_files: true
