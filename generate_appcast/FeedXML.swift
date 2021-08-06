@@ -5,7 +5,7 @@
 
 import Foundation
 
-let maxVersionsInFeed = 5
+let maxNewVersionsInFeed = 5
 
 func findElement(name: String, parent: XMLElement) -> XMLElement? {
     if let found = try? parent.nodes(forXPath: name) {
@@ -68,7 +68,7 @@ func writeAppcast(appcastDestPath: URL, updates: [ArchiveItem]) throws {
         root.addChild(channel)
     }
 
-    var numItems = 0
+    var numberOfNewItems = 0
     for update in updates {
         var item: XMLElement
         
@@ -78,20 +78,24 @@ func writeAppcast(appcastDestPath: URL, updates: [ArchiveItem]) throws {
             existingItems = try channel.nodes(forXPath: "item[\(SUAppcastElementVersion)=\"\(update.version)\"]")
         }
         
-        let createNewItem = existingItems.count == 0
+        let createNewItem = (existingItems.count == 0)
 
-        // Update all old items, but aim for less than 5 in new feeds
-        if createNewItem && numItems >= maxVersionsInFeed {
-            continue
+        // Update all old items, but aim for adding less than maxNewVersionsInFeed new items
+        if createNewItem {
+            if numberOfNewItems >= maxNewVersionsInFeed {
+                continue
+            }
+            numberOfNewItems += 1
         }
-        numItems += 1
 
         if createNewItem {
             item = XMLElement.element(withName: "item") as! XMLElement
-            channel.addChild(item)
         } else {
             item = existingItems[0] as! XMLElement
+            // Remove the existing item to make sure it's inserted in the correct order when we re-add it
+            channel.removeChild(at: item.index)
         }
+        channel.addChild(item)
 
         if nil == findElement(name: "title", parent: item) {
             item.addChild(XMLElement.element(withName: "title", stringValue: update.shortVersion) as! XMLElement)
