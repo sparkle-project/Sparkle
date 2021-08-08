@@ -5,8 +5,6 @@
 
 import Foundation
 
-let maxNewVersionsInFeed = 5
-
 func findElement(name: String, parent: XMLElement) -> XMLElement? {
     if let found = try? parent.nodes(forXPath: name) {
         if found.count > 0 {
@@ -31,7 +29,7 @@ func text(_ text: String) -> XMLNode {
     return XMLNode.text(withStringValue: text) as! XMLNode
 }
 
-func writeAppcast(appcastDestPath: URL, updates: [ArchiveItem]) throws {
+func writeAppcast(appcastDestPath: URL, updates: [ArchiveItem], newVersions: Set<String>?, maxNewVersionsInFeed: Int, link: String?, newChannel: String?, majorVersion: String?, phasedRolloutInterval: Int?, criticalUpdateVersion: String?, informationalUpdateVersions: [String]?) throws -> (numNewUpdates: Int, numExistingUpdates: Int) {
     let appBaseName = updates[0].appPath.deletingPathExtension().lastPathComponent
 
     let sparkleNS = "http://www.andymatuschak.org/xml-namespaces/sparkle"
@@ -67,8 +65,11 @@ func writeAppcast(appcastDestPath: URL, updates: [ArchiveItem]) throws {
         channel.addChild(XMLElement.element(withName: "title", stringValue: appBaseName) as! XMLElement)
         root.addChild(channel)
     }
+    
+    var numNewUpdates = 0
+    var numExistingUpdates = 0
 
-    var numberOfNewItems = 0
+    var numItems = 0
     for update in updates {
         var item: XMLElement
         
@@ -80,13 +81,24 @@ func writeAppcast(appcastDestPath: URL, updates: [ArchiveItem]) throws {
         
         let createNewItem = (existingItems.count == 0)
 
-        // Update all old items, but aim for adding less than maxNewVersionsInFeed new items
+        // Update all old items, but aim for less than maxNewVersionsInFeed in new feeds,
+        // unless the user specifies which versions they want to generate
         if createNewItem {
-            if numberOfNewItems >= maxNewVersionsInFeed {
-                continue
+            if let newVersions = newVersions {
+                if !newVersions.contains(update.version) {
+                    continue
+                }
+            } else {
+                if numItems >= maxNewVersionsInFeed {
+                    continue
+                }
             }
-            numberOfNewItems += 1
+            
+            numNewUpdates += 1
+        } else {
+            numExistingUpdates += 1
         }
+        numItems += 1
 
         if createNewItem {
             item = XMLElement.element(withName: "item") as! XMLElement
@@ -102,6 +114,58 @@ func writeAppcast(appcastDestPath: URL, updates: [ArchiveItem]) throws {
         }
         if nil == findElement(name: "pubDate", parent: item) {
             item.addChild(XMLElement.element(withName: "pubDate", stringValue: update.pubDate) as! XMLElement)
+        }
+        
+        if createNewItem {
+            // Set link
+            if let link = link,
+               let linkElement = XMLElement.element(withName: SURSSElementLink, uri: sparkleNS) as? XMLElement {
+                linkElement.setChildren([text(link)])
+                item.addChild(linkElement)
+            }
+            
+            // Set new channel name
+            if let newChannelName = newChannel,
+               let channelNameElement = XMLElement.element(withName: SUAppcastElementChannel, uri: sparkleNS) as? XMLElement {
+                channelNameElement.setChildren([text(newChannelName)])
+                item.addChild(channelNameElement)
+            }
+            
+            // Set last major version
+            if let minimumAutoupdateVersion = majorVersion,
+               let minimumAutoupdateVersionElement = XMLElement.element(withName: SUAppcastElementMinimumAutoupdateVersion, uri: sparkleNS) as? XMLElement {
+                minimumAutoupdateVersionElement.setChildren([text(minimumAutoupdateVersion)])
+                item.addChild(minimumAutoupdateVersionElement)
+            }
+            
+            // Set phased rollout interval
+            if let phasedRolloutInterval = phasedRolloutInterval,
+               let phasedRolloutIntervalElement = XMLElement.element(withName: SUAppcastElementPhasedRolloutInterval, uri: sparkleNS) as? XMLElement {
+                phasedRolloutIntervalElement.setChildren([text(String(phasedRolloutInterval))])
+                item.addChild(phasedRolloutIntervalElement)
+            }
+            
+            // Set last critical update version
+            if let criticalUpdateVersion = criticalUpdateVersion,
+               let criticalUpdateElement = XMLElement.element(withName: SUAppcastElementCriticalUpdate, uri: sparkleNS) as? XMLElement {
+                if criticalUpdateVersion.count > 0 {
+                    criticalUpdateElement.setAttributesWith([SUAppcastAttributeVersion: criticalUpdateVersion])
+                }
+                item.addChild(criticalUpdateElement)
+            }
+            
+            // Set informational update versions
+            if let informationalUpdateVersions = informationalUpdateVersions,
+               let informationalUpdateElement = XMLElement.element(withName: SUAppcastElementInformationalUpdate, uri: sparkleNS) as? XMLElement {
+                let versionElements: [XMLElement] = informationalUpdateVersions.compactMap({ informationalUpdateVersion in
+                    let element = XMLElement.element(withName: SUAppcastAttributeVersion, uri: sparkleNS) as? XMLElement
+                    element?.setChildren([text(informationalUpdateVersion)])
+                    return element
+                })
+                
+                informationalUpdateElement.setChildren(versionElements)
+                item.addChild(informationalUpdateElement)
+            }
         }
         
         var versionElement = findElement(name: SUAppcastElementVersion, parent: item)
@@ -124,13 +188,20 @@ func writeAppcast(appcastDestPath: URL, updates: [ArchiveItem]) throws {
             cdata.stringValue = html
             descElement.setChildren([cdata])
         }
-
+        
+        // Override the minimum system version with the version from the archive,
+        // only if an existing item doesn't specify one
+        let minimumSystemVersion: String
         var minVer = findElement(name: SUAppcastElementMinimumSystemVersion, parent: item)
-        if nil == minVer {
+        if let minVer = minVer {
+            minimumSystemVersion = minVer.stringValue ?? update.minimumSystemVersion
+        } else {
             minVer = XMLElement.element(withName: SUAppcastElementMinimumSystemVersion, uri: sparkleNS) as? XMLElement
             item.addChild(minVer!)
+            
+            minimumSystemVersion = update.minimumSystemVersion
         }
-        minVer?.setChildren([text(update.minimumSystemVersion)])
+        minVer?.setChildren([text(minimumSystemVersion)])
 
         // Look for an existing release notes element
         let releaseNotesXpath = "\(SUAppcastElementReleaseNotesLink)"
@@ -222,4 +293,6 @@ func writeAppcast(appcastDestPath: URL, updates: [ArchiveItem]) throws {
     let docData = doc.xmlData(options: options)
     _ = try XMLDocument(data: docData, options: XMLNode.Options()); // Verify that it was generated correctly, which does not always happen!
     try docData.write(to: appcastDestPath)
+    
+    return (numNewUpdates, numExistingUpdates)
 }
