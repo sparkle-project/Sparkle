@@ -18,7 +18,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-/*!
+/**
  This class can be used for reading certain updater settings.
  
  It retrieves the settings by first looking into the host's user defaults.
@@ -28,22 +28,22 @@ SU_EXPORT @interface SPUUpdaterSettings : NSObject
 
 - (instancetype)initWithHostBundle:(NSBundle *)hostBundle;
 
-/*!
+/**
  * Indicates whether or not automatic update checks are enabled.
  */
 @property (readonly, nonatomic) BOOL automaticallyChecksForUpdates;
 
-/*!
+/**
  * The regular update check interval.
  */
 @property (readonly, nonatomic) NSTimeInterval updateCheckInterval;
 
-/*!
+/**
  * Indicates whether or not automatically downloading updates is allowed to be turned on by the user.
  */
 @property (readonly, nonatomic) BOOL allowsAutomaticUpdates;
 
-/*!
+/**
  * Indicates whether or not automatically downloading updates is enabled by the user or developer.
  *
  * Note this does not indicate whether or not automatic downloading of updates is allowable.
@@ -51,7 +51,7 @@ SU_EXPORT @interface SPUUpdaterSettings : NSObject
  */
 @property (readonly, nonatomic) BOOL automaticallyDownloadsUpdates;
 
-/*!
+/**
  * Indicates whether or not anonymous system profile information is sent when checking for updates.
  */
 @property (readonly, nonatomic) BOOL sendsSystemProfile;

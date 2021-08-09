@@ -22,7 +22,7 @@ NS_ASSUME_NONNULL_BEGIN
 @class SUStandardVersionComparator, SPUAppcastItemState;
 @protocol SUVersionComparison;
 
-/*!
+/**
  Private exposed class used to resolve Appcast Item properties that rely on external factors such as a host.
  This resolver is used for constructing appcast items.
  */

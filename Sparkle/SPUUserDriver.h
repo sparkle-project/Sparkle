@@ -22,7 +22,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class SPUUpdatePermissionRequest, SUUpdatePermissionResponse, SUAppcastItem, SPUDownloadData;
 
-/*!
+/**
  The API in Sparkle for controlling the user interaction.
  
  This protocol is used for implementing a user interface for the Sparkle updater. Sparkle's internal drivers tell
@@ -32,7 +32,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 SU_EXPORT @protocol SPUUserDriver <NSObject>
 
-/*!
+/**
  * Show an updater permission request to the user
  *
  * Ask the user for their permission regarding update checks.
@@ -43,7 +43,7 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  */
 - (void)showUpdatePermissionRequest:(SPUUpdatePermissionRequest *)request reply:(void (^)(SUUpdatePermissionResponse *))reply;
 
-/*!
+/**
  * Show the user initating an update check
  *
  * Respond to the user initiating an update check. Sparkle uses this to show the user a window with an indeterminate progress bar.
@@ -52,7 +52,7 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  */
 - (void)showUserInitiatedUpdateCheckWithCancellation:(void (^)(void))cancellation;
 
-/*!
+/**
  * Show the user a new update is found.
  *
  * Let the user know a new update is found and ask them what they want to do.
@@ -87,7 +87,7 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  */
 - (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem state:(SPUUserUpdateState *)state reply:(void (^)(SPUUserUpdateChoice))reply;
 
-/*!
+/**
  * Show the user the release notes for the new update
  *
  * Display the release notes to the user. This will be called after showing the new update.
@@ -98,7 +98,7 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  */
 - (void)showUpdateReleaseNotesWithDownloadData:(SPUDownloadData *)downloadData;
 
-/*!
+/**
  * Show the user that the new update's release notes could not be downloaded
  *
  * This will be called after showing the new update.
@@ -109,7 +109,7 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  */
 - (void)showUpdateReleaseNotesFailedToDownloadWithError:(NSError *)error;
 
-/*!
+/**
  * Show the user a new update was not found
  *
  * Let the user know a new update was not found after they tried initiating an update check.
@@ -128,7 +128,7 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  */
 - (void)showUpdateNotFoundWithError:(NSError *)error acknowledgement:(void (^)(void))acknowledgement;
 
-/*!
+/**
  * Show the user an update error occurred
  *
  * Let the user know that the updater failed with an error. This will not be invoked without the user having been
@@ -141,7 +141,7 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  */
 - (void)showUpdaterError:(NSError *)error acknowledgement:(void (^)(void))acknowledgement;
 
-/*!
+/**
  * Show the user that downloading the new update initiated
  *
  * Let the user know that downloading the new update started.
@@ -150,7 +150,7 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  */
 - (void)showDownloadInitiatedWithCancellation:(void (^)(void))cancellation;
 
-/*!
+/**
  * Show the user the content length of the new update that will be downloaded
  *
  * @param expectedContentLength The expected content length of the new update being downloaded.
@@ -159,7 +159,7 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  */
 - (void)showDownloadDidReceiveExpectedContentLength:(uint64_t)expectedContentLength;
 
-/*!
+/**
  * Show the user that the update download received more data
  *
  * This may be an appropriate time to advance a visible progress indicator of the download
@@ -167,7 +167,7 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  */
 - (void)showDownloadDidReceiveDataOfLength:(uint64_t)length;
 
-/*!
+/**
  * Show the user that the update finished downloading and started extracting
  *
  * Sparkle uses this to show an indeterminate progress bar.
@@ -177,7 +177,7 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  */
 - (void)showDownloadDidStartExtractingUpdate;
 
-/*!
+/**
  * Show the user that the update is extracting with progress
  *
  * Let the user know how far along the update extraction is.
@@ -188,7 +188,7 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  */
 - (void)showExtractionReceivedProgress:(double)progress;
 
-/*!
+/**
  * Show the user that the update is installing
  *
  * Let the user know that the update is currently installing. Sparkle uses this to show an indeterminate progress bar.
@@ -197,7 +197,7 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  */
 - (void)showInstallingUpdate;
 
-/*!
+/**
  * Show the user that the update is ready to install & relaunch
  *
  * Let the user know that the update is ready to install and relaunch, and ask them whether they want to proceed.
@@ -214,7 +214,7 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  */
 - (void)showReadyToInstallAndRelaunch:(void (^)(SPUUserUpdateChoice))reply;
 
-/*!
+/**
  * Show or dismiss progress while a termination signal is being sent to the application from Sparkle's installer
  *
  * Terminating and relaunching the application (if requested to be relaunched) may happen quickly,
@@ -227,7 +227,7 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  */
 - (void)showSendingTerminationSignal;
 
-/*!
+/**
  * Show the user that the update installation finished
  *
  * Let the user know that the update finished installing.
@@ -243,7 +243,7 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  */
 - (void)showUpdateInstalledAndRelaunched:(BOOL)relaunched acknowledgement:(void (^)(void))acknowledgement;
 
-/*!
+/**
  * Show the user the current presented update or its progress in utmost focus
  *
  * The user wishes to check for updates while the user is being shown update progress.
@@ -251,7 +251,7 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  */
 - (void)showUpdateInFocus;
 
-/*!
+/**
  * Dismiss the current update installation
  *
  * Stop and tear down everything.

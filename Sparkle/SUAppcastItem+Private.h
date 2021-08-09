@@ -25,7 +25,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface SUAppcastItem (Private) <NSSecureCoding>
 
-/*!
+/**
  Initializes with data from a dictionary provided by the RSS class and state resolver
 
  This initializer method is intended to be marked "private" and discouraged from public usage.

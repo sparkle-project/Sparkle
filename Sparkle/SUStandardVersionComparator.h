@@ -32,7 +32,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-/*!
+/**
     Sparkle's default version comparator.
 
     This comparator is adapted from MacPAD, by Kevin Ballard.
@@ -41,19 +41,19 @@ NS_ASSUME_NONNULL_BEGIN
 */
 SU_EXPORT @interface SUStandardVersionComparator : NSObject <SUVersionComparison>
 
-/*!
+/**
     Initializes a new instance of the standard version comparator.
 */
 - (instancetype)init;
 
-/*!
+/**
     Returns a singleton instance of the comparator.
 
     It is usually preferred to alloc/init new a comparator instead.
  */
 + (SUStandardVersionComparator *)defaultComparator;
 
-/*!
+/**
     Compares version strings through textual analysis.
 
     See the implementation for more details.
