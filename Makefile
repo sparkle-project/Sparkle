@@ -23,8 +23,8 @@ release:
 build:
 	xcodebuild clean build
 	
+# Need to first gem install jazzy to run this rule
 docs:
-	# Need to first gem install jazzy
 	jazzy --objc --umbrella-header Sparkle/Sparkle.h --framework-root . --output Documentation/html
 
 uitest:
