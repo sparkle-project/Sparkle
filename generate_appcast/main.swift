@@ -140,7 +140,6 @@ struct GenerateAppcast: ParsableCommand {
         For more advanced options that can be used for publishing updates, see https://sparkle-project.org/documentation/publishing/ for further documentation.
         
         Extracted archives are cached in \((cacheDirectory.path as NSString).abbreviatingWithTildeInPath) to avoid re-computation in subsequent runs.
-        If archives that were processed are modified later, the caches may need to be cleared otherwise \(programName) assumes the archives do not change.
         
         Note that \(programName) does not support package-based (.pkg) updates.
         """)

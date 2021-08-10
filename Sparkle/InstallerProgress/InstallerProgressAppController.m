@@ -22,7 +22,7 @@
 #import "SPUSecureCoding.h"
 #import "SPUInstallationInfo.h"
 
-/*!
+/**
  * Terminate the application after a delay from launching the new update to avoid OS activation issues
  * This delay should be be high enough to increase the likelihood that our updated app will be launched up front,
  * but should be low enough so that the user doesn't ponder why the updater hasn't finished terminating yet

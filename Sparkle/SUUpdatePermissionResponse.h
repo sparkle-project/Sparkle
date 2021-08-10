@@ -16,12 +16,12 @@
 #endif
 #import <Sparkle/SUExport.h>
 
-/*!
+/**
  This class represents a response for permission to check updates.
 */
 SU_EXPORT @interface SUUpdatePermissionResponse : NSObject<NSSecureCoding>
 
-/*!
+/**
  Initializes a new update permission response instance.
  
  @param automaticUpdateChecks Flag for whether to allow automatic update checks.
@@ -34,12 +34,12 @@ SU_EXPORT @interface SUUpdatePermissionResponse : NSObject<NSSecureCoding>
  */
 - (instancetype)init NS_UNAVAILABLE;
 
-/*!
+/**
  A read-only property indicating whether automatic update checks are allowed or not.
  */
 @property (nonatomic, readonly) BOOL automaticUpdateChecks;
 
-/*!
+/**
  A read-only property indicating if system profile should be sent or not.
  */
 @property (nonatomic, readonly) BOOL sendSystemProfile;

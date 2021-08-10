@@ -35,7 +35,7 @@
 #define FIRST_UPDATER_MESSAGE_TIMEOUT 7ull
 #define RETRIEVE_PROCESS_IDENTIFIER_TIMEOUT 5ull
 
-/*!
+/**
  * Show display progress UI after a delay from starting the final part of the installation.
  * This should be long enough so that we don't show progress for very fast installations, but
  * short enough so that we don't leave the user wondering why nothing is happening.

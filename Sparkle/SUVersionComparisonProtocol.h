@@ -30,12 +30,12 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-/*!
+/**
     Provides version comparison facilities for Sparkle.
 */
 @protocol SUVersionComparison
 
-/*!
+/**
     An abstract method to compare two version strings.
 
     Should return NSOrderedAscending if b > a, NSOrderedDescending if b < a,

@@ -16,12 +16,12 @@
 #endif
 #import <Sparkle/SUExport.h>
 
-/*!
+/**
     Applies special display formatting to version numbers.
 */
 SU_EXPORT @protocol SUVersionDisplay
 
-/*!
+/**
     Formats two version strings.
 
     Both versions are provided so that important distinguishing information

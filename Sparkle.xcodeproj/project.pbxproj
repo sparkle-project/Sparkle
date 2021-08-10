@@ -442,13 +442,6 @@
 			remoteGlobalIDString = 61B5F90109C4CEE200B25A18;
 			remoteInfo = "Sparkle Test App";
 		};
-		1454BA1719637EE900344E57 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 1420DF491962329200203BB0;
-			remoteInfo = Documentation;
-		};
 		14732BCA1960F73500593899 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
@@ -811,7 +804,6 @@
 		0263187214FEBB31005EBF43 /* uk */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/Sparkle.strings; sourceTree = "<group>"; };
 		0867D69BFE84028FC02AAC07 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		0867D6A5FE840307C02AAC07 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
-		1420DF4D196247B500203BB0 /* build-docs.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "build-docs.sh"; sourceTree = "<group>"; };
 		1420DF4E196247B500203BB0 /* Doxyfile */ = {isa = PBXFileReference; lastKnownFileType = text; path = Doxyfile; sourceTree = "<group>"; };
 		1420DF4F196247F900203BB0 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		142E0E0819A83AAC00E4312B /* SUBinaryDeltaTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUBinaryDeltaTest.m; sourceTree = "<group>"; };
@@ -1608,7 +1600,6 @@
 			children = (
 				1420DF4E196247B500203BB0 /* Doxyfile */,
 				721D8A891D4D273E0032E472 /* Internal */,
-				1420DF4D196247B500203BB0 /* build-docs.sh */,
 			);
 			path = Documentation;
 			sourceTree = "<group>";
@@ -2401,20 +2392,6 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXLegacyTarget section */
-		1420DF491962329200203BB0 /* Documentation */ = {
-			isa = PBXLegacyTarget;
-			buildArgumentsString = "\"$(SRCROOT)/Documentation/build-docs.sh\" $(ACTION)";
-			buildConfigurationList = 1420DF4A1962329200203BB0 /* Build configuration list for PBXLegacyTarget "Documentation" */;
-			buildPhases = (
-			);
-			buildToolPath = bash;
-			buildWorkingDirectory = "";
-			dependencies = (
-			);
-			name = Documentation;
-			passBuildSettingsInEnvironment = 1;
-			productName = Documentation;
-		};
 		14732BC51960F69300593899 /* Distribution */ = {
 			isa = PBXLegacyTarget;
 			buildArgumentsString = "$(SRCROOT)/Configurations/make-release-package.sh $(ACTION)";
@@ -2435,7 +2412,6 @@
 				7205C46B1E13070300E370AE /* PBXTargetDependency */,
 				FA344BA724C869A300B2A401 /* PBXTargetDependency */,
 				FA344BA524C8699E00B2A401 /* PBXTargetDependency */,
-				1454BA1819637EE900344E57 /* PBXTargetDependency */,
 				895C5DC724D78F700058A82D /* PBXTargetDependency */,
 			);
 			name = Distribution;
@@ -2940,7 +2916,6 @@
 				72D9549D1CBB415B006F28BD /* sparkle-cli */,
 				721C24441CB753E6005440CB /* Installer Progress */,
 				14732BC51960F69300593899 /* Distribution */,
-				1420DF491962329200203BB0 /* Documentation */,
 				1495005F195FB89400BC5B5B /* All */,
 				895C5DC024D78E210058A82D /* XCFrameworks */,
 				726B2B5C1C645FC900388755 /* UI Tests */,
@@ -3552,11 +3527,6 @@
 			target = 61B5F90109C4CEE200B25A18 /* Sparkle Test App */;
 			targetProxy = 1454BA1519637EDB00344E57 /* PBXContainerItemProxy */;
 		};
-		1454BA1819637EE900344E57 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 1420DF491962329200203BB0 /* Documentation */;
-			targetProxy = 1454BA1719637EE900344E57 /* PBXContainerItemProxy */;
-		};
 		14732BCB1960F73500593899 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 8DC2EF4F0486A6940098B216 /* Sparkle */;
@@ -3882,18 +3852,6 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
-		1420DF4B1962329200203BB0 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-			};
-			name = Debug;
-		};
-		1420DF4C1962329200203BB0 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-			};
-			name = Release;
-		};
 		14732BC71960F69300593899 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -3954,12 +3912,6 @@
 			name = Coverage;
 		};
 		149B78601B7D398100D7D62C /* Coverage */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-			};
-			name = Coverage;
-		};
-		149B78611B7D398100D7D62C /* Coverage */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 			};
@@ -4365,16 +4317,6 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		1420DF4A1962329200203BB0 /* Build configuration list for PBXLegacyTarget "Documentation" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				1420DF4B1962329200203BB0 /* Debug */,
-				149B78611B7D398100D7D62C /* Coverage */,
-				1420DF4C1962329200203BB0 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		14732BC61960F69300593899 /* Build configuration list for PBXLegacyTarget "Distribution" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
