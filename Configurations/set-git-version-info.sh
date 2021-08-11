@@ -8,12 +8,12 @@ fi
 if [ -z "$SRCROOT" ] || \
    [ -z "$BUILT_PRODUCTS_DIR" ] || \
    [ -z "$INFOPLIST_PATH" ] || \
-   [ -z "$CURRENT_PROJECT_VERSION" ]; then
+   [ -z "$MARKETING_VERSION" ]; then
 	echo "$0: Must be run from Xcode!" 1>&2
     exit 1
 fi
 
-version="$CURRENT_PROJECT_VERSION"
+version="$MARKETING_VERSION"
 
 # Get version in format 1.x.x-commits-hash
 gitversion=$( cd "$SRCROOT"; git describe --tags --match '[12].*' || true )
