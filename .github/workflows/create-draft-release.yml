@@ -33,15 +33,15 @@ jobs:
       - name: "Extract version information from project"
         run: |
           MARKETING_VERSION=$(xcrun xcodebuild -showBuildSettings -project Sparkle.xcodeproj | grep MARKETING_VERSION | cut -f 7 -d ' ')
-          echo ::set-env name=MARKETING_VERSION::${MARKETING_VERSION}
+          echo "MARKETING_VERSION=${MARKETING_VERSION}" >> $GITHUB_ENV~
 
       - name: "Determine if this is a pre-release version"
         run: |
           SPARKLE_VERSION_SUFFIX=$(xcrun xcodebuild -showBuildSettings -project Sparkle.xcodeproj | grep SPARKLE_VERSION_SUFFIX | cut -f 7 -d ' ')
           if [[ -z "$SPARKLE_VERSION_SUFFIX" ]]; then
-            echo ::set-env name=PRERELEASE_VERSION::true
+            echo "PRERELEASE_VERSION=true" >> $GITHUB_ENV
           else
-            echo ::set-env name=PRERELEASE_VERSION::false
+            echo "PRERELEASE_VERSION=false" >> $GITHUB_ENV
           fi
 
       - name: "Commit and push updated Swift package description"
