@@ -22,8 +22,8 @@ if [ -z "$gitversion" ] ; then
     exit 0
 fi
 
-# remove everything before the last "-" to keep the hash part only
-versionsuffix=${gitversion##*-};
+# remove everything before the second last "-" to keep the hash part only
+versionsuffix=$( echo "${gitversion}" | sed -E 's/.+((-[^.]+){2})$/\1/' )
 if [ "$versionsuffix" != "$gitversion" ]; then
     version="$version$versionsuffix"
 fi
