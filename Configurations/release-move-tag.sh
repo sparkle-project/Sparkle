@@ -19,6 +19,8 @@ if [ "$commits_since_tag" -gt 0 ]; then
     # If there have been commits since the latest tag, it's highly likely that we did not intend to do a full release
     echo "WARNING: $commits_since_tag commit(s) since tag '$latest_git_tag'. Did you tag a new version?"
     echo "Package.swift has not been committed and tag has not been moved."
+elif [ "$CI" == true ]; then
+    move_tag
 else
 # TODO: add sanity check to see if version is actually being updated or not?
     read -p "Do you want to commit changes to Package.swift and force move tag '$latest_git_tag'? (required for SPM release) [Y/n]" -n 1 -r

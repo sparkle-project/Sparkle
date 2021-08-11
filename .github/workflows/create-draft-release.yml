@@ -44,11 +44,8 @@ jobs:
             echo "PRERELEASE_VERSION=false" >> $GITHUB_ENV
           fi
 
-      - name: "Commit and push updated Swift package description"
-        run: |
-            git add Package.swift
-            git commit -m "Update Package.swift for version ${{ env.MARKETING_VERSION }}"
-            git push
+      - name: "Push the updated Swift package description"
+        run: git push
 
       - name: "Draft a release"
         uses: softprops/action-gh-release@v1
