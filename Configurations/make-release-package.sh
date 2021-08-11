@@ -5,16 +5,16 @@ if [ "$ACTION" = "" ] ; then
     # If using cocoapods, sanity check that the Podspec version matches the Sparkle version
     if [ -x "$(command -v pod)" ]; then
         spec_version=$(printf "require 'cocoapods'\nspec = %s\nprint spec.version" "$(cat "$SRCROOT/Sparkle.podspec")" | LANG=en_US.UTF-8 ruby)
-        if [ "$spec_version" != "$CURRENT_PROJECT_VERSION" ] ; then
-            echo "podspec version '$spec_version' does not match the current project version '$CURRENT_PROJECT_VERSION'" >&2
+        if [ "$spec_version" != "$MARKETING_VERSION" ] ; then
+            echo "podspec version '$spec_version' does not match the marketing version '$MARKETING_VERSION'" >&2
             exit 1
         fi
     fi
 
     rm -rf "$CONFIGURATION_BUILD_DIR/staging"
     rm -rf "$CONFIGURATION_BUILD_DIR/staging-spm"
-    rm -f "Sparkle-$CURRENT_PROJECT_VERSION.tar.xz"
-    rm -f "Sparkle-$CURRENT_PROJECT_VERSION.tar.bz2"
+    rm -f "Sparkle-$MARKETING_VERSION.tar.xz"
+    rm -f "Sparkle-$MARKETING_VERSION.tar.bz2"
     rm -f "Sparkle-for-Swift-Package-Manager.zip"
 
     mkdir -p "$CONFIGURATION_BUILD_DIR/staging"
@@ -80,19 +80,19 @@ if [ "$ACTION" = "" ] ; then
 
     # Sorted file list groups similar files together, which improves tar compression
     if [ "$XZ_EXISTS" -eq 1 ] ; then
-        find . \! -type d | rev | sort | rev | tar cv --files-from=- | xz -9 > "../Sparkle-$CURRENT_PROJECT_VERSION.tar.xz"
+        find . \! -type d | rev | sort | rev | tar cv --files-from=- | xz -9 > "../Sparkle-$MARKETING_VERSION.tar.xz"
 
         # Copy archived distribution for CI
-        cp -f "../Sparkle-$CURRENT_PROJECT_VERSION.tar.xz" "../sparkle-dist.tar.xz"
+        cp -f "../Sparkle-$MARKETING_VERSION.tar.xz" "../sparkle-dist.tar.xz"
 
         # Extract archive for testing binary validity
-        tar -xf "../Sparkle-$CURRENT_PROJECT_VERSION.tar.xz" -C "/tmp/sparkle-extract"
+        tar -xf "../Sparkle-$MARKETING_VERSION.tar.xz" -C "/tmp/sparkle-extract"
     else
         # Fallback to bz2 compression if xz utility is not available
-        find . \! -type d | rev | sort | rev | tar cjvf "../Sparkle-$CURRENT_PROJECT_VERSION.tar.bz2" --files-from=-
+        find . \! -type d | rev | sort | rev | tar cjvf "../Sparkle-$MARKETING_VERSION.tar.bz2" --files-from=-
 
         # Extract archive for testing binary validity
-        tar -xf "../Sparkle-$CURRENT_PROJECT_VERSION.tar.bz2" -C "/tmp/sparkle-extract"
+        tar -xf "../Sparkle-$MARKETING_VERSION.tar.bz2" -C "/tmp/sparkle-extract"
     fi
 
     # Test code signing validity of the extracted products
@@ -140,10 +140,10 @@ if [ "$ACTION" = "" ] ; then
         # is equivalent to shasum -a 256 FILE
         spm_checksum=$(swift package compute-checksum "Sparkle-for-Swift-Package-Manager.zip")
         rm -rf ".build"
-        sed -E -i '' -e "/let tag/ s/\".+\"/\"$latest_git_tag\"/" -e "/let version/ s/\".+\"/\"$CURRENT_PROJECT_VERSION\"/" -e "/let checksum/ s/[[:xdigit:]]{64}/$spm_checksum/" "Package.swift"
+        sed -E -i '' -e "/let tag/ s/\".+\"/\"$latest_git_tag\"/" -e "/let version/ s/\".+\"/\"$MARKETING_VERSION\"/" -e "/let checksum/ s/[[:xdigit:]]{64}/$spm_checksum/" "Package.swift"
         cp "Package.swift" "$SRCROOT"
         echo "Package.swift updated with the following values:"
-        echo "Version: $CURRENT_PROJECT_VERSION"
+        echo "Version: $MARKETING_VERSION"
         echo "Tag: $latest_git_tag"
         echo "Checksum: $spm_checksum"
     else
