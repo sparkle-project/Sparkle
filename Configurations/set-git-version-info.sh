@@ -25,7 +25,7 @@ fi
 # remove everything before the last "-" to keep the hash part only
 versionsuffix=${gitversion##*-};
 if [ "$versionsuffix" != "$gitversion" ]; then
-    version="$version $versionsuffix"
+    version="$version$versionsuffix"
 fi
 
 # and use it to set the CFBundleShortVersionString value
