@@ -24,6 +24,8 @@ NS_ASSUME_NONNULL_BEGIN
 @class SUAppcastItem;
 SU_EXPORT @interface SUAppcast : NSObject
 
+- (instancetype)init NS_UNAVAILABLE;
+
 @property (readonly, copy) NSArray<SUAppcastItem *> *items;
 
 @end
