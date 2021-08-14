@@ -12,7 +12,7 @@
 #import "SPUXPCServiceInfo.h"
 #import "SPUUpdaterDelegate.h"
 #import "SUAppcastItem.h"
-#import "SULog.h"
+#import "SUAppcastItem+Private.h"
 #import "SULocalizations.h"
 #import "SUErrors.h"
 #import "SUHost.h"

@@ -33,41 +33,294 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-SU_EXPORT @interface SUAppcastItem : NSObject<NSSecureCoding>
-@property (copy, readonly, nullable) NSString *title;
-@property (copy, readonly, nullable) NSString *dateString;
-@property (copy, readonly, nullable) NSDate *date;
-@property (copy, readonly, nullable) NSString *itemDescription;
-@property (strong, readonly, nullable) NSURL *releaseNotesURL;
-@property (strong, readonly, nullable) SUSignatures *signatures;
-@property (copy, readonly, nullable) NSString *minimumSystemVersion;
-@property (copy, readonly, nullable) NSString *maximumSystemVersion;
-@property (strong, readonly, nullable) NSURL *fileURL;
-@property (nonatomic, readonly) uint64_t contentLength;
-@property (copy, readonly) NSString *versionString;
-@property (copy, readonly, nullable) NSString *osString;
-@property (copy, readonly, nullable) NSString *displayVersionString;
-@property (copy, readonly, nullable) NSDictionary *deltaUpdates;
-@property (strong, readonly, nullable) NSURL *infoURL;
-@property (copy, readonly, nullable) NSNumber* phasedRolloutInterval;
-@property (nonatomic, copy, readonly) NSString *installationType;
-@property (copy, readonly, nullable) NSString *minimumAutoupdateVersion;
-@property (nonatomic, readonly, nullable) NSString *channel;
+/**
+ The appcast item describing an update in the application's appcast feed.
 
-@property (getter=isDeltaUpdate, readonly) BOOL deltaUpdate;
-@property (getter=isCriticalUpdate, readonly) BOOL criticalUpdate;
-@property (getter=isMajorUpgrade, readonly) BOOL majorUpgrade;
-@property (getter=isMacOsUpdate, readonly) BOOL macOsUpdate;
+ An appcast item represents a single update item in your `SUAppcast`  contained within the <item> element.
+ 
+ Every appcast item must have a `versionString`, and either a `fileURL` or an `infoURL`.
+ All the remaining properties describing an update to the application are optional.
+ 
+ Extended documentation and examples on using appcast item features are available at:
+ https://sparkle-project.org/documentation/publishing/
+ */
+SU_EXPORT @interface SUAppcastItem : NSObject<NSSecureCoding>
+
+/**
+ The version of the update item.
+ 
+ This corresponds to the application update's @c CFBundleVersion
+ 
+ Sparkle also uses this property to determine the sorting order of appcast items in the `SUAppcast`.
+ 
+ This is extracted from the <sparkle:version> element, or the sparkle:version attribute from the <enclosure> element.
+ */
+@property (copy, readonly) NSString *versionString;
+
+/**
+ The human-readable display version of the update item if provided.
+ 
+ This corresponds to the application update's @c CFBundleShortVersionString
+ 
+ This is extracted from the <sparkle:shortVersionString> element,  or the sparkle:version attribute from the <enclosure> element.
+ */
+@property (copy, readonly, nullable) NSString *displayVersionString;
+
+/**
+ The file URL to the update item if provided.
+ 
+ This download contains the actual update Sparkle will attempt to install.
+ In cases a download cannot be provided, an `infoURL` must be provided instead.
+ 
+ A file URL should have an accompanying `contentLength` provided.
+ 
+ This is extracted from the @c url attribute in the <enclosure> element.
+ */
+@property (readonly, nullable) NSURL *fileURL;
+
+/**
+ The content length of the download in bytes.
+ 
+ This property is used as a fallback when the download server doesn't report the content length of the download.
+ In that case, it is used to report progress of the downloading update to the user.
+ 
+ A warning is outputted if this property is not equal the server's expected content length (if provided).
+ 
+ This is extracted from the @c length attribute in the <enclosure> element.
+ It should be specified if a `fileURL` is provided.
+ */
+@property (nonatomic, readonly) uint64_t contentLength;
+
+/**
+ The info URL to the update item if provided.
+ 
+ This informational link is used to direct the user to learn more about an update they cannot download/install directly from within the application.
+ The link should point to the product's web page.
+ 
+ The informational link will be used if `informationOnlyUpdate` is @c YES
+ 
+ This is extracted from the <link> element.
+ */
+@property (readonly, nullable) NSURL *infoURL;
+
+/**
+ Indicates whether or not the update item is informational.
+ 
+ If `infoURL` is not present, this is @c NO
+ If `fileURL` is not present, this is @c YES
+ Otherwise this is determined based on the contents extracted from the <sparkle:informationalUpdate> element.
+ */
 @property (getter=isInformationOnlyUpdate, readonly) BOOL informationOnlyUpdate;
 
+/**
+ The title of the appcast item if provided.
+ 
+ This is extracted from the <title> element.
+ */
+@property (copy, readonly, nullable) NSString *title;
+
+/**
+ The date string of the appcast item if provided.
+ 
+ The `date` property is constructed from this property and expects this string to comply with the following date format:
+ E, dd MMM yyyy HH:mm:ss Z
+ 
+ This is extracted from the <pubDate> element.
+ */
+@property (copy, readonly, nullable) NSString *dateString;
+
+/**
+ The date constructed from the `dateString` property, if provided, using an en_US locale.
+ 
+ Sparkle by itself only uses this property for phased group rollouts specified via `phasedRolloutInterval`, but clients may query this property too.
+ */
+@property (copy, readonly, nullable) NSDate *date;
+
+/**
+ The release notes URL of the appcast item if provided.
+ 
+ This link points to an HTML file that Sparkle downloads and renders to the user for showing them a new or old update item's changes.
+ 
+ An alternative to using an external release notes link is providing an embedded `itemDescription`.
+ 
+ This is extracted from the <sparkle:releaseNotesLink> element.
+ */
+@property (readonly, nullable) NSURL *releaseNotesURL;
+
+/**
+ The description of the appcast item if provided.
+ 
+ A description may be provided for inline/embedded release notes of new updates using <![CDATA[...]]>
+ This is an alternative to providing a `releaseNotesURL`.
+ 
+ This is extracted from the <description> element.
+ */
+@property (copy, readonly, nullable) NSString *itemDescription;
+
+/**
+ The required minimum system operating version string this update meets if provided.
+ 
+ This version string should contain three period-separated components.
+ 
+ Example:
+ 10.12.0
+ 
+ Use `minimumOperatingSystemVersionIsOK` property to test if the current running system passes this requirement.
+ 
+ This is extracted from the <sparkle:minimumSystemVersion> element.
+ */
+@property (copy, readonly, nullable) NSString *minimumSystemVersion;
+
+/**
+ Indicates whether or not the current running system passes the `minimumSystemVersion` requirement.
+ */
 @property (nonatomic, readonly) BOOL minimumOperatingSystemVersionIsOK;
+
+/**
+ The required maximum system operating version string this update meets if provided.
+ 
+ A maximum system operating version requirement should only be made in unusual scenarios.
+ 
+ This version string should contain three period-separated components.
+ 
+ Example:
+ 10.13.0
+ 
+ Use `maximumOperatingSystemVersionIsOK`property  to test if the current running system passes this requirement.
+ 
+ This is extracted from the <sparkle:maximumSystemVersion> element.
+ */
+@property (copy, readonly, nullable) NSString *maximumSystemVersion;
+
+/**
+ Indicates whether or not the current running system passes the `maximumSystemVersion` requirement.
+ */
 @property (nonatomic, readonly) BOOL maximumOperatingSystemVersionIsOK;
 
-// Returns the dictionary representing the appcast item; this might be useful later for extensions.
+/**
+ The channel the update item is on if provided.
+ 
+ An update item may specify a custom channel name (such as "beta") that can only be found by updaters that filter for that channel.
+ If no channel is provided, the update item is assumed to be on the default channel.
+ 
+ This is extracted from the <sparkle:channel> element.
+ Old applications must be using Sparkle 2 or later to interpret the channel element and to ignore unmatched channels.
+ */
+@property (nonatomic, readonly, nullable) NSString *channel;
+
+/**
+ The installation type of the update at `fileURL`
+ 
+ This may be:
+ @c application - indicates this is a regular application update.
+ @c package - indicates this is a guided package installer update.
+ @c interactive-package - indicates this is an interactive package installer update (deprecated; use "package" instead)
+ 
+ This is extracted from the @c sparkle:installationType attribute in the <enclosure> element.
+ If no installation type is provided in the enclosure, the installation type is inferred from the `fileURL` file extension instead.
+ If the file extension is pkg or mpkg, the installation type is @c package otherwise it is @c application
+ Hence, the installation type in the enclosure element only needs to be specified for package based updates distributed inside of a zip or other archive format.
+ Old applications must be using Sparkle 1.26 or later to support downloading bare package updates that are not additionally archived inside of a zip or other archive format.
+ */
+@property (nonatomic, copy, readonly) NSString *installationType;
+
+/**
+ The phased rollout interval of the update item in seconds if provided.
+ 
+ This is the interval between when different groups of users are notified of a new update.
+ For this property to be used by Sparkle, the published `date` on the update item must be present as well.
+ After each interval after the update item's `date`, a new group of users become eligible for being notified of a new update.
+ 
+ This is extracted from the <sparkle:phasedRolloutInterval> element.
+ Old applications must be using Sparkle 1.25 or later to support phased rollout intervals, otherwise they may assume updates are immediately available.
+ */
+@property (copy, readonly, nullable) NSNumber* phasedRolloutInterval;
+
+/**
+ The required minimum bundle version string this update meets for automatically downloading and installing updates if provided.
+ 
+ If an application's bundle version meets this version requirement, it can install the new update item in the background automatically.
+ Otherwise if the requirement is not met, the user is always  prompted to install the update. In this case, the update is assumed to be a `majorUpgrade`.
+ If the update is a `majorUpgrade` and the update is skipped by the user, other future update alerts with the same `minimumAutoupdateVersion` will also be skipped.
+ 
+ This version string corresponds to the application's @c CFBundleVersion
+ */
+@property (copy, readonly, nullable) NSString *minimumAutoupdateVersion;
+
+/**
+ Indicates whether or not the update item is a major upgrade.
+ 
+ An update is a major upgrade if the application's bundle version doesn't meet the `minimumAutoupdateVersion` requirement.
+ */
+@property (getter=isMajorUpgrade, readonly) BOOL majorUpgrade;
+
+/**
+ Indicates whether or not the update item is critical.
+ 
+ Critical updates are shown to the user more promptly. Sparkle's standard user interface does not allow them to be skipped.
+ 
+ This is determined and extracted from a top-level <sparkle:criticalUpdate> element or a sparkle:criticalUpdate element inside of a sparkle:tags element.
+ Old applications must be using Sparkle 2 or later to support the top-level <sparkle:criticalUpdate> element.
+ */
+@property (getter=isCriticalUpdate, readonly) BOOL criticalUpdate;
+
+/**
+ Specifies the operating system the download update is available for if provided.
+ 
+ If this property is not provided, then the supported operating system is assumed to be macOS.
+ 
+ Known potential values for this string are "macos" and "windows"
+ Sparkle on Mac ignores update items that are for other operating systems.
+ This is only useful for sharing appcasts between Sparkle on Mac and Sparkle on other operating systems.
+ 
+ Use `macOsUpdate` property to test if this update item is for macOS.
+ 
+ This is extracted from the @c sparkle:os attribute in the <enclosure> element.
+ */
+@property (copy, readonly, nullable) NSString *osString;
+
+/**
+ Indicates whether or not this update item is for macOS.
+ 
+ This is determined from the `osString` property.
+ */
+@property (getter=isMacOsUpdate, readonly) BOOL macOsUpdate;
+
+/**
+ The delta updates for this update item.
+ 
+ Sparkle uses these to download and apply a smaller update based on the version the user is updating from.
+ 
+ The key is based on the sparkle:version of the update.
+ The value is an update item that will have `deltaUpdate` be @c YES
+ 
+ Clients typically should not need to examine the contents of the delta updates.
+ 
+ This is extracted from the sparkle:deltas element.
+ */
+@property (copy, readonly, nullable) NSDictionary<NSString *, SUAppcastItem *> *deltaUpdates;
+
+/**
+ Indicates whether or not the update item is a delta update.
+ 
+ An update item is a delta update if it is in the `deltaUpdates` of another update item.
+ */
+@property (getter=isDeltaUpdate, readonly) BOOL deltaUpdate;
+
+/**
+ The dictionary representing the entire appcast item.
+ 
+ This is useful for querying custom extensions or elements from the appcast item.
+ */
 @property (readonly, copy) NSDictionary *propertiesDictionary;
 
 - (instancetype)init NS_UNAVAILABLE;
 
+/**
+ An empty appcast item.
+ 
+ This may be used as a potential return value in `-[SPUUpdaterDelegate bestValidUpdateInAppcast:forUpdater:]`
+ */
 + (instancetype)emptyAppcastItem;
 
 // Deprecated initializers

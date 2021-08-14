@@ -22,10 +22,19 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @class SUAppcastItem;
+
+/**
+ The appcast representing a collection of updates in the appcast feed.
+ */
 SU_EXPORT @interface SUAppcast : NSObject
 
 - (instancetype)init NS_UNAVAILABLE;
 
+/**
+ The collection of update items.
+ 
+ These update items are in the same order as specified in the appcast XML feed and are thus not sorted by version.
+ */
 @property (readonly, copy) NSArray<SUAppcastItem *> *items;
 
 @end

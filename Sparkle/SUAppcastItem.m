@@ -37,6 +37,8 @@ static NSString *SUAppcastItemStateKey = @"SUAppcastItemState";
 
 @interface SUAppcastItem ()
 
+@property (readonly, nullable) SUSignatures *signatures;
+
 // Auxillary appcast item state that needs to be evaluated based on the host state
 // This may be nil if the client creates an SUAppcastItem with a deprecated initializer
 // In that case we will need to fallback to safe behavior

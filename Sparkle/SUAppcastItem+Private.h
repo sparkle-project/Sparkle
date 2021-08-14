@@ -33,6 +33,11 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (nullable instancetype)initWithDictionary:(NSDictionary *)dict relativeToURL:(NSURL * _Nullable)appcastURL stateResolver:(SPUAppcastItemStateResolver *)stateResolver failureReason:(NSString * _Nullable __autoreleasing *_Nullable)error;
 
+/**
+ The DSA and EdDSA signatures along with their statuses.
+ */
+@property (readonly, nullable) SUSignatures *signatures;
+
 @end
 
 NS_ASSUME_NONNULL_END
