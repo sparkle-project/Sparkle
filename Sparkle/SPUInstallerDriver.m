@@ -41,7 +41,6 @@
 
 @property (nonatomic, readonly) SUHost *host;
 @property (nonatomic, readonly) NSBundle *applicationBundle;
-@property (nonatomic, readonly) NSBundle *sparkleBundle;
 @property (nonatomic, weak, readonly) id<SPUInstallerDriverDelegate> delegate;
 @property (nonatomic) SPUInstallerMessageType currentStage;
 @property (nonatomic) BOOL startedInstalling;
@@ -69,7 +68,6 @@
 
 @synthesize host = _host;
 @synthesize applicationBundle = _applicationBundle;
-@synthesize sparkleBundle = _sparkleBundle;
 @synthesize delegate = _delegate;
 @synthesize currentStage = _currentStage;
 @synthesize startedInstalling = _startedInstalling;
@@ -86,13 +84,12 @@
 @synthesize aborted = _aborted;
 @synthesize installerError = _installerError;
 
-- (instancetype)initWithHost:(SUHost *)host applicationBundle:(NSBundle *)applicationBundle sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater updaterDelegate:(id<SPUUpdaterDelegate>)updaterDelegate delegate:(nullable id<SPUInstallerDriverDelegate>)delegate
+- (instancetype)initWithHost:(SUHost *)host applicationBundle:(NSBundle *)applicationBundle updater:(id)updater updaterDelegate:(id<SPUUpdaterDelegate>)updaterDelegate delegate:(nullable id<SPUInstallerDriverDelegate>)delegate
 {
     self = [super init];
     if (self != nil) {
         _host = host;
         _applicationBundle = applicationBundle;
-        _sparkleBundle = sparkleBundle;
         _updater = updater;
         _updaterDelegate = updaterDelegate;
         _delegate = delegate;
