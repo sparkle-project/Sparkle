@@ -861,14 +861,16 @@ static NSString *escapeURLComponent(NSString *str) {
     NSArray *systemProfile = [SUSystemProfiler systemProfileArrayForHost:self.host];
     if ([self.delegate respondsToSelector:@selector(allowedSystemProfileKeysForUpdater:)]) {
         NSArray * allowedKeys = [self.delegate allowedSystemProfileKeysForUpdater:self];
-        NSMutableArray *filteredProfile = [NSMutableArray array];
-        for (NSDictionary *profileElement in systemProfile) {
-            NSString *key = [profileElement objectForKey:@"key"];
-            if (key && [allowedKeys containsObject:key]) {
-                [filteredProfile addObject:profileElement];
+        if (allowedKeys != nil) {
+            NSMutableArray *filteredProfile = [NSMutableArray array];
+            for (NSDictionary *profileElement in systemProfile) {
+                NSString *key = [profileElement objectForKey:@"key"];
+                if (key && [allowedKeys containsObject:key]) {
+                    [filteredProfile addObject:profileElement];
+                }
             }
+            systemProfile = [filteredProfile copy];
         }
-        systemProfile = [filteredProfile copy];
     }
     return systemProfile;
 }

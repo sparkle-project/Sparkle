@@ -24,7 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
 @class SUAppcastItem;
 
 /**
- The appcast representing a collection of updates in the appcast feed.
+ The appcast representing a collection of `SUAppcastItem` update items in the feed.
  */
 SU_EXPORT @interface SUAppcast : NSObject
 
