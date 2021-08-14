@@ -939,6 +939,7 @@
 		7218EC362623F31C008FECF3 /* org.sparkle-project.InstallerConnection.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "org.sparkle-project.InstallerConnection.entitlements"; sourceTree = "<group>"; };
 		7218EC372623F32E008FECF3 /* org.sparkle-project.InstallerStatus.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "org.sparkle-project.InstallerStatus.entitlements"; sourceTree = "<group>"; };
 		7218EC4B2623F51C008FECF3 /* codesign_xpc_service.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = codesign_xpc_service.py; sourceTree = "<group>"; };
+		721AB11626C777D900D34A86 /* SPUDownloadDataPrivate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SPUDownloadDataPrivate.h; sourceTree = "<group>"; };
 		721BC2061D17A532002BC71E /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
 		721BC2081D17A553002BC71E /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = System/Library/Frameworks/Carbon.framework; sourceTree = SDKROOT; };
 		721BC20A1D17A5AD002BC71E /* CoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreServices.framework; path = System/Library/Frameworks/CoreServices.framework; sourceTree = SDKROOT; };
@@ -1780,6 +1781,7 @@
 			isa = PBXGroup;
 			children = (
 				72F9EC421D5E9ED8004AC8B6 /* SPUDownloadData.h */,
+				721AB11626C777D900D34A86 /* SPUDownloadDataPrivate.h */,
 				72F9EC431D5E9ED8004AC8B6 /* SPUDownloadData.m */,
 				7214B8851D45AD9A00CB5CED /* SPUInstallationType.h */,
 				7293A1AC1CEE933800B957A7 /* SPUURLRequest.h */,
