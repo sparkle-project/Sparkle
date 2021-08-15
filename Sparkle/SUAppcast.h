@@ -24,7 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
 @class SUAppcastItem;
 
 /**
- The appcast representing a collection of `SUAppcastItem` update items in the feed.
+ The appcast representing a collection of `SUAppcastItem` items in the feed.
  */
 SU_EXPORT @interface SUAppcast : NSObject
 
@@ -33,7 +33,7 @@ SU_EXPORT @interface SUAppcast : NSObject
 /**
  The collection of update items.
  
- These update items are in the same order as specified in the appcast XML feed and are thus not sorted by version.
+ These `SUAppcastItem` items are in the same order as specified in the appcast XML feed and are thus not sorted by version.
  */
 @property (readonly, copy) NSArray<SUAppcastItem *> *items;
 

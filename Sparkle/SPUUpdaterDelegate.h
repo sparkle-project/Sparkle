@@ -64,7 +64,7 @@ typedef NS_ENUM(NSInteger, SPUUpdateCheck)
 };
 
 /**
- Provides methods to control the behavior of an `SPUUpdater` object.
+ Provides delegation methods to control the behavior of an `SPUUpdater` object.
  */
 @protocol SPUUpdaterDelegate <NSObject>
 @optional
@@ -405,7 +405,7 @@ typedef NS_ENUM(NSInteger, SPUUpdateCheck)
  
  Also if the updater is given responsibility and the update item is marked critical, the new update will be presented to the user immediately after.
  
- Even if the `immediateInstallHandler` is not invoked, the installer will attempt to install the update on termination.
+ Even if the @p immediateInstallHandler is not invoked, the installer will attempt to install the update on termination.
  
  @param updater The updater instance.
  @param item The appcast item corresponding to the update that is proposed to be installed.
