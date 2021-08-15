@@ -71,7 +71,7 @@
     exit(EXIT_SUCCESS);
 }
 
-- (void)updaterWillNotScheduleUpdate:(SPUUpdater *)__unused updater __attribute__((noreturn))
+- (void)updaterWillNotScheduleUpdateCheck:(SPUUpdater *)__unused updater __attribute__((noreturn))
 {
     if (self.verbose) {
         fprintf(stderr, "Automatic update checks are disabled. Exiting.\n");

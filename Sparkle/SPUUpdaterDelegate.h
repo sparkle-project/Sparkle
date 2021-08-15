@@ -361,13 +361,13 @@ typedef NS_ENUM(NSInteger, SPUUpdateCheck)
 - (void)updater:(SPUUpdater *)updater willScheduleUpdateCheckAfterDelay:(NSTimeInterval)delay;
 
 /**
- Called when no updates will be scheduled in the future.
+ Called when no update checks will be scheduled in the future.
  
  This may later change if automatic update checks become enabled.
  
  @param updater The updater instance.
  */
-- (void)updaterWillNotScheduleUpdate:(SPUUpdater *)updater;
+- (void)updaterWillNotScheduleUpdateCheck:(SPUUpdater *)updater;
 
 /**
  Returns whether or not the updater should allow interaction from the installer
