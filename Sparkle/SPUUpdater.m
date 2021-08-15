@@ -403,8 +403,8 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     [self.updaterTimer invalidate];
     
     if (![self automaticallyChecksForUpdates]) {
-        if ([self.delegate respondsToSelector:@selector(updaterWillIdleSchedulingUpdates:)]) {
-            [self.delegate updaterWillIdleSchedulingUpdates:self];
+        if ([self.delegate respondsToSelector:@selector(updaterWillNotScheduleUpdate:)]) {
+            [self.delegate updaterWillNotScheduleUpdate:self];
         }
         return;
     }

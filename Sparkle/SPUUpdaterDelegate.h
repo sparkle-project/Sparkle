@@ -367,7 +367,7 @@ typedef NS_ENUM(NSInteger, SPUUpdateCheck)
  
  @param updater The updater instance.
  */
-- (void)updaterWillIdleSchedulingUpdates:(SPUUpdater *)updater;
+- (void)updaterWillNotScheduleUpdate:(SPUUpdater *)updater;
 
 /**
  Returns whether or not the updater should allow interaction from the installer
