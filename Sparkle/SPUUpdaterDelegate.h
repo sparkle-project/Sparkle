@@ -140,9 +140,9 @@ typedef NS_ENUM(NSInteger, SPUUpdateCheck)
 - (BOOL)updaterShouldPromptForPermissionToCheckForUpdates:(SPUUpdater *)updater;
 
 /**
- Returns a list of system profile keys to be appended to the appcast URL's query string.
+ Returns an allowed list of system profile keys to be appended to the appcast URL's query string.
 
- If this is not implemented then all keys will be included.
+ By default all keys will be included. This method allows overriding which keys should only be allowed.
 
  @param updater The updater instance.
 
