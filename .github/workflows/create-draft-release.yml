@@ -38,7 +38,7 @@ jobs:
       - name: "Determine if this is a pre-release version"
         run: |
           SPARKLE_VERSION_SUFFIX=$(xcrun xcodebuild -showBuildSettings -project Sparkle.xcodeproj | grep SPARKLE_VERSION_SUFFIX | cut -f 7 -d ' ')
-          if [[ -z "$SPARKLE_VERSION_SUFFIX" ]]; then
+          if [[ ! -z "$SPARKLE_VERSION_SUFFIX" ]]; then
             echo "PRERELEASE_VERSION=true" >> $GITHUB_ENV
           else
             echo "PRERELEASE_VERSION=false" >> $GITHUB_ENV
