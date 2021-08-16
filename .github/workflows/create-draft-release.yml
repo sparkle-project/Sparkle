@@ -44,6 +44,9 @@ jobs:
             echo "PRERELEASE_VERSION=false" >> $GITHUB_ENV
           fi
 
+      - name: "Create a temporary Git tag"
+        run: git tag "$MARKETING_VERSION"
+
       - name: "Push the updated Swift package description"
         run: git push
 
