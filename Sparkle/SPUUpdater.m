@@ -491,8 +491,8 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
             }
             
             BOOL preventsInstallerInteraction;
-            if ([strongSelf.delegate respondsToSelector:@selector(updaterShouldAllowInstallerInteraction:userInitiated:)]) {
-                preventsInstallerInteraction = ![strongSelf.delegate updaterShouldAllowInstallerInteraction:strongSelf userInitiated:NO];
+            if ([strongSelf.delegate respondsToSelector:@selector(updater:shouldAllowInstallerInteractionForUpdateCheck:)]) {
+                preventsInstallerInteraction = ![strongSelf.delegate updater:strongSelf shouldAllowInstallerInteractionForUpdateCheck:SPUUpdateCheckBackgroundScheduled];
             } else {
                 preventsInstallerInteraction = NO;
             }
@@ -538,8 +538,8 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
             SPUUpdater *strongSelf = weakSelf;
             if (strongSelf != nil) {
                 BOOL preventsInstallerInteraction;
-                if ([strongSelf.delegate respondsToSelector:@selector(updaterShouldAllowInstallerInteraction:userInitiated:)]) {
-                    preventsInstallerInteraction = ![strongSelf.delegate updaterShouldAllowInstallerInteraction:strongSelf userInitiated:YES];
+                if ([strongSelf.delegate respondsToSelector:@selector(updater:shouldAllowInstallerInteractionForUpdateCheck:)]) {
+                    preventsInstallerInteraction = ![strongSelf.delegate updater:strongSelf shouldAllowInstallerInteractionForUpdateCheck:SPUUpdateCheckUserInitiated];
                 } else {
                     preventsInstallerInteraction = NO;
                 }

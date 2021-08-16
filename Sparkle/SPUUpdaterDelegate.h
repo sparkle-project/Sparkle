@@ -57,6 +57,12 @@ SU_EXPORT extern NSString *const SUSystemProfilerPreferredLanguageKey;
 //	SPUUpdater Delegate:
 // -----------------------------------------------------------------------------
 
+typedef NS_ENUM(NSInteger, SPUUpdateCheck)
+{
+    SPUUpdateCheckUserInitiated = 0,
+    SPUUpdateCheckBackgroundScheduled = 1
+};
+
 /**
  Provides delegation methods to control the behavior of an `SPUUpdater` object.
  */
@@ -378,10 +384,9 @@ SU_EXPORT extern NSString *const SUSystemProfilerPreferredLanguageKey;
  Note this has no effect if the update has already been downloaded in the background silently and ready to be resumed.
  
  @param updater The updater instance.
- @param userInitiated Flag that indicates if the update check is initiated by the user.
- @return @c YES if installer interaction is allowed (the default), @c NO if installer interaction is not allowed.
+ @param updateCheck The type of update check being performed.
  */
-- (BOOL)updaterShouldAllowInstallerInteraction:(SPUUpdater *)updater userInitiated:(BOOL)userInitiated;
+- (BOOL)updater:(SPUUpdater *)updater shouldAllowInstallerInteractionForUpdateCheck:(SPUUpdateCheck)updateCheck;
 
 /**
  Returns the decryption password (if any) which is used to extract the update archive DMG.
