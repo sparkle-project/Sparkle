@@ -142,15 +142,21 @@
 - (void)notifyFoundValidUpdateWithAppcastItem:(SUAppcastItem *)updateItem secondaryAppcastItem:(SUAppcastItem * _Nullable)secondaryUpdateItem systemDomain:(NSNumber * _Nullable)systemDomain
 {
     if (!self.aborted) {
-        [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidFindValidUpdateNotification
-                                                            object:self.updater
-                                                          userInfo:@{ SUUpdaterAppcastItemNotificationKey: updateItem }];
-        
-        if ([self.updaterDelegate respondsToSelector:@selector((updater:didFindValidUpdate:))]) {
-            [self.updaterDelegate updater:self.updater didFindValidUpdate:updateItem];
+        if ([self.updaterDelegate respondsToSelector:@selector(updater:mayProceedWithUpdate:)] && ![self.updaterDelegate updater:self.updater mayProceedWithUpdate:updateItem]) {
+            // TODO: implement me and maybe check update isn't resuming at all
+            
+            [self.delegate basicDriverIsRequestingAbortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUNotValidUpdateError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"A new update was found but cannot be proceeded."] }]];
+        } else {
+            [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidFindValidUpdateNotification
+                                                                object:self.updater
+                                                              userInfo:@{ SUUpdaterAppcastItemNotificationKey: updateItem }];
+            
+            if ([self.updaterDelegate respondsToSelector:@selector((updater:didFindValidUpdate:))]) {
+                [self.updaterDelegate updater:self.updater didFindValidUpdate:updateItem];
+            }
+            
+            [self.delegate basicDriverDidFindUpdateWithAppcastItem:updateItem secondaryAppcastItem:secondaryUpdateItem systemDomain:systemDomain];
         }
-        
-        [self.delegate basicDriverDidFindUpdateWithAppcastItem:updateItem secondaryAppcastItem:secondaryUpdateItem systemDomain:systemDomain];
     }
 }
 

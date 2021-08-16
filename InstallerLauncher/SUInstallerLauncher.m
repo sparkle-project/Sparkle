@@ -358,7 +358,7 @@ static BOOL SPUNeedsSystemAuthorizationAccess(NSString *path, NSString *installa
 
 
 // Note: do not pass untrusted information such as paths to the installer and progress agent tools, when we can find them ourselves here
-- (void)launchInstallerWithHostBundlePath:(NSString *)hostBundlePath updaterIdentifier:(NSString *)updaterIdentifier authorizationPrompt:(NSString *)authorizationPrompt installationType:(NSString *)installationType allowingDriverInteraction:(BOOL)allowingDriverInteraction allowingUpdaterInteraction:(BOOL)allowingUpdaterInteraction completion:(void (^)(SUInstallerLauncherStatus, BOOL))completionHandler
+- (void)launchInstallerWithHostBundlePath:(NSString *)hostBundlePath updaterIdentifier:(NSString *)updaterIdentifier authorizationPrompt:(NSString *)authorizationPrompt installationType:(NSString *)installationType allowingDriverInteraction:(BOOL)allowingDriverInteraction completion:(void (^)(SUInstallerLauncherStatus, BOOL))completionHandler
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         BOOL needsSystemAuthorization = SPUNeedsSystemAuthorizationAccess(hostBundlePath, installationType);
@@ -368,18 +368,6 @@ static BOOL SPUNeedsSystemAuthorizationAccess(NSString *path, NSString *installa
             SULog(SULogLevelError, @"InstallerLauncher failed to create bundle at %@", hostBundlePath);
             SULog(SULogLevelError, @"Please make sure InstallerLauncher is not sandboxed and do not sign your app by passing --deep. Check: codesign -d --entitlements :- \"%@\"", NSBundle.mainBundle.bundlePath);
             SULog(SULogLevelError, @"More information regarding sandboxing: https://sparkle-project.org/documentation/sandboxing/");
-            completionHandler(SUInstallerLauncherFailure, needsSystemAuthorization);
-            return;
-        }
-        
-        if (needsSystemAuthorization && !allowingUpdaterInteraction) {
-            SULog(SULogLevelError, @"Updater is not allowing interaction to the launcher.");
-            completionHandler(SUInstallerLauncherFailure, needsSystemAuthorization);
-            return;
-        }
-        
-        if (!allowingUpdaterInteraction && [installationType isEqualToString:SPUInstallationTypeInteractivePackage]) {
-            SULog(SULogLevelError, @"Updater is not allowing interaction to the launcher for performing an interactive type package installation.");
             completionHandler(SUInstallerLauncherFailure, needsSystemAuthorization);
             return;
         }
@@ -460,12 +448,6 @@ static BOOL SPUNeedsSystemAuthorizationAccess(NSString *path, NSString *installa
             completionHandler(submittedProgressTool ? SUInstallerLauncherSuccess : SUInstallerLauncherFailure, needsSystemAuthorization);
         }
     });
-}
-
-- (void)checkIfApplicationInstallationRequiresAuthorizationWithHostBundlePath:(NSString *)hostBundlePath reply:(void(^)(BOOL))reply
-{
-    // No need to execute on main queue
-    reply(SPUNeedsSystemAuthorizationAccess(hostBundlePath, SPUInstallationTypeApplication));
 }
 
 @end

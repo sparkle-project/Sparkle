@@ -59,8 +59,9 @@ SU_EXPORT extern NSString *const SUSystemProfilerPreferredLanguageKey;
 
 typedef NS_ENUM(NSInteger, SPUUpdateCheck)
 {
-    SPUUpdateCheckUserInitiated = 0,
-    SPUUpdateCheckBackgroundScheduled = 1
+    SPUUpdateCheckUpdates = 0,
+    SPUUpdateCheckUpdatesInBackground = 1,
+    SPUUpdateCheckUpdateInformation = 2
 };
 
 /**
@@ -90,10 +91,24 @@ typedef NS_ENUM(NSInteger, SPUUpdateCheck)
 - (void)updaterWillIdleSchedulingUpdates:(SPUUpdater *)updater;
 
 /**
- Returns whether to allow Sparkle to pop up.
+ Returns whether to allow Sparkle to check for updates.
  
  For example, this may be used to prevent Sparkle from interrupting a setup assistant.
  Alternatively, you may want to consider starting the updater after eg: the setup assistant finishes
+ 
+ @param updater The updater instance.
+ @param updateCheck The type of update check that will be performed if the updater is allowed to check for updates.
+ @return @c YES if the updater is allowed to check for updates, otherwise @c NO
+ */
+- (BOOL)updaterMayCheckForUpdates:(SPUUpdater *)updater updateCheck:(SPUUpdateCheck)updateCheck;
+
+/**
+ Returns whether to allow Sparkle to check for updates.
+ 
+ For example, this may be used to prevent Sparkle from interrupting a setup assistant.
+ Alternatively, you may want to consider starting the updater after eg: the setup assistant finishes
+ 
+ Implement `-[SPUUpdaterDelegate updaterMayCheckForUpdates:updateCheck:]` instead if you need the type of update check being performed.
  
  @param updater The updater instance.
  */
@@ -203,6 +218,8 @@ typedef NS_ENUM(NSInteger, SPUUpdateCheck)
          want to let Sparkle handle picking the best valid update.
  */
 - (nullable SUAppcastItem *)bestValidUpdateInAppcast:(SUAppcast *)appcast forUpdater:(SPUUpdater *)updater;
+
+- (BOOL)updater:(SPUUpdater *)updater mayProceedWithUpdate:(SUAppcastItem *)item;
 
 /**
  Called when a valid update is found by the update driver.

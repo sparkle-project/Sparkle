@@ -89,7 +89,7 @@
 @property (nonatomic) SPUReleaseNotesDriver *releaseNotesDriver;
 @property (nonatomic) BOOL resumingInstallingUpdate;
 @property (nonatomic) BOOL resumingDownloadedInfoOrUpdate;
-@property (nonatomic) BOOL preventsInstallerInteraction;
+@property (nonatomic) BOOL showsInstallerProgressUserInterface;
 @property (nonatomic, nullable) NSDictionary *httpHeaders;
 @property (nonatomic, nullable) NSString *userAgent;
 
@@ -107,7 +107,7 @@
 @synthesize delegate = _delegate;
 @synthesize resumingInstallingUpdate = _resumingInstallingUpdate;
 @synthesize resumingDownloadedInfoOrUpdate = _resumingDownloadedInfoOrUpdate;
-@synthesize preventsInstallerInteraction = _preventsInstallerInteraction;
+@synthesize showsInstallerProgressUserInterface = _showsInstallerProgressUserInterface;
 @synthesize httpHeaders = _httpHeaders;
 @synthesize userAgent = _userAgent;
 
@@ -121,6 +121,7 @@
         _userInitiated = userInitiated;
         _updaterDelegate = updaterDelegate;
         _host = host;
+        _showsInstallerProgressUserInterface = YES;
         
         _coreDriver = [[SPUCoreBasedUpdateDriver alloc] initWithHost:host applicationBundle:applicationBundle sparkleBundle:sparkleBundle updater:updater updaterDelegate:updaterDelegate delegate:self];
     }
@@ -130,13 +131,6 @@
 - (void)prepareCheckForUpdatesWithCompletion:(SPUUpdateDriverCompletion)completionBlock
 {
     [self.coreDriver prepareCheckForUpdatesWithCompletion:completionBlock];
-}
-
-- (void)preflightForUpdatePermissionPreventingInstallerInteraction:(BOOL)preventsInstallerInteraction reply:(void (^)(NSError * _Nullable))reply
-{
-    self.preventsInstallerInteraction = preventsInstallerInteraction;
-    
-    [self.coreDriver preflightForUpdatePermissionPreventingInstallerInteraction:preventsInstallerInteraction reply:reply];
 }
 
 - (void)_clearSkippedUpdatesIfUserInitiated
@@ -213,7 +207,7 @@
                             [self.coreDriver extractDownloadedUpdate];
                             break;
                         case SPUUserUpdateStageInstalling:
-                            [self.coreDriver finishInstallationWithResponse:validatedChoice displayingUserInterface:!self.preventsInstallerInteraction];
+                            [self.coreDriver finishInstallationWithResponse:validatedChoice displayingUserInterface:self.showsInstallerProgressUserInterface];
                             break;
                         case SPUUserUpdateStageNotDownloaded:
                             [self.coreDriver downloadUpdateFromAppcastItem:updateItem secondaryAppcastItem:secondaryUpdateItem inBackground:NO];
@@ -241,7 +235,7 @@
                             
                             break;
                         case SPUUserUpdateStageInstalling:
-                            [self.coreDriver finishInstallationWithResponse:validatedChoice displayingUserInterface:!self.preventsInstallerInteraction];
+                            [self.coreDriver finishInstallationWithResponse:validatedChoice displayingUserInterface:self.showsInstallerProgressUserInterface];
                             break;
                     }
                     
@@ -255,7 +249,7 @@
                             break;
                         }
                         case SPUUserUpdateStageInstalling: {
-                            [self.coreDriver finishInstallationWithResponse:validatedChoice displayingUserInterface:!self.preventsInstallerInteraction];
+                            [self.coreDriver finishInstallationWithResponse:validatedChoice displayingUserInterface:self.showsInstallerProgressUserInterface];
                             break;
                         }
                     }
@@ -332,7 +326,7 @@
     if (!willInstallImmediately) {
         [self.userDriver showReadyToInstallAndRelaunch:^(SPUUserUpdateChoice choice) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                [self.coreDriver finishInstallationWithResponse:choice displayingUserInterface:!self.preventsInstallerInteraction];
+                [self.coreDriver finishInstallationWithResponse:choice displayingUserInterface:self.showsInstallerProgressUserInterface];
             });
         }];
     }

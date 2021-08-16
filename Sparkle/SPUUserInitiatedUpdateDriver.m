@@ -41,30 +41,22 @@
     return self;
 }
 
-- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders preventingInstallerInteraction:(BOOL)preventsInstallerInteraction completion:(SPUUpdateDriverCompletion)completionBlock
+- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders completion:(SPUUpdateDriverCompletion)completionBlock
 {
     [self.uiDriver prepareCheckForUpdatesWithCompletion:completionBlock];
     
-    [self.uiDriver preflightForUpdatePermissionPreventingInstallerInteraction:preventsInstallerInteraction reply:^(NSError * _Nullable error) {
-        if (!self.aborted) {
-            if (error != nil) {
-                [self abortUpdateWithError:error];
-            } else {
-                self.showingUserInitiatedProgress = YES;
-                self.showingUpdate = YES;
-                
-                [self.userDriver showUserInitiatedUpdateCheckWithCancellation:^{
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        if (self.showingUserInitiatedProgress) {
-                            [self abortUpdate];
-                        }
-                    });
-                }];
-                
-                [self.uiDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders inBackground:NO];
+    self.showingUserInitiatedProgress = YES;
+    self.showingUpdate = YES;
+    
+    [self.userDriver showUserInitiatedUpdateCheckWithCancellation:^{
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (self.showingUserInitiatedProgress) {
+                [self abortUpdate];
             }
-        }
+        });
     }];
+    
+    [self.uiDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders inBackground:NO];
 }
 
 - (void)resumeInstallingUpdateWithCompletion:(SPUUpdateDriverCompletion)completionBlock
