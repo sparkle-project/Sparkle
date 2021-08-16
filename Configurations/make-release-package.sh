@@ -1,6 +1,29 @@
 #!/bin/bash
 set -e
 
+# Tests the code signing validity of the extracted products within the provided path.
+# This guards against our archives being corrupt / created incorrectly.
+function verify_code_signatures() {
+    verification_directory="$1"
+
+    if  [[ -z "$verification_directory" ]]; then
+        echo "Provided verification directory does not exist" >&2
+        exit 1
+    fi
+
+    codesign --verify -vvv --deep "${verification_directory}/Sparkle.framework"
+    codesign --verify -vvv --deep "${verification_directory}/XPCServices/org.sparkle-project.Downloader.xpc"
+    codesign --verify -vvv --deep "${verification_directory}/XPCServices/org.sparkle-project.InstallerConnection.xpc"
+    codesign --verify -vvv --deep "${verification_directory}/XPCServices/org.sparkle-project.InstallerLauncher.xpc"
+    codesign --verify -vvv --deep "${verification_directory}/XPCServices/org.sparkle-project.InstallerStatus.xpc"
+    codesign --verify -vvv --deep "${verification_directory}/sparkle.app"
+    codesign --verify -vvv --deep "${verification_directory}/Sparkle Test App.app"
+    codesign --verify -vvv --deep "${verification_directory}/bin/BinaryDelta"
+    codesign --verify -vvv --deep "${verification_directory}/bin/generate_appcast"
+    codesign --verify -vvv --deep "${verification_directory}/bin/sign_update"
+    codesign --verify -vvv --deep "${verification_directory}/bin/generate_keys"
+}
+
 if [ "$ACTION" = "" ] ; then
     # If using cocoapods, sanity check that the Podspec version matches the Sparkle version
     if [ -x "$(command -v pod)" ]; then
@@ -97,17 +120,7 @@ if [ "$ACTION" = "" ] ; then
 
     # Test code signing validity of the extracted products
     # This guards against our archives being corrupt / created incorrectly
-    codesign --verify -vvv --deep "/tmp/sparkle-extract/Sparkle.framework"
-    codesign --verify -vvv --deep "/tmp/sparkle-extract/XPCServices/org.sparkle-project.Downloader.xpc"
-    codesign --verify -vvv --deep "/tmp/sparkle-extract/XPCServices/org.sparkle-project.InstallerConnection.xpc"
-    codesign --verify -vvv --deep "/tmp/sparkle-extract/XPCServices/org.sparkle-project.InstallerLauncher.xpc"
-    codesign --verify -vvv --deep "/tmp/sparkle-extract/XPCServices/org.sparkle-project.InstallerStatus.xpc"
-    codesign --verify -vvv --deep "/tmp/sparkle-extract/sparkle.app"
-    codesign --verify -vvv --deep "/tmp/sparkle-extract/Sparkle Test App.app"
-    codesign --verify -vvv --deep "/tmp/sparkle-extract/bin/BinaryDelta"
-    codesign --verify -vvv --deep "/tmp/sparkle-extract/bin/generate_appcast"
-    codesign --verify -vvv --deep "/tmp/sparkle-extract/bin/sign_update"
-    codesign --verify -vvv --deep "/tmp/sparkle-extract/bin/generate_keys"
+    verify_code_signatures "/tmp/sparkle-extract"
 
     rm -rf "/tmp/sparkle-extract"
     rm -rf "$CONFIGURATION_BUILD_DIR/staging"
