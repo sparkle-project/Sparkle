@@ -11,7 +11,8 @@ function verify_code_signatures() {
         exit 1
     fi
 
-    codesign --verify -vvv --deep "${verification_directory}/Sparkle.framework"
+    # Search the current directory for all instances of the framework to verify them (XCFrameworks can have multiple copies of a framework for different platforms).
+    find "${verification_directory}" -name "Sparkle.framework" -type d -exec codesign --verify -vvv --deep {} \;
     codesign --verify -vvv --deep "${verification_directory}/XPCServices/org.sparkle-project.Downloader.xpc"
     codesign --verify -vvv --deep "${verification_directory}/XPCServices/org.sparkle-project.InstallerConnection.xpc"
     codesign --verify -vvv --deep "${verification_directory}/XPCServices/org.sparkle-project.InstallerLauncher.xpc"
@@ -129,6 +130,10 @@ if [ "$ACTION" = "" ] ; then
     cd "$CONFIGURATION_BUILD_DIR/staging-spm"
     #rm -rf "$CONFIGURATION_BUILD_DIR/Sparkle.xcarchive"
     ditto -c -k --zlibCompressionLevel 9 --rsrc . "../Sparkle-for-Swift-Package-Manager.zip"
+
+    # Test code signing validity of the extracted Swift package
+    # This guards against our archives being corrupt / created incorrectly
+    verify_code_signatures "$CONFIGURATION_BUILD_DIR/staging-spm"
     
     # Get latest git tag
     cd "$SRCROOT"
