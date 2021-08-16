@@ -128,7 +128,7 @@ if [ "$ACTION" = "" ] ; then
     
     # Generate zip containing the xcframework for SPM
     cd "$CONFIGURATION_BUILD_DIR/staging-spm"
-    #rm -rf "$CONFIGURATION_BUILD_DIR/Sparkle.xcarchive"
+    rm -rf "$CONFIGURATION_BUILD_DIR/Sparkle.xcarchive"
     ditto -c -k --zlibCompressionLevel 9 --rsrc . "../Sparkle-for-Swift-Package-Manager.zip"
 
     # Test code signing validity of the extracted Swift package
