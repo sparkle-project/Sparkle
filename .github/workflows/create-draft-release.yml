@@ -23,12 +23,8 @@ jobs:
           submodules: true
           fetch-depth: 0
 
-      - name: "Build release distribution"
-        run: make release
-        env:
-          GITHUB_ACTOR: ${{ github.actor }}
-          GITHUB_REPOSITORY: ${{ github.repository }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: "Create a temporary Git tag"
+        run: git tag "$MARKETING_VERSION"
 
       - name: "Extract version information from project"
         run: |
@@ -44,8 +40,14 @@ jobs:
             echo "PRERELEASE_VERSION=false" >> $GITHUB_ENV
           fi
 
-      - name: "Create a temporary Git tag"
-        run: git tag "$MARKETING_VERSION"
+      - name: "Build release distribution"
+        run: make release
+        env:
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MARKETING_VERSION: ${{ env.MARKETING_VERSION }}
+          SPARKLE_VERSION_SUFFIX: ${{ env.SPARKLE_VERSION_SUFFIX }}
 
       - name: "Push the updated Swift package description"
         run: git push
