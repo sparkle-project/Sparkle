@@ -109,7 +109,8 @@ static NSMutableDictionary *sharedUpdaters = nil;
 
 - (NSBundle *)sparkleBundle
 {
-    return self.updater.sparkleBundle;
+    // Use explicit class to use the correct bundle even when subclassed
+    return [NSBundle bundleForClass:[SUUpdater class]];
 }
 
 - (BOOL)automaticallyChecksForUpdates

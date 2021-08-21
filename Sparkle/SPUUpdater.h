@@ -217,11 +217,6 @@ SU_EXPORT @interface SPUUpdater : NSObject
 @property (nonatomic, readonly) NSBundle *hostBundle;
 
 /**
- The bundle this class (`SPUUpdater`) is loaded into
- */
-@property (nonatomic, readonly) NSBundle *sparkleBundle;
-
-/**
  The user agent used when checking for updates.
  
  By default the user agent string returned is in the format:
