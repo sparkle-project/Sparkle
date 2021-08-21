@@ -78,11 +78,29 @@ typedef NS_ENUM(OSStatus, SUError) {
     SUIncorrectAPIUsageError = 5000
 };
 
+/**
+ The reason why a new update is not available.
+ */
 typedef NS_ENUM(OSStatus, SPUNoUpdateFoundReason) {
+    /**
+     A new update is unavailable for an unknown reason.
+     */
     SPUNoUpdateFoundReasonUnknown,
+    /**
+     A new update is unavailable because the user is on the latest known version in the appcast feed.
+     */
     SPUNoUpdateFoundReasonOnLatestVersion,
+    /**
+     A new update is unavailable because the user is on a version newer than the latest known version in the appcast feed.
+     */
     SPUNoUpdateFoundReasonOnNewerThanLatestVersion,
+    /**
+     A new update is unavailable because the user's operating system version is too old for the update.
+     */
     SPUNoUpdateFoundReasonSystemIsTooOld,
+    /**
+     A new update is unavailable because the user's operating system version is too new for the update.
+     */
     SPUNoUpdateFoundReasonSystemIsTooNew
 };
 

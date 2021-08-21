@@ -403,8 +403,8 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     [self.updaterTimer invalidate];
     
     if (![self automaticallyChecksForUpdates]) {
-        if ([self.delegate respondsToSelector:@selector(updaterWillIdleSchedulingUpdates:)]) {
-            [self.delegate updaterWillIdleSchedulingUpdates:self];
+        if ([self.delegate respondsToSelector:@selector(updaterWillNotScheduleUpdateCheck:)]) {
+            [self.delegate updaterWillNotScheduleUpdateCheck:self];
         }
         return;
     }
@@ -859,14 +859,16 @@ static NSString *escapeURLComponent(NSString *str) {
     NSArray *systemProfile = [SUSystemProfiler systemProfileArrayForHost:self.host];
     if ([self.delegate respondsToSelector:@selector(allowedSystemProfileKeysForUpdater:)]) {
         NSArray * allowedKeys = [self.delegate allowedSystemProfileKeysForUpdater:self];
-        NSMutableArray *filteredProfile = [NSMutableArray array];
-        for (NSDictionary *profileElement in systemProfile) {
-            NSString *key = [profileElement objectForKey:@"key"];
-            if (key && [allowedKeys containsObject:key]) {
-                [filteredProfile addObject:profileElement];
+        if (allowedKeys != nil) {
+            NSMutableArray *filteredProfile = [NSMutableArray array];
+            for (NSDictionary *profileElement in systemProfile) {
+                NSString *key = [profileElement objectForKey:@"key"];
+                if (key && [allowedKeys containsObject:key]) {
+                    [filteredProfile addObject:profileElement];
+                }
             }
+            systemProfile = [filteredProfile copy];
         }
-        systemProfile = [filteredProfile copy];
     }
     return systemProfile;
 }

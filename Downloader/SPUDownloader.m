@@ -11,6 +11,7 @@
 #import "SPULocalCacheDirectory.h"
 #import "SPUURLRequest.h"
 #import "SPUDownloadData.h"
+#import "SPUDownloadDataPrivate.h"
 #import "SUErrors.h"
 
 

@@ -220,7 +220,7 @@ SU_EXPORT @interface SPUUpdater : NSObject
  The user agent used when checking for updates.
  
  By default the user agent string returned is in the format:
- $(BundleDisplayName)/$(BundleDisplayVersion)/$(SparkleDisplayVersion)
+ $(BundleDisplayName)/$(BundleDisplayVersion) Sparkle/$(SparkleDisplayVersion)
  
  BundleDisplayVersion is derived from the application Info.plist's CFBundleShortVersionString.
  
