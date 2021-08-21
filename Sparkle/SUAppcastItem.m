@@ -388,14 +388,14 @@ static NSString *SUAppcastItemStateKey = @"SUAppcastItemState";
 
         // Need an info URL or an enclosure URL. Former to show "More Info"
         //	page, latter to download & install:
-        if (!enclosure && !theInfoURL) {
+        if (!enclosure && !_infoURL) {
             if (error) {
                 *error = @"No enclosure in feed item";
             }
             return nil;
         }
         
-        if (theInfoURL != nil) {
+        if (_infoURL != nil) {
             // If enclosure doesn't exist, the update must be an informational update
             // Otherwise check presence of informational update element
             _informationalUpdateVersions = (enclosure != nil) ? [dict objectForKey:SUAppcastElementInformationalUpdate] : [NSSet set];
@@ -405,7 +405,7 @@ static NSString *SUAppcastItemStateKey = @"SUAppcastItemState";
         }
 
         NSString *enclosureURLString = [enclosure objectForKey:SURSSAttributeURL];
-        if (!enclosureURLString && !theInfoURL) {
+        if (!enclosureURLString && !_infoURL) {
             if (error) {
                 *error = @"Feed item's enclosure lacks URL";
             }
