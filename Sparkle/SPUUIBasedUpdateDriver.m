@@ -88,7 +88,7 @@
 @property (nonatomic, readonly) id<SPUUserDriver> userDriver;
 @property (nonatomic) SPUReleaseNotesDriver *releaseNotesDriver;
 @property (nonatomic) BOOL resumingInstallingUpdate;
-@property (nonatomic) BOOL resumingDownloadedUpdate;
+@property (nonatomic) BOOL resumingDownloadedInfoOrUpdate;
 @property (nonatomic) BOOL preventsInstallerInteraction;
 @property (nonatomic, nullable) NSDictionary *httpHeaders;
 @property (nonatomic, nullable) NSString *userAgent;
@@ -106,7 +106,7 @@
 @synthesize releaseNotesDriver = _releaseNotesDriver;
 @synthesize delegate = _delegate;
 @synthesize resumingInstallingUpdate = _resumingInstallingUpdate;
-@synthesize resumingDownloadedUpdate = _resumingDownloadedUpdate;
+@synthesize resumingDownloadedInfoOrUpdate = _resumingDownloadedInfoOrUpdate;
 @synthesize preventsInstallerInteraction = _preventsInstallerInteraction;
 @synthesize httpHeaders = _httpHeaders;
 @synthesize userAgent = _userAgent;
@@ -168,11 +168,7 @@
 {
     [self _clearSkippedUpdatesIfUserInitiated];
     
-    // Informational downloads shouldn't be presented as updates to be downloaded
-    // Neither should items that prevent auto updating
-    if (!resumableUpdate.updateItem.isInformationOnlyUpdate && !resumableUpdate.updateItem.majorUpgrade) {
-        self.resumingDownloadedUpdate = YES;
-    }
+    self.resumingDownloadedInfoOrUpdate = YES;
     [self.coreDriver resumeUpdate:resumableUpdate completion:completionBlock];
 }
 
@@ -188,7 +184,8 @@
     id <SPUUpdaterDelegate> updaterDelegate = self.updaterDelegate;
     
     SPUUserUpdateStage stage;
-    if (self.resumingDownloadedUpdate) {
+    // Major upgrades and information only updates are not downloaded automatically
+    if (self.resumingDownloadedInfoOrUpdate && !updateItem.majorUpgrade && !updateItem.informationOnlyUpdate) {
         stage = SPUUserUpdateStageDownloaded;
     } else if (self.resumingInstallingUpdate) {
         stage = SPUUserUpdateStageInstalling;
@@ -234,9 +231,9 @@
                     switch (stage) {
                         case SPUUserUpdateStageDownloaded:
                         case SPUUserUpdateStageNotDownloaded:
-                            // Informational updates can be resumed too, so make sure we check
-                            // self.resumingDownloadedUpdate instead of the stage we pass to user driver
-                            if (self.resumingDownloadedUpdate) {
+                            // Informational and major updates can be resumed too, so make sure we check
+                            // self.resumingDownloadedInfoOrUpdate instead of the stage we pass to user driver
+                            if (self.resumingDownloadedInfoOrUpdate) {
                                 [self.coreDriver clearDownloadedUpdate];
                             }
                             
