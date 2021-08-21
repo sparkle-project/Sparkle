@@ -65,119 +65,37 @@ typedef NS_ENUM(NSInteger, SPUUpdateCheck)
 };
 
 /**
- Provides methods to control the behavior of an `SPUUpdater` object.
+ Provides delegation methods to control the behavior of an `SPUUpdater` object.
  */
 @protocol SPUUpdaterDelegate <NSObject>
 @optional
 
 /**
- Called when a background update will be scheduled after a delay.
- 
- Automatic update checks need to be enabled for this to trigger.
- 
- @param delay The delay in seconds until the next scheduled update will occur.
- 
- @param updater The updater instance.
- */
-- (void)updater:(SPUUpdater *)updater willScheduleUpdateCheckAfterDelay:(NSTimeInterval)delay;
-
-/**
- Called when no updates will be scheduled in the future.
- 
- This may later change if automatic update checks become enabled.
- 
- @param updater The updater instance.
- */
-- (void)updaterWillIdleSchedulingUpdates:(SPUUpdater *)updater;
-
-/**
  Returns whether to allow Sparkle to check for updates.
  
  For example, this may be used to prevent Sparkle from interrupting a setup assistant.
  Alternatively, you may want to consider starting the updater after eg: the setup assistant finishes
  
- @param updater The updater instance.
  @param updateCheck The type of update check that will be performed if the updater is allowed to check for updates.
  @return @c YES if the updater is allowed to check for updates, otherwise @c NO
- */
+*/
 - (BOOL)updaterMayCheckForUpdates:(SPUUpdater *)updater updateCheck:(SPUUpdateCheck)updateCheck;
-
-/**
- Returns whether to allow Sparkle to check for updates.
- 
- For example, this may be used to prevent Sparkle from interrupting a setup assistant.
- Alternatively, you may want to consider starting the updater after eg: the setup assistant finishes
- 
- Implement `-[SPUUpdaterDelegate updaterMayCheckForUpdates:updateCheck:]` instead if you need the type of update check being performed.
- 
- @param updater The updater instance.
- */
-- (BOOL)updaterMayCheckForUpdates:(SPUUpdater *)updater;
-
-/**
- Returns additional parameters to append to the appcast URL's query string.
- 
- This is potentially based on whether or not Sparkle will also be sending along the system profile.
- 
- @param updater The updater instance.
- @param sendingProfile Whether the system profile will also be sent.
- 
- @return An array of dictionaries with keys: "key", "value", "displayKey", "displayValue", the latter two being specifically for display to the user.
- */
-- (NSArray<NSDictionary<NSString *, NSString *> *> *)feedParametersForUpdater:(SPUUpdater *)updater sendingSystemProfile:(BOOL)sendingProfile;
-
-/**
- Returns a list of system profile keys to be appended to the appcast URL's query string.
-
- If this is unimplemented then all keys will be included.
-
- @param updater The updater instance.
-
- @return An array of system profile keys to include in the appcast URL's query string. Elements must be one of the SUSystemProfiler*Key constants
- */
-- (NSArray<NSString *> *)allowedSystemProfileKeysForUpdater:(SPUUpdater *)updater;
-
-/**
- Returns a custom appcast URL.
- 
- Override this to dynamically specify the feed URL.
- 
- @param updater The updater instance.
- */
-- (nullable NSString *)feedURLStringForUpdater:(SPUUpdater *)updater;
-
-/**
- Returns whether Sparkle should prompt the user about automatic update checks.
- 
- Use this to override the default behavior.
- 
- @param updater The updater instance.
- */
-- (BOOL)updaterShouldPromptForPermissionToCheckForUpdates:(SPUUpdater *)updater;
-
-/**
- Called after Sparkle has downloaded the appcast from the remote server.
- 
- Implement this if you want to do some special handling with the appcast once it finishes loading.
- 
- @param updater The updater instance.
- @param appcast The appcast that was downloaded from the remote server.
- */
-- (void)updater:(SPUUpdater *)updater didFinishLoadingAppcast:(SUAppcast *)appcast;
 
 /**
  Returns the set of Sparkle channels the updater is allowed to find new updates from.
  
  An appcast item can specify a channel the update is posted to. Without specifying a channel, the appcast item is posted to the default channel.
  For instance:
+ ```
  <item>
     <sparkle:version>2.0 Beta 1</sparkle:version>
     <sparkle:channel>beta</sparkle:channel>
  </item>
+ ```
  
- This example posts an update to the 'beta' channel, so only updaters that are allowed to use the 'beta' channel can find this update.
+ This example posts an update to the @c beta channel, so only updaters that are allowed to use the @c beta channel can find this update.
  
- If the <sparkle:channel> is not present, the update item is posted to the default channel and can be found by any updater.
+ If the @c <sparkle:channel> element is not present, the update item is posted to the default channel and can be found by any updater.
  
  You can pick any name you'd like for the channel. The valid characters for channel names are letters, numbers, dashes, underscores, and periods.
  
@@ -190,39 +108,60 @@ typedef NS_ENUM(NSInteger, SPUUpdateCheck)
 - (NSSet<NSString *> *)allowedChannelsForUpdater:(SPUUpdater *)updater;
 
 /**
- Returns the item in the appcast corresponding to the update that should be installed.
+ Returns a custom appcast URL used for checking for new updates.
  
- Please consider using or migrating to other supported features before adopting this method.
- Specifically:
- If you want to filter out certain tagged updates (like beta updates), consider -[SPUUpdaterDelegate allowedChannelsForUpdater:] instead.
- If you want to treat certain updates as informational-only, consider supplying <sparkle:informationalUpdate> with a set of affected versions users are updating from.
+ Override this to dynamically specify the feed URL.
  
- If you're using special logic or extensions in your appcast,
- implement this to use your own logic for finding a valid update, if any,
- in the given appcast.
- 
- Do not base your logic by filtering out items with a minimum or maximum OS version or minimum autoupdate version,
- because Sparkle already has logic for determining whether or not those items should be filtered out.
- Also do not return a non-top level item from the appcast such as a delta item. Delta items will be ignored.
- Sparkle picks the delta item from your selection if the appropriate one is available.
- 
- This method will not be invoked with an appcast that has zero items. Pick the best item from the appcast.
- If an item is available that has the same version as the application or bundle to update,
- do not pick an item that is worse than that version.
- 
- This method may be called multiple times for different selections and filters. This method should be efficient.
- 
- @param appcast The appcast that was downloaded from the remote server.
  @param updater The updater instance.
- @return The best valid appcast item. Return SUAppcastItem.emptyAppcastItem if no appcast item is valid. Return nil if you don't want to be delegated this task and
-         want to let Sparkle handle picking the best valid update.
+ @return An appcast feed URL to check for new updates in, or  @c nil for the default behavior and if you don't want to be delegated this task.
  */
-- (nullable SUAppcastItem *)bestValidUpdateInAppcast:(SUAppcast *)appcast forUpdater:(SPUUpdater *)updater;
-
-- (BOOL)updater:(SPUUpdater *)updater mayProceedWithUpdate:(SUAppcastItem *)item;
+- (nullable NSString *)feedURLStringForUpdater:(SPUUpdater *)updater;
 
 /**
- Called when a valid update is found by the update driver.
+ Returns additional parameters to append to the appcast URL's query string.
+ 
+ This is potentially based on whether or not Sparkle will also be sending along the system profile.
+ 
+ @param updater The updater instance.
+ @param sendingProfile Whether the system profile will also be sent.
+ 
+ @return An array of dictionaries with keys: `key`, `value`, `displayKey`, `displayValue`, the latter two being specifically for display to the user.
+ */
+- (NSArray<NSDictionary<NSString *, NSString *> *> *)feedParametersForUpdater:(SPUUpdater *)updater sendingSystemProfile:(BOOL)sendingProfile;
+
+/**
+ Returns whether Sparkle should prompt the user about checking for new updates automatically.
+ 
+ Use this to override the default behavior.
+ 
+ @param updater The updater instance.
+ @return @c YES if the updater should prompt for permission to check for new updates automatically, otherwise @c NO
+ */
+- (BOOL)updaterShouldPromptForPermissionToCheckForUpdates:(SPUUpdater *)updater;
+
+/**
+ Returns an allowed list of system profile keys to be appended to the appcast URL's query string.
+
+ By default all keys will be included. This method allows overriding which keys should only be allowed.
+
+ @param updater The updater instance.
+
+ @return An array of system profile keys to include in the appcast URL's query string. Elements must be one of the `SUSystemProfiler*Key` constants. Return @c nil for the default behavior and if you don't want to be delegated this task.
+ */
+- (nullable NSArray<NSString *> *)allowedSystemProfileKeysForUpdater:(SPUUpdater *)updater;
+
+/**
+ Called after Sparkle has downloaded the appcast from the remote server.
+ 
+ Implement this if you want to do some special handling with the appcast once it finishes loading.
+ 
+ @param updater The updater instance.
+ @param appcast The appcast that was downloaded from the remote server.
+ */
+- (void)updater:(SPUUpdater *)updater didFinishLoadingAppcast:(SUAppcast *)appcast;
+
+/**
+ Called when a new valid update is found by the update driver.
  
  @param updater The updater instance.
  @param item The appcast item corresponding to the update that is proposed to be installed.
@@ -230,25 +169,74 @@ typedef NS_ENUM(NSInteger, SPUUpdateCheck)
 - (void)updater:(SPUUpdater *)updater didFindValidUpdate:(SUAppcastItem *)item;
 
 /**
- Called when a valid update is not found.
+ Called when a valid new update is not found.
+ 
+ There are various reasons a new update is unavailable and can't be installed.
+ 
+ The userInfo dictionary on the error is populated with three keys:
+ - `SPULatestAppcastItemFoundKey`: if available, this may provide the latest `SUAppcastItem` that was found. This will be @c nil if it's unavailable.
+ - `SPUNoUpdateFoundReasonKey`: This will provide the `SPUNoUpdateFoundReason`.
+ For example the reason could be because the latest version in the feed requires a newer OS version or could be because the user is already on the latest version.
+ - `SPUNoUpdateFoundUserInitiatedKey`: A boolean that indicates if a new update was not found when the user intitiated an update check manually.
  
  @param updater The updater instance.
  @param error An error containing information on why a new valid update was not found
-    There are various reasons a new update is unavailable and can't be installed.
-    The userInfo dictionary on the error is also populated with three keys:
-    SPULatestAppcastItemFoundKey: if available, this may provide the latest SUAppcastItem that was found. This will be nil if it's unavailable.
-    SPUNoUpdateFoundReasonKey: This will provide the SUNoUpdateFoundReason.
-    For example the reason could be because the latest version in the feed requires a newer OS version or could be because the user is already on the latest version.
-    SPUNoUpdateFoundUserInitiatedKey: A boolean that indicates if a new update was not found when the user intitiated an update check manually.
  */
 - (void)updaterDidNotFindUpdate:(SPUUpdater *)updater error:(NSError *)error;
 
 /**
- Called when a valid update is not found.
+ Called when a valid new update is not found.
+ 
+ If more information is needed on why an update was not found, use `-[SPUUpdaterDelegate updaterDidNotFindUpdate:error:]` instead.
  
  @param updater The updater instance.
  */
 - (void)updaterDidNotFindUpdate:(SPUUpdater *)updater;
+
+/**
+ Returns the item in the appcast corresponding to the update that should be installed.
+ 
+ Please consider using or migrating to other supported features before adopting this method.
+ Specifically:
+ - If you want to filter out certain tagged updates (like beta updates), consider `-[SPUUpdaterDelegate allowedChannelsForUpdater:]` instead.
+ - If you want to treat certain updates as informational-only, consider supplying @c <sparkle:informationalUpdate> with a set of affected versions users are updating from.
+ 
+ If you're using special logic or extensions in your appcast, implement this to use your own logic for finding a valid update, if any, in the given appcast.
+ 
+ Do not base your logic by filtering out items with a minimum or maximum OS version or minimum autoupdate version
+ because Sparkle already has logic for determining whether or not those items should be filtered out.
+ 
+ Also do not return a non-top level item from the appcast such as a delta item. Delta items will be ignored.
+ Sparkle picks the delta item from your selection if the appropriate one is available.
+ 
+ This method will not be invoked with an appcast that has zero items. Pick the best item from the appcast.
+ If an item is available that has the same version as the application or bundle to update, do not pick an item that is worse than that version.
+ 
+ This method may be called multiple times for different selections and filters. This method should be efficient.
+ 
+ Return `+[SUAppcastItem emptyAppcastItem]` if no appcast item is valid.
+ 
+ Return @c nil if you don't want to be delegated this task and want to let Sparkle handle picking the best valid update.
+ 
+ @param appcast The appcast that was downloaded from the remote server.
+ @param updater The updater instance.
+ @return The best valid appcast item.
+ */
+- (nullable SUAppcastItem *)bestValidUpdateInAppcast:(SUAppcast *)appcast forUpdater:(SPUUpdater *)updater;
+
+/**
+ Returns whether or not the updater should proceed with the new chosen update from the appcast.
+ 
+ By default, the updater will always proceed with the best selected update found in an appcast. Override this to override this behavior.
+ 
+ If you return @c NO and populate the @p error, the user is not shown this @p updateItem nor is the update downloaded or installed.
+ 
+ @param updater The updater instance.
+ @param updateItem The selected update item to proceed with.
+ @param error An error object that must be populated by the delegate if the updater should not proceed with the update.
+ @return @c YES if the updater should proceed with @p updateItem, otherwise @c NO if the updater should not proceed with the update with an @p error populated.
+ */
+- (BOOL)updater:(SPUUpdater *)updater shouldProceedWithUpdate:(SUAppcastItem *)updateItem error:(NSError * __autoreleasing *)error;
 
 /**
  Called when an update is skipped by the user.
@@ -261,11 +249,11 @@ typedef NS_ENUM(NSInteger, SPUUpdateCheck)
 /**
  Returns whether the release notes (if available) should be downloaded after an update is found and shown.
  
- This is specifically for the releaseNotesLink element in the appcast.
+ This is specifically for the @c <releaseNotesLink> element in the appcast item.
  
  @param updater The updater instance.
  
- @return @c YES to download and show the release notes if available, otherwise @c NO. The default behavior is YES.
+ @return @c YES to download and show the release notes if available, otherwise @c NO. The default behavior is @c YES.
  */
 - (BOOL)updaterShouldDownloadReleaseNotes:(SPUUpdater *)updater;
 
@@ -345,11 +333,11 @@ typedef NS_ENUM(NSInteger, SPUUpdateCheck)
 /**
  Returns whether the application should be relaunched at all.
  
- Some apps \b cannot be relaunched under certain circumstances.
+ Some apps @b cannot be relaunched under certain circumstances.
  This method can be used to explicitly prevent a relaunch.
  
  @param updater The updater instance.
- @return YES if the updater should be relaunched, otherwise NO if it shouldn't.
+ @return @c YES if the updater should be relaunched, otherwise @c NO if it shouldn't.
  */
 - (BOOL)updaterShouldRelaunchApplication:(SPUUpdater *)updater;
 
@@ -371,9 +359,29 @@ typedef NS_ENUM(NSInteger, SPUUpdateCheck)
  even if you provide a custom comparator here.
  
  @param updater The updater instance.
- @return The custom version comparator or nil if you don't want to be delegated this task.
+ @return The custom version comparator or @c nil if you don't want to be delegated this task.
  */
 - (nullable id<SUVersionComparison>)versionComparatorForUpdater:(SPUUpdater *)updater;
+
+/**
+ Called when a background update will be scheduled after a delay.
+ 
+ Automatic update checks need to be enabled for this to trigger.
+ 
+ @param delay The delay in seconds until the next scheduled update will occur.
+ 
+ @param updater The updater instance.
+ */
+- (void)updater:(SPUUpdater *)updater willScheduleUpdateCheckAfterDelay:(NSTimeInterval)delay;
+
+/**
+ Called when no update checks will be scheduled in the future.
+ 
+ This may later change if automatic update checks become enabled.
+ 
+ @param updater The updater instance.
+ */
+- (void)updaterWillNotScheduleUpdateCheck:(SPUUpdater *)updater;
 
 /**
  Returns whether or not the updater should allow interaction from the installer
@@ -397,24 +405,26 @@ typedef NS_ENUM(NSInteger, SPUUpdateCheck)
 /**
  Returns the decryption password (if any) which is used to extract the update archive DMG.
  
- Return nil if no password should be used.
+ Return @c nil if no password should be used.
  
  @param updater The updater instance.
- @return The password used for decrypting the archive, or nil if no password should be used.
+ @return The password used for decrypting the archive, or @c nil if no password should be used.
  */
 - (nullable NSString *)decryptionPasswordForUpdater:(SPUUpdater *)updater;
 
 /**
  Called when an update is scheduled to be silently installed on quit after downloading the update automatically.
  
+ If the updater is given responsibility, it can later remind the user an update is available if they have not terminated the application for a long time.
+ 
+ Also if the updater is given responsibility and the update item is marked critical, the new update will be presented to the user immediately after.
+ 
+ Even if the @p immediateInstallHandler is not invoked, the installer will attempt to install the update on termination.
+ 
  @param updater The updater instance.
  @param item The appcast item corresponding to the update that is proposed to be installed.
  @param immediateInstallHandler The install handler to immediately install the update. No UI interaction will be shown and the application will be relaunched after installation.
- @return YES if the delegate will handle installing the update or NO if the updater should be given responsibility.
- 
- If the updater is given responsibility, it can later remind the user an update is available if they have not terminated the application for a long time.
- Also if the updater is given responsibility and the update item is marked critical, the new update will be presented to the user immediately after.
- Even if the immediateInstallHandler is not invoked, the installer will attempt to install the update on termination.
+ @return @c YES if the delegate will handle installing the update or @c NO if the updater should be given responsibility.
  */
 - (BOOL)updater:(SPUUpdater *)updater willInstallUpdateOnQuit:(SUAppcastItem *)item immediateInstallationBlock:(void (^)(void))immediateInstallHandler;
 
@@ -425,6 +435,10 @@ typedef NS_ENUM(NSInteger, SPUUpdateCheck)
  @param error The error that caused the abort
  */
 - (void)updater:(SPUUpdater *)updater didAbortWithError:(NSError *)error;
+
+/* Deprecated methods */
+
+- (BOOL)updaterMayCheckForUpdates:(SPUUpdater *)updater __deprecated_msg("Please use -[SPUUpdaterDelegate updaterMayCheckForUpdates:updateCheck:] instead.");
 
 @end
 

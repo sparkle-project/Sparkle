@@ -142,10 +142,11 @@
 - (void)notifyFoundValidUpdateWithAppcastItem:(SUAppcastItem *)updateItem secondaryAppcastItem:(SUAppcastItem * _Nullable)secondaryUpdateItem systemDomain:(NSNumber * _Nullable)systemDomain
 {
     if (!self.aborted) {
-        if ([self.updaterDelegate respondsToSelector:@selector(updater:mayProceedWithUpdate:)] && ![self.updaterDelegate updater:self.updater mayProceedWithUpdate:updateItem]) {
+        NSError *shouldProceedError = nil;
+        if ([self.updaterDelegate respondsToSelector:@selector(updater:shouldProceedWithUpdate:error:)] && ![self.updaterDelegate updater:self.updater shouldProceedWithUpdate:updateItem error:&shouldProceedError]) {
             // TODO: implement me and maybe check update isn't resuming at all
             
-            [self.delegate basicDriverIsRequestingAbortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUNotValidUpdateError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"A new update was found but cannot be proceeded."] }]];
+            [self.delegate basicDriverIsRequestingAbortUpdateWithError:shouldProceedError];
         } else {
             [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidFindValidUpdateNotification
                                                                 object:self.updater

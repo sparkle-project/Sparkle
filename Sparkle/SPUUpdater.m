@@ -50,6 +50,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 @property (nonatomic) id <SPUUpdateDriver> driver;
 @property (nonatomic, readonly) SUHost *host;
 @property (nonatomic, readonly) NSBundle *applicationBundle;
+@property (nonatomic, readonly) NSBundle *sparkleBundle;
 @property (nonatomic, readonly) SPUUpdaterSettings *updaterSettings;
 @property (nonatomic, readonly) SPUUpdaterCycle *updaterCycle;
 @property (nonatomic, readonly) SPUUpdaterTimer *updaterTimer;
@@ -290,9 +291,8 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     }
     
     // Check XPC Services are functional
-    NSBundle *sparkleBundle = [NSBundle bundleForClass:[self class]];
     for (NSString *xpcServiceID in @[@INSTALLER_LAUNCHER_BUNDLE_ID, @DOWNLOADER_BUNDLE_ID, @INSTALLER_CONNECTION_BUNDLE_ID, @INSTALLER_STATUS_BUNDLE_ID]) {
-        if (!SPUXPCValidateServiceIfBundleExists(xpcServiceID, sparkleBundle, error)) {
+        if (!SPUXPCValidateServiceIfBundleExists(xpcServiceID, self.sparkleBundle, error)) {
             return NO;
         }
     }
@@ -403,8 +403,8 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     [self.updaterTimer invalidate];
     
     if (![self automaticallyChecksForUpdates]) {
-        if ([self.delegate respondsToSelector:@selector(updaterWillIdleSchedulingUpdates:)]) {
-            [self.delegate updaterWillIdleSchedulingUpdates:self];
+        if ([self.delegate respondsToSelector:@selector(updaterWillNotScheduleUpdateCheck:)]) {
+            [self.delegate updaterWillNotScheduleUpdateCheck:self];
         }
         return;
     }
@@ -475,7 +475,6 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
                 [[SPUAutomaticUpdateDriver alloc]
                  initWithHost:strongSelf.host
                  applicationBundle:strongSelf.applicationBundle
-                 sparkleBundle:strongSelf.sparkleBundle
                  updater:strongSelf
                  userDriver:strongSelf.userDriver
                  updaterDelegate:strongSelf.delegate];
@@ -484,7 +483,6 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
                 [[SPUScheduledUpdateDriver alloc]
                  initWithHost:strongSelf.host
                  applicationBundle:strongSelf.applicationBundle
-                 sparkleBundle:strongSelf.sparkleBundle
                  updater:strongSelf
                  userDriver:strongSelf.userDriver
                  updaterDelegate:strongSelf.delegate];
@@ -520,7 +518,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     
     self.sessionInProgress = YES;
     
-    id <SPUUpdateDriver> theUpdateDriver = [[SPUUserInitiatedUpdateDriver alloc] initWithHost:self.host applicationBundle:self.applicationBundle sparkleBundle:self.sparkleBundle updater:self userDriver:self.userDriver updaterDelegate:self.delegate];
+    id <SPUUpdateDriver> theUpdateDriver = [[SPUUserInitiatedUpdateDriver alloc] initWithHost:self.host applicationBundle:self.applicationBundle updater:self userDriver:self.userDriver updaterDelegate:self.delegate];
     
     NSString *bundleIdentifier = self.host.bundle.bundleIdentifier;
     assert(bundleIdentifier != nil);
@@ -575,7 +573,10 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 
     if (
         ([self.delegate respondsToSelector:@selector(updaterMayCheckForUpdates:updateCheck:)] && ![self.delegate updaterMayCheckForUpdates:self updateCheck:updateCheck]) ||
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
         ([self.delegate respondsToSelector:@selector((updaterMayCheckForUpdates:))] && ![self.delegate updaterMayCheckForUpdates:self])) {
+#pragma clang diagnostic pop
         self.sessionInProgress = NO;
         [self scheduleNextUpdateCheck];
         return;
@@ -848,14 +849,16 @@ static NSString *escapeURLComponent(NSString *str) {
     NSArray *systemProfile = [SUSystemProfiler systemProfileArrayForHost:self.host];
     if ([self.delegate respondsToSelector:@selector(allowedSystemProfileKeysForUpdater:)]) {
         NSArray * allowedKeys = [self.delegate allowedSystemProfileKeysForUpdater:self];
-        NSMutableArray *filteredProfile = [NSMutableArray array];
-        for (NSDictionary *profileElement in systemProfile) {
-            NSString *key = [profileElement objectForKey:@"key"];
-            if (key && [allowedKeys containsObject:key]) {
-                [filteredProfile addObject:profileElement];
+        if (allowedKeys != nil) {
+            NSMutableArray *filteredProfile = [NSMutableArray array];
+            for (NSDictionary *profileElement in systemProfile) {
+                NSString *key = [profileElement objectForKey:@"key"];
+                if (key && [allowedKeys containsObject:key]) {
+                    [filteredProfile addObject:profileElement];
+                }
             }
+            systemProfile = [filteredProfile copy];
         }
-        systemProfile = [filteredProfile copy];
     }
     return systemProfile;
 }

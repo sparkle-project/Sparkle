@@ -32,8 +32,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 SU_EXPORT @interface SPUDownloadData : NSObject <NSSecureCoding>
 
-- (instancetype)initWithData:(NSData *)data URL:(NSURL *)URL textEncodingName:(NSString * _Nullable)textEncodingName MIMEType:(NSString * _Nullable)MIMEType;
-
 /**
  * The raw data that was downloaded.
  */
