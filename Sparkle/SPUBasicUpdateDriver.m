@@ -90,7 +90,7 @@
         [self notifyFinishLoadingAppcast];
         
         SUAppcastItem *nonNullUpdateItem = updateItem;
-        [self notifyFoundValidUpdateWithAppcastItem:nonNullUpdateItem secondaryAppcastItem:secondaryUpdateItem systemDomain:systemDomain];
+        [self notifyFoundValidUpdateWithAppcastItem:nonNullUpdateItem secondaryAppcastItem:secondaryUpdateItem systemDomain:systemDomain resuming:YES];
     }
 }
 
@@ -139,14 +139,13 @@
     }
 }
 
-- (void)notifyFoundValidUpdateWithAppcastItem:(SUAppcastItem *)updateItem secondaryAppcastItem:(SUAppcastItem * _Nullable)secondaryUpdateItem systemDomain:(NSNumber * _Nullable)systemDomain
+- (void)notifyFoundValidUpdateWithAppcastItem:(SUAppcastItem *)updateItem secondaryAppcastItem:(SUAppcastItem * _Nullable)secondaryUpdateItem systemDomain:(NSNumber * _Nullable)systemDomain resuming:(BOOL)resuming
 {
     if (!self.aborted) {
-        NSError *shouldProceedError = nil;
-        if ([self.updaterDelegate respondsToSelector:@selector(updater:shouldProceedWithUpdate:error:)] && ![self.updaterDelegate updater:self.updater shouldProceedWithUpdate:updateItem error:&shouldProceedError]) {
-            // TODO: implement me and maybe check update isn't resuming at all
-            
-            [self.delegate basicDriverIsRequestingAbortUpdateWithError:shouldProceedError];
+        // If the update is not being resumed from a prior session, give the delegate a chance to bail
+        NSError *shouldNotProceedError = nil;
+        if (!resuming && [self.updaterDelegate respondsToSelector:@selector(updater:shouldProceedWithUpdate:error:)] && ![self.updaterDelegate updater:self.updater shouldProceedWithUpdate:updateItem error:&shouldNotProceedError]) {
+            [self.delegate basicDriverIsRequestingAbortUpdateWithError:shouldNotProceedError];
         } else {
             [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidFindValidUpdateNotification
                                                                 object:self.updater
@@ -163,7 +162,7 @@
 
 - (void)didFindValidUpdateWithAppcastItem:(SUAppcastItem *)updateItem secondaryAppcastItem:(SUAppcastItem * _Nullable)secondaryAppcastItem
 {
-    [self notifyFoundValidUpdateWithAppcastItem:updateItem secondaryAppcastItem:secondaryAppcastItem systemDomain:nil];
+    [self notifyFoundValidUpdateWithAppcastItem:updateItem secondaryAppcastItem:secondaryAppcastItem systemDomain:nil resuming:NO];
 }
 
 - (void)didNotFindUpdateWithLatestAppcastItem:(nullable SUAppcastItem *)latestAppcastItem hostToLatestAppcastItemComparisonResult:(NSComparisonResult)hostToLatestAppcastItemComparisonResult background:(BOOL)background
