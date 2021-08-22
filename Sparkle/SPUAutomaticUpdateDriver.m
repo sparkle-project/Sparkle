@@ -52,33 +52,26 @@
     return self;
 }
 
-- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders completion:(SPUUpdateDriverCompletion)completionBlock
+- (void)setCompletionHandler:(SPUUpdateDriverCompletion)completionBlock
 {
     [self.coreDriver prepareCheckForUpdatesWithCompletion:completionBlock];
-    
+}
+
+- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders
+{
     [self.coreDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders inBackground:YES requiresSilentInstall:YES];
 }
 
-#pragma clang diagnostic push
-#if __has_warning("-Wcompletion-handler")
-#pragma clang diagnostic ignored "-Wcompletion-handler"
-#endif
-- (void)resumeInstallingUpdateWithCompletion:(SPUUpdateDriverCompletion)__unused completionBlock
-#pragma clang diagnostic pop
+- (void)resumeInstallingUpdate
 {
     // Nothing really to do here.. this shouldn't be called.
-    SULog(SULogLevelError, @"Error: resumeInstallingUpdateWithCompletion: called on SPUAutomaticUpdateDriver");
+    SULog(SULogLevelError, @"Error: resumeInstallingUpdate: called on SPUAutomaticUpdateDriver");
 }
 
-#pragma clang diagnostic push
-#if __has_warning("-Wcompletion-handler")
-#pragma clang diagnostic ignored "-Wcompletion-handler"
-#endif
-- (void)resumeUpdate:(id<SPUResumableUpdate>)__unused resumableUpdate completion:(SPUUpdateDriverCompletion)__unused completionBlock
-#pragma clang diagnostic pop
+- (void)resumeUpdate:(id<SPUResumableUpdate>)__unused resumableUpdate
 {
     // Nothing really to do here.. this shouldn't be called.
-    SULog(SULogLevelError, @"Error: resumeDownloadedUpdate:completion: called on SPUAutomaticUpdateDriver");
+    SULog(SULogLevelError, @"Error: resumeDownloadedUpdate: called on SPUAutomaticUpdateDriver");
 }
 
 - (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)updateItem secondaryAppcastItem:(SUAppcastItem * _Nullable)secondaryUpdateItem

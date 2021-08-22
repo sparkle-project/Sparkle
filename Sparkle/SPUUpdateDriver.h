@@ -19,11 +19,13 @@ typedef void (^SPUUpdateDriverCompletion)(BOOL shouldShowUpdateImmediately, id<S
 // The newer architecture is still complex but should be more reliable to maintain and extend.
 @protocol SPUUpdateDriver <NSObject>
 
-- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders completion:(SPUUpdateDriverCompletion)completionBlock;
+- (void)setCompletionHandler:(SPUUpdateDriverCompletion)completionBlock;
 
-- (void)resumeInstallingUpdateWithCompletion:(SPUUpdateDriverCompletion)completionBlock;
+- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders;
 
-- (void)resumeUpdate:(id<SPUResumableUpdate>)resumableUpdate completion:(SPUUpdateDriverCompletion)completionBlock;
+- (void)resumeInstallingUpdate;
+
+- (void)resumeUpdate:(id<SPUResumableUpdate>)resumableUpdate;
 
 @property (nonatomic, readonly) BOOL showingUpdate;
 

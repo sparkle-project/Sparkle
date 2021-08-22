@@ -97,15 +97,15 @@
     [self.basicDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders inBackground:background];
 }
 
-- (void)resumeInstallingUpdateWithCompletion:(SPUUpdateDriverCompletion)completionBlock
+- (void)resumeInstallingUpdate
 {
     self.resumingInstallingUpdate = YES;
     self.silentInstall = NO;
     
-    [self.basicDriver resumeInstallingUpdateWithCompletion:completionBlock];
+    [self.basicDriver resumeInstallingUpdate];
 }
 
-- (void)resumeUpdate:(id<SPUResumableUpdate>)resumableUpdate completion:(SPUUpdateDriverCompletion)completionBlock
+- (void)resumeUpdate:(id<SPUResumableUpdate>)resumableUpdate
 {
     self.resumableUpdate = resumableUpdate;
     self.silentInstall = NO;
@@ -113,7 +113,7 @@
     // Note if installer interaction isn't allowed, we shouldn't have downloaded the update, and shouldn't be able to get here
     // So no need to do a test if we can perform an update without authorization
     
-    [self.basicDriver resumeUpdate:resumableUpdate completion:completionBlock];
+    [self.basicDriver resumeUpdate:resumableUpdate];
 }
 
 - (void)basicDriverDidFinishLoadingAppcast

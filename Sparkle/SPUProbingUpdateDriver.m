@@ -33,25 +33,26 @@
     return self;
 }
 
-- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders completion:(SPUUpdateDriverCompletion)completionBlock
+- (void)setCompletionHandler:(SPUUpdateDriverCompletion)completionBlock
 {
-    // We don't preflight for update permission in this driver because we are just interested if an update is available
-    
     [self.basicDriver prepareCheckForUpdatesWithCompletion:completionBlock];
-    
+}
+
+- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders
+{
     [self.basicDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders inBackground:YES];
 }
 
-- (void)resumeInstallingUpdateWithCompletion:(SPUUpdateDriverCompletion)completionBlock
+- (void)resumeInstallingUpdate
 {
-    [self.basicDriver resumeInstallingUpdateWithCompletion:completionBlock];
+    [self.basicDriver resumeInstallingUpdate];
 }
 
-- (void)resumeUpdate:(id<SPUResumableUpdate>)resumableUpdate completion:(SPUUpdateDriverCompletion)completionBlock
+- (void)resumeUpdate:(id<SPUResumableUpdate>)resumableUpdate
 {
     self.resumableUpdate = resumableUpdate;
     
-    [self.basicDriver resumeUpdate:resumableUpdate completion:completionBlock];
+    [self.basicDriver resumeUpdate:resumableUpdate];
 }
 
 - (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)__unused appcastItem secondaryAppcastItem:(SUAppcastItem * _Nullable)__unused secondaryAppcastItem systemDomain:(NSNumber * _Nullable)__unused systemDomain

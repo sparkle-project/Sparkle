@@ -150,20 +150,20 @@
     [self.coreDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders inBackground:background requiresSilentInstall:NO];
 }
 
-- (void)resumeInstallingUpdateWithCompletion:(SPUUpdateDriverCompletion)completionBlock
+- (void)resumeInstallingUpdate
 {
     [self _clearSkippedUpdatesIfUserInitiated];
     
     self.resumingInstallingUpdate = YES;
-    [self.coreDriver resumeInstallingUpdateWithCompletion:completionBlock];
+    [self.coreDriver resumeInstallingUpdate];
 }
 
-- (void)resumeUpdate:(id<SPUResumableUpdate>)resumableUpdate completion:(SPUUpdateDriverCompletion)completionBlock
+- (void)resumeUpdate:(id<SPUResumableUpdate>)resumableUpdate
 {
     [self _clearSkippedUpdatesIfUserInitiated];
     
     self.resumingDownloadedInfoOrUpdate = YES;
-    [self.coreDriver resumeUpdate:resumableUpdate completion:completionBlock];
+    [self.coreDriver resumeUpdate:resumableUpdate];
 }
 
 - (void)basicDriverDidFinishLoadingAppcast

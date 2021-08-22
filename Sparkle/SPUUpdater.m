@@ -582,11 +582,19 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         ([self.delegate respondsToSelector:@selector((updaterMayCheckForUpdates:))] && ![self.delegate updaterMayCheckForUpdates:self]))
 #pragma clang diagnostic pop
     {
-        self.sessionInProgress = NO;
-        [self.driver abortUpdateWithError:mayCheckForUpdatesError];
-        self.driver = nil;
+        __weak SPUUpdater *weakSelf = self;
+        [self.driver setCompletionHandler:^(BOOL __unused shouldShowUpdateImmediately, id<SPUResumableUpdate>  _Nullable __unused resumableUpdate) {
+            SPUUpdater *strongSelf = weakSelf;
+            if (strongSelf != nil) {
+                strongSelf.driver = nil;
+                strongSelf.sessionInProgress = NO;
+                
+                [strongSelf updateLastUpdateCheckDate];
+                [strongSelf scheduleNextUpdateCheck];
+            }
+        }];
         
-        [self scheduleNextUpdateCheck];
+        [self.driver abortUpdateWithError:mayCheckForUpdatesError];
         
         return;
     }
@@ -594,14 +602,21 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     // Because an application can change the configuration (eg: the feed url) at any point, we should always check if it's valid
     NSError *configurationError = nil;
     if (![self checkIfConfiguredProperlyAndRequireFeedURL:YES error:&configurationError]) {
-        // Don't think we should schedule a next update check if the bundle has been misconfigured once,
-        // which would mean something is really off
         SULog(SULogLevelError, @"Sparkle configuration error (%ld): %@", (long)configurationError.code, configurationError.localizedDescription);
-        SULog(SULogLevelDefault, @"Disabling scheduled updates..");
         
-        self.sessionInProgress = NO;
+        __weak SPUUpdater *weakSelf = self;
+        [self.driver setCompletionHandler:^(BOOL __unused shouldShowUpdateImmediately, id<SPUResumableUpdate>  _Nullable __unused resumableUpdate) {
+            SPUUpdater *strongSelf = weakSelf;
+            if (strongSelf != nil) {
+                strongSelf.driver = nil;
+                strongSelf.sessionInProgress = NO;
+                [strongSelf updateLastUpdateCheckDate];
+                // We don't need to schedule off another update if bundle is misconfigured
+                SULog(SULogLevelDefault, @"Disabling scheduled updates..");
+            }
+        }];
+        
         [self.driver abortUpdateWithError:configurationError];
-        self.driver = nil;
         
         return;
     }
@@ -609,29 +624,41 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     NSURL *theFeedURL = [self parameterizedFeedURL];
     if (theFeedURL) {
         __weak SPUUpdater *weakSelf = self;
-        SPUUpdateDriverCompletion completionBlock = ^(BOOL shouldShowUpdateImmediately, id<SPUResumableUpdate> _Nullable resumableUpdate) {
+        [self.driver setCompletionHandler:^(BOOL shouldShowUpdateImmediately, id<SPUResumableUpdate>  _Nullable resumableUpdate) {
             SPUUpdater *strongSelf = weakSelf;
             if (strongSelf != nil) {
                 strongSelf.resumableUpdate = resumableUpdate;
                 strongSelf.driver = nil;
-                self.sessionInProgress = NO;
+                strongSelf.sessionInProgress = NO;
                 [strongSelf updateLastUpdateCheckDate];
                 [strongSelf scheduleNextUpdateCheckFiringImmediately:shouldShowUpdateImmediately];
             }
-        };
+        }];
         
         if (installerInProgress) {
-            [self.driver resumeInstallingUpdateWithCompletion:completionBlock];
+            [self.driver resumeInstallingUpdate];
         } else if (self.resumableUpdate != nil) {
-            [self.driver resumeUpdate:(id<SPUResumableUpdate> _Nonnull)self.resumableUpdate completion:completionBlock];
+            [self.driver resumeUpdate:(id<SPUResumableUpdate> _Nonnull)self.resumableUpdate];
         } else {
-            [self.driver checkForUpdatesAtAppcastURL:theFeedURL withUserAgent:[self userAgentString] httpHeaders:[self httpHeaders] completion:completionBlock];
+            [self.driver checkForUpdatesAtAppcastURL:theFeedURL withUserAgent:[self userAgentString] httpHeaders:[self httpHeaders]];
         }
     } else {
         // I think this is really unlikely to occur but better be safe
+        SULog(SULogLevelError, @"Error: failed to retrieve feed URL for bundle");
+        
+        __weak SPUUpdater *weakSelf = self;
+        [self.driver setCompletionHandler:^(BOOL __unused shouldShowUpdateImmediately, id<SPUResumableUpdate>  _Nullable __unused resumableUpdate) {
+            SPUUpdater *strongSelf = weakSelf;
+            if (strongSelf != nil) {
+                strongSelf.driver = nil;
+                strongSelf.sessionInProgress = NO;
+                [strongSelf updateLastUpdateCheckDate];
+                // We don't need to schedule off another update if feed is going to be bad
+                SULog(SULogLevelDefault, @"Disabling scheduled updates..");
+            }
+        }];
+        
         [self.driver abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUInvalidFeedURLError userInfo:@{ NSLocalizedDescriptionKey: @"Sparkle cannot form a valid feed URL." }]];
-        self.sessionInProgress = NO;
-        self.driver = nil;
     }
 }
 
