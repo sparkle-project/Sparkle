@@ -76,10 +76,12 @@ typedef NS_ENUM(NSInteger, SPUUpdateCheck)
  For example, this may be used to prevent Sparkle from interrupting a setup assistant.
  Alternatively, you may want to consider starting the updater after eg: the setup assistant finishes
  
+ @param updater The updater instance.
  @param updateCheck The type of update check that will be performed if the updater is allowed to check for updates.
+ @param error The (optionally) populated error object if the updater may not perform a new update check.
  @return @c YES if the updater is allowed to check for updates, otherwise @c NO
 */
-- (BOOL)updaterMayCheckForUpdates:(SPUUpdater *)updater updateCheck:(SPUUpdateCheck)updateCheck;
+- (BOOL)updater:(SPUUpdater *)updater mayPerformUpdateCheck:(SPUUpdateCheck)updateCheck error:(NSError * __autoreleasing *)error;
 
 /**
  Returns the set of Sparkle channels the updater is allowed to find new updates from.
@@ -419,7 +421,7 @@ typedef NS_ENUM(NSInteger, SPUUpdateCheck)
 
 /* Deprecated methods */
 
-- (BOOL)updaterMayCheckForUpdates:(SPUUpdater *)updater __deprecated_msg("Please use -[SPUUpdaterDelegate updaterMayCheckForUpdates:updateCheck:] instead.");
+- (BOOL)updaterMayCheckForUpdates:(SPUUpdater *)updater __deprecated_msg("Please use -[SPUUpdaterDelegate updater:mayPerformUpdateCheck:error:] instead.");
 
 @end
 

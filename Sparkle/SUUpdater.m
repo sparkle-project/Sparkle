@@ -256,7 +256,7 @@ static NSMutableDictionary *sharedUpdaters = nil;
     return versionDisplayer;
 }
 
-- (BOOL)updaterMayCheckForUpdates:(SPUUpdater *)__unused updater updateCheck:(SPUUpdateCheck)__unused updateCheck
+- (BOOL)updater:(SPUUpdater *)__unused updater mayPerformUpdateCheck:(SPUUpdateCheck)__unused updateCheck error:(NSError *__autoreleasing  _Nullable *)error
 {
     BOOL updaterMayCheck = YES;
     if ([self.delegate respondsToSelector:@selector(updaterMayCheckForUpdates:)]) {

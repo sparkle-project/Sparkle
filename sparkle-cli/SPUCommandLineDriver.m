@@ -11,6 +11,10 @@
 #import <Sparkle/SUInstallerLauncher+Private.h>
 #import "SPUCommandLineUserDriver.h"
 
+#define SPARKLE_CLI_ERROR_DOMAIN @"sparkle-cli"
+#define SPARKLE_CLI_ERROR_CANNOT_PERFORM_CHECK_CODE 0x1
+#define SPARKLE_CLI_ERROR_CANNOT_INSTALL_PACKAGE_CODE 0x2
+
 @interface SPUCommandLineDriver () <SPUUpdaterDelegate>
 
 @property (nonatomic, readonly) SPUUpdater *updater;
@@ -81,12 +85,20 @@
 }
 
 // If the installation is not interactive, we should not perform an update check if we don't have permission to update the bundle path
-- (BOOL)updaterMayCheckForUpdates:(SPUUpdater *)updater updateCheck:(SPUUpdateCheck)updateCheck
+- (BOOL)updater:(SPUUpdater *)updater mayPerformUpdateCheck:(SPUUpdateCheck)updateCheck error:(NSError *__autoreleasing  _Nullable *)error
 {
     switch (updateCheck) {
         case SPUUpdateCheckUpdates:
         case SPUUpdateCheckUpdatesInBackground:
-            return (self.interactive || !SPUSystemNeedsAuthorizationAccessForBundlePath(self.updater.hostBundle.bundlePath));
+            if (self.interactive || !SPUSystemNeedsAuthorizationAccessForBundlePath(self.updater.hostBundle.bundlePath)) {
+                return YES;
+            }
+            
+            if (error != NULL) {
+                *error = [NSError errorWithDomain:SPARKLE_CLI_ERROR_DOMAIN code:SPARKLE_CLI_ERROR_CANNOT_PERFORM_CHECK_CODE userInfo:@{ NSLocalizedDescriptionKey: @"A new update check cannot be performed because updating this bundle will require user authorization. Please use --interactive to allow this." }];
+            }
+            
+            return NO;
         case SPUUpdateCheckUpdateInformation:
             return YES;
     }
@@ -100,7 +112,7 @@
     }
     
     if (error != NULL) {
-        *error = [NSError errorWithDomain:@"sparkle-cli" code:1 userInfo:@{ NSLocalizedDescriptionKey: @"No new update has been checked because the installation will require user authorization. Please use --interactive to allow this." }]);
+        *error = [NSError errorWithDomain:SPARKLE_CLI_ERROR_DOMAIN code:SPARKLE_CLI_ERROR_CANNOT_INSTALL_PACKAGE_CODE userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"A new package-based update has been found (%@), but installing it will require user authorization. Please use --interactive to allow this.", updateItem.versionString] }];
     }
     
     return NO;

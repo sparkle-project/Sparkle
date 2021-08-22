@@ -571,19 +571,25 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 
     [self updateLastUpdateCheckDate];
 
-    if (
-        ([self.delegate respondsToSelector:@selector(updaterMayCheckForUpdates:updateCheck:)] && ![self.delegate updaterMayCheckForUpdates:self updateCheck:updateCheck]) ||
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-        ([self.delegate respondsToSelector:@selector((updaterMayCheckForUpdates:))] && ![self.delegate updaterMayCheckForUpdates:self])) {
-#pragma clang diagnostic pop
-        self.sessionInProgress = NO;
-        [self scheduleNextUpdateCheck];
-        return;
-    }
-
     self.driver = d;
     assert(self.driver != nil);
+    
+    NSError *mayCheckForUpdatesError = nil;
+    if (
+        ([self.delegate respondsToSelector:@selector(updater:mayPerformUpdateCheck:error:)] && ![self.delegate updater:self mayPerformUpdateCheck:updateCheck error:&mayCheckForUpdatesError]) ||
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+        ([self.delegate respondsToSelector:@selector((updaterMayCheckForUpdates:))] && ![self.delegate updaterMayCheckForUpdates:self]))
+#pragma clang diagnostic pop
+    {
+        self.sessionInProgress = NO;
+        [self.driver abortUpdateWithError:mayCheckForUpdatesError];
+        self.driver = nil;
+        
+        [self scheduleNextUpdateCheck];
+        
+        return;
+    }
 
     // Because an application can change the configuration (eg: the feed url) at any point, we should always check if it's valid
     NSError *configurationError = nil;
