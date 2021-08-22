@@ -95,7 +95,15 @@
 // If the installation is not interactive, we should only proceed with application based updates and not package-based ones
 - (BOOL)updater:(SPUUpdater *)updater shouldProceedWithUpdate:(nonnull SUAppcastItem *)updateItem error:(NSError *__autoreleasing  _Nullable * _Nullable)error
 {
-    return (self.interactive || [updateItem.installationType isEqualToString:SPUInstallationTypeApplication]);
+    if (self.interactive || [updateItem.installationType isEqualToString:SPUInstallationTypeApplication]) {
+        return YES;
+    }
+    
+    if (error != NULL) {
+        *error = [NSError errorWithDomain:@"sparkle-cli" code:1 userInfo:@{ NSLocalizedDescriptionKey: @"No new update has been checked because the installation will require user authorization. Please use --interactive to allow this." }]);
+    }
+    
+    return NO;
 }
 
 - (NSSet<NSString *> *)allowedChannelsForUpdater:(SPUUpdater *)__unused updater
