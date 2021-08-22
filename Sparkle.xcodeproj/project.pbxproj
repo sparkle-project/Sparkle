@@ -370,6 +370,8 @@
 		72EB87EA1CB8798800C37F42 /* ShowInstallerProgress.m in Sources */ = {isa = PBXBuildFile; fileRef = 72EB87E91CB8798800C37F42 /* ShowInstallerProgress.m */; };
 		72EB87EB1CB8859100C37F42 /* Updater.app in Copy Tools */ = {isa = PBXBuildFile; fileRef = 721C24451CB753E6005440CB /* Updater.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		72EB87EC1CB8887E00C37F42 /* SUStatus.xib in Resources */ = {isa = PBXBuildFile; fileRef = 55C14BD8136EF00C00649790 /* SUStatus.xib */; };
+		72EE17FB26D1CC8800C58B19 /* SUInstallerLauncher+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 72EE17FA26D1CBC000C58B19 /* SUInstallerLauncher+Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		72EE17FC26D1CC9D00C58B19 /* SPUInstallationType.h in Headers */ = {isa = PBXBuildFile; fileRef = 7214B8851D45AD9A00CB5CED /* SPUInstallationType.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		72EF30BE2675CF38008CE987 /* SPUAppcastItemStateResolver.h in Headers */ = {isa = PBXBuildFile; fileRef = 72EF30BA2675CF38008CE987 /* SPUAppcastItemStateResolver.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		72EF30BF2675CF38008CE987 /* SPUAppcastItemState.m in Sources */ = {isa = PBXBuildFile; fileRef = 72EF30BB2675CF38008CE987 /* SPUAppcastItemState.m */; };
 		72EF30C02675CF38008CE987 /* SPUAppcastItemStateResolver.m in Sources */ = {isa = PBXBuildFile; fileRef = 72EF30BC2675CF38008CE987 /* SPUAppcastItemStateResolver.m */; };
@@ -1274,6 +1276,7 @@
 		72E45CF61B640DAE005C701A /* SUUpdateSettingsWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SUUpdateSettingsWindowController.xib; sourceTree = "<group>"; };
 		72E45CFB1B641961005C701A /* sparkletestcast.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = sparkletestcast.xml; sourceTree = "<group>"; };
 		72EB87E91CB8798800C37F42 /* ShowInstallerProgress.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ShowInstallerProgress.m; path = Sparkle/InstallerProgress/ShowInstallerProgress.m; sourceTree = SOURCE_ROOT; };
+		72EE17FA26D1CBC000C58B19 /* SUInstallerLauncher+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SUInstallerLauncher+Private.h"; sourceTree = "<group>"; };
 		72EF30BA2675CF38008CE987 /* SPUAppcastItemStateResolver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPUAppcastItemStateResolver.h; sourceTree = "<group>"; };
 		72EF30BB2675CF38008CE987 /* SPUAppcastItemState.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SPUAppcastItemState.m; sourceTree = "<group>"; };
 		72EF30BC2675CF38008CE987 /* SPUAppcastItemStateResolver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SPUAppcastItemStateResolver.m; sourceTree = "<group>"; };
@@ -2091,6 +2094,7 @@
 				726E07B51CAF08D6001A286B /* Info.plist */,
 				726E07B31CAF08D6001A286B /* main.m */,
 				726E07B01CAF08D6001A286B /* SUInstallerLauncher.h */,
+				72EE17FA26D1CBC000C58B19 /* SUInstallerLauncher+Private.h */,
 				726E07B11CAF08D6001A286B /* SUInstallerLauncher.m */,
 				726E07AF1CAF08D6001A286B /* SUInstallerLauncherProtocol.h */,
 				721652671D3C8FED00FD13D8 /* SUInstallerLauncherStatus.h */,
@@ -2339,8 +2343,10 @@
 				7246E0A31C83B685003B4E75 /* SPUStandardUpdaterController.h in Headers */,
 				725CB95A1C7121830064365A /* SPUStandardUserDriver.h in Headers */,
 				726E4A371C89116000C57C6A /* SPUStandardUserDriverDelegate.h in Headers */,
+				72EE17FC26D1CC9D00C58B19 /* SPUInstallationType.h in Headers */,
 				72EF30BE2675CF38008CE987 /* SPUAppcastItemStateResolver.h in Headers */,
 				72EF30C7267C716A008CE987 /* SUAppcastItem+Private.h in Headers */,
+				72EE17FB26D1CC8800C58B19 /* SUInstallerLauncher+Private.h in Headers */,
 				61299A5C09CA6D4500B7442F /* SUConstants.h in Headers */,
 				726DF88E1C84277600188804 /* SPUUserUpdateState.h in Headers */,
 				72B767DA1C9CD2E400A07552 /* SPUUIBasedUpdateDriver.h in Headers */,

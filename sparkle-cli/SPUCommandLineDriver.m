@@ -8,6 +8,7 @@
 
 #import "SPUCommandLineDriver.h"
 #import <Sparkle/Sparkle.h>
+#import <Sparkle/SUInstallerLauncher+Private.h>
 #import "SPUCommandLineUserDriver.h"
 
 @interface SPUCommandLineDriver () <SPUUpdaterDelegate>
@@ -79,15 +80,22 @@
     exit(EXIT_SUCCESS);
 }
 
-// If the installation is interactive, we can show an authorization prompt for requesting additional privileges,
-// along with allowing the installer to show UI when installing
-- (BOOL)updater:(SPUUpdater *)__unused updater shouldAllowInstallerInteractionForUpdateCheck:(SPUUpdateCheck)updateCheck
+// If the installation is not interactive, we should not perform an update check if we don't have permission to update the bundle path
+- (BOOL)updaterMayCheckForUpdates:(SPUUpdater *)updater updateCheck:(SPUUpdateCheck)updateCheck
 {
     switch (updateCheck) {
-        case SPUUpdateCheckUserInitiated:
-        case SPUUpdateCheckBackgroundScheduled:
-            return self.interactive;
+        case SPUUpdateCheckUpdates:
+        case SPUUpdateCheckUpdatesInBackground:
+            return (self.interactive || !SPUSystemNeedsAuthorizationAccessForBundlePath(self.updater.hostBundle.bundlePath));
+        case SPUUpdateCheckUpdateInformation:
+            return YES;
     }
+}
+
+// If the installation is not interactive, we should only proceed with application based updates and not package-based ones
+- (BOOL)updater:(SPUUpdater *)updater shouldProceedWithUpdate:(nonnull SUAppcastItem *)updateItem error:(NSError *__autoreleasing  _Nullable * _Nullable)error
+{
+    return (self.interactive || [updateItem.installationType isEqualToString:SPUInstallationTypeApplication]);
 }
 
 - (NSSet<NSString *> *)allowedChannelsForUpdater:(SPUUpdater *)__unused updater
