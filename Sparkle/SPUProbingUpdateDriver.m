@@ -35,7 +35,7 @@
 
 - (void)setCompletionHandler:(SPUUpdateDriverCompletion)completionBlock
 {
-    [self.basicDriver prepareCheckForUpdatesWithCompletion:completionBlock];
+    [self.basicDriver setCompletionHandler:completionBlock];
 }
 
 - (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders
