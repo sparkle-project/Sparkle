@@ -166,6 +166,10 @@
                 fprintf(stderr, "Exiting.\n");
             }
             exit(EXIT_SUCCESS);
+        } else if ([error.domain isEqualToString:SPARKLE_CLI_ERROR_DOMAIN]) {
+               // This is one of our own interactive update failures
+               fprintf(stderr, "%s\n", error.localizedDescription.UTF8String);
+               exit(EXIT_FAILURE);
         } else if (error.code == SUNoUpdateError) {
             if (self.verbose) {
                 fprintf(stderr, "No new update available!\n");
@@ -178,10 +182,6 @@
                 fprintf(stderr, "Exiting.\n");
             }
             exit(EXIT_SUCCESS);
-        } else if ([error.domain isEqualToString:SPARKLE_CLI_ERROR_DOMAIN]) {
-            // This is one of our own interactive update failures
-            fprintf(stderr, "%s\n", error.localizedDescription.UTF8String);
-            exit(EXIT_FAILURE);
         } else {
             fprintf(stderr, "Error: Update has failed due to error %ld (%s). %s\n", (long)error.code, error.domain.UTF8String, error.localizedDescription.UTF8String);
             exit(EXIT_FAILURE);
