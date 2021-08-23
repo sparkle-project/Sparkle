@@ -89,7 +89,6 @@
 @property (nonatomic) SPUReleaseNotesDriver *releaseNotesDriver;
 @property (nonatomic) BOOL resumingInstallingUpdate;
 @property (nonatomic) BOOL resumingDownloadedInfoOrUpdate;
-@property (nonatomic) BOOL showsInstallerProgressUserInterface;
 @property (nonatomic, nullable) NSDictionary *httpHeaders;
 @property (nonatomic, nullable) NSString *userAgent;
 
@@ -107,7 +106,6 @@
 @synthesize delegate = _delegate;
 @synthesize resumingInstallingUpdate = _resumingInstallingUpdate;
 @synthesize resumingDownloadedInfoOrUpdate = _resumingDownloadedInfoOrUpdate;
-@synthesize showsInstallerProgressUserInterface = _showsInstallerProgressUserInterface;
 @synthesize httpHeaders = _httpHeaders;
 @synthesize userAgent = _userAgent;
 
@@ -121,7 +119,6 @@
         _userInitiated = userInitiated;
         _updaterDelegate = updaterDelegate;
         _host = host;
-        _showsInstallerProgressUserInterface = YES;
         
         _coreDriver = [[SPUCoreBasedUpdateDriver alloc] initWithHost:host applicationBundle:applicationBundle updater:updater updaterDelegate:updaterDelegate delegate:self];
     }
@@ -207,7 +204,7 @@
                             [self.coreDriver extractDownloadedUpdate];
                             break;
                         case SPUUserUpdateStageInstalling:
-                            [self.coreDriver finishInstallationWithResponse:validatedChoice displayingUserInterface:self.showsInstallerProgressUserInterface];
+                            [self.coreDriver finishInstallationWithResponse:validatedChoice displayingUserInterface:YES];
                             break;
                         case SPUUserUpdateStageNotDownloaded:
                             [self.coreDriver downloadUpdateFromAppcastItem:updateItem secondaryAppcastItem:secondaryUpdateItem inBackground:NO];
@@ -235,7 +232,7 @@
                             
                             break;
                         case SPUUserUpdateStageInstalling:
-                            [self.coreDriver finishInstallationWithResponse:validatedChoice displayingUserInterface:self.showsInstallerProgressUserInterface];
+                            [self.coreDriver finishInstallationWithResponse:validatedChoice displayingUserInterface:YES];
                             break;
                     }
                     
@@ -249,7 +246,7 @@
                             break;
                         }
                         case SPUUserUpdateStageInstalling: {
-                            [self.coreDriver finishInstallationWithResponse:validatedChoice displayingUserInterface:self.showsInstallerProgressUserInterface];
+                            [self.coreDriver finishInstallationWithResponse:validatedChoice displayingUserInterface:YES];
                             break;
                         }
                     }
@@ -326,7 +323,7 @@
     if (!willInstallImmediately) {
         [self.userDriver showReadyToInstallAndRelaunch:^(SPUUserUpdateChoice choice) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                [self.coreDriver finishInstallationWithResponse:choice displayingUserInterface:self.showsInstallerProgressUserInterface];
+                [self.coreDriver finishInstallationWithResponse:choice displayingUserInterface:YES];
             });
         }];
     }
