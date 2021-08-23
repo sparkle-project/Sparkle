@@ -122,10 +122,11 @@ if [ "$ACTION" = "" ] ; then
     mkdir -p "/tmp/sparkle-spm-extract"
     cd "$CONFIGURATION_BUILD_DIR/staging-spm"
     # rm -rf "$CONFIGURATION_BUILD_DIR/Sparkle.xcarchive"
-    ditto -c -k --zlibCompressionLevel 9 --rsrc . "../Sparkle-for-Swift-Package-Manager.zip" "/tmp/sparkle-spm-extract"
+    ditto -c -k --zlibCompressionLevel 9 --rsrc . "../Sparkle-for-Swift-Package-Manager.zip"
 
     # Test code signing validity of the extracted Swift package
     # This guards against our archives being corrupt / created incorrectly
+    ditto -x -k "../Sparkle-for-Swift-Package-Manager.zip" "/tmp/sparkle-spm-extract"
     verify_code_signatures "/tmp/sparkle-spm-extract"
     
     rm -rf "/tmp/sparkle-spm-extract"
