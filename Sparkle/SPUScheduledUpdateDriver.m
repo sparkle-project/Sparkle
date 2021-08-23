@@ -88,8 +88,7 @@
 
 - (void)abortUpdateWithError:(nullable NSError *)error
 {
-    // Don't tell the user that an update error occurred for scheduled update checks if we haven't shown the update
-    [self.uiDriver abortUpdateWithError:self.showedUpdate ? error : nil];
+    [self.uiDriver abortUpdateWithError:error showErrorToUser:self.showedUpdate];
 }
 
 @end

@@ -426,12 +426,21 @@ typedef NS_ENUM(NSInteger, SPUUpdateCheck)
 - (BOOL)updater:(SPUUpdater *)updater willInstallUpdateOnQuit:(SUAppcastItem *)item immediateInstallationBlock:(void (^)(void))immediateInstallHandler;
 
 /**
- Called after an update is aborted due to an error.
+ Called after the update driver finishes or aborts due an error.
+ 
+ The update driver runs when checking for updates. This delegate method is called when that check is finished.
+ 
+ If the @p error is @c nil, no error has occurred. This is possible if the user dismisses the update.
+ 
+ Some special possible values of `error.code` are:
+ 
+ - `SUNoUpdateError`: No new update was found.
+ - `SUInstallationCanceledError`: The user canceled installing the update when requested for authorization.
  
  @param updater The updater instance.
- @param error The error that caused the abort
+ @param error The error that caused the update driver to abort. This is @c nil if the update driver finished normally and there is no error.
  */
-- (void)updater:(SPUUpdater *)updater didAbortWithError:(NSError *)error;
+- (void)updater:(SPUUpdater *)updater didAbortWithError:(nullable NSError *)error;
 
 /* Deprecated methods */
 

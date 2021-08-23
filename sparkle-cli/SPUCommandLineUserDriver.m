@@ -159,18 +159,14 @@
     }
 }
 
-- (void)showUpdateNotFoundWithError:(NSError *)error acknowledgement:(void (^)(void))__unused acknowledgement __attribute__((noreturn))
+- (void)showUpdateNotFoundWithError:(NSError *)__unused error acknowledgement:(void (^)(void))acknowledgement
 {
-    if (self.verbose) {
-        fprintf(stderr, "No new update available!\n");
-    }
-    exit(EXIT_SUCCESS);
+    acknowledgement();
 }
 
-- (void)showUpdaterError:(NSError *)error acknowledgement:(void (^)(void))__unused acknowledgement __attribute__((noreturn))
+- (void)showUpdaterError:(NSError *)__unused error acknowledgement:(void (^)(void))acknowledgement
 {
-    fprintf(stderr, "Error: Update has failed: %s\n", error.localizedDescription.UTF8String);
-    exit(EXIT_FAILURE);
+    acknowledgement();
 }
 
 - (void)showDownloadInitiatedWithCancellation:(void (^)(void))__unused cancellation
@@ -245,12 +241,8 @@
     acknowledgement();
 }
 
-- (void)dismissUpdateInstallation __attribute__((noreturn))
+- (void)dismissUpdateInstallation
 {
-    if (self.verbose) {
-        fprintf(stderr, "Exiting.\n");
-    }
-    exit(EXIT_SUCCESS);
 }
 
 - (void)showSendingTerminationSignal

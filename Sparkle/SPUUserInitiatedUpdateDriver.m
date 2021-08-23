@@ -117,7 +117,7 @@
         self.showingUserInitiatedProgress = NO;
     }
     self.aborted = YES;
-    [self.uiDriver abortUpdateWithError:error];
+    [self.uiDriver abortUpdateWithError:error showErrorToUser:YES];
 }
 
 @end

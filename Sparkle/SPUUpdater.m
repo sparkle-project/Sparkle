@@ -574,7 +574,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     self.driver = d;
     assert(self.driver != nil);
     
-    void (^runDriverAndAbort)(NSError  * _Nullable , BOOL) = ^(NSError * _Nullable abortError, BOOL shouldScheduleNextUpdateCheck) {
+    void (^abortUpdateDriver)(NSError  * _Nullable , BOOL) = ^(NSError * _Nullable abortError, BOOL shouldScheduleNextUpdateCheck) {
         __weak SPUUpdater *weakSelf = self;
         [self.driver setCompletionHandler:^(BOOL __unused shouldShowUpdateImmediately, id<SPUResumableUpdate>  _Nullable __unused resumableUpdate) {
             SPUUpdater *strongSelf = weakSelf;
@@ -604,7 +604,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         ([self.delegate respondsToSelector:@selector((updaterMayCheckForUpdates:))] && ![self.delegate updaterMayCheckForUpdates:self]))
 #pragma clang diagnostic pop
     {
-        runDriverAndAbort(mayCheckForUpdatesError, YES);
+        abortUpdateDriver(mayCheckForUpdatesError, YES);
         return;
     }
 
@@ -614,18 +614,8 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     if (![self checkIfConfiguredProperlyAndRequireFeedURL:YES error:&configurationError]) {
         SULog(SULogLevelError, @"Sparkle configuration error (%ld): %@", (long)configurationError.code, configurationError.localizedDescription);
         
-        runDriverAndAbort(configurationError, NO);
+        abortUpdateDriver(configurationError, NO);
         return;
-    }
-
-    // Check that the parameterized feed URL is valid
-    NSURL *theFeedURL = [self parameterizedFeedURL];
-    if (theFeedURL == nil) {
-        // I think this is really unlikely to occur but better be safe
-        // We will not schedule a next update check if the feed URL cannot be formed
-        SULog(SULogLevelError, @"Error: failed to retrieve feed URL for bundle");
-        
-        runDriverAndAbort([NSError errorWithDomain:SUSparkleErrorDomain code:SUInvalidFeedURLError userInfo:@{ NSLocalizedDescriptionKey: @"Sparkle cannot form a valid feed URL." }], NO);
     }
     
     // Run our update driver and schedule next update check on its completion
@@ -648,8 +638,18 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         // Resume an update or info that has already been downloaded
         [self.driver resumeUpdate:(id<SPUResumableUpdate> _Nonnull)self.resumableUpdate];
     } else {
-        // Check for new updates
-        [self.driver checkForUpdatesAtAppcastURL:theFeedURL withUserAgent:[self userAgentString] httpHeaders:[self httpHeaders]];
+        // Check that the parameterized feed URL is valid
+        NSURL *theFeedURL = [self parameterizedFeedURL];
+        if (theFeedURL == nil) {
+            // I think this is really unlikely to occur but better be safe
+            // We will not schedule a next update check if the feed URL cannot be formed
+            SULog(SULogLevelError, @"Error: failed to retrieve feed URL for bundle");
+            
+            abortUpdateDriver([NSError errorWithDomain:SUSparkleErrorDomain code:SUInvalidFeedURLError userInfo:@{ NSLocalizedDescriptionKey: @"Sparkle cannot form a valid feed URL." }], NO);
+        } else {
+            // Check for new updates
+            [self.driver checkForUpdatesAtAppcastURL:theFeedURL withUserAgent:[self userAgentString] httpHeaders:[self httpHeaders]];
+        }
     }
 }
 

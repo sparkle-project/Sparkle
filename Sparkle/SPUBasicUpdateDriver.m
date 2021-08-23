@@ -264,11 +264,12 @@
             if (error.code != SUNoUpdateError && error.code != SUInstallationCanceledError && error.code != SUInstallationAuthorizeLaterError) { // Let's not bother logging this.
                 SULogError(error);
             }
-            
-            // Notify host app that updater has aborted
-            if ([self.updaterDelegate respondsToSelector:@selector((updater:didAbortWithError:))]) {
-                [self.updaterDelegate updater:self.updater didAbortWithError:(NSError * _Nonnull)error];
-            }
+        }
+        
+        // Notify host app that update driver has aborted/finished
+        // As long as we're not going to immmediately kick off a new check
+        if (!shouldShowUpdateImmediately && [self.updaterDelegate respondsToSelector:@selector((updater:didAbortWithError:))]) {
+            [self.updaterDelegate updater:self.updater didAbortWithError:error];
         }
         
         if (self.completionBlock != nil) {

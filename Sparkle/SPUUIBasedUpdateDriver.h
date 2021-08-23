@@ -39,7 +39,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)resumeUpdate:(id<SPUResumableUpdate>)resumableUpdate;
 
-- (void)abortUpdateWithError:(nullable NSError *)error;
+- (void)abortUpdateWithError:(nullable NSError *)error showErrorToUser:(BOOL)showedUserProgress;
 
 @end
 

@@ -358,14 +358,16 @@
     [self.delegate coreDriverIsRequestingAbortUpdateWithError:error];
 }
 
-- (void)_abortUpdateWithError:(nullable NSError *)error
+- (void)_abortUpdateWithError:(nullable NSError *)error showErrorToUser:(BOOL)showErrorToUser
 {
     void (^abortUpdate)(void) = ^{
-        [self.userDriver dismissUpdateInstallation];
+        if (showErrorToUser) {
+            [self.userDriver dismissUpdateInstallation];
+        }
         [self.coreDriver abortUpdateAndShowNextUpdateImmediately:NO error:error];
     };
     
-    if (error != nil) {
+    if (error != nil && showErrorToUser) {
         NSError *nonNullError = error;
         
         if (error.code == SUNoUpdateError) {
@@ -400,14 +402,14 @@
     }
 }
 
-- (void)abortUpdateWithError:(nullable NSError *)error
+- (void)abortUpdateWithError:(nullable NSError *)error showErrorToUser:(BOOL)showErrorToUser
 {
     if (self.releaseNotesDriver != nil) {
         [self.releaseNotesDriver cleanup:^{
-            [self _abortUpdateWithError:error];
+            [self _abortUpdateWithError:error showErrorToUser:showErrorToUser];
         }];
     } else {
-        [self _abortUpdateWithError:error];
+        [self _abortUpdateWithError:error showErrorToUser:showErrorToUser];
     }
 }
 
