@@ -68,14 +68,12 @@
 
 - (void)basicDriverIsRequestingAbortUpdateWithError:(nullable NSError *) error
 {
-    // Don't tell the user that no update was found or some appcast fetch error occurred for scheduled update checks if we haven't shown the update
-    [self abortUpdateWithError:self.showedUpdate ? error : nil];
+    [self abortUpdateWithError:error];
 }
 
 - (void)coreDriverIsRequestingAbortUpdateWithError:(nullable NSError *) error
 {
-    // Don't tell the user that an update error occurred for scheduled update checks if we haven't shown the update
-    [self abortUpdateWithError:self.showedUpdate ? error : nil];
+    [self abortUpdateWithError:error];
 }
 
 - (void)uiDriverIsRequestingAbortUpdateWithError:(nullable NSError *)error
@@ -90,7 +88,8 @@
 
 - (void)abortUpdateWithError:(nullable NSError *)error
 {
-    [self.uiDriver abortUpdateWithError:error];
+    // Don't tell the user that an update error occurred for scheduled update checks if we haven't shown the update
+    [self.uiDriver abortUpdateWithError:self.showedUpdate ? error : nil];
 }
 
 @end
