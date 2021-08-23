@@ -135,6 +135,8 @@ if [ "$ACTION" = "" ] ; then
     # This guards against our archives being corrupt / created incorrectly
     verify_code_signatures "$CONFIGURATION_BUILD_DIR/staging-spm"
     
+    rm -rf "$CONFIGURATION_BUILD_DIR/staging-spm"
+
     # Get latest git tag
     cd "$SRCROOT"
     latest_git_tag=$(git describe --tags --abbrev=0)
