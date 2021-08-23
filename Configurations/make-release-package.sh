@@ -118,14 +118,17 @@ if [ "$ACTION" = "" ] ; then
     rm -rf "$CONFIGURATION_BUILD_DIR/staging"
     
     # Generate zip containing the xcframework for SPM
+    rm -rf "/tmp/sparkle-spm-extract"
+    mkdir -p "/tmp/sparkle-spm-extract"
     cd "$CONFIGURATION_BUILD_DIR/staging-spm"
     rm -rf "$CONFIGURATION_BUILD_DIR/Sparkle.xcarchive"
-    ditto -c -k --zlibCompressionLevel 9 --rsrc . "../Sparkle-for-Swift-Package-Manager.zip"
+    ditto -c -k --zlibCompressionLevel 9 --rsrc . "../Sparkle-for-Swift-Package-Manager.zip" "/tmp/sparkle-spm-extract"
 
     # Test code signing validity of the extracted Swift package
     # This guards against our archives being corrupt / created incorrectly
-    verify_code_signatures "$CONFIGURATION_BUILD_DIR/staging-spm"
+    verify_code_signatures "/tmp/sparkle-spm-extract"
     
+    rm -rf "/tmp/sparkle-spm-extract"
     rm -rf "$CONFIGURATION_BUILD_DIR/staging-spm"
 
     # Get latest git tag
