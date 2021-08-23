@@ -23,9 +23,6 @@ jobs:
           submodules: true
           fetch-depth: 0
 
-      - name: "Create a temporary Git tag"
-        run: git tag "$MARKETING_VERSION"
-
       - name: "Extract version information from project"
         run: |
           MARKETING_VERSION=$(xcrun xcodebuild -showBuildSettings -project Sparkle.xcodeproj | grep MARKETING_VERSION | sed -E 's/.+=[[:space:]]+(.*)$/\1/')
@@ -39,6 +36,9 @@ jobs:
           else
             echo "PRERELEASE_VERSION=false" >> $GITHUB_ENV
           fi
+
+      - name: "Create a temporary Git tag"
+        run: git tag "$MARKETING_VERSION"
 
       - name: "Build release distribution"
         run: make release
