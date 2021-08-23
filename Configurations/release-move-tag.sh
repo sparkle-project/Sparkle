@@ -9,10 +9,10 @@ function move_tag() {
     long_message=$(git tag -n99 -l $latest_git_tag) # gets corresponding message
     long_message=${long_message/$latest_git_tag} # trims tag name
     long_message="$(echo -e "${long_message}" | sed -e 's/^[[:space:]]*//')" # trim leading whitespace
-    git add Package.swift
-    git commit -m "Update Package.swift for version ${latest_git_tag}"
+    git add Package.swift Sparkle.podspec
+    git commit -m "Update Package.swift and Sparkle.podspec for version ${latest_git_tag}"
     git tag -fa $latest_git_tag -m "${long_message}"
-    echo "Package.swift committed and tag '$latest_git_tag' moved."
+    echo "Package.swift and Sparkle.podspec committed and tag '$latest_git_tag' moved."
 }
 
 if [ "$commits_since_tag" -gt 0 ]; then
@@ -23,11 +23,11 @@ elif [ "$CI" == true ]; then
     move_tag
 else
 # TODO: add sanity check to see if version is actually being updated or not?
-    read -p "Do you want to commit changes to Package.swift and force move tag '$latest_git_tag'? (required for SPM release) [Y/n]" -n 1 -r
+    read -p "Do you want to commit changes to Package.swift and Sparkle.podspec, and force move tag '$latest_git_tag'? (required for official release) [Y/n]" -n 1 -r
         echo    # (optional) move to a new line
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         move_tag
     else
-        echo "Package.swift has not been committed and tag has not been moved."
+        echo "Package.swift and Sparkle.podspec have not been committed and tag has not been moved."
     fi
 fi

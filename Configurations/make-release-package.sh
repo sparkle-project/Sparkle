@@ -26,15 +26,6 @@ function verify_code_signatures() {
 }
 
 if [ "$ACTION" = "" ] ; then
-    # If using cocoapods, sanity check that the Podspec version matches the Sparkle version
-    if [ -x "$(command -v pod)" ]; then
-        spec_version=$(printf "require 'cocoapods'\nspec = %s\nprint spec.version" "$(cat "$SRCROOT/Sparkle.podspec")" | LANG=en_US.UTF-8 ruby)
-        if [ "$spec_version" != "$MARKETING_VERSION" ] ; then
-            echo "podspec version '$spec_version' does not match the marketing version '$MARKETING_VERSION'" >&2
-            exit 1
-        fi
-    fi
-
     rm -rf "$CONFIGURATION_BUILD_DIR/staging"
     rm -rf "$CONFIGURATION_BUILD_DIR/staging-spm"
     rm -f "Sparkle-$MARKETING_VERSION.tar.xz"
@@ -149,9 +140,10 @@ if [ "$ACTION" = "" ] ; then
         exit 1
     fi
 
-    # Generate new Package manifest
+    # Generate new Package manifest and podspec
     cd "$CONFIGURATION_BUILD_DIR"
     cp "$SRCROOT/Package.swift" "$CONFIGURATION_BUILD_DIR"
+    cp "$SRCROOT/Sparkle.podspec" "$CONFIGURATION_BUILD_DIR"
     if [ "$XCODE_VERSION_MAJOR" -ge "1200" ]; then
         # is equivalent to shasum -a 256 FILE
         spm_checksum=$(swift package compute-checksum "Sparkle-for-Swift-Package-Manager.zip")
@@ -162,6 +154,11 @@ if [ "$ACTION" = "" ] ; then
         echo "Version: $MARKETING_VERSION"
         echo "Tag: $latest_git_tag"
         echo "Checksum: $spm_checksum"
+
+        sed -E -i '' -e "/s\.version.+=/ s/\".+\"/\"$MARKETING_VERSION\"/" "Sparkle.podspec"
+        cp "Sparkle.podspec" "$SRCROOT"
+        echo "Sparkle.podspec updated with following values:"
+        echo "Version: $MARKETING_VERSION"
     else
         echo "warning: Xcode version $XCODE_VERSION_ACTUAL does not support computing checksums for Swift Packages. Please update the Package manifest manually."
     fi
