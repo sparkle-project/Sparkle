@@ -8,12 +8,12 @@ fi
 if [ -z "$SRCROOT" ] || \
    [ -z "$BUILT_PRODUCTS_DIR" ] || \
    [ -z "$INFOPLIST_PATH" ] || \
-   [ -z "$CURRENT_PROJECT_VERSION" ]; then
+   [ -z "$MARKETING_VERSION" ]; then
 	echo "$0: Must be run from Xcode!" 1>&2
     exit 1
 fi
 
-version="$CURRENT_PROJECT_VERSION"
+version="$MARKETING_VERSION"
 
 # Get version in format 1.x.x-commits-hash
 gitversion=$( cd "$SRCROOT"; git describe --tags --match '[12].*' || true )
@@ -22,10 +22,10 @@ if [ -z "$gitversion" ] ; then
     exit 0
 fi
 
-# remove everything before the first "-" to keep the hash part only
-versionsuffix=${gitversion#*-};
+# remove everything before the second last "-" to keep the hash part only
+versionsuffix=$( echo "${gitversion}" | sed -E 's/.+((-[^.]+){2})$/\1/' )
 if [ "$versionsuffix" != "$gitversion" ]; then
-    version="$version $versionsuffix"
+    version="$version$versionsuffix"
 fi
 
 # and use it to set the CFBundleShortVersionString value
