@@ -10,8 +10,6 @@
 #import <AppKit/AppKit.h>
 #import <Sparkle/Sparkle.h>
 
-#define SCHEDULED_UPDATE_TIMER_THRESHOLD 2.0 // seconds
-
 @interface SPUCommandLineUserDriver ()
 
 @property (nonatomic, nullable, readonly) SUUpdatePermissionResponse *updatePermissionResponse;
