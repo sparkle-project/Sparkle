@@ -133,13 +133,16 @@ SU_EXPORT @interface SPUUpdater : NSObject
  
  An update session is in progress when the appcast is being downloaded, an update is being downloaded,
  an update is being shown, update permission is being requested, or the installer is being started.
+ 
  An active session is when Sparkle's fired scheduler is running.
  
  Note an update session may be inactive even though Sparkle's installer (ran as a separate process) may be running,
  or even though the update has been downloaded but the installation has been deferred. In both of these cases, a new update session
  may be activated with the update resumed at a later point (automatically or manually).
  
- See also `canCheckForUpdates` property which is more suited for menu item validation.
+ See also:
+ - `canCheckForUpdates` property which is more suited for menu item validation.
+ -  `-[SPUUpdaterDelegate updaterDidFinishUpdateCycle:error:]` which lets the updater delegate know when an update cycle and session finishes.
  */
 @property (nonatomic, readonly) BOOL sessionInProgress;
 
