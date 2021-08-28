@@ -268,10 +268,11 @@ typedef NS_ENUM(NSInteger, SPUUpdateCheck)
  This is specifically for the @c <releaseNotesLink> element in the appcast item.
  
  @param updater The updater instance.
+ @param updateItem The update item to download and show release notes from.
  
  @return @c YES to download and show the release notes if available, otherwise @c NO. The default behavior is @c YES.
  */
-- (BOOL)updaterShouldDownloadReleaseNotes:(SPUUpdater *)updater;
+- (BOOL)updater:(SPUUpdater *)updater shouldDownloadReleaseNotesForUpdate:(SUAppcastItem *)updateItem;
 
 /**
  Called immediately before downloading the specified update.

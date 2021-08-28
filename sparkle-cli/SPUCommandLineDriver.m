@@ -216,8 +216,7 @@ typedef NS_ENUM(int, CLIErrorExitStatus) {
     }
 }
 
-// TODO: Move to updater:shouldDownloadReleaseNotesForUpdate:
-- (BOOL)updaterShouldDownloadReleaseNotes:(SPUUpdater *)__unused updater
+- (BOOL)updater:(SPUUpdater *)updater shouldDownloadReleaseNotesForUpdate:(nonnull SUAppcastItem *)__unused item
 {
     return self.verbose;
 }

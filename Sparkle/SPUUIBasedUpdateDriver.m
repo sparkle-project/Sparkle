@@ -261,7 +261,7 @@
         [self.delegate uiDriverDidShowUpdate];
     }
     
-    if (updateItem.releaseNotesURL != nil && (![updaterDelegate respondsToSelector:@selector(updaterShouldDownloadReleaseNotes:)] || [updaterDelegate updaterShouldDownloadReleaseNotes:self.updater])) {
+    if (updateItem.releaseNotesURL != nil && (![updaterDelegate respondsToSelector:@selector(updater:shouldDownloadReleaseNotesForUpdate:)] || [updaterDelegate updater:self.updater shouldDownloadReleaseNotesForUpdate:updateItem])) {
         
         __weak __typeof__(self) weakSelf = self;
         self.releaseNotesDriver = [[SPUReleaseNotesDriver alloc] initWithReleaseNotesURL:updateItem.releaseNotesURL httpHeaders:self.httpHeaders userAgent:self.userAgent host:self.host completionHandler:^(SPUDownloadData * _Nullable downloadData, NSError * _Nullable error) {
