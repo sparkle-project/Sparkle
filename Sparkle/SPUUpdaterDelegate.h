@@ -426,11 +426,28 @@ typedef NS_ENUM(NSInteger, SPUUpdateCheck)
 - (BOOL)updater:(SPUUpdater *)updater willInstallUpdateOnQuit:(SUAppcastItem *)item immediateInstallationBlock:(void (^)(void))immediateInstallHandler;
 
 /**
- Called after the update driver finishes or aborts due an error.
+ Called after the update driver aborts due to an error.
+ 
+ The update driver runs when checking for updates. This delegate method is called an error occurs during this process.
+ 
+ Some special possible values of `error.code` are:
+ 
+ - `SUNoUpdateError`: No new update was found.
+ - `SUInstallationCanceledError`: The user canceled installing the update when requested for authorization.
+ 
+ @param updater The updater instance.
+ @param error The error that caused the update driver to abort.
+ */
+- (void)updater:(SPUUpdater *)updater didAbortWithError:(NSError *)error;
+
+/**
+ Called after the update driver finishes.
  
  The update driver runs when checking for updates. This delegate method is called when that check is finished.
  
- If the @p error is @c nil, no error has occurred. This is possible if the user dismisses the update.
+ An update may be scheduled to be installed during the update cycle, or no updates may be found, or an available update may be dismissed or skipped (which is the same as no error).
+ 
+ If the @p error is @c nil, no error has occurred.
  
  Some special possible values of `error.code` are:
  
@@ -440,7 +457,7 @@ typedef NS_ENUM(NSInteger, SPUUpdateCheck)
  @param updater The updater instance.
  @param error The error that caused the update driver to abort. This is @c nil if the update driver finished normally and there is no error.
  */
-- (void)updater:(SPUUpdater *)updater didAbortWithError:(nullable NSError *)error;
+- (void)updaterDidFinishUpdateCycle:(SPUUpdater *)updater error:(nullable NSError *)error;
 
 /* Deprecated methods */
 

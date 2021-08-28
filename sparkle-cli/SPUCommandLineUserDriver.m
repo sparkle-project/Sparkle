@@ -43,16 +43,10 @@
 
 - (void)showUpdatePermissionRequest:(SPUUpdatePermissionRequest *)__unused request reply:(void (^)(SUUpdatePermissionResponse *))reply
 {
-    if (self.updatePermissionResponse == nil) {
-        // We don't want to make this decision on behalf of the user.
-        fprintf(stderr, "Error: Asked to grant update permission. Exiting.\n");
-        exit(EXIT_FAILURE);
-    } else {
-        if (self.verbose) {
-            fprintf(stderr, "Granting permission for automatic update checks with sending system profile %s...\n", self.updatePermissionResponse.sendSystemProfile ? "enabled" : "disabled");
-        }
-        reply(self.updatePermissionResponse);
+    if (self.verbose) {
+        fprintf(stderr, "Granting permission for automatic update checks with sending system profile %s...\n", self.updatePermissionResponse.sendSystemProfile ? "enabled" : "disabled");
     }
+    reply(self.updatePermissionResponse);
 }
 
 - (void)showUserInitiatedUpdateCheckWithCancellation:(void (^)(void))__unused cancellation
