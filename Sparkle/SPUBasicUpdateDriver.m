@@ -10,8 +10,6 @@
 #import "SUAppcastDriver.h"
 #import "SPUUpdaterDelegate.h"
 #import "SUErrors.h"
-#import "SULog.h"
-#import "SULog+NSError.h"
 #import "SULocalizations.h"
 #import "SUHost.h"
 #import "SUAppcastItem.h"
@@ -260,25 +258,8 @@
     self.aborted = YES;
     
     [self.appcastDriver cleanup:^{
-        if (error != nil) {
-            if (error.code != SUNoUpdateError && error.code != SUInstallationCanceledError && error.code != SUInstallationAuthorizeLaterError) { // Let's not bother logging this.
-                SULogError(error);
-            }
-            
-            // Notify host app that update driver has aborted if a non-recoverable error occurs
-            if (error.code != SUInstallationAuthorizeLaterError && [self.updaterDelegate respondsToSelector:@selector((updater:didAbortWithError:))]) {
-                [self.updaterDelegate updater:self.updater didAbortWithError:(NSError * _Nonnull)error];
-            }
-        }
-        
-        // Notify host app that update driver has finished
-        // As long as we're not going to immmediately kick off a new check
-        if (!shouldShowUpdateImmediately && [self.updaterDelegate respondsToSelector:@selector((updaterDidFinishUpdateCycle:error:))]) {
-            [self.updaterDelegate updaterDidFinishUpdateCycle:self.updater error:error];
-        }
-        
         if (self.completionBlock != nil) {
-            self.completionBlock(shouldShowUpdateImmediately, resumableUpdate);
+            self.completionBlock(shouldShowUpdateImmediately, resumableUpdate, error);
             self.completionBlock = nil;
         }
     }];

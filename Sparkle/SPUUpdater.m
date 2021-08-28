@@ -15,6 +15,7 @@
 #import "SPUUpdateDriver.h"
 #import "SUConstants.h"
 #import "SULog.h"
+#import "SULog+NSError.h"
 #import "SUCodeSigningVerifier.h"
 #import "SUSystemProfiler.h"
 #import "SPUScheduledUpdateDriver.h"
@@ -574,9 +575,28 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     self.driver = d;
     assert(self.driver != nil);
     
+    void (^notifyDelegateOfDriverCompletion)(NSError * _Nullable, BOOL) = ^(NSError * _Nullable error, BOOL shouldShowUpdateImmediately) {
+        if (error != nil) {
+            if (error.code != SUNoUpdateError && error.code != SUInstallationCanceledError && error.code != SUInstallationAuthorizeLaterError) { // Let's not bother logging this.
+                SULogError(error);
+            }
+            
+            // Notify host app that update driver has aborted if a non-recoverable error occurs
+            if (error.code != SUInstallationAuthorizeLaterError && [self.delegate respondsToSelector:@selector((updater:didAbortWithError:))]) {
+                [self.delegate updater:self didAbortWithError:(NSError * _Nonnull)error];
+            }
+        }
+        
+        // Notify host app that update driver has finished
+        // As long as we're not going to immmediately kick off a new check
+        if (!shouldShowUpdateImmediately && [self.delegate respondsToSelector:@selector((updaterDidFinishUpdateCycle:error:))]) {
+            [self.delegate updaterDidFinishUpdateCycle:self error:error];
+        }
+    };
+    
     void (^abortUpdateDriver)(NSError  * _Nullable , BOOL) = ^(NSError * _Nullable abortError, BOOL shouldScheduleNextUpdateCheck) {
         __weak SPUUpdater *weakSelf = self;
-        [self.driver setCompletionHandler:^(BOOL __unused shouldShowUpdateImmediately, id<SPUResumableUpdate>  _Nullable __unused resumableUpdate) {
+        [self.driver setCompletionHandler:^(BOOL __unused shouldShowUpdateImmediately, id<SPUResumableUpdate>  _Nullable __unused resumableUpdate, NSError * _Nullable error) {
             SPUUpdater *strongSelf = weakSelf;
             if (strongSelf != nil) {
                 strongSelf.driver = nil;
@@ -584,10 +604,15 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
                 
                 [strongSelf updateLastUpdateCheckDate];
                 
-                if (shouldScheduleNextUpdateCheck) {
-                    [strongSelf scheduleNextUpdateCheck];
-                } else {
-                    SULog(SULogLevelDefault, @"Disabling scheduled updates..");
+                notifyDelegateOfDriverCompletion(error, NO);
+                
+                // Ensure the delegate doesn't start a new session when being notified of the previous one ending
+                if (!strongSelf.sessionInProgress) {
+                    if (shouldScheduleNextUpdateCheck) {
+                        [strongSelf scheduleNextUpdateCheck];
+                    } else {
+                        SULog(SULogLevelDefault, @"Disabling scheduled updates..");
+                    }
                 }
             }
         }];
@@ -620,14 +645,20 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     
     // Run our update driver and schedule next update check on its completion
     __weak SPUUpdater *weakSelf = self;
-    [self.driver setCompletionHandler:^(BOOL shouldShowUpdateImmediately, id<SPUResumableUpdate>  _Nullable resumableUpdate) {
+    [self.driver setCompletionHandler:^(BOOL shouldShowUpdateImmediately, id<SPUResumableUpdate>  _Nullable resumableUpdate, NSError * _Nullable error) {
         SPUUpdater *strongSelf = weakSelf;
         if (strongSelf != nil) {
             strongSelf.resumableUpdate = resumableUpdate;
             strongSelf.driver = nil;
             strongSelf.sessionInProgress = NO;
             [strongSelf updateLastUpdateCheckDate];
-            [strongSelf scheduleNextUpdateCheckFiringImmediately:shouldShowUpdateImmediately];
+            
+            notifyDelegateOfDriverCompletion(error, shouldShowUpdateImmediately);
+            
+            // Ensure the delegate doesn't start a new session when being notified of the previous one ending
+            if (!strongSelf.sessionInProgress) {
+                [strongSelf scheduleNextUpdateCheckFiringImmediately:shouldShowUpdateImmediately];
+            }
         }
     }];
     
