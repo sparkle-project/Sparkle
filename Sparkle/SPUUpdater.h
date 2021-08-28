@@ -83,7 +83,7 @@ SU_EXPORT @interface SPUUpdater : NSObject
  This is meant for users initiating a new update check or checking the current update progress.
  
  If an update hasn't started, the user may be shown that a new check for updates is occurring.
- If an update has already been downloaded or begun installing, the user may be presented to install that update.
+ If an update has already been downloaded or begun installing from a previous session, the user may be presented to install that update.
  If the user is already being presented with an update, that update will be shown to the user in active focus.
  
  This will find updates that the user has previously opted into skipping.
@@ -101,6 +101,8 @@ SU_EXPORT @interface SPUUpdater : NSObject
  
  Note if there is no resumable update found, and automated updating is turned on,
  the update will be downloaded in the background without disrupting the user.
+ 
+ This method does not do anything if there is a `sessionInProgress`.
  */
 - (void)checkForUpdatesInBackground;
 
@@ -113,7 +115,12 @@ SU_EXPORT @interface SPUUpdater : NSObject
  `-[SPUUpdaterDelegate updaterDidNotFindUpdate:]` will be called,
  so you can use that information in your UI.
  
+ `-[SPUUpdaterDelegate updater:didFinishUpdateCycleForUpdateCheck:error:]` will be called when
+ this probing check is completed.
+ 
  Updates that have been skipped by the user will not be found.
+ 
+ This method does not do anything if there is a `sessionInProgress`.
  */
 - (void)checkForUpdateInformation;
 
@@ -136,7 +143,7 @@ SU_EXPORT @interface SPUUpdater : NSObject
  
  An active session is when Sparkle's fired scheduler is running.
  
- Note an update session may be inactive even though Sparkle's installer (ran as a separate process) may be running,
+ Note an update session may not be running even though Sparkle's installer (ran as a separate process) may be running,
  or even though the update has been downloaded but the installation has been deferred. In both of these cases, a new update session
  may be activated with the update resumed at a later point (automatically or manually).
  
