@@ -181,7 +181,7 @@ typedef NS_ENUM(int, CLIErrorExitStatus) {
     }
 }
 
-- (void)updaterDidFinishUpdateCycle:(SPUUpdater *)updater error:(nullable NSError *)error __attribute__((noreturn))
+- (void)updater:(SPUUpdater *)updater didFinishUpdateCycleForUpdateCheck:(SPUUpdateCheck)__unused updateCheck error:(nullable NSError *)error __attribute__((noreturn))
 {
     if (error == nil) {
         if (self.verbose) {

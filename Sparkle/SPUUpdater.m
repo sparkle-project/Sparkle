@@ -589,8 +589,8 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         
         // Notify host app that update driver has finished
         // As long as we're not going to immmediately kick off a new check
-        if (!shouldShowUpdateImmediately && [self.delegate respondsToSelector:@selector((updaterDidFinishUpdateCycle:error:))]) {
-            [self.delegate updaterDidFinishUpdateCycle:self error:error];
+        if (!shouldShowUpdateImmediately && [self.delegate respondsToSelector:@selector((updater:didFinishUpdateCycleForUpdateCheck:error:))]) {
+            [self.delegate updater:self didFinishUpdateCycleForUpdateCheck:updateCheck error:error];
         }
     };
     

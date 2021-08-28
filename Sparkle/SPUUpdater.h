@@ -142,7 +142,7 @@ SU_EXPORT @interface SPUUpdater : NSObject
  
  See also:
  - `canCheckForUpdates` property which is more suited for menu item validation.
- -  `-[SPUUpdaterDelegate updaterDidFinishUpdateCycle:error:]` which lets the updater delegate know when an update cycle and session finishes.
+ -  `-[SPUUpdaterDelegate updater:didFinishUpdateCycleForUpdateCheck:error:]` which lets the updater delegate know when an update cycle and session finishes.
  */
 @property (nonatomic, readonly) BOOL sessionInProgress;
 

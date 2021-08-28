@@ -456,9 +456,10 @@ typedef NS_ENUM(NSInteger, SPUUpdateCheck)
  - `SUInstallationCanceledError`: The user canceled installing the update when requested for authorization.
  
  @param updater The updater instance.
+ @param updateCheck The type of update check was performed.
  @param error The error that caused the update driver to abort. This is @c nil if the update driver finished normally and there is no error.
  */
-- (void)updaterDidFinishUpdateCycle:(SPUUpdater *)updater error:(nullable NSError *)error;
+- (void)updater:(SPUUpdater *)updater didFinishUpdateCycleForUpdateCheck:(SPUUpdateCheck)updateCheck error:(nullable NSError *)error;
 
 /* Deprecated methods */
 
