@@ -181,41 +181,39 @@ typedef NS_ENUM(int, CLIErrorExitStatus) {
     }
 }
 
-- (void)updaterDidFinishUpdateCycle:(SPUUpdater *)updater error:(nullable NSError *)error;
+- (void)updaterDidFinishUpdateCycle:(SPUUpdater *)updater error:(nullable NSError *)error __attribute__((noreturn))
 {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if (error == nil) {
-            if (self.verbose) {
-                fprintf(stderr, "Exiting.\n");
-            }
-            exit(EXIT_SUCCESS);
-        } else if ([error.domain isEqualToString:SPARKLE_CLI_ERROR_DOMAIN]) {
-            fprintf(stderr, "%s\n", error.localizedDescription.UTF8String);
-            
-            if (error.code == CLIErrorCodeCannotInstallMajorUpgrade) {
-                // Major upgrades are not allowed
-                exit(CLIErrorExitStatusMajorUpgradeNotAllowed);
-            } else {
-                // This is one of our own interactive update failures
-                exit(CLIErrorExitStatusInstallerInteractionNotAllowed);
-            }
-        } else if (error.code == SUNoUpdateError) {
-            if (self.verbose) {
-                fprintf(stderr, "No new update available!\n");
-            }
-            exit(CLIErrorExitStatusUpdateNotFound);
-        } else if (error.code == SUInstallationCanceledError) {
-            // User canceled authorization themselves
-            assert(self.interactive);
-            if (self.verbose) {
-                fprintf(stderr, "Update was cancelled.\n");
-            }
-            exit(CLIErrorExitStatusUpdateCancelledAuthorization);
-        } else {
-            fprintf(stderr, "Error: Update has failed due to error %ld (%s). %s\n", (long)error.code, error.domain.UTF8String, error.localizedDescription.UTF8String);
-            exit(EXIT_FAILURE);
+    if (error == nil) {
+        if (self.verbose) {
+            fprintf(stderr, "Exiting.\n");
         }
-    });
+        exit(EXIT_SUCCESS);
+    } else if ([error.domain isEqualToString:SPARKLE_CLI_ERROR_DOMAIN]) {
+        fprintf(stderr, "%s\n", error.localizedDescription.UTF8String);
+        
+        if (error.code == CLIErrorCodeCannotInstallMajorUpgrade) {
+            // Major upgrades are not allowed
+            exit(CLIErrorExitStatusMajorUpgradeNotAllowed);
+        } else {
+            // This is one of our own interactive update failures
+            exit(CLIErrorExitStatusInstallerInteractionNotAllowed);
+        }
+    } else if (error.code == SUNoUpdateError) {
+        if (self.verbose) {
+            fprintf(stderr, "No new update available!\n");
+        }
+        exit(CLIErrorExitStatusUpdateNotFound);
+    } else if (error.code == SUInstallationCanceledError) {
+        // User canceled authorization themselves
+        assert(self.interactive);
+        if (self.verbose) {
+            fprintf(stderr, "Update was cancelled.\n");
+        }
+        exit(CLIErrorExitStatusUpdateCancelledAuthorization);
+    } else {
+        fprintf(stderr, "Error: Update has failed due to error %ld (%s). %s\n", (long)error.code, error.domain.UTF8String, error.localizedDescription.UTF8String);
+        exit(EXIT_FAILURE);
+    }
 }
 
 // TODO: Move to updater:shouldDownloadReleaseNotesForUpdate:
