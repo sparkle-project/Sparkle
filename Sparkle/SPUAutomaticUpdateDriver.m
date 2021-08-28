@@ -47,7 +47,7 @@
         // The user driver is only used for a termination callback
         _userDriver = userDriver;
         _updaterDelegate = updaterDelegate;
-        _coreDriver = [[SPUCoreBasedUpdateDriver alloc] initWithHost:host applicationBundle:applicationBundle updater:updater updaterDelegate:updaterDelegate delegate:self];
+        _coreDriver = [[SPUCoreBasedUpdateDriver alloc] initWithHost:host applicationBundle:applicationBundle updateCheck:SPUUpdateCheckUpdatesInBackground updater:updater updaterDelegate:updaterDelegate delegate:self];
     }
     return self;
 }

@@ -29,6 +29,7 @@
 @property (nonatomic, copy) SPUUpdateDriverCompletion completionBlock;
 
 @property (nonatomic, readonly) SUHost *host;
+@property (nonatomic, readonly) SPUUpdateCheck updateCheck;
 @property (nonatomic, readonly, weak) id updater; // if we didn't have legacy support, I'd remove this..
 @property (nullable, nonatomic, readonly, weak) id <SPUUpdaterDelegate>updaterDelegate;
 
@@ -39,6 +40,7 @@
 @implementation SPUBasicUpdateDriver
 
 @synthesize host = _host;
+@synthesize updateCheck = _updateCheck;
 @synthesize updater = _updater;
 @synthesize updaterDelegate = _updaterDelegate;
 @synthesize delegate = _delegate;
@@ -46,11 +48,12 @@
 @synthesize completionBlock = _completionBlock;
 @synthesize aborted = _aborted;
 
-- (instancetype)initWithHost:(SUHost *)host updater:(id)updater updaterDelegate:(id <SPUUpdaterDelegate>)updaterDelegate delegate:(id <SPUBasicUpdateDriverDelegate>)delegate
+- (instancetype)initWithHost:(SUHost *)host updateCheck:(SPUUpdateCheck)updateCheck updater:(id)updater updaterDelegate:(id <SPUUpdaterDelegate>)updaterDelegate delegate:(id <SPUBasicUpdateDriverDelegate>)delegate
 {
     self = [super init];
     if (self != nil) {
         _host = host;
+        _updateCheck = updateCheck;
         _updater = updater;
         _updaterDelegate = updaterDelegate;
         _delegate = delegate;
@@ -138,7 +141,7 @@
     if (!self.aborted) {
         // If the update is not being resumed from a prior session, give the delegate a chance to bail
         NSError *shouldNotProceedError = nil;
-        if (!resuming && [self.updaterDelegate respondsToSelector:@selector(updater:shouldProceedWithUpdate:error:)] && ![self.updaterDelegate updater:self.updater shouldProceedWithUpdate:updateItem error:&shouldNotProceedError]) {
+        if (!resuming && [self.updaterDelegate respondsToSelector:@selector(updater:shouldProceedWithUpdate:updateCheck:error:)] && ![self.updaterDelegate updater:self.updater shouldProceedWithUpdate:updateItem updateCheck:self.updateCheck error:&shouldNotProceedError]) {
             [self.delegate basicDriverIsRequestingAbortUpdateWithError:shouldNotProceedError];
         } else {
             [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidFindValidUpdateNotification

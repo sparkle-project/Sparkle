@@ -64,7 +64,7 @@
 @synthesize resumableUpdate = _resumableUpdate;
 @synthesize downloadedUpdateForRemoval = _downloadedUpdateForRemoval;
 
-- (instancetype)initWithHost:(SUHost *)host applicationBundle:(NSBundle *)applicationBundle updater:(id)updater updaterDelegate:(nullable id <SPUUpdaterDelegate>)updaterDelegate delegate:(id<SPUCoreBasedUpdateDriverDelegate>)delegate
+- (instancetype)initWithHost:(SUHost *)host applicationBundle:(NSBundle *)applicationBundle updateCheck:(SPUUpdateCheck)updateCheck updater:(id)updater updaterDelegate:(nullable id <SPUUpdaterDelegate>)updaterDelegate delegate:(id<SPUCoreBasedUpdateDriverDelegate>)delegate
 {
     self = [super init];
     if (self != nil) {
@@ -73,7 +73,7 @@
         NSString *bundleIdentifier = host.bundle.bundleIdentifier;
         assert(bundleIdentifier != nil);
         
-        _basicDriver = [[SPUBasicUpdateDriver alloc] initWithHost:host updater:updater updaterDelegate:updaterDelegate delegate:self];
+        _basicDriver = [[SPUBasicUpdateDriver alloc] initWithHost:host updateCheck:updateCheck updater:updater updaterDelegate:updaterDelegate delegate:self];
         _installerDriver = [[SPUInstallerDriver alloc] initWithHost:host applicationBundle:applicationBundle updater:updater updaterDelegate:updaterDelegate delegate:self];
         
         _host = host;

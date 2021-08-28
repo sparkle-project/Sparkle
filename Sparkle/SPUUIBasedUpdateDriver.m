@@ -120,7 +120,9 @@
         _updaterDelegate = updaterDelegate;
         _host = host;
         
-        _coreDriver = [[SPUCoreBasedUpdateDriver alloc] initWithHost:host applicationBundle:applicationBundle updater:updater updaterDelegate:updaterDelegate delegate:self];
+        SPUUpdateCheck updateCheck = userInitiated ? SPUUpdateCheckUpdates : SPUUpdateCheckUpdatesInBackground;
+        
+        _coreDriver = [[SPUCoreBasedUpdateDriver alloc] initWithHost:host applicationBundle:applicationBundle updateCheck:updateCheck updater:updater updaterDelegate:updaterDelegate delegate:self];
     }
     return self;
 }

@@ -28,7 +28,7 @@
 {
     self = [super init];
     if (self != nil) {
-        _basicDriver = [[SPUBasicUpdateDriver alloc] initWithHost:host updater:updater updaterDelegate:updaterDelegate delegate:self];
+        _basicDriver = [[SPUBasicUpdateDriver alloc] initWithHost:host updateCheck:SPUUpdateCheckUpdateInformation updater:updater updaterDelegate:updaterDelegate delegate:self];
     }
     return self;
 }

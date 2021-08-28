@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "SPUUpdateDriver.h"
 #import "SPUUserUpdateState.h"
+#import "SPUUpdateCheck.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -49,7 +50,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface SPUCoreBasedUpdateDriver : NSObject
 
-- (instancetype)initWithHost:(SUHost *)host applicationBundle:(NSBundle *)applicationBundle updater:(id)updater updaterDelegate:(nullable id <SPUUpdaterDelegate>)updaterDelegate delegate:(id<SPUCoreBasedUpdateDriverDelegate>)delegate;
+- (instancetype)initWithHost:(SUHost *)host applicationBundle:(NSBundle *)applicationBundle updateCheck:(SPUUpdateCheck)updateCheck updater:(id)updater updaterDelegate:(nullable id <SPUUpdaterDelegate>)updaterDelegate delegate:(id<SPUCoreBasedUpdateDriverDelegate>)delegate;
 
 - (void)setCompletionHandler:(SPUUpdateDriverCompletion)completionBlock;
 

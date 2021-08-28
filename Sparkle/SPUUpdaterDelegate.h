@@ -15,6 +15,7 @@
 #import <Foundation/Foundation.h>
 #endif
 #import <Sparkle/SUExport.h>
+#import <Sparkle/SPUUpdateCheck.h>
 
 @protocol SUVersionComparison;
 @class SPUUpdater, SUAppcast, SUAppcastItem;
@@ -56,27 +57,6 @@ SU_EXPORT extern NSString *const SUSystemProfilerPreferredLanguageKey;
 // -----------------------------------------------------------------------------
 //	SPUUpdater Delegate:
 // -----------------------------------------------------------------------------
-
-/**
- Describes the type of update check being performed.
- 
- Each update check corresponds to an update check method on `SPUUpdater`.
- */
-typedef NS_ENUM(NSInteger, SPUUpdateCheck)
-{
-    /**
-     The user-initiated update check corresponding to `-[SPUUpdater checkForUpdates]`.
-     */
-    SPUUpdateCheckUpdates = 0,
-    /**
-     The background scheduled update check corresponding to `-[SPUUpdater checkForUpdatesInBackground]`.
-     */
-    SPUUpdateCheckUpdatesInBackground = 1,
-    /**
-     The informational probe update check corresponding to `-[SPUUpdater checkForUpdateInformation]`.
-     */
-    SPUUpdateCheckUpdateInformation = 2
-};
 
 /**
  Provides delegation methods to control the behavior of an `SPUUpdater` object.
@@ -249,10 +229,11 @@ typedef NS_ENUM(NSInteger, SPUUpdateCheck)
  
  @param updater The updater instance.
  @param updateItem The selected update item to proceed with.
+ @param updateCheck The type of update check that would be performed if proceeded.
  @param error An error object that must be populated by the delegate if the updater should not proceed with the update.
  @return @c YES if the updater should proceed with @p updateItem, otherwise @c NO if the updater should not proceed with the update with an @p error populated.
  */
-- (BOOL)updater:(SPUUpdater *)updater shouldProceedWithUpdate:(SUAppcastItem *)updateItem error:(NSError * __autoreleasing *)error;
+- (BOOL)updater:(SPUUpdater *)updater shouldProceedWithUpdate:(SUAppcastItem *)updateItem updateCheck:(SPUUpdateCheck)updateCheck error:(NSError * __autoreleasing *)error;
 
 /**
  Called when an update is skipped by the user.

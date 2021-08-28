@@ -131,9 +131,10 @@ typedef NS_ENUM(int, CLIErrorExitStatus) {
 }
 
 // If the installation is not interactive, we should only proceed with application based updates and not package-based ones
-- (BOOL)updater:(SPUUpdater *)updater shouldProceedWithUpdate:(nonnull SUAppcastItem *)updateItem error:(NSError * __autoreleasing *)error
+- (BOOL)updater:(SPUUpdater *)updater shouldProceedWithUpdate:(nonnull SUAppcastItem *)updateItem updateCheck:(SPUUpdateCheck)updateCheck error:(NSError * __autoreleasing *)error
 {
-    if (self.probingForUpdates) {
+    // We can always probe for update information
+    if (updateCheck == SPUUpdateCheckUpdateInformation) {
         return YES;
     }
     
