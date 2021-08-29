@@ -38,7 +38,7 @@ jobs:
           fi
 
       - name: "Create a temporary Git tag"
-        run: git tag "$MARKETING_VERSION"
+        run: git tag "${{ env.MARKETING_VERSION }}"
 
       - name: "Build release distribution"
         run: make release
