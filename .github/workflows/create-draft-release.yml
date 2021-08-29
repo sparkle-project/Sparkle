@@ -25,12 +25,12 @@ jobs:
 
       - name: "Extract version information from project"
         run: |
-          MARKETING_VERSION=$(xcrun xcodebuild -showBuildSettings -project Sparkle.xcodeproj | grep MARKETING_VERSION | grep -m 1 '^[[:space:]]*MARKETING_VERSION')
-          echo "MARKETING_VERSION=${MARKETING_VERSION}" >> $GITHUB_ENV~
+          MARKETING_VERSION=$(xcrun xcodebuild -showBuildSettings -project Sparkle.xcodeproj | grep -m 1 '^[[:space:]]*MARKETING_VERSION' | sed -E 's/.+=[[:space:]]+(.*)$/\1/')
+          echo "MARKETING_VERSION=${MARKETING_VERSION}" >> $GITHUB_ENV
 
       - name: "Determine if this is a pre-release version"
         run: |
-          SPARKLE_VERSION_SUFFIX=$(xcrun xcodebuild -showBuildSettings -project Sparkle.xcodeproj | grep SPARKLE_VERSION_SUFFIX | grep -m 1 '^[[:space:]]*SPARKLE_VERSION_SUFFIX')
+          SPARKLE_VERSION_SUFFIX=$(xcrun xcodebuild -showBuildSettings -project Sparkle.xcodeproj | grep -m 1 '^[[:space:]]*SPARKLE_VERSION_SUFFIX' | sed -E 's/.+=[[:space:]]+(.*)$/\1/')
           if [[ ! -z "$SPARKLE_VERSION_SUFFIX" ]]; then
             echo "PRERELEASE_VERSION=true" >> $GITHUB_ENV
           else
@@ -38,7 +38,7 @@ jobs:
           fi
 
       - name: "Create a temporary Git tag"
-        run: git tag "$MARKETING_VERSION"
+        run: git tag "${{ env.MARKETING_VERSION }}"
 
       - name: "Build release distribution"
         run: make release

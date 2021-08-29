@@ -24,11 +24,8 @@ SPARKLE_VERSION_PATCH = 0
 
 // This should be in SemVer format or empty, ie. "-beta.1"
 SPARKLE_VERSION_SUFFIX = -beta.1
-
 CURRENT_PROJECT_VERSION = 2001
 
-// Please be careful not to use MARKETING_VERSION as part of any other build settings. 
-// We extract this value during builds, and they would be exported at the same time.
 MARKETING_VERSION = $(SPARKLE_VERSION_MAJOR).$(SPARKLE_VERSION_MINOR).$(SPARKLE_VERSION_PATCH)$(SPARKLE_VERSION_SUFFIX)
 ALWAYS_SEARCH_USER_PATHS = NO
 ENABLE_STRICT_OBJC_MSGSEND = YES
