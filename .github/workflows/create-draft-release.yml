@@ -19,8 +19,8 @@ jobs:
     steps:
       - name: "Checkout sources"
         uses: actions/checkout@v2
-        token: ${{ secrets.BOT_PERSONAL_ACCESS_TOKEN }}
         with:
+          token: ${{ secrets.BOT_PERSONAL_ACCESS_TOKEN }}
           submodules: true
           fetch-depth: 0
 
