@@ -50,8 +50,6 @@ jobs:
           GITHUB_ACTOR: ${{ github.actor }}
           GITHUB_REPOSITORY: ${{ github.repository }}
           GITHUB_TOKEN: ${{ secrets.BOT_PERSONAL_ACCESS_TOKEN }}
-          MARKETING_VERSION: ${{ env.MARKETING_VERSION }}
-          SPARKLE_VERSION_SUFFIX: ${{ env.SPARKLE_VERSION_SUFFIX }}
 
       - name: "Push the updated Swift package description"
         env:
