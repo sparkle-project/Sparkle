@@ -19,6 +19,7 @@ jobs:
     steps:
       - name: "Checkout sources"
         uses: actions/checkout@v2
+        token: ${{ secrets.BOT_PERSONAL_ACCESS_TOKEN }}
         with:
           submodules: true
           fetch-depth: 0
@@ -45,11 +46,13 @@ jobs:
         env:
           GITHUB_ACTOR: ${{ github.actor }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.BOT_PERSONAL_ACCESS_TOKEN }}
           MARKETING_VERSION: ${{ env.MARKETING_VERSION }}
           SPARKLE_VERSION_SUFFIX: ${{ env.SPARKLE_VERSION_SUFFIX }}
 
       - name: "Push the updated Swift package description"
+        env:
+            GITHUB_TOKEN: ${{ secrets.BOT_PERSONAL_ACCESS_TOKEN }}
         run: git push
 
       - name: "Draft a release"
@@ -60,6 +63,7 @@ jobs:
           name: "Sparkle ${{ env.MARKETING_VERSION }}"
           tag_name: ${{ env.MARKETING_VERSION }}
           fail_on_unmatched_files: true
+          token: ${{ secrets.BOT_PERSONAL_ACCESS_TOKEN }}
           files: |
             build/Build/Products/Release/Sparkle-*.tar.xz
             build/Build/Products/Release/Sparkle-for-Swift-Package-Manager.zip
