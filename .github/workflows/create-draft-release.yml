@@ -38,8 +38,11 @@ jobs:
             echo "PRERELEASE_VERSION=false" >> $GITHUB_ENV
           fi
 
-      - name: "Create a temporary Git tag"
-        run: git tag "${{ env.MARKETING_VERSION }}"
+      - name: "Set up git and create tag"
+        run: |
+            git config user.name Sparkle-Bot
+            git config user.email sparkle.project.bot@gmail.com
+            git tag "${{ env.MARKETING_VERSION }}"
 
       - name: "Build release distribution"
         run: make release
