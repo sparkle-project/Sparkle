@@ -110,9 +110,6 @@
     self.resumableUpdate = resumableUpdate;
     self.silentInstall = NO;
     
-    // Note if installer interaction isn't allowed, we shouldn't have downloaded the update, and shouldn't be able to get here
-    // So no need to do a test if we can perform an update without authorization
-    
     [self.basicDriver resumeUpdate:resumableUpdate];
 }
 
