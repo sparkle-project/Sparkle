@@ -26,7 +26,7 @@ jobs:
           
       - name: "Extract latest changes from CHANGELOG"
         run: |
-            ./generate_latest_changes.py > latest-changes.txt
+            ./Configurations/generate_latest_changes.py > latest-changes.txt
 
       - name: "Extract version information from project"
         run: |
