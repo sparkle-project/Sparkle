@@ -23,6 +23,10 @@ jobs:
           token: ${{ secrets.BOT_PERSONAL_ACCESS_TOKEN }}
           submodules: true
           fetch-depth: 0
+          
+      - name: "Extract latest changes from CHANGELOG"
+        run: |
+            ./generate_latest_changes.py > latest-changes.txt
 
       - name: "Extract version information from project"
         run: |
@@ -65,6 +69,7 @@ jobs:
           tag_name: ${{ env.MARKETING_VERSION }}
           fail_on_unmatched_files: true
           token: ${{ secrets.BOT_PERSONAL_ACCESS_TOKEN }}
+          body_path: latest-changes.txt
           files: |
             build/Build/Products/Release/Sparkle-*.tar.xz
             build/Build/Products/Release/Sparkle-for-Swift-Package-Manager.zip
