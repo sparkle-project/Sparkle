@@ -11,7 +11,7 @@
 BOOL SUWebViewIsSafeURL(NSURL *url, BOOL *isAboutBlankURL)
 {
     NSString *scheme = url.scheme;
-    BOOL isAboutBlank = [url.absoluteString isEqualToString:@"about:blank"];
+    BOOL isAboutBlank = [@[@"about:blank", @"about:srcdoc"] containsObject:url.absoluteString];
     BOOL whitelistedSafe = isAboutBlank || [@[@"http", @"https", @"macappstore", @"macappstores", @"itms-apps", @"itms-appss"] containsObject:scheme];
     
     *isAboutBlankURL = isAboutBlank;
