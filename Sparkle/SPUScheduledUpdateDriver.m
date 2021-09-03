@@ -36,28 +36,24 @@
     return self;
 }
 
-- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders preventingInstallerInteraction:(BOOL)preventsInstallerInteraction completion:(SPUUpdateDriverCompletion)completionBlock
+- (void)setCompletionHandler:(SPUUpdateDriverCompletion)completionBlock
 {
-    [self.uiDriver prepareCheckForUpdatesWithCompletion:completionBlock];
-    
-    [self.uiDriver preflightForUpdatePermissionPreventingInstallerInteraction:preventsInstallerInteraction reply:^(NSError * _Nullable error) {
-        if (error != nil) {
-            // Don't tell the user about the permission error for scheduled update checks
-            [self abortUpdateWithError:nil];
-        } else {
-            [self.uiDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders inBackground:YES];
-        }
-    }];
+    [self.uiDriver setCompletionHandler:completionBlock];
 }
 
-- (void)resumeInstallingUpdateWithCompletion:(SPUUpdateDriverCompletion)completionBlock
+- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders
 {
-    [self.uiDriver resumeInstallingUpdateWithCompletion:completionBlock];
+    [self.uiDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders inBackground:YES];
 }
 
-- (void)resumeUpdate:(id<SPUResumableUpdate>)resumableUpdate completion:(SPUUpdateDriverCompletion)completionBlock
+- (void)resumeInstallingUpdate
 {
-    [self.uiDriver resumeUpdate:resumableUpdate completion:completionBlock];
+    [self.uiDriver resumeInstallingUpdate];
+}
+
+- (void)resumeUpdate:(id<SPUResumableUpdate>)resumableUpdate
+{
+    [self.uiDriver resumeUpdate:resumableUpdate];
 }
 
 - (void)uiDriverDidShowUpdate
@@ -72,14 +68,12 @@
 
 - (void)basicDriverIsRequestingAbortUpdateWithError:(nullable NSError *) error
 {
-    // Don't tell the user that no update was found or some appcast fetch error occurred for scheduled update checks if we haven't shown the update
-    [self abortUpdateWithError:self.showedUpdate ? error : nil];
+    [self abortUpdateWithError:error];
 }
 
 - (void)coreDriverIsRequestingAbortUpdateWithError:(nullable NSError *) error
 {
-    // Don't tell the user that an update error occurred for scheduled update checks if we haven't shown the update
-    [self abortUpdateWithError:self.showedUpdate ? error : nil];
+    [self abortUpdateWithError:error];
 }
 
 - (void)uiDriverIsRequestingAbortUpdateWithError:(nullable NSError *)error
@@ -94,7 +88,7 @@
 
 - (void)abortUpdateWithError:(nullable NSError *)error
 {
-    [self.uiDriver abortUpdateWithError:error];
+    [self.uiDriver abortUpdateWithError:error showErrorToUser:self.showedUpdate];
 }
 
 @end

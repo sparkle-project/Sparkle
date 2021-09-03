@@ -10,7 +10,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol SPUResumableUpdate;
 
-typedef void (^SPUUpdateDriverCompletion)(BOOL shouldShowUpdateImmediately, id<SPUResumableUpdate> _Nullable resumableUpdate);
+typedef void (^SPUUpdateDriverCompletion)(BOOL shouldShowUpdateImmediately, id<SPUResumableUpdate> _Nullable resumableUpdate, NSError * _Nullable error);
 
 // This protocol describes an update driver that drives updates
 // An update driver may have multiple levels of other controller components (eg: basic update driver, core based update driver, ui based update driver, appcast driver, etc)
@@ -19,11 +19,13 @@ typedef void (^SPUUpdateDriverCompletion)(BOOL shouldShowUpdateImmediately, id<S
 // The newer architecture is still complex but should be more reliable to maintain and extend.
 @protocol SPUUpdateDriver <NSObject>
 
-- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders preventingInstallerInteraction:(BOOL)preventsInstallerInteraction completion:(SPUUpdateDriverCompletion)completionBlock;
+- (void)setCompletionHandler:(SPUUpdateDriverCompletion)completionBlock;
 
-- (void)resumeInstallingUpdateWithCompletion:(SPUUpdateDriverCompletion)completionBlock;
+- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders;
 
-- (void)resumeUpdate:(id<SPUResumableUpdate>)resumableUpdate completion:(SPUUpdateDriverCompletion)completionBlock;
+- (void)resumeInstallingUpdate;
+
+- (void)resumeUpdate:(id<SPUResumableUpdate>)resumableUpdate;
 
 @property (nonatomic, readonly) BOOL showingUpdate;
 

@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "SPUUpdateDriver.h"
+#import "SPUUpdateCheck.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -28,15 +29,15 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface SPUBasicUpdateDriver : NSObject
 
-- (instancetype)initWithHost:(SUHost *)host updater:(id)updater updaterDelegate:(nullable id <SPUUpdaterDelegate>)updaterDelegate delegate:(id <SPUBasicUpdateDriverDelegate>)delegate;
+- (instancetype)initWithHost:(SUHost *)host updateCheck:(SPUUpdateCheck)updateCheck updater:(id)updater updaterDelegate:(nullable id <SPUUpdaterDelegate>)updaterDelegate delegate:(id <SPUBasicUpdateDriverDelegate>)delegate;
 
-- (void)prepareCheckForUpdatesWithCompletion:(SPUUpdateDriverCompletion)completionBlock;
+- (void)setCompletionHandler:(SPUUpdateDriverCompletion)completionBlock;
 
 - (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background;
 
-- (void)resumeInstallingUpdateWithCompletion:(SPUUpdateDriverCompletion)completionBlock;
+- (void)resumeInstallingUpdate;
 
-- (void)resumeUpdate:(id<SPUResumableUpdate>)resumableUpdate completion:(SPUUpdateDriverCompletion)completionBlock;
+- (void)resumeUpdate:(id<SPUResumableUpdate>)resumableUpdate;
 
 - (void)abortUpdateAndShowNextUpdateImmediately:(BOOL)shouldSignalShowingUpdate resumableUpdate:(id<SPUResumableUpdate> _Nullable)resumableUpdate error:(nullable NSError *)error;
 

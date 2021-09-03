@@ -10,8 +10,6 @@
 #import "SUAppcastDriver.h"
 #import "SPUUpdaterDelegate.h"
 #import "SUErrors.h"
-#import "SULog.h"
-#import "SULog+NSError.h"
 #import "SULocalizations.h"
 #import "SUHost.h"
 #import "SUAppcastItem.h"
@@ -31,6 +29,7 @@
 @property (nonatomic, copy) SPUUpdateDriverCompletion completionBlock;
 
 @property (nonatomic, readonly) SUHost *host;
+@property (nonatomic, readonly) SPUUpdateCheck updateCheck;
 @property (nonatomic, readonly, weak) id updater; // if we didn't have legacy support, I'd remove this..
 @property (nullable, nonatomic, readonly, weak) id <SPUUpdaterDelegate>updaterDelegate;
 
@@ -41,6 +40,7 @@
 @implementation SPUBasicUpdateDriver
 
 @synthesize host = _host;
+@synthesize updateCheck = _updateCheck;
 @synthesize updater = _updater;
 @synthesize updaterDelegate = _updaterDelegate;
 @synthesize delegate = _delegate;
@@ -48,11 +48,12 @@
 @synthesize completionBlock = _completionBlock;
 @synthesize aborted = _aborted;
 
-- (instancetype)initWithHost:(SUHost *)host updater:(id)updater updaterDelegate:(id <SPUUpdaterDelegate>)updaterDelegate delegate:(id <SPUBasicUpdateDriverDelegate>)delegate
+- (instancetype)initWithHost:(SUHost *)host updateCheck:(SPUUpdateCheck)updateCheck updater:(id)updater updaterDelegate:(id <SPUUpdaterDelegate>)updaterDelegate delegate:(id <SPUBasicUpdateDriverDelegate>)delegate
 {
     self = [super init];
     if (self != nil) {
         _host = host;
+        _updateCheck = updateCheck;
         _updater = updater;
         _updaterDelegate = updaterDelegate;
         _delegate = delegate;
@@ -62,7 +63,7 @@
     return self;
 }
 
-- (void)prepareCheckForUpdatesWithCompletion:(SPUUpdateDriverCompletion)completionBlock
+- (void)setCompletionHandler:(SPUUpdateDriverCompletion)completionBlock
 {
     self.completionBlock = completionBlock;
 }
@@ -90,14 +91,12 @@
         [self notifyFinishLoadingAppcast];
         
         SUAppcastItem *nonNullUpdateItem = updateItem;
-        [self notifyFoundValidUpdateWithAppcastItem:nonNullUpdateItem secondaryAppcastItem:secondaryUpdateItem systemDomain:systemDomain];
+        [self notifyFoundValidUpdateWithAppcastItem:nonNullUpdateItem secondaryAppcastItem:secondaryUpdateItem systemDomain:systemDomain resuming:YES];
     }
 }
 
-- (void)resumeInstallingUpdateWithCompletion:(SPUUpdateDriverCompletion)completionBlock
+- (void)resumeInstallingUpdate
 {
-    self.completionBlock = completionBlock;
-    
     NSString *hostBundleIdentifier = self.host.bundle.bundleIdentifier;
     assert(hostBundleIdentifier != nil);
     [SPUProbeInstallStatus probeInstallerUpdateItemForHostBundleIdentifier:hostBundleIdentifier completion:^(SPUInstallationInfo * _Nullable installationInfo) {
@@ -107,10 +106,8 @@
     }];
 }
 
-- (void)resumeUpdate:(id<SPUResumableUpdate>)resumableUpdate completion:(SPUUpdateDriverCompletion)completionBlock
+- (void)resumeUpdate:(id<SPUResumableUpdate>)resumableUpdate
 {
-    self.completionBlock = completionBlock;
-    
     [self notifyResumableUpdateItem:resumableUpdate.updateItem secondaryUpdateItem:resumableUpdate.secondaryUpdateItem systemDomain:nil];
 }
 
@@ -139,24 +136,30 @@
     }
 }
 
-- (void)notifyFoundValidUpdateWithAppcastItem:(SUAppcastItem *)updateItem secondaryAppcastItem:(SUAppcastItem * _Nullable)secondaryUpdateItem systemDomain:(NSNumber * _Nullable)systemDomain
+- (void)notifyFoundValidUpdateWithAppcastItem:(SUAppcastItem *)updateItem secondaryAppcastItem:(SUAppcastItem * _Nullable)secondaryUpdateItem systemDomain:(NSNumber * _Nullable)systemDomain resuming:(BOOL)resuming
 {
     if (!self.aborted) {
-        [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidFindValidUpdateNotification
-                                                            object:self.updater
-                                                          userInfo:@{ SUUpdaterAppcastItemNotificationKey: updateItem }];
-        
-        if ([self.updaterDelegate respondsToSelector:@selector((updater:didFindValidUpdate:))]) {
-            [self.updaterDelegate updater:self.updater didFindValidUpdate:updateItem];
+        // If the update is not being resumed from a prior session, give the delegate a chance to bail
+        NSError *shouldNotProceedError = nil;
+        if (!resuming && [self.updaterDelegate respondsToSelector:@selector(updater:shouldProceedWithUpdate:updateCheck:error:)] && ![self.updaterDelegate updater:self.updater shouldProceedWithUpdate:updateItem updateCheck:self.updateCheck error:&shouldNotProceedError]) {
+            [self.delegate basicDriverIsRequestingAbortUpdateWithError:shouldNotProceedError];
+        } else {
+            [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidFindValidUpdateNotification
+                                                                object:self.updater
+                                                              userInfo:@{ SUUpdaterAppcastItemNotificationKey: updateItem }];
+            
+            if ([self.updaterDelegate respondsToSelector:@selector((updater:didFindValidUpdate:))]) {
+                [self.updaterDelegate updater:self.updater didFindValidUpdate:updateItem];
+            }
+            
+            [self.delegate basicDriverDidFindUpdateWithAppcastItem:updateItem secondaryAppcastItem:secondaryUpdateItem systemDomain:systemDomain];
         }
-        
-        [self.delegate basicDriverDidFindUpdateWithAppcastItem:updateItem secondaryAppcastItem:secondaryUpdateItem systemDomain:systemDomain];
     }
 }
 
 - (void)didFindValidUpdateWithAppcastItem:(SUAppcastItem *)updateItem secondaryAppcastItem:(SUAppcastItem * _Nullable)secondaryAppcastItem
 {
-    [self notifyFoundValidUpdateWithAppcastItem:updateItem secondaryAppcastItem:secondaryAppcastItem systemDomain:nil];
+    [self notifyFoundValidUpdateWithAppcastItem:updateItem secondaryAppcastItem:secondaryAppcastItem systemDomain:nil resuming:NO];
 }
 
 - (void)didNotFindUpdateWithLatestAppcastItem:(nullable SUAppcastItem *)latestAppcastItem hostToLatestAppcastItemComparisonResult:(NSComparisonResult)hostToLatestAppcastItemComparisonResult background:(BOOL)background
@@ -258,19 +261,8 @@
     self.aborted = YES;
     
     [self.appcastDriver cleanup:^{
-        if (error != nil) {
-            if (error.code != SUNoUpdateError && error.code != SUInstallationCanceledError && error.code != SUInstallationAuthorizeLaterError) { // Let's not bother logging this.
-                SULogError(error);
-            }
-            
-            // Notify host app that updater has aborted
-            if ([self.updaterDelegate respondsToSelector:@selector((updater:didAbortWithError:))]) {
-                [self.updaterDelegate updater:self.updater didAbortWithError:(NSError * _Nonnull)error];
-            }
-        }
-        
         if (self.completionBlock != nil) {
-            self.completionBlock(shouldShowUpdateImmediately, resumableUpdate);
+            self.completionBlock(shouldShowUpdateImmediately, resumableUpdate, error);
             self.completionBlock = nil;
         }
     }];

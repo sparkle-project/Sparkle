@@ -47,44 +47,31 @@
         // The user driver is only used for a termination callback
         _userDriver = userDriver;
         _updaterDelegate = updaterDelegate;
-        _coreDriver = [[SPUCoreBasedUpdateDriver alloc] initWithHost:host applicationBundle:applicationBundle updater:updater updaterDelegate:updaterDelegate delegate:self];
+        _coreDriver = [[SPUCoreBasedUpdateDriver alloc] initWithHost:host applicationBundle:applicationBundle updateCheck:SPUUpdateCheckUpdatesInBackground updater:updater updaterDelegate:updaterDelegate delegate:self];
     }
     return self;
 }
 
-- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders preventingInstallerInteraction:(BOOL)preventsInstallerInteraction completion:(SPUUpdateDriverCompletion)completionBlock
+- (void)setCompletionHandler:(SPUUpdateDriverCompletion)completionBlock
 {
-    [self.coreDriver prepareCheckForUpdatesWithCompletion:completionBlock];
-    
-    [self.coreDriver preflightForUpdatePermissionPreventingInstallerInteraction:preventsInstallerInteraction reply:^(NSError * _Nullable error) {
-        if (error != nil) {
-            [self abortUpdateWithError:error];
-        } else {
-            [self.coreDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders inBackground:YES requiresSilentInstall:YES];
-        }
-    }];
+    [self.coreDriver setCompletionHandler:completionBlock];
 }
 
-#pragma clang diagnostic push
-#if __has_warning("-Wcompletion-handler")
-#pragma clang diagnostic ignored "-Wcompletion-handler"
-#endif
-- (void)resumeInstallingUpdateWithCompletion:(SPUUpdateDriverCompletion)__unused completionBlock
-#pragma clang diagnostic pop
+- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders
 {
-    // Nothing really to do here.. this shouldn't be called.
-    SULog(SULogLevelError, @"Error: resumeInstallingUpdateWithCompletion: called on SPUAutomaticUpdateDriver");
+    [self.coreDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders inBackground:YES requiresSilentInstall:YES];
 }
 
-#pragma clang diagnostic push
-#if __has_warning("-Wcompletion-handler")
-#pragma clang diagnostic ignored "-Wcompletion-handler"
-#endif
-- (void)resumeUpdate:(id<SPUResumableUpdate>)__unused resumableUpdate completion:(SPUUpdateDriverCompletion)__unused completionBlock
-#pragma clang diagnostic pop
+- (void)resumeInstallingUpdate
 {
     // Nothing really to do here.. this shouldn't be called.
-    SULog(SULogLevelError, @"Error: resumeDownloadedUpdate:completion: called on SPUAutomaticUpdateDriver");
+    SULog(SULogLevelError, @"Error: resumeInstallingUpdate: called on SPUAutomaticUpdateDriver");
+}
+
+- (void)resumeUpdate:(id<SPUResumableUpdate>)__unused resumableUpdate
+{
+    // Nothing really to do here.. this shouldn't be called.
+    SULog(SULogLevelError, @"Error: resumeDownloadedUpdate: called on SPUAutomaticUpdateDriver");
 }
 
 - (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)updateItem secondaryAppcastItem:(SUAppcastItem * _Nullable)secondaryUpdateItem

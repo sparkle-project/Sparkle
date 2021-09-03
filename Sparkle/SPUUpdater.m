@@ -15,6 +15,7 @@
 #import "SPUUpdateDriver.h"
 #import "SUConstants.h"
 #import "SULog.h"
+#import "SULog+NSError.h"
 #import "SUCodeSigningVerifier.h"
 #import "SUSystemProfiler.h"
 #import "SPUScheduledUpdateDriver.h"
@@ -488,14 +489,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
                  updaterDelegate:strongSelf.delegate];
             }
             
-            BOOL preventsInstallerInteraction;
-            if ([strongSelf.delegate respondsToSelector:@selector(updater:shouldAllowInstallerInteractionForUpdateCheck:)]) {
-                preventsInstallerInteraction = ![strongSelf.delegate updater:strongSelf shouldAllowInstallerInteractionForUpdateCheck:SPUUpdateCheckBackgroundScheduled];
-            } else {
-                preventsInstallerInteraction = NO;
-            }
-            
-            [strongSelf checkForUpdatesWithDriver:updateDriver installerInProgress:installerIsRunning preventsInstallerInteraction:preventsInstallerInteraction];
+            [strongSelf checkForUpdatesWithDriver:updateDriver updateCheck:SPUUpdateCheckUpdatesInBackground installerInProgress:installerIsRunning];
         });
     }];
 }
@@ -535,14 +529,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         dispatch_async(dispatch_get_main_queue(), ^{
             SPUUpdater *strongSelf = weakSelf;
             if (strongSelf != nil) {
-                BOOL preventsInstallerInteraction;
-                if ([strongSelf.delegate respondsToSelector:@selector(updater:shouldAllowInstallerInteractionForUpdateCheck:)]) {
-                    preventsInstallerInteraction = ![strongSelf.delegate updater:strongSelf shouldAllowInstallerInteractionForUpdateCheck:SPUUpdateCheckUserInitiated];
-                } else {
-                    preventsInstallerInteraction = NO;
-                }
-                
-                [strongSelf checkForUpdatesWithDriver:theUpdateDriver installerInProgress:installerInProgress preventsInstallerInteraction:preventsInstallerInteraction];
+                [strongSelf checkForUpdatesWithDriver:theUpdateDriver updateCheck:SPUUpdateCheckUpdates installerInProgress:installerInProgress];
             }
         });
     }];
@@ -569,13 +556,13 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         dispatch_async(dispatch_get_main_queue(), ^{
             SPUUpdater *strongSelf = weakSelf;
             if (strongSelf != nil) {
-                [strongSelf checkForUpdatesWithDriver:[[SPUProbingUpdateDriver alloc] initWithHost:strongSelf.host updater:strongSelf updaterDelegate:strongSelf.delegate] installerInProgress:installerInProgress preventsInstallerInteraction:NO];
+                [strongSelf checkForUpdatesWithDriver:[[SPUProbingUpdateDriver alloc] initWithHost:strongSelf.host updater:strongSelf updaterDelegate:strongSelf.delegate] updateCheck:SPUUpdateCheckUpdateInformation installerInProgress:installerInProgress];
             }
         });
     }];
 }
 
-- (void)checkForUpdatesWithDriver:(id <SPUUpdateDriver> )d installerInProgress:(BOOL)installerInProgress preventsInstallerInteraction:(BOOL)preventsInstallerInteraction
+- (void)checkForUpdatesWithDriver:(id <SPUUpdateDriver> )d updateCheck:(SPUUpdateCheck)updateCheck installerInProgress:(BOOL)installerInProgress
 {
     if (self.driver != nil) {
         return;
@@ -585,57 +572,115 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 
     [self updateLastUpdateCheckDate];
 
-    if( [self.delegate respondsToSelector: @selector((updaterMayCheckForUpdates:))] && ![self.delegate updaterMayCheckForUpdates:self] )
-	{
-        self.sessionInProgress = NO;
-        [self scheduleNextUpdateCheck];
-        return;
-    }
-
     self.driver = d;
     assert(self.driver != nil);
-
-    // Because an application can change the configuration (eg: the feed url) at any point, we should always check if it's valid
-    NSError *configurationError = nil;
-    if (![self checkIfConfiguredProperlyAndRequireFeedURL:YES error:&configurationError]) {
-        // Don't think we should schedule a next update check if the bundle has been misconfigured once,
-        // which would mean something is really off
-        SULog(SULogLevelError, @"Sparkle configuration error (%ld): %@", (long)configurationError.code, configurationError.localizedDescription);
-        SULog(SULogLevelDefault, @"Disabling scheduled updates..");
+    
+    void (^notifyDelegateOfDriverCompletion)(NSError * _Nullable, BOOL) = ^(NSError * _Nullable error, BOOL shouldShowUpdateImmediately) {
+        if (error != nil) {
+            if (error.code != SUNoUpdateError && error.code != SUInstallationCanceledError && error.code != SUInstallationAuthorizeLaterError) { // Let's not bother logging this.
+                SULogError(error);
+            }
+            
+            // Notify host app that update driver has aborted if a non-recoverable error occurs
+            if (error.code != SUInstallationAuthorizeLaterError && [self.delegate respondsToSelector:@selector((updater:didAbortWithError:))]) {
+                [self.delegate updater:self didAbortWithError:(NSError * _Nonnull)error];
+            }
+        }
         
-        self.sessionInProgress = NO;
-        [self.driver abortUpdateWithError:configurationError];
-        self.driver = nil;
+        // Notify host app that update driver has finished
+        // As long as we're not going to immmediately kick off a new check
+        if (!shouldShowUpdateImmediately && [self.delegate respondsToSelector:@selector((updater:didFinishUpdateCycleForUpdateCheck:error:))]) {
+            [self.delegate updater:self didFinishUpdateCycleForUpdateCheck:updateCheck error:error];
+        }
+    };
+    
+    void (^abortUpdateDriver)(NSError  * _Nullable , BOOL) = ^(NSError * _Nullable abortError, BOOL shouldScheduleNextUpdateCheck) {
+        __weak SPUUpdater *weakSelf = self;
+        [self.driver setCompletionHandler:^(BOOL __unused shouldShowUpdateImmediately, id<SPUResumableUpdate>  _Nullable __unused resumableUpdate, NSError * _Nullable error) {
+            SPUUpdater *strongSelf = weakSelf;
+            if (strongSelf != nil) {
+                strongSelf.driver = nil;
+                strongSelf.sessionInProgress = NO;
+                
+                [strongSelf updateLastUpdateCheckDate];
+                
+                notifyDelegateOfDriverCompletion(error, NO);
+                
+                // Ensure the delegate doesn't start a new session when being notified of the previous one ending
+                if (!strongSelf.sessionInProgress) {
+                    if (shouldScheduleNextUpdateCheck) {
+                        [strongSelf scheduleNextUpdateCheck];
+                    } else {
+                        SULog(SULogLevelDefault, @"Disabling scheduled updates..");
+                    }
+                }
+            }
+        }];
         
+        [self.driver abortUpdateWithError:abortError];
+    };
+    
+    // Check if the delegate wants to defer checking for updates
+    NSError *mayCheckForUpdatesError = nil;
+    if (
+        ([self.delegate respondsToSelector:@selector(updater:mayPerformUpdateCheck:error:)] && ![self.delegate updater:self mayPerformUpdateCheck:updateCheck error:&mayCheckForUpdatesError]) ||
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+        ([self.delegate respondsToSelector:@selector((updaterMayCheckForUpdates:))] && ![self.delegate updaterMayCheckForUpdates:self]))
+#pragma clang diagnostic pop
+    {
+        abortUpdateDriver(mayCheckForUpdatesError, YES);
         return;
     }
 
-    NSURL *theFeedURL = [self parameterizedFeedURL];
-    if (theFeedURL) {
-        __weak SPUUpdater *weakSelf = self;
-        SPUUpdateDriverCompletion completionBlock = ^(BOOL shouldShowUpdateImmediately, id<SPUResumableUpdate> _Nullable resumableUpdate) {
-            SPUUpdater *strongSelf = weakSelf;
-            if (strongSelf != nil) {
-                strongSelf.resumableUpdate = resumableUpdate;
-                strongSelf.driver = nil;
-                self.sessionInProgress = NO;
-                [strongSelf updateLastUpdateCheckDate];
+    // Because an application can change the configuration (eg: the feed url) at any point, we should always check if it's valid
+    // We will not schedule a next update check if the bundle is misconfigured
+    NSError *configurationError = nil;
+    if (![self checkIfConfiguredProperlyAndRequireFeedURL:YES error:&configurationError]) {
+        SULog(SULogLevelError, @"Sparkle configuration error (%ld): %@", (long)configurationError.code, configurationError.localizedDescription);
+        
+        abortUpdateDriver(configurationError, NO);
+        return;
+    }
+    
+    // Run our update driver and schedule next update check on its completion
+    __weak SPUUpdater *weakSelf = self;
+    [self.driver setCompletionHandler:^(BOOL shouldShowUpdateImmediately, id<SPUResumableUpdate>  _Nullable resumableUpdate, NSError * _Nullable error) {
+        SPUUpdater *strongSelf = weakSelf;
+        if (strongSelf != nil) {
+            strongSelf.resumableUpdate = resumableUpdate;
+            strongSelf.driver = nil;
+            strongSelf.sessionInProgress = NO;
+            [strongSelf updateLastUpdateCheckDate];
+            
+            notifyDelegateOfDriverCompletion(error, shouldShowUpdateImmediately);
+            
+            // Ensure the delegate doesn't start a new session when being notified of the previous one ending
+            if (!strongSelf.sessionInProgress) {
                 [strongSelf scheduleNextUpdateCheckFiringImmediately:shouldShowUpdateImmediately];
             }
-        };
-        
-        if (installerInProgress) {
-            [self.driver resumeInstallingUpdateWithCompletion:completionBlock];
-        } else if (self.resumableUpdate != nil) {
-            [self.driver resumeUpdate:(id<SPUResumableUpdate> _Nonnull)self.resumableUpdate completion:completionBlock];
-        } else {
-            [self.driver checkForUpdatesAtAppcastURL:theFeedURL withUserAgent:[self userAgentString] httpHeaders:[self httpHeaders] preventingInstallerInteraction:preventsInstallerInteraction completion:completionBlock];
         }
+    }];
+    
+    if (installerInProgress) {
+        // Resume an update that has already begun installing in the background
+        [self.driver resumeInstallingUpdate];
+    } else if (self.resumableUpdate != nil) {
+        // Resume an update or info that has already been downloaded
+        [self.driver resumeUpdate:(id<SPUResumableUpdate> _Nonnull)self.resumableUpdate];
     } else {
-        // I think this is really unlikely to occur but better be safe
-        [self.driver abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUInvalidFeedURLError userInfo:@{ NSLocalizedDescriptionKey: @"Sparkle cannot form a valid feed URL." }]];
-        self.sessionInProgress = NO;
-        self.driver = nil;
+        // Check that the parameterized feed URL is valid
+        NSURL *theFeedURL = [self parameterizedFeedURL];
+        if (theFeedURL == nil) {
+            // I think this is really unlikely to occur but better be safe
+            // We will not schedule a next update check if the feed URL cannot be formed
+            SULog(SULogLevelError, @"Error: failed to retrieve feed URL for bundle");
+            
+            abortUpdateDriver([NSError errorWithDomain:SUSparkleErrorDomain code:SUInvalidFeedURLError userInfo:@{ NSLocalizedDescriptionKey: @"Sparkle cannot form a valid feed URL." }], NO);
+        } else {
+            // Check for new updates
+            [self.driver checkForUpdatesAtAppcastURL:theFeedURL withUserAgent:[self userAgentString] httpHeaders:[self httpHeaders]];
+        }
     }
 }
 

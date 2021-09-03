@@ -39,7 +39,6 @@
 @property (nonatomic, readonly) SUHost *host;
 @property (nonatomic) BOOL resumingInstallingUpdate;
 @property (nonatomic) BOOL silentInstall;
-@property (nonatomic) BOOL preventsInstallerInteraction;
 @property (nonatomic, readonly, weak) id updater; // if we didn't have legacy support, I'd remove this..
 @property (nullable, nonatomic, readonly, weak) id <SPUUpdaterDelegate>updaterDelegate;
 @property (nonatomic) NSString *userAgent;
@@ -58,7 +57,6 @@
 @synthesize host = _host;
 @synthesize resumingInstallingUpdate = _resumingInstallingUpdate;
 @synthesize silentInstall = _silentInstall;
-@synthesize preventsInstallerInteraction = _preventsInstallerInteraction;
 @synthesize updater = _updater;
 @synthesize updaterDelegate = _updaterDelegate;
 @synthesize userAgent = _userAgent;
@@ -66,7 +64,7 @@
 @synthesize resumableUpdate = _resumableUpdate;
 @synthesize downloadedUpdateForRemoval = _downloadedUpdateForRemoval;
 
-- (instancetype)initWithHost:(SUHost *)host applicationBundle:(NSBundle *)applicationBundle updater:(id)updater updaterDelegate:(nullable id <SPUUpdaterDelegate>)updaterDelegate delegate:(id<SPUCoreBasedUpdateDriverDelegate>)delegate
+- (instancetype)initWithHost:(SUHost *)host applicationBundle:(NSBundle *)applicationBundle updateCheck:(SPUUpdateCheck)updateCheck updater:(id)updater updaterDelegate:(nullable id <SPUUpdaterDelegate>)updaterDelegate delegate:(id<SPUCoreBasedUpdateDriverDelegate>)delegate
 {
     self = [super init];
     if (self != nil) {
@@ -75,7 +73,7 @@
         NSString *bundleIdentifier = host.bundle.bundleIdentifier;
         assert(bundleIdentifier != nil);
         
-        _basicDriver = [[SPUBasicUpdateDriver alloc] initWithHost:host updater:updater updaterDelegate:updaterDelegate delegate:self];
+        _basicDriver = [[SPUBasicUpdateDriver alloc] initWithHost:host updateCheck:updateCheck updater:updater updaterDelegate:updaterDelegate delegate:self];
         _installerDriver = [[SPUInstallerDriver alloc] initWithHost:host applicationBundle:applicationBundle updater:updater updaterDelegate:updaterDelegate delegate:self];
         
         _host = host;
@@ -85,33 +83,9 @@
     return self;
 }
 
-- (void)prepareCheckForUpdatesWithCompletion:(SPUUpdateDriverCompletion)completionBlock
+- (void)setCompletionHandler:(SPUUpdateDriverCompletion)completionBlock
 {
-    [self.basicDriver prepareCheckForUpdatesWithCompletion:completionBlock];
-}
-
-- (void)preflightForUpdatePermissionPreventingInstallerInteraction:(BOOL)preventsInstallerInteraction reply:(void (^)(NSError * _Nullable))reply
-{
-    // Save for later
-    self.preventsInstallerInteraction = preventsInstallerInteraction;
-    
-    // If we don't allow interaction, make sure we have sufficient privileges to update
-    // If we don't, then we should abort early before trying to check for updates
-    // Note if we don't have permission to update an application update without interaction,
-    // then we won't have permission for package type of updates either (converse is not true)
-    
-    if (!preventsInstallerInteraction) {
-        reply(nil);
-    } else {
-        // Otherwise check if we have sufficient privileges to update without interaction
-        [self.installerDriver checkIfApplicationInstallationRequiresAuthorizationWithReply:^(BOOL requiresAuthorization) {
-            if (requiresAuthorization) {
-                reply([NSError errorWithDomain:SUSparkleErrorDomain code:SUNotAllowedInteractionError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"No new update has been checked because the installation will require interaction, which has been prevented."] }]);
-            } else {
-                reply(nil);
-            }
-        }];
-    }
+    [self.basicDriver setCompletionHandler:completionBlock];
 }
 
 - (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background requiresSilentInstall:(BOOL)silentInstall
@@ -123,23 +97,20 @@
     [self.basicDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders inBackground:background];
 }
 
-- (void)resumeInstallingUpdateWithCompletion:(SPUUpdateDriverCompletion)completionBlock
+- (void)resumeInstallingUpdate
 {
     self.resumingInstallingUpdate = YES;
     self.silentInstall = NO;
     
-    [self.basicDriver resumeInstallingUpdateWithCompletion:completionBlock];
+    [self.basicDriver resumeInstallingUpdate];
 }
 
-- (void)resumeUpdate:(id<SPUResumableUpdate>)resumableUpdate completion:(SPUUpdateDriverCompletion)completionBlock
+- (void)resumeUpdate:(id<SPUResumableUpdate>)resumableUpdate
 {
     self.resumableUpdate = resumableUpdate;
     self.silentInstall = NO;
     
-    // Note if installer interaction isn't allowed, we shouldn't have downloaded the update, and shouldn't be able to get here
-    // So no need to do a test if we can perform an update without authorization
-    
-    [self.basicDriver resumeUpdate:resumableUpdate completion:completionBlock];
+    [self.basicDriver resumeUpdate:resumableUpdate];
 }
 
 - (void)basicDriverDidFinishLoadingAppcast
@@ -157,21 +128,9 @@
     if (self.resumingInstallingUpdate) {
         assert(systemDomain != nil);
         [self.installerDriver resumeInstallingUpdateWithUpdateItem:updateItem systemDomain:systemDomain.boolValue];
-        [self.delegate basicDriverDidFindUpdateWithAppcastItem:updateItem secondaryAppcastItem:secondaryUpdateItem];
-    } else {
-        if (!self.preventsInstallerInteraction) {
-            // Simple case - delegate allows interaction, so we should continue along
-            [self.delegate basicDriverDidFindUpdateWithAppcastItem:updateItem secondaryAppcastItem:secondaryUpdateItem];
-        } else {
-            // Package type installations will always require installer interaction as long as we don't support running as root
-            // If it's not a package type installation, we should be okay since we did an auth check before checking for updates above
-            if (![updateItem.installationType isEqualToString:SPUInstallationTypeApplication]) {
-                [self.delegate coreDriverIsRequestingAbortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUNotAllowedInteractionError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"A new update is available but cannot be installed because interaction has been prevented."] }]];
-            } else {
-                [self.delegate basicDriverDidFindUpdateWithAppcastItem:updateItem secondaryAppcastItem:secondaryUpdateItem];
-            }
-        }
     }
+    
+    [self.delegate basicDriverDidFindUpdateWithAppcastItem:updateItem secondaryAppcastItem:secondaryUpdateItem];
 }
 
 - (void)downloadUpdateFromAppcastItem:(SUAppcastItem *)updateItem secondaryAppcastItem:(SUAppcastItem * _Nullable)secondaryUpdateItem inBackground:(BOOL)background
@@ -265,7 +224,7 @@
         [self.delegate coreDriverDidStartExtractingUpdate];
     }
     
-    [self.installerDriver extractDownloadedUpdate:downloadedUpdate silently:self.silentInstall preventsInstallerInteraction:self.preventsInstallerInteraction completion:^(NSError * _Nullable error) {
+    [self.installerDriver extractDownloadedUpdate:downloadedUpdate silently:self.silentInstall completion:^(NSError * _Nullable error) {
         if (error != nil) {
             if (error.code != SUInstallationAuthorizeLaterError) {
                 [self clearDownloadedUpdate];

@@ -15,6 +15,7 @@
 #import <Foundation/Foundation.h>
 #endif
 #import <Sparkle/SUExport.h>
+#import <Sparkle/SPUUpdateCheck.h>
 
 @protocol SUVersionComparison;
 @class SPUUpdater, SUAppcast, SUAppcastItem;
@@ -57,12 +58,6 @@ SU_EXPORT extern NSString *const SUSystemProfilerPreferredLanguageKey;
 //	SPUUpdater Delegate:
 // -----------------------------------------------------------------------------
 
-typedef NS_ENUM(NSInteger, SPUUpdateCheck)
-{
-    SPUUpdateCheckUserInitiated = 0,
-    SPUUpdateCheckBackgroundScheduled = 1
-};
-
 /**
  Provides delegation methods to control the behavior of an `SPUUpdater` object.
  */
@@ -70,15 +65,17 @@ typedef NS_ENUM(NSInteger, SPUUpdateCheck)
 @optional
 
 /**
- Returns whether to allow Sparkle to pop up.
+ Returns whether to allow Sparkle to check for updates.
  
  For example, this may be used to prevent Sparkle from interrupting a setup assistant.
  Alternatively, you may want to consider starting the updater after eg: the setup assistant finishes
  
  @param updater The updater instance.
- @return @c YES if the updater may check for updates otherwise @c NO
- */
-- (BOOL)updaterMayCheckForUpdates:(SPUUpdater *)updater;
+ @param updateCheck The type of update check that will be performed if the updater is allowed to check for updates.
+ @param error The (optionally) populated error object if the updater may not perform a new update check.
+ @return @c YES if the updater is allowed to check for updates, otherwise @c NO
+*/
+- (BOOL)updater:(SPUUpdater *)updater mayPerformUpdateCheck:(SPUUpdateCheck)updateCheck error:(NSError * __autoreleasing *)error;
 
 /**
  Returns the set of Sparkle channels the updater is allowed to find new updates from.
@@ -107,12 +104,12 @@ typedef NS_ENUM(NSInteger, SPUUpdateCheck)
 - (NSSet<NSString *> *)allowedChannelsForUpdater:(SPUUpdater *)updater;
 
 /**
- Returns a custom appcast URL.
+ Returns a custom appcast URL used for checking for new updates.
  
  Override this to dynamically specify the feed URL.
  
  @param updater The updater instance.
- @return An appcast feed URL to check for new updates in. Return @c nil for the default behavior and if you don't want to be delegated this task.
+ @return An appcast feed URL to check for new updates in, or  @c nil for the default behavior and if you don't want to be delegated this task.
  */
 - (nullable NSString *)feedURLStringForUpdater:(SPUUpdater *)updater;
 
@@ -128,14 +125,13 @@ typedef NS_ENUM(NSInteger, SPUUpdateCheck)
  */
 - (NSArray<NSDictionary<NSString *, NSString *> *> *)feedParametersForUpdater:(SPUUpdater *)updater sendingSystemProfile:(BOOL)sendingProfile;
 
-
 /**
- Returns whether Sparkle should prompt the user about automatic update checks.
+ Returns whether Sparkle should prompt the user about checking for new updates automatically.
  
  Use this to override the default behavior.
  
  @param updater The updater instance.
- @return @c YES if the updater should prompt for permission to check for updates, otherwise @c NO
+ @return @c YES if the updater should prompt for permission to check for new updates automatically, otherwise @c NO
  */
 - (BOOL)updaterShouldPromptForPermissionToCheckForUpdates:(SPUUpdater *)updater;
 
@@ -225,6 +221,21 @@ typedef NS_ENUM(NSInteger, SPUUpdateCheck)
 - (nullable SUAppcastItem *)bestValidUpdateInAppcast:(SUAppcast *)appcast forUpdater:(SPUUpdater *)updater;
 
 /**
+ Returns whether or not the updater should proceed with the new chosen update from the appcast.
+ 
+ By default, the updater will always proceed with the best selected update found in an appcast. Override this to override this behavior.
+ 
+ If you return @c NO and populate the @p error, the user is not shown this @p updateItem nor is the update downloaded or installed.
+ 
+ @param updater The updater instance.
+ @param updateItem The selected update item to proceed with.
+ @param updateCheck The type of update check that would be performed if proceeded.
+ @param error An error object that must be populated by the delegate if the updater should not proceed with the update.
+ @return @c YES if the updater should proceed with @p updateItem, otherwise @c NO if the updater should not proceed with the update with an @p error populated.
+ */
+- (BOOL)updater:(SPUUpdater *)updater shouldProceedWithUpdate:(SUAppcastItem *)updateItem updateCheck:(SPUUpdateCheck)updateCheck error:(NSError * __autoreleasing *)error;
+
+/**
  Called when an update is skipped by the user.
  
  @param updater The updater instance.
@@ -238,10 +249,11 @@ typedef NS_ENUM(NSInteger, SPUUpdateCheck)
  This is specifically for the @c <releaseNotesLink> element in the appcast item.
  
  @param updater The updater instance.
+ @param updateItem The update item to download and show release notes from.
  
  @return @c YES to download and show the release notes if available, otherwise @c NO. The default behavior is @c YES.
  */
-- (BOOL)updaterShouldDownloadReleaseNotes:(SPUUpdater *)updater;
+- (BOOL)updater:(SPUUpdater *)updater shouldDownloadReleaseNotesForUpdate:(SUAppcastItem *)updateItem;
 
 /**
  Called immediately before downloading the specified update.
@@ -270,7 +282,7 @@ typedef NS_ENUM(NSInteger, SPUUpdateCheck)
 - (void)updater:(SPUUpdater *)updater failedToDownloadUpdate:(SUAppcastItem *)item error:(NSError *)error;
 
 /**
- Called when the user clicks the cancel button while and update is being downloaded.
+ Called when the user cancels an update while it is being downloaded.
  
  @param updater The updater instance.
  */
@@ -370,25 +382,6 @@ typedef NS_ENUM(NSInteger, SPUUpdateCheck)
 - (void)updaterWillNotScheduleUpdateCheck:(SPUUpdater *)updater;
 
 /**
- Returns whether or not the updater should allow interaction from the installer
- 
- Use this to override the default behavior which is to allow interaction with the installer.
- 
- If interaction is allowed, then an authorization prompt may show up to the user if they do
- not curently have sufficient privileges to perform the installation of the new update.
- The installer may also show UI and progress when interaction is allowed.
- 
- On the other hand, if interaction is not allowed, then an installation may fail if the user does not
- have sufficient privileges to perform the installation. In this case, the feed and update may not even be downloaded.
- 
- Note this has no effect if the update has already been downloaded in the background silently and ready to be resumed.
- 
- @param updater The updater instance.
- @param updateCheck The type of update check being performed.
- */
-- (BOOL)updater:(SPUUpdater *)updater shouldAllowInstallerInteractionForUpdateCheck:(SPUUpdateCheck)updateCheck;
-
-/**
  Returns the decryption password (if any) which is used to extract the update archive DMG.
  
  Return @c nil if no password should be used.
@@ -415,12 +408,43 @@ typedef NS_ENUM(NSInteger, SPUUpdateCheck)
 - (BOOL)updater:(SPUUpdater *)updater willInstallUpdateOnQuit:(SUAppcastItem *)item immediateInstallationBlock:(void (^)(void))immediateInstallHandler;
 
 /**
- Called after an update is aborted due to an error.
+ Called after the update driver aborts due to an error.
+ 
+ The update driver runs when checking for updates. This delegate method is called an error occurs during this process.
+ 
+ Some special possible values of `error.code` are:
+ 
+ - `SUNoUpdateError`: No new update was found.
+ - `SUInstallationCanceledError`: The user canceled installing the update when requested for authorization.
  
  @param updater The updater instance.
- @param error The error that caused the abort
+ @param error The error that caused the update driver to abort.
  */
 - (void)updater:(SPUUpdater *)updater didAbortWithError:(NSError *)error;
+
+/**
+ Called after the update driver finishes.
+ 
+ The update driver runs when checking for updates. This delegate method is called when that check is finished.
+ 
+ An update may be scheduled to be installed during the update cycle, or no updates may be found, or an available update may be dismissed or skipped (which is the same as no error).
+ 
+ If the @p error is @c nil, no error has occurred.
+ 
+ Some special possible values of `error.code` are:
+ 
+ - `SUNoUpdateError`: No new update was found.
+ - `SUInstallationCanceledError`: The user canceled installing the update when requested for authorization.
+ 
+ @param updater The updater instance.
+ @param updateCheck The type of update check was performed.
+ @param error The error that caused the update driver to abort. This is @c nil if the update driver finished normally and there is no error.
+ */
+- (void)updater:(SPUUpdater *)updater didFinishUpdateCycleForUpdateCheck:(SPUUpdateCheck)updateCheck error:(nullable NSError *)error;
+
+/* Deprecated methods */
+
+- (BOOL)updaterMayCheckForUpdates:(SPUUpdater *)updater __deprecated_msg("Please use -[SPUUpdaterDelegate updater:mayPerformUpdateCheck:error:] instead.");
 
 @end
 
