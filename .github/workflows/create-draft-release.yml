@@ -20,8 +20,13 @@ jobs:
       - name: "Checkout sources"
         uses: actions/checkout@v2
         with:
+          token: ${{ secrets.BOT_PERSONAL_ACCESS_TOKEN }}
           submodules: true
           fetch-depth: 0
+          
+      - name: "Extract latest changes from CHANGELOG"
+        run: |
+            ./Configurations/generate_latest_changes.py > latest-changes.txt
 
       - name: "Extract version information from project"
         run: |
@@ -37,19 +42,22 @@ jobs:
             echo "PRERELEASE_VERSION=false" >> $GITHUB_ENV
           fi
 
-      - name: "Create a temporary Git tag"
-        run: git tag "${{ env.MARKETING_VERSION }}"
+      - name: "Set up git and create tag"
+        run: |
+            git config user.name Sparkle-Bot
+            git config user.email sparkle.project.bot@gmail.com
+            git tag "${{ env.MARKETING_VERSION }}"
 
       - name: "Build release distribution"
         run: make release
         env:
           GITHUB_ACTOR: ${{ github.actor }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          MARKETING_VERSION: ${{ env.MARKETING_VERSION }}
-          SPARKLE_VERSION_SUFFIX: ${{ env.SPARKLE_VERSION_SUFFIX }}
+          GITHUB_TOKEN: ${{ secrets.BOT_PERSONAL_ACCESS_TOKEN }}
 
       - name: "Push the updated Swift package description"
+        env:
+            GITHUB_TOKEN: ${{ secrets.BOT_PERSONAL_ACCESS_TOKEN }}
         run: git push
 
       - name: "Draft a release"
@@ -60,6 +68,8 @@ jobs:
           name: "Sparkle ${{ env.MARKETING_VERSION }}"
           tag_name: ${{ env.MARKETING_VERSION }}
           fail_on_unmatched_files: true
+          token: ${{ secrets.BOT_PERSONAL_ACCESS_TOKEN }}
+          body_path: latest-changes.txt
           files: |
             build/Build/Products/Release/Sparkle-*.tar.xz
             build/Build/Products/Release/Sparkle-for-Swift-Package-Manager.zip
