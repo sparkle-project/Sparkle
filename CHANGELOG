@@ -6,6 +6,8 @@
  * Update sample appcast from #1895 (Zorg)
  * Fix appcast pubDate tag generation in different locales from #1898 (Sungbin Jo)
  * Create valid xar archives for generating binary delta files from #1906 (Zorg)
+ * Fix a few issues with German localization from #1931 (J-rg)
+ * Add an automated workflow that builds and publishes official Sparkle releases (Tony Arnold, Zorg)
 
 # 1.26.0
 
