@@ -26,7 +26,7 @@ BOOL SPUXPCValidateServiceIfBundleExists(NSString *bundleName, NSBundle *sparkle
         return YES;
     }
 
-#if !DEBUG
+#if DEBUG
         // Post install scripts for appending git hash info to CFBundleShortVersionString are too unreliable to verify for debug/development
         // Fortunately debug builds of Sparkle are not usable in a production environment
     (void)sparkleBundle; // Mark parameter as used
