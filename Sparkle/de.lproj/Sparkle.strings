@@ -2,11 +2,11 @@
 
 "%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ wurde geladen und steht zur Installation bereit! Möchtest du %1$@ jetzt durch die neue Version ersetzen und neu starten?";
 
-"%1$@ can't be updated, because it was opened from a read-only or a temporary location." = "%1$@ kann nicht aktualisiert werden, da es aus dem Downloads-Order, oder von einer DMG Datei oder Laufwerk ohne Schreibzugriff gestartet wurde.";
+"%1$@ can't be updated, because it was opened from a read-only or a temporary location." = "%1$@ kann nicht aktualisiert werden, da es aus dem Downloads-Order, oder von einer DMG-Datei oder einem Laufwerk ohne Schreibzugriff gestartet wurde.";
 
 "Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "Kopiere %1$@ in den Programmeordner, starte es von dort aus und versuche es erneut zu aktualisieren.";
 
-"Quit %1$@, move it into your Applications folder, relaunch it from there and try again." = "Beenden Sie „%1$@“, bewegen Sie es in den Ordner „Programme“, starten Sie das Programm von dort erneut und versuchen Sie es noch einmal.";
+"Quit %1$@, move it into your Applications folder, relaunch it from there and try again." = "Beende „%1$@“, bewege es in den Ordner „Programme“, starte das Programm von dort erneut und versuche es noch einmal.";
 
 "%1$@ can’t be updated if it’s running from the location it was downloaded to." = "„%1$@“ kann nicht aktualisiert werden, wenn das Programm von dem Ort ausgeführt wird, an den es heruntergeladen wurde.";
 
@@ -28,7 +28,7 @@
 
 "A new version of %@ is ready to install!" = "Eine neue Version von %@ steht zur Installation bereit!";
 
-"An error occurred in retrieving update information. Please try again later." = "Beim Laden der Updateinformationen trat ein Fehler auf. Bitte versuche es später erneut.";
+"An error occurred in retrieving update information. Please try again later." = "Beim Laden der Updateinformationen ist ein Fehler aufgetreten. Bitte versuche es später erneut.";
 
 "An error occurred while downloading the update. Please try again later." = "Beim Laden des Updates ist ein Fehler aufgetreten. Bitte versuche es später erneut.";
 
