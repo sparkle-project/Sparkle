@@ -19,7 +19,7 @@ Pod::Spec.new do |s|
   }
 
   s.platform = :osx, '10.11'
-  s.source   = { :http => "https://github.com/sparkle-project/Sparkle/releases/download/#{s.version}/Sparkle-#{s.version}.tar.bz2" }
+  s.source   = { :http => "https://github.com/sparkle-project/Sparkle/releases/download/#{s.version}/Sparkle-#{s.version}.tar.xz" }
   s.source_files = 'Sparkle.framework/Versions/A/Headers/*.h'
 
   s.preserve_paths = ['bin/*', 'XPCServices/*']
