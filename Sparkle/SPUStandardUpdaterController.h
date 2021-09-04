@@ -24,14 +24,14 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol SPUUserDriver, SPUUpdaterDelegate, SPUStandardUserDriverDelegate;
 
 /**
- A controller class that instantiates a `SPUUpdater` and allows binding UI to it.
+ A controller class that instantiates a `SPUUpdater` and allows binding UI to its updater settings.
  
  This class can be instantiated in a nib or created programatically using `-initWithUpdaterDelegate:userDriverDelegate:` or `-initWithStartingUpdater:updaterDelegate:userDriverDelegate:`.
  
  The controller's updater targets the application's main bundle and uses Sparkle's standard user interface.
  Typically, this class is used by sticking it as a custom NSObject subclass in an Interface Builder nib (probably in MainMenu) but it works well programatically too.
  
- The controller creates an `SPUUpdater` instance and allows hooking up the check for updates action and handling menu item validation.
+ The controller creates an `SPUUpdater` instance using a `SPUStandardUserDriver` and allows hooking up the check for updates action and handling menu item validation.
  It also allows hooking up the updater's and user driver's delegates.
  
  If you need more control over what bundle you want to update, or you want to provide a custom user interface (via `SPUUserDriver`), please use `SPUUpdater` directly instead.

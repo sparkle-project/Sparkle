@@ -26,10 +26,19 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  The main API in Sparkle for controlling the update mechanism.
 
- This class is used to configure the update parameters as well as manually
- and automatically schedule and control checks for updates.
+ This class is used to configure the update parameters as well as manually and automatically schedule and control checks for updates.
  
- If you want to use a standard updater or instantiate an updater in a nib, see `SPUStandardUpdaterController` for convenience.
+ For convenience, you can create a standard or nib instantiable updater by using `SPUStandardUpdaterController`.
+ 
+ Prefer to set initial properties in your bundle's Info.plist as described in [Customizing Sparkle](https://sparkle-project.org/documentation/customization/).
+ 
+ Otherwise only if you need dynamic behavior (eg. for user preferences) should you set properties on the updater such as:
+ - `automaticallyChecksForUpdates`
+ - `updateCheckInterval`
+ - `automaticallyDownloadsUpdates`
+ - `feedURL`
+ 
+ Please view the documentation on each of these properties for more detail if you are to configure them dynamically.
  */
 SU_EXPORT @interface SPUUpdater : NSObject
 

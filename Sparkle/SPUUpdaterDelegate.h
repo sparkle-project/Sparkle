@@ -225,13 +225,13 @@ SU_EXPORT extern NSString *const SUSystemProfilerPreferredLanguageKey;
  
  By default, the updater will always proceed with the best selected update found in an appcast. Override this to override this behavior.
  
- If you return @c NO and populate the @p error, the user is not shown this @p updateItem nor is the update downloaded or installed.
+ If you return @c NO and populate the @c error, the user is not shown this @c updateItem nor is the update downloaded or installed.
  
  @param updater The updater instance.
  @param updateItem The selected update item to proceed with.
  @param updateCheck The type of update check that would be performed if proceeded.
  @param error An error object that must be populated by the delegate if the updater should not proceed with the update.
- @return @c YES if the updater should proceed with @p updateItem, otherwise @c NO if the updater should not proceed with the update with an @p error populated.
+ @return @c YES if the updater should proceed with @c updateItem, otherwise @c NO if the updater should not proceed with the update with an @c error populated.
  */
 - (BOOL)updater:(SPUUpdater *)updater shouldProceedWithUpdate:(SUAppcastItem *)updateItem updateCheck:(SPUUpdateCheck)updateCheck error:(NSError * __autoreleasing *)error;
 
@@ -324,14 +324,14 @@ SU_EXPORT extern NSString *const SUSystemProfilerPreferredLanguageKey;
  @param item The appcast item corresponding to the update that is proposed to be installed.
  @param installHandler The install handler that must be completed before continuing with the relaunch.
  
- @return @c YES to delay the relaunch until @p installHandler is invoked.
+ @return @c YES to delay the relaunch until @c installHandler is invoked.
  */
 - (BOOL)updater:(SPUUpdater *)updater shouldPostponeRelaunchForUpdate:(SUAppcastItem *)item untilInvokingBlock:(void (^)(void))installHandler;
 
 /**
  Returns whether the application should be relaunched at all.
  
- Some apps @b cannot be relaunched under certain circumstances.
+ Some apps **cannot** be relaunched under certain circumstances.
  This method can be used to explicitly prevent a relaunch.
  
  @param updater The updater instance.
@@ -398,7 +398,7 @@ SU_EXPORT extern NSString *const SUSystemProfilerPreferredLanguageKey;
  
  Also if the updater is given responsibility and the update item is marked critical, the new update will be presented to the user immediately after.
  
- Even if the @p immediateInstallHandler is not invoked, the installer will attempt to install the update on termination.
+ Even if the @c immediateInstallHandler is not invoked, the installer will attempt to install the update on termination.
  
  @param updater The updater instance.
  @param item The appcast item corresponding to the update that is proposed to be installed.
@@ -429,7 +429,7 @@ SU_EXPORT extern NSString *const SUSystemProfilerPreferredLanguageKey;
  
  An update may be scheduled to be installed during the update cycle, or no updates may be found, or an available update may be dismissed or skipped (which is the same as no error).
  
- If the @p error is @c nil, no error has occurred.
+ If the @c error is @c nil, no error has occurred.
  
  Some special possible values of `error.code` are:
  
