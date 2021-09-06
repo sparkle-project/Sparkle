@@ -1,4 +1,4 @@
-# Sparkle 2 (Beta) ![Build Status](https://github.com/sparkle-project/Sparkle/workflows/Build%20%26%20Tests/badge.svg?branch=2.x) [![CocoaPods](https://img.shields.io/cocoapods/v/Sparkle.svg?maxAge=2592000)]()
+# Sparkle 2 (Beta) ![Build Status](https://github.com/sparkle-project/Sparkle/workflows/Build%20%26%20Tests/badge.svg?branch=2.x) [![CocoaPods](https://img.shields.io/cocoapods/v/Sparkle.svg?cacheSeconds=86400)]()
 
 Secure and reliable software update framework for Cocoa developers.
 
