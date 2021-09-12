@@ -72,6 +72,13 @@
     [self.uiDriver resumeUpdate:resumableUpdate];
 }
 
+- (void)uiDriverDidShowUpdate
+{
+    // When a new update check has not been initiated and an update has been resumed,
+    // update the driver to indicate we are showing an update to the user
+    self.showingUpdate = YES;
+}
+
 - (void)basicDriverIsRequestingAbortUpdateWithError:(nullable NSError *)error
 {
     [self abortUpdateWithError:error];
