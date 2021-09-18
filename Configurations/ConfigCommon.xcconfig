@@ -21,9 +21,9 @@ SPARKLE_VERSION_MINOR = 27
 SPARKLE_VERSION_PATCH = 0
 
 // This should be in SemVer format or empty, ie. "-rc.1"
-SPARKLE_VERSION_SUFFIX = -rc.1
+SPARKLE_VERSION_SUFFIX =
 // This is now a monotonically increasing ID number, even across prereleases, but let's keep this below 2.0
-CURRENT_PROJECT_VERSION = 1.101
+CURRENT_PROJECT_VERSION = 1.102
 
 MARKETING_VERSION = $(SPARKLE_VERSION_MAJOR).$(SPARKLE_VERSION_MINOR).$(SPARKLE_VERSION_PATCH)$(SPARKLE_VERSION_SUFFIX)
 
