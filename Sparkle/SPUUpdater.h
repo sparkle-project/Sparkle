@@ -104,6 +104,10 @@ SU_EXPORT @interface SPUUpdater : NSObject
 /**
  Checks for updates, but does not display any UI unless an update is found.
  
+ You usually do not need to call this method directly. If `automaticallyChecksForUpdates` is @c YES,
+ Sparkle calls this method automatically according to its update schedule using the `updateCheckInterval`
+ and the `lastUpdateCheckDate`.
+ 
  This is meant for programmatically initating a check for updates.
  That is, it will display no UI unless it finds an update, in which case it proceeds as usual.
  This will not find updates that the user has opted into skipping.
