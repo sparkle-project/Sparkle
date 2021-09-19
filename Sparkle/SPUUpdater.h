@@ -170,7 +170,7 @@ SU_EXPORT @interface SPUUpdater : NSObject
  A property indicating whether or not to check for updates automatically.
  
  By default, Sparkle asks users on second launch for permission if they want automatic update checks enabled
- and sets this property based on their response. If SUEnableAutomaticChecks is set in the Info.plist,
+ and sets this property based on their response. If `SUEnableAutomaticChecks` is set in the Info.plist,
  this permission request is not performed however.
  
  Setting this property will persist in the host bundle's user defaults.
@@ -267,6 +267,10 @@ SU_EXPORT @interface SPUUpdater : NSObject
 
 /**
  The date of the last update check or nil if no check has been performed yet.
+ 
+ For testing purposes, the last update check is stored in the `SULastCheckTime` key in the host bundle's user defaults.
+ For example, `defaults delete my-bundle-id SULastCheckTime` can be invoked to clear the last update check time and test
+ if update checks are automatically scheduled.
  */
 @property (nonatomic, readonly, copy, nullable) NSDate *lastUpdateCheckDate;
 
