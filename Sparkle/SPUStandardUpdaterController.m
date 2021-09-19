@@ -17,6 +17,10 @@
 #import "SULocalizations.h"
 #import <AppKit/AppKit.h>
 
+// We use public instance variables instead of properties for the updater / user driver delegates
+// because we want them to be connectable outlets from Interface Builder, but we do not want their setters to be invoked
+// programmatically.
+
 @interface SPUStandardUpdaterController () <NSMenuItemValidation>
 
 @property (nonatomic) SPUUpdater *updater;
@@ -70,30 +74,6 @@
         }
     }
     return self;
-}
-
-- (void)setUpdaterDelegate:(id<SPUUpdaterDelegate>)newUpdaterDelegate
-{
-    if (self.updater != nil) {
-        NSLog(@"Error: %@ - cannot set updater delegate %@ after the updater has been initialized. If you are instantiating %@ programmatically, please pass the updater delegate in its initializer. If you are instantiating %@ in a nib, please set the updater delegate by connecting its outlet.", NSStringFromSelector(_cmd), newUpdaterDelegate, [self className], [self className]);
-    } else {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdirect-ivar-access"
-        self->updaterDelegate = newUpdaterDelegate;
-#pragma clang diagnostic pop
-    }
-}
-
-- (void)setUserDriverDelegate:(id<SPUStandardUserDriverDelegate>)newUserDriverDelegate
-{
-    if (self.updater != nil) {
-        NSLog(@"Error: %@ - cannot set user driver delegate %@ after the updater has been initialized. If you are instantiating %@ programmatically, please pass the user driver delegate in its initializer. If you are instantiating %@ in a nib, please set the user driver delegate by connecting its outlet.", NSStringFromSelector(_cmd), newUserDriverDelegate, [self className], [self className]);
-    } else {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdirect-ivar-access"
-        self->userDriverDelegate = newUserDriverDelegate;
-#pragma clang diagnostic pop
-    }
 }
 
 - (void)startUpdater
