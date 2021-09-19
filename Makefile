@@ -25,7 +25,7 @@ build:
 	
 # Need to first gem install jazzy to run this rule
 docs:
-	jazzy --objc --umbrella-header Sparkle/Sparkle.h --framework-root . --readme Documentation/API_README.markdown --theme jony --output Documentation/html
+	jazzy --author "Sparkle Project" --objc --umbrella-header Sparkle/Sparkle.h --framework-root . --readme Documentation/API_README.markdown --theme jony --output Documentation/html
 
 uitest:
 	xcodebuild -scheme UITests -configuration Debug test

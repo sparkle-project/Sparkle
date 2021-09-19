@@ -58,17 +58,17 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  * Let the user know a new update is found and ask them what they want to do.
  * Before this point, `-showUserInitiatedUpdateCheckWithCancellation:` may be called.
  *
- * @param appcastItem The Appcast Item containing information that reflects the new update.
+ *  The potential  `stage`s on the updater @c state are:
  *
- * @param state The current state of the user update.
- *  The state.stage values are:
  *  `SPUUpdateStateNotDownloaded` - Update has not been downloaded yet.
+ *
  *  `SPUUpdateStateDownloaded` - Update has already been downloaded but not started installing yet.
+ *
  *  `SPUUpdateStateInstalling` - Update has been downloaded and already started installing.
  *
- *  state.userInitiated indicates if the update was initiated by the user or if it was automatically scheduled in the background.
+ *  The `userIntiated` property on the @c state indicates if the update was initiated by the user or if it was automatically scheduled in the background.
  *
- *  Additionally, these properties on the appcastItem are of importance:
+ *  Additionally, these properties on the @c appcastItem are of importance:
  *
  *  @c appcastItem.informationOnlyUpdate indicates if the update is only informational and should not be downloaded. You can direct the user to the infoURL property of the appcastItem in their web browser. Sometimes information only updates are used as a fallback in case a bad update is shipped, so you'll want to support this case.
  *
@@ -76,9 +76,9 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  *
  *  @c appcastItem.criticalUpdate indicates if the update is a critical update.
  *
- * @param reply
  * A reply of `SPUUserUpdateChoiceInstall` begins or resumes downloading or installing the update.
- * If the state.stage is `SPUUserUpdateStateInstalling`, this may send a quit event to the application and relaunch it immediately (in this state, this behaves as a fast "install and Relaunch"). Do not use this reply if @c appcastItem.informationOnlyUpdate is YES.
+ * If the state.stage is `SPUUserUpdateStateInstalling`, this may send a quit event to the application and relaunch it immediately (in this state, this behaves as a fast "install and Relaunch").
+ * Do not use this reply if @c appcastItem.informationOnlyUpdate is YES.
  *
  * A reply of `SPUUserUpdateChoiceDismiss` dismisses the update for the time being. The user may be reminded of the update at a later point.
  * If the state.stage is `SPUUserUpdateStateDownloaded`, the downloaded update is kept after dismissing until the next time an update is shown to the user.
@@ -87,6 +87,10 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  * A reply of `SPUUserUpdateChoiceSkip` skips this particular version and won't notify the user again, unless they initiate an update check themselves.
  * If @c appcastItem.majorUpgrade is YES, the major update and any future minor updates to that major release are skipped.
  * If the state.stage is `SPUUpdateStateInstalling`, the installation is also canceled when the update is skipped.
+ *
+ * @param appcastItem The Appcast Item containing information that reflects the new update.
+ * @param state The current state of the user update. See above discussion for notable properties.
+ * @param reply The reply which indicates if the update should be installed, dismissed, or skipped. See above discussion for more details.
  */
 - (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem state:(SPUUserUpdateState *)state reply:(void (^)(SPUUserUpdateChoice))reply;
 
@@ -118,17 +122,17 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  * Let the user know a new update was not found after they tried initiating an update check.
  * Before this point, `-showUserInitiatedUpdateCheckWithCancellation:` may be called.
  *
- * @param error The error associated with why a new update was not found.
- *  There are various reasons a new update is unavailable and can't be installed.
- *  This error object is populated with recovery and suggestion strings suitable to be shown in an alert.
+ * There are various reasons a new update is unavailable and can't be installed.
+ * The @c error object is populated with recovery and suggestion strings suitable to be shown in an alert.
  *
- *  The userInfo dictionary is also populated with two keys:
+ * The @c userInfo dictionary on the @c error is also populated with two keys:
  *
- *  `SPULatestAppcastItemFoundKey`: if available, this may provide the latest SUAppcastItem that was found.
+ * `SPULatestAppcastItemFoundKey`: if available, this may provide the latest SUAppcastItem that was found.
  *
- *  `SPUNoUpdateFoundReasonKey`: if available, this will provide the `SUNoUpdateFoundReason`. For example the reason could be because
- *  the latest version in the feed requires a newer OS version or could be because the user is already on the latest version.
+ * `SPUNoUpdateFoundReasonKey`: if available, this will provide the `SUNoUpdateFoundReason`. For example the reason could be because
+ * the latest version in the feed requires a newer OS version or could be because the user is already on the latest version.
  *
+ * @param error The error associated with why a new update was not found. See above discussion for more details.
  * @param acknowledgement Acknowledge to the updater that no update found error was shown.
  */
 - (void)showUpdateNotFoundWithError:(NSError *)error acknowledgement:(void (^)(void))acknowledgement;
@@ -208,7 +212,6 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  * Let the user know that the update is ready to install and relaunch, and ask them whether they want to proceed.
  * Note if the target application has already terminated, this method may not be invoked.
  *
- * @param reply
  * A reply of `SPUUserUpdateChoiceInstall` installs the update the new update immediately. The application is relaunched only if it is still running by the time this reply is invoked. If the application terminates on its own, Sparkle will attempt to automatically install the update.
  *
  * A reply of `SPUUserUpdateChoiceDismiss` dismisses the update installation for the time being. Note the update may still be installed automatically after the application terminates.
@@ -216,6 +219,8 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  * A reply of `SPUUserUpdateChoiceSkip` cancels the current update that has begun installing and dismisses the update. In this circumstance, the update is canceled but this update version is not skipped in the future.
  *
  * Before this point, `-showInstallingUpdate` will be called.
+ *
+ * @param reply The reply which indicates if the update should be installed, dismissed, or skipped. See above discussion for more details.
  */
 - (void)showReadyToInstallAndRelaunch:(void (^)(SPUUserUpdateChoice))reply;
 
