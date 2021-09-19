@@ -41,12 +41,12 @@ SU_EXPORT @interface SPUStandardUpdaterController : NSObject
     /**
      * Interface builder outlet for the updater's delegate.
      */
-    IBOutlet id<SPUUpdaterDelegate> updaterDelegate;
+    IBOutlet __weak id<SPUUpdaterDelegate> updaterDelegate;
     
     /**
      * Interface builder outlet for the user driver's delegate.
      */
-    IBOutlet id<SPUStandardUserDriverDelegate> userDriverDelegate;
+    IBOutlet __weak id<SPUStandardUserDriverDelegate> userDriverDelegate;
 }
 
 /**
