@@ -28,8 +28,6 @@
 
 @synthesize updater = _updater;
 @synthesize userDriver = _userDriver;
-@synthesize updaterDelegate = _updaterDelegate;
-@synthesize userDriverDelegate = _userDriverDelegate;
 
 - (void)awakeFromNib
 {
@@ -45,22 +43,25 @@
 - (void)_initUpdater
 {
     NSBundle *hostBundle = [NSBundle mainBundle];
-    SPUStandardUserDriver *userDriver = [[SPUStandardUserDriver alloc] initWithHostBundle:hostBundle delegate:self.userDriverDelegate];
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdirect-ivar-access"
+    SPUStandardUserDriver *userDriver = [[SPUStandardUserDriver alloc] initWithHostBundle:hostBundle delegate:self->userDriverDelegate];
     
-    self.updater = [[SPUUpdater alloc] initWithHostBundle:hostBundle applicationBundle:hostBundle userDriver:userDriver delegate:self.updaterDelegate];
+    self.updater = [[SPUUpdater alloc] initWithHostBundle:hostBundle applicationBundle:hostBundle userDriver:userDriver delegate:self->updaterDelegate];
     self.userDriver = userDriver;
+#pragma clang diagnostic pop
 }
 
-- (instancetype)initWithUpdaterDelegate:(nullable id<SPUUpdaterDelegate>)updaterDelegate userDriverDelegate:(nullable id<SPUStandardUserDriverDelegate>)userDriverDelegate
+- (instancetype)initWithUpdaterDelegate:(nullable id<SPUUpdaterDelegate>)theUpdaterDelegate userDriverDelegate:(nullable id<SPUStandardUserDriverDelegate>)theUserDriverDelegate
 {
-    return [self initWithStartingUpdater:YES updaterDelegate:updaterDelegate userDriverDelegate:userDriverDelegate];
+    return [self initWithStartingUpdater:YES updaterDelegate:theUpdaterDelegate userDriverDelegate:theUserDriverDelegate];
 }
 
-- (instancetype)initWithStartingUpdater:(BOOL)startUpdater updaterDelegate:(nullable id<SPUUpdaterDelegate>)updaterDelegate userDriverDelegate:(nullable id<SPUStandardUserDriverDelegate>)userDriverDelegate
+- (instancetype)initWithStartingUpdater:(BOOL)startUpdater updaterDelegate:(nullable id<SPUUpdaterDelegate>)theUpdaterDelegate userDriverDelegate:(nullable id<SPUStandardUserDriverDelegate>)theUserDriverDelegate
 {
     if ((self = [super init])) {
-        _updaterDelegate = updaterDelegate;
-        _userDriverDelegate = userDriverDelegate;
+        self->updaterDelegate = theUpdaterDelegate;
+        self->userDriverDelegate = theUserDriverDelegate;
 
         [self _initUpdater];
         
@@ -71,21 +72,27 @@
     return self;
 }
 
-- (void)setUpdaterDelegate:(id<SPUUpdaterDelegate>)updaterDelegate
+- (void)setUpdaterDelegate:(id<SPUUpdaterDelegate>)newUpdaterDelegate
 {
     if (self.updater != nil) {
-        NSLog(@"Error: %@ - cannot set updater delegate %@ after the updater has been initialized. If you are instantiating %@ programmatically, please pass the updater delegate in its initializer. If you are instantiating %@ in a nib, please set the updater delegate by connecting its outlet.", NSStringFromSelector(_cmd), updaterDelegate, [self className], [self className]);
+        NSLog(@"Error: %@ - cannot set updater delegate %@ after the updater has been initialized. If you are instantiating %@ programmatically, please pass the updater delegate in its initializer. If you are instantiating %@ in a nib, please set the updater delegate by connecting its outlet.", NSStringFromSelector(_cmd), newUpdaterDelegate, [self className], [self className]);
     } else {
-        _updaterDelegate = updaterDelegate;
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdirect-ivar-access"
+        self->updaterDelegate = newUpdaterDelegate;
+#pragma clang diagnostic pop
     }
 }
 
-- (void)setUserDriverDelegate:(id<SPUStandardUserDriverDelegate>)userDriverDelegate
+- (void)setUserDriverDelegate:(id<SPUStandardUserDriverDelegate>)newUserDriverDelegate
 {
     if (self.updater != nil) {
-        NSLog(@"Error: %@ - cannot set user driver delegate %@ after the updater has been initialized. If you are instantiating %@ programmatically, please pass the user driver delegate in its initializer. If you are instantiating %@ in a nib, please set the user driver delegate by connecting its outlet.", NSStringFromSelector(_cmd), userDriverDelegate, [self className], [self className]);
+        NSLog(@"Error: %@ - cannot set user driver delegate %@ after the updater has been initialized. If you are instantiating %@ programmatically, please pass the user driver delegate in its initializer. If you are instantiating %@ in a nib, please set the user driver delegate by connecting its outlet.", NSStringFromSelector(_cmd), newUserDriverDelegate, [self className], [self className]);
     } else {
-        _userDriverDelegate = userDriverDelegate;
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdirect-ivar-access"
+        self->userDriverDelegate = newUserDriverDelegate;
+#pragma clang diagnostic pop
     }
 }
 
