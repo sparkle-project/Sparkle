@@ -58,7 +58,7 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  * Let the user know a new update is found and ask them what they want to do.
  * Before this point, `-showUserInitiatedUpdateCheckWithCancellation:` may be called.
  *
- *  The potential  `stage`s on the updater @p state are:
+ *  The potential  `stage`s on the updater @c state are:
  *
  *  `SPUUpdateStateNotDownloaded` - Update has not been downloaded yet.
  *
@@ -66,9 +66,9 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  *
  *  `SPUUpdateStateInstalling` - Update has been downloaded and already started installing.
  *
- *  The `userIntiated` property on the @p state indicates if the update was initiated by the user or if it was automatically scheduled in the background.
+ *  The `userIntiated` property on the @c state indicates if the update was initiated by the user or if it was automatically scheduled in the background.
  *
- *  Additionally, these properties on the @p appcastItem are of importance:
+ *  Additionally, these properties on the @c appcastItem are of importance:
  *
  *  @c appcastItem.informationOnlyUpdate indicates if the update is only informational and should not be downloaded. You can direct the user to the infoURL property of the appcastItem in their web browser. Sometimes information only updates are used as a fallback in case a bad update is shipped, so you'll want to support this case.
  *
@@ -123,9 +123,9 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  * Before this point, `-showUserInitiatedUpdateCheckWithCancellation:` may be called.
  *
  * There are various reasons a new update is unavailable and can't be installed.
- * The @p error object is populated with recovery and suggestion strings suitable to be shown in an alert.
+ * The @c error object is populated with recovery and suggestion strings suitable to be shown in an alert.
  *
- * The @c userInfo dictionary on the @p error is also populated with two keys:
+ * The @c userInfo dictionary on the @c error is also populated with two keys:
  *
  * `SPULatestAppcastItemFoundKey`: if available, this may provide the latest SUAppcastItem that was found.
  *

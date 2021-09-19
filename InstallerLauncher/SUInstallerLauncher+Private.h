@@ -22,7 +22,7 @@
  This API is not supported when used directly from a Sandboxed applications and will always return @c YES in that case.
  
  @param bundlePath The bundle path to test if authorization is needed when performing an update that replaces this bundle.
- @return @c YES if Sparkle thinks authorization is needed to update the @p bundlePath, otherwise @c NO.
+ @return @c YES if Sparkle thinks authorization is needed to update the @c bundlePath, otherwise @c NO.
  */
 SU_EXPORT BOOL SPUSystemNeedsAuthorizationAccessForBundlePath(NSString *bundlePath);
 
