@@ -30,8 +30,9 @@
     self = [super init];
     if (self != nil) {
         _webView = [[WebView alloc] initWithFrame:NSZeroRect];
-        
-        WebPreferences *preferences = _webView.preferences;
+
+        WebPreferences *preferences = [[WebPreferences alloc] initWithIdentifier:@"sparkle-project.org.legacy-web-view"];
+        preferences.autosaves = NO;
         preferences.javaScriptEnabled = javaScriptEnabled;
         preferences.javaEnabled = NO;
         preferences.plugInsEnabled = NO;
