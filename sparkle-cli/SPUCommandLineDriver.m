@@ -8,7 +8,24 @@
 
 #import "SPUCommandLineDriver.h"
 #import <Sparkle/Sparkle.h>
+#import <Sparkle/SUInstallerLauncher+Private.h>
 #import "SPUCommandLineUserDriver.h"
+
+#define SPARKLE_CLI_ERROR_DOMAIN @"sparkle-cli"
+
+typedef NS_ENUM(NSInteger, CLIErrorCode) {
+    CLIErrorCodeCannotPerformCheck = 1,
+    CLIErrorCodeCannotInstallPackage,
+    CLIErrorCodeCannotInstallMajorUpgrade
+};
+
+typedef NS_ENUM(int, CLIErrorExitStatus) {
+    CLIErrorExitStatusMajorUpgradeNotAllowed = 2,
+    CLIErrorExitStatusInstallerInteractionNotAllowed = 3,
+    CLIErrorExitStatusUpdateNotFound = 4,
+    CLIErrorExitStatusUpdateCancelledAuthorization = 5,
+    CLIErrorExitStatusUpdatePermissionRequested = 6
+};
 
 @interface SPUCommandLineDriver () <SPUUpdaterDelegate>
 
@@ -19,6 +36,7 @@
 @property (nonatomic, readonly) BOOL allowMajorUpgrades;
 @property (nonatomic, readonly) NSSet<NSString *> *allowedChannels;
 @property (nonatomic, copy, readonly, nullable) NSString *customFeedURL;
+@property (nonatomic, readonly) SUUpdatePermissionResponse *updatePermissionResponse;
 
 @end
 
@@ -31,6 +49,7 @@
 @synthesize allowMajorUpgrades = _allowMajorUpgrades;
 @synthesize allowedChannels = _allowedChannels;
 @synthesize customFeedURL = _customFeedURL;
+@synthesize updatePermissionResponse = _updatePermissionResponse;
 
 - (instancetype)initWithUpdateBundlePath:(NSString *)updateBundlePath applicationBundlePath:(nullable NSString *)applicationBundlePath allowedChannels:(NSSet<NSString *> *)allowedChannels customFeedURL:(nullable NSString *)customFeedURL updatePermissionResponse:(nullable SUUpdatePermissionResponse *)updatePermissionResponse deferInstallation:(BOOL)deferInstallation interactiveInstallation:(BOOL)interactiveInstallation allowMajorUpgrades:(BOOL)allowMajorUpgrades verbose:(BOOL)verbose
 {
@@ -56,6 +75,7 @@
         _allowMajorUpgrades = allowMajorUpgrades;
         _allowedChannels = allowedChannels;
         _customFeedURL = [customFeedURL copy];
+        _updatePermissionResponse = updatePermissionResponse;
         
         id <SPUUserDriver> userDriver = [[SPUCommandLineUserDriver alloc] initWithUpdatePermissionResponse:updatePermissionResponse deferInstallation:deferInstallation verbose:verbose];
         _updater = [[SPUUpdater alloc] initWithHostBundle:updateBundle applicationBundle:applicationBundle userDriver:userDriver delegate:self];
@@ -71,7 +91,7 @@
     exit(EXIT_SUCCESS);
 }
 
-- (void)updaterWillIdleSchedulingUpdates:(SPUUpdater *)__unused updater __attribute__((noreturn))
+- (void)updaterWillNotScheduleUpdateCheck:(SPUUpdater *)__unused updater __attribute__((noreturn))
 {
     if (self.verbose) {
         fprintf(stderr, "Automatic update checks are disabled. Exiting.\n");
@@ -79,15 +99,63 @@
     exit(EXIT_SUCCESS);
 }
 
-// If the installation is interactive, we can show an authorization prompt for requesting additional privileges,
-// along with allowing the installer to show UI when installing
-- (BOOL)updater:(SPUUpdater *)__unused updater shouldAllowInstallerInteractionForUpdateCheck:(SPUUpdateCheck)updateCheck
+- (BOOL)updaterShouldPromptForPermissionToCheckForUpdates:(SPUUpdater *)__unused updater
+{
+    if (self.updatePermissionResponse == nil) {
+        // We don't want to make this decision on behalf of the user.
+        fprintf(stderr, "Error: Asked to grant update permission and --grant-automatic-checks is not specified. Exiting.\n");
+        exit(CLIErrorExitStatusUpdatePermissionRequested);
+    }
+    
+    return YES;
+}
+
+// If the installation is not interactive, we should not perform an update check if we don't have permission to update the bundle path
+- (BOOL)updater:(SPUUpdater *)updater mayPerformUpdateCheck:(SPUUpdateCheck)updateCheck error:(NSError * __autoreleasing *)error
 {
     switch (updateCheck) {
-        case SPUUpdateCheckUserInitiated:
-        case SPUUpdateCheckBackgroundScheduled:
-            return self.interactive;
+        case SPUUpdateCheckUpdates:
+        case SPUUpdateCheckUpdatesInBackground:
+            if (self.interactive || !SPUSystemNeedsAuthorizationAccessForBundlePath(self.updater.hostBundle.bundlePath)) {
+                return YES;
+            }
+            
+            if (error != NULL) {
+                *error = [NSError errorWithDomain:SPARKLE_CLI_ERROR_DOMAIN code:CLIErrorCodeCannotPerformCheck userInfo:@{ NSLocalizedDescriptionKey: @"A new update check cannot be performed because updating this bundle will require user authorization. Please use --interactive to allow this." }];
+            }
+            
+            return NO;
+        case SPUUpdateCheckUpdateInformation:
+            return YES;
     }
+}
+
+// If the installation is not interactive, we should only proceed with application based updates and not package-based ones
+- (BOOL)updater:(SPUUpdater *)updater shouldProceedWithUpdate:(nonnull SUAppcastItem *)updateItem updateCheck:(SPUUpdateCheck)updateCheck error:(NSError * __autoreleasing *)error
+{
+    // We can always probe for update information
+    if (updateCheck == SPUUpdateCheckUpdateInformation) {
+        return YES;
+    }
+    
+    // If we encounter a major upgrade and not allowed to act on it, then error
+    if (updateItem.majorUpgrade && !self.allowMajorUpgrades) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:SPARKLE_CLI_ERROR_DOMAIN code:CLIErrorCodeCannotInstallMajorUpgrade userInfo:@{ NSLocalizedDescriptionKey: @"Major upgrade available but not allowed to install it. Pass --allow-major-upgrades to allow this." }];
+        }
+        
+        return NO;
+    }
+    
+    if (!self.interactive && ![updateItem.installationType isEqualToString:SPUInstallationTypeApplication]) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:SPARKLE_CLI_ERROR_DOMAIN code:CLIErrorCodeCannotInstallPackage userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"A new package-based update has been found (%@), but installing it will require user authorization. Please use --interactive to allow this.", updateItem.versionString] }];
+        }
+        
+        return NO;
+    }
+    
+    return YES;
 }
 
 - (NSSet<NSString *> *)allowedChannelsForUpdater:(SPUUpdater *)__unused updater
@@ -100,47 +168,56 @@
     return self.customFeedURL;
 }
 
-// In case we find an update during probing, otherwise we leave this to the user driver
+// In case we find an update during probing
 - (void)updater:(SPUUpdater *)__unused updater didFindValidUpdate:(SUAppcastItem *)item
 {
-    // If we encounter a major upgrade and not allowed to act on it, then exit(2)
-    if (item.majorUpgrade && !self.allowMajorUpgrades) {
+    if (self.probingForUpdates) {
         if (self.verbose) {
-            fprintf(stderr, "Major upgrade available");
-            if (self.probingForUpdates) {
-                fprintf(stderr, "\n");
+            if (item.majorUpgrade) {
+                fprintf(stderr, "Major upgrade available.\n");
             } else {
-                fprintf(stderr, " but not allowed to install it.\n");
+                fprintf(stderr, "Update available!\n");
             }
         }
-        exit(2);
-    } else if (self.probingForUpdates) {
+    }
+}
+
+- (void)updater:(SPUUpdater *)updater didFinishUpdateCycleForUpdateCheck:(SPUUpdateCheck)__unused updateCheck error:(nullable NSError *)error __attribute__((noreturn))
+{
+    if (error == nil) {
         if (self.verbose) {
-            fprintf(stderr, "Update available!\n");
+            fprintf(stderr, "Exiting.\n");
         }
         exit(EXIT_SUCCESS);
-    }
-}
-
-- (void)updaterDidNotFindUpdate:(SPUUpdater *)__unused updater __attribute__((noreturn))
-{
-    if (self.verbose) {
-        fprintf(stderr, "No update available!\n");
-    }
-    exit(EXIT_FAILURE);
-}
-
-- (void)updater:(SPUUpdater *)__unused updater didAbortWithError:(NSError *)error
-{
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if (self.verbose) {
-            fprintf(stderr, "Aborted update with error (%ld): %s\n", (long)error.code, error.localizedDescription.UTF8String);
+    } else if ([error.domain isEqualToString:SPARKLE_CLI_ERROR_DOMAIN]) {
+        fprintf(stderr, "%s\n", error.localizedDescription.UTF8String);
+        
+        if (error.code == CLIErrorCodeCannotInstallMajorUpgrade) {
+            // Major upgrades are not allowed
+            exit(CLIErrorExitStatusMajorUpgradeNotAllowed);
+        } else {
+            // This is one of our own interactive update failures
+            exit(CLIErrorExitStatusInstallerInteractionNotAllowed);
         }
+    } else if (error.code == SUNoUpdateError) {
+        if (self.verbose) {
+            fprintf(stderr, "No new update available!\n");
+        }
+        exit(CLIErrorExitStatusUpdateNotFound);
+    } else if (error.code == SUInstallationCanceledError) {
+        // User canceled authorization themselves
+        assert(self.interactive);
+        if (self.verbose) {
+            fprintf(stderr, "Update was cancelled.\n");
+        }
+        exit(CLIErrorExitStatusUpdateCancelledAuthorization);
+    } else {
+        fprintf(stderr, "Error: Update has failed due to error %ld (%s). %s\n", (long)error.code, error.domain.UTF8String, error.localizedDescription.UTF8String);
         exit(EXIT_FAILURE);
-    });
+    }
 }
 
-- (BOOL)updaterShouldDownloadReleaseNotes:(SPUUpdater *)__unused updater
+- (BOOL)updater:(SPUUpdater *)updater shouldDownloadReleaseNotesForUpdate:(nonnull SUAppcastItem *)__unused item
 {
     return self.verbose;
 }

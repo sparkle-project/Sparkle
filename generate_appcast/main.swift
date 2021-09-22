@@ -7,49 +7,7 @@
 //
 
 import Foundation
-
-var verbose = false
-
-// Enum that contains keys for command-line arguments
-struct CommandLineArguments {
-    var privateDSAKey : SecKey?
-    var privateEdString : String?
-    var downloadURLPrefix : URL?
-    var releaseNotesURLPrefix: URL?
-    var outputPathURL: URL?
-    var archivesSourceDir: URL?
-}
-
-func printUsage() {
-    let command = URL(fileURLWithPath: CommandLine.arguments.first!).lastPathComponent
-    let usage = """
-
-Generate appcast from a directory of Sparkle update archives
-
-Usage: \(command) [OPTIONS] [ARCHIVES_FOLDER]
-    -h: prints this message
-    -f: provide the path to the private DSA key
-    -n: provide the name of the private DSA key. This option must be used with `-k`
-    -k: provide the name of the keychain. This option must be used with `-n`
-    -s: provide the private EdDSA key (128 characters)
-    -o: provide a filename for the generated appcast (allowed when only one will be created)
-    
-    --download-url-prefix: provide a prefix used to construct URLs for update downloads
-    --release-notes-url-prefix: provide a prefix used to construct URLs for release notes
-    
-Examples:
-    \(command) ./my-app-release-zipfiles/
-    \(command) -o appcast-name.xml ./my-app-release-zipfiles/
-    
-    \(command) dsa_priv.pem ./my-app-release-zipfiles/ [DEPRECATED]
-
-Appcast files and deltas will be written to the archives directory.
-Note that pkg-based updates are not supported.
-
-"""
-    
-    print(usage)
-}
+import ArgumentParser
 
 func loadPrivateKeys(_ privateDSAKey: SecKey?, _ privateEdString: String?) -> PrivateKeys {
     var privateEdKey: Data?
@@ -88,222 +46,198 @@ func loadPrivateKeys(_ privateDSAKey: SecKey?, _ privateEdString: String?) -> Pr
     return PrivateKeys(privateDSAKey: privateDSAKey, privateEdKey: privateEdKey, publicEdKey: publicEdKey)
 }
 
-/**
- * Parses all possible command line options and returns a struct that contains them
- */
-func parseCommandLineOptions() -> CommandLineArguments {
-    var arguments = CommandLine.arguments
+struct GenerateAppcast: ParsableCommand {
+    static let programName = "generate_appcast"
+    static let programNamePath: String = CommandLine.arguments.first ?? "./\(programName)"
+    static let cacheDirectory = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0].appendingPathComponent("Sparkle_generate_appcast")
     
-    // If there are fewer than two arguments (the name of the application +
-    // the required archive directory), or if `-h` is in the argument list,
-    // then show the usage message
-    if arguments.count < 2  || arguments.contains("-h") {
-        printUsage()
-        exit(1)
+    static let DEFAULT_MAX_NEW_VERSIONS_IN_FEED = 5
+    static let DEFAULT_MAXIMUM_DELTAS = 5
+    
+    @Option(name: .customShort("s"), help: ArgumentHelp("The private EdDSA string (128 characters). If not specified, the private EdDSA key will be read from the Keychain instead.", valueName: "private-EdDSA-key"))
+    var privateEdString : String?
+    
+    @Option(name: .customShort("f"), help: ArgumentHelp("Path to the private DSA key file. Only use this option for transitioning to EdDSA from older updates.", valueName: "private-dsa-key-file"), transform: { URL(fileURLWithPath: $0) })
+    var privateDSAKeyURL: URL?
+    
+    @Option(name: .customShort("n"), help: ArgumentHelp("The name of the private DSA key. This option must be used together with `-k`. Only use this option for transitioning to EdDSA from older updates.", valueName: "dsa-key-name"))
+    var privateDSAKeyName: String?
+    
+    @Option(name: .customShort("k"), help: ArgumentHelp("The path to the keychain to look up the private DSA key. This option must be used together with `-n`. Only use this option for transitioning to EdDSA from older updates.", valueName: "keychain-for-dsa"), transform: { URL(fileURLWithPath: $0) })
+    var keychainURL: URL?
+    
+    @Option(name: .customLong("download-url-prefix"), help: ArgumentHelp("A URL that will be used as prefix for the URL from where updates will be downloaded.", valueName: "url"), transform: { URL(string: $0) })
+    var downloadURLPrefix : URL?
+    
+    @Option(name: .customLong("release-notes-url-prefix"), help: ArgumentHelp("A URL that will be used as prefix for constructing URLs for release notes.", valueName: "url"), transform: { URL(string: $0) })
+    var releaseNotesURLPrefix : URL?
+    
+    @Option(name: .long, help: ArgumentHelp("A URL to the application's website which Sparkle may use for directing users to if they cannot download a new update from within the application. This will be used for new generated update items. By default, no product link is used.", valueName: "link"))
+    var link: String?
+    
+    @Option(name: .long, help: ArgumentHelp("An optional comma delimited list of application versions (specified by CFBundleVersion) to generate new update items for. By default, new update items are inferred from the available archives and are only generated if they are in the latest \(DEFAULT_MAX_NEW_VERSIONS_IN_FEED) updates in the appcast.", valueName: "versions"), transform: { Set($0.components(separatedBy: ",")) })
+    var versions: Set<String>?
+    
+    @Option(name: .long, help: ArgumentHelp("The maximum number of delta items to create for the latest update for each minimum required operating system.", valueName: "maximum-deltas"))
+    var maximumDeltas: Int = DEFAULT_MAXIMUM_DELTAS
+    
+    @Option(name: .long, help: ArgumentHelp("The Sparkle channel name that will be used for generating new updates. By default, no channel is used. Old applications need to be using Sparkle 2 to use this feature.", valueName: "channel-name"))
+    var channel: String?
+    
+    @Option(name: .long, help: ArgumentHelp("The last major or minimum autoupdate sparkle:version that will be used for generating new updates. By default, no last major version is used.", valueName: "major-version"))
+    var majorVersion: String?
+    
+    @Option(name: .long, help: ArgumentHelp("The phased rollout interval in seconds that will be used for generating new updates. By default, no phased rollout interval is used.", valueName: "phased-rollout-interval"), transform: { Int($0) })
+    var phasedRolloutInterval: Int?
+    
+    @Option(name: .long, help: ArgumentHelp("The last critical update sparkle:version that will be used for generating new updates. An empty string argument will treat this update as critical coming from any application version. By default, no last critical update version is used. Old applications need to be using Sparkle 2 to use this feature.", valueName: "critical-update-version"))
+    var criticalUpdateVersion: String?
+    
+    @Option(name: .long, help: ArgumentHelp("A comma delimited list of application sparkle:version's that will see newly generated updates as being informational only. An empty string argument will treat this update as informational coming from any application version. By default, updates are not informational only. --link must also be provided. Old applications need to be using Sparkle 2 to use this feature.", valueName: "informational-update-versions"), transform: { $0.components(separatedBy: ",").filter({$0.count > 0}) })
+    var informationalUpdateVersions: [String]?
+    
+    @Option(name: .customShort("o"), help: ArgumentHelp("Path to filename for the generated appcast (allowed when only one will be created).", valueName: "output-path"), transform: { URL(fileURLWithPath: $0) })
+    var outputPathURL: URL?
+    
+    @Argument(help: "The path to the directory containing the update archives and delta files.", transform: { URL(fileURLWithPath: $0, isDirectory: true) })
+    var archivesSourceDir: URL
+    
+    // New update items are only generated if they are in the latest maxNewVersionsInFeed updates in the appcast
+    // If the `versions` to generate is specified however, this counter has no effect.
+    // Keep this option hidden from the user for now
+    @Option(name: .long, help: .hidden)
+    var maxNewVersionsInFeed: Int = DEFAULT_MAX_NEW_VERSIONS_IN_FEED
+    
+    @Flag(help: .hidden)
+    var verbose: Bool = false
+    
+    static var configuration = CommandConfiguration(
+        abstract: "Generate appcast from a directory of Sparkle update archives.",
+        discussion: """
+        Appcast files and deltas will be written to the archives directory.
+        
+        If an appcast file is already present in the archives directory, that file will be re-used and updated with new entries.
+        Old entries in the appcast are kept intact. Otherwise, a new appcast file will be generated and written.
+        
+        .html files that have the same filename as an archive (except for the file extension) will be used for release notes for that item.
+        If the contents of these files are short (< \(CDATA_HTML_FRAGMENT_THRESHOLD) characters) and do not include a DOCTYPE or body tags, they will be treated as embedded CDATA release notes.
+        
+        For new update entries, Sparkle infers the minimum system OS requirement based on your update's LSMinimumSystemVersion provided
+        by your application's Info.plist. If none is found, \(programName) defaults to Sparkle's own minimum system requirement (macOS 10.11).
+        
+        An example of an archives directory may look like:
+            ./my-app-release-zipfiles/
+                MyApp 1.0.zip
+                MyApp 1.0.html
+                MyApp 1.1.zip
+                MyApp 1.1.html
+                appcast.xml
+                
+        EXAMPLES:
+            \(programNamePath) ./my-app-release-zipfiles/
+            \(programNamePath) -o appcast-name.xml ./my-app-release-zipfiles/
+        
+        For more advanced options that can be used for publishing updates, see https://sparkle-project.org/documentation/publishing/ for further documentation.
+        
+        Extracted archives are cached in \((cacheDirectory.path as NSString).abbreviatingWithTildeInPath) to avoid re-computation in subsequent runs.
+        
+        Note that \(programName) does not support package-based (.pkg) updates.
+        """)
+    
+    func validate() throws {
+        guard (keychainURL == nil) == (privateDSAKeyName == nil) else {
+            throw ValidationError("Both -n <dsa-key-name> and -k <keychain> options must be provided together, or neither should be provided.")
+        }
+        
+        // Both keychain/dsa key name options, and private dsa key file options cannot coexist
+        guard (keychainURL == nil) || (privateDSAKeyURL == nil) else {
+            throw ValidationError("-f <private-dsa-key-file> cannot be provided if -n <dsa-key-name> and -k <keychain> is provided")
+        }
+        
+        if let versions = versions {
+            guard versions.count > 0 else {
+                throw ValidationError("--versions must specify at least one application version.")
+            }
+        }
+        
+        guard (informationalUpdateVersions == nil) || (link != nil) else {
+            throw ValidationError("--link must be specified if --informational-update-versions is specified.")
+        }
     }
     
-    // Remove the first element since this is the path to executable which we don't need
-    arguments.removeFirst()
-
-    // Create the struct that will hold the parsed args
-    var commandLineArguments = CommandLineArguments()
-
-    // check if the private dsa key option is present
-    if let privateDSAKeyOptionIndex = arguments.firstIndex(of: "-f") {
-        // check that when accessing the value of the option we don't get out of bounds
-        if privateDSAKeyOptionIndex + 1 >= arguments.count {
-            print("Too few arguments were given")
-            exit(1)
+    func run() throws {
+        // Extract the keys
+        let privateDSAKey : SecKey?
+        if let privateDSAKeyURL = privateDSAKeyURL {
+            do {
+                privateDSAKey = try loadPrivateDSAKey(at: privateDSAKeyURL)
+            } catch {
+                print("Unable to load DSA private key from", privateDSAKeyURL.path, "\n", error)
+                throw ExitCode(1)
+            }
+        } else if let keychainURL = keychainURL, let privateDSAKeyName = privateDSAKeyName {
+            do {
+                privateDSAKey = try loadPrivateDSAKey(named: privateDSAKeyName, fromKeychainAt: keychainURL)
+            } catch {
+                print("Unable to load DSA private key '\(privateDSAKeyName)' from keychain at", keychainURL.path, "\n", error)
+                throw ExitCode(1)
+            }
+        } else {
+            privateDSAKey = nil
         }
-
-        // get the private DSA key
-        let privateKeyUrl = URL(fileURLWithPath: arguments[privateDSAKeyOptionIndex + 1])
+        
+        let keys = loadPrivateKeys(privateDSAKey, privateEdString)
+        
         do {
-            commandLineArguments.privateDSAKey = try loadPrivateDSAKey(at: privateKeyUrl)
-        } catch {
-            print("Unable to load DSA private key from", privateKeyUrl.path, "\n", error)
-            exit(1)
-        }
-
-        // remove the already parsed arguments
-        arguments.remove(at: privateDSAKeyOptionIndex + 1)
-        arguments.remove(at: privateDSAKeyOptionIndex)
-    }
-
-    // check if the private dsa sould be loaded using the keyname and the name of the keychain
-    if let keyNameOptionIndex = arguments.firstIndex(of: "-n"), let keychainNameOptionIndex = arguments.firstIndex(of: "-k") {
-        // check that when accessing one of the values of the options we don't get out of bounds
-        if keyNameOptionIndex + 1 >= arguments.count || keychainNameOptionIndex + 1 >= arguments.count {
-            print("Too few arguments were given")
-            exit(1)
-        }
-
-        // get the keyname and the keychain url to load the private DSA key
-        let keyName: String = arguments[keyNameOptionIndex + 1]
-        let keychainUrl: URL = URL(fileURLWithPath: arguments[keychainNameOptionIndex + 1])
-        do {
-            commandLineArguments.privateDSAKey = try loadPrivateDSAKey(named: keyName, fromKeychainAt: keychainUrl)
-        } catch {
-            print("Unable to load DSA private key '\(keyName)' from keychain at", keychainUrl.path, "\n", error)
-            exit(1)
-        }
-
-        // remove the already parsed arguments
-        arguments.remove(at: keyNameOptionIndex + 1)
-        arguments.remove(at: keyNameOptionIndex)
-        arguments.remove(at: arguments.firstIndex(of: "-k")! + 1)
-        arguments.remove(at: keychainNameOptionIndex)
-    }
-
-    // check if the private EdDSA key string was given as an argument
-    if let privateEdDSAKeyOptionIndex = arguments.firstIndex(of: "-s") {
-        // check that when accessing the value of the option we don't get out of bounds
-        if privateEdDSAKeyOptionIndex + 1 >= arguments.count {
-            print("Too few arguments were given")
-            exit(1)
-        }
-
-        // get the private EdDSA key string
-        commandLineArguments.privateEdString = arguments[privateEdDSAKeyOptionIndex + 1]
-
-        // remove the already parsed argument
-        arguments.remove(at: privateEdDSAKeyOptionIndex + 1)
-        arguments.remove(at: privateEdDSAKeyOptionIndex)
-    }
-
-    // check if a prefix for the download url of the archives was given
-    if let downloadUrlPrefixOptionIndex = arguments.firstIndex(of: "--download-url-prefix") {
-        // check that when accessing the value of the option we don't get out of bounds
-        if downloadUrlPrefixOptionIndex + 1 >= arguments.count {
-            print("Too few arguments were given")
-            exit(1)
-        }
-
-        // get the download url prefix
-        commandLineArguments.downloadURLPrefix = URL(string: arguments[downloadUrlPrefixOptionIndex + 1])
-
-        // remove the parsed argument
-        arguments.remove(at: downloadUrlPrefixOptionIndex + 1)
-        arguments.remove(at: downloadUrlPrefixOptionIndex)
-    }
-    
-    // Check if a URL prefix was specified for the release notes
-    if let releaseNotesURLPrefixOptionIndex = arguments.firstIndex(of: "--release-notes-url-prefix") {
-        if releaseNotesURLPrefixOptionIndex + 1 >= arguments.count {
-            print("Too few arguments were given")
-            exit(1)
-        }
-        
-        // Get the URL prefix for the release notes
-        commandLineArguments.releaseNotesURLPrefix = URL(string: arguments[releaseNotesURLPrefixOptionIndex + 1])
-        
-        // Remove the parsed argument
-        arguments.remove(at: releaseNotesURLPrefixOptionIndex + 1)
-        arguments.remove(at: releaseNotesURLPrefixOptionIndex)
-    }
-    
-    // Check if an output filename was specified
-    if let outputFilenameOptionIndex = arguments.firstIndex(of: "-o") {
-        // check that when accessing the value of the option we don't get out of bounds
-        if outputFilenameOptionIndex + 1 >= arguments.count {
-            print("Too few arguments were given")
-            exit(1)
-        }
-        
-        // Get the URL prefix for the release notes
-        commandLineArguments.outputPathURL = URL(fileURLWithPath: arguments[outputFilenameOptionIndex + 1])
-        
-        // Remove the parsed argument
-        arguments.remove(at: outputFilenameOptionIndex + 1)
-        arguments.remove(at: outputFilenameOptionIndex)
-    }
-
-    // now that all command line options have been removed from the arguments array
-    // there should only be the path to the private DSA key (if provided) path to the archives dir left
-    if arguments.count == 2 {
-        // if there are two arguments left they are the private DSA key and the path to the archives directory (in this order)
-        // first get the private DSA key
-        let privateKeyURL = URL(fileURLWithPath: arguments[0])
-        do {
-            commandLineArguments.privateDSAKey = try loadPrivateDSAKey(at: privateKeyURL)
-        } catch {
-            print("Unable to load DSA private key from", privateKeyURL.path, "\n", error)
-            exit(1)
-        }
-
-        // remove the parsed path to the DSA key
-        arguments.removeFirst()
-    }
-
-    // now only the archives source dir is left
-    if let archivesSourceDir = arguments.first {
-        commandLineArguments.archivesSourceDir = URL(fileURLWithPath: archivesSourceDir, isDirectory: true)
-    } else {
-        print("Archive folder must be specified")
-        exit(1);
-    }
-
-    return commandLineArguments
-}
-
-func main() {
-    // Parse the command line arguments
-    let args = parseCommandLineOptions()
-    
-    // If parsing the command line options was successful, then
-    // the archivesSourceDir must exist
-    let archivesSourceDir = args.archivesSourceDir!
-    
-    // Extract the keys
-    let keys = loadPrivateKeys(args.privateDSAKey, args.privateEdString)
-    
-    do {
-        let allUpdates = try makeAppcast(archivesSourceDir: archivesSourceDir, keys: keys, verbose: verbose)
-
-        // If a URL prefix was provided, set on the archive items
-        if args.downloadURLPrefix != nil || args.releaseNotesURLPrefix != nil {
-            for (_, archiveItems) in allUpdates {
-                for archiveItem in archiveItems {
-                    if let downloadURLPrefix = args.downloadURLPrefix {
-                        archiveItem.downloadUrlPrefix = downloadURLPrefix
-                    }
-                    if let releaseNotesURLPrefix = args.releaseNotesURLPrefix {
-                        archiveItem.releaseNotesURLPrefix = releaseNotesURLPrefix
+            let allUpdates = try makeAppcast(archivesSourceDir: archivesSourceDir, cacheDirectory: GenerateAppcast.cacheDirectory, keys: keys, versions: versions, maximumDeltas: maximumDeltas, verbose: verbose)
+            
+            // If a URL prefix was provided, set on the archive items
+            if downloadURLPrefix != nil || releaseNotesURLPrefix != nil {
+                for (_, archiveItems) in allUpdates {
+                    for archiveItem in archiveItems {
+                        if let downloadURLPrefix = downloadURLPrefix {
+                            archiveItem.downloadUrlPrefix = downloadURLPrefix
+                        }
+                        if let releaseNotesURLPrefix = releaseNotesURLPrefix {
+                            archiveItem.releaseNotesURLPrefix = releaseNotesURLPrefix
+                        }
                     }
                 }
             }
-        }
+            
+            // If a (single) output filename was specified on the command-line, but more than one
+            // appcast file was found in the archives, then it's an error.
+            if let outputPathURL = outputPathURL,
+                allUpdates.count > 1 {
+                print("Cannot write to \(outputPathURL.path): multiple appcasts found")
+                throw ExitCode(1)
+            }
+            
+            for (appcastFile, updates) in allUpdates {
+                // If an output filename was specified, use it.
+                // Otherwise, use the name of the appcast file found in the archive.
+                let appcastDestPath = outputPathURL ?? URL(fileURLWithPath: appcastFile,
+                                                                relativeTo: archivesSourceDir)
 
-        // If a (single) output filename was specified on the command-line, but more than one
-        // appcast file was found in the archives, then it's an error.
-        if let outputPathURL = args.outputPathURL,
-            allUpdates.count > 1 {
-            print("Cannot write to \(outputPathURL.path): multiple appcasts found")
-            exit(1);
+                // Write the appcast
+                let (numNewUpdates, numExistingUpdates) = try writeAppcast(appcastDestPath: appcastDestPath, updates: updates, newVersions: versions, maxNewVersionsInFeed: maxNewVersionsInFeed, link: link, newChannel: channel, majorVersion: majorVersion, phasedRolloutInterval: phasedRolloutInterval, criticalUpdateVersion: criticalUpdateVersion, informationalUpdateVersions: informationalUpdateVersions)
+
+                // Inform the user, pluralizing "update" if necessary
+                let pluralizeUpdates = { $0 == 1 ? "update" : "updates" }
+                let newUpdatesString = pluralizeUpdates(numNewUpdates)
+                let existingUpdatesString = pluralizeUpdates(numExistingUpdates)
+                
+                print("Wrote \(numNewUpdates) new \(newUpdatesString) and updated \(numExistingUpdates) existing \(existingUpdatesString)")
+            }
+        } catch {
+            print("Error generating appcast from directory", archivesSourceDir.path, "\n", error)
+            throw ExitCode(1)
         }
-        
-        for (appcastFile, updates) in allUpdates {
-            // If an output filename was specified, use it.
-            // Otherwise, use the name of the appcast file found in the archive.
-            let appcastDestPath = args.outputPathURL ?? URL(fileURLWithPath: appcastFile,
-                                                            relativeTo: archivesSourceDir)
-            
-            // Write the appcast
-            try writeAppcast(appcastDestPath: appcastDestPath, updates: updates)
-            
-            // Inform the user, pluralizing "update" if necessary
-            let updateString = (updates.count == 1) ? "update" : "updates"
-            print("Wrote \(updates.count) \(updateString) to: \(appcastDestPath.path)")
-        }
-    } catch {
-        print("Error generating appcast from directory", archivesSourceDir.path, "\n", error)
-        exit(1)
     }
 }
 
 DispatchQueue.global().async(execute: {
-    main()
+    GenerateAppcast.main()
     CFRunLoopStop(CFRunLoopGetMain())
 })
-
 CFRunLoopRun()

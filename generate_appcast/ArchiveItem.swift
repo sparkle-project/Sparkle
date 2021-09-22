@@ -5,6 +5,9 @@
 
 import Foundation
 
+// CDATA text must contain less characters than this threshold
+let CDATA_HTML_FRAGMENT_THRESHOLD = 1000
+
 class DeltaUpdate {
     let fromVersion: String
     let archivePath: URL
@@ -141,6 +144,7 @@ class ArchiveItem: CustomStringConvertible {
     var pubDate: String {
         let date = self.archiveFileAttributes[.creationDate] as! Date
         let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
         formatter.dateFormat = "EEE, dd MMM yyyy HH:mm:ss ZZ"
         return formatter.string(from: date)
     }
@@ -163,7 +167,7 @@ class ArchiveItem: CustomStringConvertible {
 
     private func getReleaseNotesAsHTMLFragment(_ path: URL) -> String?  {
         if let html = try? String(contentsOf: path) {
-            if html.utf8.count < 1000 &&
+            if html.utf8.count < CDATA_HTML_FRAGMENT_THRESHOLD &&
                 !html.localizedCaseInsensitiveContains("<!DOCTYPE") &&
                 !html.localizedCaseInsensitiveContains("<body") {
                 return html

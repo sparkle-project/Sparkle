@@ -5,17 +5,13 @@
 
 import Foundation
 
-// Maximum number of delta updates (per OS).
-let maxDeltas = 5
-
 func makeError(code: SUError, _ description: String) -> NSError {
     return NSError(domain: SUSparkleErrorDomain, code: Int(OSStatus(code.rawValue)), userInfo: [
         NSLocalizedDescriptionKey: description,
         ])
 }
 
-func makeAppcast(archivesSourceDir: URL, keys: PrivateKeys, verbose: Bool) throws -> [String: [ArchiveItem]] {
-    let cacheDir = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0].appendingPathComponent("Sparkle_generate_appcast")
+func makeAppcast(archivesSourceDir: URL, cacheDirectory cacheDir: URL, keys: PrivateKeys, versions: Set<String>?, maximumDeltas: Int, verbose: Bool) throws -> [String: [ArchiveItem]] {
     let comparator = SUStandardVersionComparator()
 
     let allUpdates = (try unarchiveUpdates(archivesSourceDir: archivesSourceDir, archivesDestDir: cacheDir, verbose: verbose))
@@ -73,6 +69,11 @@ func makeAppcast(archivesSourceDir: URL, keys: PrivateKeys, verbose: Bool) throw
         var latestUpdatePerOS: [String: ArchiveItem] = [:]
 
         for update in updates {
+            // If the new versions are specified, ignore everything else
+            if let versions = versions, !versions.contains(update.version) {
+                continue
+            }
+            
             // items are ordered starting latest first
             let os = update.minimumSystemVersion
             if latestUpdatePerOS[os] == nil {
@@ -84,7 +85,7 @@ func makeAppcast(archivesSourceDir: URL, keys: PrivateKeys, verbose: Bool) throw
             var numDeltas = 0
             let appBaseName = latestItem.appPath.deletingPathExtension().lastPathComponent
             for item in updates {
-                if numDeltas > maxDeltas {
+                if numDeltas >= maximumDeltas {
                     break
                 }
 

@@ -10,6 +10,7 @@
 #include <Security/SecCode.h>
 #import "SUCodeSigningVerifier.h"
 #import "SULog.h"
+#import "SUErrors.h"
 
 
 #include "AppKitPrevention.h"
@@ -23,24 +24,38 @@
     SecStaticCodeRef staticCode = NULL;
     SecStaticCodeRef oldCode = NULL;
     CFErrorRef cfError = NULL;
-    if (error) {
-        *error = nil;
-    }
 
     result = SecStaticCodeCreateWithPath((__bridge CFURLRef)oldBundleURL, kSecCSDefaultFlags, &oldCode);
     if (result == errSecCSUnsigned) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInsufficientSigningError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Bundle is not code signed: %@", newBundleURL] }];
+        }
+        
         return NO;
     }
 
     result = SecCodeCopyDesignatedRequirement(oldCode, kSecCSDefaultFlags, &requirement);
     if (result != noErr) {
-        SULog(SULogLevelError, @"Failed to copy designated requirement. Code Signing OSStatus code: %d", result);
+        NSString *message = [NSString stringWithFormat:@"Failed to copy designated requirement. Code Signing OSStatus code: %d", result];
+        SULog(SULogLevelError, @"%@", message);
+        
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInsufficientSigningError userInfo:@{ NSLocalizedDescriptionKey: message }];
+        }
+        
         goto finally;
     }
 
     result = SecStaticCodeCreateWithPath((__bridge CFURLRef)newBundleURL, kSecCSDefaultFlags, &staticCode);
     if (result != noErr) {
-        SULog(SULogLevelError, @"Failed to get static code %d", result);
+        NSString *message = [NSString stringWithFormat:@"Failed to get static code %d", result];
+        
+        SULog(SULogLevelError, @"%@", message);
+        
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInsufficientSigningError userInfo:@{ NSLocalizedDescriptionKey: message }];
+        }
+        
         goto finally;
     }
     
@@ -51,24 +66,56 @@
     SecCSFlags flags = (SecCSFlags) (kSecCSDefaultFlags | kSecCSCheckAllArchitectures);
     result = SecStaticCodeCheckValidityWithErrors(staticCode, flags, requirement, &cfError);
     
-    if (cfError) {
-        NSError *tmpError = CFBridgingRelease(cfError);
-        if (error) *error = tmpError;
-    }
-    
-    if (result != noErr) {
-        if (result == errSecCSUnsigned) {
-            SULog(SULogLevelError, @"The host app is signed, but the new version of the app is not signed using Apple Code Signing. Please ensure that the new app is signed and that archiving did not corrupt the signature.");
+    if (result != errSecSuccess) {
+        NSError *underlyingError;
+        if (cfError != NULL) {
+            NSError *tmpError = CFBridgingRelease(cfError);
+            underlyingError = tmpError;
+        } else {
+            underlyingError = nil;
         }
-        if (result == errSecCSReqFailed) {
+        
+        NSMutableDictionary *userInfo = [NSMutableDictionary dictionary];
+        if (underlyingError != nil) {
+            userInfo[NSUnderlyingErrorKey] = underlyingError;
+        }
+        
+        if (result == errSecCSUnsigned) {
+            NSString *message = @"The host app is signed, but the new version of the app is not signed using Apple Code Signing. Please ensure that the new app is signed and that archiving did not corrupt the signature.";
+            
+            SULog(SULogLevelError, @"%@", message);
+            
+            if (error != NULL) {
+                userInfo[NSLocalizedDescriptionKey] = message;
+                
+                *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInsufficientSigningError userInfo:[userInfo copy]];
+            }
+        } else if (result == errSecCSReqFailed) {
             CFStringRef requirementString = nil;
+            NSString *initialMessage;
             if (SecRequirementCopyString(requirement, kSecCSDefaultFlags, &requirementString) == noErr) {
-                SULog(SULogLevelError, @"Code signature of the new version doesn't match the old version: %@. Please ensure that old and new app is signed using exactly the same certificate.", requirementString);
+                initialMessage = [NSString stringWithFormat:@"Code signature of the new version doesn't match the old version: %@. Please ensure that old and new app is signed using exactly the same certificate.", requirementString];
+                
+                SULog(SULogLevelError, @"%@", initialMessage);
                 CFRelease(requirementString);
+            } else {
+                initialMessage = @"Code signature of new version doesn't match the old version. Please ensure that old and new app is signed using exactly the same certificate.";
             }
             
-            [self logSigningInfoForCode:oldCode label:@"old info"];
-            [self logSigningInfoForCode:staticCode label:@"new info"];
+            NSDictionary *oldInfo = [self logSigningInfoForCode:oldCode label:@"old info"];
+            NSDictionary *newInfo = [self logSigningInfoForCode:staticCode label:@"new info"];
+            
+            if (error != NULL) {
+                userInfo[NSLocalizedDescriptionKey] = [NSString stringWithFormat:@"%@ old info: %@. new info: %@", initialMessage, oldInfo, newInfo];
+                
+                *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInsufficientSigningError userInfo:[userInfo copy]];
+            }
+        } else {
+            if (error != NULL) {
+                userInfo[NSLocalizedDescriptionKey] = @"Error: Old app bundle code signing signature failed to match new bundle code signature";
+                
+                *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInsufficientSigningError userInfo:[userInfo copy]];
+            }
         }
     }
     
@@ -84,13 +131,15 @@ finally:
     OSStatus result;
     SecStaticCodeRef staticCode = NULL;
     CFErrorRef cfError = NULL;
-    if (error) {
-        *error = nil;
-    }
     
     result = SecStaticCodeCreateWithPath((__bridge CFURLRef)bundleURL, kSecCSDefaultFlags, &staticCode);
     if (result != noErr) {
         SULog(SULogLevelError, @"Failed to get static code %d", result);
+        
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInsufficientSigningError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to get static code for verifying code signature: %d", result] }];
+        }
+        
         goto finally;
     }
 
@@ -98,17 +147,47 @@ finally:
     SecCSFlags flags = (SecCSFlags) (kSecCSDefaultFlags | kSecCSCheckAllArchitectures);
     result = SecStaticCodeCheckValidityWithErrors(staticCode, flags, NULL, &cfError);
     
-    if (cfError) {
-        NSError *tmpError = CFBridgingRelease(cfError);
-        if (error) *error = tmpError;
-    }
-    
-    if (result != noErr) {
-        if (result == errSecCSUnsigned) {
-            SULog(SULogLevelError, @"Error: The app is not signed using Apple Code Signing. %@", bundleURL);
+    if (result != errSecSuccess) {
+        NSError *underlyingError;
+        if (cfError != NULL) {
+            NSError *tmpError = CFBridgingRelease(cfError);
+            underlyingError = tmpError;
+        } else {
+            underlyingError = nil;
         }
-        if (result == errSecCSReqFailed) {
-            [self logSigningInfoForCode:staticCode label:@"new info"];
+        
+        NSMutableDictionary *userInfo = [NSMutableDictionary dictionary];
+        if (underlyingError != nil) {
+            userInfo[NSUnderlyingErrorKey] = underlyingError;
+        }
+        
+        if (result == errSecCSUnsigned) {
+            NSString *message = [NSString stringWithFormat:@"Error: The app is not signed using Apple Code Signing. %@", bundleURL];
+            SULog(SULogLevelError, @"%@", message);
+            
+            if (error != NULL) {
+                userInfo[NSLocalizedDescriptionKey] = message;
+                
+                *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInsufficientSigningError userInfo:[userInfo copy]];
+            }
+        } else if (result == errSecCSReqFailed) {
+            if (error != NULL) {
+                NSDictionary *newInfo = [self logSigningInfoForCode:staticCode label:@"new info"];
+                
+                NSString *message = [NSString stringWithFormat:@"Error: The app failed Apple Code Signing checks: %@ - new info: %@", bundleURL, newInfo];
+                
+                userInfo[NSLocalizedDescriptionKey] = message;
+                
+                *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInsufficientSigningError userInfo:[userInfo copy]];
+            }
+        } else {
+            if (error != NULL) {
+                NSString *message = [NSString stringWithFormat:@"Error: The app failed Apple Code Signing checks: %@", bundleURL];
+                
+                userInfo[NSLocalizedDescriptionKey] = message;
+                
+                *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInsufficientSigningError userInfo:[userInfo copy]];
+            }
         }
     }
     
@@ -153,9 +232,10 @@ finally:
     return nil;
 }
 
-+ (void)logSigningInfoForCode:(SecStaticCodeRef)code label:(NSString*)label {
++ (NSDictionary *)logSigningInfoForCode:(SecStaticCodeRef)code label:(NSString*)label {
     NSDictionary *relevantInfo = [self codeSignatureInfoForCode:code];
     SULog(SULogLevelDefault, @"%@: %@", label, relevantInfo);
+    return relevantInfo;
 }
 
 + (BOOL)bundleAtURLIsCodeSigned:(NSURL *)bundleURL

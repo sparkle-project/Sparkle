@@ -17,7 +17,14 @@
 #import "SULocalizations.h"
 #import <AppKit/AppKit.h>
 
+// We use public instance variables instead of properties for the updater / user driver delegates
+// because we want them to be connectable outlets from Interface Builder, but we do not want their setters to be invoked
+// programmatically.
+
 @interface SPUStandardUpdaterController () <NSMenuItemValidation>
+
+@property (nonatomic) SPUUpdater *updater;
+@property (nonatomic) id<SPUUserDriver> userDriver;
 
 @end
 
@@ -25,41 +32,42 @@
 
 @synthesize updater = _updater;
 @synthesize userDriver = _userDriver;
-@synthesize updaterDelegate = _updaterDelegate;
-@synthesize userDriverDelegate = _userDriverDelegate;
-
-- (instancetype)init
-{
-    // Updater will be later started in -awakeFromNib
-    // Our updater delegate and user driver delegate outlets will be connected by then too.
-    // For now we can make sure the updater/userDriver are accessible
-    return [self initWithStartingUpdater:NO updaterDelegate:nil userDriverDelegate:nil];
-}
 
 - (void)awakeFromNib
 {
-    // Note: awakeFromNib might be called more than once but -startUpdate handles that
+    // Note: awakeFromNib might be called more than once
     // We have to use awakeFromNib otherwise the delegate outlets may not be connected yet,
     // and we aren't a proper window or view controller, so we don't have a proper "did load" point
-    [self startUpdater];
+    if (self.updater == nil) {
+        [self _initUpdater];
+        [self startUpdater];
+    }
 }
 
-- (instancetype)initWithUpdaterDelegate:(nullable id<SPUUpdaterDelegate>)updaterDelegate userDriverDelegate:(nullable id<SPUStandardUserDriverDelegate>)userDriverDelegate
+- (void)_initUpdater
 {
-    return [self initWithStartingUpdater:YES updaterDelegate:updaterDelegate userDriverDelegate:userDriverDelegate];
+    NSBundle *hostBundle = [NSBundle mainBundle];
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdirect-ivar-access"
+    SPUStandardUserDriver *userDriver = [[SPUStandardUserDriver alloc] initWithHostBundle:hostBundle delegate:self->userDriverDelegate];
+    
+    self.updater = [[SPUUpdater alloc] initWithHostBundle:hostBundle applicationBundle:hostBundle userDriver:userDriver delegate:self->updaterDelegate];
+    self.userDriver = userDriver;
+#pragma clang diagnostic pop
 }
 
-- (instancetype)initWithStartingUpdater:(BOOL)startUpdater updaterDelegate:(nullable id<SPUUpdaterDelegate>)updaterDelegate userDriverDelegate:(nullable id<SPUStandardUserDriverDelegate>)userDriverDelegate
+- (instancetype)initWithUpdaterDelegate:(nullable id<SPUUpdaterDelegate>)theUpdaterDelegate userDriverDelegate:(nullable id<SPUStandardUserDriverDelegate>)theUserDriverDelegate
+{
+    return [self initWithStartingUpdater:YES updaterDelegate:theUpdaterDelegate userDriverDelegate:theUserDriverDelegate];
+}
+
+- (instancetype)initWithStartingUpdater:(BOOL)startUpdater updaterDelegate:(nullable id<SPUUpdaterDelegate>)theUpdaterDelegate userDriverDelegate:(nullable id<SPUStandardUserDriverDelegate>)theUserDriverDelegate
 {
     if ((self = [super init])) {
-        _updaterDelegate = updaterDelegate;
-        _userDriverDelegate = userDriverDelegate;
+        self->updaterDelegate = theUpdaterDelegate;
+        self->userDriverDelegate = theUserDriverDelegate;
 
-        NSBundle *hostBundle = [NSBundle mainBundle];
-        SPUStandardUserDriver *userDriver = [[SPUStandardUserDriver alloc] initWithHostBundle:hostBundle delegate:userDriverDelegate];
-        
-        _updater = [[SPUUpdater alloc] initWithHostBundle:hostBundle applicationBundle:hostBundle userDriver:userDriver delegate:updaterDelegate];
-        _userDriver = userDriver;
+        [self _initUpdater];
         
         if (startUpdater) {
             [self startUpdater];

@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 47;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXAggregateTarget section */
@@ -309,6 +309,9 @@
 		726F2CE81BC9C48F001971A4 /* SUConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 61299A5F09CA6EB100B7442F /* SUConstants.m */; };
 		726F2CE91BC9C499001971A4 /* SUOperatingSystem.m in Sources */ = {isa = PBXBuildFile; fileRef = 726F2CE41BC9C33D001971A4 /* SUOperatingSystem.m */; };
 		726F2CEB1BC9C733001971A4 /* SUConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 61299A5F09CA6EB100B7442F /* SUConstants.m */; };
+		727DBAE526B5BBFD00111F0C /* ArgumentParser in Frameworks */ = {isa = PBXBuildFile; productRef = 727DBAE426B5BBFD00111F0C /* ArgumentParser */; };
+		727DBAE726B5C47800111F0C /* ArgumentParser in Frameworks */ = {isa = PBXBuildFile; productRef = 727DBAE626B5C47800111F0C /* ArgumentParser */; };
+		727DBAE926B5C48A00111F0C /* ArgumentParser in Frameworks */ = {isa = PBXBuildFile; productRef = 727DBAE826B5C48A00111F0C /* ArgumentParser */; };
 		727F340B2605321D00020E85 /* SULog+NSError.m in Sources */ = {isa = PBXBuildFile; fileRef = 727F340A2605321D00020E85 /* SULog+NSError.m */; };
 		727F340D2605321D00020E85 /* SULog+NSError.m in Sources */ = {isa = PBXBuildFile; fileRef = 727F340A2605321D00020E85 /* SULog+NSError.m */; };
 		727F340E2605321D00020E85 /* SULog+NSError.m in Sources */ = {isa = PBXBuildFile; fileRef = 727F340A2605321D00020E85 /* SULog+NSError.m */; };
@@ -367,6 +370,9 @@
 		72EB87EA1CB8798800C37F42 /* ShowInstallerProgress.m in Sources */ = {isa = PBXBuildFile; fileRef = 72EB87E91CB8798800C37F42 /* ShowInstallerProgress.m */; };
 		72EB87EB1CB8859100C37F42 /* Updater.app in Copy Tools */ = {isa = PBXBuildFile; fileRef = 721C24451CB753E6005440CB /* Updater.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		72EB87EC1CB8887E00C37F42 /* SUStatus.xib in Resources */ = {isa = PBXBuildFile; fileRef = 55C14BD8136EF00C00649790 /* SUStatus.xib */; };
+		72EE17FB26D1CC8800C58B19 /* SUInstallerLauncher+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 72EE17FA26D1CBC000C58B19 /* SUInstallerLauncher+Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		72EE17FC26D1CC9D00C58B19 /* SPUInstallationType.h in Headers */ = {isa = PBXBuildFile; fileRef = 7214B8851D45AD9A00CB5CED /* SPUInstallationType.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		72EE181926DAE70900C58B19 /* SPUUpdateCheck.h in Headers */ = {isa = PBXBuildFile; fileRef = 72EE181826DAE6E100C58B19 /* SPUUpdateCheck.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		72EF30BE2675CF38008CE987 /* SPUAppcastItemStateResolver.h in Headers */ = {isa = PBXBuildFile; fileRef = 72EF30BA2675CF38008CE987 /* SPUAppcastItemStateResolver.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		72EF30BF2675CF38008CE987 /* SPUAppcastItemState.m in Sources */ = {isa = PBXBuildFile; fileRef = 72EF30BB2675CF38008CE987 /* SPUAppcastItemState.m */; };
 		72EF30C02675CF38008CE987 /* SPUAppcastItemStateResolver.m in Sources */ = {isa = PBXBuildFile; fileRef = 72EF30BC2675CF38008CE987 /* SPUAppcastItemStateResolver.m */; };
@@ -438,13 +444,6 @@
 			proxyType = 1;
 			remoteGlobalIDString = 61B5F90109C4CEE200B25A18;
 			remoteInfo = "Sparkle Test App";
-		};
-		1454BA1719637EE900344E57 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 1420DF491962329200203BB0;
-			remoteInfo = Documentation;
 		};
 		14732BCA1960F73500593899 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -808,8 +807,6 @@
 		0263187214FEBB31005EBF43 /* uk */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/Sparkle.strings; sourceTree = "<group>"; };
 		0867D69BFE84028FC02AAC07 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		0867D6A5FE840307C02AAC07 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
-		1420DF4D196247B500203BB0 /* build-docs.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "build-docs.sh"; sourceTree = "<group>"; };
-		1420DF4E196247B500203BB0 /* Doxyfile */ = {isa = PBXFileReference; lastKnownFileType = text; path = Doxyfile; sourceTree = "<group>"; };
 		1420DF4F196247F900203BB0 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		142E0E0819A83AAC00E4312B /* SUBinaryDeltaTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUBinaryDeltaTest.m; sourceTree = "<group>"; };
 		14652F7919A93E5F00959E44 /* set-git-version-info.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "set-git-version-info.sh"; sourceTree = "<group>"; };
@@ -944,6 +941,7 @@
 		7218EC362623F31C008FECF3 /* org.sparkle-project.InstallerConnection.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "org.sparkle-project.InstallerConnection.entitlements"; sourceTree = "<group>"; };
 		7218EC372623F32E008FECF3 /* org.sparkle-project.InstallerStatus.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "org.sparkle-project.InstallerStatus.entitlements"; sourceTree = "<group>"; };
 		7218EC4B2623F51C008FECF3 /* codesign_xpc_service.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = codesign_xpc_service.py; sourceTree = "<group>"; };
+		721AB11626C777D900D34A86 /* SPUDownloadDataPrivate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SPUDownloadDataPrivate.h; sourceTree = "<group>"; };
 		721BC2061D17A532002BC71E /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
 		721BC2081D17A553002BC71E /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = System/Library/Frameworks/Carbon.framework; sourceTree = SDKROOT; };
 		721BC20A1D17A5AD002BC71E /* CoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreServices.framework; path = System/Library/Frameworks/CoreServices.framework; sourceTree = SDKROOT; };
@@ -1278,6 +1276,8 @@
 		72E45CF61B640DAE005C701A /* SUUpdateSettingsWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SUUpdateSettingsWindowController.xib; sourceTree = "<group>"; };
 		72E45CFB1B641961005C701A /* sparkletestcast.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = sparkletestcast.xml; sourceTree = "<group>"; };
 		72EB87E91CB8798800C37F42 /* ShowInstallerProgress.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ShowInstallerProgress.m; path = Sparkle/InstallerProgress/ShowInstallerProgress.m; sourceTree = SOURCE_ROOT; };
+		72EE17FA26D1CBC000C58B19 /* SUInstallerLauncher+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SUInstallerLauncher+Private.h"; sourceTree = "<group>"; };
+		72EE181826DAE6E100C58B19 /* SPUUpdateCheck.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SPUUpdateCheck.h; sourceTree = "<group>"; };
 		72EF30BA2675CF38008CE987 /* SPUAppcastItemStateResolver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPUAppcastItemStateResolver.h; sourceTree = "<group>"; };
 		72EF30BB2675CF38008CE987 /* SPUAppcastItemState.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SPUAppcastItemState.m; sourceTree = "<group>"; };
 		72EF30BC2675CF38008CE987 /* SPUAppcastItemStateResolver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SPUAppcastItemStateResolver.m; sourceTree = "<group>"; };
@@ -1400,6 +1400,7 @@
 				EA1E285622B6619B004AA304 /* libed25519.a in Frameworks */,
 				EA1E281A22B645F4004AA304 /* libbsdiff.a in Frameworks */,
 				7205C4641E1306BE00E370AE /* libbz2.tbd in Frameworks */,
+				727DBAE526B5BBFD00111F0C /* ArgumentParser in Frameworks */,
 				7205C4631E1306B500E370AE /* libxar.tbd in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1498,6 +1499,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				727DBAE726B5C47800111F0C /* ArgumentParser in Frameworks */,
 				EA1E286A22B6653D004AA304 /* libed25519.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1506,6 +1508,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				727DBAE926B5C48A00111F0C /* ArgumentParser in Frameworks */,
 				EA1E287E22B66705004AA304 /* libed25519.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1600,9 +1603,7 @@
 		1420DE391962322200203BB0 /* Documentation */ = {
 			isa = PBXGroup;
 			children = (
-				1420DF4E196247B500203BB0 /* Doxyfile */,
 				721D8A891D4D273E0032E472 /* Internal */,
-				1420DF4D196247B500203BB0 /* build-docs.sh */,
 			);
 			path = Documentation;
 			sourceTree = "<group>";
@@ -1783,6 +1784,7 @@
 			isa = PBXGroup;
 			children = (
 				72F9EC421D5E9ED8004AC8B6 /* SPUDownloadData.h */,
+				721AB11626C777D900D34A86 /* SPUDownloadDataPrivate.h */,
 				72F9EC431D5E9ED8004AC8B6 /* SPUDownloadData.m */,
 				7214B8851D45AD9A00CB5CED /* SPUInstallationType.h */,
 				7293A1AC1CEE933800B957A7 /* SPUURLRequest.h */,
@@ -1958,6 +1960,7 @@
 				720E21791D0D00BF003A311C /* SPUUpdaterCycle.h */,
 				720E217A1D0D00BF003A311C /* SPUUpdaterCycle.m */,
 				72F9EC471D5EA7D3004AC8B6 /* SPUUpdaterDelegate.h */,
+				72EE181826DAE6E100C58B19 /* SPUUpdateCheck.h */,
 				726E078B1CA891E9001A286B /* SPUUpdaterSettings.h */,
 				726E078C1CA891E9001A286B /* SPUUpdaterSettings.m */,
 				72F9EC3D1D5E823F004AC8B6 /* SPUUpdaterTimer.h */,
@@ -2092,6 +2095,7 @@
 				726E07B51CAF08D6001A286B /* Info.plist */,
 				726E07B31CAF08D6001A286B /* main.m */,
 				726E07B01CAF08D6001A286B /* SUInstallerLauncher.h */,
+				72EE17FA26D1CBC000C58B19 /* SUInstallerLauncher+Private.h */,
 				726E07B11CAF08D6001A286B /* SUInstallerLauncher.m */,
 				726E07AF1CAF08D6001A286B /* SUInstallerLauncherProtocol.h */,
 				721652671D3C8FED00FD13D8 /* SUInstallerLauncherStatus.h */,
@@ -2328,6 +2332,7 @@
 				7229E1BD1C98EFF200CB50D0 /* SPUDownloadDriver.h in Headers */,
 				7267E5FD1D3DD1B700D1BF90 /* SPUResumableUpdate.h in Headers */,
 				7267E5B61D3D8AEE00D1BF90 /* SPUInstallationInfo.h in Headers */,
+				72EE181926DAE70900C58B19 /* SPUUpdateCheck.h in Headers */,
 				72B767CE1C9B924900A07552 /* SPUInstallerDriver.h in Headers */,
 				723ABF30259D062F00BDB4FA /* SULegacyWebView.h in Headers */,
 				721BC20E1D1CDE55002BC71E /* SPULocalCacheDirectory.h in Headers */,
@@ -2340,8 +2345,10 @@
 				7246E0A31C83B685003B4E75 /* SPUStandardUpdaterController.h in Headers */,
 				725CB95A1C7121830064365A /* SPUStandardUserDriver.h in Headers */,
 				726E4A371C89116000C57C6A /* SPUStandardUserDriverDelegate.h in Headers */,
+				72EE17FC26D1CC9D00C58B19 /* SPUInstallationType.h in Headers */,
 				72EF30BE2675CF38008CE987 /* SPUAppcastItemStateResolver.h in Headers */,
 				72EF30C7267C716A008CE987 /* SUAppcastItem+Private.h in Headers */,
+				72EE17FB26D1CC8800C58B19 /* SUInstallerLauncher+Private.h in Headers */,
 				61299A5C09CA6D4500B7442F /* SUConstants.h in Headers */,
 				726DF88E1C84277600188804 /* SPUUserUpdateState.h in Headers */,
 				72B767DA1C9CD2E400A07552 /* SPUUIBasedUpdateDriver.h in Headers */,
@@ -2395,20 +2402,6 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXLegacyTarget section */
-		1420DF491962329200203BB0 /* Documentation */ = {
-			isa = PBXLegacyTarget;
-			buildArgumentsString = "\"$(SRCROOT)/Documentation/build-docs.sh\" $(ACTION)";
-			buildConfigurationList = 1420DF4A1962329200203BB0 /* Build configuration list for PBXLegacyTarget "Documentation" */;
-			buildPhases = (
-			);
-			buildToolPath = bash;
-			buildWorkingDirectory = "";
-			dependencies = (
-			);
-			name = Documentation;
-			passBuildSettingsInEnvironment = 1;
-			productName = Documentation;
-		};
 		14732BC51960F69300593899 /* Distribution */ = {
 			isa = PBXLegacyTarget;
 			buildArgumentsString = "$(SRCROOT)/Configurations/make-release-package.sh $(ACTION)";
@@ -2429,7 +2422,6 @@
 				7205C46B1E13070300E370AE /* PBXTargetDependency */,
 				FA344BA724C869A300B2A401 /* PBXTargetDependency */,
 				FA344BA524C8699E00B2A401 /* PBXTargetDependency */,
-				1454BA1819637EE900344E57 /* PBXTargetDependency */,
 				895C5DC724D78F700058A82D /* PBXTargetDependency */,
 			);
 			name = Distribution;
@@ -2511,6 +2503,9 @@
 			dependencies = (
 			);
 			name = generate_appcast;
+			packageProductDependencies = (
+				727DBAE426B5BBFD00111F0C /* ArgumentParser */,
+			);
 			productName = generate_appcast;
 			productReference = 7205C43E1E13049400E370AE /* generate_appcast */;
 			productType = "com.apple.product-type.tool";
@@ -2749,6 +2744,9 @@
 			dependencies = (
 			);
 			name = generate_keys;
+			packageProductDependencies = (
+				727DBAE626B5C47800111F0C /* ArgumentParser */,
+			);
 			productName = generate_keys;
 			productReference = EA1E285E22B66487004AA304 /* generate_keys */;
 			productType = "com.apple.product-type.tool";
@@ -2766,6 +2764,9 @@
 			dependencies = (
 			);
 			name = sign_update;
+			packageProductDependencies = (
+				727DBAE826B5C48A00111F0C /* ArgumentParser */,
+			);
 			productName = sign_update;
 			productReference = EA1E287622B666EB004AA304 /* sign_update */;
 			productType = "com.apple.product-type.tool";
@@ -2906,6 +2907,9 @@
 				fa,
 			);
 			mainGroup = 0867D691FE84028FC02AAC07 /* Sparkle */;
+			packageReferences = (
+				727DBAE326B5BBFD00111F0C /* XCRemoteSwiftPackageReference "swift-argument-parser" */,
+			);
 			productRefGroup = 034768DFFF38A50411DB9C8B /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -2923,7 +2927,6 @@
 				72D9549D1CBB415B006F28BD /* sparkle-cli */,
 				721C24441CB753E6005440CB /* Installer Progress */,
 				14732BC51960F69300593899 /* Distribution */,
-				1420DF491962329200203BB0 /* Documentation */,
 				1495005F195FB89400BC5B5B /* All */,
 				895C5DC024D78E210058A82D /* XCFrameworks */,
 				726B2B5C1C645FC900388755 /* UI Tests */,
@@ -3535,11 +3538,6 @@
 			target = 61B5F90109C4CEE200B25A18 /* Sparkle Test App */;
 			targetProxy = 1454BA1519637EDB00344E57 /* PBXContainerItemProxy */;
 		};
-		1454BA1819637EE900344E57 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 1420DF491962329200203BB0 /* Documentation */;
-			targetProxy = 1454BA1719637EE900344E57 /* PBXContainerItemProxy */;
-		};
 		14732BCB1960F73500593899 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 8DC2EF4F0486A6940098B216 /* Sparkle */;
@@ -3865,18 +3863,6 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
-		1420DF4B1962329200203BB0 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-			};
-			name = Debug;
-		};
-		1420DF4C1962329200203BB0 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-			};
-			name = Release;
-		};
 		14732BC71960F69300593899 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -3937,12 +3923,6 @@
 			name = Coverage;
 		};
 		149B78601B7D398100D7D62C /* Coverage */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-			};
-			name = Coverage;
-		};
-		149B78611B7D398100D7D62C /* Coverage */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 			};
@@ -4230,7 +4210,6 @@
 			baseConfigurationReference = 72D954B01CBB41E2006F28BD /* ConfigSparkleTool.xcconfig */;
 			buildSettings = {
 				CLANG_ANALYZER_NONNULL = YES;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 			};
 			name = Debug;
 		};
@@ -4239,7 +4218,6 @@
 			baseConfigurationReference = 72D954B01CBB41E2006F28BD /* ConfigSparkleTool.xcconfig */;
 			buildSettings = {
 				CLANG_ANALYZER_NONNULL = YES;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 			};
 			name = Coverage;
 		};
@@ -4248,7 +4226,6 @@
 			baseConfigurationReference = 72D954B01CBB41E2006F28BD /* ConfigSparkleTool.xcconfig */;
 			buildSettings = {
 				CLANG_ANALYZER_NONNULL = YES;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 			};
 			name = Release;
 		};
@@ -4357,16 +4334,6 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		1420DF4A1962329200203BB0 /* Build configuration list for PBXLegacyTarget "Documentation" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				1420DF4B1962329200203BB0 /* Debug */,
-				149B78611B7D398100D7D62C /* Coverage */,
-				1420DF4C1962329200203BB0 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		14732BC61960F69300593899 /* Build configuration list for PBXLegacyTarget "Distribution" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -4588,6 +4555,35 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		727DBAE326B5BBFD00111F0C /* XCRemoteSwiftPackageReference "swift-argument-parser" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-argument-parser.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.4.3;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		727DBAE426B5BBFD00111F0C /* ArgumentParser */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 727DBAE326B5BBFD00111F0C /* XCRemoteSwiftPackageReference "swift-argument-parser" */;
+			productName = ArgumentParser;
+		};
+		727DBAE626B5C47800111F0C /* ArgumentParser */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 727DBAE326B5BBFD00111F0C /* XCRemoteSwiftPackageReference "swift-argument-parser" */;
+			productName = ArgumentParser;
+		};
+		727DBAE826B5C48A00111F0C /* ArgumentParser */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 727DBAE326B5BBFD00111F0C /* XCRemoteSwiftPackageReference "swift-argument-parser" */;
+			productName = ArgumentParser;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 0867D690FE84028FC02AAC07 /* Project object */;
 }

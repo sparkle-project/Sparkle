@@ -1,0 +1,75 @@
+name: "Create Draft Release"
+
+env:
+  BUILDDIR: "build"
+  DEVELOPER_DIR: "/Applications/Xcode_12.5.1.app/Contents/Developer"
+
+on:
+  workflow_dispatch
+
+concurrency: 
+  group: publish-release-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  release:
+    name: "Publish binaries for release"
+    runs-on: macos-11
+
+    steps:
+      - name: "Checkout sources"
+        uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.BOT_PERSONAL_ACCESS_TOKEN }}
+          submodules: true
+          fetch-depth: 0
+          
+      - name: "Extract latest changes from CHANGELOG"
+        run: |
+            ./Configurations/generate_latest_changes.py > latest-changes.txt
+
+      - name: "Extract version information from project"
+        run: |
+          MARKETING_VERSION=$(xcrun xcodebuild -showBuildSettings -project Sparkle.xcodeproj | grep -m 1 '^[[:space:]]*MARKETING_VERSION' | sed -E 's/.+=[[:space:]]+(.*)$/\1/')
+          echo "MARKETING_VERSION=${MARKETING_VERSION}" >> $GITHUB_ENV
+
+      - name: "Determine if this is a pre-release version"
+        run: |
+          SPARKLE_VERSION_SUFFIX=$(xcrun xcodebuild -showBuildSettings -project Sparkle.xcodeproj | grep -m 1 '^[[:space:]]*SPARKLE_VERSION_SUFFIX' | sed -E 's/.+=[[:space:]]+(.*)$/\1/')
+          if [[ ! -z "$SPARKLE_VERSION_SUFFIX" ]]; then
+            echo "PRERELEASE_VERSION=true" >> $GITHUB_ENV
+          else
+            echo "PRERELEASE_VERSION=false" >> $GITHUB_ENV
+          fi
+
+      - name: "Set up git and create tag"
+        run: |
+            git config user.name Sparkle-Bot
+            git config user.email sparkle.project.bot@gmail.com
+            git tag "${{ env.MARKETING_VERSION }}"
+
+      - name: "Build release distribution"
+        run: make release
+        env:
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_TOKEN: ${{ secrets.BOT_PERSONAL_ACCESS_TOKEN }}
+
+      - name: "Push the updated Swift package description"
+        env:
+            GITHUB_TOKEN: ${{ secrets.BOT_PERSONAL_ACCESS_TOKEN }}
+        run: git push
+
+      - name: "Draft a release"
+        uses: softprops/action-gh-release@v1
+        with:
+          draft: true
+          prerelease: ${{ env.PRERELEASE_VERSION }}
+          name: "Sparkle ${{ env.MARKETING_VERSION }}"
+          tag_name: ${{ env.MARKETING_VERSION }}
+          fail_on_unmatched_files: true
+          token: ${{ secrets.BOT_PERSONAL_ACCESS_TOKEN }}
+          body_path: latest-changes.txt
+          files: |
+            build/Build/Products/Release/Sparkle-*.tar.xz
+            build/Build/Products/Release/Sparkle-for-Swift-Package-Manager.zip

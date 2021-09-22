@@ -45,7 +45,7 @@ int latestMinorVersionForMajorVersion(SUBinaryDeltaMajorVersion majorVersion)
         case SUAzureMajorVersion:
             return 1;
         case SUBeigeMajorVersion:
-            return 2;
+            return 3;
     }
     return 0;
 }
@@ -137,15 +137,6 @@ static BOOL _hashOfFileContents(unsigned char *hash, FTSENT *ent)
     return YES;
 }
 
-NSData *hashOfFileContents(FTSENT *ent)
-{
-    unsigned char fileHash[CC_SHA1_DIGEST_LENGTH];
-    if (!_hashOfFileContents(fileHash, ent)) {
-        return nil;
-    }
-    return [NSData dataWithBytes:fileHash length:CC_SHA1_DIGEST_LENGTH];
-}
-
 NSString *hashOfTreeWithVersion(NSString *path, uint16_t majorVersion)
 {
     char pathBuffer[PATH_MAX] = { 0 };
@@ -190,6 +181,11 @@ NSString *hashOfTreeWithVersion(NSString *path, uint16_t majorVersion)
 
         if (MAJOR_VERSION_IS_AT_LEAST(majorVersion, SUBeigeMajorVersion)) {
             uint16_t mode = ent->fts_statp->st_mode;
+            // permission of symlinks is irrelevant and can't be changed.
+            // hardcoding a value helps avoid differences between filesystems.
+            if (ent->fts_info == FTS_SL) {
+                mode = 0755;
+            }
             uint16_t type = ent->fts_info;
             uint16_t permissions = mode & PERMISSION_FLAGS;
 

@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "SPUUpdateDriver.h"
 #import "SPUUserUpdateState.h"
+#import "SPUUpdateCheck.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -49,17 +50,15 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface SPUCoreBasedUpdateDriver : NSObject
 
-- (instancetype)initWithHost:(SUHost *)host applicationBundle:(NSBundle *)applicationBundle sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater updaterDelegate:(nullable id <SPUUpdaterDelegate>)updaterDelegate delegate:(id<SPUCoreBasedUpdateDriverDelegate>)delegate;
+- (instancetype)initWithHost:(SUHost *)host applicationBundle:(NSBundle *)applicationBundle updateCheck:(SPUUpdateCheck)updateCheck updater:(id)updater updaterDelegate:(nullable id <SPUUpdaterDelegate>)updaterDelegate delegate:(id<SPUCoreBasedUpdateDriverDelegate>)delegate;
 
-- (void)prepareCheckForUpdatesWithCompletion:(SPUUpdateDriverCompletion)completionBlock;
-
-- (void)preflightForUpdatePermissionPreventingInstallerInteraction:(BOOL)preventsInstallerInteraction reply:(void (^)(NSError * _Nullable))reply;
+- (void)setCompletionHandler:(SPUUpdateDriverCompletion)completionBlock;
 
 - (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background requiresSilentInstall:(BOOL)silentInstall;
 
-- (void)resumeInstallingUpdateWithCompletion:(SPUUpdateDriverCompletion)completionBlock;
+- (void)resumeInstallingUpdate;
 
-- (void)resumeUpdate:(id<SPUResumableUpdate>)resumableUpdate completion:(SPUUpdateDriverCompletion)completionBlock;
+- (void)resumeUpdate:(id<SPUResumableUpdate>)resumableUpdate;
 
 - (void)downloadUpdateFromAppcastItem:(SUAppcastItem *)updateItem secondaryAppcastItem:(SUAppcastItem * _Nullable)secondaryUpdateItem inBackground:(BOOL)background;
 

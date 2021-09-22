@@ -12,7 +12,7 @@
 #import "SPUXPCServiceInfo.h"
 #import "SPUUpdaterDelegate.h"
 #import "SUAppcastItem.h"
-#import "SULog.h"
+#import "SUAppcastItem+Private.h"
 #import "SULocalizations.h"
 #import "SUErrors.h"
 #import "SUHost.h"
@@ -41,7 +41,6 @@
 
 @property (nonatomic, readonly) SUHost *host;
 @property (nonatomic, readonly) NSBundle *applicationBundle;
-@property (nonatomic, readonly) NSBundle *sparkleBundle;
 @property (nonatomic, weak, readonly) id<SPUInstallerDriverDelegate> delegate;
 @property (nonatomic) SPUInstallerMessageType currentStage;
 @property (nonatomic) BOOL startedInstalling;
@@ -69,7 +68,6 @@
 
 @synthesize host = _host;
 @synthesize applicationBundle = _applicationBundle;
-@synthesize sparkleBundle = _sparkleBundle;
 @synthesize delegate = _delegate;
 @synthesize currentStage = _currentStage;
 @synthesize startedInstalling = _startedInstalling;
@@ -86,13 +84,12 @@
 @synthesize aborted = _aborted;
 @synthesize installerError = _installerError;
 
-- (instancetype)initWithHost:(SUHost *)host applicationBundle:(NSBundle *)applicationBundle sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater updaterDelegate:(id<SPUUpdaterDelegate>)updaterDelegate delegate:(nullable id<SPUInstallerDriverDelegate>)delegate
+- (instancetype)initWithHost:(SUHost *)host applicationBundle:(NSBundle *)applicationBundle updater:(id)updater updaterDelegate:(id<SPUUpdaterDelegate>)updaterDelegate delegate:(nullable id<SPUInstallerDriverDelegate>)delegate
 {
     self = [super init];
     if (self != nil) {
         _host = host;
         _applicationBundle = applicationBundle;
-        _sparkleBundle = sparkleBundle;
         _updater = updater;
         _updaterDelegate = updaterDelegate;
         _delegate = delegate;
@@ -144,7 +141,7 @@
 }
 
 // This can be called multiple times (eg: if a delta update fails, this may be called again with a regular update item)
-- (void)extractDownloadedUpdate:(SPUDownloadedUpdate *)downloadedUpdate silently:(BOOL)silently preventsInstallerInteraction:(BOOL)preventsInstallerInteraction completion:(void (^)(NSError * _Nullable))completionHandler
+- (void)extractDownloadedUpdate:(SPUDownloadedUpdate *)downloadedUpdate silently:(BOOL)silently completion:(void (^)(NSError * _Nullable))completionHandler
 {
     self.updateItem = downloadedUpdate.updateItem;
     self.temporaryDirectory = downloadedUpdate.temporaryDirectory;
@@ -153,7 +150,7 @@
     self.currentStage = SPUInstallerNotStarted;
     
     if (self.installerConnection == nil) {
-        [self launchAutoUpdateSilently:silently preventsInstallerInteraction:preventsInstallerInteraction completion:completionHandler];
+        [self launchAutoUpdateSilently:silently completion:completionHandler];
     } else {
         // The Install tool is already alive; just send out installation input data again
         [self sendInstallationData];
@@ -320,74 +317,7 @@
     }
 }
 
-- (void)checkIfApplicationInstallationRequiresAuthorizationWithReply:(void (^)(BOOL requiresAuthorization))reply
-{
-    id<SUInstallerLauncherProtocol> installerLauncher = nil;
-    __block BOOL madeReply = NO;
-    NSXPCConnection *launcherConnection = nil;
-    
-    if (!SPUXPCServiceExists(@INSTALLER_LAUNCHER_BUNDLE_ID)) {
-        installerLauncher = [[SUInstallerLauncher alloc] init];
-    } else {
-        launcherConnection = [[NSXPCConnection alloc] initWithServiceName:@INSTALLER_LAUNCHER_BUNDLE_ID];
-        launcherConnection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SUInstallerLauncherProtocol)];
-        
-        launcherConnection.interruptionHandler = ^{
-            dispatch_async(dispatch_get_main_queue(), ^{
-                if (!madeReply) {
-                    // We'll break the retain cycle in the invalidation handler
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Warc-retain-cycles"
-                    [launcherConnection invalidate];
-#pragma clang diagnostic pop
-                }
-            });
-        };
-        
-        launcherConnection.invalidationHandler = ^{
-            dispatch_async(dispatch_get_main_queue(), ^{
-#pragma clang diagnostic push
-#if __has_warning("-Wcompletion-handler")
-#pragma clang diagnostic ignored "-Wcompletion-handler"
-#endif
-                if (!madeReply) {
-#pragma clang diagnostic pop
-                    // If something went horribly wrong, just guess that we won't require authorization
-                    reply(NO);
-                    
-                    // Break the retain cycle
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Warc-retain-cycles"
-                    launcherConnection.interruptionHandler = nil;
-                    launcherConnection.invalidationHandler = nil;
-#pragma clang diagnostic pop
-                }
-            });
-        };
-        
-        [launcherConnection resume];
-        
-        installerLauncher = launcherConnection.remoteObjectProxy;
-    }
-    
-    [installerLauncher checkIfApplicationInstallationRequiresAuthorizationWithHostBundlePath:self.host.bundlePath reply:^(BOOL requiresAuthorization) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-#pragma clang diagnostic push
-#if __has_warning("-Wcompletion-handler")
-#pragma clang diagnostic ignored "-Wcompletion-handler"
-#endif
-            if (!madeReply) {
-#pragma clang diagnostic pop
-                madeReply = YES;
-                [launcherConnection invalidate];
-                
-                reply(requiresAuthorization);
-            }
-        });
-    }];
-}
-
-- (void)launchAutoUpdateSilently:(BOOL)silently preventsInstallerInteraction:(BOOL)preventsInstallerInteraction completion:(void (^)(NSError *_Nullable))completionHandler
+- (void)launchAutoUpdateSilently:(BOOL)silently completion:(void (^)(NSError *_Nullable))completionHandler
 {
     id<SUInstallerLauncherProtocol> installerLauncher = nil;
     __block BOOL retrievedLaunchStatus = NO;
@@ -476,7 +406,7 @@
         mainBundleIdentifier = (bundleIdentifier == nil) ? mainBundleName : bundleIdentifier;
     }
     
-    [installerLauncher launchInstallerWithHostBundlePath:hostBundlePath updaterIdentifier:mainBundleIdentifier authorizationPrompt:authorizationPrompt installationType:installationType allowingDriverInteraction:driverAllowsInteraction allowingUpdaterInteraction:!preventsInstallerInteraction completion:^(SUInstallerLauncherStatus result, BOOL systemDomain) {
+    [installerLauncher launchInstallerWithHostBundlePath:hostBundlePath updaterIdentifier:mainBundleIdentifier authorizationPrompt:authorizationPrompt installationType:installationType allowingDriverInteraction:driverAllowsInteraction completion:^(SUInstallerLauncherStatus result, BOOL systemDomain) {
         dispatch_async(dispatch_get_main_queue(), ^{
             retrievedLaunchStatus = YES;
             [launcherConnection invalidate];

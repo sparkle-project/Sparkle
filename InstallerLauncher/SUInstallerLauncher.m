@@ -7,6 +7,7 @@
 //
 
 #import "SUInstallerLauncher.h"
+#import "SUInstallerLauncher+Private.h"
 #import "SUFileManager.h"
 #import "SULog.h"
 #import "SPUMessageTypes.h"
@@ -315,7 +316,44 @@
     return resolvedAuxiliaryToolURL.path;
 }
 
-static BOOL SPUNeedsSystemAuthorizationAccess(NSString *path, NSString *installationType)
+BOOL SPUSystemNeedsAuthorizationAccessForBundlePath(NSString *bundlePath)
+{
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    BOOL hasWritability = [fileManager isWritableFileAtPath:bundlePath] && [fileManager isWritableFileAtPath:[bundlePath stringByDeletingLastPathComponent]];
+    
+    BOOL needsAuthorization;
+    if (!hasWritability) {
+        needsAuthorization = YES;
+    } else {
+        // Just because we have writability access does not mean we can set the correct owner/group
+        // Test if we can set the owner/group on a temporarily created file
+        // If we can, then we can probably perform an update without authorization
+        
+        NSString *tempFilename = @"permission_test" ;
+        
+        SUFileManager *suFileManager = [[SUFileManager alloc] init];
+        NSURL *tempDirectoryURL = [suFileManager makeTemporaryDirectoryWithPreferredName:tempFilename appropriateForDirectoryURL:[NSURL fileURLWithPath:NSTemporaryDirectory()] error:NULL];
+        
+        if (tempDirectoryURL == nil) {
+            // I don't imagine this ever happening but in case it does, requesting authorization may be the better option
+            needsAuthorization = YES;
+        } else {
+            NSURL *tempFileURL = [tempDirectoryURL URLByAppendingPathComponent:tempFilename];
+            if (![[NSData data] writeToURL:tempFileURL atomically:NO]) {
+                // Obvious indicator we may need authorization
+                needsAuthorization = YES;
+            } else {
+                needsAuthorization = ![suFileManager changeOwnerAndGroupOfItemAtRootURL:tempFileURL toMatchURL:[NSURL fileURLWithPath:bundlePath] error:NULL];
+            }
+            
+            [suFileManager removeItemAtURL:tempDirectoryURL error:NULL];
+        }
+    }
+    
+    return needsAuthorization;
+}
+
+static BOOL SPUSystemNeedsAuthorizationAccess(NSString *path, NSString *installationType)
 {
     BOOL needsAuthorization;
     if ([installationType isEqualToString:SPUInstallationTypeGuidedPackage]) {
@@ -323,63 +361,23 @@ static BOOL SPUNeedsSystemAuthorizationAccess(NSString *path, NSString *installa
     } else if ([installationType isEqualToString:SPUInstallationTypeInteractivePackage]) {
         needsAuthorization = NO;
     } else {
-        NSFileManager *fileManager = [NSFileManager defaultManager];
-        BOOL hasWritability = [fileManager isWritableFileAtPath:path] && [fileManager isWritableFileAtPath:[path stringByDeletingLastPathComponent]];
-        if (!hasWritability) {
-            needsAuthorization = YES;
-        } else {
-            // Just because we have writability access does not mean we can set the correct owner/group
-            // Test if we can set the owner/group on a temporarily created file
-            // If we can, then we can probably perform an update without authorization
-            
-            NSString *tempFilename = @"permission_test" ;
-            
-            SUFileManager *suFileManager = [[SUFileManager alloc] init];
-            NSURL *tempDirectoryURL = [suFileManager makeTemporaryDirectoryWithPreferredName:tempFilename appropriateForDirectoryURL:[NSURL fileURLWithPath:NSTemporaryDirectory()] error:NULL];
-            
-            if (tempDirectoryURL == nil) {
-                // I don't imagine this ever happening but in case it does, requesting authorization may be the better option
-                needsAuthorization = YES;
-            } else {
-                NSURL *tempFileURL = [tempDirectoryURL URLByAppendingPathComponent:tempFilename];
-                if (![[NSData data] writeToURL:tempFileURL atomically:NO]) {
-                    // Obvious indicator we may need authorization
-                    needsAuthorization = YES;
-                } else {
-                    needsAuthorization = ![suFileManager changeOwnerAndGroupOfItemAtRootURL:tempFileURL toMatchURL:[NSURL fileURLWithPath:path] error:NULL];
-                }
-                
-                [suFileManager removeItemAtURL:tempDirectoryURL error:NULL];
-            }
-        }
+        needsAuthorization = SPUSystemNeedsAuthorizationAccessForBundlePath(path);
     }
     return needsAuthorization;
 }
 
 
 // Note: do not pass untrusted information such as paths to the installer and progress agent tools, when we can find them ourselves here
-- (void)launchInstallerWithHostBundlePath:(NSString *)hostBundlePath updaterIdentifier:(NSString *)updaterIdentifier authorizationPrompt:(NSString *)authorizationPrompt installationType:(NSString *)installationType allowingDriverInteraction:(BOOL)allowingDriverInteraction allowingUpdaterInteraction:(BOOL)allowingUpdaterInteraction completion:(void (^)(SUInstallerLauncherStatus, BOOL))completionHandler
+- (void)launchInstallerWithHostBundlePath:(NSString *)hostBundlePath updaterIdentifier:(NSString *)updaterIdentifier authorizationPrompt:(NSString *)authorizationPrompt installationType:(NSString *)installationType allowingDriverInteraction:(BOOL)allowingDriverInteraction completion:(void (^)(SUInstallerLauncherStatus, BOOL))completionHandler
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        BOOL needsSystemAuthorization = SPUNeedsSystemAuthorizationAccess(hostBundlePath, installationType);
+        BOOL needsSystemAuthorization = SPUSystemNeedsAuthorizationAccess(hostBundlePath, installationType);
         
         NSBundle *hostBundle = [NSBundle bundleWithPath:hostBundlePath];
         if (hostBundle == nil) {
             SULog(SULogLevelError, @"InstallerLauncher failed to create bundle at %@", hostBundlePath);
             SULog(SULogLevelError, @"Please make sure InstallerLauncher is not sandboxed and do not sign your app by passing --deep. Check: codesign -d --entitlements :- \"%@\"", NSBundle.mainBundle.bundlePath);
             SULog(SULogLevelError, @"More information regarding sandboxing: https://sparkle-project.org/documentation/sandboxing/");
-            completionHandler(SUInstallerLauncherFailure, needsSystemAuthorization);
-            return;
-        }
-        
-        if (needsSystemAuthorization && !allowingUpdaterInteraction) {
-            SULog(SULogLevelError, @"Updater is not allowing interaction to the launcher.");
-            completionHandler(SUInstallerLauncherFailure, needsSystemAuthorization);
-            return;
-        }
-        
-        if (!allowingUpdaterInteraction && [installationType isEqualToString:SPUInstallationTypeInteractivePackage]) {
-            SULog(SULogLevelError, @"Updater is not allowing interaction to the launcher for performing an interactive type package installation.");
             completionHandler(SUInstallerLauncherFailure, needsSystemAuthorization);
             return;
         }
@@ -460,12 +458,6 @@ static BOOL SPUNeedsSystemAuthorizationAccess(NSString *path, NSString *installa
             completionHandler(submittedProgressTool ? SUInstallerLauncherSuccess : SUInstallerLauncherFailure, needsSystemAuthorization);
         }
     });
-}
-
-- (void)checkIfApplicationInstallationRequiresAuthorizationWithHostBundlePath:(NSString *)hostBundlePath reply:(void(^)(BOOL))reply
-{
-    // No need to execute on main queue
-    reply(SPUNeedsSystemAuthorizationAccess(hostBundlePath, SPUInstallationTypeApplication));
 }
 
 @end

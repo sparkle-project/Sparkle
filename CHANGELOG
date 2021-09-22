@@ -45,6 +45,19 @@ Please visit [Sparkle's website](http://sparkle-project.org) for more informatio
 
 If you are migrating from earlier alpha versions of Sparkle 2, please re-familiarize yourself with the [Sandboxing guide](https://sparkle-project.org/documentation/sandboxing/). Some of the XPC Services are now optional and integration with code signing has been simplified. The SPUUserDriver protocol for custom user interfaces has been greatly simplified too.
 
+# 1.27.0
+
+ * Deprecate not using EdDSA and skip DSA verification when possible in #1892 (Zorg)
+ * Pass http headers and user agent when downloading release notes from #1873 (Zorg)
+ * Fix project warnings from #1893 (Zorg)
+ * Update sample appcast from #1895 (Zorg)
+ * Fix appcast pubDate tag generation in different locales from #1898 (Sungbin Jo)
+ * Create valid xar archives for generating binary delta files from #1906 (Zorg)
+ * Fix a few issues with German localization from #1931 (J-rg)
+ * Fix issues with Russian localizations from #1947 (Konstantin Zamyakin)
+ * Fix issues with Czech localizations from #1943 (Vojtěch Koňařík)
+ * Add an automated workflow that builds and publishes official Sparkle releases (Tony Arnold, Zorg)
+
 # 1.26.0
 
  * Flat package support from #1745 (Zorg)

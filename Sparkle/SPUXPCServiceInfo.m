@@ -25,22 +25,35 @@ BOOL SPUXPCValidateServiceIfBundleExists(NSString *bundleName, NSBundle *sparkle
     if (xpcBundle == nil) {
         return YES;
     }
-    
-    // Sometimes in debug the short version where we append a git hash is not available,
-    // so if our CFBundleVersion == CFBundleShortVersionString, we will compare to CURRENT_PROJECT_VERSION,
-    // Otherwise if git hash is correctly appended, we will compare to short version string of Sparkle framework
-    NSString *bundleVersion = [xpcBundle objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey];
-    NSString *version = [xpcBundle objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
-    
-    NSString *projectVersion = [bundleVersion isEqualToString:version] ? @""CURRENT_PROJECT_VERSION : [sparkleBundle objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
-    
-    if (version == nil || projectVersion == nil || ![version isEqualToString:projectVersion]) {
+
+#if DEBUG
+        // Post install scripts for appending git hash info to CFBundleShortVersionString are too unreliable to verify for debug/development
+        // Fortunately debug builds of Sparkle are not usable in a production environment
+    (void)sparkleBundle; // Mark parameter as used
+#else
+        // Make sure the display versions of Sparkle and the XPC bundle match
+        // These versions may contain a git hash identifier if built from the Sparkle repository
+    NSString *sparkleDisplayVersion = [sparkleBundle objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
+    NSString *xpcDisplayVersion = [xpcBundle objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
+
+    if (sparkleDisplayVersion == nil || xpcDisplayVersion == nil || ![sparkleDisplayVersion isEqualToString:xpcDisplayVersion]) {
         if (error != NULL) {
-            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInvalidUpdaterError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"XPC Version mismatch. Framework display version is %@ but XPC Service (%@) display version is %@. Bundled XPC Service cannot be used.", projectVersion, xpcBundle.bundlePath, version] }];
+            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInvalidUpdaterError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"XPC Version mismatch. Framework display version is %@ but XPC Service (%@) display version is %@. Bundled XPC Service cannot be used.", sparkleDisplayVersion, xpcBundle.bundlePath, xpcDisplayVersion] }];
         }
         return NO;
     }
-    
+#endif
+
+        // Make sure the bundle versions of Sparkle and the XPC bundle match
+    NSString *xpcBundleVersion = [xpcBundle objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey];
+
+    if (xpcBundleVersion == nil || ![xpcBundleVersion isEqualToString:@""CURRENT_PROJECT_VERSION]) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInvalidUpdaterError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"XPC Version mismatch. Framework bundle version is %@ but XPC Service (%@) bundle version is %@. Bundled XPC Service cannot be used.", @""CURRENT_PROJECT_VERSION, xpcBundle.bundlePath, xpcBundleVersion] }];
+        }
+        return NO;
+    }
+
     return YES;
 }
 

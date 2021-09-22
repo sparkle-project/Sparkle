@@ -32,7 +32,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-/*!
+/**
     Sparkle's default version comparator.
 
     This comparator is adapted from MacPAD, by Kevin Ballard.
@@ -41,24 +41,29 @@ NS_ASSUME_NONNULL_BEGIN
 */
 SU_EXPORT @interface SUStandardVersionComparator : NSObject <SUVersionComparison>
 
-/*!
+/**
     Initializes a new instance of the standard version comparator.
 */
 - (instancetype)init;
 
-/*!
-    Returns a singleton instance of the comparator.
-
-    It is usually preferred to alloc/init new a comparator instead.
+/**
+    A singleton instance of the comparator.
  */
-+ (SUStandardVersionComparator *)defaultComparator;
+@property (nonatomic, class, readonly) SUStandardVersionComparator *defaultComparator;
 
-/*!
-    Compares version strings through textual analysis.
-
-    See the implementation for more details.
+/**
+    Compares two version strings through textual analysis.
+ 
+    These version strings should be in the format of x, x.y, or x.y.z where each component is a number.
+    For example, valid version strings include "1.5.3", "500", or "4000.1"
+    These versions that are compared correspond to the @c CFBundleVersion values of the updates.
+ 
+    @param versionA The first version string to compare.
+    @param versionB The second version string to compare.
+    @return A comparison result between @c versionA and @c versionB
 */
 - (NSComparisonResult)compareVersion:(NSString *)versionA toVersion:(NSString *)versionB;
+
 @end
 
 NS_ASSUME_NONNULL_END

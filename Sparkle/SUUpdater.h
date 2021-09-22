@@ -26,13 +26,12 @@
 
 @protocol SUUpdaterDelegate;
 
-/*!
- The main API in Sparkle for controlling the update mechanism.
+/**
+ The legacy API in Sparkle for controlling the update mechanism.
 
- This class is used to configure the update paramters as well as manually
- and automatically schedule and control checks for updates.
+ This class is now deprecated and acts as a thin wrapper around `SPUUpdater` and `SPUStandardUserDriver`.
  
- Note: This class is now deprecated and acts as a thin wrapper around SPUUpdater and SPUStandardUserDriver
+ If you are migrating to Sparkle 2, use `SPUStandardUpdaterController` instead, or `SPUUpdater` if you need more control.
  */
 __deprecated_msg("Deprecated in Sparkle 2. Use SPUStandardUpdaterController instead, or SPUUpdater if you need more control.")
 SU_EXPORT @interface SUUpdater : NSObject

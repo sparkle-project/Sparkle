@@ -17,7 +17,7 @@ class SUAppcastTest: XCTestCase {
         do {
             let testData = try Data(contentsOf: testURL)
             
-            let versionComparator = SUStandardVersionComparator.default()
+            let versionComparator = SUStandardVersionComparator.default
             let hostVersion = "1.0"
             let stateResolver = SPUAppcastItemStateResolver(hostVersion: hostVersion, applicationVersionComparator: versionComparator, standardVersionComparator: versionComparator)
             
@@ -86,7 +86,7 @@ class SUAppcastTest: XCTestCase {
         do {
             let testData = try Data(contentsOf: testURL)
             
-            let versionComparator = SUStandardVersionComparator.default()
+            let versionComparator = SUStandardVersionComparator.default
             let hostVersion = "1.0"
             let stateResolver = SPUAppcastItemStateResolver(hostVersion: hostVersion, applicationVersionComparator: versionComparator, standardVersionComparator: versionComparator)
             
@@ -144,7 +144,7 @@ class SUAppcastTest: XCTestCase {
         do {
             let testData = try Data(contentsOf: testURL)
             
-            let versionComparator = SUStandardVersionComparator.default()
+            let versionComparator = SUStandardVersionComparator.default
             
             // If critical update version is 1.5 and host version is 1.0, update should be marked critical
             do {
@@ -184,7 +184,7 @@ class SUAppcastTest: XCTestCase {
         do {
             let testData = try Data(contentsOf: testURL)
             
-            let versionComparator = SUStandardVersionComparator.default()
+            let versionComparator = SUStandardVersionComparator.default
             
             // Test informational updates from version 1.0
             do {
@@ -200,7 +200,7 @@ class SUAppcastTest: XCTestCase {
                 
                 // Test delta updates inheriting informational only updates
                 do {
-                    let deltaUpdate = appcast.items[2].deltaUpdates!["2.0"] as! SUAppcastItem
+                    let deltaUpdate = appcast.items[2].deltaUpdates!["2.0"]!
                     XCTAssertTrue(deltaUpdate.isInformationOnlyUpdate)
                 }
             }
@@ -612,7 +612,7 @@ class SUAppcastTest: XCTestCase {
         do {
             let testFileData = try Data(contentsOf: testFileUrl)
             
-            let stateResolver = SPUAppcastItemStateResolver(hostVersion: "1.0", applicationVersionComparator: SUStandardVersionComparator.default(), standardVersionComparator: SUStandardVersionComparator.default())
+            let stateResolver = SPUAppcastItemStateResolver(hostVersion: "1.0", applicationVersionComparator: SUStandardVersionComparator.default, standardVersionComparator: SUStandardVersionComparator.default)
             
             let appcast = try SUAppcast(xmlData: testFileData, relativeTo: testFileUrl, stateResolver: stateResolver)
             let items = appcast.items
@@ -628,7 +628,7 @@ class SUAppcastTest: XCTestCase {
         let testData = NSData(contentsOfFile: testFile)!
 
         do {
-            let stateResolver = SPUAppcastItemStateResolver(hostVersion: "1.0", applicationVersionComparator: SUStandardVersionComparator.default(), standardVersionComparator: SUStandardVersionComparator.default())
+            let stateResolver = SPUAppcastItemStateResolver(hostVersion: "1.0", applicationVersionComparator: SUStandardVersionComparator.default, standardVersionComparator: SUStandardVersionComparator.default)
             
             let appcast = try SUAppcast(xmlData: testData as Data, relativeTo: nil, stateResolver: stateResolver)
             let items = appcast.items
@@ -652,7 +652,7 @@ class SUAppcastTest: XCTestCase {
         do {
             let baseURL = URL(string: "https://fake.sparkle-project.org/updates/index.xml")!
             
-            let stateResolver = SPUAppcastItemStateResolver(hostVersion: "1.0", applicationVersionComparator: SUStandardVersionComparator.default(), standardVersionComparator: SUStandardVersionComparator.default())
+            let stateResolver = SPUAppcastItemStateResolver(hostVersion: "1.0", applicationVersionComparator: SUStandardVersionComparator.default, standardVersionComparator: SUStandardVersionComparator.default)
             
             let appcast = try SUAppcast(xmlData: testData as Data, relativeTo: baseURL, stateResolver: stateResolver)
             let items = appcast.items

@@ -6,7 +6,7 @@
 //  Copyright 2010 Dragon Systems Software Limited. All rights reserved.
 //
 
-/*!
+/**
 # Sparkle Guided Installations
 
 A guided installation allows Sparkle to download and install a package (pkg) or multi-package (mpkg) without user interaction.

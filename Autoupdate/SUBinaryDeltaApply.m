@@ -186,6 +186,9 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
         // Don't use -[NSFileManager fileExistsAtPath:] because it will follow symbolic links
         BOOL fileExisted = verbose && [fileManager attributesOfItemAtPath:destinationFilePath error:nil];
         BOOL removedFile = NO;
+        
+        // Files that have no property set that we check for will get ignored
+        // This is important because they aren't part of the delta, just part of the directory structure
 
         const char *value;
         if (!xar_prop_get(file, DELETE_KEY, &value) || (!hasExtractKeyAvailable && !xar_prop_get(file, DELETE_THEN_EXTRACT_OLD_KEY, &value))) {

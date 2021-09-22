@@ -29,19 +29,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface SPUUIBasedUpdateDriver : NSObject
 
-- (instancetype)initWithHost:(SUHost *)host applicationBundle:(NSBundle *)applicationBundle sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater userDriver:(id <SPUUserDriver>)userDriver userInitiated:(BOOL)userInitiated updaterDelegate:(nullable id <SPUUpdaterDelegate>)updaterDelegate delegate:(id<SPUUIBasedUpdateDriverDelegate>)delegate;
+- (instancetype)initWithHost:(SUHost *)host applicationBundle:(NSBundle *)applicationBundle updater:(id)updater userDriver:(id <SPUUserDriver>)userDriver userInitiated:(BOOL)userInitiated updaterDelegate:(nullable id <SPUUpdaterDelegate>)updaterDelegate delegate:(id<SPUUIBasedUpdateDriverDelegate>)delegate;
 
-- (void)prepareCheckForUpdatesWithCompletion:(SPUUpdateDriverCompletion)completionBlock;
-
-- (void)preflightForUpdatePermissionPreventingInstallerInteraction:(BOOL)preventsInstallerInteraction reply:(void (^)(NSError * _Nullable))reply;
+- (void)setCompletionHandler:(SPUUpdateDriverCompletion)completionBlock;
 
 - (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background;
 
-- (void)resumeInstallingUpdateWithCompletion:(SPUUpdateDriverCompletion)completionBlock;
+- (void)resumeInstallingUpdate;
 
-- (void)resumeUpdate:(id<SPUResumableUpdate>)resumableUpdate completion:(SPUUpdateDriverCompletion)completionBlock;
+- (void)resumeUpdate:(id<SPUResumableUpdate>)resumableUpdate;
 
-- (void)abortUpdateWithError:(nullable NSError *)error;
+- (void)abortUpdateWithError:(nullable NSError *)error showErrorToUser:(BOOL)showedUserProgress;
 
 @end
 

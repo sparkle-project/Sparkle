@@ -8,8 +8,9 @@
 
 import Foundation
 import Security
+import ArgumentParser
 
-func findKeysInKeychain() -> (Data, Data) {
+func findKeysInKeychain() throws -> (Data, Data) {
     var item: CFTypeRef?
     let res = SecItemCopyMatching([
         kSecClass as String: kSecClassGenericPassword,
@@ -30,25 +31,25 @@ func findKeysInKeychain() -> (Data, Data) {
     } else if res == errSecInteractionNotAllowed {
         print("ERROR! The operating system has blocked access to the Keychain.")
     } else {
-        print("ERROR! Unable to access required key in the Keychain", res, "(you can look it up at osstatus.com)")
+        print("ERROR! Unable to access required key in the Keychain: \(res) (you can look it up at osstatus.com)")
     }
-    exit(1)
+    throw ExitCode.failure
 }
 
 func findKeys(inFile privateAndPublicBase64KeyFile: String) throws -> (Data, Data) {
     let privateAndPublicBase64Key = try String(contentsOfFile: privateAndPublicBase64KeyFile)
-    return findKeys(inString: privateAndPublicBase64Key)
+    return try findKeys(inString: privateAndPublicBase64Key)
 }
 
-func findKeys(inString privateAndPublicBase64Key: String) -> (Data, Data) {
+func findKeys(inString privateAndPublicBase64Key: String) throws -> (Data, Data) {
     guard let privateAndPublicKey = Data(base64Encoded: privateAndPublicBase64Key.trimmingCharacters(in: .whitespacesAndNewlines), options: .init()) else {
         print("ERROR! Failed to decode base64 encoded key data from: \(privateAndPublicBase64Key)")
-        exit(1)
+        throw ExitCode.failure
     }
     
     guard privateAndPublicKey.count == 64 + 32 else {
         print("ERROR! Imported key must be 96 bytes decoded. Instead it is \(privateAndPublicKey.count) bytes decoded.")
-        exit(1)
+        throw ExitCode.failure
     }
     
     let publicKey = privateAndPublicKey[64...]
@@ -68,30 +69,41 @@ func edSignature(data: Data, publicEdKey: Data, privateEdKey: Data) -> String {
     return Data(output).base64EncodedString()
 }
 
-let args = CommandLine.arguments
-if args.count != 2 && args.count != 4 {
-    print("Usage: \(args[0]) <archive to sign> [-f <private_key_file> | -s <private_key>]\nPrivate EdDSA (ed25519) key is automatically read from the Keychain if no <private_key_file> or <private_key> is given.\n")
-    exit(1)
-}
-
-do {
-    let (priv, pub): (Data, Data)
-    let mode = args.count > 2 ? args[2] : nil
+struct SignUpdate: ParsableCommand {
+    @Argument(help: "The update archive, delta update, or package (pkg) to sign.")
+    var updatePath: String
     
-    switch mode {
-    case .some("-f"):
-        (priv, pub) = try findKeys(inFile: args[3])
-        
-    case .some("-s"):
-        (priv, pub) = findKeys(inString: args[3])
-        
-    default:
-        (priv, pub) = findKeysInKeychain()
+    @Option(name: .customShort("s"), help: ArgumentHelp("The private EdDSA (ed25519) key.", valueName: "private-key"))
+    var privateKey: String?
+    
+    @Option(name: .customShort("f"), help: ArgumentHelp("Path to the file containing the private EdDSA (ed25519) key.", valueName: "private-key-file"))
+    var privateKeyFile: String?
+    
+    static var configuration: CommandConfiguration = CommandConfiguration(
+        abstract: "Sign an update using your private EdDSA (ed25519) key.",
+        discussion: "The private EdDSA key is automatically read from the Keychain if no <private-key> or <private-key-file> is specified.\n\nThis tool will output an EdDSA signature and length attributes to use for your update's appcast item enclosure.")
+    
+    func validate() throws {
+        guard privateKey == nil || privateKeyFile == nil else {
+            throw ValidationError("Both -s <private-key> and -f <private-key-file> options cannot be provided.")
+        }
     }
     
-    let data = try Data.init(contentsOf: URL.init(fileURLWithPath: args[1]), options: .mappedIfSafe)
-    let sig = edSignature(data: data, publicEdKey: pub, privateEdKey: priv)
-    print("sparkle:edSignature=\"\(sig)\" length=\"\(data.count)\"")
-} catch {
-    print("ERROR: ", error)
+    func run() throws {
+        let (priv, pub): (Data, Data)
+        
+        if let privateKey = privateKey {
+            (priv, pub) = try findKeys(inString: privateKey)
+        } else if let privateKeyFile = privateKeyFile {
+            (priv, pub) = try findKeys(inFile: privateKeyFile)
+        } else {
+            (priv, pub) = try findKeysInKeychain()
+        }
+    
+        let data = try Data.init(contentsOf: URL.init(fileURLWithPath: updatePath), options: .mappedIfSafe)
+        let sig = edSignature(data: data, publicEdKey: pub, privateEdKey: priv)
+        print("sparkle:edSignature=\"\(sig)\" length=\"\(data.count)\"")
+    }
 }
+
+SignUpdate.main()

@@ -31,50 +31,52 @@
 @synthesize showingUpdate = _showingUpdate;
 @synthesize aborted = _aborted;
 
-- (instancetype)initWithHost:(SUHost *)host applicationBundle:(NSBundle *)applicationBundle sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater userDriver:(id <SPUUserDriver>)userDriver updaterDelegate:(nullable id <SPUUpdaterDelegate>)updaterDelegate
+- (instancetype)initWithHost:(SUHost *)host applicationBundle:(NSBundle *)applicationBundle updater:(id)updater userDriver:(id <SPUUserDriver>)userDriver updaterDelegate:(nullable id <SPUUpdaterDelegate>)updaterDelegate
 {
     self = [super init];
     if (self != nil) {
-        _uiDriver = [[SPUUIBasedUpdateDriver alloc] initWithHost:host applicationBundle:applicationBundle sparkleBundle:sparkleBundle updater:updater userDriver:userDriver userInitiated:YES updaterDelegate:updaterDelegate delegate:self];
+        _uiDriver = [[SPUUIBasedUpdateDriver alloc] initWithHost:host applicationBundle:applicationBundle updater:updater userDriver:userDriver userInitiated:YES updaterDelegate:updaterDelegate delegate:self];
         _userDriver = userDriver;
     }
     return self;
 }
 
-- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders preventingInstallerInteraction:(BOOL)preventsInstallerInteraction completion:(SPUUpdateDriverCompletion)completionBlock
+- (void)setCompletionHandler:(SPUUpdateDriverCompletion)completionBlock
 {
-    [self.uiDriver prepareCheckForUpdatesWithCompletion:completionBlock];
+    [self.uiDriver setCompletionHandler:completionBlock];
+}
+
+- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders
+{
+    self.showingUserInitiatedProgress = YES;
+    self.showingUpdate = YES;
     
-    [self.uiDriver preflightForUpdatePermissionPreventingInstallerInteraction:preventsInstallerInteraction reply:^(NSError * _Nullable error) {
-        if (!self.aborted) {
-            if (error != nil) {
-                [self abortUpdateWithError:error];
-            } else {
-                self.showingUserInitiatedProgress = YES;
-                self.showingUpdate = YES;
-                
-                [self.userDriver showUserInitiatedUpdateCheckWithCancellation:^{
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        if (self.showingUserInitiatedProgress) {
-                            [self abortUpdate];
-                        }
-                    });
-                }];
-                
-                [self.uiDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders inBackground:NO];
+    [self.userDriver showUserInitiatedUpdateCheckWithCancellation:^{
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (self.showingUserInitiatedProgress) {
+                [self abortUpdate];
             }
-        }
+        });
     }];
+    
+    [self.uiDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders inBackground:NO];
 }
 
-- (void)resumeInstallingUpdateWithCompletion:(SPUUpdateDriverCompletion)completionBlock
+- (void)resumeInstallingUpdate
 {
-    [self.uiDriver resumeInstallingUpdateWithCompletion:completionBlock];
+    [self.uiDriver resumeInstallingUpdate];
 }
 
-- (void)resumeUpdate:(id<SPUResumableUpdate>)resumableUpdate completion:(SPUUpdateDriverCompletion)completionBlock
+- (void)resumeUpdate:(id<SPUResumableUpdate>)resumableUpdate
 {
-    [self.uiDriver resumeUpdate:resumableUpdate completion:completionBlock];
+    [self.uiDriver resumeUpdate:resumableUpdate];
+}
+
+- (void)uiDriverDidShowUpdate
+{
+    // When a new update check has not been initiated and an update has been resumed,
+    // update the driver to indicate we are showing an update to the user
+    self.showingUpdate = YES;
 }
 
 - (void)basicDriverIsRequestingAbortUpdateWithError:(nullable NSError *)error
@@ -122,7 +124,7 @@
         self.showingUserInitiatedProgress = NO;
     }
     self.aborted = YES;
-    [self.uiDriver abortUpdateWithError:error];
+    [self.uiDriver abortUpdateWithError:error showErrorToUser:YES];
 }
 
 @end

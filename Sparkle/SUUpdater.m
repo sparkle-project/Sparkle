@@ -109,7 +109,8 @@ static NSMutableDictionary *sharedUpdaters = nil;
 
 - (NSBundle *)sparkleBundle
 {
-    return self.updater.sparkleBundle;
+    // Use explicit class to use the correct bundle even when subclassed
+    return [NSBundle bundleForClass:[SUUpdater class]];
 }
 
 - (BOOL)automaticallyChecksForUpdates
@@ -255,7 +256,7 @@ static NSMutableDictionary *sharedUpdaters = nil;
     return versionDisplayer;
 }
 
-- (BOOL)updaterMayCheckForUpdates:(SPUUpdater *)__unused updater
+- (BOOL)updater:(SPUUpdater *)__unused updater mayPerformUpdateCheck:(SPUUpdateCheck)__unused updateCheck error:(NSError *__autoreleasing  _Nullable *)error
 {
     BOOL updaterMayCheck = YES;
     if ([self.delegate respondsToSelector:@selector(updaterMayCheckForUpdates:)]) {

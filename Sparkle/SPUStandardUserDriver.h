@@ -21,20 +21,20 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol SPUStandardUserDriverDelegate;
 
-/*!
+/**
  Sparkle's standard built-in user driver for updater interactions
  */
 SU_EXPORT @interface SPUStandardUserDriver : NSObject <SPUUserDriver>
 
-/*!
+/**
  Initializes a Sparkle's standard user driver for user update interactions
  
  @param hostBundle The target bundle of the host that is being updated.
- @param delegate The delegate to this user driver. Pass nil if you don't want to provide one.
+ @param delegate The optional delegate to this user driver.
  */
 - (instancetype)initWithHostBundle:(NSBundle *)hostBundle delegate:(nullable id<SPUStandardUserDriverDelegate>)delegate;
 
-/*!
+/**
  Use initWithHostBundle:delegate: instead.
  */
 - (instancetype)init NS_UNAVAILABLE;
