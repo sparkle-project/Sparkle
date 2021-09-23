@@ -88,7 +88,7 @@ static WKUserScript *_userScriptWithInjectedStyleSource(NSString *styleSource)
         
         WKUserContentController *userContentController = [[WKUserContentController alloc] init];
         
-        NSString *fontStyleContents = [NSString stringWithFormat:@"body { font-family: %@; font-size: %dpt; }", fontFamily, fontPointSize];
+        NSString *fontStyleContents = [NSString stringWithFormat:@"body { font-family: %@; font-size: %dpx; }", fontFamily, fontPointSize];
         
         NSString *finalStyleContents;
         if (colorStyleContents == nil) {
