@@ -178,6 +178,37 @@ NS_ASSUME_NONNULL_BEGIN
     return [self objectForInfoDictionaryKey:SUPublicDSAKeyFileKey];
 }
 
+// WKWebView has a bug where it won't work in loading local HTML content in sandboxed apps that do not have an outgoing network entitlement
+// FB6993802: https://twitter.com/sindresorhus/status/1160577243929878528 | https://github.com/feedback-assistant/reports/issues/1
+- (BOOL)requiresLegacyWebView
+{
+    static BOOL sRequiresLegacyWebView = NO;
+    static dispatch_once_t sEntitlementsCheckToken = 0;
+
+    dispatch_once(&sEntitlementsCheckToken, ^{
+        // If we run into any error at all, we just assume we don't have entitlements
+        NSDictionary* entitlements = nil;
+        SecCodeRef appCodeRef = NULL;
+        OSStatus securityErr = SecCodeCopySelf(kSecCSDefaultFlags, &appCodeRef);
+        if (securityErr == errSecSuccess) {
+            CFDictionaryRef codeSignInfo;
+            if (SecCodeCopySigningInformation(appCodeRef, kSecCSRequirementInformation, &codeSignInfo) == errSecSuccess) {
+                entitlements = (__bridge NSDictionary*)CFDictionaryGetValue(codeSignInfo, kSecCodeInfoEntitlementsDict);
+                CFRelease(codeSignInfo);
+            }
+            CFRelease(appCodeRef);
+        }
+
+        NSNumber* sandboxedValue = [entitlements objectForKey:@"com.apple.security.app-sandbox"];
+        BOOL isSandboxed = [sandboxedValue isKindOfClass:[NSNumber class]] ? [sandboxedValue boolValue] : NO;
+        NSNumber* networkAccessValue = [entitlements objectForKey:@"com.apple.security.network.client"];
+        BOOL hasNetworkAccess = [networkAccessValue isKindOfClass:[NSNumber class]] ? [networkAccessValue boolValue] : NO;
+        sRequiresLegacyWebView = isSandboxed && (hasNetworkAccess == NO);
+    });
+
+    return sRequiresLegacyWebView;
+}
+
 - (nullable id)objectForInfoDictionaryKey:(NSString *)key
 {
     if (self.isMainBundle) {

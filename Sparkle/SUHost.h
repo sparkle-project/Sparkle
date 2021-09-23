@@ -27,6 +27,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (getter=isRunningOnReadOnlyVolume, readonly) BOOL runningOnReadOnlyVolume;
 @property (getter=isRunningTranslocated, readonly) BOOL runningTranslocated;
 @property (readonly, nonatomic, copy, nullable) NSString *publicDSAKeyFileKey;
+@property (readonly) BOOL requiresLegacyWebView;
 
 - (nullable id)objectForInfoDictionaryKey:(NSString *)key;
 - (BOOL)boolForInfoDictionaryKey:(NSString *)key;
