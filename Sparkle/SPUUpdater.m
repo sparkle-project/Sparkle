@@ -150,7 +150,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         return YES;
     }
     
-    if (![self checkIfConfiguredProperlyAndRequireFeedURL:NO error:error]) {
+    if (![self checkIfConfiguredProperlyAndRequireFeedURL:NO validateXPCServices:YES error:error]) {
         return NO;
     }
     
@@ -180,7 +180,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     return ([bundle objectForInfoDictionaryKey:@"NSAppTransportSecurity"] == nil);
 }
 
-- (BOOL)checkIfConfiguredProperlyAndRequireFeedURL:(BOOL)requireFeedURL error:(NSError * __autoreleasing *)error
+- (BOOL)checkIfConfiguredProperlyAndRequireFeedURL:(BOOL)requireFeedURL validateXPCServices:(BOOL)validateXPCServices error:(NSError * __autoreleasing *)error
 {
     NSString *hostName = self.host.name;
     
@@ -205,39 +205,37 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         return NO;
     }
     
-    // Check that all enabled XPC Services are embedded
     NSBundle *mainBundle = [NSBundle mainBundle];
-    SUHost *mainBundleHost = [[SUHost alloc] initWithBundle:mainBundle];
-    
-    NSArray<NSString *> *xpcServiceIDs = @[@INSTALLER_LAUNCHER_BUNDLE_ID, @DOWNLOADER_BUNDLE_ID, @INSTALLER_CONNECTION_BUNDLE_ID, @INSTALLER_STATUS_BUNDLE_ID];
-    NSArray<NSString *> *xpcServiceEnabledKeys = @[SUEnableInstallerLauncherServiceKey, SUEnableDownloaderServiceKey, SUEnableInstallerConnectionServiceKey, SUEnableInstallerStatusServiceKey];
-    NSUInteger xpcServiceCount = xpcServiceIDs.count;
-    NSURL *enabledDownloaderServiceBundleURL = nil;
-    
-    for (NSUInteger xpcServiceIndex = 0; xpcServiceIndex < xpcServiceCount; xpcServiceIndex++) {
-        NSString *xpcServiceEnabledKey = xpcServiceEnabledKeys[xpcServiceIndex];
-        NSString *xpcServiceBundleName = [xpcServiceIDs[xpcServiceIndex] stringByAppendingPathExtension:@"xpc"];
+    if (validateXPCServices) {
+        // Check that all enabled XPC Services are embedded
+        SUHost *mainBundleHost = [[SUHost alloc] initWithBundle:mainBundle];
         
-        if ([mainBundleHost boolForInfoDictionaryKey:xpcServiceEnabledKey]) {
-            NSURL *xpcServiceBundleURL = [[self.sparkleBundle.bundleURL URLByAppendingPathComponent:@"XPCServices"] URLByAppendingPathComponent:xpcServiceBundleName];
+        NSArray<NSString *> *xpcServiceIDs = @[@INSTALLER_LAUNCHER_BUNDLE_ID, @DOWNLOADER_BUNDLE_ID, @INSTALLER_CONNECTION_BUNDLE_ID, @INSTALLER_STATUS_BUNDLE_ID];
+        NSArray<NSString *> *xpcServiceEnabledKeys = @[SUEnableInstallerLauncherServiceKey, SUEnableDownloaderServiceKey, SUEnableInstallerConnectionServiceKey, SUEnableInstallerStatusServiceKey];
+        NSUInteger xpcServiceCount = xpcServiceIDs.count;
+        
+        for (NSUInteger xpcServiceIndex = 0; xpcServiceIndex < xpcServiceCount; xpcServiceIndex++) {
+            NSString *xpcServiceEnabledKey = xpcServiceEnabledKeys[xpcServiceIndex];
+            NSString *xpcServiceBundleName = [xpcServiceIDs[xpcServiceIndex] stringByAppendingPathExtension:@"xpc"];
             
-            if (![xpcServiceBundleURL checkResourceIsReachableAndReturnError:NULL]) {
-                *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInvalidUpdaterError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"XPC Service is enabled (%@) but does not exist: %@", xpcServiceEnabledKey, xpcServiceBundleURL.path] }];
+            if ([mainBundleHost boolForInfoDictionaryKey:xpcServiceEnabledKey]) {
+                NSURL *xpcServiceBundleURL = [[self.sparkleBundle.bundleURL URLByAppendingPathComponent:@"XPCServices"] URLByAppendingPathComponent:xpcServiceBundleName];
+                
+                if (![xpcServiceBundleURL checkResourceIsReachableAndReturnError:NULL]) {
+                    *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInvalidUpdaterError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"XPC Service is enabled (%@) but does not exist: %@", xpcServiceEnabledKey, xpcServiceBundleURL.path] }];
+                    
+                    return NO;
+                }
+            }
+            
+            // Make sure the app isn't bundling XPC Services directly
+            NSURL *mainBundleXPCServiceURL = [[[mainBundle.bundleURL URLByAppendingPathComponent:@"Contents"] URLByAppendingPathComponent:@"XPCServices"] URLByAppendingPathComponent:xpcServiceBundleName];
+            
+            if ([mainBundleXPCServiceURL checkResourceIsReachableAndReturnError:NULL]) {
+                *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInvalidUpdaterError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"XPC Service (%@) must be in the Sparkle framework, not in the application bundle (%@). Please visit https://sparkle-project.org/documentation/sandboxing/ for up to date Sandboxing instructions.", xpcServiceBundleName, mainBundleXPCServiceURL.path] }];
                 
                 return NO;
-            } else if ([xpcServiceEnabledKey isEqualToString:SUEnableDownloaderServiceKey]) {
-                // Tracking downloader bundle (if service is enabled) for checking ATS issues later
-                enabledDownloaderServiceBundleURL = xpcServiceBundleURL;
             }
-        }
-        
-        // Make sure the app isn't bundling XPC Services directly
-        NSURL *mainBundleXPCServiceURL = [[[mainBundle.bundleURL URLByAppendingPathComponent:@"Contents"] URLByAppendingPathComponent:@"XPCServices"] URLByAppendingPathComponent:xpcServiceBundleName];
-        
-        if ([mainBundleXPCServiceURL checkResourceIsReachableAndReturnError:NULL]) {
-            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInvalidUpdaterError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"XPC Service (%@) must be in the Sparkle framework, not in the application bundle (%@). Please visit https://sparkle-project.org/documentation/sandboxing/ for up to date Sandboxing instructions.", xpcServiceBundleName, mainBundleXPCServiceURL.path] }];
-            
-            return NO;
         }
     }
     
@@ -257,13 +255,22 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     
     if (feedURL != nil) {
         servingOverHttps = [[[feedURL scheme] lowercaseString] isEqualToString:@"https"];
-        if (!servingOverHttps) {
-            BOOL foundXPCPersistentDownloaderService = NO;
-            NSBundle *downloaderBundle = (enabledDownloaderServiceBundleURL != nil) ? [NSBundle bundleWithURL:enabledDownloaderServiceBundleURL] : nil;
-            BOOL foundATSPersistentIssue = [self checkATSIssueForBundle:downloaderBundle getBundleExists:&foundXPCPersistentDownloaderService];
+        if (!servingOverHttps && !self.loggedATSWarning) {
+            BOOL foundXPCDownloaderService = NO;
+            
+            SUHost *mainBundleHost = [[SUHost alloc] initWithBundle:mainBundle];
+            NSBundle *downloaderBundle;
+            if ([mainBundleHost boolForInfoDictionaryKey:SUEnableDownloaderServiceKey]) {
+                NSURL *downloaderServiceBundleURL = [[[self.sparkleBundle.bundleURL URLByAppendingPathComponent:@"XPCServices"] URLByAppendingPathComponent:@DOWNLOADER_BUNDLE_ID] URLByAppendingPathExtension:@"xpc"];
+                downloaderBundle = [NSBundle bundleWithURL:downloaderServiceBundleURL];
+            } else {
+                downloaderBundle = nil;
+            }
+            
+            BOOL foundATSPersistentIssue = [self checkATSIssueForBundle:downloaderBundle getBundleExists:&foundXPCDownloaderService];
             
             BOOL foundATSMainBundleIssue = NO;
-            if (!foundATSPersistentIssue && !foundXPCPersistentDownloaderService) {
+            if (!foundATSPersistentIssue && !foundXPCDownloaderService) {
                 BOOL foundATSIssue = ([mainBundle objectForInfoDictionaryKey:@"NSAppTransportSecurity"] == nil);
                 
                 if (updatingMainBundle) {
@@ -274,12 +281,10 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
             }
             
             if (foundATSPersistentIssue || foundATSMainBundleIssue) {
-                if (!self.loggedATSWarning) {
-                    // Just log a warning. Don't outright fail in case we are wrong (eg: app is linked on an old SDK where ATS doesn't take effect)
-                    SULog(SULogLevelDefault, @"The feed URL (%@) may need to change to use HTTPS.\nFor more information: https://sparkle-project.org/documentation/app-transport-security", [feedURL absoluteString]);
-                    
-                    self.loggedATSWarning = YES;
-                }
+                // Just log a warning. Don't outright fail in case we are wrong (eg: app is linked on an old SDK where ATS doesn't take effect)
+                SULog(SULogLevelDefault, @"The feed URL (%@) may need to change to use HTTPS.\nFor more information: https://sparkle-project.org/documentation/app-transport-security", [feedURL absoluteString]);
+                
+                self.loggedATSWarning = YES;
             }
         }
     }
@@ -665,7 +670,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     // Because an application can change the configuration (eg: the feed url) at any point, we should always check if it's valid
     // We will not schedule a next update check if the bundle is misconfigured
     NSError *configurationError = nil;
-    if (![self checkIfConfiguredProperlyAndRequireFeedURL:YES error:&configurationError]) {
+    if (![self checkIfConfiguredProperlyAndRequireFeedURL:YES validateXPCServices:NO error:&configurationError]) {
         SULog(SULogLevelError, @"Sparkle configuration error (%ld): %@", (long)configurationError.code, configurationError.localizedDescription);
         
         abortUpdateDriver(configurationError, NO);
