@@ -4148,7 +4148,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 72F94ED51CC3441A002DEE68 /* ConfigInstallerLauncherDebug.xcconfig */;
 			buildSettings = {
-				INFOPLIST_FILE = InstallerLauncher/Info.plist;
 			};
 			name = Debug;
 		};
@@ -4156,7 +4155,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 72F94ED51CC3441A002DEE68 /* ConfigInstallerLauncherDebug.xcconfig */;
 			buildSettings = {
-				INFOPLIST_FILE = InstallerLauncher/Info.plist;
 			};
 			name = Coverage;
 		};
@@ -4164,7 +4162,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 726E07C11CAF1E79001A286B /* ConfigInstallerLauncher.xcconfig */;
 			buildSettings = {
-				INFOPLIST_FILE = InstallerLauncher/Info.plist;
 			};
 			name = Release;
 		};
