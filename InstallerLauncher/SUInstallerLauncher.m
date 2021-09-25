@@ -309,7 +309,10 @@
     
     NSURL *auxiliaryToolURL;
     if ([bundle.bundleURL.pathExtension isEqualToString:@"xpc"]) {
-        auxiliaryToolURL = [bundle.bundleURL.URLByDeletingLastPathComponent.URLByDeletingLastPathComponent URLByAppendingPathComponent:nameWithExtension];
+        // Paranoid check to get full bundle URL
+        NSURL *fullURL = bundle.bundleURL.URLByResolvingSymlinksInPath;
+        
+        auxiliaryToolURL = [fullURL.URLByDeletingLastPathComponent.URLByDeletingLastPathComponent URLByAppendingPathComponent:nameWithExtension];
     } else {
         auxiliaryToolURL = [bundle URLForAuxiliaryExecutable:nameWithExtension];
     }
