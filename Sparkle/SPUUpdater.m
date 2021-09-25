@@ -212,15 +212,13 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     NSArray<NSString *> *xpcServiceIDs = @[@INSTALLER_LAUNCHER_BUNDLE_ID, @DOWNLOADER_BUNDLE_ID, @INSTALLER_CONNECTION_BUNDLE_ID, @INSTALLER_STATUS_BUNDLE_ID];
     NSArray<NSString *> *xpcServiceEnabledKeys = @[SUEnableInstallerLauncherServiceKey, SUEnableDownloaderServiceKey, SUEnableInstallerConnectionServiceKey, SUEnableInstallerStatusServiceKey];
     NSUInteger xpcServiceCount = xpcServiceIDs.count;
-    
-    // Tracking downloader bundle (if service is enabled) for ATS issues later
     NSURL *enabledDownloaderServiceBundleURL = nil;
     
     for (NSUInteger xpcServiceIndex = 0; xpcServiceIndex < xpcServiceCount; xpcServiceIndex++) {
         NSString *xpcServiceEnabledKey = xpcServiceEnabledKeys[xpcServiceIndex];
+        NSString *xpcServiceBundleName = [xpcServiceIDs[xpcServiceIndex] stringByAppendingPathExtension:@"xpc"];
         
         if ([mainBundleHost boolForInfoDictionaryKey:xpcServiceEnabledKey]) {
-            NSString *xpcServiceBundleName = [xpcServiceIDs[xpcServiceIndex] stringByAppendingPathExtension:@"xpc"];
             NSURL *xpcServiceBundleURL = [[self.sparkleBundle.bundleURL URLByAppendingPathComponent:@"XPCServices"] URLByAppendingPathComponent:xpcServiceBundleName];
             
             if (![xpcServiceBundleURL checkResourceIsReachableAndReturnError:NULL]) {
@@ -228,8 +226,18 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
                 
                 return NO;
             } else if ([xpcServiceEnabledKey isEqualToString:SUEnableDownloaderServiceKey]) {
+                // Tracking downloader bundle (if service is enabled) for checking ATS issues later
                 enabledDownloaderServiceBundleURL = xpcServiceBundleURL;
             }
+        }
+        
+        // Make sure the app isn't bundling XPC Services directly
+        NSURL *mainBundleXPCServiceURL = [[[mainBundle.bundleURL URLByAppendingPathComponent:@"Contents"] URLByAppendingPathComponent:@"XPCServices"] URLByAppendingPathComponent:xpcServiceBundleName];
+        
+        if ([mainBundleXPCServiceURL checkResourceIsReachableAndReturnError:NULL]) {
+            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInvalidUpdaterError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"XPC Service (%@) must be in the Sparkle framework, not in the application bundle (%@). Please visit https://sparkle-project.org/documentation/sandboxing/ for up to date Sandboxing instructions.", xpcServiceBundleName, mainBundleXPCServiceURL.path] }];
+            
+            return NO;
         }
     }
     
