@@ -301,13 +301,18 @@
     return status;
 }
 
-- (NSString *)pathForBundledTool:(NSString *)toolName extension:(NSString *)extension inBundle:(NSBundle *)bundle
+- (NSString *)pathForBundledTool:(NSString *)toolName extension:(NSString *)extension fromBundle:(NSBundle *)bundle
 {
     // If the path extension is empty, we don't want to add a "." at the end
     NSString *nameWithExtension = (extension.length > 0) ? [toolName stringByAppendingPathExtension:extension] : toolName;
     assert(nameWithExtension != nil);
     
-    NSURL *auxiliaryToolURL = [bundle URLForAuxiliaryExecutable:nameWithExtension];
+    NSURL *auxiliaryToolURL;
+    if ([bundle.bundleURL.pathExtension isEqualToString:@"xpc"]) {
+        auxiliaryToolURL = [bundle.bundleURL.URLByDeletingLastPathComponent.URLByDeletingLastPathComponent URLByAppendingPathComponent:nameWithExtension];
+    } else {
+        auxiliaryToolURL = [bundle URLForAuxiliaryExecutable:nameWithExtension];
+    }
     assert(auxiliaryToolURL != nil);
     
     NSURL *resolvedAuxiliaryToolURL = [auxiliaryToolURL URLByResolvingSymlinksInPath];
@@ -396,7 +401,7 @@ static BOOL SPUSystemNeedsAuthorizationAccess(NSString *path, NSString *installa
         
         // Note we do not have to copy this tool out of the bundle it's in because it's a utility with no dependencies.
         // Furthermore, we can keep the tool at a place that may not necessarily be writable.
-        NSString *installerPath = [self pathForBundledTool:@""SPARKLE_RELAUNCH_TOOL_NAME extension:@"" inBundle:ourBundle];
+        NSString *installerPath = [self pathForBundledTool:@""SPARKLE_RELAUNCH_TOOL_NAME extension:@"" fromBundle:ourBundle];
         if (installerPath == nil) {
             SULog(SULogLevelError, @"Error: Cannot submit installer because the installer could not be located");
             completionHandler(SUInstallerLauncherFailure, needsSystemAuthorization);
@@ -404,7 +409,7 @@ static BOOL SPUSystemNeedsAuthorizationAccess(NSString *path, NSString *installa
         }
         
         // We do however have to copy the progress tool app somewhere safe due to its external depedencies
-        NSString *progressToolResourcePath = [self pathForBundledTool:@""SPARKLE_INSTALLER_PROGRESS_TOOL_NAME extension:@"app" inBundle:ourBundle];
+        NSString *progressToolResourcePath = [self pathForBundledTool:@""SPARKLE_INSTALLER_PROGRESS_TOOL_NAME extension:@"app" fromBundle:ourBundle];
         
         if (progressToolResourcePath == nil) {
             SULog(SULogLevelError, @"Error: Cannot submit progress tool because the progress tool could not be located");

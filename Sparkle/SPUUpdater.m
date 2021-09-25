@@ -205,6 +205,34 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         return NO;
     }
     
+    // Check that all enabled XPC Services are embedded
+    NSBundle *mainBundle = [NSBundle mainBundle];
+    SUHost *mainBundleHost = [[SUHost alloc] initWithBundle:mainBundle];
+    
+    NSArray<NSString *> *xpcServiceIDs = @[@INSTALLER_LAUNCHER_BUNDLE_ID, @DOWNLOADER_BUNDLE_ID, @INSTALLER_CONNECTION_BUNDLE_ID, @INSTALLER_STATUS_BUNDLE_ID];
+    NSArray<NSString *> *xpcServiceEnabledKeys = @[SUEnableInstallerLauncherServiceKey, SUEnableDownloaderServiceKey, SUEnableInstallerConnectionServiceKey, SUEnableInstallerStatusServiceKey];
+    NSUInteger xpcServiceCount = xpcServiceIDs.count;
+    
+    // Tracking downloader bundle (if service is enabled) for ATS issues later
+    NSURL *enabledDownloaderServiceBundleURL = nil;
+    
+    for (NSUInteger xpcServiceIndex = 0; xpcServiceIndex < xpcServiceCount; xpcServiceIndex++) {
+        NSString *xpcServiceEnabledKey = xpcServiceEnabledKeys[xpcServiceIndex];
+        
+        if ([mainBundleHost boolForInfoDictionaryKey:xpcServiceEnabledKey]) {
+            NSString *xpcServiceBundleName = [xpcServiceIDs[xpcServiceIndex] stringByAppendingPathExtension:@"xpc"];
+            NSURL *xpcServiceBundleURL = [[self.sparkleBundle.bundleURL URLByAppendingPathComponent:@"XPCServices"] URLByAppendingPathComponent:xpcServiceBundleName];
+            
+            if (![xpcServiceBundleURL checkResourceIsReachableAndReturnError:NULL]) {
+                *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInvalidUpdaterError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"XPC Service is enabled (%@) but does not exist: %@", xpcServiceEnabledKey, xpcServiceBundleURL.path] }];
+                
+                return NO;
+            } else if ([xpcServiceEnabledKey isEqualToString:SUEnableDownloaderServiceKey]) {
+                enabledDownloaderServiceBundleURL = xpcServiceBundleURL;
+            }
+        }
+    }
+    
     BOOL servingOverHttps = NO;
     NSError *feedError = nil;
     NSURL *feedURL = [self retrieveFeedURL:&feedError];
@@ -217,14 +245,14 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         }
     }
     
-    NSBundle *mainBundle = [NSBundle mainBundle];
     BOOL updatingMainBundle = [self.host.bundle isEqualTo:mainBundle];
     
     if (feedURL != nil) {
         servingOverHttps = [[[feedURL scheme] lowercaseString] isEqualToString:@"https"];
         if (!servingOverHttps) {
             BOOL foundXPCPersistentDownloaderService = NO;
-            BOOL foundATSPersistentIssue = [self checkATSIssueForBundle:SPUXPCServiceBundle(@DOWNLOADER_BUNDLE_ID) getBundleExists:&foundXPCPersistentDownloaderService];
+            NSBundle *downloaderBundle = (enabledDownloaderServiceBundleURL != nil) ? [NSBundle bundleWithURL:enabledDownloaderServiceBundleURL] : nil;
+            BOOL foundATSPersistentIssue = [self checkATSIssueForBundle:downloaderBundle getBundleExists:&foundXPCPersistentDownloaderService];
             
             BOOL foundATSMainBundleIssue = NO;
             if (!foundATSPersistentIssue && !foundXPCPersistentDownloaderService) {
@@ -288,13 +316,6 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
             SULog(SULogLevelError, @"Error: Serving updates without an EdDSA key is insecure and deprecated. DSA support may be removed in a future Sparkle release. Please migrate to using EdDSA (ed25519). Visit Sparkle's documentation for migration information: https://sparkle-project.org/documentation/#3-segue-for-security-concerns");
             
             self.loggedNoSecureKeyWarning = YES;
-        }
-    }
-    
-    // Check XPC Services are functional
-    for (NSString *xpcServiceID in @[@INSTALLER_LAUNCHER_BUNDLE_ID, @DOWNLOADER_BUNDLE_ID, @INSTALLER_CONNECTION_BUNDLE_ID, @INSTALLER_STATUS_BUNDLE_ID]) {
-        if (!SPUXPCValidateServiceIfBundleExists(xpcServiceID, self.sparkleBundle, error)) {
-            return NO;
         }
     }
     
