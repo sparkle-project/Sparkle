@@ -591,6 +591,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 
 - (void)checkForUpdatesWithDriver:(id <SPUUpdateDriver> )d updateCheck:(SPUUpdateCheck)updateCheck installerInProgress:(BOOL)installerInProgress
 {
+    assert(self.driver == nil);
     if (self.driver != nil) {
         return;
     }
