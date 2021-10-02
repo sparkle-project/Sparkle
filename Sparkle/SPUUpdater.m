@@ -58,6 +58,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 @property (nonatomic) BOOL startedUpdater;
 @property (nonatomic, nullable) id<SPUResumableUpdate> resumableUpdate;
 @property (nonatomic) BOOL sessionInProgress;
+@property (nonatomic) BOOL canCheckForUpdates;
 @property (nonatomic) BOOL showingPermissionRequest;
 
 @property (nonatomic, copy) NSDate *updateLastCheckedDate;
@@ -83,6 +84,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 @synthesize startedUpdater = _startedUpdater;
 @synthesize resumableUpdate = _resumableUpdate;
 @synthesize sessionInProgress = _sessionInProgress;
+@synthesize canCheckForUpdates = _canCheckForUpdates;
 @synthesize showingPermissionRequest = _showingPermissionRequest;
 @synthesize updateLastCheckedDate = _updateLastCheckedDate;
 @synthesize loggedATSWarning = _loggedATSWarning;
@@ -155,6 +157,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     }
     
     self.startedUpdater = YES;
+    self.canCheckForUpdates = YES;
     
     // Start updater on next update cycle so we make sure the application invoking the updater is ready
     // This also gives the developer a cycle to check for updates before Sparkle's update cycle scheduler kicks in
@@ -341,6 +344,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         
         self.showingPermissionRequest = YES;
         self.sessionInProgress = YES;
+        self.canCheckForUpdates = YES;
         
         __weak SPUUpdater *weakSelf = self;
         [self.userDriver showUpdatePermissionRequest:updatePermissionRequest reply:^(SUUpdatePermissionResponse *response) {
@@ -360,7 +364,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         // We start the update checks and register as observer for changes after the prompt finishes
     } else {
         // We check if the user's said they want updates, or they haven't said anything, and the default is set to checking.
-        [self scheduleNextUpdateCheck];
+        [self scheduleNextUpdateCheckFiringImmediately:NO];
     }
 }
 
@@ -389,16 +393,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     [self didChangeValueForKey:NSStringFromSelector(@selector((lastUpdateCheckDate)))];
 }
 
-- (void)scheduleNextUpdateCheck
-{
-    [self scheduleNextUpdateCheckFiringImmediately:NO];
-}
-
-- (BOOL)canCheckForUpdates
-{
-    return self.startedUpdater && (self.showingPermissionRequest || self.driver.showingUpdate || !self.sessionInProgress);
-}
-
+// Note this method is never called when sessionInProgress is YES
 - (void)scheduleNextUpdateCheckFiringImmediately:(BOOL)firingImmediately
 {
     [self.updaterTimer invalidate];
@@ -413,7 +408,36 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     if (firingImmediately) {
         [self checkForUpdatesInBackground];
     } else {
-        [self retrieveNextUpdateCheckInterval:^(NSTimeInterval updateCheckInterval) {
+        // This may not return the same update check interval as the developer has configured
+        // Notably it may differ when we have an update that has been already downloaded and needs to resume,
+        // as well as if that update is marked critical or not
+        void (^retrieveNextUpdateCheckInterval)(void (^)(NSTimeInterval)) = ^(void (^completionHandler)(NSTimeInterval)) {
+            NSString *hostBundleIdentifier = self.host.bundle.bundleIdentifier;
+            assert(hostBundleIdentifier != nil);
+            [SPUProbeInstallStatus probeInstallerUpdateItemForHostBundleIdentifier:hostBundleIdentifier completion:^(SPUInstallationInfo * _Nullable installationInfo) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    NSTimeInterval regularCheckInterval = [self updateCheckInterval];
+                    if (installationInfo == nil) {
+                        // Proceed as normal if there's no resumable updates
+                        completionHandler(regularCheckInterval);
+                    } else {
+                        if (!installationInfo.canSilentlyInstall || [installationInfo.appcastItem isCriticalUpdate] || [installationInfo.appcastItem isInformationOnlyUpdate]) {
+                            completionHandler(MIN(regularCheckInterval, SUImpatientUpdateCheckInterval));
+                        } else {
+                            completionHandler(MAX(regularCheckInterval, SUImpatientUpdateCheckInterval));
+                        }
+                    }
+                });
+            }];
+        };
+        
+        self.canCheckForUpdates = NO;
+        self.sessionInProgress = YES;
+        
+        retrieveNextUpdateCheckInterval(^(NSTimeInterval updateCheckInterval) {
+            self.canCheckForUpdates = YES;
+            self.sessionInProgress = NO;
+            
             // This callback is asynchronous, so the timer may be set. Invalidate to make sure it isn't.
             [self.updaterTimer invalidate];
             
@@ -435,7 +459,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
                 // We're overdue! Run one now.
                 [self checkForUpdatesInBackground];
             }
-        }];
+        });
     }
 }
 
@@ -457,6 +481,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     }
     
     self.sessionInProgress = YES;
+    self.canCheckForUpdates = NO;
     
     // We don't want the probe check to act on the driver if the updater is going near death
     __weak SPUUpdater *weakSelf = self;
@@ -518,6 +543,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     }
     
     self.sessionInProgress = YES;
+    self.canCheckForUpdates = NO;
     
     id <SPUUpdateDriver> theUpdateDriver = [[SPUUserInitiatedUpdateDriver alloc] initWithHost:self.host applicationBundle:self.applicationBundle updater:self userDriver:self.userDriver updaterDelegate:self.delegate];
     
@@ -549,6 +575,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     }
     
     self.sessionInProgress = YES;
+    self.canCheckForUpdates = NO;
     
     NSString *bundleIdentifier = self.host.bundle.bundleIdentifier;
     assert(bundleIdentifier != nil);
@@ -600,16 +627,18 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
             SPUUpdater *strongSelf = weakSelf;
             if (strongSelf != nil) {
                 strongSelf.driver = nil;
-                strongSelf.sessionInProgress = NO;
                 
                 [strongSelf updateLastUpdateCheckDate];
+                
+                strongSelf.sessionInProgress = NO;
+                strongSelf.canCheckForUpdates = YES;
                 
                 notifyDelegateOfDriverCompletion(error, NO);
                 
                 // Ensure the delegate doesn't start a new session when being notified of the previous one ending
                 if (!strongSelf.sessionInProgress) {
                     if (shouldScheduleNextUpdateCheck) {
-                        [strongSelf scheduleNextUpdateCheck];
+                        [strongSelf scheduleNextUpdateCheckFiringImmediately:NO];
                     } else {
                         SULog(SULogLevelDefault, @"Disabling scheduled updates..");
                     }
@@ -650,8 +679,11 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         if (strongSelf != nil) {
             strongSelf.resumableUpdate = resumableUpdate;
             strongSelf.driver = nil;
-            strongSelf.sessionInProgress = NO;
+            
             [strongSelf updateLastUpdateCheckDate];
+            
+            strongSelf.sessionInProgress = NO;
+            strongSelf.canCheckForUpdates = YES;
             
             notifyDelegateOfDriverCompletion(error, shouldShowUpdateImmediately);
             
@@ -660,6 +692,10 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
                 [strongSelf scheduleNextUpdateCheckFiringImmediately:shouldShowUpdateImmediately];
             }
         }
+    }];
+    
+    [self.driver setUpdateShownHandler:^{
+        weakSelf.canCheckForUpdates = YES;
     }];
     
     if (installerInProgress) {
@@ -698,7 +734,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     
     if (!self.sessionInProgress) {
         [self cancelNextUpdateCycle];
-        [self scheduleNextUpdateCheck];
+        [self scheduleNextUpdateCheckFiringImmediately:NO];
     }
 }
 
@@ -933,30 +969,6 @@ static NSString *escapeURLComponent(NSString *str) {
 - (NSTimeInterval)updateCheckInterval
 {
     return [self.updaterSettings updateCheckInterval];
-}
-
-// This may not return the same update check interval as the developer has configured
-// Notably it may differ when we have an update that has been already downloaded and needs to resume,
-// as well as if that update is marked critical or not
-- (void)retrieveNextUpdateCheckInterval:(void (^)(NSTimeInterval))completionHandler
-{
-    NSString *hostBundleIdentifier = self.host.bundle.bundleIdentifier;
-    assert(hostBundleIdentifier != nil);
-    [SPUProbeInstallStatus probeInstallerUpdateItemForHostBundleIdentifier:hostBundleIdentifier completion:^(SPUInstallationInfo * _Nullable installationInfo) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            NSTimeInterval regularCheckInterval = [self updateCheckInterval];
-            if (installationInfo == nil) {
-                // Proceed as normal if there's no resumable updates
-                completionHandler(regularCheckInterval);
-            } else {
-                if (!installationInfo.canSilentlyInstall || [installationInfo.appcastItem isCriticalUpdate] || [installationInfo.appcastItem isInformationOnlyUpdate]) {
-                    completionHandler(MIN(regularCheckInterval, SUImpatientUpdateCheckInterval));
-                } else {
-                    completionHandler(MAX(regularCheckInterval, SUImpatientUpdateCheckInterval));
-                }
-            }
-        });
-    }];
 }
 
 - (void)dealloc
