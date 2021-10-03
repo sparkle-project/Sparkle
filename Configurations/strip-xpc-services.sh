@@ -2,10 +2,6 @@
 
 FRAMEWORK_PATH="${TARGET_BUILD_DIR}"/"${FULL_PRODUCT_NAME}"
 
-echo "Framework path!"
-echo $FRAMEWORK_PATH
-exit 1
-
 removedservices=0
 
 if [[ "$SPARKLE_EMBED_INSTALLER_LAUNCHER_XPC_SERVICE" -eq 0 ]]; then
