@@ -144,6 +144,8 @@ SU_EXPORT @interface SPUUpdater : NSObject
  
  This property is suitable to use for menu item validation for seeing if `-checkForUpdates` can be invoked.
  
+ This property is also KVO-compliant.
+ 
  Note this property does not reflect whether or not an update session is in progress. Please see `sessionInProgress` property instead.
  */
 @property (nonatomic, readonly) BOOL canCheckForUpdates;

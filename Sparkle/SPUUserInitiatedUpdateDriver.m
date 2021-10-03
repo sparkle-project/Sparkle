@@ -20,6 +20,7 @@
 @property (nonatomic) BOOL showingUserInitiatedProgress;
 @property (nonatomic) BOOL showingUpdate;
 @property (nonatomic) BOOL aborted;
+@property (nonatomic) void (^updateDidShowHandler)(void);
 
 @end
 
@@ -30,6 +31,7 @@
 @synthesize showingUserInitiatedProgress = _showingUserInitiatedProgress;
 @synthesize showingUpdate = _showingUpdate;
 @synthesize aborted = _aborted;
+@synthesize updateDidShowHandler = _updateDidShowHandler;
 
 - (instancetype)initWithHost:(SUHost *)host applicationBundle:(NSBundle *)applicationBundle updater:(id)updater userDriver:(id <SPUUserDriver>)userDriver updaterDelegate:(nullable id <SPUUpdaterDelegate>)updaterDelegate
 {
@@ -46,10 +48,19 @@
     [self.uiDriver setCompletionHandler:completionBlock];
 }
 
+- (void)setUpdateShownHandler:(void (^)(void))handler
+{
+    self.updateDidShowHandler = handler;
+}
+
 - (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders
 {
     self.showingUserInitiatedProgress = YES;
-    self.showingUpdate = YES;
+    
+    if (self.updateDidShowHandler != nil) {
+        self.updateDidShowHandler();
+        self.updateDidShowHandler = nil;
+    }
     
     [self.userDriver showUserInitiatedUpdateCheckWithCancellation:^{
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -77,6 +88,11 @@
     // When a new update check has not been initiated and an update has been resumed,
     // update the driver to indicate we are showing an update to the user
     self.showingUpdate = YES;
+    
+    if (self.updateDidShowHandler != nil) {
+        self.updateDidShowHandler();
+        self.updateDidShowHandler = nil;
+    }
 }
 
 - (void)basicDriverIsRequestingAbortUpdateWithError:(nullable NSError *)error
