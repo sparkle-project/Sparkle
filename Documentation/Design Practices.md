@@ -2,7 +2,7 @@
 
 ## XPC Services
 
-XPC services in Sparkle are all optional, so the code involved in the services needs to be usable directly from the framework as well. For this to work well, if the class used in the XPC service takes a delegate, it must not be weakly referenced, so the retain cycle will have to be broken explicitly (via an explicit added invalidate method). dealloc also must not be implemented (do cleanup in custom invalidate method). As one may tell, a couple of the services are simply proxies (InstallerConnection, InstallerStatus), and I wish that didn't have to be the case -- it would be a burden to require a developer to set up a temporary exception with a specific bundle ID, and unsure how long that approach would work for in the future.
+XPC services in Sparkle are all optional, so the code involved in the services needs to be usable directly from the framework as well. For this to work well, if the class used in the XPC service takes a delegate, it must not be weakly referenced, so the retain cycle will have to be broken explicitly (via an explicit added invalidate method). dealloc also must not be implemented (do cleanup in custom invalidate method). As one may tell, two of the services are simply proxies (InstallerConnection, InstallerStatus) -- we now recommend most developers to set up a temporary exception with their bundle ID rather than use these two services.
 
 The protocols used in XPC services must also not adopt other protocols (i.e, one protocol inheriting from another protocol). This is because the XPC protocol decoder on older supported systems doesn't properly handle this case, and won't be able to find that methods exist on a class.
 
@@ -18,7 +18,7 @@ The original `SUUpdater` may have also been created to assist plug-ins and other
 
 ## Extensibility
 
-This fork does not support subclassing classes internal (not exported) to Sparkle anymore. Doing so would be almost impossible to maintain into the future. Subclassing in general has been banned in this fork. Composition is prefered everywhere, even amongst the internal update drivers which were rewritten to follow a protocol oriented approach. The reason why composition is preferred is because it's easier to follow the flow of logic.
+Sparkle 2.0 does not support subclassing classes internal (not exported) to Sparkle anymore. Doing so would be almost impossible to maintain into the future. Subclassing in general has been banned. Composition is prefered everywhere, even amongst the internal update drivers which were rewritten to follow a protocol oriented approach. The reason why composition is preferred is because it's easier to follow the flow of logic.
 
 I hope the user driver API gives enough extensibility without someone wanting to create another fork.
 
