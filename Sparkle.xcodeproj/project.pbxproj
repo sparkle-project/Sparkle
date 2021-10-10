@@ -940,6 +940,7 @@
 		720B16421C66433D006985FB /* UITests-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "UITests-Info.plist"; path = "UITests/UITests-Info.plist"; sourceTree = SOURCE_ROOT; };
 		720B16431C66433D006985FB /* SUTestApplicationTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SUTestApplicationTest.swift; path = UITests/SUTestApplicationTest.swift; sourceTree = SOURCE_ROOT; };
 		720B4C2325EBFAFD005A0592 /* link-tools.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "link-tools.sh"; sourceTree = "<group>"; };
+		720C192827127A3800740C8E /* release-move-tag.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "release-move-tag.sh"; sourceTree = "<group>"; };
 		720E21791D0D00BF003A311C /* SPUUpdaterCycle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPUUpdaterCycle.h; sourceTree = "<group>"; };
 		720E217A1D0D00BF003A311C /* SPUUpdaterCycle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SPUUpdaterCycle.m; sourceTree = "<group>"; };
 		7210C7671B9A9A1500EB90AC /* SUUnarchiverTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SUUnarchiverTest.swift; sourceTree = "<group>"; };
@@ -950,7 +951,6 @@
 		721652671D3C8FED00FD13D8 /* SUInstallerLauncherStatus.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SUInstallerLauncherStatus.h; path = InstallerLauncher/SUInstallerLauncherStatus.h; sourceTree = SOURCE_ROOT; };
 		7218EC362623F31C008FECF3 /* org.sparkle-project.InstallerConnection.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "org.sparkle-project.InstallerConnection.entitlements"; sourceTree = "<group>"; };
 		7218EC372623F32E008FECF3 /* org.sparkle-project.InstallerStatus.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "org.sparkle-project.InstallerStatus.entitlements"; sourceTree = "<group>"; };
-		7218EC4B2623F51C008FECF3 /* codesign_xpc_service.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = codesign_xpc_service.py; sourceTree = "<group>"; };
 		721AB11626C777D900D34A86 /* SPUDownloadDataPrivate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SPUDownloadDataPrivate.h; sourceTree = "<group>"; };
 		721BC2061D17A532002BC71E /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
 		721BC2081D17A553002BC71E /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = System/Library/Frameworks/Carbon.framework; sourceTree = SDKROOT; };
@@ -2318,9 +2318,9 @@
 				EA1E285722B6622E004AA304 /* ed25519-Release.xcconfig */,
 				EA1E285922B6622E004AA304 /* ed25519-Shared.xcconfig */,
 				14732BC91960F70A00593899 /* make-release-package.sh */,
-				7218EC4B2623F51C008FECF3 /* codesign_xpc_service.py */,
 				14652F7919A93E5F00959E44 /* set-git-version-info.sh */,
 				72045CE426FEE708004F96E5 /* strip-xpc-services.sh */,
+				720C192827127A3800740C8E /* release-move-tag.sh */,
 				720B4C2325EBFAFD005A0592 /* link-tools.sh */,
 				146EC84E19A68CF8004A50C5 /* Sparkle.podspec */,
 			);
