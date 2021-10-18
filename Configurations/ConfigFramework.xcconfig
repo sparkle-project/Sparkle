@@ -4,7 +4,15 @@ DYLIB_INSTALL_NAME_BASE = @rpath
 DYLIB_COMPATIBILITY_VERSION = 1.6
 DYLIB_CURRENT_VERSION = $(SPARKLE_VERSION_MAJOR).$(SPARKLE_VERSION_MINOR).$(SPARKLE_VERSION_PATCH)
 WRAPPER_EXTENSION = framework
-FRAMEWORK_VERSION = A
+
+// Sparkle 2 used to support developers embedding XPC Services in their own app bundle
+// However the Sparkle framework now bundles these XPC Services. Unfortunately this causes
+// a cache conflict in the system from upgrading from previous to newer versions of Sparkle, and
+// XPC Services inside Sparkle may not launch (a system reboot would fix this though).
+// The system cache seems to depend on the Sparkle file path,
+// so as a better workaround we have changed the FRAMEWORK_VERSION from A to B
+FRAMEWORK_VERSION = B
+
 INFOPLIST_FILE = Sparkle/Sparkle-Info.plist
 GCC_PREPROCESSOR_DEFINITIONS = $(inherited) BUILDING_SPARKLE=1
 SKIP_INSTALL = YES

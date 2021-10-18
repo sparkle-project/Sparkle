@@ -61,7 +61,7 @@
     if (self != nil) {
         _host = host;
         
-        if (!SPUXPCServiceExists(@DOWNLOADER_BUNDLE_ID)) {
+        if (!SPUXPCServiceIsEnabled(SUEnableDownloaderServiceKey)) {
             _downloader = [[SPUDownloader alloc] initWithDelegate:self];
         } else {
             _connection = [[NSXPCConnection alloc] initWithServiceName:@DOWNLOADER_BUNDLE_ID];
