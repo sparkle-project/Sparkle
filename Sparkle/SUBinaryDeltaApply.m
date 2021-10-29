@@ -116,6 +116,7 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
         return NO;
     }
     
+#if HAS_XAR_GET_SAFE_PATH
     // Reject patches that did not generate valid hierarchical xar container paths
     // These will not succeed to patch using recent versions of BinaryDelta
     if ((majorDiffVersion == SUBinaryDeltaMajorVersion2 && minorDiffVersion < 3) || (majorDiffVersion == SUBinaryDeltaMajorVersion1 && minorDiffVersion < 2)) {
@@ -127,6 +128,7 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
         
         return NO;
     }
+#endif
 
     BOOL usesNewTreeHash = MAJOR_VERSION_IS_AT_LEAST(majorDiffVersion, SUBinaryDeltaMajorVersion2);
 
