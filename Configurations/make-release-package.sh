@@ -13,10 +13,6 @@ function verify_code_signatures() {
 
     # Search the current directory for all instances of the framework to verify them (XCFrameworks can have multiple copies of a framework for different platforms).
     find "${verification_directory}" -name "Sparkle.framework" -type d -exec codesign --verify -vvv --deep {} \;
-    codesign --verify -vvv --deep "${verification_directory}/XPCServices/org.sparkle-project.Downloader.xpc"
-    codesign --verify -vvv --deep "${verification_directory}/XPCServices/org.sparkle-project.InstallerConnection.xpc"
-    codesign --verify -vvv --deep "${verification_directory}/XPCServices/org.sparkle-project.InstallerLauncher.xpc"
-    codesign --verify -vvv --deep "${verification_directory}/XPCServices/org.sparkle-project.InstallerStatus.xpc"
     codesign --verify -vvv --deep "${verification_directory}/sparkle.app"
     codesign --verify -vvv --deep "${verification_directory}/Sparkle Test App.app"
     codesign --verify -vvv --deep "${verification_directory}/bin/BinaryDelta"
@@ -41,8 +37,6 @@ if [ "$ACTION" = "" ] ; then
     cp "$CONFIGURATION_BUILD_DIR/generate_appcast" "$CONFIGURATION_BUILD_DIR/staging/bin"
     cp "$CONFIGURATION_BUILD_DIR/generate_keys" "$CONFIGURATION_BUILD_DIR/staging/bin"
     cp "$CONFIGURATION_BUILD_DIR/sign_update" "$CONFIGURATION_BUILD_DIR/staging/bin"
-    cp "$SRCROOT/Configurations/codesign_xpc_service.py" "$CONFIGURATION_BUILD_DIR/staging/bin/codesign_xpc_service"
-    chmod 0755 "$CONFIGURATION_BUILD_DIR/staging/bin/codesign_xpc_service"
     cp -R "$CONFIGURATION_BUILD_DIR/Sparkle Test App.app" "$CONFIGURATION_BUILD_DIR/staging"
     cp -R "$CONFIGURATION_BUILD_DIR/Sparkle Test App.app" "$CONFIGURATION_BUILD_DIR/staging-spm"
     cp -R "$CONFIGURATION_BUILD_DIR/sparkle.app" "$CONFIGURATION_BUILD_DIR/staging"
@@ -50,37 +44,25 @@ if [ "$ACTION" = "" ] ; then
     cp -R "$CONFIGURATION_BUILD_DIR/Sparkle.framework" "$CONFIGURATION_BUILD_DIR/staging"
     cp -R "$CONFIGURATION_BUILD_DIR/Sparkle.xcframework" "$CONFIGURATION_BUILD_DIR/staging-spm"
 
-    mkdir -p "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
-
-    cp -R "$CONFIGURATION_BUILD_DIR/$INSTALLER_LAUNCHER_BUNDLE_ID.xpc" "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
-    cp -R "$CONFIGURATION_BUILD_DIR/$DOWNLOADER_BUNDLE_ID.xpc" "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
-    cp -R "$CONFIGURATION_BUILD_DIR/$INSTALLER_CONNECTION_BUNDLE_ID.xpc" "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
-    cp -R "$CONFIGURATION_BUILD_DIR/$INSTALLER_STATUS_BUNDLE_ID.xpc" "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
-
-    cp "$SRCROOT/Downloader/$DOWNLOADER_BUNDLE_ID.entitlements" "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
-    cp "$SRCROOT/InstallerConnection/$INSTALLER_CONNECTION_BUNDLE_ID.entitlements" "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
-    cp "$SRCROOT/InstallerStatus/$INSTALLER_STATUS_BUNDLE_ID.entitlements" "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
+    mkdir -p "$CONFIGURATION_BUILD_DIR/staging/Symbols"
 
     # Only copy dSYMs for Release builds, but don't check for the presence of the actual files
     # because missing dSYMs in a release build SHOULD trigger a build failure
     if [ "$CONFIGURATION" = "Release" ] ; then
-        cp -R "$CONFIGURATION_BUILD_DIR/BinaryDelta.dSYM" "$CONFIGURATION_BUILD_DIR/staging/bin"
-        cp -R "$CONFIGURATION_BUILD_DIR/generate_appcast.dSYM" "$CONFIGURATION_BUILD_DIR/staging/bin"
-        cp -R "$CONFIGURATION_BUILD_DIR/generate_keys.dSYM" "$CONFIGURATION_BUILD_DIR/staging/bin"
-        cp -R "$CONFIGURATION_BUILD_DIR/sign_update.dSYM" "$CONFIGURATION_BUILD_DIR/staging/bin"
-        cp -R "$CONFIGURATION_BUILD_DIR/Sparkle Test App.app.dSYM" "$CONFIGURATION_BUILD_DIR/staging"
-        cp -R "$CONFIGURATION_BUILD_DIR/Sparkle Test App.app.dSYM" "$CONFIGURATION_BUILD_DIR/staging-spm"
-        cp -R "$CONFIGURATION_BUILD_DIR/sparkle.app.dSYM" "$CONFIGURATION_BUILD_DIR/staging"
-        cp -R "$CONFIGURATION_BUILD_DIR/sparkle.app.dSYM" "$CONFIGURATION_BUILD_DIR/staging-spm"
-        cp -R "$CONFIGURATION_BUILD_DIR/Sparkle.framework.dSYM" "$CONFIGURATION_BUILD_DIR/staging"
-
-        cp -R "$CONFIGURATION_BUILD_DIR/$INSTALLER_LAUNCHER_BUNDLE_ID.xpc.dSYM" "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
-        cp -R "$CONFIGURATION_BUILD_DIR/$DOWNLOADER_BUNDLE_ID.xpc.dSYM" "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
-        cp -R "$CONFIGURATION_BUILD_DIR/$INSTALLER_CONNECTION_BUNDLE_ID.xpc.dSYM" "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
-        cp -R "$CONFIGURATION_BUILD_DIR/$INSTALLER_STATUS_BUNDLE_ID.xpc.dSYM" "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
+        cp -R "$CONFIGURATION_BUILD_DIR/BinaryDelta.dSYM" "$CONFIGURATION_BUILD_DIR/staging/Symbols"
+        cp -R "$CONFIGURATION_BUILD_DIR/generate_appcast.dSYM" "$CONFIGURATION_BUILD_DIR/staging/Symbols"
+        cp -R "$CONFIGURATION_BUILD_DIR/generate_keys.dSYM" "$CONFIGURATION_BUILD_DIR/staging/Symbols"
+        cp -R "$CONFIGURATION_BUILD_DIR/sign_update.dSYM" "$CONFIGURATION_BUILD_DIR/staging/Symbols"
+        cp -R "$CONFIGURATION_BUILD_DIR/Sparkle Test App.app.dSYM" "$CONFIGURATION_BUILD_DIR/staging/Symbols"
+        cp -R "$CONFIGURATION_BUILD_DIR/sparkle.app.dSYM" "$CONFIGURATION_BUILD_DIR/staging/Symbols"
+        cp -R "$CONFIGURATION_BUILD_DIR/Sparkle.framework.dSYM" "$CONFIGURATION_BUILD_DIR/staging/Symbols"
+        cp -R "$CONFIGURATION_BUILD_DIR/Autoupdate.dSYM" "$CONFIGURATION_BUILD_DIR/staging/Symbols"
+        cp -R "$CONFIGURATION_BUILD_DIR/Updater.app.dSYM" "$CONFIGURATION_BUILD_DIR/staging/Symbols"
+        cp -R "$CONFIGURATION_BUILD_DIR/org.sparkle-project.InstallerLauncher.xpc.dSYM" "$CONFIGURATION_BUILD_DIR/staging/Symbols"
+        cp -R "$CONFIGURATION_BUILD_DIR/org.sparkle-project.Downloader.xpc.dSYM" "$CONFIGURATION_BUILD_DIR/staging/Symbols"
     fi
     cp -R "$CONFIGURATION_BUILD_DIR/staging/bin" "$CONFIGURATION_BUILD_DIR/staging-spm"
-    cp -R "$CONFIGURATION_BUILD_DIR/staging/XPCServices" "$CONFIGURATION_BUILD_DIR/staging-spm"
+    cp -R "$CONFIGURATION_BUILD_DIR/staging/Symbols" "$CONFIGURATION_BUILD_DIR/staging-spm"
 
     cd "$CONFIGURATION_BUILD_DIR/staging"
     

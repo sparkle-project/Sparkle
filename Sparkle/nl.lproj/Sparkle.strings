@@ -1,12 +1,11 @@
-"%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ is gedownload en klaar om te installeren! Wil je %1$@ nu installeren en herstarten?";
-
-"%1$@ can't be updated, because it was opened from a read-only or a temporary location." = "%1$@ kan niet worden geüpdatet, omdat het vanuit een alleen-lezen- of tijdelijke locatie geopend is.";
-
-"Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "Verplaats %1$@ naar de map ’Programma’s’, herstart vandaar en probeer opnieuw.";
-
+/* (No Comment) */
 "%@ %@ is currently the newest version available." = "%1$@ %2$@ is momenteel de nieuwste versie.";
 
-"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%1$@ %2$@ is momenteel de nieuwste versie.\n(You are currently running version %3$@.)";
+/* (No Comment) */
+"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%1$@ %2$@ is momenteel de nieuwste versie.\n(Je gebruikt op dit moment versie %3$@.)";
+
+/* Critical downloadable update */
+"%@ %@ is now available--you have %@. This is an important update; would you like to download it now?" = "%1$@ %2$@ is nu beschikbaar – je hebt %3$@. Dit is een belangrijke update. Wil je deze nu downloaden?";
 
 /* Description text for SUUpdateAlert when the update is downloadable. */
 "%@ %@ is now available--you have %@. Would you like to download it now?" = "%1$@ %2$@ is nu beschikbaar – je hebt %3$@. Wil je de update nu downloaden?";
@@ -14,34 +13,101 @@
 /* Description text for SUUpdateAlert when the update informational with no download. */
 "%@ %@ is now available--you have %@. Would you like to learn more about this update on the web?" = "%1$@ %2$@ is nu beschikbaar – je hebt %3$@. Wil je een webpagina openen met meer informatie?";
 
+/* (No Comment) */
 "%@ downloaded" = "%@ gedownload";
 
+/* (No Comment) */
+"%@ is now updated to version %@!" = "%@ is nu bijgewerkt naar versie %@!";
+
+/* (No Comment) */
+"%@ is now updated!" = "%@ is nu bijgewerkt!";
+
+/* (No Comment) */
 "%@ of %@" = "%1$@ van %2$@";
 
+/* (No Comment) */
+"%1$@ %2$@ has been downloaded and is ready to use! This is an important update; would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ is gedownload en klaar om te installeren! Dit is een belangrijke update. Wil je deze nu installeren en %1$@ herstarten?";
+
+/* (No Comment) */
+"%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ is gedownload en klaar om te installeren! Wil je deze nu installeren en %1$@ herstarten?";
+
+/* (No Comment) */
+"%1$@ %2$@ is available but your macOS version is too new for this update. This update only supports up to macOS %3$@." = "%1$@ %2$@ is beschikbaar, maar je versie van macOS is te nieuw voor deze update. De update kan alleen worden gebruikt tot macOS %3$@.";
+
+/* (No Comment) */
+"%1$@ %2$@ is available but your macOS version is too old to install it. At least macOS %3$@ is required." = "%1$@ %2$@ is beschikbaar, maar je versie van macOS is te oud om deze te installeren. Ten minste macOS %3$@ is vereist.";
+
+/* (No Comment) */
+"%1$@ can't be updated, because it was opened from a read-only or a temporary location." = "%1$@ kan niet worden bijgewerkt, omdat het vanuit een alleen-lezen- of tijdelijke locatie is geopend.";
+
+/* (No Comment) */
+"%1$@ can’t be updated if it’s running from the location it was downloaded to." = "%1$@ kan niet worden bijgewerkt als het is geopend vanuit de downloadlocatie.";
+
+/* Authorization message shown when app wants permission to update another app / bundle. */
+"%1$@ wants permission to update %2$@." = "%1$@ vraagt om toestemming om %2$@ bij te werken.";
+
+/* Authorization message shown when app wants permission to update itself. */
+"%1$@ wants permission to update." = "%1$@ vraagt om toestemming om bij te werken.";
+
+/* (No Comment) */
 "A new version of %@ is available!" = "Een nieuwe versie van %@ is beschikbaar!";
 
+/* (No Comment) */
 "A new version of %@ is ready to install!" = "Een nieuwe versie van %@ is klaar om te installeren!";
 
-"An error occurred in retrieving update information. Please try again later." = "Bij het ophalen van update-informatie deed zich een fout voor. Probeer het later opnieuw.";
+/* (No Comment) */
+"An error occurred in retrieving update information. Please try again later." = "Er heeft zich een fout voorgedaan bij het ophalen van update-informatie. Probeer het later opnieuw.";
 
-"An error occurred while downloading the update. Please try again later." = "Bij het downloaden van de update deed zich een fout voor. Probeer het later opnieuw";
+/* (No Comment) */
+"An error occurred while connecting to the installer. Please try again later." = "Er heeft zich een fout voorgedaan bij het verbinden met het installatieprogramma. Probeer het later opnieuw.";
 
-"An error occurred while extracting the archive. Please try again later." = "Bij het uitpakken van het archief deed zich een fout voor. Probeer het later opnieuw.";
+/* (No Comment) */
+"An error occurred while downloading the update feed." = "Er heeft zich een fout voorgedaan bij het downloaden van de update-informatie.";
 
-"An error occurred while installing the update. Please try again later." = "Bij het installeren van de update deed zich een fout voor. Probeer het later opnieuw.";
+/* (No Comment) */
+"An error occurred while downloading the update. Please try again later." = "Er heeft zich een fout voorgedaan bij het downloaden van de update. Probeer het later opnieuw";
 
-"An error occurred while parsing the update feed." = "Bij het verwerken van de update-informatie deed zich een fout voor.";
+/* (No Comment) */
+"An error occurred while extracting the archive. Please try again later." = "Er heeft zich een fout voorgedaan bij het uitpakken van het archief. Probeer het later opnieuw.";
 
-"An error occurred while relaunching %1$@, but the new version will be available next time you run %1$@." = "Bij het herstarten van %1$@ deed zich een fout voor. De nieuwe versie is beschikbaar wanneer je %1$@ de volgende keer opent.";
+/* (No Comment) */
+"An error occurred while installing the update. Please try again later." = "Er heeft zich een fout voorgedaan bij het installeren van de update. Probeer het later opnieuw.";
+
+/* (No Comment) */
+"An error occurred while launching the installer. Please try again later." = "Er heeft zich een fout voorgedaan bij het starten van het installatieprogramma. Probeer het later opnieuw.";
+
+/* (No Comment) */
+"An error occurred while parsing the update feed." = "Er heeft zich een fout voorgedaan bij het verwerken van de update-informatie.";
+
+/* (No Comment) */
+"An error occurred while relaunching %1$@, but the new version will be available next time you run %1$@." = "Er heeft zich een fout voorgedaan bij het herstarten van %1$@. De nieuwe versie is beschikbaar wanneer je %1$@ de volgende keer opent.";
+
+/* (No Comment) */
+"An error occurred while running the updater. Please try again later." = "Er heeft zich een fout voorgedaan bij het uitvoeren van het bijwerkprogramma. Probeer het later opnieuw.";
+
+/* (No Comment) */
+"An error occurred while starting the installer. Please try again later." = "Er heeft zich een fout voorgedaan bij het starten van het installatieprogramma. Probeer het later opnieuw.";
+
+/* (No Comment) */
+"An important update to %@ is ready to install" = "Een belangrijke update voor %@ is klaar om te installeren";
+
+/* Title confirmation for skipping major upgrade and future updates */
+"Are you sure you want to skip this upgrade?" = "Weet je zeker dat je deze update wilt overslaan?";
 
 /* the unit for bytes */
 "B" = "B";
 
+/* (No Comment) */
 "Cancel" = "Annuleer";
 
+/* (No Comment) */
 "Cancel Update" = "Annuleer update";
 
+/* (No Comment) */
 "Checking for updates..." = "Naar updates zoeken…";
+
+/* Not skipping a major upgrade */
+"Don't Skip" = "Sla niet over";
 
 /* Take care not to overflow the status window. */
 "Downloading update..." = "Update downloaden…";
@@ -49,10 +115,17 @@
 /* Take care not to overflow the status window. */
 "Extracting update..." = "Update uitpakken…";
 
+/* (No Comment) */
+"Failed to resume installing update." = "Het hervatten van de update-installatie is mislukt.";
+
 /* the unit for gigabytes */
 "GB" = "GB";
 
+/* (No Comment) */
 "Install and Relaunch" = "Installeer en herstart";
+
+/* (No Comment) */
+"Install on Quit" = "Installeer bij het stoppen";
 
 /* Take care not to overflow the status window. */
 "Installing update..." = "Update installeren…";
@@ -60,11 +133,18 @@
 /* the unit for kilobytes */
 "KB" = "KB";
 
+/* Alternative name for "Install" button if we have a paid update or other update
+	without a download but with a URL. */
+"Learn More..." = "Meer informatie…";
+
 /* the unit for megabytes */
 "MB" = "MB";
 
 /* OK button. */
 "OK" = "OK";
+
+/* (No Comment) */
+"Quit %1$@, move it into your Applications folder, relaunch it from there and try again." = "Stop %1$@, verplaats het naar de map 'Apps', herstart het van daaruit en probeer opnieuw.";
 
 /* Status message on progress window once download has finished. */
 "Ready to Install" = "Klaar om te installeren";
@@ -72,9 +152,35 @@
 /* Message that is optionally shown at startup to allow users to turn on/off update checks. */
 "Should %1$@ automatically check for updates? You can always check for updates manually from the %1$@ menu." = "Wil je dat %1$@ automatisch naar updates zoekt? Je kunt altijd nog handmatig zoeken naar updates via het %1$@-menu.";
 
+/* Skipping major upgrade */
+"Skip Upgrade" = "Sla update over";
+
+/* Confirmation message for skipping major upgrade and future updates */
+"Skipping this major upgrade will opt out of alerts for future updates." = "Als je deze hoofdupdate overslaat, zul je geen meldingen voor toekomstige updates ontvangen.";
+
+/* (No Comment) */
+"The update checker failed to start correctly. You should contact the app developer to report this issue and verify that you have the latest version" = "Het bijwerkprogramma is niet goed gestart. Je kunt wellicht met de app-ontwikkelaar contact opnemen om de fout te melden en te controleren dat je de nieuwste versie hebt";
+
+/* (No Comment) */
+"The update is improperly signed." = "De update is onjuist gesigneerd.";
+
+/* (No Comment) */
+"Unable to Check For Updates" = "Zoeken naar updates mislukt";
+
+/* (No Comment) */
 "Update Error!" = "Fout bij het bijwerken!";
 
+/* (No Comment) */
+"Update Installed" = "Update geïnstalleerd";
+
+/* (No Comment) */
 "Updating %@" = "%@ bijwerken…";
+
+/* (No Comment) */
+"Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "Gebruik Finder om %1$@ naar de map 'Apps' te kopiëren, herstart het van daaruit en probeer opnieuw.";
+
+/* Used when a new update is not found */
+"Version History" = "Versiegeschiedenis";
 
 /* 'Error' message when the user checks for updates but is already current or the feed doesn't contain any updates. (not necessarily shown in UI) */
 "You already have the newest version of %@." = "Je hebt al de nieuwste versie van %@.";
@@ -82,7 +188,9 @@
 /* Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates. */
 "You're up-to-date!" = "Je hebt de nieuwste versie!";
 
-/* Alternative name for "Install" button if we have a paid update or other update
-	without a download but with a URL. */
+/* (No Comment) */
+"Your macOS version is too new" = "Je versie van macOS is te nieuw";
 
-"Learn More..." = "Meer informatie…";
+/* (No Comment) */
+"Your macOS version is too old" = "Je versie van macOS is te oud";
+

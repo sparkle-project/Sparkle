@@ -12,7 +12,7 @@
 
 "%@ %@ is currently the newest version available." = "%1$@ %2$@ is currently the newest version available.";
 
-"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%1$@ %2$@ is currently the newest version available.\n(You are currently running version %3$@.)";
+"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%1$@ %2$@ is currently the newest version available.\n(You are currently running version %3$@.)";
 
 "An error occurred while running the updater. Please try again later." = "An error occurred while running the updater. Please try again later.";
 
@@ -24,7 +24,7 @@
 
 "Update Installed" = "Update Installed";
 
-"%@ is now updated to version %@!" = "%@ is now updated to version %@!";
+"%@ is now updated to version %@!" = "%@ is now updated to version %@!";
 
 "%@ is now updated!" = "%@ is now updated!";
 
@@ -35,7 +35,7 @@
 "%@ %@ is now available--you have %@. Would you like to learn more about this update on the web?" = "%1$@ %2$@ is now available—you have %3$@. Would you like to learn more about this update on the web?";
 
 /* Critical downloadable update */
-"%@ %@ is now available--you have %@. This is an important update; would you like to download it now?" = "%1$@ %2$@ is now available--you have %3$@. This is an important update; would you like to download it now?";
+"%@ %@ is now available--you have %@. This is an important update; would you like to download it now?" = "%1$@ %2$@ is now available—you have %3$@. This is an important update; would you like to download it now?";
 
 "%@ downloaded" = "%@ downloaded";
 
@@ -137,11 +137,11 @@
 
 "Your macOS version is too old" = "Your macOS version is too old";
 
-"%1$@ %2$@ is available but your macOS version is too old to install it. At least macOS %3$@ is required." = "%1$@ %2$@ is available but your macOS version is too old to install it. At least macOS %3$@ is required.";
+"%1$@ %2$@ is available but your macOS version is too old to install it. At least macOS %3$@ is required." = "%1$@ %2$@ is available but your macOS version is too old to install it. At least macOS %3$@ is required.";
 
 "Your macOS version is too new" = "Your macOS version is too new";
 
-"%1$@ %2$@ is available but your macOS version is too new for this update. This update only supports up to macOS %3$@." = "%1$@ %2$@ is available but your macOS version is too new for this update. This update only supports up to macOS %3$@.";
+"%1$@ %2$@ is available but your macOS version is too new for this update. This update only supports up to macOS %3$@." = "%1$@ %2$@ is available but your macOS version is too new for this update. This update only supports up to macOS %3$@.";
 
 /* Used when a new update is not found */
 "Version History" = "Version History";
