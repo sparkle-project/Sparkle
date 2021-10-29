@@ -280,12 +280,11 @@
                 // Check if the delegate implements a Version History action
                 id <SPUStandardUserDriverDelegate> delegate = self.delegate;
                 
-                if ([delegate respondsToSelector:@selector(standardUserDriverShowVersionHistory)]) {
+                if ([delegate respondsToSelector:@selector(standardUserDriverShowVersionHistory:)]) {
                     [alert addButtonWithTitle:localizedButtonTitle];
                     
-                    __weak SPUStandardUserDriver *weakSelf = self;
                     secondaryAction = ^{
-                        [weakSelf.delegate standardUserDriverShowVersionHistory];
+                        [delegate standardUserDriverShowVersionHistory:latestAppcastItem];
                     };
                 } else if (latestAppcastItem.releaseNotesURL != nil) {
                     // Fall back to opening the release notes URL (or forthcoming full version history link attr!)

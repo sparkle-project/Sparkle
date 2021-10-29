@@ -47,9 +47,11 @@ SU_EXPORT @protocol SPUStandardUserDriverDelegate <NSObject>
 
 /**
  Called if implemented when the Version History button is chosen by the user. Otherwise,
- the `releaseNotesFullLink` or `releaseNoteLink` in the appcast's latest item will be be
+ the `fullReleaseNotesLink` or `releaseNotesLink` in the appcast's latest item will be be
  opened.
+ 
+ @param item The appcast item corresponding to the latest version available.
  */
-- (void)standardUserDriverShowVersionHistory;
+- (void)standardUserDriverShowVersionHistory:(SUAppcastItem *_Nonnull)item;
 
 @end
