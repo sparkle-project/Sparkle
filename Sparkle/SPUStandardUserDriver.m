@@ -274,9 +274,21 @@
         switch (reason) {
             case SPUNoUpdateFoundReasonOnLatestVersion:
             case SPUNoUpdateFoundReasonOnNewerThanLatestVersion: {
-                if (latestAppcastItem.releaseNotesURL != nil) {
-                    // Show the user the past version history if available
-                    [alert addButtonWithTitle:SULocalizedString(@"Version History", nil)];
+                // Show the user the past version history if available
+                NSString *localizedButtonTitle = SULocalizedString(@"Version History", nil);
+
+                // Check if the delegate implements a Version History action
+                id <SPUStandardUserDriverDelegate> delegate = self.delegate;
+                
+                if ([delegate respondsToSelector:@selector(standardUserDriverShowVersionHistoryForAppcastItem:)]) {
+                    [alert addButtonWithTitle:localizedButtonTitle];
+                    
+                    secondaryAction = ^{
+                        [delegate standardUserDriverShowVersionHistoryForAppcastItem:latestAppcastItem];
+                    };
+                } else if (latestAppcastItem.releaseNotesURL != nil) {
+                    // Fall back to opening the release notes URL (or forthcoming full version history link attr!)
+                    [alert addButtonWithTitle:localizedButtonTitle];
                     
                     secondaryAction = ^{
                         [[NSWorkspace sharedWorkspace] openURL:(NSURL * _Nonnull)latestAppcastItem.releaseNotesURL];
