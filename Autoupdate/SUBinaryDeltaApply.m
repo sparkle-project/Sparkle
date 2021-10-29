@@ -234,8 +234,36 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
         }
         
         NSString *path = @(pathCString);
+        if ([path.pathComponents containsObject:@".."]) {
+            xar_close(x);
+            
+            if (error != NULL) {
+                *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Relative path '%@' contains '..' path component", path] }];
+            }
+            return NO;
+        }
+        
         NSString *sourceFilePath = [source stringByAppendingPathComponent:path];
         NSString *destinationFilePath = [destination stringByAppendingPathComponent:path];
+        {
+            NSString *destinationParentDirectory = destinationFilePath.stringByDeletingLastPathComponent;
+            NSDictionary<NSFileAttributeKey, id> *destinationParentDirectoryAttributes = [fileManager attributesOfItemAtPath:destinationParentDirectory error:NULL];
+            
+            // It is OK for the directory parent to not exist if it has already been removed
+            if (destinationParentDirectoryAttributes != nil) {
+                // But if it does exist, make sure the entry in the parent directory we're looking at is good
+                // If it's inside a symlink, this is not good in any circumstance
+                NSString *fileType = destinationParentDirectoryAttributes[NSFileType];
+                if ([fileType isEqualToString:NSFileTypeSymbolicLink]) {
+                    xar_close(x);
+                    
+                    if (error != NULL) {
+                        *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to create patch because '%@' is cannot be a symbolic link.", destinationParentDirectory] }];
+                    }
+                    return NO;
+                }
+            }
+        }
 
         // Don't use -[NSFileManager fileExistsAtPath:] because it will follow symbolic links
         BOOL fileExisted = verbose && [fileManager attributesOfItemAtPath:destinationFilePath error:nil];
