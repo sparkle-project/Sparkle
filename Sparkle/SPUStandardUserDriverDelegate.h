@@ -52,6 +52,6 @@ SU_EXPORT @protocol SPUStandardUserDriverDelegate <NSObject>
  
  @param item The appcast item corresponding to the latest version available.
  */
-- (void)standardUserDriverShowVersionHistory:(SUAppcastItem *_Nonnull)item;
+- (void)standardUserDriverShowVersionHistoryForAppcastItem:(SUAppcastItem *_Nonnull)item;
 
 @end

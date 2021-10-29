@@ -284,7 +284,7 @@
                     [alert addButtonWithTitle:localizedButtonTitle];
                     
                     secondaryAction = ^{
-                        [delegate standardUserDriverShowVersionHistory:latestAppcastItem];
+                        [delegate standardUserDriverShowVersionHistoryForAppcastItem:latestAppcastItem];
                     };
                 } else if (latestAppcastItem.releaseNotesURL != nil) {
                     // Fall back to opening the release notes URL (or forthcoming full version history link attr!)
