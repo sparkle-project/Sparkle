@@ -257,7 +257,7 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
                     xar_close(x);
                     
                     if (error != NULL) {
-                        *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to create patch because '%@' is cannot be a symbolic link.", destinationParentDirectory] }];
+                        *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to create patch because '%@' cannot be a symbolic link.", destinationParentDirectory] }];
                     }
                     return NO;
                 }
