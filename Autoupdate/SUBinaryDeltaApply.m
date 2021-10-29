@@ -14,9 +14,22 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <xar/xar.h>
+#include <Availability.h>
 
 
 #include "AppKitPrevention.h"
+
+#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 120000
+    #define HAS_XAR_GET_SAFE_PATH 1
+#else
+    #define HAS_XAR_GET_SAFE_PATH 0
+#endif
+
+#if HAS_XAR_GET_SAFE_PATH
+// This is preferred over xar_get_path (which is deprecated) when it's available
+// Don't use OS availability for this API
+extern char *xar_get_safe_path(xar_file_t f) __attribute__((weak_import));
+#endif
 
 static BOOL applyBinaryDeltaToFile(xar_t x, xar_file_t file, NSString *sourceFilePath, NSString *destinationFilePath)
 {
@@ -179,7 +192,22 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
     xar_file_t file;
     xar_iter_t iter = xar_iter_new();
     for (file = xar_file_first(x, iter); file; file = xar_file_next(iter)) {
-        NSString *path = @(xar_get_path(file));
+        char *pathCString;
+#if HAS_XAR_GET_SAFE_PATH
+        if (xar_get_safe_path != NULL) {
+            pathCString = xar_get_safe_path(file);
+        }
+        else
+#endif
+        {
+            pathCString = xar_get_path(file);
+        }
+        
+        if (pathCString == NULL) {
+            continue;
+        }
+        
+        NSString *path = @(pathCString);
         NSString *sourceFilePath = [source stringByAppendingPathComponent:path];
         NSString *destinationFilePath = [destination stringByAppendingPathComponent:path];
 
