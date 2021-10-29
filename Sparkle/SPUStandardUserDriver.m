@@ -280,7 +280,7 @@
                 // Check if the delegate implements a Version History action
                 id <SPUStandardUserDriverDelegate> delegate = self.delegate;
                 
-                if ([delegate respondsToSelector:@selector(standardUserDriverShowVersionHistory:)]) {
+                if ([delegate respondsToSelector:@selector(standardUserDriverShowVersionHistoryForAppcastItem:)]) {
                     [alert addButtonWithTitle:localizedButtonTitle];
                     
                     secondaryAction = ^{
