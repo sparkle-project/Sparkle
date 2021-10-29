@@ -111,6 +111,16 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
         }
         return NO;
     }
+    
+    // Reject patches that did not generate valid hierarchical xar container paths
+    // These will not succeed to patch using recent versions of BinaryDelta
+    if ((majorDiffVersion == SUBinaryDeltaMajorVersion2 && minorDiffVersion < 3) || (majorDiffVersion == SUBinaryDeltaMajorVersion1 && minorDiffVersion < 2)) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"This patch version (%u.%u) is too old and potentially unsafe to apply. Please re-generate the patch using the latest version of BinaryDelta.", majorDiffVersion, minorDiffVersion] }];
+        }
+        
+        return NO;
+    }
 
     BOOL usesNewTreeHash = MAJOR_VERSION_IS_AT_LEAST(majorDiffVersion, SUBinaryDeltaMajorVersion2);
 
