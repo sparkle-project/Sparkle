@@ -43,7 +43,7 @@ int latestMinorVersionForMajorVersion(SUBinaryDeltaMajorVersion majorVersion)
 {
     switch (majorVersion) {
         case SUBinaryDeltaMajorVersion1:
-            return 1;
+            return 2;
         case SUBinaryDeltaMajorVersion2:
             return 3;
     }
