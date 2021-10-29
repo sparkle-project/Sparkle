@@ -42,9 +42,9 @@ NSString *stringWithFileSystemRepresentation(const char *input)
 int latestMinorVersionForMajorVersion(SUBinaryDeltaMajorVersion majorVersion)
 {
     switch (majorVersion) {
-        case SUAzureMajorVersion:
-            return 1;
-        case SUBeigeMajorVersion:
+        case SUBinaryDeltaMajorVersion1:
+            return 2;
+        case SUBinaryDeltaMajorVersion2:
             return 3;
     }
     return 0;
@@ -162,7 +162,7 @@ NSString *hashOfTreeWithVersion(NSString *path, uint16_t majorVersion)
         if (ent->fts_info != FTS_F && ent->fts_info != FTS_SL && ent->fts_info != FTS_D)
             continue;
 
-        if (ent->fts_info == FTS_D && !MAJOR_VERSION_IS_AT_LEAST(majorVersion, SUBeigeMajorVersion)) {
+        if (ent->fts_info == FTS_D && !MAJOR_VERSION_IS_AT_LEAST(majorVersion, SUBinaryDeltaMajorVersion2)) {
             continue;
         }
 
@@ -179,7 +179,7 @@ NSString *hashOfTreeWithVersion(NSString *path, uint16_t majorVersion)
         const char *relativePathBytes = [relativePath fileSystemRepresentation];
         CC_SHA1_Update(&hashContext, relativePathBytes, (CC_LONG)strlen(relativePathBytes));
 
-        if (MAJOR_VERSION_IS_AT_LEAST(majorVersion, SUBeigeMajorVersion)) {
+        if (MAJOR_VERSION_IS_AT_LEAST(majorVersion, SUBinaryDeltaMajorVersion2)) {
             uint16_t mode = ent->fts_statp->st_mode;
             // permission of symlinks is irrelevant and can't be changed.
             // hardcoding a value helps avoid differences between filesystems.

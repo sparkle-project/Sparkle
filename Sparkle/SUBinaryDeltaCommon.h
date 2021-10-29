@@ -53,12 +53,12 @@
 
 typedef NS_ENUM(uint16_t, SUBinaryDeltaMajorVersion)
 {
-    SUAzureMajorVersion = 1,
-    SUBeigeMajorVersion = 2
+    SUBinaryDeltaMajorVersion1 = 1,
+    SUBinaryDeltaMajorVersion2 = 2
 };
 
-#define FIRST_DELTA_DIFF_MAJOR_VERSION SUAzureMajorVersion
-#define LATEST_DELTA_DIFF_MAJOR_VERSION SUBeigeMajorVersion
+#define FIRST_DELTA_DIFF_MAJOR_VERSION SUBinaryDeltaMajorVersion1
+#define LATEST_DELTA_DIFF_MAJOR_VERSION SUBinaryDeltaMajorVersion2
 
 extern int compareFiles(const FTSENT **a, const FTSENT **b);
 extern NSString *hashOfTreeWithVersion(NSString *path, uint16_t majorVersion);
