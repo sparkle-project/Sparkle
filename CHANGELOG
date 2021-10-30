@@ -1,3 +1,10 @@
+# 1.27.1
+
+ * Use px instead of pt when specifying font size to fix default font size in WebView from #1962 (regressed in 1.25.0 with WKWebView adoption) (Daniel Jalkut)
+ * Fix to prevent Sparkle manipulating the host app's high level WebView defaults from #1961 (affecting only macOS versions before 10.11 in 1.x branch) (Daniel Jalkut)
+ * Add safer handling of applying binary delta files from #1990 (Zorg)
+ * Don't use current date unless necessary when scheduling next update to be more resilient against rapid polling from #1991 (Zorg)
+
 # 1.27.0
 
  * Deprecate not using EdDSA and skip DSA verification when possible in #1892 (Zorg)
