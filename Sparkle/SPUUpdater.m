@@ -482,6 +482,9 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
                 if (!lastCheckDate) { lastCheckDate = [NSDate distantPast]; }
                 intervalSinceCheck = [[NSDate date] timeIntervalSinceDate:lastCheckDate];
                 if (intervalSinceCheck < 0) {
+                    // Last update check date is in the future and bogus, so reset it to current date
+                    [self updateLastUpdateCheckDate];
+                    
                     intervalSinceCheck = 0;
                 }
             } else {
