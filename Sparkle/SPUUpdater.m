@@ -398,7 +398,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         // We start the update checks and register as observer for changes after the prompt finishes
     } else {
         // We check if the user's said they want updates, or they haven't said anything, and the default is set to checking.
-        [self scheduleNextUpdateCheckFiringImmediately:NO];
+        [self scheduleNextUpdateCheckFiringImmediately:NO usingCurrentTime:YES];
     }
 }
 
@@ -428,7 +428,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 }
 
 // Note this method is never called when sessionInProgress is YES
-- (void)scheduleNextUpdateCheckFiringImmediately:(BOOL)firingImmediately
+- (void)scheduleNextUpdateCheckFiringImmediately:(BOOL)firingImmediately usingCurrentTime:(BOOL)usingCurrentTime
 {
     [self.updaterTimer invalidate];
     
@@ -475,10 +475,21 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
             // This callback is asynchronous, so the timer may be set. Invalidate to make sure it isn't.
             [self.updaterTimer invalidate];
             
-            // How long has it been since last we checked for an update?
-            NSDate *lastCheckDate = [self lastUpdateCheckDate];
-            if (!lastCheckDate) { lastCheckDate = [NSDate distantPast]; }
-            NSTimeInterval intervalSinceCheck = [[NSDate date] timeIntervalSinceDate:lastCheckDate];
+            NSTimeInterval intervalSinceCheck;
+            if (usingCurrentTime) {
+                // How long has it been since last we checked for an update?
+                NSDate *lastCheckDate = [self lastUpdateCheckDate];
+                if (!lastCheckDate) { lastCheckDate = [NSDate distantPast]; }
+                intervalSinceCheck = [[NSDate date] timeIntervalSinceDate:lastCheckDate];
+                if (intervalSinceCheck < 0) {
+                    // Last update check date is in the future and bogus, so reset it to current date
+                    [self updateLastUpdateCheckDate];
+                    
+                    intervalSinceCheck = 0;
+                }
+            } else {
+                intervalSinceCheck = 0;
+            }
             
             // Now we want to figure out how long until we check again.
             if (updateCheckInterval < SUMinimumUpdateCheckInterval)
@@ -673,7 +684,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
                 // Ensure the delegate doesn't start a new session when being notified of the previous one ending
                 if (!strongSelf.sessionInProgress) {
                     if (shouldScheduleNextUpdateCheck) {
-                        [strongSelf scheduleNextUpdateCheckFiringImmediately:NO];
+                        [strongSelf scheduleNextUpdateCheckFiringImmediately:NO usingCurrentTime:NO];
                     } else {
                         SULog(SULogLevelDefault, @"Disabling scheduled updates..");
                     }
@@ -724,7 +735,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
             
             // Ensure the delegate doesn't start a new session when being notified of the previous one ending
             if (!strongSelf.sessionInProgress) {
-                [strongSelf scheduleNextUpdateCheckFiringImmediately:shouldShowUpdateImmediately];
+                [strongSelf scheduleNextUpdateCheckFiringImmediately:shouldShowUpdateImmediately usingCurrentTime:NO];
             }
         }
     }];
@@ -769,7 +780,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     
     if (!self.sessionInProgress) {
         [self cancelNextUpdateCycle];
-        [self scheduleNextUpdateCheckFiringImmediately:NO];
+        [self scheduleNextUpdateCheckFiringImmediately:NO usingCurrentTime:YES];
     }
 }
 
