@@ -6,6 +6,21 @@ env:
 
 on:
   workflow_dispatch
+    inputs:
+      marketingVersion:
+        description: "Marketing Version"
+        required: true
+        default: ""
+        
+      prereleaseSuffix:
+        description: "Pre-release Suffix"
+        required: false
+        default: ""
+        
+      buildVersion:
+        description: "Product Build"
+        required: true
+        default: ""
 
 concurrency: 
   group: publish-release-${{ github.ref }}
@@ -27,16 +42,26 @@ jobs:
       - name: "Extract latest changes from CHANGELOG"
         run: |
             ./Configurations/generate_latest_changes.py > latest-changes.txt
-
-      - name: "Extract version information from project"
+            
+      - name: "Overwrite project versions in project"
         run: |
-          MARKETING_VERSION=$(xcrun xcodebuild -showBuildSettings -project Sparkle.xcodeproj | grep -m 1 '^[[:space:]]*MARKETING_VERSION' | sed -E 's/.+=[[:space:]]+(.*)$/\1/')
-          echo "MARKETING_VERSION=${MARKETING_VERSION}" >> $GITHUB_ENV
+            IFS='.' read major minor patch <<< "${{ github.event.inputs.marketingVersion }}"
+            sed -E -i '' "s/SPARKLE_VERSION_MAJOR =.+/SPARKLE_VERSION_MAJOR = $major/g" ./Configurations/ConfigCommon.xcconfig
+            sed -E -i '' "s/SPARKLE_VERSION_MINOR =.+/SPARKLE_VERSION_MAJOR = $minor/g" ./Configurations/ConfigCommon.xcconfig
+            sed -E -i '' "s/SPARKLE_VERSION_PATCH =.+/SPARKLE_VERSION_MAJOR = $patch/g" ./Configurations/ConfigCommon.xcconfig
+            
+            if [[ ! -z "${{ github.event.inputs.prereleaseSuffix }}" ]]; then
+                sed -E -i '' "s/SPARKLE_VERSION_SUFFIX =.*/SPARKLE_VERSION_SUFFIX = ${{ github.event.inputs.prereleaseSuffix }}/g" ./Configurations/ConfigCommon.xcconfig
+            else
+                sed -E -i '' "s/SPARKLE_VERSION_SUFFIX =.*/SPARKLE_VERSION_SUFFIX =/g" ./Configurations/ConfigCommon.xcconfig
+            fi
+            
+            sed -E -i '' "s/CURRENT_PROJECT_VERSION =.+/CURRENT_PROJECT_VERSION = ${{ github.event.inputs.buildVersion }}/g" ./Configurations/ConfigCommon.xcconfig
+            git add ./Configurations/ConfigCommon.xcconfig
 
       - name: "Determine if this is a pre-release version"
         run: |
-          SPARKLE_VERSION_SUFFIX=$(xcrun xcodebuild -showBuildSettings -project Sparkle.xcodeproj | grep -m 1 '^[[:space:]]*SPARKLE_VERSION_SUFFIX' | sed -E 's/.+=[[:space:]]+(.*)$/\1/')
-          if [[ ! -z "$SPARKLE_VERSION_SUFFIX" ]]; then
+          if [[ ! -z "${{ github.event.inputs.prereleaseSuffix }}" ]]; then
             echo "PRERELEASE_VERSION=true" >> $GITHUB_ENV
           else
             echo "PRERELEASE_VERSION=false" >> $GITHUB_ENV
@@ -46,7 +71,7 @@ jobs:
         run: |
             git config user.name Sparkle-Bot
             git config user.email sparkle.project.bot@gmail.com
-            git tag "${{ env.MARKETING_VERSION }}"
+            git tag "${{ github.event.inputs.marketingVersion }}"
 
       - name: "Build release distribution"
         run: make release
@@ -65,8 +90,8 @@ jobs:
         with:
           draft: true
           prerelease: ${{ env.PRERELEASE_VERSION }}
-          name: "Sparkle ${{ env.MARKETING_VERSION }}"
-          tag_name: ${{ env.MARKETING_VERSION }}
+          name: "Sparkle ${{ github.event.inputs.marketingVersion }}"
+          tag_name: ${{ github.event.inputs.marketingVersion }}
           fail_on_unmatched_files: true
           token: ${{ secrets.BOT_PERSONAL_ACCESS_TOKEN }}
           body_path: latest-changes.txt
