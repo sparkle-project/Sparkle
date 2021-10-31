@@ -47,8 +47,8 @@ jobs:
         run: |
             IFS='.' read major minor patch <<< "${{ github.event.inputs.marketingVersion }}"
             sed -E -i '' "s/SPARKLE_VERSION_MAJOR =.+/SPARKLE_VERSION_MAJOR = $major/g" ./Configurations/ConfigCommon.xcconfig
-            sed -E -i '' "s/SPARKLE_VERSION_MINOR =.+/SPARKLE_VERSION_MAJOR = $minor/g" ./Configurations/ConfigCommon.xcconfig
-            sed -E -i '' "s/SPARKLE_VERSION_PATCH =.+/SPARKLE_VERSION_MAJOR = $patch/g" ./Configurations/ConfigCommon.xcconfig
+            sed -E -i '' "s/SPARKLE_VERSION_MINOR =.+/SPARKLE_VERSION_MINOR = $minor/g" ./Configurations/ConfigCommon.xcconfig
+            sed -E -i '' "s/SPARKLE_VERSION_PATCH =.+/SPARKLE_VERSION_PATCH = $patch/g" ./Configurations/ConfigCommon.xcconfig
             
             if [[ ! -z "${{ github.event.inputs.prereleaseSuffix }}" ]]; then
                 sed -E -i '' "s/SPARKLE_VERSION_SUFFIX =.*/SPARKLE_VERSION_SUFFIX = ${{ github.event.inputs.prereleaseSuffix }}/g" ./Configurations/ConfigCommon.xcconfig
