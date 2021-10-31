@@ -32,11 +32,13 @@ SPARKLE_NORMALIZE_INSTALLED_APPLICATION_NAME = 0
 SPARKLE_ICON_NAME = AppIcon
 
 // If you change any of these version details, you must increase CURRENT_PROJECT_VERSION
+// These variables must have a space after the '=' too
 SPARKLE_VERSION_MAJOR = 2
 SPARKLE_VERSION_MINOR = 0
 SPARKLE_VERSION_PATCH = 0
 
 // This should be in SemVer format or empty, ie. "-beta.1"
+// These variables must have a space after the '=' too
 SPARKLE_VERSION_SUFFIX = -beta.4
 CURRENT_PROJECT_VERSION = 2004
 
