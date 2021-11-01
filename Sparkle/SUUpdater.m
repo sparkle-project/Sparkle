@@ -294,7 +294,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
 }
 
 // Note: minimumDelay only matters if usingCurrentTime is YES. minimumDelay is to prevent update checks
-// happening too frequently (in case there's some bug in the system)
+// happening too frequently (in case there's some bug in the system for computing the last update check date / current date)
 - (void)scheduleNextUpdateCheckUsingCurrentTime:(BOOL)usingCurrentTime minimumDelay:(NSTimeInterval)minimumDelay
 {
     if (self.checkTimer)
