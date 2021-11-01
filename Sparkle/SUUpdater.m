@@ -45,7 +45,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 - (instancetype)initForBundle:(NSBundle *)bundle;
 - (void)startUpdateCycle;
 - (void)checkForUpdatesWithDriver:(SUUpdateDriver *)updateDriver;
-- (void)scheduleNextUpdateCheckUsingCurrentTime:(BOOL)usingCurrentTime;
+- (void)scheduleNextUpdateCheckUsingCurrentTime:(BOOL)usingCurrentTime minimumDelay:(NSTimeInterval)minimumDelay;
 - (void)registerAsObserver;
 - (void)unregisterAsObserver;
 - (void)updateDriverDidFinish:(NSNotification *)note;
@@ -255,7 +255,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
         // We start the update checks and register as observer for changes after the prompt finishes
     } else {
         // We check if the user's said they want updates, or they haven't said anything, and the default is set to checking.
-        [self scheduleNextUpdateCheckUsingCurrentTime:YES];
+        [self scheduleNextUpdateCheckUsingCurrentTime:YES minimumDelay:0.0];
     }
 }
 
@@ -271,7 +271,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
     {
         self.driver = nil;
         [self updateLastUpdateCheckDate];
-        [self scheduleNextUpdateCheckUsingCurrentTime:NO];
+        [self scheduleNextUpdateCheckUsingCurrentTime:NO minimumDelay:0.0];
     }
 }
 
@@ -293,7 +293,9 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
     [self didChangeValueForKey:@"lastUpdateCheckDate"];
 }
 
-- (void)scheduleNextUpdateCheckUsingCurrentTime:(BOOL)usingCurrentTime
+// Note: minimumDelay only matters if usingCurrentTime is YES. minimumDelay is to prevent update checks
+// happening too frequently (in case there's some bug in the system)
+- (void)scheduleNextUpdateCheckUsingCurrentTime:(BOOL)usingCurrentTime minimumDelay:(NSTimeInterval)minimumDelay
 {
     if (self.checkTimer)
     {
@@ -326,6 +328,10 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
         delayUntilCheck = (updateCheckInterval - intervalSinceCheck); // It hasn't been long enough.
     else
         delayUntilCheck = 0; // We're overdue! Run one now.
+    
+    if (delayUntilCheck < minimumDelay) {
+        delayUntilCheck = minimumDelay;
+    }
     self.checkTimer = [NSTimer scheduledTimerWithTimeInterval:delayUntilCheck target:self selector:@selector(checkForUpdatesInBackground) userInfo:nil repeats:NO]; // Timer is non-repeating, may have invalidated itself, so we had to retain it.
 }
 
@@ -343,8 +349,12 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
     
 - (void)receiveWakeNote
 {
-    if (self.shouldRescheduleOnWake) // the reason for rescheduling the update-check timer is that NSTimer does behave as if the time the Mac spends asleep did not exist at all, which can significantly prolong the time between update checks
-        [self scheduleNextUpdateCheckUsingCurrentTime:YES];
+    // the reason for rescheduling the update-check timer is that NSTimer does behave as if the time the Mac spends asleep did not exist at all, which can significantly prolong the time between update checks
+    if (self.shouldRescheduleOnWake) {
+        // Paranoid check: give a minimum delay so sleep/wake events cannot spam update checks
+        // Eg: if two wake requests are sent within 15 seconds, only the last request will be processed
+        [self scheduleNextUpdateCheckUsingCurrentTime:YES minimumDelay:15.0];
+    }
 }
 
 - (void)checkForUpdatesInBackground
@@ -397,7 +407,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
 
     if( [self.delegate respondsToSelector: @selector(updaterMayCheckForUpdates:)] && ![self.delegate updaterMayCheckForUpdates: self] )
     {
-        [self scheduleNextUpdateCheckUsingCurrentTime:NO];
+        [self scheduleNextUpdateCheckUsingCurrentTime:NO minimumDelay:0.0];
         return;
     }
 
@@ -406,7 +416,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
     // If we're not given a driver at all, just schedule the next update check and bail.
     if (!self.driver)
     {
-        [self scheduleNextUpdateCheckUsingCurrentTime:NO];
+        [self scheduleNextUpdateCheckUsingCurrentTime:NO minimumDelay:0.0];
         return;
     }
 
@@ -458,7 +468,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
 - (void)resetUpdateCycle
 {
     [[self class] cancelPreviousPerformRequestsWithTarget:self selector:@selector(resetUpdateCycle) object:nil];
-    [self scheduleNextUpdateCheckUsingCurrentTime:YES];
+    [self scheduleNextUpdateCheckUsingCurrentTime:YES minimumDelay:0.0];
 }
 
 - (void)setAutomaticallyChecksForUpdates:(BOOL)automaticallyCheckForUpdates
