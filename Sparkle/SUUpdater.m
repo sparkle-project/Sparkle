@@ -353,7 +353,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
     if (self.shouldRescheduleOnWake) {
         // Paranoid check: give a minimum delay so sleep/wake events cannot spam update checks
         // Eg: if two wake requests are sent within 15 seconds, only the last request will be processed
-        [self scheduleNextUpdateCheckUsingCurrentTime:YES minimumDelay:15.0];
+        [self scheduleNextUpdateCheckUsingCurrentTime:YES minimumDelay:60.0];
     }
 }
 
