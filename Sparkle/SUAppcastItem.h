@@ -164,6 +164,18 @@ SU_EXPORT @interface SUAppcastItem : NSObject<NSSecureCoding>
 @property (copy, readonly, nullable) NSString *itemDescription;
 
 /**
+ The full release notes URL of the appcast item if provided.
+ 
+ This external link will open when `Version History` button is clicked. The link should point to the product's changelog.
+ 
+ The delegate `standardUserDriverShowVersionHistoryForAppcastItem` will be used instead if implemented.
+ If none is set `releaseNotesURL` will be used.
+ 
+ This is extracted from the @c <sparkle:fullReleaseNotesLink> element.
+ */
+@property (readonly, nullable) NSURL *fullReleaseNotesURL;
+
+/**
  The required minimum system operating version string for this update if provided.
  
  This version string should contain three period-separated components.

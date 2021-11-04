@@ -29,6 +29,7 @@ static NSString *SUAppcastItemDescriptionKey = @"itemDescription";
 static NSString *SUAppcastItemMaximumSystemVersionKey = @"maximumSystemVersion";
 static NSString *SUAppcastItemMinimumSystemVersionKey = @"minimumSystemVersion";
 static NSString *SUAppcastItemReleaseNotesURLKey = @"releaseNotesURL";
+static NSString *SUAppcastItemFullReleaseNotesURLKey = @"fullReleaseNotesURL";
 static NSString *SUAppcastItemTitleKey = @"title";
 static NSString *SUAppcastItemVersionStringKey = @"versionString";
 static NSString *SUAppcastItemPropertiesKey = @"propertiesDictionary";
@@ -65,6 +66,7 @@ static NSString *SUAppcastItemStateKey = @"SUAppcastItemState";
 @synthesize maximumSystemVersion = _maximumSystemVersion;
 @synthesize minimumSystemVersion = _minimumSystemVersion;
 @synthesize releaseNotesURL = _releaseNotesURL;
+@synthesize fullReleaseNotesURL = _fullReleaseNotesURL;
 @synthesize title = _title;
 @synthesize versionString = _versionString;
 @synthesize osString = _osString;
@@ -114,6 +116,7 @@ static NSString *SUAppcastItemStateKey = @"SUAppcastItemState";
         _minimumSystemVersion = [(NSString *)[decoder decodeObjectOfClass:[NSString class] forKey:SUAppcastItemMinimumSystemVersionKey] copy];
         _minimumAutoupdateVersion = [(NSString *)[decoder decodeObjectOfClass:[NSString class] forKey:SUAppcastElementMinimumAutoupdateVersion] copy];
         _releaseNotesURL = [decoder decodeObjectOfClass:[NSURL class] forKey:SUAppcastItemReleaseNotesURLKey];
+        _fullReleaseNotesURL = [decoder decodeObjectOfClass:[NSURL class] forKey:SUAppcastItemFullReleaseNotesURLKey];
         _title = [(NSString *)[decoder decodeObjectOfClass:[NSString class] forKey:SUAppcastItemTitleKey] copy];
         
         NSString *versionString =  [(NSString *)[decoder decodeObjectOfClass:[NSString class] forKey:SUAppcastItemVersionStringKey] copy];
@@ -186,6 +189,10 @@ static NSString *SUAppcastItemStateKey = @"SUAppcastItemState";
     
     if (self.releaseNotesURL != nil) {
         [encoder encodeObject:self.releaseNotesURL forKey:SUAppcastItemReleaseNotesURLKey];
+    }
+    
+    if (self.fullReleaseNotesURL != nil) {
+        [encoder encodeObject:self.fullReleaseNotesURL forKey:SUAppcastItemFullReleaseNotesURLKey];
     }
     
     if (self.title != nil) {
@@ -542,6 +549,19 @@ static NSString *SUAppcastItemStateKey = @"SUAppcastItemState";
             _releaseNotesURL = [NSURL URLWithString:(NSString * _Nonnull)self.itemDescription];
         } else {
             _releaseNotesURL = nil;
+        }
+        
+        // Get full release notes URL if informed.
+        NSString *fullReleaseNotesString = [dict objectForKey:SUAppcastElementFullReleaseNotesLink];
+        if (fullReleaseNotesString) {
+            NSURL *url = [NSURL URLWithString:fullReleaseNotesString];
+            if ([url isFileURL]) {
+                SULog(SULogLevelError, @"Full release notes with file:// URLs are not supported");
+            } else {
+                _fullReleaseNotesURL = url;
+            }
+        } else {
+            _fullReleaseNotesURL = nil;
         }
 
         NSArray *deltaDictionaries = [dict objectForKey:SUAppcastElementDeltas];
