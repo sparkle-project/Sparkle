@@ -286,8 +286,15 @@
                     secondaryAction = ^{
                         [delegate standardUserDriverShowVersionHistoryForAppcastItem:latestAppcastItem];
                     };
+                } else if (latestAppcastItem.fullReleaseNotesURL != nil) {
+                    // Open the full release notes URL if informed
+                    [alert addButtonWithTitle:localizedButtonTitle];
+                    
+                    secondaryAction = ^{
+                        [[NSWorkspace sharedWorkspace] openURL:(NSURL * _Nonnull)latestAppcastItem.fullReleaseNotesURL];
+                    };
                 } else if (latestAppcastItem.releaseNotesURL != nil) {
-                    // Fall back to opening the release notes URL (or forthcoming full version history link attr!)
+                    // Fall back to opening the release notes URL
                     [alert addButtonWithTitle:localizedButtonTitle];
                     
                     secondaryAction = ^{

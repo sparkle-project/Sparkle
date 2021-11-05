@@ -89,6 +89,7 @@ extern NSString *const SUAppcastElementMinimumAutoupdateVersion;
 extern NSString *const SUAppcastElementMinimumSystemVersion;
 extern NSString *const SUAppcastElementMaximumSystemVersion;
 extern NSString *const SUAppcastElementReleaseNotesLink;
+extern NSString *const SUAppcastElementFullReleaseNotesLink;
 extern NSString *const SUAppcastElementTags;
 extern NSString *const SUAppcastElementPhasedRolloutInterval;
 extern NSString *const SUAppcastElementInformationalUpdate;
