@@ -1,11 +1,11 @@
 # Sparkle 2 (Beta) ![Build Status](https://github.com/sparkle-project/Sparkle/workflows/Build%20%26%20Tests/badge.svg?branch=2.x) [![CocoaPods](https://img.shields.io/cocoapods/v/Sparkle.svg?cacheSeconds=86400)]()
 
-Secure and reliable software update framework for Cocoa developers.
+Secure and reliable software update framework for macOS.
 
 <img src="Resources/Screenshot.png" width="732" alt="Sparkle shows familiar update window with release notes">
 
 This is the upcoming new version of Sparkle.
-Major new features are support for sandboxing, custom user interfaces, updating external bundles, and a more modern secure architecture which includes faster and more reliable installs.
+Major new features are support for sandboxing, custom user interfaces, updating external bundles, and a more modern architecture which includes faster and more reliable installs.
 
 For the production ready version of Sparkle, please see the [Sparkle 1.x (master) branch](https://github.com/sparkle-project/Sparkle/tree/master). Note development has shifted to Sparkle 2 and the 1.x branch is now only accepting bug fixes, localization updates, and adoption of critical upcoming OS features.
 
@@ -20,15 +20,16 @@ Please visit [Sparkle's website](http://sparkle-project.org) for up to date docu
 ## Features
 
 * Seamless. There's no mention of Sparkle; your icons and app name are used.
-* Secure. Updates are verified using EdDSA signatures and Apple Code Signing.
-* Fast. Supports delta updates which only patch files that have changed.
+* Secure. Updates are verified using EdDSA signatures and Apple Code Signing. Supports Sandboxed applications in Sparkle 2.
+* Fast. Supports delta updates which only patch files that have changed and atomic-safe installs.
 * Easy to install. Sparkle requires no code in your app, and only needs static files on a web server.
-* Supports bundles, preference panes, plugins, and other non-.app software. Can install .pkg files for more complicated products.
-* Handles permissions, quarantine and automatically asks for authentication if needed.
+* Customizable. Sparkle 2 supports plugging in a custom UI for updates.
+* Supports applications, package installers, preference panes, and other plug-ins.
+* Handles permissions, quarantine, and automatically asks for authentication if needed.
 * Uses RSS-based appcasts for release information. Appcasts are a de-facto standard supported by 3rd party update-tracking programs and websites.
 * Stays hidden until second launch for better first impressions.
 * Truly self-updating — the user can choose to automatically download and install all updates in the background.
-* Ability to mark updates as critical.
+* Ability to use channels for beta updates (in Sparkle 2), add phased rollouts to users, and mark updates as critical or major.
 * Progress and status notifications for the host app.
 
 ## Requirements
