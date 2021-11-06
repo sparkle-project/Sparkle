@@ -141,6 +141,7 @@ SU_EXPORT @interface SPUUpdater : NSObject
  A property indicating whether or not updates can be checked by the user.
  
  An update check can be made by the user when an update session isn't in progress, or when an update or its progress is being shown to the user.
+ A user cannot check for updates when data (such as the feed or an update) is still being downloaded automatically in the background.
  
  This property is suitable to use for menu item validation for seeing if `-checkForUpdates` can be invoked.
  
@@ -163,7 +164,7 @@ SU_EXPORT @interface SPUUpdater : NSObject
  may be activated with the update resumed at a later point (automatically or manually).
  
  See also:
- - `canCheckForUpdates` property which is more suited for menu item validation.
+ - `canCheckForUpdates` property which is more suited for menu item validation and deciding if the user can initiate update checks.
  -  `-[SPUUpdaterDelegate updater:didFinishUpdateCycleForUpdateCheck:error:]` which lets the updater delegate know when an update cycle and session finishes.
  */
 @property (nonatomic, readonly) BOOL sessionInProgress;
