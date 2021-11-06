@@ -166,10 +166,9 @@ SU_EXPORT @interface SUAppcastItem : NSObject<NSSecureCoding>
 /**
  The full release notes URL of the appcast item if provided.
  
- This external link will open when `Version History` button is clicked. The link should point to the product's changelog.
+ The link should point to the product's full changelog.
  
- The delegate `standardUserDriverShowVersionHistoryForAppcastItem` will be used instead if implemented.
- If none is set `releaseNotesURL` will be used.
+ Sparkle's standard user interface offers to show these full release notes when a user checks for a new update and no new update is available.
  
  This is extracted from the @c <sparkle:fullReleaseNotesLink> element.
  */
