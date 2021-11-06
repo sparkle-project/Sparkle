@@ -79,17 +79,19 @@
         });
     }
     
-    // Resume timers
-    if (self.wallTimeSource != nil) {
-        dispatch_resume(self.wallTimeSource);
-    }
-    
-    if (self.monotonicTimeSource != nil) {
-        dispatch_resume(self.monotonicTimeSource);
-    }
-    
+    // Have both timers already ran? (this should be unlikely)
     if (timersFired > 1) {
         [self.delegate updaterTimerDidFire];
+    } else {
+        // Resume available timers
+        
+        if (self.wallTimeSource != nil) {
+            dispatch_resume(self.wallTimeSource);
+        }
+        
+        if (self.monotonicTimeSource != nil) {
+            dispatch_resume(self.monotonicTimeSource);
+        }
     }
 }
 
