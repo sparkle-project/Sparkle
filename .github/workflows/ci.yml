@@ -57,7 +57,8 @@ jobs:
             
       - name: Find Analyzed Warnings
         if: success()
-        env: DEVELOPER_DIR: ${{ matrix.xcode-path }}
+        env:
+          DEVELOPER_DIR: ${{ matrix.xcode-path }}
         run: |
             grep -q "warning:" anaylze_output.txt
         
