@@ -47,7 +47,7 @@ class SUTestApplicationTest: XCTestCase
             menuBarsQuery.menuBarItems["Sparkle Test App"].click()
         }
 
-        app.dialogs["SUUpdateAlert"].buttons["Install Update"].click()
+        app.windows["SUUpdateAlert"].buttons["Install Update"].click()
         
         // Give some time for the update to finish downloading / extracting
         sleep(30)

@@ -97,7 +97,6 @@
     // update prompt to behave like a normal window. Otherwise if the window were hidden
     // there may be no way for the application to be activated to make it visible again.
     if ([SUApplicationInfo isBackgroundApplication:[NSApplication sharedApplication]]) {
-        [[self.updateAlert window] setHidesOnDeactivate:NO];
         [NSApp activateIgnoringOtherApps:YES];
     }
 
