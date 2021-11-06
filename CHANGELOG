@@ -24,16 +24,17 @@
   * Sparkle uses the icon of the bundle to update for its authorization dialog. A 32x32 image representation of the icon is needed. (Zorg)
   * Sudden termination for silent automatic updates isn't disabled anymore (Zorg)
 * Policy Changes
-  * Distributing updates without EdDSA signing the archives is now deprecated (Zorg)
-  * Package based updates that are zipped or archived must add sparkle:installationType="package" to the appcast item enclosure (Zorg)
+  * Package based updates that are zipped or archived must add sparkle:installationType="package" to the appcast item enclosure (this doesn't apply to bare packages that aren't archived) (Zorg)
   * We now recommend using sparkle:version and sparkle:shortVersionString top level elements instead of enclosure attributes (#1878) (Zorg)
   * The link element in an appcast item is now used for directing users to the product's website if they don't meet minimum system requirements (#1877) (Zorg)
 * Major/Paid Upgrades Enhancements
-  * Latest minor updates are preferred over major updates (specified by sparkle:minimumAutoupdateVersion) (#1850) Zorg
-  * Major updates can be skipped with a user confirmation (#1853) Zorg
+  * Latest minor updates are preferred over major updates (specified by sparkle:minimumAutoupdateVersion) (#1850) (Zorg)
+  * Major updates can be skipped with a user confirmation (#1853) (Zorg)
 * Informational only and critical updates can be specified selectively by app version (#1862)
 * Expose why a new update is unavailable and direct user to prior release notes or website info (#1877, #1886) (Zorg)
-* Add support for posting updates only on specific channels (#1879) (Zorg)
+  * Add <sparkle:fullReleaseNotesLink> element allowing Sparkle to show a better stylized and full changelog to the user (#2001) (aONe)
+  * Add delegate API allowing applications to show full in-app or offline version history to the user (#1989) (Billy Gray)
+* Add support for posting updates only on specific channels (eg for supporting beta updates) (#1879) (Zorg)
 * System profiler privacy and transparency (#1690) (Martin Pilkington)
 * Support getting app icon from asset catalog (#1694) (Charles Srstka)
 * Don't hide update alert window now on deactivation (#1804) (Zorg)
