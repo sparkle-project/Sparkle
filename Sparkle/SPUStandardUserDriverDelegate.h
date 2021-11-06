@@ -46,9 +46,16 @@ SU_EXPORT @protocol SPUStandardUserDriverDelegate <NSObject>
 - (_Nullable id <SUVersionDisplay>)standardUserDriverRequestsVersionDisplayer;
 
 /**
- Called if implemented when the Version History button is chosen by the user. Otherwise,
- the `fullReleaseNotesLink` or `releaseNotesLink` in the appcast's latest item will be be
- opened.
+ Handles showing the full release notes to the user.
+ 
+ When a user checks for new updates and no new update is found, Sparkle will offer to show the application's version history to the user
+ by providing a "Version History" button in the no new update available alert.
+ 
+ If this delegate method is not implemented, Sparkle will instead offer to open the
+ `fullReleaseNotesLink` (or `releaseNotesLink` if the former is unavailable) from the appcast's latest `item` in the user's web browser.
+ 
+ If this delegate method is implemented, Sparkle will instead ask the delegate to show the full release notes to the user.
+ A delegate may want to implement this method if they want to show in-app or offline release notes.
  
  @param item The appcast item corresponding to the latest version available.
  */
