@@ -48,6 +48,32 @@ jobs:
           DEVELOPER_DIR: ${{ matrix.xcode-path }}
         run: |
           xcodebuild test-without-building -project Sparkle.xcodeproj -scheme UITests -configuration Debug -derivedDataPath build
+
+      - name: Analyze Sparkle
+        env:
+          DEVELOPER_DIR: ${{ matrix.xcode-path }}
+        run: |
+            xcodebuild analyze -project Sparkle.xcodeproj -quiet -scheme Sparkle -configuration Release -derivedDataPath analyze > anaylze_output.txt
+            
+      - name: Find Analyzed Warnings
+        if: success()
+        env: DEVELOPER_DIR: ${{ matrix.xcode-path }}
+        run: |
+            grep -q "warning:" anaylze_output.txt
+        
+      - name: Extract Analyzed Warnings
+        if: success()
+        id: warnings
+        run: |
+            echo ::set-output name=content::$(cat anaylze_output.txt)
+      
+      - name: Post Analyzed Warnings
+        if: success()
+        uses: thollander/actions-comment-pull-request@v1
+        with:
+            token: ${{ secrets.BOT_PERSONAL_ACCESS_TOKEN }}
+            message: "``` ${{ steps.warnings.outputs.content }} ```"
+        
       - name: Build Release Distribution
         env:
           DEVELOPER_DIR: ${{ matrix.xcode-path }}
