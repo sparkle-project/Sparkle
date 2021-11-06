@@ -397,8 +397,6 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
 {
     // the reason for rescheduling the update-check timer is that NSTimer does behave as if the time the Mac spends asleep did not exist at all, which can significantly prolong the time between update checks
     if (self.shouldRescheduleOnWake) {
-        // Paranoid check: give a minimum delay so sleep/wake events cannot spam update checks
-        // Eg: if two wake requests are sent within 15 seconds, only the last request will be processed
         [self scheduleNextUpdateCheckUsingCurrentDate:YES];
     }
 }
