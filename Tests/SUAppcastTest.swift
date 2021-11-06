@@ -644,6 +644,44 @@ class SUAppcastTest: XCTestCase {
             XCTFail(err.localizedDescription)
         }
     }
+    
+    func testLinks() {
+        let testFile = Bundle(for: SUAppcastTest.self).path(forResource: "test-links", ofType: "xml")!
+        let testData = NSData(contentsOfFile: testFile)!
+        
+        do {
+            let baseURL: URL? = nil
+            
+            let stateResolver = SPUAppcastItemStateResolver(hostVersion: "1.0", applicationVersionComparator: SUStandardVersionComparator.default, standardVersionComparator: SUStandardVersionComparator.default)
+            
+            let appcast = try SUAppcast(xmlData: testData as Data, relativeTo: baseURL, stateResolver: stateResolver)
+            let items = appcast.items
+            
+            XCTAssertEqual(3, items.count)
+            
+            // Test https
+            XCTAssertEqual("https://sparkle-project.org/notes/relnote-3.0.txt", items[0].releaseNotesURL?.absoluteString)
+            XCTAssertEqual("https://sparkle-project.org/fullnotes.txt", items[0].fullReleaseNotesURL?.absoluteString)
+            XCTAssertEqual("https://sparkle-project.org", items[0].infoURL?.absoluteString)
+            XCTAssertEqual("https://sparkle-project.org/release-3.0.zip", items[0].fileURL?.absoluteString)
+            
+            // Test http
+            XCTAssertEqual("http://sparkle-project.org/notes/relnote-2.0.txt", items[1].releaseNotesURL?.absoluteString)
+            XCTAssertEqual("http://sparkle-project.org/fullnotes.txt", items[1].fullReleaseNotesURL?.absoluteString)
+            XCTAssertEqual("http://sparkle-project.org", items[1].infoURL?.absoluteString)
+            XCTAssertEqual("http://sparkle-project.org/release-2.0.zip", items[1].fileURL?.absoluteString)
+            
+            // Test bad file URLs
+            XCTAssertEqual(nil, items[2].releaseNotesURL?.absoluteString)
+            XCTAssertEqual(nil, items[2].fullReleaseNotesURL?.absoluteString)
+            XCTAssertEqual(nil, items[2].infoURL?.absoluteString)
+            XCTAssertEqual(nil, items[2].fileURL?.absoluteString)
+            
+        } catch let err as NSError {
+            NSLog("%@", err)
+            XCTFail(err.localizedDescription)
+        }
+    }
 
     func testRelativeURLs() {
         let testFile = Bundle(for: SUAppcastTest.self).path(forResource: "test-relative-urls", ofType: "xml")!
@@ -657,12 +695,17 @@ class SUAppcastTest: XCTestCase {
             let appcast = try SUAppcast(xmlData: testData as Data, relativeTo: baseURL, stateResolver: stateResolver)
             let items = appcast.items
 
-            XCTAssertEqual(2, items.count)
+            XCTAssertEqual(4, items.count)
 
             XCTAssertEqual("https://fake.sparkle-project.org/updates/release-3.0.zip", items[0].fileURL?.absoluteString)
             XCTAssertEqual("https://fake.sparkle-project.org/updates/notes/relnote-3.0.txt", items[0].releaseNotesURL?.absoluteString)
 
             XCTAssertEqual("https://fake.sparkle-project.org/info/info-2.0.txt", items[1].infoURL?.absoluteString)
+            
+            XCTAssertEqual("https://fake.sparkle-project.org/updates/notes/fullnotes.txt", items[2].fullReleaseNotesURL?.absoluteString)
+            
+            // If a different base URL is in the feed, we should respect the base URL in the feed
+            XCTAssertEqual("https://sparkle-project.org/releasenotes.html", items[3].fullReleaseNotesURL?.absoluteString)
 
         } catch let err as NSError {
             NSLog("%@", err)
