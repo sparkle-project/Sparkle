@@ -8,6 +8,7 @@
         <title>Version 2.0</title>
         <sparkle:version>2.0</sparkle:version>
         <link>https://sparkle-project.org</link>
+        <sparkle:fullReleaseNotesLink>releasenotes.html</sparkle:fullReleaseNotesLink>
         <description>
           <![CDATA[
             <ul>

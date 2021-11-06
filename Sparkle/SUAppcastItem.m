@@ -385,10 +385,17 @@ static NSString *SUAppcastItemStateKey = @"SUAppcastItemState";
             if (![theInfoURL isKindOfClass:[NSString class]]) {
                 SULog(SULogLevelError, @"%@ -%@ Info URL is not of valid type.", NSStringFromClass([self class]), NSStringFromSelector(_cmd));
             } else {
+                NSURL *infoURL;
                 if (appcastURL != nil) {
-                    _infoURL = [NSURL URLWithString:theInfoURL relativeToURL:appcastURL];
+                    infoURL = [NSURL URLWithString:theInfoURL relativeToURL:appcastURL];
                 } else {
-                    _infoURL = [NSURL URLWithString:theInfoURL];
+                    infoURL = [NSURL URLWithString:theInfoURL];
+                }
+                
+                if ([infoURL.scheme caseInsensitiveCompare:@"http"] == NSOrderedSame || [infoURL.scheme caseInsensitiveCompare:@"https"] == NSOrderedSame) {
+                    _infoURL = infoURL;
+                } else {
+                    SULog(SULogLevelError, @"%@ -%@ Info URL must have a http or https URL scheme.", NSStringFromClass([self class]), NSStringFromSelector(_cmd));
                 }
             }
         }
@@ -431,10 +438,19 @@ static NSString *SUAppcastItemStateKey = @"SUAppcastItemState";
         if (enclosureURLString) {
             // Sparkle used to always URL-encode, so for backwards compatibility spaces in URLs must be forgiven.
             NSString *fileURLString = [enclosureURLString stringByReplacingOccurrencesOfString:@" " withString:@"%20"];
+            
+            NSURL *fileURL;
             if (appcastURL != nil) {
-                _fileURL = [NSURL URLWithString:fileURLString relativeToURL:appcastURL];
+                fileURL = [NSURL URLWithString:fileURLString relativeToURL:appcastURL];
             } else {
-                _fileURL = [NSURL URLWithString:fileURLString];
+                fileURL = [NSURL URLWithString:fileURLString];
+            }
+            
+            if ([fileURL.scheme caseInsensitiveCompare:@"http"] == NSOrderedSame || [fileURL.scheme caseInsensitiveCompare:@"https"] == NSOrderedSame) {
+                _fileURL = fileURL;
+            } else {
+                SULog(SULogLevelError, @"File URLs must have a http or https URL scheme.");
+                _fileURL = nil;
             }
         }
         if (enclosure) {
@@ -540,10 +556,11 @@ static NSString *SUAppcastItemStateKey = @"SUAppcastItemState";
             } else {
                 url = [NSURL URLWithString:releaseNotesString];
             }
-            if ([url isFileURL]) {
-                SULog(SULogLevelError, @"Release notes with file:// URLs are not supported");
-            } else {
+            if ([url.scheme caseInsensitiveCompare:@"http"] == NSOrderedSame || [url.scheme caseInsensitiveCompare:@"https"] == NSOrderedSame) {
                 _releaseNotesURL = url;
+            } else {
+                SULog(SULogLevelError, @"Release notes must have a http or https URL scheme.");
+                _releaseNotesURL = nil;
             }
         } else if ([self.itemDescription hasPrefix:@"http://"] || [self.itemDescription hasPrefix:@"https://"]) { // if the description starts with http:// or https:// use that.
             _releaseNotesURL = [NSURL URLWithString:(NSString * _Nonnull)self.itemDescription];
@@ -554,11 +571,17 @@ static NSString *SUAppcastItemStateKey = @"SUAppcastItemState";
         // Get full release notes URL if informed.
         NSString *fullReleaseNotesString = [dict objectForKey:SUAppcastElementFullReleaseNotesLink];
         if (fullReleaseNotesString) {
-            NSURL *url = [NSURL URLWithString:fullReleaseNotesString];
-            if ([url isFileURL]) {
-                SULog(SULogLevelError, @"Full release notes with file:// URLs are not supported");
+            NSURL *url;
+            if (appcastURL != nil) {
+                url = [NSURL URLWithString:fullReleaseNotesString relativeToURL:appcastURL];
             } else {
+                url = [NSURL URLWithString:fullReleaseNotesString];
+            }
+            if ([url.scheme caseInsensitiveCompare:@"http"] == NSOrderedSame || [url.scheme caseInsensitiveCompare:@"https"] == NSOrderedSame) {
                 _fullReleaseNotesURL = url;
+            } else {
+                SULog(SULogLevelError, @"Full release notes must have a http or https URL scheme.");
+                _fullReleaseNotesURL = nil;
             }
         } else {
             _fullReleaseNotesURL = nil;
