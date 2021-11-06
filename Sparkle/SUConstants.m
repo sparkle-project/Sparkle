@@ -18,8 +18,11 @@
 // Define some minimum intervals to avoid DoS-like checking attacks
 const NSTimeInterval SUMinimumUpdateCheckInterval = DEBUG ? 60 : (60 * 60);
 const NSTimeInterval SUDefaultUpdateCheckInterval = DEBUG ? 60 : (60 * 60 * 24);
+const NSTimeInterval SUMinimumMonotonicUpdateCheckInterval = DEBUG ? 30 : (60 * 5);
+
 // The amount of time the system can defer our update check (for improved performance)
-const uint64_t SULeewayUpdateCheckInterval = DEBUG ? 1 : 15;
+const uint64_t SULeewayWallUpdateCheckInterval = DEBUG ? 1 : 60;
+const uint64_t SULeewayMonotonicUpdateCheckInterval = DEBUG ? 1 : 5;
 
 // If the update has already been automatically downloaded, we normally don't want to bug the user about the update
 // However if the user has gone a very long time without quitting an application, we will bug them

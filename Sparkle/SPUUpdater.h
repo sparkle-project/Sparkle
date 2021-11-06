@@ -278,11 +278,13 @@ SU_EXPORT @interface SPUUpdater : NSObject
 
 /**
  Appropriately schedules or cancels the update checking timer according to the preferences for time interval and automatic checks.
+ 
+ If you change the `updateCheckInterval` or `automaticallyChecksForUpdates` properties, the update cycle will be reset automatically after a short delay.
+ The update cycle is also started automatically after the updater is started. In these cases, this method should not be called directly.
 
  This call does not change the date of the next check, but only the internal timer.
  */
 - (void)resetUpdateCycle;
-
 
 /**
  The system profile information that is sent when checking for updates.
