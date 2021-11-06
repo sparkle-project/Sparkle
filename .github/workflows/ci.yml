@@ -75,7 +75,7 @@ jobs:
         if: ${{ success() && matrix.run-analyzer }}
         uses: thollander/actions-comment-pull-request@v1
         with:
-            token: ${{ secrets.BOT_PERSONAL_ACCESS_TOKEN }}
+            GITHUB_TOKEN: ${{ secrets.BOT_PERSONAL_ACCESS_TOKEN }}
             message: "``` ${{ steps.warnings.outputs.content }} ```"
         
       - name: Build Release Distribution
