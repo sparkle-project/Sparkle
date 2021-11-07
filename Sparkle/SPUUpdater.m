@@ -225,7 +225,9 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
                 NSURL *xpcServiceBundleURL = [[self.sparkleBundle.bundleURL URLByAppendingPathComponent:@"XPCServices"] URLByAppendingPathComponent:xpcServiceBundleName];
                 
                 if (![xpcServiceBundleURL checkResourceIsReachableAndReturnError:NULL]) {
-                    *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInvalidUpdaterError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"XPC Service is enabled (%@) but does not exist: %@", xpcServiceEnabledKey, xpcServiceBundleURL.path] }];
+                    if (error != NULL) {
+                        *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInvalidUpdaterError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"XPC Service is enabled (%@) but does not exist: %@", xpcServiceEnabledKey, xpcServiceBundleURL.path] }];
+                    }
                     
                     return NO;
                 }
@@ -235,7 +237,9 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
             NSURL *mainBundleXPCServiceURL = [[[mainBundle.bundleURL URLByAppendingPathComponent:@"Contents"] URLByAppendingPathComponent:@"XPCServices"] URLByAppendingPathComponent:xpcServiceBundleName];
             
             if ([mainBundleXPCServiceURL checkResourceIsReachableAndReturnError:NULL]) {
-                *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInvalidUpdaterError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"XPC Service (%@) must be in the Sparkle framework, not in the application bundle (%@). Please visit https://sparkle-project.org/documentation/sandboxing/ for up to date Sandboxing instructions.", xpcServiceBundleName, mainBundleXPCServiceURL.path] }];
+                if (error != NULL) {
+                    *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInvalidUpdaterError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"XPC Service (%@) must be in the Sparkle framework, not in the application bundle (%@). Please visit https://sparkle-project.org/documentation/sandboxing/ for up to date Sandboxing instructions.", xpcServiceBundleName, mainBundleXPCServiceURL.path] }];
+                }
                 
                 return NO;
             }

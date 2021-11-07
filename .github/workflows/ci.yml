@@ -60,22 +60,27 @@ jobs:
             
       - name: Find Analyzed Warnings
         if: ${{ success() && matrix.run-analyzer && github.event_name == 'pull_request' }}
+        id: findwarnings
         env:
           DEVELOPER_DIR: ${{ matrix.xcode-path }}
         run: |
-            grep -q "warning:" anaylze_output.txt
+            if grep -q "warning:" anaylze_output.txt; then
+                echo '::set-output name=analyzestatus::0'
+            else
+                echo '::set-output name=analyzestatus::1'
+            fi
         
       - name: Extract Analyzed Warnings
-        if: ${{ success() && matrix.run-analyzer && github.event_name == 'pull_request' }}
+        if: ${{ success() && matrix.run-analyzer && github.event_name == 'pull_request' && steps.findwarnings.outputs.analyzestatus == '0' }}
         id: warnings
         run: |
             echo ::set-output name=content::$(cat anaylze_output.txt)
       
       - name: Post Analyzed Warnings
-        if: ${{ success() && matrix.run-analyzer && github.event_name == 'pull_request' }}
+        if: ${{ success() && matrix.run-analyzer && github.event_name == 'pull_request' && steps.findwarnings.outputs.analyzestatus == '0' }}
         uses: mshick/add-pr-comment@v1
         with:
-            allow-repeats: true
+            allow-repeats: false
             repo-token: ${{ secrets.BOT_PERSONAL_ACCESS_TOKEN }}
             repo-token-user-login: 'Sparkle-Bot'
             message: "``` ${{ steps.warnings.outputs.content }} ```"
