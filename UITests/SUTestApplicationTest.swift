@@ -26,6 +26,10 @@ class SUTestApplicationTest: XCTestCase
     func testRegularUpdate()
     {
         let app = XCUIApplication()
+        app.launchArguments = [
+            "-AppleLanguages",
+            "(en)"
+        ]
         app.launch()
         
         XCTAssertFalse(app.dialogs["alert"].staticTexts["Update succeeded!"].exists, "Update is already installed; please do a clean build")
