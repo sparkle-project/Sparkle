@@ -75,7 +75,7 @@ jobs:
         if: ${{ success() && matrix.run-analyzer }}
         uses: mshick/add-pr-comment@v1
         with:
-            GITHUB_TOKEN: ${{ secrets.BOT_PERSONAL_ACCESS_TOKEN }}
+            repo-token: ${{ secrets.BOT_PERSONAL_ACCESS_TOKEN }}
             message: "``` ${{ steps.warnings.outputs.content }} ```"
         
       - name: Build Release Distribution
