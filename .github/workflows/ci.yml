@@ -52,27 +52,27 @@ jobs:
           xcodebuild test-without-building -project Sparkle.xcodeproj -scheme UITests -configuration Debug -derivedDataPath build
 
       - name: Analyze Sparkle
-        if: ${{ matrix.run-analyzer }}
+        if: ${{ matrix.run-analyzer && github.event_name == 'pull_request' }}
         env:
           DEVELOPER_DIR: ${{ matrix.xcode-path }}
         run: |
             xcodebuild analyze -project Sparkle.xcodeproj -quiet -scheme Sparkle -configuration Release -derivedDataPath analyze > anaylze_output.txt
             
       - name: Find Analyzed Warnings
-        if: ${{ success() && matrix.run-analyzer }}
+        if: ${{ success() && matrix.run-analyzer && github.event_name == 'pull_request' }}
         env:
           DEVELOPER_DIR: ${{ matrix.xcode-path }}
         run: |
             grep -q "warning:" anaylze_output.txt
         
       - name: Extract Analyzed Warnings
-        if: ${{ success() && matrix.run-analyzer }}
+        if: ${{ success() && matrix.run-analyzer && github.event_name == 'pull_request' }}
         id: warnings
         run: |
             echo ::set-output name=content::$(cat anaylze_output.txt)
       
       - name: Post Analyzed Warnings
-        if: ${{ success() && matrix.run-analyzer }}
+        if: ${{ success() && matrix.run-analyzer && github.event_name == 'pull_request' }}
         uses: mshick/add-pr-comment@v1
         with:
             allow-repeats: true
