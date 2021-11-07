@@ -47,12 +47,12 @@ class SUTestApplicationTest: XCTestCase
             menuBarsQuery.menuBarItems["Sparkle Test App"].click()
         }
 
-        app.windows["SUUpdateAlert"].buttons["Install Update"].click()
+        app.dialogs["SUUpdateAlert"].buttons["Install Update"].click()
         
         // Give some time for the update to finish downloading / extracting
         sleep(30)
         
-        app.windows["SUStatus"].buttons["Install and Relaunch"].click()
+        app.dialogs["SUStatus"].buttons["Install and Relaunch"].click()
 
         // Wait for the new updated app to finish launching so we can test if it's the frontmost app
         sleep(10)
