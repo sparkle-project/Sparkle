@@ -15,9 +15,11 @@ jobs:
             - xcode: 'xcode12.5.1'
               xcode-path: '/Applications/Xcode_12.5.1.app/Contents/Developer'
               upload-dist: false
+              run-analyzer: false
             - xcode: 'xcode13.1'
               xcode-path: '/Applications/Xcode_13.1.app/Contents/Developer'
               upload-dist: true
+              run-analyzer: true
             
     name: Build and Test Sparkle
     runs-on: macos-11
@@ -48,6 +50,36 @@ jobs:
           DEVELOPER_DIR: ${{ matrix.xcode-path }}
         run: |
           xcodebuild test-without-building -project Sparkle.xcodeproj -scheme UITests -configuration Debug -derivedDataPath build
+
+      - name: Analyze Sparkle
+        if: ${{ matrix.run-analyzer }}
+        env:
+          DEVELOPER_DIR: ${{ matrix.xcode-path }}
+        run: |
+            xcodebuild analyze -project Sparkle.xcodeproj -quiet -scheme Sparkle -configuration Release -derivedDataPath analyze > anaylze_output.txt
+            
+      - name: Find Analyzed Warnings
+        if: ${{ success() && matrix.run-analyzer }}
+        env:
+          DEVELOPER_DIR: ${{ matrix.xcode-path }}
+        run: |
+            grep -q "warning:" anaylze_output.txt
+        
+      - name: Extract Analyzed Warnings
+        if: ${{ success() && matrix.run-analyzer }}
+        id: warnings
+        run: |
+            echo ::set-output name=content::$(cat anaylze_output.txt)
+      
+      - name: Post Analyzed Warnings
+        if: ${{ success() && matrix.run-analyzer }}
+        uses: mshick/add-pr-comment@v1
+        with:
+            allow-repeats: true
+            repo-token: ${{ secrets.BOT_PERSONAL_ACCESS_TOKEN }}
+            repo-token-user-login: 'Sparkle-Bot'
+            message: "``` ${{ steps.warnings.outputs.content }} ```"
+        
       - name: Build Release Distribution
         env:
           DEVELOPER_DIR: ${{ matrix.xcode-path }}
