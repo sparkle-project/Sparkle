@@ -258,6 +258,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         }
     }
     
+    BOOL test;
     BOOL updatingMainBundle = [self.host.bundle isEqualTo:mainBundle];
     
     if (feedURL != nil) {
