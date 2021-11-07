@@ -75,7 +75,9 @@ jobs:
         if: ${{ success() && matrix.run-analyzer }}
         uses: mshick/add-pr-comment@v1
         with:
+            allow-repeats: true
             repo-token: ${{ secrets.BOT_PERSONAL_ACCESS_TOKEN }}
+            repo-token-user-login: 'Sparkle-Bot'
             message: "``` ${{ steps.warnings.outputs.content }} ```"
         
       - name: Build Release Distribution
