@@ -72,6 +72,9 @@ struct GenerateAppcast: ParsableCommand {
     @Option(name: .customLong("release-notes-url-prefix"), help: ArgumentHelp("A URL that will be used as prefix for constructing URLs for release notes.", valueName: "url"), transform: { URL(string: $0) })
     var releaseNotesURLPrefix : URL?
     
+    @Option(name: .customLong("full-release-notes-url"), help: ArgumentHelp("A URL that will be used for the full release notes.", valueName: "url"))
+    var fullReleaseNotesURL: String?
+    
     @Option(name: .long, help: ArgumentHelp("A URL to the application's website which Sparkle may use for directing users to if they cannot download a new update from within the application. This will be used for new generated update items. By default, no product link is used.", valueName: "link"))
     var link: String?
     
@@ -220,7 +223,7 @@ struct GenerateAppcast: ParsableCommand {
                                                                 relativeTo: archivesSourceDir)
 
                 // Write the appcast
-                let (numNewUpdates, numExistingUpdates) = try writeAppcast(appcastDestPath: appcastDestPath, updates: updates, newVersions: versions, maxNewVersionsInFeed: maxNewVersionsInFeed, link: link, newChannel: channel, majorVersion: majorVersion, phasedRolloutInterval: phasedRolloutInterval, criticalUpdateVersion: criticalUpdateVersion, informationalUpdateVersions: informationalUpdateVersions)
+                let (numNewUpdates, numExistingUpdates) = try writeAppcast(appcastDestPath: appcastDestPath, updates: updates, newVersions: versions, maxNewVersionsInFeed: maxNewVersionsInFeed, fullReleaseNotesLink: fullReleaseNotesURL, link: link, newChannel: channel, majorVersion: majorVersion, phasedRolloutInterval: phasedRolloutInterval, criticalUpdateVersion: criticalUpdateVersion, informationalUpdateVersions: informationalUpdateVersions)
 
                 // Inform the user, pluralizing "update" if necessary
                 let pluralizeUpdates = { $0 == 1 ? "update" : "updates" }
