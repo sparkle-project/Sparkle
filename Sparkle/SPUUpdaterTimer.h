@@ -22,7 +22,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithDelegate:(id<SPUUpdaterTimerDelegate>)delegate;
 
-- (void)startAndFireAfterDelay:(NSTimeInterval)delay;
+- (void)startTimerWithWallTimeDelay:(NSTimeInterval)wallDelayUntilCheck monotonicTimeDelay:(NSTimeInterval)minimumEnforcedDelay;
 
 - (void)invalidate;
 
