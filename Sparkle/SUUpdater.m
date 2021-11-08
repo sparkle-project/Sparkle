@@ -41,11 +41,12 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 @property (assign) BOOL shouldRescheduleOnWake;
 @property (strong) NSBundle *sparkleBundle;
 @property (nonatomic) BOOL loggedNoSecureKeyWarning;
+@property (nonatomic) NSTimeInterval lastMonotonicUpdateCheckTime;
 
 - (instancetype)initForBundle:(NSBundle *)bundle;
 - (void)startUpdateCycle;
 - (void)checkForUpdatesWithDriver:(SUUpdateDriver *)updateDriver;
-- (void)scheduleNextUpdateCheckUsingCurrentTime:(BOOL)usingCurrentTime;
+- (void)scheduleNextUpdateCheckUsingCurrentDate:(BOOL)usingCurrentDate;
 - (void)registerAsObserver;
 - (void)unregisterAsObserver;
 - (void)updateDriverDidFinish:(NSNotification *)note;
@@ -71,6 +72,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 @synthesize decryptionPassword;
 @synthesize updateLastCheckedDate;
 @synthesize loggedNoSecureKeyWarning = _loggedNoSecureKeyWarning;
+@synthesize lastMonotonicUpdateCheckTime = _lastMonotonicUpdateCheckTime;
 
 static NSMutableDictionary *sharedUpdaters = nil;
 static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObservationContext";
@@ -255,7 +257,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
         // We start the update checks and register as observer for changes after the prompt finishes
     } else {
         // We check if the user's said they want updates, or they haven't said anything, and the default is set to checking.
-        [self scheduleNextUpdateCheckUsingCurrentTime:YES];
+        [self scheduleNextUpdateCheckUsingCurrentDate:YES];
     }
 }
 
@@ -271,7 +273,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
     {
         self.driver = nil;
         [self updateLastUpdateCheckDate];
-        [self scheduleNextUpdateCheckUsingCurrentTime:NO];
+        [self scheduleNextUpdateCheckUsingCurrentDate:NO];
     }
 }
 
@@ -285,15 +287,25 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
     return [self updateLastCheckedDate];
 }
 
+- (NSTimeInterval)currentMonotonicTimeInterval
+{
+    // This is monotonic system time while the system is not asleep
+    return [[NSProcessInfo processInfo] systemUptime];
+}
+
 - (void)updateLastUpdateCheckDate
 {
     [self willChangeValueForKey:@"lastUpdateCheckDate"];
+    
     [self setUpdateLastCheckedDate:[NSDate date]];
     [self.host setObject:[self updateLastCheckedDate] forUserDefaultsKey:SULastCheckTimeKey];
+    
+    self.lastMonotonicUpdateCheckTime = [self currentMonotonicTimeInterval];
+    
     [self didChangeValueForKey:@"lastUpdateCheckDate"];
 }
 
-- (void)scheduleNextUpdateCheckUsingCurrentTime:(BOOL)usingCurrentTime
+- (void)scheduleNextUpdateCheckUsingCurrentDate:(BOOL)usingCurrentDate
 {
     if (self.checkTimer)
     {
@@ -303,30 +315,70 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
     if (![self automaticallyChecksForUpdates]) return;
 
     // How long has it been since last we checked for an update?
-    NSTimeInterval intervalSinceCheck;
-    if (usingCurrentTime) {
+    NSTimeInterval dateIntervalSinceCheck;
+    NSTimeInterval minimumEnforcedDelay;
+    if (usingCurrentDate) {
         NSDate *lastCheckDate = [self lastUpdateCheckDate];
         if (!lastCheckDate) { lastCheckDate = [NSDate distantPast]; }
-        intervalSinceCheck = [[NSDate date] timeIntervalSinceDate:lastCheckDate];
-        if (intervalSinceCheck < 0) {
+        NSTimeInterval wallTimeInterval = [[NSDate date] timeIntervalSinceDate:lastCheckDate];
+        if (wallTimeInterval < 0) {
             // Last update check date is in the future and bogus, so reset it to current date
             [self updateLastUpdateCheckDate];
             
-            intervalSinceCheck = 0;
+            // And assume a full update interval is needed
+            dateIntervalSinceCheck = 0;
+            minimumEnforcedDelay = SUMinimumMonotonicUpdateCheckInterval;
+        } else {
+            // Check the monotonic clock for an enforced minimum delay
+            NSTimeInterval lastMonotonicUpdateCheckTime = self.lastMonotonicUpdateCheckTime;
+            if (lastMonotonicUpdateCheckTime <= 0) {
+                // When the updater is first started, the last monotonic time may not have been updated yet.
+                // In this case there is no enforced minimum delay.
+                minimumEnforcedDelay = 0;
+            } else {
+                // Compute an enforced minimum delay based on elapsed monotonic time
+                // The elapsed monotonic time is more stable than wall time interval and does not include the
+                // amount of time while the system is asleep
+                NSTimeInterval currentMonotonicTime = [self currentMonotonicTimeInterval];
+                NSTimeInterval elapsedMonotonicTime = (currentMonotonicTime - lastMonotonicUpdateCheckTime);
+                
+                if (elapsedMonotonicTime < SUMinimumMonotonicUpdateCheckInterval) {
+                    minimumEnforcedDelay = (SUMinimumMonotonicUpdateCheckInterval - elapsedMonotonicTime);
+                } else {
+                    minimumEnforcedDelay = 0;
+                }
+            }
+            
+            dateIntervalSinceCheck = wallTimeInterval;
         }
     } else {
-        intervalSinceCheck = 0;
+        // Without using the current date, we assume a full update interval is needed
+        dateIntervalSinceCheck = 0;
+        minimumEnforcedDelay = SUMinimumMonotonicUpdateCheckInterval;
     }
 
-    // Now we want to figure out how long until we check again.
-    NSTimeInterval delayUntilCheck, updateCheckInterval = [self updateCheckInterval];
-    if (updateCheckInterval < SUMinimumUpdateCheckInterval)
+    NSTimeInterval updateCheckInterval = [self updateCheckInterval];
+    if (updateCheckInterval < SUMinimumUpdateCheckInterval) {
         updateCheckInterval = SUMinimumUpdateCheckInterval;
-    if (intervalSinceCheck < updateCheckInterval)
-        delayUntilCheck = (updateCheckInterval - intervalSinceCheck); // It hasn't been long enough.
-    else
-        delayUntilCheck = 0; // We're overdue! Run one now.
-    self.checkTimer = [NSTimer scheduledTimerWithTimeInterval:delayUntilCheck target:self selector:@selector(checkForUpdatesInBackground) userInfo:nil repeats:NO]; // Timer is non-repeating, may have invalidated itself, so we had to retain it.
+    }
+    
+    // Now we want to figure out how long until we check again.
+    NSTimeInterval delayUntilCheck;
+    if (dateIntervalSinceCheck < updateCheckInterval) {
+        // It hasn't been long enough.
+        delayUntilCheck = (updateCheckInterval - dateIntervalSinceCheck);
+    } else {
+        // We're overdue!
+        delayUntilCheck = 0;
+    }
+    
+    // Now compute delay with enforced minimum delay requirement
+    // The minimum delay (based on monotonic clock) is an extra layer of defense to prevent too frequent update checks
+    // in case the wall clock is not working properly (eg from too many system wake events, system date changes, NTP..)
+    NSTimeInterval delayUntilCheckWithMinimumEnforcedDelay =
+        (delayUntilCheck < minimumEnforcedDelay) ? minimumEnforcedDelay : delayUntilCheck;
+    
+    self.checkTimer = [NSTimer scheduledTimerWithTimeInterval:delayUntilCheckWithMinimumEnforcedDelay target:self selector:@selector(checkForUpdatesInBackground) userInfo:nil repeats:NO];
 }
 
 - (void)receiveSleepNote
@@ -343,8 +395,10 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
     
 - (void)receiveWakeNote
 {
-    if (self.shouldRescheduleOnWake) // the reason for rescheduling the update-check timer is that NSTimer does behave as if the time the Mac spends asleep did not exist at all, which can significantly prolong the time between update checks
-        [self scheduleNextUpdateCheckUsingCurrentTime:YES];
+    // the reason for rescheduling the update-check timer is that NSTimer does behave as if the time the Mac spends asleep did not exist at all, which can significantly prolong the time between update checks
+    if (self.shouldRescheduleOnWake) {
+        [self scheduleNextUpdateCheckUsingCurrentDate:YES];
+    }
 }
 
 - (void)checkForUpdatesInBackground
@@ -397,7 +451,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
 
     if( [self.delegate respondsToSelector: @selector(updaterMayCheckForUpdates:)] && ![self.delegate updaterMayCheckForUpdates: self] )
     {
-        [self scheduleNextUpdateCheckUsingCurrentTime:NO];
+        [self scheduleNextUpdateCheckUsingCurrentDate:NO];
         return;
     }
 
@@ -406,7 +460,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
     // If we're not given a driver at all, just schedule the next update check and bail.
     if (!self.driver)
     {
-        [self scheduleNextUpdateCheckUsingCurrentTime:NO];
+        [self scheduleNextUpdateCheckUsingCurrentDate:NO];
         return;
     }
 
@@ -458,7 +512,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
 - (void)resetUpdateCycle
 {
     [[self class] cancelPreviousPerformRequestsWithTarget:self selector:@selector(resetUpdateCycle) object:nil];
-    [self scheduleNextUpdateCheckUsingCurrentTime:YES];
+    [self scheduleNextUpdateCheckUsingCurrentDate:YES];
 }
 
 - (void)setAutomaticallyChecksForUpdates:(BOOL)automaticallyCheckForUpdates
