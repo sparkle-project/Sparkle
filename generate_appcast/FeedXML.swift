@@ -49,7 +49,7 @@ func extractVersion(parent: XMLNode) -> String? {
     return nil
 }
 
-func writeAppcast(appcastDestPath: URL, updates: [ArchiveItem], newVersions: Set<String>?, maxNewVersionsInFeed: Int, link: String?, newChannel: String?, majorVersion: String?, phasedRolloutInterval: Int?, criticalUpdateVersion: String?, informationalUpdateVersions: [String]?) throws -> (numNewUpdates: Int, numExistingUpdates: Int) {
+func writeAppcast(appcastDestPath: URL, updates: [ArchiveItem], newVersions: Set<String>?, maxNewVersionsInFeed: Int, fullReleaseNotesLink: String?, link: String?, newChannel: String?, majorVersion: String?, phasedRolloutInterval: Int?, criticalUpdateVersion: String?, informationalUpdateVersions: [String]?) throws -> (numNewUpdates: Int, numExistingUpdates: Int) {
     let appBaseName = updates[0].appPath.deletingPathExtension().lastPathComponent
 
     let sparkleNS = "http://www.andymatuschak.org/xml-namespaces/sparkle"
@@ -166,6 +166,12 @@ func writeAppcast(appcastDestPath: URL, updates: [ArchiveItem], newVersions: Set
                let linkElement = XMLElement.element(withName: SURSSElementLink, uri: sparkleNS) as? XMLElement {
                 linkElement.setChildren([text(link)])
                 item.addChild(linkElement)
+            }
+            
+            if let fullReleaseNotesLink = fullReleaseNotesLink,
+               let fullReleaseNotesElement = XMLElement.element(withName: SUAppcastElementFullReleaseNotesLink, uri: sparkleNS) as? XMLElement {
+                fullReleaseNotesElement.setChildren([text(fullReleaseNotesLink)])
+                item.addChild(fullReleaseNotesElement)
             }
             
             // Set new channel name
