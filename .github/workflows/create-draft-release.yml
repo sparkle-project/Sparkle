@@ -71,7 +71,7 @@ jobs:
         run: |
             git config user.name Sparkle-Bot
             git config user.email sparkle.project.bot@gmail.com
-            git tag "${{ github.event.inputs.marketingVersion }}"
+            git tag "${{ github.event.inputs.marketingVersion }}${{ github.event.inputs.prereleaseSuffix }}"
 
       - name: "Build release distribution"
         run: make release
@@ -90,8 +90,8 @@ jobs:
         with:
           draft: true
           prerelease: ${{ env.PRERELEASE_VERSION }}
-          name: "Sparkle ${{ github.event.inputs.marketingVersion }}"
-          tag_name: ${{ github.event.inputs.marketingVersion }}
+          name: "Sparkle ${{ github.event.inputs.marketingVersion }}${{ github.event.inputs.prereleaseSuffix }}"
+          tag_name: "${{ github.event.inputs.marketingVersion }}${{ github.event.inputs.prereleaseSuffix }}"
           fail_on_unmatched_files: true
           token: ${{ secrets.BOT_PERSONAL_ACCESS_TOKEN }}
           body_path: latest-changes.txt
