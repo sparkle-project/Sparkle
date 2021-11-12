@@ -18,7 +18,6 @@
 
 extern const NSTimeInterval SUMinimumUpdateCheckInterval;
 extern const NSTimeInterval SUDefaultUpdateCheckInterval;
-extern const NSTimeInterval SUMinimumMonotonicUpdateCheckInterval;
 
 extern NSString *const SUBundleIdentifier;
 
