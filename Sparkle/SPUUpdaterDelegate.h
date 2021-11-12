@@ -366,7 +366,7 @@ SU_EXPORT extern NSString *const SUSystemProfilerPreferredLanguageKey;
  
  Automatic update checks need to be enabled for this to trigger.
  
- @param delay The delay in seconds until the next scheduled update will occur. This is an approximation and may vary due to system state.
+ @param delay The delay in seconds until the next scheduled update will occur.
  
  @param updater The updater instance.
  */

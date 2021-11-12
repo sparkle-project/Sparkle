@@ -62,7 +62,6 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 @property (nonatomic) BOOL showingPermissionRequest;
 
 @property (nonatomic, copy) NSDate *updateLastCheckedDate;
-@property (nonatomic) NSTimeInterval lastMonotonicUpdateCheckTime;
 
 @property (nonatomic) BOOL loggedATSWarning;
 @property (nonatomic) BOOL loggedNoSecureKeyWarning;
@@ -88,7 +87,6 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 @synthesize canCheckForUpdates = _canCheckForUpdates;
 @synthesize showingPermissionRequest = _showingPermissionRequest;
 @synthesize updateLastCheckedDate = _updateLastCheckedDate;
-@synthesize lastMonotonicUpdateCheckTime = _lastMonotonicUpdateCheckTime;
 @synthesize loggedATSWarning = _loggedATSWarning;
 @synthesize loggedNoSecureKeyWarning = _loggedNoSecureKeyWarning;
 
@@ -404,7 +402,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         // We start the update checks and register as observer for changes after the prompt finishes
     } else {
         // We check if the user's said they want updates, or they haven't said anything, and the default is set to checking.
-        [self scheduleNextUpdateCheckFiringImmediately:NO usingCurrentDate:YES];
+        [self scheduleNextUpdateCheckFiringImmediately:NO usingCurrentTime:YES];
     }
 }
 
@@ -424,27 +422,17 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     return [self updateLastCheckedDate];
 }
 
-- (NSTimeInterval)currentMonotonicTimeInterval
-{
-    // This is monotonic system time while the system is not asleep
-    return [[NSProcessInfo processInfo] systemUptime];
-}
-
 - (void)updateLastUpdateCheckDate
 {
     [self willChangeValueForKey:NSStringFromSelector(@selector((lastUpdateCheckDate)))];
-    
     // We use an intermediate property for last update check date due to https://github.com/sparkle-project/Sparkle/pull/1135
     [self setUpdateLastCheckedDate:[NSDate date]];
     [self.host setObject:[self updateLastCheckedDate] forUserDefaultsKey:SULastCheckTimeKey];
-    
-    self.lastMonotonicUpdateCheckTime = [self currentMonotonicTimeInterval];
-    
     [self didChangeValueForKey:NSStringFromSelector(@selector((lastUpdateCheckDate)))];
 }
 
 // Note this method is never called when sessionInProgress is YES
-- (void)scheduleNextUpdateCheckFiringImmediately:(BOOL)firingImmediately usingCurrentDate:(BOOL)usingCurrentDate
+- (void)scheduleNextUpdateCheckFiringImmediately:(BOOL)firingImmediately usingCurrentTime:(BOOL)usingCurrentTime
 {
     [self.updaterTimer invalidate];
     
@@ -491,74 +479,34 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
             // This callback is asynchronous, so the timer may be set. Invalidate to make sure it isn't.
             [self.updaterTimer invalidate];
             
-            NSTimeInterval dateIntervalSinceCheck;
-            NSTimeInterval minimumMonotonicEnforcedDelay;
-            if (usingCurrentDate) {
+            NSTimeInterval intervalSinceCheck;
+            if (usingCurrentTime) {
                 // How long has it been since last we checked for an update?
                 NSDate *lastCheckDate = [self lastUpdateCheckDate];
                 if (!lastCheckDate) { lastCheckDate = [NSDate distantPast]; }
-                NSTimeInterval wallTimeInterval = [[NSDate date] timeIntervalSinceDate:lastCheckDate];
-                if (wallTimeInterval < 0) {
+                intervalSinceCheck = [[NSDate date] timeIntervalSinceDate:lastCheckDate];
+                if (intervalSinceCheck < 0) {
                     // Last update check date is in the future and bogus, so reset it to current date
                     [self updateLastUpdateCheckDate];
                     
-                    // And assume a full update interval is needed
-                    dateIntervalSinceCheck = 0;
-                    minimumMonotonicEnforcedDelay = SUMinimumMonotonicUpdateCheckInterval;
-                } else {
-                    // Check the monotonic clock for an enforced minimum delay
-                    NSTimeInterval lastMonotonicUpdateCheckTime = self.lastMonotonicUpdateCheckTime;
-                    if (lastMonotonicUpdateCheckTime <= 0) {
-                        // When the updater is first started, the last monotonic time may not have been updated yet.
-                        // In this case there is no enforced minimum delay.
-                        minimumMonotonicEnforcedDelay = 0;
-                    } else {
-                        // Compute an enforced minimum delay based on elapsed monotonic time
-                        // The elapsed monotonic time is more stable than wall time interval and does not include the
-                        // amount of time while the system is asleep
-                        NSTimeInterval currentMonotonicTime = [self currentMonotonicTimeInterval];
-                        NSTimeInterval elapsedMonotonicTime = (currentMonotonicTime - lastMonotonicUpdateCheckTime);
-
-                        if (elapsedMonotonicTime < SUMinimumMonotonicUpdateCheckInterval) {
-                            minimumMonotonicEnforcedDelay = (SUMinimumMonotonicUpdateCheckInterval - elapsedMonotonicTime);
-                        } else {
-                            minimumMonotonicEnforcedDelay = 0;
-                        }
-                    }
-                    
-                    dateIntervalSinceCheck = wallTimeInterval;
+                    intervalSinceCheck = 0;
                 }
             } else {
-                // Without using the current date, we assume a full update interval is needed
-                dateIntervalSinceCheck = 0;
-                minimumMonotonicEnforcedDelay = SUMinimumMonotonicUpdateCheckInterval;
-            }
-            
-            if (updateCheckInterval < SUMinimumUpdateCheckInterval) {
-                updateCheckInterval = SUMinimumUpdateCheckInterval;
+                intervalSinceCheck = 0;
             }
             
             // Now we want to figure out how long until we check again.
-            NSTimeInterval wallDelayUntilCheck;
-            if (dateIntervalSinceCheck < updateCheckInterval) {
-                // It hasn't been long enough.
-                wallDelayUntilCheck = (updateCheckInterval - dateIntervalSinceCheck);
+            if (updateCheckInterval < SUMinimumUpdateCheckInterval)
+                updateCheckInterval = SUMinimumUpdateCheckInterval;
+            if (intervalSinceCheck < updateCheckInterval) {
+                NSTimeInterval delayUntilCheck = (updateCheckInterval - intervalSinceCheck); // It hasn't been long enough.
+                if ([self.delegate respondsToSelector:@selector(updater:willScheduleUpdateCheckAfterDelay:)]) {
+                    [self.delegate updater:self willScheduleUpdateCheckAfterDelay:delayUntilCheck];
+                }
+                [self.updaterTimer startAndFireAfterDelay:delayUntilCheck];
             } else {
-                wallDelayUntilCheck = 0;
-            }
-            
-            // Now compute delay with enforced minimum delay requirement
-            // The minimum delay (based on monotonic clock) is an extra layer of defense to prevent too frequent update checks
-            // in case the wall clock is not working properly (eg from too many system wake events, system date changes, NTP..)
-            NSTimeInterval finalDelayUntilCheck = MAX(wallDelayUntilCheck, minimumMonotonicEnforcedDelay);
-            if (finalDelayUntilCheck <= 0) {
                 // We're overdue! Run one now.
                 [self checkForUpdatesInBackground];
-            } else {
-                if ([self.delegate respondsToSelector:@selector(updater:willScheduleUpdateCheckAfterDelay:)]) {
-                    [self.delegate updater:self willScheduleUpdateCheckAfterDelay:finalDelayUntilCheck];
-                }
-                [self.updaterTimer startTimerWithWallTimeDelay:wallDelayUntilCheck monotonicTimeDelay:minimumMonotonicEnforcedDelay];
             }
         });
     }
@@ -740,7 +688,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
                 // Ensure the delegate doesn't start a new session when being notified of the previous one ending
                 if (!strongSelf.sessionInProgress) {
                     if (shouldScheduleNextUpdateCheck) {
-                        [strongSelf scheduleNextUpdateCheckFiringImmediately:NO usingCurrentDate:NO];
+                        [strongSelf scheduleNextUpdateCheckFiringImmediately:NO usingCurrentTime:NO];
                     } else {
                         SULog(SULogLevelDefault, @"Disabling scheduled updates..");
                     }
@@ -791,7 +739,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
             
             // Ensure the delegate doesn't start a new session when being notified of the previous one ending
             if (!strongSelf.sessionInProgress) {
-                [strongSelf scheduleNextUpdateCheckFiringImmediately:shouldShowUpdateImmediately usingCurrentDate:NO];
+                [strongSelf scheduleNextUpdateCheckFiringImmediately:shouldShowUpdateImmediately usingCurrentTime:NO];
             }
         }
     }];
@@ -836,7 +784,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     
     if (!self.sessionInProgress) {
         [self cancelNextUpdateCycle];
-        [self scheduleNextUpdateCheckFiringImmediately:NO usingCurrentDate:YES];
+        [self scheduleNextUpdateCheckFiringImmediately:NO usingCurrentTime:YES];
     }
 }
 
