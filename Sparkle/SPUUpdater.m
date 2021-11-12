@@ -402,7 +402,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         // We start the update checks and register as observer for changes after the prompt finishes
     } else {
         // We check if the user's said they want updates, or they haven't said anything, and the default is set to checking.
-        [self scheduleNextUpdateCheckFiringImmediately:NO usingCurrentTime:YES];
+        [self scheduleNextUpdateCheckFiringImmediately:NO usingCurrentDate:YES];
     }
 }
 
@@ -432,7 +432,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 }
 
 // Note this method is never called when sessionInProgress is YES
-- (void)scheduleNextUpdateCheckFiringImmediately:(BOOL)firingImmediately usingCurrentTime:(BOOL)usingCurrentTime
+- (void)scheduleNextUpdateCheckFiringImmediately:(BOOL)firingImmediately usingCurrentDate:(BOOL)usingCurrentDate
 {
     [self.updaterTimer invalidate];
     
@@ -480,7 +480,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
             [self.updaterTimer invalidate];
             
             NSTimeInterval intervalSinceCheck;
-            if (usingCurrentTime) {
+            if (usingCurrentDate) {
                 // How long has it been since last we checked for an update?
                 NSDate *lastCheckDate = [self lastUpdateCheckDate];
                 if (!lastCheckDate) { lastCheckDate = [NSDate distantPast]; }
@@ -688,7 +688,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
                 // Ensure the delegate doesn't start a new session when being notified of the previous one ending
                 if (!strongSelf.sessionInProgress) {
                     if (shouldScheduleNextUpdateCheck) {
-                        [strongSelf scheduleNextUpdateCheckFiringImmediately:NO usingCurrentTime:NO];
+                        [strongSelf scheduleNextUpdateCheckFiringImmediately:NO usingCurrentDate:NO];
                     } else {
                         SULog(SULogLevelDefault, @"Disabling scheduled updates..");
                     }
@@ -739,7 +739,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
             
             // Ensure the delegate doesn't start a new session when being notified of the previous one ending
             if (!strongSelf.sessionInProgress) {
-                [strongSelf scheduleNextUpdateCheckFiringImmediately:shouldShowUpdateImmediately usingCurrentTime:NO];
+                [strongSelf scheduleNextUpdateCheckFiringImmediately:shouldShowUpdateImmediately usingCurrentDate:NO];
             }
         }
     }];
@@ -784,7 +784,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     
     if (!self.sessionInProgress) {
         [self cancelNextUpdateCycle];
-        [self scheduleNextUpdateCheckFiringImmediately:NO usingCurrentTime:YES];
+        [self scheduleNextUpdateCheckFiringImmediately:NO usingCurrentDate:YES];
     }
 }
 
