@@ -1,12 +1,12 @@
 //
-//  SPUUserAgent.m
+//  SPUUserAgent+Private.m
 //  Sparkle
 //
 //  Created by Mayur Pawashe on 11/12/21.
 //  Copyright © 2021 Sparkle Project. All rights reserved.
 //
 
-#import "SPUUserAgent.h"
+#import "SPUUserAgent+Private.h"
 #import "SUHost.h"
 
 NSString *SPUMakeUserAgentWithBundle(NSBundle *responsibleBundle, NSString * _Nullable displayNameSuffix)

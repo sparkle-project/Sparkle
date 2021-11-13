@@ -9,8 +9,8 @@
 #import "SPUCommandLineDriver.h"
 #import <Sparkle/Sparkle.h>
 #import <Sparkle/SUInstallerLauncher+Private.h>
+#import <Sparkle/SPUUserAgent+Private.h>
 #import "SPUCommandLineUserDriver.h"
-#import "SPUUserAgent.h"
 
 #define SPARKLE_CLI_ERROR_DOMAIN @"sparkle-cli"
 

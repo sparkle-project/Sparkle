@@ -31,7 +31,7 @@
 #import "SPUUpdaterTimer.h"
 #import "SPUResumableUpdate.h"
 #import "SUSignatures.h"
-#import "SPUUserAgent.h"
+#import "SPUUserAgent+Private.h"
 
 
 #include "AppKitPrevention.h"
