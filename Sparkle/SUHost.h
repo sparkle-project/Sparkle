@@ -17,6 +17,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithBundle:(NSBundle *)aBundle;
 
+- (instancetype)init NS_UNAVAILABLE;
+
 @property (readonly, copy) NSString *bundlePath;
 @property (readonly, copy) NSString *name;
 @property (readonly, copy) NSString *version;

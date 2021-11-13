@@ -248,7 +248,9 @@ SU_EXPORT @interface SPUUpdater : NSObject
  By default the user agent string returned is in the format:
  $(BundleDisplayName)/$(BundleDisplayVersion) Sparkle/$(SparkleDisplayVersion)
  
- BundleDisplayVersion is derived from the application Info.plist's CFBundleShortVersionString.
+ BundleDisplayVersion is derived from the main application's Info.plist's CFBundleShortVersionString.
+ 
+ Note if Sparkle is being used to update another application, the bundle information retrieved is from the main application performing the updating.
  
  This default implementation can be overrided.
  */

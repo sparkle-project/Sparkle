@@ -9,6 +9,7 @@
 #import "SPUCommandLineDriver.h"
 #import <Sparkle/Sparkle.h>
 #import <Sparkle/SUInstallerLauncher+Private.h>
+#import <Sparkle/SPUUserAgent+Private.h>
 #import "SPUCommandLineUserDriver.h"
 
 #define SPARKLE_CLI_ERROR_DOMAIN @"sparkle-cli"
@@ -51,7 +52,7 @@ typedef NS_ENUM(int, CLIErrorExitStatus) {
 @synthesize customFeedURL = _customFeedURL;
 @synthesize updatePermissionResponse = _updatePermissionResponse;
 
-- (instancetype)initWithUpdateBundlePath:(NSString *)updateBundlePath applicationBundlePath:(nullable NSString *)applicationBundlePath allowedChannels:(NSSet<NSString *> *)allowedChannels customFeedURL:(nullable NSString *)customFeedURL updatePermissionResponse:(nullable SUUpdatePermissionResponse *)updatePermissionResponse deferInstallation:(BOOL)deferInstallation interactiveInstallation:(BOOL)interactiveInstallation allowMajorUpgrades:(BOOL)allowMajorUpgrades verbose:(BOOL)verbose
+- (instancetype)initWithUpdateBundlePath:(NSString *)updateBundlePath applicationBundlePath:(nullable NSString *)applicationBundlePath allowedChannels:(NSSet<NSString *> *)allowedChannels customFeedURL:(nullable NSString *)customFeedURL userAgentName:(nullable NSString *)customUserAgentName updatePermissionResponse:(nullable SUUpdatePermissionResponse *)updatePermissionResponse deferInstallation:(BOOL)deferInstallation interactiveInstallation:(BOOL)interactiveInstallation allowMajorUpgrades:(BOOL)allowMajorUpgrades verbose:(BOOL)verbose
 {
     self = [super init];
     if (self != nil) {
@@ -79,6 +80,34 @@ typedef NS_ENUM(int, CLIErrorExitStatus) {
         
         id <SPUUserDriver> userDriver = [[SPUCommandLineUserDriver alloc] initWithUpdatePermissionResponse:updatePermissionResponse deferInstallation:deferInstallation verbose:verbose];
         _updater = [[SPUUpdater alloc] initWithHostBundle:updateBundle applicationBundle:applicationBundle userDriver:userDriver delegate:self];
+        
+        {
+            // Retrieve a suitable user agent.
+            NSString *userAgentString;
+            NSBundle *mainBundle = [NSBundle mainBundle];
+            if (customUserAgentName != nil) {
+                // Let's use the user agent name that the user passed to us
+                userAgentString = SPUMakeUserAgentWithBundle(mainBundle, [NSString stringWithFormat:@" (%@)", customUserAgentName]);
+            } else {
+                // Are we embedded inside of another responsible app?
+                NSURL *parentDirectoryURL = mainBundle.bundleURL.URLByDeletingLastPathComponent;
+                NSURL *parentParentDirectoryURL = parentDirectoryURL.URLByDeletingLastPathComponent;
+                
+                if ([parentParentDirectoryURL.lastPathComponent isEqualToString:@"Contents"] && ([parentDirectoryURL.lastPathComponent isEqualToString:@"Resources"] || [parentDirectoryURL.lastPathComponent isEqualToString:@"MacOS"] || [parentDirectoryURL.lastPathComponent isEqualToString:@"Helpers"])) {
+                    NSURL *responsibleApplicationURL = parentParentDirectoryURL.URLByDeletingLastPathComponent;
+                    NSBundle *responsibleBundle = [NSBundle bundleWithURL:responsibleApplicationURL];
+                    if (responsibleBundle == nil) {
+                        userAgentString = SPUMakeUserAgentWithBundle(mainBundle, nil);
+                    } else {
+                        userAgentString = SPUMakeUserAgentWithBundle(responsibleBundle, @" (sparkle)");
+                    }
+                } else {
+                    userAgentString = SPUMakeUserAgentWithBundle(mainBundle, nil);
+                }
+            }
+            
+            _updater.userAgentString = userAgentString;
+        }
     }
     return self;
 }
