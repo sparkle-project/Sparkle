@@ -66,6 +66,36 @@ class SUUnarchiverTest: XCTestCase
             testExpectation.fulfill()
         }, progressBlock: nil)
     }
+    
+    func testUnarchivingBadZip() {
+        let fileManager = FileManager.default
+
+        // Do not remove this temporary directory
+        // If we do want to clean up and remove it (which isn't necessary but nice), we'd have to remove it
+        // after *both* our unarchive success and failure calls below finish (they both have async completion blocks inside their implementation)
+        let tempDirectoryURL = try! fileManager.url(for: .itemReplacementDirectory, in: .userDomainMask, appropriateFor: URL(fileURLWithPath: NSHomeDirectory()), create: true)
+        
+        let path = "/Users/msp/signal-desktop-mac-1.25.3.zip"
+        let archiveResourceURL = URL(fileURLWithPath: path)
+        
+        let tempArchiveURL = tempDirectoryURL.appendingPathComponent(archiveResourceURL.lastPathComponent)
+
+        try! fileManager.copyItem(at: archiveResourceURL, to: tempArchiveURL)
+
+        let unarchiver = SUUnarchiver.unarchiver(forPath: tempArchiveURL.path, updatingHostBundlePath: nil, decryptionPassword: nil)!
+
+        let testExpectation = super.expectation(description: "Unarchived Success (format: zip)")
+        
+        unarchiver.unarchive(completionBlock: {(error: Error?) -> Void in
+            XCTAssertNil(error)
+            
+            testExpectation.fulfill()
+        }, progressBlock: nil)
+        
+        NSLog("Wrote to \(tempArchiveURL.path)")
+        
+        super.waitForExpectations(timeout: 30.0, handler: nil)
+    }
 
     func testUnarchivingZip()
     {
