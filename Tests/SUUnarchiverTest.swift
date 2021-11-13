@@ -82,7 +82,7 @@ class SUUnarchiverTest: XCTestCase
 
         try! fileManager.copyItem(at: archiveResourceURL, to: tempArchiveURL)
 
-        let unarchiver = SUUnarchiver.unarchiver(forPath: tempArchiveURL.path, updatingHostBundlePath: nil, decryptionPassword: nil)!
+        let unarchiver = SUUnarchiver.unarchiver(forPath: tempArchiveURL.path, updatingHostBundlePath: nil, decryptionPassword: nil, expectingInstallationType: SPUInstallationTypeApplication)!
 
         let testExpectation = super.expectation(description: "Unarchived Success (format: zip)")
         
