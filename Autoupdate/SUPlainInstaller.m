@@ -155,6 +155,15 @@
         [newTempURL setResourceValue:resourceTags forKey:NSURLTagNamesKey error:NULL];
     }
     
+    // Try to preserve custom icons set by the user in the Finder
+    if ([[oldTempURL URLByAppendingPathComponent:@"Icon\r"] checkResourceIsReachableAndReturnError:nil])
+    {
+        NSString *oldTempPath = oldTempURL.path;
+        NSString *destinationAppPath = destinationAppURL.path;
+        NSImage *customIcon = [NSWorkspace.sharedWorkspace iconForFile:oldTempPath];
+        [NSWorkspace.sharedWorkspace setIcon:customIcon forFile:destinationAppPath options:NSExcludeQuickDrawElementsIconCreationOption]; // ignore return status - failure ain't fatal
+    }
+    
     // We must leave moving the app to its destination as the final step in installing it, so that
     // it's not possible our new app can be left in an incomplete state at the final destination
     
