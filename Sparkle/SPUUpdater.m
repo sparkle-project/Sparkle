@@ -31,6 +31,7 @@
 #import "SPUUpdaterTimer.h"
 #import "SPUResumableUpdate.h"
 #import "SUSignatures.h"
+#import "SPUUserAgent.h"
 
 
 #include "AppKitPrevention.h"
@@ -123,32 +124,11 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         _delegate = delegate;
         
         // Set up default user agent
-        {
-            // Use the main bundle rather than the bundle to update for retrieving user agent information from
-            // We want the user agent to reflect the updater that is doing the updater
-            NSBundle *mainBundle = [NSBundle mainBundle];
-            SUHost *mainBundleHost = [[SUHost alloc] initWithBundle:mainBundle];
-            
-            NSString *displayVersion = mainBundleHost.displayVersion;
-            
-            NSString *userAgent = [NSString stringWithFormat:@"%@/%@ Sparkle/%@", mainBundleHost.name, (displayVersion.length > 0 ? displayVersion : @"?"), @""MARKETING_VERSION];
-            NSData *cleanedAgent = [userAgent dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:YES];
-            
-            NSString *result;
-            if (cleanedAgent != nil) {
-                NSString *cleanedAgentString = [[NSString alloc] initWithData:(NSData * _Nonnull)cleanedAgent encoding:NSASCIIStringEncoding];
-                if (cleanedAgentString != nil) {
-                    result = cleanedAgentString;
-                } else {
-                    result = @"";
-                }
-            } else {
-                result = @"";
-            }
-            
-            _userAgentString = result;
-            _mainBundleHost = mainBundleHost;
-        }
+        // Use the main bundle rather than the bundle to update for retrieving user agent information from
+        // We want the user agent to reflect the updater that is doing the updating
+        SUHost *mainBundleHost = [[SUHost alloc] initWithBundle:[NSBundle mainBundle]];
+        _userAgentString = SPUMakeUserAgentWithHost(mainBundleHost, nil);
+        _mainBundleHost = mainBundleHost;
     }
     
     return self;
