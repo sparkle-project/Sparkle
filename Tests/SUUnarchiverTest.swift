@@ -10,7 +10,7 @@ import XCTest
 
 class SUUnarchiverTest: XCTestCase
 {
-    func unarchiveTestAppWithExtension(_ archiveExtension: String, password: String? = nil, resourceName: String = "SparkleTestCodeSignApp", expectingInstallationType installationType: String = SPUInstallationTypeApplication, expectingSuccess: Bool = true) {
+    func unarchiveTestAppWithExtension(_ archiveExtension: String, password: String? = nil, resourceName: String = "SparkleTestCodeSignApp", extractedAppName: String = "SparkleTestCodeSignApp", expectingInstallationType installationType: String = SPUInstallationTypeApplication, expectingSuccess: Bool = true) {
         let appName = resourceName
         let archiveResourceURL = Bundle(for: type(of: self)).url(forResource: appName, withExtension: archiveExtension)!
 
@@ -25,7 +25,7 @@ class SUUnarchiverTest: XCTestCase
         let unarchivedFailureExpectation = super.expectation(description: "Unarchived Failure (format: \(archiveExtension))")
 
         let tempArchiveURL = tempDirectoryURL.appendingPathComponent(archiveResourceURL.lastPathComponent)
-        let extractedAppURL = tempDirectoryURL.appendingPathComponent(appName).appendingPathExtension("app")
+        let extractedAppURL = tempDirectoryURL.appendingPathComponent(extractedAppName).appendingPathExtension("app")
 
         self.unarchiveTestAppWithExtension(archiveExtension, appName: appName, tempDirectoryURL: tempDirectoryURL, tempArchiveURL: tempArchiveURL, archiveResourceURL: archiveResourceURL, password: password, expectingInstallationType: installationType, expectingSuccess: expectingSuccess, testExpectation: unarchivedSuccessExpectation)
         self.unarchiveNonExistentFileTestFailureAppWithExtension(archiveExtension, tempDirectoryURL: tempDirectoryURL, password: password, expectingInstallationType: installationType, testExpectation: unarchivedFailureExpectation)
@@ -66,40 +66,15 @@ class SUUnarchiverTest: XCTestCase
             testExpectation.fulfill()
         }, progressBlock: nil)
     }
-    
-    func testUnarchivingBadZip() {
-        let fileManager = FileManager.default
-
-        // Do not remove this temporary directory
-        // If we do want to clean up and remove it (which isn't necessary but nice), we'd have to remove it
-        // after *both* our unarchive success and failure calls below finish (they both have async completion blocks inside their implementation)
-        let tempDirectoryURL = try! fileManager.url(for: .itemReplacementDirectory, in: .userDomainMask, appropriateFor: URL(fileURLWithPath: NSHomeDirectory()), create: true)
-        
-        let path = "/Users/msp/signal-desktop-mac-1.25.3.zip"
-        let archiveResourceURL = URL(fileURLWithPath: path)
-        
-        let tempArchiveURL = tempDirectoryURL.appendingPathComponent(archiveResourceURL.lastPathComponent)
-
-        try! fileManager.copyItem(at: archiveResourceURL, to: tempArchiveURL)
-
-        let unarchiver = SUUnarchiver.unarchiver(forPath: tempArchiveURL.path, updatingHostBundlePath: nil, decryptionPassword: nil, expectingInstallationType: SPUInstallationTypeApplication)!
-
-        let testExpectation = super.expectation(description: "Unarchived Success (format: zip)")
-        
-        unarchiver.unarchive(completionBlock: {(error: Error?) -> Void in
-            XCTAssertNil(error)
-            
-            testExpectation.fulfill()
-        }, progressBlock: nil)
-        
-        NSLog("Wrote to \(tempArchiveURL.path)")
-        
-        super.waitForExpectations(timeout: 30.0, handler: nil)
-    }
 
     func testUnarchivingZip()
     {
         self.unarchiveTestAppWithExtension("zip")
+    }
+    
+    // This zip file has extraneous zero bytes added at the very end
+    func testUnarchivingBadZip() {
+        self.unarchiveTestAppWithExtension("zip", resourceName: "SparkleTestCodeSignApp_bad", extractedAppName: "SparkleTestCodeSignApp")
     }
 
     func testUnarchivingTarDotGz()

@@ -328,6 +328,7 @@
 		729F7EAC27366353004592DC /* test-links.xml in Resources */ = {isa = PBXBuildFile; fileRef = 729F7EAB27366353004592DC /* test-links.xml */; };
 		729F7EAF273F1840004592DC /* SPUUserAgent+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 729F7EAD273F1840004592DC /* SPUUserAgent+Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		729F7EB0273F1840004592DC /* SPUUserAgent+Private.m in Sources */ = {isa = PBXBuildFile; fileRef = 729F7EAE273F1840004592DC /* SPUUserAgent+Private.m */; };
+		729F7ECE27409077004592DC /* SparkleTestCodeSignApp_bad.zip in Resources */ = {isa = PBXBuildFile; fileRef = 729F7ECD27409076004592DC /* SparkleTestCodeSignApp_bad.zip */; };
 		72A1C2631CD6849C004CD282 /* SUUpdatePermissionPrompt.h in Headers */ = {isa = PBXBuildFile; fileRef = 612DCBAD0D488BC60015DBEA /* SUUpdatePermissionPrompt.h */; };
 		72A450531C69A68900D67EEA /* SUUpdatePermissionResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = 72A450511C69A68900D67EEA /* SUUpdatePermissionResponse.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		72A450541C69A68900D67EEA /* SUUpdatePermissionResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 72A450521C69A68900D67EEA /* SUUpdatePermissionResponse.m */; };
@@ -1233,6 +1234,7 @@
 		729F7EAB27366353004592DC /* test-links.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "test-links.xml"; sourceTree = "<group>"; };
 		729F7EAD273F1840004592DC /* SPUUserAgent+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SPUUserAgent+Private.h"; sourceTree = "<group>"; };
 		729F7EAE273F1840004592DC /* SPUUserAgent+Private.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "SPUUserAgent+Private.m"; sourceTree = "<group>"; };
+		729F7ECD27409076004592DC /* SparkleTestCodeSignApp_bad.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = SparkleTestCodeSignApp_bad.zip; sourceTree = "<group>"; };
 		72A450511C69A68900D67EEA /* SUUpdatePermissionResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUUpdatePermissionResponse.h; sourceTree = "<group>"; };
 		72A450521C69A68900D67EEA /* SUUpdatePermissionResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUUpdatePermissionResponse.m; sourceTree = "<group>"; };
 		72A4A23F1BB6567D00E7820D /* SUFileManagerTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SUFileManagerTest.swift; sourceTree = "<group>"; };
@@ -1704,6 +1706,7 @@
 				72AC6B291B9AAF3A00F62325 /* SparkleTestCodeSignApp.tar.bz2 */,
 				72AC6B251B9AAC8800F62325 /* SparkleTestCodeSignApp.tar.gz */,
 				72AC6B2B1B9AB0EE00F62325 /* SparkleTestCodeSignApp.tar.xz */,
+				729F7ECD27409076004592DC /* SparkleTestCodeSignApp_bad.zip */,
 				F8761EB21ADC50EB000C9034 /* SparkleTestCodeSignApp.zip */,
 				14958C6C19AEBC610061B14F /* test-pubkey.pem */,
 				5AF6C74E1AEA46D10014A3AB /* test.pkg */,
@@ -2973,6 +2976,7 @@
 				72AC6B2A1B9AAF3A00F62325 /* SparkleTestCodeSignApp.tar.bz2 in Resources */,
 				72AC6B261B9AAC8800F62325 /* SparkleTestCodeSignApp.tar.gz in Resources */,
 				72AC6B2C1B9AB0EE00F62325 /* SparkleTestCodeSignApp.tar.xz in Resources */,
+				729F7ECE27409077004592DC /* SparkleTestCodeSignApp_bad.zip in Resources */,
 				5A5DD41D249F116E0045EB3E /* test-relative-urls.xml in Resources */,
 				F8761EB31ADC50EB000C9034 /* SparkleTestCodeSignApp.zip in Resources */,
 				5A5DD40424958B000045EB3E /* SUUpdateValidatorTest in Resources */,
