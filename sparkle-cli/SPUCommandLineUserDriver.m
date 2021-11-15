@@ -194,7 +194,7 @@
 - (void)showDownloadDidStartExtractingUpdate
 {
     if (self.verbose) {
-        fprintf(stderr, "Extracting update...\n");
+        fprintf(stderr, "Extracting Update...\n");
     }
 }
 

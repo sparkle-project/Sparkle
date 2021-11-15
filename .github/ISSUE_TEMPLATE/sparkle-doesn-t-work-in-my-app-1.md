@@ -32,3 +32,5 @@ https://github.com/sparkle-project/Sparkle#troubleshooting
 ```
 
 ### Steps to reproduce the behavior
+
+[The more information provided and pasted verbatim, the easier it will be to diagnose an issue. If you can provide the affected application/binary and XML feed to reproduce an issue, share them]
