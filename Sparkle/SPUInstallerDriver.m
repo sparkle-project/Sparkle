@@ -117,18 +117,40 @@
         dispatch_async(dispatch_get_main_queue(), ^{
             SPUInstallerDriver *strongSelf = weakSelf;
             if (strongSelf.installerConnection != nil && !strongSelf.aborted) {
-                
-                NSMutableDictionary *userInfo = [NSMutableDictionary dictionaryWithDictionary:@{
-                    NSLocalizedDescriptionKey: SULocalizedString(@"An error occurred while running the updater. Please try again later.", nil),
-                    NSLocalizedFailureReasonErrorKey:@"The remote port connection was invalidated from the updater. For additional details, please check Console logs for "@SPARKLE_RELAUNCH_TOOL_NAME". If your application is sandboxed, please also ensure Installer Connection & Status entitlements are correctly set up: https://sparkle-project.org/documentation/sandboxing/"
-                }];
-                
-                NSError *installerError = strongSelf.installerError;
-                if (installerError != nil) {
-                    userInfo[NSUnderlyingErrorKey] = installerError;
+                // First see if there is a good custom error we can show
+                // We only check for signing validation errors currently
+                NSError *customError;
+                NSError *priorInstallerError = strongSelf.installerError;
+                if (priorInstallerError != nil) {
+                    NSError *underlyingError = priorInstallerError.userInfo[NSUnderlyingErrorKey];
+                    
+                    if (underlyingError != nil && underlyingError.code == SUValidationError) {
+                        NSDictionary *userInfo = @{
+                            NSLocalizedDescriptionKey: SULocalizedString(@"The update is improperly signed. Please try again later or contact the app developer.", nil)
+                        };
+                        
+                        customError = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:userInfo];
+                    } else {
+                        customError = nil;
+                    }
+                } else {
+                    customError = nil;
                 }
                 
-                [strongSelf.delegate installerIsRequestingAbortInstallWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:userInfo]];
+                // If there's no custom error then use a generic installer error to show
+                NSError *installerError;
+                if (customError != nil) {
+                    installerError = customError;
+                } else {
+                    NSDictionary *userInfo = @{
+                        NSLocalizedDescriptionKey: SULocalizedString(@"An error occurred while running the updater. Please try again later.", nil),
+                        NSLocalizedFailureReasonErrorKey:@"The remote port connection was invalidated from the updater. For additional details, please check Console logs for "@SPARKLE_RELAUNCH_TOOL_NAME". If your application is sandboxed, please also ensure Installer Connection & Status entitlements are correctly set up: https://sparkle-project.org/documentation/sandboxing/"
+                    };
+                    
+                    installerError = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:userInfo];
+                }
+                
+                [strongSelf.delegate installerIsRequestingAbortInstallWithError:installerError];
             }
         });
     }];
