@@ -106,7 +106,7 @@
             
             NSPipe *pipe = [NSPipe pipe];
             NSTask *task = [[NSTask alloc] init];
-            [task setStandardInput:[pipe fileHandleForReading]];
+            [task setStandardInput:pipe];
             [task setStandardError:[NSFileHandle fileHandleWithStandardError]];
             [task setStandardOutput:[NSFileHandle fileHandleWithStandardOutput]];
             [task setLaunchPath:command];
@@ -128,12 +128,21 @@
                         break;
                     }
                     bytesRead += len;
-                    [archiveOutput writeData:data];
+                    
+                    NSError *writeError = nil;
+                    if (![archiveOutput writeData:data error:&writeError]) {
+                        SULog(SULogLevelError, @"Failed to write data to pipe with error %@", writeError);
+                        break;
+                    }
+                    
                     [notifier notifyProgress:(double)bytesRead / (double)expectedLength];
                 }
                 while(bytesRead < expectedLength);
                 
-                [archiveOutput closeFile];
+                NSError *closeError = nil;
+                if (![archiveOutput closeAndReturnError:&closeError]) {
+                    SULog(SULogLevelError, @"Failed to close pipe with error %@", closeError);
+                }
                 
                 [task waitUntilExit];
                 
