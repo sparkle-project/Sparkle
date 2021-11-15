@@ -32,7 +32,7 @@ class SUUnarchiverTest: XCTestCase
 
         super.waitForExpectations(timeout: 30.0, handler: nil)
 
-        if !archiveExtension.hasSuffix("pkg") {
+        if !archiveExtension.hasSuffix("pkg") && expectingSuccess {
             XCTAssertTrue(fileManager.fileExists(atPath: extractedAppURL.path))
             XCTAssertEqual("6a60ab31430cfca8fb499a884f4a29f73e59b472", hashOfTree(extractedAppURL.path))
         }
@@ -74,7 +74,12 @@ class SUUnarchiverTest: XCTestCase
     
     // This zip file has extraneous zero bytes added at the very end
     func testUnarchivingBadZip() {
-        self.unarchiveTestAppWithExtension("zip", resourceName: "SparkleTestCodeSignApp_bad", extractedAppName: "SparkleTestCodeSignApp")
+        // We may receive a SIGPIPE error when writing data to a pipe
+        signal(SIGPIPE, SIG_IGN)
+        
+        self.unarchiveTestAppWithExtension("zip", resourceName: "SparkleTestCodeSignApp_bad", extractedAppName: "SparkleTestCodeSignApp", expectingSuccess: false)
+        
+        signal(SIGPIPE, SIG_DFL)
     }
 
     func testUnarchivingTarDotGz()
