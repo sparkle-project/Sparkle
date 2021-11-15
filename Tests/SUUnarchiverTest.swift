@@ -75,6 +75,8 @@ class SUUnarchiverTest: XCTestCase
     // This zip file has extraneous zero bytes added at the very end
     func testUnarchivingBadZip() {
         // We may receive a SIGPIPE error when writing data to a pipe
+        // The Autoupdate installer ignores SIGPIPE too
+        // We need to ignore it otherwise the xctest will terminate unexpectedly
         signal(SIGPIPE, SIG_IGN)
         
         self.unarchiveTestAppWithExtension("zip", resourceName: "SparkleTestCodeSignApp_bad", extractedAppName: "SparkleTestCodeSignApp", expectingSuccess: false)
