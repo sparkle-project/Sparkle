@@ -106,7 +106,7 @@
         NSError *underlyingError = currentInstallerError.userInfo[NSUnderlyingErrorKey];
         if (underlyingError != nil && underlyingError.code == SUValidationError) {
             NSDictionary *userInfo = @{
-                NSLocalizedDescriptionKey: SULocalizedString(@"The update is improperly signed. Please try again later or contact the app developer.", nil),
+                NSLocalizedDescriptionKey: SULocalizedString(@"The update is improperly signed and could not be validated. Please try again later or contact the app developer.", nil),
                 NSUnderlyingErrorKey: (NSError * _Nonnull)currentInstallerError
             };
             

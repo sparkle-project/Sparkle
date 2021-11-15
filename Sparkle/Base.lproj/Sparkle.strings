@@ -125,7 +125,7 @@
 
 "The update is improperly signed." = "The update is improperly signed.";
 
-"The update is improperly signed. Please try again later or contact the app developer." = "The update is improperly signed. Please try again later or contact the app developer.";
+"The update is improperly signed and could not be validated. Please try again later or contact the app developer." = "The update is improperly signed and could not be validated. Please try again later or contact the app developer.";
 
 "Update Error!" = "Update Error!";
 
