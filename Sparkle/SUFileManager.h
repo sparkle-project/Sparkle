@@ -35,7 +35,7 @@ NS_ASSUME_NONNULL_BEGIN
  * When moving an item from a source to a destination, it is desirable to create a temporary intermediate destination on the same volume as the destination to ensure
  * that the item will be moved, and not copied, from the intermediate point to the final destination. This ensures file atomicity.
  */
-- (NSURL * _Nullable)makeTemporaryDirectoryWithPreferredName:(NSString *)preferredName appropriateForDirectoryURL:(NSURL *)appropriateURL error:(NSError * __autoreleasing *)error;
+- (NSURL * _Nullable)makeTemporaryDirectoryAppropriateForDirectoryURL:(NSURL *)appropriateURL error:(NSError * __autoreleasing *)error;
 
 /**
  * Creates a directory at the target URL
@@ -60,7 +60,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)moveItemAtURL:(NSURL *)sourceURL toURL:(NSURL *)destinationURL error:(NSError **)error;
 
 /**
- * Replaces an original item with a new item atomically.
+ * Swaps an original item with a new item atomically.
  * @param originalItemURL A URL pointing to the original item to replace. The item at this URL must exist.
  * @param newItemURL A URL pointing to the new item that will replace the original item.
  * @param error If an error occurs, upon returns contains an NSError object that describes the problem. If you are not interested in possible errors, you may pass in NULL.
@@ -70,7 +70,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Otherwise on failure you may need to re-try using move operations. This operation will fail on non-apfs volumes or volumes that don't support rename swapping.
  * Both originalItemURL and newItemURL must exist.
  */
-- (BOOL)replaceItemAtURL:(NSURL *)originalItemURL withItemAtURL:(NSURL *)newItemURL error:(NSError **)error __OSX_AVAILABLE(10.13);
+- (BOOL)swapItemAtURL:(NSURL *)originalItemURL withItemAtURL:(NSURL *)newItemURL error:(NSError **)error __OSX_AVAILABLE(10.13);
 
 /**
  * Copies an item from a source to a destination
