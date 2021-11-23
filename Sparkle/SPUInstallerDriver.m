@@ -97,6 +97,43 @@
     return self;
 }
 
+- (void)_reportInstallerError:(nullable NSError *)currentInstallerError genericErrorCode:(NSInteger)genericErrorCode genericUserInfo:(NSDictionary *)genericUserInfo
+{
+    // First see if there is a good custom error we can show
+    // We only check for signing validation errors currently
+    NSError *customError;
+    if (currentInstallerError != nil) {
+        NSError *underlyingError = currentInstallerError.userInfo[NSUnderlyingErrorKey];
+        if (underlyingError != nil && underlyingError.code == SUValidationError) {
+            NSDictionary *userInfo = @{
+                NSLocalizedDescriptionKey: SULocalizedString(@"The update is improperly signed and could not be validated. Please try again later or contact the app developer.", nil),
+                NSUnderlyingErrorKey: (NSError * _Nonnull)currentInstallerError
+            };
+            
+            customError = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:userInfo];
+        } else {
+            customError = nil;
+        }
+    } else {
+        customError = nil;
+    }
+    
+    // Otherwise if there's no custom error, then use a generic installer error to show
+    // and keep the underlying error around for logging
+    NSError *installerError;
+    if (customError != nil) {
+        installerError = customError;
+    } else {
+        NSMutableDictionary *userInfo = [NSMutableDictionary dictionaryWithDictionary:genericUserInfo];
+        if (currentInstallerError != nil) {
+            userInfo[NSUnderlyingErrorKey] = currentInstallerError;
+        }
+        installerError = [NSError errorWithDomain:SUSparkleErrorDomain code:genericErrorCode userInfo:userInfo];
+    }
+    
+    [self.delegate installerIsRequestingAbortInstallWithError:installerError];
+}
+
 - (void)setUpConnection
 {
     if (self.installerConnection != nil) {
@@ -117,18 +154,12 @@
         dispatch_async(dispatch_get_main_queue(), ^{
             SPUInstallerDriver *strongSelf = weakSelf;
             if (strongSelf.installerConnection != nil && !strongSelf.aborted) {
-                
-                NSMutableDictionary *userInfo = [NSMutableDictionary dictionaryWithDictionary:@{
+                NSDictionary *genericUserInfo = @{
                     NSLocalizedDescriptionKey: SULocalizedString(@"An error occurred while running the updater. Please try again later.", nil),
                     NSLocalizedFailureReasonErrorKey:@"The remote port connection was invalidated from the updater. For additional details, please check Console logs for "@SPARKLE_RELAUNCH_TOOL_NAME". If your application is sandboxed, please also ensure Installer Connection & Status entitlements are correctly set up: https://sparkle-project.org/documentation/sandboxing/"
-                }];
+                };
                 
-                NSError *installerError = strongSelf.installerError;
-                if (installerError != nil) {
-                    userInfo[NSUnderlyingErrorKey] = installerError;
-                }
-                
-                [strongSelf.delegate installerIsRequestingAbortInstallWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:userInfo]];
+                [strongSelf _reportInstallerError:strongSelf.installerError genericErrorCode:SUInstallationError genericUserInfo:genericUserInfo];
             }
         });
     }];
@@ -238,14 +269,10 @@
             [self.delegate installerDidFailToApplyDeltaUpdate];
         } else {
             // Don't have to store current stage because we're going to abort
-            NSMutableDictionary *userInfo = [NSMutableDictionary dictionaryWithDictionary:@{ NSLocalizedDescriptionKey:SULocalizedString(@"An error occurred while extracting the archive. Please try again later.", nil) }];
+            NSDictionary *genericUserInfo = @{ NSLocalizedDescriptionKey:SULocalizedString(@"An error occurred while extracting the archive. Please try again later.", nil) };
             
             NSError *unarchivedError = (NSError *)SPUUnarchiveRootObjectSecurely(data, [NSError class]);
-            if (unarchivedError != nil) {
-                userInfo[NSUnderlyingErrorKey] = unarchivedError;
-            }
-            
-            [self.delegate installerIsRequestingAbortInstallWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUUnarchivingError userInfo:userInfo]];
+            [self _reportInstallerError:unarchivedError genericErrorCode:SUUnarchivingError genericUserInfo:genericUserInfo];
         }
     } else if (identifier == SPUValidationStarted) {
         self.currentStage = identifier;
