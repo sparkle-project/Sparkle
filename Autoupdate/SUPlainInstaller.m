@@ -111,6 +111,10 @@
         return NO;
     }
     
+    if (progress) {
+        progress(2/10.0);
+    }
+    
     // Create a temporary directory for our new app that resides on our destination's volume
     // We use oldURL here instead of installationURL because in the case of normalization, installationURL may not exist
     // And we don't want to use either of the URL's parent directories because the parent directory could be on a different volume
@@ -122,7 +126,7 @@
     self.temporaryNewDirectory = tempNewDirectoryURL;
 
     if (progress) {
-        progress(2/10.0);
+        progress(3/10.0);
     }
 
     // Move the new app to our temporary directory
@@ -143,7 +147,7 @@
     }
 
     if (progress) {
-        progress(3/10.0);
+        progress(4/10.0);
     }
 
     // Release our new app from quarantine
@@ -154,7 +158,7 @@
     }
 
     if (progress) {
-        progress(4/10.0);
+        progress(5/10.0);
     }
     
     // Try to preserve Finder Tags
@@ -162,6 +166,10 @@
     BOOL retrievedResourceTags = [oldURL getResourceValue:&resourceTags forKey:NSURLTagNamesKey error:NULL];
     if (retrievedResourceTags && resourceTags.count > 0) {
         [newTempURL setResourceValue:resourceTags forKey:NSURLTagNamesKey error:NULL];
+    }
+    
+    if (progress) {
+        progress(6/10.0);
     }
     
     // We must leave moving the app to its destination as the final step in installing it, so that
@@ -175,7 +183,7 @@
     }
 
     if (progress) {
-        progress(5/10.0);
+        progress(7/10.0);
     }
 
     NSError *touchError = nil;
@@ -186,7 +194,7 @@
     }
 
     if (progress) {
-        progress(6/10.0);
+        progress(8/10.0);
     }
     
     // First try swapping the application atomically
@@ -221,7 +229,7 @@
         self.temporaryOldDirectory = tempOldDirectoryURL;
 
         if (progress) {
-            progress(7/10.0);
+            progress(9/10.0);
         }
         
         NSString *oldURLFilename = oldURL.lastPathComponent;
@@ -251,7 +259,7 @@
         }
 
         if (progress) {
-            progress(8/10.0);
+            progress(9.5/10.0);
         }
 
         // Move the new app to its final destination
@@ -271,10 +279,6 @@
             [fileManager moveItemAtURL:oldTempURL toURL:oldURL error:NULL];
             
             return NO;
-        }
-        
-        if (progress) {
-            progress(9/10.0);
         }
     }
 
