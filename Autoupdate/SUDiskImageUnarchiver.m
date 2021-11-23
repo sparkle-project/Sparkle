@@ -115,6 +115,20 @@
             task.standardInput = inputPipe;
             task.standardOutput = outputPipe;
             
+            NSFileHandle *fileStdHandle = outputPipe.fileHandleForReading;
+            NSMutableData *currentOutput = [NSMutableData data];
+            
+            fileStdHandle.readabilityHandler = ^(NSFileHandle *file) {
+                [currentOutput appendData:file.availableData];
+            };
+            
+            dispatch_semaphore_t terminationSemaphore = dispatch_semaphore_create(0);
+            task.terminationHandler = ^(NSTask *__unused terminatingTask) {
+                fileStdHandle.readabilityHandler = nil;
+                
+                dispatch_semaphore_signal(terminationSemaphore);
+            };
+            
             [task launch];
             
             [notifier notifyProgress:0.125];
@@ -122,10 +136,9 @@
             [inputPipe.fileHandleForWriting writeData:promptData];
             [inputPipe.fileHandleForWriting closeFile];
             
-            // Read data to end *before* waiting until the task ends so we don't deadlock if the stdout buffer becomes full if we haven't consumed from it
-            output = [outputPipe.fileHandleForReading readDataToEndOfFile];
+            dispatch_semaphore_wait(terminationSemaphore, DISPATCH_TIME_FOREVER);
+            output = [currentOutput copy];
             
-            [task waitUntilExit];
             taskResult = task.terminationStatus;
         }
         @catch (NSException *)
@@ -146,14 +159,14 @@
         // Now that we've mounted it, we need to copy out its contents.
         manager = [[NSFileManager alloc] init];
         contents = [manager contentsOfDirectoryAtPath:mountPoint error:&error];
-        if (error)
+        if (contents == nil)
         {
             SULog(SULogLevelError, @"Couldn't enumerate contents of archive mounted at %@: %@", mountPoint, error);
             goto reportError;
         }
 
         double itemsCopied = 0;
-        double totalItems = [contents count];
+        double totalItems = (double)[contents count];
 
 		for (NSString *item in contents)
 		{
