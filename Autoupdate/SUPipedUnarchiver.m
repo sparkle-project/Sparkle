@@ -135,7 +135,7 @@
         }
         
         NSFileHandle *archiveOutput = [pipe fileHandleForWriting];
-        NSUInteger bytesRead = 0;
+        NSUInteger bytesWritten = 0;
         
         BOOL hasIOErrorMethods;
         if (@available(macOS 10.15, *)) {
@@ -168,7 +168,6 @@
             if (len == 0) {
                 break;
             }
-            bytesRead += len;
             
             NSError *writeError = nil;
             if (hasIOErrorMethods) {
@@ -188,9 +187,11 @@
                 }
             }
             
-            [notifier notifyProgress:(double)bytesRead / (double)expectedLength];
+            bytesWritten += len;
+            
+            [notifier notifyProgress:(double)bytesWritten / (double)expectedLength];
         }
-        while(bytesRead < expectedLength);
+        while(bytesWritten < expectedLength);
         
         if (@available(macOS 10.15, *)) {
             NSError *archiveOutputCloseError = nil;
@@ -219,8 +220,8 @@
             return;
         }
         
-        if (bytesRead != expectedLength) {
-            NSError *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUUnarchivingError userInfo:@{ NSLocalizedDescriptionKey:[NSString stringWithFormat:@"Extraction failed, command '%@' got only %ld of %ld bytes", command, (long)bytesRead, (long)expectedLength]}];
+        if (bytesWritten != expectedLength) {
+            NSError *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUUnarchivingError userInfo:@{ NSLocalizedDescriptionKey:[NSString stringWithFormat:@"Extraction failed, command '%@' got only %ld of %ld bytes", command, (long)bytesWritten, (long)expectedLength]}];
             
             [notifier notifyFailureWithError:error];
             return;
