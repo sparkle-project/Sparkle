@@ -53,7 +53,7 @@
     SUFileManager *fileManager = [[SUFileManager alloc] init];
     
     NSError *tempError = nil;
-    NSURL *tempDir = [fileManager makeTemporaryDirectoryWithPreferredName:unitTestBundleIdentifier appropriateForDirectoryURL:[NSURL fileURLWithPath:zippedAppURL] error:&tempError];
+    NSURL *tempDir = [fileManager makeTemporaryDirectoryAppropriateForDirectoryURL:[NSURL fileURLWithPath:zippedAppURL] error:&tempError];
 
     if (tempDir == nil) {
         XCTFail(@"Failed to create temporary directory with error: %@", tempError);
