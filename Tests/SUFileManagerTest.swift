@@ -13,8 +13,8 @@ class SUFileManagerTest: XCTestCase
     func makeTempFiles(_ testBlock: (SUFileManager, URL, URL, URL, URL, URL, URL) -> Void)
     {
         let fileManager = SUFileManager()
-
-        let tempDirectoryURL = try! fileManager.makeTemporaryDirectory(withPreferredName: "Sparkle Unit Test Data", appropriateForDirectoryURL: URL(fileURLWithPath: NSHomeDirectory()))
+        
+        let tempDirectoryURL = try! fileManager.makeTemporaryDirectoryAppropriate(forDirectoryURL: URL(fileURLWithPath: NSHomeDirectory()))
 
         defer {
             try! fileManager.removeItem(at: tempDirectoryURL)
