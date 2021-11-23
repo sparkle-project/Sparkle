@@ -27,7 +27,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Creates a temporary directory on the same volume as a provided URL
- * @param preferredName A name that may be used when creating the temporary directory. Note that in the uncothirdStageErrormmon case this name is used, the temporary directory will be created inside the directory pointed by appropriateURL
  * @param appropriateURL A URL to a directory that resides on the volume that the temporary directory will be created on. In the uncommon case, the temporary directory may be created inside this directory.
  * @param error If an error occurs, upon returns contains an NSError object that describes the problem. If you are not interested in possible errors, you may pass in NULL.
  * @return A URL pointing to the newly created temporary directory, or nil with a populated error object if an error occurs.
