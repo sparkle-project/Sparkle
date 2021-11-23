@@ -62,8 +62,8 @@
         // get a unique mount point path
         NSString *mountPoint = nil;
         NSFileManager *manager;
-        NSError *error;
-        NSArray *contents;
+        NSError *error = nil;
+        NSArray *contents = nil;
         do
 		{
             // Using NSUUID would make creating UUIDs be done in Cocoa,
@@ -82,8 +82,7 @@
         // Note: this check does not follow symbolic links, which is what we want
 		while ([[NSURL fileURLWithPath:mountPoint] checkResourceIsReachableAndReturnError:NULL]);
         
-        NSData *promptData = nil;
-        promptData = [NSData dataWithBytes:"yes\n" length:4];
+        NSData *promptData = [NSData dataWithBytes:"yes\n" length:4];
         
         NSMutableArray *arguments = [@[@"attach", self.archivePath, @"-mountpoint", mountPoint, /*@"-noverify",*/ @"-nobrowse", @"-noautoopen"] mutableCopy];
         
@@ -102,7 +101,7 @@
         
         NSData *output = nil;
         NSInteger taskResult = -1;
-        @try
+        
         {
             NSTask *task = [[NSTask alloc] init];
             task.launchPath = @"/usr/bin/hdiutil";
@@ -129,21 +128,40 @@
                 dispatch_semaphore_signal(terminationSemaphore);
             };
             
-            [task launch];
+            if (@available(macOS 10.13, *)) {
+                if (![task launchAndReturnError:&error]) {
+                    goto reportError;
+                }
+            } else {
+                @try {
+                    [task launch];
+                } @catch (NSException *) {
+                    goto reportError;
+                }
+            }
             
             [notifier notifyProgress:0.125];
 
             [inputPipe.fileHandleForWriting writeData:promptData];
+            
+            if (@available(macOS 10.15, *)) {
+                if (![inputPipe.fileHandleForWriting writeData:promptData error:&error]) {
+                    goto reportError;
+                }
+            } else {
+                @try {
+                    [inputPipe.fileHandleForWriting writeData:promptData];
+                } @catch (NSException *) {
+                    goto reportError;
+                }
+            }
+            
             [inputPipe.fileHandleForWriting closeFile];
             
             dispatch_semaphore_wait(terminationSemaphore, DISPATCH_TIME_FOREVER);
             output = [currentOutput copy];
             
             taskResult = task.terminationStatus;
-        }
-        @catch (NSException *)
-        {
-            goto reportError;
         }
         
         [notifier notifyProgress:0.5];
