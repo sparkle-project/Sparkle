@@ -221,11 +221,20 @@
             task.standardOutput = [NSPipe pipe];
             task.standardError = [NSPipe pipe];
             
-            @try {
-                [task launch];
-            } @catch (NSException *exception) {
-                SULog(SULogLevelError, @"Failed to unmount %@", mountPoint);
-                SULog(SULogLevelError, @"Exception: %@", exception);
+            
+            if (@available(macOS 10.13, *)) {
+                NSError *launchCleanupError = nil;
+                if (![task launchAndReturnError:&launchCleanupError]) {
+                    SULog(SULogLevelError, @"Failed to unmount %@", mountPoint);
+                    SULog(SULogLevelError, @"Error: %@", launchCleanupError);
+                }
+            } else {
+                @try {
+                    [task launch];
+                } @catch (NSException *exception) {
+                    SULog(SULogLevelError, @"Failed to unmount %@", mountPoint);
+                    SULog(SULogLevelError, @"Exception: %@", exception);
+                }
             }
         } else {
             SULog(SULogLevelError, @"Can't mount DMG %@", self.archivePath);
