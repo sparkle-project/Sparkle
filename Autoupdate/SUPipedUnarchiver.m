@@ -93,7 +93,6 @@
 {
     // *** GETS CALLED ON NON-MAIN THREAD!!!
 	@autoreleasepool {
-        NSError *error = nil;
         NSString *destination = [self.archivePath stringByDeletingLastPathComponent];
         
         SULog(SULogLevelDefault, @"Extracting using '%@' '%@' < '%@' '%@'", command, [args componentsJoinedByString:@"' '"], self.archivePath, destination);
@@ -101,58 +100,134 @@
         // Get the file size.
         NSDictionary *attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:self.archivePath error:nil];
         NSUInteger expectedLength = [(NSNumber *)[attributes objectForKey:NSFileSize] unsignedIntegerValue];
-        if (expectedLength > 0) {
-            NSFileHandle *archiveInput = [NSFileHandle fileHandleForReadingAtPath:self.archivePath];
+        
+        if (expectedLength == 0) {
+            NSError *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUUnarchivingError userInfo:@{ NSLocalizedDescriptionKey:[NSString stringWithFormat:@"Extraction failed, archive '%@' is empty", self.archivePath]}];
             
-            NSPipe *pipe = [NSPipe pipe];
-            NSTask *task = [[NSTask alloc] init];
-            [task setStandardInput:[pipe fileHandleForReading]];
-            [task setStandardError:[NSFileHandle fileHandleWithStandardError]];
-            [task setStandardOutput:[NSFileHandle fileHandleWithStandardOutput]];
-            [task setLaunchPath:command];
-            [task setArguments:[args arrayByAddingObject:destination]];
-            @try {
-                [task launch];
-            }
-            @catch (NSException *e) {
-                error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUUnarchivingError userInfo:@{ NSLocalizedDescriptionKey:[NSString stringWithFormat:@"Extraction failed, -[NSTask launch] threw exception '%@'", e.description]}];
-            }
-            
-            if (!error) {
-                NSFileHandle *archiveOutput = [pipe fileHandleForWriting];
-                NSUInteger bytesRead = 0;
-                do {
-                    NSData *data = [archiveInput readDataOfLength:256*1024];
-                    NSUInteger len = [data length];
-                    if (!len) {
-                        break;
-                    }
-                    bytesRead += len;
-                    [archiveOutput writeData:data];
-                    [notifier notifyProgress:(double)bytesRead / (double)expectedLength];
-                }
-                while(bytesRead < expectedLength);
-                
-                [archiveOutput closeFile];
-                
-                [task waitUntilExit];
-                
-                if ([task terminationStatus] == 0) {
-                    if (bytesRead == expectedLength) {
-                        [notifier notifySuccess];
-                        return;
-                    } else {
-                        error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUUnarchivingError userInfo:@{ NSLocalizedDescriptionKey:[NSString stringWithFormat:@"Extraction failed, command '%@' got only %ld of %ld bytes", command, (long)bytesRead, (long)expectedLength]}];
-
-                    }
-                } else {
-                    error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUUnarchivingError userInfo:@{ NSLocalizedDescriptionKey:[NSString stringWithFormat:@"Extraction failed, command '%@' returned %d", command, [task terminationStatus]]}];
-                }
+            [notifier notifyFailureWithError:error];
+            return;
+        }
+        
+        NSFileHandle *archiveInput = [NSFileHandle fileHandleForReadingAtPath:self.archivePath];
+        
+        NSPipe *pipe = [NSPipe pipe];
+        NSTask *task = [[NSTask alloc] init];
+        [task setStandardInput:pipe];
+        [task setStandardError:[NSFileHandle fileHandleWithStandardError]];
+        [task setStandardOutput:[NSFileHandle fileHandleWithStandardOutput]];
+        [task setLaunchPath:command];
+        [task setArguments:[args arrayByAddingObject:destination]];
+        
+        NSError *launchError = nil;
+        if (@available(macOS 10.13, *)) {
+            if (![task launchAndReturnError:&launchError]) {
+                [notifier notifyFailureWithError:launchError];
+                return;
             }
         } else {
-            error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUUnarchivingError userInfo:@{ NSLocalizedDescriptionKey:[NSString stringWithFormat:@"Extraction failed, archive '%@' is empty", self.archivePath]}];
+            @try {
+                [task launch];
+            } @catch (NSException *e) {
+                NSError *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUUnarchivingError userInfo:@{ NSLocalizedDescriptionKey:[NSString stringWithFormat:@"Extraction failed, -[NSTask launch] threw exception '%@'", e.description]}];
+                [notifier notifyFailureWithError:error];
+                return;
+            }
         }
-        [notifier notifyFailureWithError:error];
+        
+        NSFileHandle *archiveOutput = [pipe fileHandleForWriting];
+        NSUInteger bytesWritten = 0;
+        
+        BOOL hasIOErrorMethods;
+        if (@available(macOS 10.15, *)) {
+            hasIOErrorMethods = YES;
+        } else {
+            hasIOErrorMethods = NO;
+        }
+        
+        do {
+            NSData *data;
+            if (hasIOErrorMethods) {
+                NSError *readError = nil;
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wpartial-availability"
+                data = [archiveInput readDataUpToLength:256*1024 error:&readError];
+#pragma clang diagnostic pop
+                if (data == nil) {
+                    SULog(SULogLevelError, @"Failed to read data from archive with error %@", readError);
+                }
+            } else {
+                @try {
+                    data = [archiveInput readDataOfLength:256*1024];
+                } @catch (NSException *exception) {
+                    SULog(SULogLevelError, @"Failed to read data from archive with exception reason %@", exception.reason);
+                    data = nil;
+                }
+            }
+            
+            NSUInteger len = [data length];
+            if (len == 0) {
+                break;
+            }
+            
+            NSError *writeError = nil;
+            if (hasIOErrorMethods) {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wpartial-availability"
+                if (![archiveOutput writeData:data error:&writeError]) {
+#pragma clang diagnostic pop
+                    SULog(SULogLevelError, @"Failed to write data to pipe with error %@", writeError);
+                    break;
+                }
+            } else {
+                @try {
+                    [archiveOutput writeData:data];
+                } @catch (NSException *exception) {
+                    SULog(SULogLevelError, @"Failed to write data to pipe with exception reason %@", exception.reason);
+                    break;
+                }
+            }
+            
+            bytesWritten += len;
+            
+            [notifier notifyProgress:(double)bytesWritten / (double)expectedLength];
+        }
+        while(bytesWritten < expectedLength);
+        
+        if (@available(macOS 10.15, *)) {
+            NSError *archiveOutputCloseError = nil;
+            if (![archiveOutput closeAndReturnError:&archiveOutputCloseError]) {
+                SULog(SULogLevelError, @"Failed to close pipe with error %@", archiveOutputCloseError);
+            }
+        } else {
+            [archiveOutput closeFile];
+        }
+        
+        if (@available(macOS 10.15, *)) {
+            NSError *archiveInputCloseError = nil;
+            if (![archiveInput closeAndReturnError:&archiveInputCloseError]) {
+                SULog(SULogLevelError, @"Failed to close archive input with error %@", archiveInputCloseError);
+            }
+        } else {
+            [archiveInput closeFile];
+        }
+        
+        [task waitUntilExit];
+        
+        if ([task terminationStatus] != 0) {
+            NSError *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUUnarchivingError userInfo:@{ NSLocalizedDescriptionKey:[NSString stringWithFormat:@"Extraction failed, command '%@' returned %d", command, [task terminationStatus]]}];
+            
+            [notifier notifyFailureWithError:error];
+            return;
+        }
+        
+        if (bytesWritten != expectedLength) {
+            NSError *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUUnarchivingError userInfo:@{ NSLocalizedDescriptionKey:[NSString stringWithFormat:@"Extraction failed, command '%@' got only %ld of %ld bytes", command, (long)bytesWritten, (long)expectedLength]}];
+            
+            [notifier notifyFailureWithError:error];
+            return;
+        }
+        
+        [notifier notifySuccess];
     }
 }
 
