@@ -53,8 +53,8 @@
     task.arguments = @[@"-pkg", self.packagePath, @"-target", @"/"];
     // Set the $HOME and $USER variables so pre/post install scripts reference the correct user environment
     task.environment = @{@"HOME": self.homeDirectory, @"USER": self.userName};
-    task.standardError = [NSPipe pipe];
-    task.standardOutput = [NSPipe pipe];
+    task.standardError = nil;
+    task.standardOutput = nil;
     
     BOOL success = YES;
     @try {
