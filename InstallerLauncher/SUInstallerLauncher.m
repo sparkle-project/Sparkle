@@ -340,7 +340,7 @@ BOOL SPUSystemNeedsAuthorizationAccessForBundlePath(NSString *bundlePath)
         NSString *tempFilename = @"permission_test" ;
         
         SUFileManager *suFileManager = [[SUFileManager alloc] init];
-        NSURL *tempDirectoryURL = [suFileManager makeTemporaryDirectoryWithPreferredName:tempFilename appropriateForDirectoryURL:[NSURL fileURLWithPath:NSTemporaryDirectory()] error:NULL];
+        NSURL *tempDirectoryURL = [suFileManager makeTemporaryDirectoryAppropriateForDirectoryURL:[NSURL fileURLWithPath:NSTemporaryDirectory()] error:NULL];
         
         if (tempDirectoryURL == nil) {
             // I don't imagine this ever happening but in case it does, requesting authorization may be the better option

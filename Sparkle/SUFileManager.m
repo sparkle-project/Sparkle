@@ -311,7 +311,7 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
     return [_fileManager moveItemAtURL:sourceURL toURL:destinationURL error:error];
 }
 
-- (BOOL)replaceItemAtURL:(NSURL *)originalItemURL withItemAtURL:(NSURL *)newItemURL error:(NSError * __autoreleasing *)error __OSX_AVAILABLE(10.13)
+- (BOOL)swapItemAtURL:(NSURL *)originalItemURL withItemAtURL:(NSURL *)newItemURL error:(NSError * __autoreleasing *)error __OSX_AVAILABLE(10.13)
 {
     char originalPath[PATH_MAX] = {0};
     if (![originalItemURL.path getFileSystemRepresentation:originalPath maxLength:sizeof(originalPath)]) {
@@ -641,25 +641,9 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
     return YES;
 }
 
-- (NSURL *)makeTemporaryDirectoryWithPreferredName:(NSString *)preferredName appropriateForDirectoryURL:(NSURL *)directoryURL error:(NSError * __autoreleasing *)error
+- (NSURL *)makeTemporaryDirectoryAppropriateForDirectoryURL:(NSURL *)directoryURL error:(NSError * __autoreleasing *)error
 {
-    NSError *tempError = nil;
-    NSURL *tempURL = [_fileManager URLForDirectory:NSItemReplacementDirectory inDomain:NSUserDomainMask appropriateForURL:directoryURL create:YES error:&tempError];
-
-    if (tempURL != nil) {
-        return tempURL;
-    }
-
-    // It is pretty unlikely in my testing we will get here, but just in case we do, we should create a directory inside
-    // the directory pointed by directoryURL, using the preferredName
-
-    NSURL *desiredURL = [directoryURL URLByAppendingPathComponent:preferredName];
-    NSUInteger tagIndex = 1;
-    while ([self _itemExistsAtURL:desiredURL] && tagIndex <= 9999) {
-        desiredURL = [directoryURL URLByAppendingPathComponent:[preferredName stringByAppendingFormat:@" (%lu)", (unsigned long)++tagIndex]];
-    }
-
-    return [self makeDirectoryAtURL:desiredURL error:error] ? desiredURL : nil;
+    return [_fileManager URLForDirectory:NSItemReplacementDirectory inDomain:NSUserDomainMask appropriateForURL:directoryURL create:YES error:error];
 }
 
 - (BOOL)removeItemAtURL:(NSURL *)url error:(NSError * __autoreleasing *)error
