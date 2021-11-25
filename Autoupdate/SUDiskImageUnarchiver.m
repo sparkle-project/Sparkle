@@ -62,8 +62,8 @@
         // get a unique mount point path
         NSString *mountPoint = nil;
         NSFileManager *manager;
-        NSError *error;
-        NSArray *contents;
+        NSError *error = nil;
+        NSArray *contents = nil;
         do
 		{
             // Using NSUUID would make creating UUIDs be done in Cocoa,
@@ -82,8 +82,7 @@
         // Note: this check does not follow symbolic links, which is what we want
 		while ([[NSURL fileURLWithPath:mountPoint] checkResourceIsReachableAndReturnError:NULL]);
         
-        NSData *promptData = nil;
-        promptData = [NSData dataWithBytes:"yes\n" length:4];
+        NSData *promptData = [NSData dataWithBytes:"yes\n" length:4];
         
         NSMutableArray *arguments = [@[@"attach", self.archivePath, @"-mountpoint", mountPoint, /*@"-noverify",*/ @"-nobrowse", @"-noautoopen"] mutableCopy];
         
@@ -102,7 +101,7 @@
         
         NSData *output = nil;
         NSInteger taskResult = -1;
-        @try
+        
         {
             NSTask *task = [[NSTask alloc] init];
             task.launchPath = @"/usr/bin/hdiutil";
@@ -115,22 +114,54 @@
             task.standardInput = inputPipe;
             task.standardOutput = outputPipe;
             
-            [task launch];
+            NSFileHandle *fileStdHandle = outputPipe.fileHandleForReading;
+            NSMutableData *currentOutput = [NSMutableData data];
+            
+            fileStdHandle.readabilityHandler = ^(NSFileHandle *file) {
+                [currentOutput appendData:file.availableData];
+            };
+            
+            dispatch_semaphore_t terminationSemaphore = dispatch_semaphore_create(0);
+            task.terminationHandler = ^(NSTask *__unused terminatingTask) {
+                fileStdHandle.readabilityHandler = nil;
+                
+                dispatch_semaphore_signal(terminationSemaphore);
+            };
+            
+            if (@available(macOS 10.13, *)) {
+                if (![task launchAndReturnError:&error]) {
+                    goto reportError;
+                }
+            } else {
+                @try {
+                    [task launch];
+                } @catch (NSException *) {
+                    goto reportError;
+                }
+            }
             
             [notifier notifyProgress:0.125];
 
             [inputPipe.fileHandleForWriting writeData:promptData];
+            
+            if (@available(macOS 10.15, *)) {
+                if (![inputPipe.fileHandleForWriting writeData:promptData error:&error]) {
+                    goto reportError;
+                }
+            } else {
+                @try {
+                    [inputPipe.fileHandleForWriting writeData:promptData];
+                } @catch (NSException *) {
+                    goto reportError;
+                }
+            }
+            
             [inputPipe.fileHandleForWriting closeFile];
             
-            // Read data to end *before* waiting until the task ends so we don't deadlock if the stdout buffer becomes full if we haven't consumed from it
-            output = [outputPipe.fileHandleForReading readDataToEndOfFile];
+            dispatch_semaphore_wait(terminationSemaphore, DISPATCH_TIME_FOREVER);
+            output = [currentOutput copy];
             
-            [task waitUntilExit];
             taskResult = task.terminationStatus;
-        }
-        @catch (NSException *)
-        {
-            goto reportError;
         }
         
         [notifier notifyProgress:0.5];
@@ -146,14 +177,14 @@
         // Now that we've mounted it, we need to copy out its contents.
         manager = [[NSFileManager alloc] init];
         contents = [manager contentsOfDirectoryAtPath:mountPoint error:&error];
-        if (error)
+        if (contents == nil)
         {
             SULog(SULogLevelError, @"Couldn't enumerate contents of archive mounted at %@: %@", mountPoint, error);
             goto reportError;
         }
 
         double itemsCopied = 0;
-        double totalItems = [contents count];
+        double totalItems = (double)[contents count];
 
 		for (NSString *item in contents)
 		{
@@ -190,11 +221,20 @@
             task.standardOutput = [NSPipe pipe];
             task.standardError = [NSPipe pipe];
             
-            @try {
-                [task launch];
-            } @catch (NSException *exception) {
-                SULog(SULogLevelError, @"Failed to unmount %@", mountPoint);
-                SULog(SULogLevelError, @"Exception: %@", exception);
+            
+            if (@available(macOS 10.13, *)) {
+                NSError *launchCleanupError = nil;
+                if (![task launchAndReturnError:&launchCleanupError]) {
+                    SULog(SULogLevelError, @"Failed to unmount %@", mountPoint);
+                    SULog(SULogLevelError, @"Error: %@", launchCleanupError);
+                }
+            } else {
+                @try {
+                    [task launch];
+                } @catch (NSException *exception) {
+                    SULog(SULogLevelError, @"Failed to unmount %@", mountPoint);
+                    SULog(SULogLevelError, @"Exception: %@", exception);
+                }
             }
         } else {
             SULog(SULogLevelError, @"Can't mount DMG %@", self.archivePath);

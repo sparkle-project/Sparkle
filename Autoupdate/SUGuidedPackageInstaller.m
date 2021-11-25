@@ -53,26 +53,46 @@
     task.arguments = @[@"-pkg", self.packagePath, @"-target", @"/"];
     // Set the $HOME and $USER variables so pre/post install scripts reference the correct user environment
     task.environment = @{@"HOME": self.homeDirectory, @"USER": self.userName};
-    task.standardError = [NSPipe pipe];
-    task.standardOutput = [NSPipe pipe];
+    task.standardError = nil;
+    task.standardOutput = nil;
     
-    BOOL success = YES;
-    @try {
-        [task launch];
-        [task waitUntilExit];
-        if (task.terminationStatus != EXIT_SUCCESS) {
-            success = NO;
+    if (@available(macOS 10.13, *)) {
+        NSError *launchError = nil;
+        if (![task launchAndReturnError:&launchError]) {
             if (error != NULL) {
-                *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Guided package installer returned non-zero exit status (%d)", task.terminationStatus] }];
+                NSMutableDictionary *userInfo = [NSMutableDictionary dictionaryWithDictionary:@{ NSLocalizedDescriptionKey: @"Guided package installer failed to launch" }];
+                
+                if (launchError != nil) {
+                    userInfo[NSUnderlyingErrorKey] = launchError;
+                }
+                
+                *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:userInfo];
             }
+            return NO;
         }
-    } @catch (NSException *) {
-        success = NO;
-        if (error != NULL) {
-            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Guided package installer task threw an exception"] }];
+    } else {
+        @try {
+            [task launch];
+        } @catch (NSException *) {
+            if (error != NULL) {
+                *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey: @"Guided package installer task threw an exception" }];
+            }
+            
+            return NO;
         }
     }
-    return success;
+    
+    [task waitUntilExit];
+    
+    if (task.terminationStatus != EXIT_SUCCESS) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Guided package installer returned non-zero exit status (%d)", task.terminationStatus] }];
+        }
+        
+        return NO;
+    }
+    
+    return YES;
 }
 
 - (void)performCleanup
