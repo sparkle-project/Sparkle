@@ -359,6 +359,7 @@
 		72B767E31C9CE90A00A07552 /* SPUCoreBasedUpdateDriver.m in Sources */ = {isa = PBXBuildFile; fileRef = 72B767E11C9CE90A00A07552 /* SPUCoreBasedUpdateDriver.m */; };
 		72B767E61C9CFD7200A07552 /* SPUAutomaticUpdateDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 72B767E41C9CFD7200A07552 /* SPUAutomaticUpdateDriver.h */; };
 		72B767E71C9CFD7200A07552 /* SPUAutomaticUpdateDriver.m in Sources */ = {isa = PBXBuildFile; fileRef = 72B767E51C9CFD7200A07552 /* SPUAutomaticUpdateDriver.m */; };
+		72BC6C3D275027BF0083F14B /* SparkleTestCodeSign_apfs.dmg in Resources */ = {isa = PBXBuildFile; fileRef = 72BC6C3C275027BF0083F14B /* SparkleTestCodeSign_apfs.dmg */; };
 		72BEBFEF1D7287570019146B /* SUSpotlightImporterTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72BEBFEE1D7287560019146B /* SUSpotlightImporterTest.swift */; };
 		72CCDEBE27421FD500B53718 /* SparkleTestCodeSignApp_bad_header.zip in Resources */ = {isa = PBXBuildFile; fileRef = 72CCDEBD27421FD500B53718 /* SparkleTestCodeSignApp_bad_header.zip */; };
 		72D954811CBACC35006F28BD /* InstallerProgressAppController.m in Sources */ = {isa = PBXBuildFile; fileRef = 72D954801CBACC35006F28BD /* InstallerProgressAppController.m */; };
@@ -1269,6 +1270,7 @@
 		72B767E11C9CE90A00A07552 /* SPUCoreBasedUpdateDriver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SPUCoreBasedUpdateDriver.m; sourceTree = "<group>"; };
 		72B767E41C9CFD7200A07552 /* SPUAutomaticUpdateDriver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPUAutomaticUpdateDriver.h; sourceTree = "<group>"; };
 		72B767E51C9CFD7200A07552 /* SPUAutomaticUpdateDriver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SPUAutomaticUpdateDriver.m; sourceTree = "<group>"; };
+		72BC6C3C275027BF0083F14B /* SparkleTestCodeSign_apfs.dmg */ = {isa = PBXFileReference; lastKnownFileType = file; path = SparkleTestCodeSign_apfs.dmg; sourceTree = "<group>"; };
 		72BEBFEE1D7287560019146B /* SUSpotlightImporterTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SUSpotlightImporterTest.swift; sourceTree = "<group>"; };
 		72CCDEBD27421FD500B53718 /* SparkleTestCodeSignApp_bad_header.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = SparkleTestCodeSignApp_bad_header.zip; sourceTree = "<group>"; };
 		72D9547F1CBACC35006F28BD /* InstallerProgressAppController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = InstallerProgressAppController.h; path = Sparkle/InstallerProgress/InstallerProgressAppController.h; sourceTree = SOURCE_ROOT; };
@@ -1705,6 +1707,7 @@
 				72AC6B2D1B9B218C00F62325 /* SparkleTestCodeSignApp.dmg */,
 				C23E88591BE7AF890050BB73 /* SparkleTestCodeSignApp.enc.dmg */,
 				72AC6B271B9AAD6700F62325 /* SparkleTestCodeSignApp.tar */,
+				72BC6C3C275027BF0083F14B /* SparkleTestCodeSign_apfs.dmg */,
 				72AC6B291B9AAF3A00F62325 /* SparkleTestCodeSignApp.tar.bz2 */,
 				72AC6B251B9AAC8800F62325 /* SparkleTestCodeSignApp.tar.gz */,
 				72AC6B2B1B9AB0EE00F62325 /* SparkleTestCodeSignApp.tar.xz */,
@@ -2985,6 +2988,7 @@
 				5A5DD40424958B000045EB3E /* SUUpdateValidatorTest in Resources */,
 				14958C6F19AEBC980061B14F /* test-pubkey.pem in Resources */,
 				5AF6C74F1AEA46D10014A3AB /* test.pkg in Resources */,
+				72BC6C3D275027BF0083F14B /* SparkleTestCodeSign_apfs.dmg in Resources */,
 				5AD0FA7F1C73F2E2004BCEFF /* testappcast.xml in Resources */,
 				FA30773D24CBC295007BA37D /* testlocalizedreleasenotesappcast.xml in Resources */,
 				72CCDEBE27421FD500B53718 /* SparkleTestCodeSignApp_bad_header.zip in Resources */,

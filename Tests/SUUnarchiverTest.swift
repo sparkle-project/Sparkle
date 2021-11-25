@@ -115,14 +115,19 @@ class SUUnarchiverTest: XCTestCase
         self.unarchiveTestAppWithExtension("tar.xz")
     }
 
-    func testUnarchivingDmg()
+    func testUnarchivingHFSDmgWithLicenseAgreement()
     {
         self.unarchiveTestAppWithExtension("dmg")
     }
 
-    func testUnarchivingEncryptedDmg()
+    func testUnarchivingEncryptedDmgWithLicenseAgreement()
     {
         self.unarchiveTestAppWithExtension("enc.dmg", password: "testpass")
+    }
+    
+    func testUnarchivingAPFSDMG()
+    {
+        self.unarchiveTestAppWithExtension("dmg", resourceName: "SparkleTestCodeSign_apfs")
     }
     
     func testUnarchivingFlatPackage()
