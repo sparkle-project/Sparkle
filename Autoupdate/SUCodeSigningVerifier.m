@@ -61,7 +61,7 @@
     
     // Note that kSecCSCheckNestedCode may not work with pre-Mavericks code signing.
     // See https://github.com/sparkle-project/Sparkle/issues/376#issuecomment-48824267 and https://developer.apple.com/library/mac/technotes/tn2206
-    // Aditionally, there are several reasons to stay away from deep verification and to prefer DSA signing the download archive instead.
+    // Aditionally, there are several reasons to stay away from deep verification and to prefer EdDSA signing the download archive instead.
     // See https://github.com/sparkle-project/Sparkle/pull/523#commitcomment-17549302 and https://github.com/sparkle-project/Sparkle/issues/543
     SecCSFlags flags = (SecCSFlags) (kSecCSDefaultFlags | kSecCSCheckAllArchitectures);
     result = SecStaticCodeCheckValidityWithErrors(staticCode, flags, requirement, &cfError);
