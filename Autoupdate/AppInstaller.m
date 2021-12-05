@@ -203,7 +203,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
         self.updateValidator = [[SUUpdateValidator alloc] initWithDownloadPath:archivePath signatures:self.signatures host:self.host];
 
         // Delta & package updates will require validation before extraction
-        // Normal application updates are a bit more lenient allowing developers to change one of apple dev ID or DSA keys
+        // Normal application updates are a bit more lenient allowing developers to change one of apple dev ID or EdDSA keys
         BOOL needsPrevalidation = [[unarchiver class] mustValidateBeforeExtraction] || ![self.installationType isEqualToString:SPUInstallationTypeApplication];
 
         if (needsPrevalidation) {
@@ -330,7 +330,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     if (identifier == SPUInstallationData && self.updateDirectoryPath == nil) {
         dispatch_async(dispatch_get_main_queue(), ^{
             // Mark that we have received the installation data
-            // Do not rely on eg: self.ipdateDirectoryPath != nil because we may set it to nil again if an early stage fails (i.e, archive extraction)
+            // Do not rely on eg: self.updateDirectoryPath != nil because we may set it to nil again if an early stage fails (i.e, archive extraction)
             self.receivedInstallationData = YES;
             
             SPUInstallationInputData *installationData = (SPUInstallationInputData *)SPUUnarchiveRootObjectSecurely(data, [SPUInstallationInputData class]);
