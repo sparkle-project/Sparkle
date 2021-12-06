@@ -71,8 +71,8 @@ SU_EXPORT extern NSString *const SUSystemProfilerPreferredLanguageKey;
  Alternatively, you may want to consider starting the updater after eg: the setup assistant finishes.
  
  Note in Swift, this method returns Void and is marked with the throws keyword. If this method
- doesn't throw an error, the updater may perform an update check. Otherwise if an error is thrown,
- then the updater may not perform an update check. We recommend throwing an NSError.
+ doesn't throw an error, the updater may perform an update check. Otherwise if an error is thrown (we recommend using an NSError),
+ then the updater may not perform an update check.
  
  @param updater The updater instance.
  @param updateCheck The type of update check that will be performed if the updater is allowed to check for updates.
@@ -232,7 +232,7 @@ SU_EXPORT extern NSString *const SUSystemProfilerPreferredLanguageKey;
  If you return @c NO and populate the @c error, the user is not shown this @c updateItem nor is the update downloaded or installed.
  
  Note in Swift, this method returns Void and is marked with the throws keyword. If this method doesn't throw an error, the updater will proceed with the update.
- Otherwise if an error is thrown, then the will not proceed with the update. We recommend throwing an NSError.
+ Otherwise if an error is thrown (we recommend using an NSError), then the will not proceed with the update.
  
  @param updater The updater instance.
  @param updateItem The selected update item to proceed with.
