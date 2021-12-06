@@ -68,11 +68,15 @@ SU_EXPORT extern NSString *const SUSystemProfilerPreferredLanguageKey;
  Returns whether to allow Sparkle to check for updates.
  
  For example, this may be used to prevent Sparkle from interrupting a setup assistant.
- Alternatively, you may want to consider starting the updater after eg: the setup assistant finishes
+ Alternatively, you may want to consider starting the updater after eg: the setup assistant finishes.
+ 
+ Note in Swift, this method returns Void and is marked with the throws keyword. If this method
+ doesn't throw an error, the updater may perform an update check. Otherwise if an error is thrown,
+ then the updater may not perform an update check.
  
  @param updater The updater instance.
  @param updateCheck The type of update check that will be performed if the updater is allowed to check for updates.
- @param error The (optionally) populated error object if the updater may not perform a new update check.
+ @param error The  populated error object if the updater may not perform a new update check.
  @return @c YES if the updater is allowed to check for updates, otherwise @c NO
 */
 - (BOOL)updater:(SPUUpdater *)updater mayPerformUpdateCheck:(SPUUpdateCheck)updateCheck error:(NSError * __autoreleasing *)error;
@@ -226,6 +230,9 @@ SU_EXPORT extern NSString *const SUSystemProfilerPreferredLanguageKey;
  By default, the updater will always proceed with the best selected update found in an appcast. Override this to override this behavior.
  
  If you return @c NO and populate the @c error, the user is not shown this @c updateItem nor is the update downloaded or installed.
+ 
+ Note in Swift, this method returns Void and is marked with the throws keyword. If this method doesn't throw an error, the updater will proceed with the update.
+ Otherwise if an error is thrown, then the will not proceed with the update.
  
  @param updater The updater instance.
  @param updateItem The selected update item to proceed with.
