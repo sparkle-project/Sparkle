@@ -72,11 +72,11 @@ SU_EXPORT extern NSString *const SUSystemProfilerPreferredLanguageKey;
  
  Note in Swift, this method returns Void and is marked with the throws keyword. If this method
  doesn't throw an error, the updater may perform an update check. Otherwise if an error is thrown,
- then the updater may not perform an update check.
+ then the updater may not perform an update check. We recommend throwing an NSError.
  
  @param updater The updater instance.
  @param updateCheck The type of update check that will be performed if the updater is allowed to check for updates.
- @param error The  populated error object if the updater may not perform a new update check.
+ @param error The  populated error object if the updater may not perform a new update check. The @c NSLocalizedDescriptionKey user info key should be populated indicating a description of the error.
  @return @c YES if the updater is allowed to check for updates, otherwise @c NO
 */
 - (BOOL)updater:(SPUUpdater *)updater mayPerformUpdateCheck:(SPUUpdateCheck)updateCheck error:(NSError * __autoreleasing *)error;
@@ -232,12 +232,12 @@ SU_EXPORT extern NSString *const SUSystemProfilerPreferredLanguageKey;
  If you return @c NO and populate the @c error, the user is not shown this @c updateItem nor is the update downloaded or installed.
  
  Note in Swift, this method returns Void and is marked with the throws keyword. If this method doesn't throw an error, the updater will proceed with the update.
- Otherwise if an error is thrown, then the will not proceed with the update.
+ Otherwise if an error is thrown, then the will not proceed with the update. We recommend throwing an NSError.
  
  @param updater The updater instance.
  @param updateItem The selected update item to proceed with.
  @param updateCheck The type of update check that would be performed if proceeded.
- @param error An error object that must be populated by the delegate if the updater should not proceed with the update.
+ @param error An error object that must be populated by the delegate if the updater should not proceed with the update. The @c NSLocalizedDescriptionKey user info key should be populated indicating a description of the error.
  @return @c YES if the updater should proceed with @c updateItem, otherwise @c NO if the updater should not proceed with the update with an @c error populated.
  */
 - (BOOL)updater:(SPUUpdater *)updater shouldProceedWithUpdate:(SUAppcastItem *)updateItem updateCheck:(SPUUpdateCheck)updateCheck error:(NSError * __autoreleasing *)error;
