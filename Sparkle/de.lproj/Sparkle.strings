@@ -162,6 +162,9 @@
 "The update checker failed to start correctly. You should contact the app developer to report this issue and verify that you have the latest version" = "Das Aktualisierungsprogramm wurde nicht richtig gestartet. Du solltest den App-Entwickler kontaktieren, um diesen Fehler zu melden und zu prüfen, ob du die neueste Version hast.";
 
 /* (No Comment) */
+"The update is improperly signed and could not be validated. Please try again later or contact the app developer." = "Das Update ist nicht ordnungsgemäß signiert und konnte nicht überprüft werden. Bitte versuche es später erneut oder kontaktiere den App-Entwickler.";
+
+/* (No Comment) */
 "The update is improperly signed." = "Das Update ist nicht ordnungsgemäß signiert.";
 
 /* (No Comment) */

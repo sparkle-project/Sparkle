@@ -162,6 +162,9 @@
 "The update checker failed to start correctly. You should contact the app developer to report this issue and verify that you have the latest version" = "Het bijwerkprogramma is niet goed gestart. Je kunt wellicht met de app-ontwikkelaar contact opnemen om de fout te melden en te controleren dat je de nieuwste versie hebt";
 
 /* (No Comment) */
+"The update is improperly signed and could not be validated. Please try again later or contact the app developer." = "De update is onjuist gesigneerd en kan niet worden gecontroleerd. Probeer het later opnieuw of neem contact op met de app-ontwikkelaar.";
+
+/* (No Comment) */
 "The update is improperly signed." = "De update is onjuist gesigneerd.";
 
 /* (No Comment) */
