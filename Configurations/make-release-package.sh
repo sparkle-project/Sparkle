@@ -134,10 +134,12 @@ if [ "$ACTION" = "" ] ; then
         exit 1
     fi
 
-    # Generate new Package manifest and podspec
+    # Generate new Package manifest, podspec, and carthage files
     cd "$CONFIGURATION_BUILD_DIR"
     cp "$SRCROOT/Package.swift" "$CONFIGURATION_BUILD_DIR"
     cp "$SRCROOT/Sparkle.podspec" "$CONFIGURATION_BUILD_DIR"
+    cp "$SRCROOT/Carthage-dev.json" "$CONFIGURATION_BUILD_DIR"
+    
     if [ "$XCODE_VERSION_MAJOR" -ge "1200" ]; then
         # is equivalent to shasum -a 256 FILE
         spm_checksum=$(swift package compute-checksum "Sparkle-for-Swift-Package-Manager.zip")
@@ -150,8 +152,12 @@ if [ "$ACTION" = "" ] ; then
         echo "Checksum: $spm_checksum"
 
         sed -E -i '' -e "/s\.version.+=/ s/\".+\"/\"$MARKETING_VERSION\"/" "Sparkle.podspec"
+        
+        "$SRCROOT/Configurations/update-carthage.py" "Carthage-dev.json" "$MARKETING_VERSION"
         cp "Sparkle.podspec" "$SRCROOT"
-        echo "Sparkle.podspec updated with following values:"
+        # Note the Carthage-dev.json file will finally be copied to the website repo in Carthage/Sparkle.json in the end
+        cp "Carthage-dev.json" "$SRCROOT"
+        echo "Sparkle.podspec and Carthage-dev.json updated with following values:"
         echo "Version: $MARKETING_VERSION"
     else
         echo "warning: Xcode version $XCODE_VERSION_ACTUAL does not support computing checksums for Swift Packages. Please update the Package manifest manually."
