@@ -155,6 +155,7 @@ if [ "$ACTION" = "" ] ; then
         
         "$SRCROOT/Configurations/update-carthage.py" "Carthage-dev.json" "$MARKETING_VERSION"
         cp "Sparkle.podspec" "$SRCROOT"
+        # Note the Carthage-dev.json file will finally be copied to the website repo in Carthage/Sparkle.json in the end
         cp "Carthage-dev.json" "$SRCROOT"
         echo "Sparkle.podspec and Carthage-dev.json updated with following values:"
         echo "Version: $MARKETING_VERSION"
