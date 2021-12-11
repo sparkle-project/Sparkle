@@ -3,7 +3,7 @@
 # If Carthage is trying to build us, it won't preserve code signing information from our bundled tools properly
 # Building Sparkle from source with Carthage is thus not supported
 if [ "$CARTHAGE" = "YES" ]; then
-    echo "Building Sparkle from source using Carthage is not supported. Please visit https://sparkle-project.org/documentation/ for proper Carthage integration."
+    echo "Error: Building Sparkle from source using Carthage is not supported. Please visit https://sparkle-project.org/documentation/ for proper Carthage integration."
     exit 1
 fi
 
