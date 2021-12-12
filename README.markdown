@@ -1,4 +1,4 @@
-# Sparkle 2 (Beta) ![Build Status](https://github.com/sparkle-project/Sparkle/workflows/Build%20%26%20Tests/badge.svg?branch=2.x) [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage) [![CocoaPods](https://img.shields.io/cocoapods/v/Sparkle.svg?cacheSeconds=86400)]()
+# Sparkle 2 ![Build Status](https://github.com/sparkle-project/Sparkle/workflows/Build%20%26%20Tests/badge.svg?branch=2.x) ![SwiftPM](https://img.shields.io/badge/SwiftPM-compatible-4BC51D.svg?style=flat) [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage) [![CocoaPods](https://img.shields.io/cocoapods/v/Sparkle.svg?cacheSeconds=86400)]()
 
 Secure and reliable software update framework for macOS.
 
@@ -7,13 +7,9 @@ Secure and reliable software update framework for macOS.
 This is the upcoming new version of Sparkle.
 Major new features are support for sandboxing, custom user interfaces, updating external bundles, and a more modern architecture which includes faster and more reliable installs.
 
-For the production ready version of Sparkle, please see the [Sparkle 1.x (master) branch](https://github.com/sparkle-project/Sparkle/tree/master). Note development has shifted to Sparkle 2 and the 1.x branch is now only accepting bug fixes, localization updates, and adoption of critical upcoming OS features.
+Sparkle 2 is currently in beta, but is almost ready for official release. Applications, typically sandboxed, have already been using it in production though. Pre-releases can be found on the [Sparkle's Releases](https://github.com/sparkle-project/Sparkle/releases). More nightly builds can be downloaded by selecting a recent [workflow run](https://github.com/sparkle-project/Sparkle/actions?query=event%3Apush+is%3Asuccess+branch%3A2.x) and downloading the corresponding Sparkle-distribution artifact.
 
-Sparkle 2 is currently in beta. Applications, typically sandboxed, have already been using it in production, but some work including testing is still required before an official version can be released. Pre-releases can be found on the [Sparkle's Releases](https://github.com/sparkle-project/Sparkle/releases). More nightly builds can be downloaded by selecting a recent [workflow run](https://github.com/sparkle-project/Sparkle/actions?query=event%3Apush+is%3Asuccess+branch%3A2.x) and downloading the corresponding Sparkle-distribution artifact.
-
-The current status of Sparkle 2 is tracked by [its roadmap](https://github.com/sparkle-project/Sparkle/milestone/2).
-
-If you can help with testing or reviewing over the new changes, please report issues or submit pull requests!
+The current status of Sparkle is tracked by [its roadmap](https://github.com/sparkle-project/Sparkle/milestones).
 
 Please visit [Sparkle's website](http://sparkle-project.org) for up to date documentation on using and migrating over to Sparkle 2. Refer to [Changelog](CHANGELOG) for a more detailed list of changes. More internal design documents can be found in [Documentation](Documentation/). 
 
@@ -51,7 +47,7 @@ This repository uses git submodules, and will not build unless you clone recursi
 
 ### Troubleshooting
 
-  * Please check **Console.app**. Sparkle prints detailed information there about all problems it encounters. It often also suggests solutions to the problems, so please read Sparkle's log messages carefully.
+  * Please check **Console.app** for logs under your application. Sparkle prints detailed information there about all problems it encounters. It often also suggests solutions to the problems, so please read Sparkle's log messages carefully.
 
   * Use the `generate_appcast` tool which creates appcast files, correct signatures, and delta updates automatically.
 
