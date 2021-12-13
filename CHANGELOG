@@ -4,15 +4,15 @@
 * Support for writing custom user interfaces (Zorg)
 * Support for updating external Sparkle-based bundles (Zorg)
   * Added command line utility to update Sparkle-based bundles (Zorg)
-* More modern architecture
+* Modern architecture
   * Moves extraction, validation, and installation into a submitted launchd agent/daemon with XPC communication (Zorg)
   * Features faster installs with shorter update/relaunch times (#1802) (Zorg)
-  * Provides more robust installs that need to request user authorization (Zorg)
-  * Adoption of atomic-safe bundle replacing updates leveraging APFS (#1801) (Zorg)
+  * Provides more robust installs when user authorization is needed (Zorg)
+  * Adoption of improved atomic-safe updates leveraging APFS (#1801) (Zorg)
 * API Changes
   * Introduced new SPUStandardUpdaterController, SPUUpdater, SPUUserDriver classes/protocols (Zorg)
   * Decoupled AppKit and UI logic in the framework from core functionality (Zorg)
-  * Ensure (most) API / ABI compatibility with Sparkle 1.x; you can likely test Sparkle 2 in an existing app without any changes (Zorg)
+  * Ensure (most) API / ABI compatibility with Sparkle 1; you can likely test Sparkle 2 in an existing app with little to no changes (Zorg)
   * Deprecated SUUpdater, albeit it is still functional for testing and transitional purposes (Zorg)
   * `-bestValidUpdateInAppcast:forUpdater:` delegate method behavior has been refined and discouraged for some cases. Please review its updated header documentation in `SPUUpdaterDelegate.h` if you use this method. (#1838, #1862, #1879, #1880) (Zorg)
   * Delegation methods may have been removed or added to the newer updater API. Please review `SPUUpdaterDelegate` if using `SPUUpdater`. (Zorg)
@@ -24,16 +24,16 @@
   * Sparkle uses the icon of the bundle to update for its authorization dialog. A 32x32 image representation of the icon is needed. (Zorg)
   * Sudden termination for silent automatic updates isn't disabled anymore (Zorg)
 * Policy Changes
-  * Package based updates that are zipped or archived must add sparkle:installationType="package" to the appcast item enclosure (this doesn't apply to bare packages that aren't archived) (Zorg)
+  * Non-bare package based updates that are zipped or archived must add sparkle:installationType="package" to the appcast item enclosure (this doesn't apply to bare packages which aren't archived) (Zorg)
   * We now recommend using sparkle:version and sparkle:shortVersionString top level elements instead of enclosure attributes (#1878) (Zorg)
   * The link element in an appcast item is now used for directing users to the product's website if they don't meet minimum system requirements (#1877) (Zorg)
+* Expose why a new update is unavailable and direct user to prior release notes or website info (#1877, #1886) (Zorg)
+  * Add <sparkle:fullReleaseNotesLink> element allowing Sparkle to show a better stylized and full changelog to the user (#2001) (aONe)
+  * Add delegate API allowing applications to show full in-app or offline version history to the user (#1989) (Billy Gray)
 * Major/Paid Upgrades Enhancements
   * Latest minor updates are preferred over major updates (specified by sparkle:minimumAutoupdateVersion) (#1850) (Zorg)
   * Major updates can be skipped with a user confirmation (#1853) (Zorg)
 * Informational only and critical updates can be specified selectively by app version (#1862)
-* Expose why a new update is unavailable and direct user to prior release notes or website info (#1877, #1886) (Zorg)
-  * Add <sparkle:fullReleaseNotesLink> element allowing Sparkle to show a better stylized and full changelog to the user (#2001) (aONe)
-  * Add delegate API allowing applications to show full in-app or offline version history to the user (#1989) (Billy Gray)
 * Add support for posting updates only on specific channels (eg for supporting beta updates) (#1879) (Zorg)
 * System profiler privacy and transparency (#1690) (Martin Pilkington)
 * Support getting app icon from asset catalog (#1694) (Charles Srstka)
@@ -44,7 +44,7 @@
 
 Please visit [Sparkle's website](http://sparkle-project.org) for more information on documentation and migration.
 
-If you are migrating from earlier alpha versions of Sparkle 2, please re-familiarize yourself with the [Sandboxing guide](https://sparkle-project.org/documentation/sandboxing/). Some of the XPC Services are now optional and integration with code signing has been simplified. The SPUUserDriver protocol for custom user interfaces has been greatly simplified too.
+If you are migrating from earlier beta versions of Sparkle 2, please re-familiarize yourself with the [Sandboxing guide](https://sparkle-project.org/documentation/sandboxing/). Some of the XPC Services are now optional and integration with XPC Serviecs and code signing have been simplified. The SPUUserDriver protocol for custom user interfaces has been greatly simplified too.
 
 # 1.27.1
 
