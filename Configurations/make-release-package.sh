@@ -55,13 +55,13 @@ if [ "$ACTION" = "" ] ; then
     cp -R "$CONFIGURATION_BUILD_DIR/staging/bin" "$CONFIGURATION_BUILD_DIR/staging-spm"
 
     cd "$CONFIGURATION_BUILD_DIR/staging"
-    
+
     if [ -x "$(command -v xz)" ]; then
         XZ_EXISTS=1
     else
         XZ_EXISTS=0
     fi
-    
+
     rm -rf "/tmp/sparkle-extract"
     mkdir -p "/tmp/sparkle-extract"
 
@@ -88,7 +88,7 @@ if [ "$ACTION" = "" ] ; then
 
     rm -rf "/tmp/sparkle-extract"
     rm -rf "$CONFIGURATION_BUILD_DIR/staging"
-    
+
     # Generate zip containing the xcframework for SPM
     rm -rf "/tmp/sparkle-spm-extract"
     mkdir -p "/tmp/sparkle-spm-extract"
@@ -100,7 +100,7 @@ if [ "$ACTION" = "" ] ; then
     # This guards against our archives being corrupt / created incorrectly
     ditto -x -k "../Sparkle-for-Swift-Package-Manager.zip" "/tmp/sparkle-spm-extract"
     verify_code_signatures "/tmp/sparkle-spm-extract"
-    
+
     rm -rf "/tmp/sparkle-spm-extract"
     rm -rf "$CONFIGURATION_BUILD_DIR/staging-spm"
 
@@ -138,10 +138,10 @@ if [ "$ACTION" = "" ] ; then
     else
         echo "warning: Xcode version $XCODE_VERSION_ACTUAL does not support computing checksums for Swift Packages. Please update the Package manifest manually."
     fi
-    
-    if [ "$XZ_EXISTS" -eq 1 ] ; then
+
+    if [ "$XZ_EXISTS" -ne 1 ] ; then
         echo "WARNING: xz compression is used for official releases but bz2 is being used instead because xz tool is not installed on your system."
     fi
-        
+
     rm -rf "$CONFIGURATION_BUILD_DIR/staging-spm"
 fi
