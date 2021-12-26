@@ -37,14 +37,13 @@
 * Add support for posting updates only on specific channels (eg for supporting beta updates) (#1879) (Zorg)
 * System profiler privacy and transparency (#1690) (Martin Pilkington)
 * Support getting app icon from asset catalog (#1694) (Charles Srstka)
-* Don't hide update alert window now on deactivation (#1804) (Zorg)
 * Don't bring up authorization just because group ID doesn't match (#1830) (Zorg)
-* Raise minimum system version to 10.11 (Zorg)
+* Raise minimum system version to macOS 10.11 (Zorg)
 * Special thanks to developers using early builds of this release in production and contributors for keeping this running (Kornel, Jonas Zaugg, Gwynne Raskind, Jordan Rose, Tony Arnold, Bryan Jones, Christian Tietze, Jakob Egger, and many more)
 
 Please visit [Sparkle's website](http://sparkle-project.org) for more information on documentation and migration.
 
-If you are migrating from earlier beta versions of Sparkle 2, please re-familiarize yourself with the [Sandboxing guide](https://sparkle-project.org/documentation/sandboxing/). Some of the XPC Services are now optional and integration with XPC Serviecs and code signing have been simplified. The SPUUserDriver protocol for custom user interfaces has been greatly simplified too.
+If you are migrating from earlier beta versions of Sparkle 2 and use sandboxing, please re-familiarize yourself with the [Sandboxing guide](https://sparkle-project.org/documentation/sandboxing/). Some of the XPC Services are now optional and integration with XPC Serviecs and code signing have been simplified. The SPUUserDriver protocol for custom user interfaces has been greatly simplified too.
 
 # 1.27.1
 
