@@ -4,7 +4,7 @@ Secure and reliable software update framework for macOS.
 
 <img src="Resources/Screenshot.png" width="732" alt="Sparkle shows familiar update window with release notes">
 
-Sparkle 2 adds support for applicationg sandboxing, custom user interfaces, updating external bundles, and a more modern architecture which includes faster and more reliable installs.
+Sparkle 2 adds support for application sandboxing, custom user interfaces, updating external bundles, and a more modern architecture which includes faster and more reliable installs.
 
 Pre-releases when available can be found on the [Sparkle's Releases](https://github.com/sparkle-project/Sparkle/releases) or on your favorite package manager. More nightly builds can be downloaded by selecting a recent [workflow run](https://github.com/sparkle-project/Sparkle/actions?query=event%3Apush+is%3Asuccess+branch%3A2.x) and downloading the corresponding Sparkle-distribution artifact.
 
