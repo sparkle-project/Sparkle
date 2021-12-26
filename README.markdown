@@ -4,14 +4,13 @@ Secure and reliable software update framework for macOS.
 
 <img src="Resources/Screenshot.png" width="732" alt="Sparkle shows familiar update window with release notes">
 
-This is the upcoming new version of Sparkle.
-Major new features are support for sandboxing, custom user interfaces, updating external bundles, and a more modern architecture which includes faster and more reliable installs.
+Sparkle 2 adds support for applicationg sandboxing, custom user interfaces, updating external bundles, and a more modern architecture which includes faster and more reliable installs.
 
-Sparkle 2 is currently in beta, but is almost ready for official release. Applications, typically sandboxed, have already been using it in production though. Pre-releases can be found on the [Sparkle's Releases](https://github.com/sparkle-project/Sparkle/releases). More nightly builds can be downloaded by selecting a recent [workflow run](https://github.com/sparkle-project/Sparkle/actions?query=event%3Apush+is%3Asuccess+branch%3A2.x) and downloading the corresponding Sparkle-distribution artifact.
+Pre-releases when available can be found on the [Sparkle's Releases](https://github.com/sparkle-project/Sparkle/releases) or on your favorite package manager. More nightly builds can be downloaded by selecting a recent [workflow run](https://github.com/sparkle-project/Sparkle/actions?query=event%3Apush+is%3Asuccess+branch%3A2.x) and downloading the corresponding Sparkle-distribution artifact.
 
-The current status of Sparkle is tracked by [its roadmap](https://github.com/sparkle-project/Sparkle/milestones).
+The current status for future versions of Sparkle is tracked by [its roadmap](https://github.com/sparkle-project/Sparkle/milestones).
 
-Please visit [Sparkle's website](http://sparkle-project.org) for up to date documentation on using and migrating over to Sparkle 2. Refer to [Changelog](CHANGELOG) for a more detailed list of changes. More internal design documents can be found in [Documentation](Documentation/). 
+Please visit [Sparkle's website](http://sparkle-project.org) for up to date documentation on using and migrating over to Sparkle 2. Refer to [Changelog](CHANGELOG) for a more detailed list of changes. More internal design documents to the project can be found in the repository under [Documentation](Documentation/).
 
 ## Features
 
@@ -20,7 +19,7 @@ Please visit [Sparkle's website](http://sparkle-project.org) for up to date docu
 * Fast. Supports delta updates which only patch files that have changed and atomic-safe installs.
 * Easy to install. Sparkle requires no code in your app, and only needs static files on a web server.
 * Customizable. Sparkle 2 supports plugging in a custom UI for updates.
-* Supports applications, package installers, preference panes, and other plug-ins.
+* Flexible. Supports applications, package installers, preference panes, and other plug-ins. Sparkle 2 supports updating external bundles.
 * Handles permissions, quarantine, and automatically asks for authentication if needed.
 * Uses RSS-based appcasts for release information. Appcasts are a de-facto standard supported by 3rd party update-tracking programs and websites.
 * Stays hidden until second launch for better first impressions.
