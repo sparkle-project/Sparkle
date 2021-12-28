@@ -222,9 +222,12 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
     for (file = xar_file_first(x, iter); file; file = xar_file_next(iter)) {
         char *pathCString;
 #if HAS_XAR_GET_SAFE_PATH
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunguarded-availability-new"
         if (xar_get_safe_path != NULL) {
             pathCString = xar_get_safe_path(file);
         }
+#pragma clang diagnostic pop
         else
 #endif
         {
