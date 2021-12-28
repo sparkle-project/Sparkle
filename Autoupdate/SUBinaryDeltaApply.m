@@ -54,48 +54,50 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
     SUBinaryDeltaMajorVersion majorDiffVersion = FIRST_DELTA_DIFF_MAJOR_VERSION;
     int minorDiffVersion = 0;
 
-    NSString *expectedBeforeHashv1 = nil;
-    NSString *expectedAfterHashv1 = nil;
-
-    NSString *expectedNewBeforeHash = nil;
-    NSString *expectedNewAfterHash = nil;
+    NSString *expectedBeforeHash = nil;
+    NSString *expectedAfterHash = nil;
 
     progressCallback(0/6.0);
 
     xar_subdoc_t subdoc;
     for (subdoc = xar_subdoc_first(x); subdoc; subdoc = xar_subdoc_next(subdoc)) {
-        if (!strcmp(xar_subdoc_name(subdoc), BINARY_DELTA_ATTRIBUTES_KEY)) {
-            const char *value = 0;
+        if (strcmp(xar_subdoc_name(subdoc), BINARY_DELTA_ATTRIBUTES_KEY) == 0) {
 
             // available in version 2.0 or later
-            xar_subdoc_prop_get(subdoc, MAJOR_DIFF_VERSION_KEY, &value);
-            if (value)
-                majorDiffVersion = (SUBinaryDeltaMajorVersion)[@(value) intValue];
+            {
+                const char *value = NULL;
+                xar_subdoc_prop_get(subdoc, MAJOR_DIFF_VERSION_KEY, &value);
+                if (value != NULL) {
+                    majorDiffVersion = (SUBinaryDeltaMajorVersion)[@(value) intValue];
+                }
+            }
 
             // available in version 2.0 or later
-            xar_subdoc_prop_get(subdoc, MINOR_DIFF_VERSION_KEY, &value);
-            if (value)
-                minorDiffVersion = [@(value) intValue];
+            {
+                const char *value = NULL;
+                xar_subdoc_prop_get(subdoc, MINOR_DIFF_VERSION_KEY, &value);
+                if (value != NULL) {
+                    minorDiffVersion = [@(value) intValue];
+                }
+            }
 
             // available in version 2.0 or later
-            xar_subdoc_prop_get(subdoc, BEFORE_TREE_SHA1_KEY, &value);
-            if (value)
-                expectedNewBeforeHash = @(value);
+            {
+                const char *value = NULL;
+                xar_subdoc_prop_get(subdoc, BEFORE_TREE_SHA1_KEY, &value);
+                if (value != NULL) {
+                    expectedBeforeHash = @(value);
+                }
+            }
 
             // available in version 2.0 or later
-            xar_subdoc_prop_get(subdoc, AFTER_TREE_SHA1_KEY, &value);
-            if (value)
-                expectedNewAfterHash = @(value);
-
-            // only available in version 1.0
-            xar_subdoc_prop_get(subdoc, BEFORE_TREE_SHA1_OLD_KEY, &value);
-            if (value)
-                expectedBeforeHashv1 = @(value);
-
-            // only available in version 1.0
-            xar_subdoc_prop_get(subdoc, AFTER_TREE_SHA1_OLD_KEY, &value);
-            if (value)
-                expectedAfterHashv1 = @(value);
+            {
+                const char *value = NULL;
+                xar_subdoc_prop_get(subdoc, AFTER_TREE_SHA1_KEY, &value);
+                if (value != NULL) {
+                    expectedAfterHash = @(value);
+                }
+            }
         }
     }
 
@@ -104,6 +106,15 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
         
         if (error != NULL) {
             *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadCorruptFileError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Unable to identify diff-version %u in delta.  Giving up.", majorDiffVersion] }];
+        }
+        return NO;
+    }
+    
+    if (majorDiffVersion < FIRST_SUPPORTED_DELTA_MAJOR_VERSION) {
+        xar_close(x);
+        
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadCorruptFileError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Applying version %u patches is no longer supported.", majorDiffVersion] }];
         }
         return NO;
     }
@@ -120,7 +131,7 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
 #if HAS_XAR_GET_SAFE_PATH
     // Reject patches that did not generate valid hierarchical xar container paths
     // These will not succeed to patch using recent versions of BinaryDelta
-    if ((majorDiffVersion == SUBinaryDeltaMajorVersion2 && minorDiffVersion < 3) || (majorDiffVersion == SUBinaryDeltaMajorVersion1 && minorDiffVersion < 2)) {
+    if (majorDiffVersion == SUBinaryDeltaMajorVersion2 && minorDiffVersion < 3) {
         xar_close(x);
         
         if (error != NULL) {
@@ -131,12 +142,7 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
     }
 #endif
 
-    BOOL usesNewTreeHash = MAJOR_VERSION_IS_AT_LEAST(majorDiffVersion, SUBinaryDeltaMajorVersion2);
-
-    NSString *expectedBeforeHash = usesNewTreeHash ? expectedNewBeforeHash : expectedBeforeHashv1;
-    NSString *expectedAfterHash = usesNewTreeHash ? expectedNewAfterHash : expectedAfterHashv1;
-
-    if (!expectedBeforeHash || !expectedAfterHash) {
+    if (expectedBeforeHash == nil || expectedAfterHash == nil) {
         xar_close(x);
         
         if (error != NULL) {
@@ -211,8 +217,6 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
 
     progressCallback(4/6.0);
 
-    BOOL hasExtractKeyAvailable = MAJOR_VERSION_IS_AT_LEAST(majorDiffVersion, SUBinaryDeltaMajorVersion2);
-
     if (verbose) {
         fprintf(stderr, "\nPatching...");
     }
@@ -275,7 +279,7 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
         // This is important because they aren't part of the delta, just part of the directory structure
 
         const char *value;
-        if (!xar_prop_get(file, DELETE_KEY, &value) || (!hasExtractKeyAvailable && !xar_prop_get(file, DELETE_THEN_EXTRACT_OLD_KEY, &value))) {
+        if (xar_prop_get(file, DELETE_KEY, &value) == 0) {
             if (!removeTree(destinationFilePath)) {
                 xar_close(x);
                 
@@ -283,15 +287,9 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
                     fprintf(stderr, "\n");
                 }
                 if (error != NULL) {
-                    *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"%@ or %@: failed to remove %@", @DELETE_KEY, @DELETE_THEN_EXTRACT_OLD_KEY, destination] }];
+                    *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"%@: failed to remove %@", @DELETE_KEY, destination] }];
                 }
                 return NO;
-            }
-            if (!hasExtractKeyAvailable && !xar_prop_get(file, DELETE_KEY, &value)) {
-                if (verbose) {
-                    fprintf(stderr, "\n❌  %s %s", VERBOSE_DELETED, [path fileSystemRepresentation]);
-                }
-                continue;
             }
 
             removedFile = YES;
@@ -313,7 +311,7 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
             if (verbose) {
                 fprintf(stderr, "\n🔨  %s %s", VERBOSE_PATCHED, [path fileSystemRepresentation]);
             }
-        } else if ((hasExtractKeyAvailable && !xar_prop_get(file, EXTRACT_KEY, &value)) || (!hasExtractKeyAvailable && xar_prop_get(file, MODIFY_PERMISSIONS_KEY, &value))) { // extract and permission modifications don't coexist
+        } else if (xar_prop_get(file, EXTRACT_KEY, &value) == 0) { // extract and permission modifications don't coexist
 
             if (xar_extract_tofile(x, file, [destinationFilePath fileSystemRepresentation]) != 0) {
                 xar_close(x);
@@ -338,7 +336,7 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
             fprintf(stderr, "\n❌  %s %s", VERBOSE_DELETED, [path fileSystemRepresentation]);
         }
 
-        if (!xar_prop_get(file, MODIFY_PERMISSIONS_KEY, &value)) {
+        if (xar_prop_get(file, MODIFY_PERMISSIONS_KEY, &value) == 0) {
             mode_t mode = (mode_t)[[NSString stringWithUTF8String:value] intValue];
             if (!modifyPermissions(destinationFilePath, mode)) {
                 xar_close(x);
@@ -366,7 +364,7 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
         fprintf(stderr, "\nVerifying destination...");
     }
     NSString *afterHash = hashOfTreeWithVersion(destination, majorDiffVersion);
-    if (!afterHash) {
+    if (afterHash == nil) {
         if (verbose) {
             fprintf(stderr, "\n");
         }

@@ -162,10 +162,6 @@ NSString *hashOfTreeWithVersion(NSString *path, uint16_t majorVersion)
         if (ent->fts_info != FTS_F && ent->fts_info != FTS_SL && ent->fts_info != FTS_D)
             continue;
 
-        if (ent->fts_info == FTS_D && !MAJOR_VERSION_IS_AT_LEAST(majorVersion, SUBinaryDeltaMajorVersion2)) {
-            continue;
-        }
-
         NSString *relativePath = pathRelativeToDirectory(normalizedPath, stringWithFileSystemRepresentation(ent->fts_path));
         if (relativePath.length == 0)
             continue;
@@ -179,19 +175,17 @@ NSString *hashOfTreeWithVersion(NSString *path, uint16_t majorVersion)
         const char *relativePathBytes = [relativePath fileSystemRepresentation];
         CC_SHA1_Update(&hashContext, relativePathBytes, (CC_LONG)strlen(relativePathBytes));
 
-        if (MAJOR_VERSION_IS_AT_LEAST(majorVersion, SUBinaryDeltaMajorVersion2)) {
-            uint16_t mode = ent->fts_statp->st_mode;
-            // permission of symlinks is irrelevant and can't be changed.
-            // hardcoding a value helps avoid differences between filesystems.
-            if (ent->fts_info == FTS_SL) {
-                mode = 0755;
-            }
-            uint16_t type = ent->fts_info;
-            uint16_t permissions = mode & PERMISSION_FLAGS;
-
-            CC_SHA1_Update(&hashContext, &type, sizeof(type));
-            CC_SHA1_Update(&hashContext, &permissions, sizeof(permissions));
+        uint16_t mode = ent->fts_statp->st_mode;
+        // permission of symlinks is irrelevant and can't be changed.
+        // hardcoding a value helps avoid differences between filesystems.
+        if (ent->fts_info == FTS_SL) {
+            mode = 0755;
         }
+        uint16_t type = ent->fts_info;
+        uint16_t permissions = mode & PERMISSION_FLAGS;
+
+        CC_SHA1_Update(&hashContext, &type, sizeof(type));
+        CC_SHA1_Update(&hashContext, &permissions, sizeof(permissions));
     }
     fts_close(fts);
 

@@ -80,6 +80,11 @@ static BOOL runCreateCommand(NSString *programName, NSArray<NSString *> *args)
         fprintf(stderr, "Version provided (%u) is not valid\n", patchVersion);
         return NO;
     }
+    
+    if (patchVersion < FIRST_SUPPORTED_DELTA_MAJOR_VERSION) {
+        fprintf(stderr, "Creating version %u patches is no longer supported.\n", patchVersion);
+        return NO;
+    }
 
     if (patchVersion > LATEST_DELTA_DIFF_MAJOR_VERSION) {
         fprintf(stderr, "This program is too old to create a version %u patch, or the version number provided is invalid\n", patchVersion);

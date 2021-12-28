@@ -32,11 +32,6 @@
 #define BINARY_DELTA_KEY "binary-delta"
 #define MODIFY_PERMISSIONS_KEY "mod-permissions"
 
-// Properties no longer used in new patches
-#define DELETE_THEN_EXTRACT_OLD_KEY "delete-then-extract"
-#define BEFORE_TREE_SHA1_OLD_KEY "before-sha1"
-#define AFTER_TREE_SHA1_OLD_KEY "after-sha1"
-
 #define VERBOSE_DELETED "Deleted" // file is deleted from the file system when applying a patch
 #define VERBOSE_REMOVED "Removed" // file is set to be removed when creating a patch
 #define VERBOSE_ADDED "Added" // file is added to the patch or file system
@@ -53,11 +48,13 @@
 
 typedef NS_ENUM(uint16_t, SUBinaryDeltaMajorVersion)
 {
+    // Note: support for creating or applying version 1 deltas have been removed
     SUBinaryDeltaMajorVersion1 = 1,
     SUBinaryDeltaMajorVersion2 = 2
 };
 
 #define FIRST_DELTA_DIFF_MAJOR_VERSION SUBinaryDeltaMajorVersion1
+#define FIRST_SUPPORTED_DELTA_MAJOR_VERSION SUBinaryDeltaMajorVersion2
 #define LATEST_DELTA_DIFF_MAJOR_VERSION SUBinaryDeltaMajorVersion2
 
 extern int compareFiles(const FTSENT **a, const FTSENT **b);
