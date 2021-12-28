@@ -331,7 +331,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
             }
             
             // Note: we can launch application bundles or open plug-in bundles
-            if (![[NSWorkspace sharedWorkspace] openFile:pathToRelaunch]) {
+            if (![[NSWorkspace sharedWorkspace] openURL:[NSURL fileURLWithPath:pathToRelaunch isDirectory:YES]]) {
                 SULog(SULogLevelError, @"Error: Failed to relaunch bundle at %@", pathToRelaunch);
             }
             

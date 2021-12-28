@@ -228,7 +228,10 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
         else
 #endif
         {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
             pathCString = xar_get_path(file);
+#pragma clang diagnostic pop
         }
         
         if (pathCString == NULL) {

@@ -265,7 +265,11 @@
         return NO;
     }
 
+    // Sparkle's DSA support is deprecated
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
     __block SecGroupTransformRef group = SecTransformCreateGroupTransform();
+#pragma clang diagnostic pop
     __block SecTransformRef dataReadTransform = NULL;
     __block SecTransformRef dataDigestTransform = NULL;
     __block SecTransformRef dataVerifyTransform = NULL;
@@ -318,7 +322,10 @@
         return cleanup();
     }
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
     SecTransformConnectTransforms(dataReadTransform, kSecTransformOutputAttributeName, dataDigestTransform, kSecTransformInputAttributeName, group, &error);
+#pragma clang diagnostic pop
     if (error) {
         if (outError != NULL) {
             *outError = [NSError errorWithDomain:SUSparkleErrorDomain code:SUValidationError userInfo:@{NSLocalizedDescriptionKey : @"Failed to connect data read transform", NSUnderlyingErrorKey: (__bridge NSError *)error}];
@@ -327,7 +334,10 @@
         return cleanup();
     }
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
     SecTransformConnectTransforms(dataDigestTransform, kSecTransformOutputAttributeName, dataVerifyTransform, kSecTransformInputAttributeName, group, &error);
+#pragma clang diagnostic pop
     if (error) {
         if (outError != NULL) {
             *outError = [NSError errorWithDomain:SUSparkleErrorDomain code:SUValidationError userInfo:@{NSLocalizedDescriptionKey : @"Failed to connect data digest transform", NSUnderlyingErrorKey: (__bridge NSError *)error}];
@@ -336,7 +346,10 @@
         return cleanup();
     }
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
     NSNumber *result = CFBridgingRelease(SecTransformExecute(group, &error));
+#pragma clang diagnostic pop
     if (error) {
         SULog(SULogLevelError, @"DSA signature verification failed: %@", error);
         if (outError != NULL) {
