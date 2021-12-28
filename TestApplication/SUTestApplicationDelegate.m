@@ -15,7 +15,7 @@
 #import <Sparkle/Sparkle.h>
 #import "SUPopUpTitlebarUserDriver.h"
 
-@interface SUTestApplicationDelegate ()
+@interface SUTestApplicationDelegate () <NSMenuItemValidation>
 
 @property (nonatomic) SPUUpdater *updater;
 @property (nonatomic) SUUpdateSettingsWindowController *updateSettingsWindowController;
