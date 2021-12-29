@@ -16,7 +16,6 @@
 #include <sys/mman.h>
 #include <sys/param.h>
 #include <sys/stat.h>
-#include <xar/xar.h>
 
 #include "AppKitPrevention.h"
 
@@ -39,7 +38,7 @@ NSString *stringWithFileSystemRepresentation(const char *input)
     return [[NSFileManager defaultManager] stringWithFileSystemRepresentation:input length:strlen(input)];
 }
 
-int latestMinorVersionForMajorVersion(SUBinaryDeltaMajorVersion majorVersion)
+uint16_t latestMinorVersionForMajorVersion(SUBinaryDeltaMajorVersion majorVersion)
 {
     switch (majorVersion) {
         case SUBinaryDeltaMajorVersion1:
@@ -137,7 +136,7 @@ static BOOL _hashOfFileContents(unsigned char *hash, FTSENT *ent)
     return YES;
 }
 
-NSString *hashOfTreeWithVersion(NSString *path, uint16_t majorVersion)
+NSString *hashOfTreeWithVersion(NSString *path, uint16_t __unused majorVersion)
 {
     char pathBuffer[PATH_MAX] = { 0 };
     if (![path getFileSystemRepresentation:pathBuffer maxLength:sizeof(pathBuffer)]) {

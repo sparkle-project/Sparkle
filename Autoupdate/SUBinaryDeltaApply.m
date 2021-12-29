@@ -295,7 +295,7 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
             removedFile = YES;
         }
 
-        if (!xar_prop_get(file, BINARY_DELTA_KEY, &value)) {
+        if (xar_prop_get(file, BINARY_DELTA_KEY, &value) == 0) {
             if (!applyBinaryDeltaToFile(x, file, sourceFilePath, destinationFilePath)) {
                 xar_close(x);
                 

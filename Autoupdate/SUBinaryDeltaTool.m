@@ -8,9 +8,8 @@
 
 #include "SUBinaryDeltaApply.h"
 #include "SUBinaryDeltaCreate.h"
-#import "SUBinaryDeltaCommon.h"
+#include "SPUXarDeltaArchive.h"
 #include <Foundation/Foundation.h>
-#include <xar/xar.h>
 
 #define VERBOSE_FLAG @"--verbose"
 #define VERSION_FLAG @"--version"
@@ -188,32 +187,17 @@ static BOOL runVersionCommand(NSString *programName, NSArray *args)
         fprintf(stdout, "%u.%u\n", LATEST_DELTA_DIFF_MAJOR_VERSION, latestMinorVersionForMajorVersion(LATEST_DELTA_DIFF_MAJOR_VERSION));
     } else {
         NSString *patchFile = args[0];
-        xar_t x = xar_open([patchFile fileSystemRepresentation], READ);
-        if (!x) {
-            fprintf(stderr, "Unable to open patch %s\n", [patchFile fileSystemRepresentation]);
+        
+        uint16_t majorDiffVersion = 0;
+        uint16_t minorDiffVersion = 0;
+        
+        BOOL retrievedInfo = [SPUXarDeltaArchive getMajorDeltaVersion:&majorDiffVersion minorDeltaVersion:&minorDiffVersion fromPatchFile:patchFile];
+        
+        if (!retrievedInfo) {
+            fprintf(stderr, "Unable to retrieve version information from patch %s\n", [patchFile fileSystemRepresentation]);
             return NO;
         }
-
-        SUBinaryDeltaMajorVersion majorDiffVersion = FIRST_DELTA_DIFF_MAJOR_VERSION;
-        int minorDiffVersion = 0;
-
-        xar_subdoc_t subdoc;
-        for (subdoc = xar_subdoc_first(x); subdoc; subdoc = xar_subdoc_next(subdoc)) {
-            if (!strcmp(xar_subdoc_name(subdoc), BINARY_DELTA_ATTRIBUTES_KEY)) {
-                const char *value = 0;
-
-                // available in version 2.0 or later
-                xar_subdoc_prop_get(subdoc, MAJOR_DIFF_VERSION_KEY, &value);
-                if (value)
-                    majorDiffVersion = (SUBinaryDeltaMajorVersion)[@(value) intValue];
-
-                // available in version 2.0 or later
-                xar_subdoc_prop_get(subdoc, MINOR_DIFF_VERSION_KEY, &value);
-                if (value)
-                    minorDiffVersion = [@(value) intValue];
-            }
-        }
-
+        
         fprintf(stdout, "%u.%u\n", majorDiffVersion, minorDiffVersion);
     }
 

@@ -67,5 +67,5 @@ extern NSString *pathRelativeToDirectory(NSString *directory, NSString *path);
 NSString *temporaryFilename(NSString *base);
 NSString *temporaryDirectory(NSString *base);
 NSString *stringWithFileSystemRepresentation(const char*);
-int latestMinorVersionForMajorVersion(SUBinaryDeltaMajorVersion majorVersion);
+uint16_t latestMinorVersionForMajorVersion(SUBinaryDeltaMajorVersion majorVersion);
 #endif
