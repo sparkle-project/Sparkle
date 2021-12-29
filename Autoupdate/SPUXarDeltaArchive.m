@@ -9,8 +9,33 @@
 #import "SPUXarDeltaArchive.h"
 #include <xar/xar.h>
 #include "SUBinaryDeltaCommon.h"
+#include <Availability.h>
+
 
 #include "AppKitPrevention.h"
+
+#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 120000
+    #define HAS_XAR_GET_SAFE_PATH 1
+#else
+    #define HAS_XAR_GET_SAFE_PATH 0
+#endif
+
+#if HAS_XAR_GET_SAFE_PATH
+// This is preferred over xar_get_path (which is deprecated) when it's available
+// Don't use OS availability for this API
+extern char *xar_get_safe_path(xar_file_t f) __attribute__((weak_import));
+#endif
+
+// Xar attribute keys
+#define BINARY_DELTA_ATTRIBUTES_KEY "binary-delta-attributes"
+#define MAJOR_DIFF_VERSION_KEY "major-version"
+#define MINOR_DIFF_VERSION_KEY "minor-version"
+#define BEFORE_TREE_SHA1_KEY "before-tree-sha1"
+#define AFTER_TREE_SHA1_KEY "after-tree-sha1"
+#define DELETE_KEY "delete"
+#define EXTRACT_KEY "extract"
+#define BINARY_DELTA_KEY "binary-delta"
+#define MODIFY_PERMISSIONS_KEY "mod-permissions"
 
 @interface SPUXarDeltaArchive ()
 
@@ -26,46 +51,13 @@
 
 + (BOOL)getMajorDeltaVersion:(uint16_t *)outMajorDiffVersion minorDeltaVersion:(uint16_t *)outMinorDiffVersion fromPatchFile:(NSString *)patchFile
 {
-    xar_t x = xar_open([patchFile fileSystemRepresentation], READ);
-    if (x == NULL) {
+    SPUXarDeltaArchive *archive = [[SPUXarDeltaArchive alloc] initWithPatchFileForReading:patchFile];
+    if (archive == nil) {
         return NO;
     }
-
-    uint16_t majorDiffVersion = FIRST_DELTA_DIFF_MAJOR_VERSION;
-    uint16_t minorDiffVersion = 0;
-
-    xar_subdoc_t subdoc;
-    for (subdoc = xar_subdoc_first(x); subdoc; subdoc = xar_subdoc_next(subdoc)) {
-        if (strcmp(xar_subdoc_name(subdoc), BINARY_DELTA_ATTRIBUTES_KEY) == 0) {
-            {
-                // available in version 2.0 or later
-                const char *value = NULL;
-                xar_subdoc_prop_get(subdoc, MAJOR_DIFF_VERSION_KEY, &value);
-                if (value != NULL) {
-                    majorDiffVersion = (uint16_t)[@(value) intValue];
-                }
-            }
-
-            {
-                // available in version 2.0 or later
-                const char *value = NULL;
-                xar_subdoc_prop_get(subdoc, MINOR_DIFF_VERSION_KEY, &value);
-                if (value != NULL) {
-                    minorDiffVersion = (uint16_t)[@(value) intValue];
-                }
-            }
-        }
-    }
     
-    if (outMajorDiffVersion != NULL) {
-        *outMajorDiffVersion = majorDiffVersion;
-    }
+    [archive getMajorDeltaVersion:outMajorDiffVersion minorDeltaVersion:outMinorDiffVersion beforeTreeHash:NULL afterTreeHash:NULL];
     
-    if (outMinorDiffVersion != NULL) {
-        *outMinorDiffVersion = minorDiffVersion;
-    }
-    
-    xar_close(x);
     return YES;
 }
 
@@ -84,6 +76,18 @@
     return self;
 }
 
+- (nullable instancetype)initWithPatchFileForReading:(NSString *)patchFile
+{
+    self = [super init];
+    if (self != nil) {
+        _x = xar_open(patchFile.fileSystemRepresentation, READ);
+        if (_x == NULL) {
+            return nil;
+        }
+    }
+    return self;
+}
+
 - (void)dealloc
 {
     [self close];
@@ -96,6 +100,77 @@
         self.x = NULL;
     }
 }
+
++ (BOOL)supportsSafeExtraction
+{
+    return HAS_XAR_GET_SAFE_PATH;
+}
+
+- (void)getMajorDeltaVersion:(nullable uint16_t *)outMajorDiffVersion minorDeltaVersion:(nullable uint16_t *)outMinorDiffVersion beforeTreeHash:(NSString * _Nullable __autoreleasing * _Nullable)outBeforeTreeHash afterTreeHash:(NSString * _Nullable __autoreleasing * _Nullable)outAfterTreeHash
+{
+    uint16_t majorDiffVersion = FIRST_DELTA_DIFF_MAJOR_VERSION;
+    uint16_t minorDiffVersion = 0;
+    NSString *expectedBeforeHash = nil;
+    NSString *expectedAfterHash = nil;
+
+    xar_subdoc_t subdoc;
+    for (subdoc = xar_subdoc_first(self.x); subdoc; subdoc = xar_subdoc_next(subdoc)) {
+        if (strcmp(xar_subdoc_name(subdoc), BINARY_DELTA_ATTRIBUTES_KEY) == 0) {
+            {
+                // available in version 2.0 or later
+                const char *value = NULL;
+                xar_subdoc_prop_get(subdoc, MAJOR_DIFF_VERSION_KEY, &value);
+                if (value != NULL) {
+                    majorDiffVersion = (uint16_t)[@(value) intValue];
+                }
+            }
+
+            {
+                // available in version 2.0 or later
+                const char *value = NULL;
+                xar_subdoc_prop_get(subdoc, MINOR_DIFF_VERSION_KEY, &value);
+                if (value != NULL) {
+                    minorDiffVersion = (uint16_t)[@(value) intValue];
+                }
+            }
+            
+            // available in version 2.0 or later
+            {
+                const char *value = NULL;
+                xar_subdoc_prop_get(subdoc, BEFORE_TREE_SHA1_KEY, &value);
+                if (value != NULL) {
+                    expectedBeforeHash = @(value);
+                }
+            }
+
+            // available in version 2.0 or later
+            {
+                const char *value = NULL;
+                xar_subdoc_prop_get(subdoc, AFTER_TREE_SHA1_KEY, &value);
+                if (value != NULL) {
+                    expectedAfterHash = @(value);
+                }
+            }
+        }
+    }
+    
+    if (outMajorDiffVersion != NULL) {
+        *outMajorDiffVersion = majorDiffVersion;
+    }
+    
+    if (outMinorDiffVersion != NULL) {
+        *outMinorDiffVersion = minorDiffVersion;
+    }
+    
+    if (outBeforeTreeHash != NULL) {
+        *outBeforeTreeHash = expectedBeforeHash;
+    }
+    
+    if (outAfterTreeHash != NULL) {
+        *outAfterTreeHash = expectedAfterHash;
+    }
+}
+
 
 - (void)setMajorVersion:(uint16_t)majorVersion minorVersion:(uint16_t)minorVersion beforeTreeHash:(NSString *)beforeTreeHash afterTreeHash:(NSString *)afterTreeHash
 {
@@ -177,6 +252,74 @@ static xar_file_t _xarAddFile(NSMutableDictionary<NSString *, NSValue *> *fileTa
             xar_prop_set(newFile, MODIFY_PERMISSIONS_KEY, [NSString stringWithFormat:@"%u", permissions.unsignedShortValue].UTF8String);
         }
     }
+}
+
+- (BOOL)enumerateItems:(void (^)(const void *, NSString *, SPUDeltaFileAttributes, uint16_t, BOOL *))itemHandler
+{
+    BOOL exitedEarly = NO;
+    xar_iter_t iter = xar_iter_new();
+    for (xar_file_t file = xar_file_first(self.x, iter); file; file = xar_file_next(iter)) {
+        char *pathCString;
+#if HAS_XAR_GET_SAFE_PATH
+        if (xar_get_safe_path != NULL) {
+            pathCString = xar_get_safe_path(file);
+        }
+        else
+#endif
+        {
+            pathCString = xar_get_path(file);
+        }
+        
+        if (pathCString == NULL) {
+            continue;
+        }
+        
+        NSString *relativePath = @(pathCString);
+        
+        SPUDeltaFileAttributes attributes = 0;
+        {
+            const char *value = NULL;
+            if (xar_prop_get(file, DELETE_KEY, &value) == 0) {
+                attributes |= SPUDeltaFileAttributesDelete;
+            }
+        }
+        {
+            const char *value = NULL;
+            if (xar_prop_get(file, BINARY_DELTA_KEY, &value) == 0) {
+                attributes |= SPUDeltaFileAttributesBinaryDiff;
+            }
+        }
+        {
+            const char *value = NULL;
+            if (xar_prop_get(file, EXTRACT_KEY, &value) == 0) {
+                attributes |= SPUDeltaFileAttributesExtract;
+            }
+        }
+        
+        uint16_t permissions = 0;
+        {
+            const char *value = NULL;
+            if (xar_prop_get(file, MODIFY_PERMISSIONS_KEY, &value) == 0) {
+                attributes |= SPUDeltaFileAttributesModifyPermissions;
+                permissions = (uint16_t)[@(value) intValue];
+            }
+        }
+        
+        itemHandler(file, relativePath, attributes, permissions, &exitedEarly);
+        if (exitedEarly) {
+            break;
+        }
+    }
+    
+    xar_iter_free(iter);
+    
+    return !exitedEarly;
+}
+
+- (BOOL)extractItem:(const void *)item destination:(NSString *)destinationPath
+{
+    xar_file_t file = item;
+    return (xar_extract_tofile(self.x, file, destinationPath.fileSystemRepresentation) == 0);
 }
 
 @end

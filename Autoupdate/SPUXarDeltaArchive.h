@@ -15,6 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface SPUXarDeltaArchive : NSObject <SPUDeltaArchiveProtocol>
 
 - (nullable instancetype)initWithPatchFileForWriting:(NSString *)patchFile;
+- (nullable instancetype)initWithPatchFileForReading:(NSString *)patchFile;
 
 @end
 

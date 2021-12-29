@@ -22,16 +22,6 @@
 #define APPLE_CODE_SIGN_XATTR_CODE_REQUIREMENTS_KEY "com.apple.cs.CodeRequirements"
 #define APPLE_CODE_SIGN_XATTR_CODE_SIGNATURE_KEY "com.apple.cs.CodeSignature"
 
-#define BINARY_DELTA_ATTRIBUTES_KEY "binary-delta-attributes"
-#define MAJOR_DIFF_VERSION_KEY "major-version"
-#define MINOR_DIFF_VERSION_KEY "minor-version"
-#define BEFORE_TREE_SHA1_KEY "before-tree-sha1"
-#define AFTER_TREE_SHA1_KEY "after-tree-sha1"
-#define DELETE_KEY "delete"
-#define EXTRACT_KEY "extract"
-#define BINARY_DELTA_KEY "binary-delta"
-#define MODIFY_PERMISSIONS_KEY "mod-permissions"
-
 #define VERBOSE_DELETED "Deleted" // file is deleted from the file system when applying a patch
 #define VERBOSE_REMOVED "Removed" // file is set to be removed when creating a patch
 #define VERBOSE_ADDED "Added" // file is added to the patch or file system
