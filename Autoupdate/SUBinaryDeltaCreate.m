@@ -9,7 +9,8 @@
 #import "SUBinaryDeltaCreate.h"
 #import <Foundation/Foundation.h>
 #include "SUBinaryDeltaCommon.h"
-#import "SPUXarDeltaArchive.h"
+#import "SPUDeltaArchiveProtocol.h"
+#import "SPUDeltaArchive.h"
 #import <CommonCrypto/CommonDigest.h>
 #include <fcntl.h>
 #include <fts.h>
@@ -469,7 +470,7 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
         fprintf(stderr, "\nWriting to temporary file %s...", [temporaryFile fileSystemRepresentation]);
     }
     
-    id<SPUDeltaArchiveProtocol> archive = [[SPUXarDeltaArchive alloc] initWithPatchFileForWriting:temporaryFile];
+    id<SPUDeltaArchiveProtocol> archive = SPUDeltaArchiveForWriting(temporaryFile);
     if (archive == nil) {
         if (verbose) {
             fprintf(stderr, "\n");

@@ -8,8 +8,9 @@
 
 #import "SUBinaryDeltaApply.h"
 #import "SUBinaryDeltaCommon.h"
-#import "SPUXarDeltaArchive.h"
-#include <CommonCrypto/CommonDigest.h>
+#import "SPUDeltaArchiveProtocol.h"
+#import "SPUDeltaArchive.h"
+#import <CommonCrypto/CommonDigest.h>
 #import <Foundation/Foundation.h>
 #include "bspatch.h"
 #include <stdio.h>
@@ -18,7 +19,7 @@
 
 #include "AppKitPrevention.h"
 
-static BOOL applyBinaryDeltaToFile(SPUXarDeltaArchive *archive, const void *item, NSString *sourceFilePath, NSString *destinationFilePath)
+static BOOL applyBinaryDeltaToFile(id<SPUDeltaArchiveProtocol> archive, const void *item, NSString *sourceFilePath, NSString *destinationFilePath)
 {
     NSString *patchFile = temporaryFilename(@"apply-binary-delta");
     if (![archive extractItem:item destination:patchFile]) {
@@ -33,7 +34,7 @@ static BOOL applyBinaryDeltaToFile(SPUXarDeltaArchive *archive, const void *item
 
 BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFile, BOOL verbose, void (^progressCallback)(double progress), NSError *__autoreleasing *error)
 {
-    id<SPUDeltaArchiveProtocol> archive = [[SPUXarDeltaArchive alloc] initWithPatchFileForReading:patchFile];
+    id<SPUDeltaArchiveProtocol> archive = SPUDeltaArchiveForReading(patchFile);
     if (archive == nil) {
         if (error != NULL) {
             *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Unable to open %@. Giving up.", patchFile] }];

@@ -6,10 +6,11 @@
 //  Copyright 2009 Mark Rowe. All rights reserved.
 //
 
-#include "SUBinaryDeltaApply.h"
-#include "SUBinaryDeltaCreate.h"
-#include "SPUXarDeltaArchive.h"
-#include <Foundation/Foundation.h>
+#import "SUBinaryDeltaApply.h"
+#import "SUBinaryDeltaCreate.h"
+#import "SPUDeltaArchive.h"
+#import "SPUDeltaArchiveProtocol.h"
+#import <Foundation/Foundation.h>
 
 #define VERBOSE_FLAG @"--verbose"
 #define VERSION_FLAG @"--version"
@@ -191,7 +192,7 @@ static BOOL runVersionCommand(NSString *programName, NSArray *args)
         uint16_t majorDiffVersion = 0;
         uint16_t minorDiffVersion = 0;
         
-        SPUXarDeltaArchive *archive = [[SPUXarDeltaArchive alloc] initWithPatchFileForReading:patchFile];
+        id<SPUDeltaArchiveProtocol> archive = SPUDeltaArchiveForReading(patchFile);
         if (archive == nil) {
             fprintf(stderr, "Unable to open patch %s\n", [patchFile fileSystemRepresentation]);
             return NO;
