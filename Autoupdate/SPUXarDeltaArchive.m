@@ -49,18 +49,6 @@ extern char *xar_get_safe_path(xar_file_t f) __attribute__((weak_import));
 @synthesize x = _x;
 @synthesize fileTable = _fileTable;
 
-+ (BOOL)getMajorDeltaVersion:(uint16_t *)outMajorDiffVersion minorDeltaVersion:(uint16_t *)outMinorDiffVersion fromPatchFile:(NSString *)patchFile
-{
-    SPUXarDeltaArchive *archive = [[SPUXarDeltaArchive alloc] initWithPatchFileForReading:patchFile];
-    if (archive == nil) {
-        return NO;
-    }
-    
-    [archive getMajorDeltaVersion:outMajorDiffVersion minorDeltaVersion:outMinorDiffVersion beforeTreeHash:NULL afterTreeHash:NULL];
-    
-    return YES;
-}
-
 - (nullable instancetype)initWithPatchFileForWriting:(NSString *)patchFile
 {
     self = [super init];

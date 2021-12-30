@@ -191,9 +191,15 @@ static BOOL runVersionCommand(NSString *programName, NSArray *args)
         uint16_t majorDiffVersion = 0;
         uint16_t minorDiffVersion = 0;
         
-        BOOL retrievedInfo = [SPUXarDeltaArchive getMajorDeltaVersion:&majorDiffVersion minorDeltaVersion:&minorDiffVersion fromPatchFile:patchFile];
+        SPUXarDeltaArchive *archive = [[SPUXarDeltaArchive alloc] initWithPatchFileForReading:patchFile];
+        if (archive == nil) {
+            fprintf(stderr, "Unable to open patch %s\n", [patchFile fileSystemRepresentation]);
+            return NO;
+        }
         
-        if (!retrievedInfo) {
+        [archive getMajorDeltaVersion:&majorDiffVersion minorDeltaVersion:&minorDiffVersion beforeTreeHash:NULL afterTreeHash:NULL];
+        
+        if (majorDiffVersion < FIRST_DELTA_DIFF_MAJOR_VERSION) {
             fprintf(stderr, "Unable to retrieve version information from patch %s\n", [patchFile fileSystemRepresentation]);
             return NO;
         }

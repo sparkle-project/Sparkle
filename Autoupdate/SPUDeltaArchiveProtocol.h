@@ -25,8 +25,6 @@ typedef NS_ENUM(uint8_t, SPUDeltaFileAttributes) {
 
 @property (nonatomic, readonly, class) BOOL supportsSafeExtraction;
 
-+ (BOOL)getMajorDeltaVersion:(uint16_t *)outMajorDiffVersion minorDeltaVersion:(uint16_t *)outMinorDiffVersion fromPatchFile:(NSString *)patchFile;
-
 - (void)getMajorDeltaVersion:(nullable uint16_t *)outMajorDiffVersion minorDeltaVersion:(nullable uint16_t *)outMinorDiffVersion beforeTreeHash:(NSString * _Nullable __autoreleasing * _Nullable)outBeforeTreeHash afterTreeHash:(NSString * _Nullable __autoreleasing * _Nullable)outAfterTreeHash;
 
 - (BOOL)enumerateItems:(void (^)(const void *item, NSString *relativePath, SPUDeltaFileAttributes attributes, uint16_t permissions, BOOL *stop))itemHandler;
