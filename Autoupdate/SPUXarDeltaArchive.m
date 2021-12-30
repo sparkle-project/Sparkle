@@ -261,13 +261,19 @@ static xar_file_t _xarAddFile(NSMutableDictionary<NSString *, NSValue *> *fileTa
     for (xar_file_t file = xar_file_first(self.x, iter); file; file = xar_file_next(iter)) {
         char *pathCString;
 #if HAS_XAR_GET_SAFE_PATH
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunguarded-availability-new"
         if (xar_get_safe_path != NULL) {
             pathCString = xar_get_safe_path(file);
         }
+#pragma clang diagnostic pop
         else
 #endif
         {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
             pathCString = xar_get_path(file);
+#pragma clang diagnostic pop
         }
         
         if (pathCString == NULL) {
