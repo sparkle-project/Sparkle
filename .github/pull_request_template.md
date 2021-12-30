@@ -2,18 +2,12 @@
 
 Fixes # (issue)
 
-## Checklist:
+## Misc Checklist:
 
-- [ ] My change is being tested and reviewed against the Sparkle 2.x branch. New changes must be developed on the 2.x development branch first.
-- [ ] My change is being backported to master branch (Sparkle 1.x). Please create a separate pull request for 1.x, should it be backported. Note 1.x is feature frozen and is only taking bug fixes, localization updates, and critical OS adoption enhancements.
-- [ ] I have reviewed and commented my code, particularly in hard-to-understand areas.
+- [ ] My change requires a documentation update on [Sparkle's website repository](https://github.com/sparkle-project/sparkle-project.github.io)
+- [ ] My change requires changes to generate_appcast, generate_keys, or sign_update
 
-## Type of change
-
-- [ ] Bug fix (non-breaking change which fixes an issue)
-- [ ] New feature (non-breaking change which adds functionality)
-- [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)
-- [ ] My change is or requires a documentation or localization update
+Only bug fixes to regressions or security fixes are being backported to the 1.x (master) branch now. If you believe your change is significant enough to backport, please also create a separate pull request against the master branch.
 
 ## Testing
 
