@@ -16,4 +16,4 @@ assignees: ''
 
 ## Version
 
-[please specify versions of Sparkle this is applicable to; note new pull requests must be developed and landed in 2.x development branch first and the 1.x (master) branch is feature-frozen]
+[please specify versions of Sparkle this is applicable to; note the old 1.x (master) branch is only taking fixes to regressions and security fixes now.]
