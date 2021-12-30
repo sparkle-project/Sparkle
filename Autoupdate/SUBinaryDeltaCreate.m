@@ -21,7 +21,6 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <sys/xattr.h>
-#include <xar/xar.h>
 
 
 #include "AppKitPrevention.h"
