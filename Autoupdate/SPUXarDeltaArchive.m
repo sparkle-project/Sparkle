@@ -89,7 +89,8 @@ extern char *xar_get_safe_path(xar_file_t f) __attribute__((weak_import));
     }
 }
 
-+ (BOOL)supportsSafeExtraction
+// This indicates if safe extraction is available at compile time (SDK), but not if it's available at runtime.
++ (BOOL)maySupportSafeExtraction
 {
     return HAS_XAR_GET_SAFE_PATH;
 }
