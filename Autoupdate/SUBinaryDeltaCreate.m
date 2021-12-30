@@ -501,7 +501,7 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
         id value = [newTreeState valueForKey:key];
 
         if ([(NSObject *)value isEqual:[NSNull null]]) {
-            [archive addRelativeFilePath:key realFilePath:nil attributes:SPUDeltaFileAttributesDelete permissions:nil];
+            [archive addRelativeFilePath:key realFilePath:nil attributes:SPUDeltaFileAttributesDelete permissions:0];
 
             if (verbose) {
                 fprintf(stderr, "\n❌  %s %s", VERBOSE_REMOVED, [key fileSystemRepresentation]);
@@ -514,7 +514,7 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
         if (shouldSkipDeltaCompression(originalInfo, newInfo)) {
             if (shouldSkipExtracting(originalInfo, newInfo)) {
                 if (shouldChangePermissions(originalInfo, newInfo)) {
-                    [archive addRelativeFilePath:key realFilePath:nil attributes:SPUDeltaFileAttributesModifyPermissions permissions:(NSNumber *)newInfo[INFO_PERMISSIONS_KEY]];
+                    [archive addRelativeFilePath:key realFilePath:nil attributes:SPUDeltaFileAttributesModifyPermissions permissions:[(NSNumber *)newInfo[INFO_PERMISSIONS_KEY] unsignedShortValue]];
 
                     if (verbose) {
                         fprintf(stderr, "\n👮  %s %s (0%o -> 0%o)", VERBOSE_MODIFIED, [key fileSystemRepresentation], [(NSNumber *)originalInfo[INFO_PERMISSIONS_KEY] unsignedShortValue], [(NSNumber *)newInfo[INFO_PERMISSIONS_KEY] unsignedShortValue]);
@@ -525,7 +525,7 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
                 
                 SPUDeltaFileAttributes attributes = shouldDeleteThenExtract(originalInfo, newInfo) ? (SPUDeltaFileAttributesDelete | SPUDeltaFileAttributesExtract) : SPUDeltaFileAttributesExtract;
                 
-                [archive addRelativeFilePath:key realFilePath:path attributes:attributes permissions:nil];
+                [archive addRelativeFilePath:key realFilePath:path attributes:attributes permissions:0];
 
                 if (verbose) {
                     if (originalInfo) {
@@ -569,7 +569,7 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
         
         SPUDeltaFileAttributes attributes = (permissions != nil) ? (SPUDeltaFileAttributesBinaryDiff | SPUDeltaFileAttributesModifyPermissions) : SPUDeltaFileAttributesBinaryDiff;
         
-        [archive addRelativeFilePath:relativePath realFilePath:resultPath attributes:attributes permissions:permissions];
+        [archive addRelativeFilePath:relativePath realFilePath:resultPath attributes:attributes permissions:permissions.unsignedShortValue];
         
         unlink(resultPath.fileSystemRepresentation);
 

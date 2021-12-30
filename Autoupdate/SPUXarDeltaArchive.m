@@ -218,7 +218,7 @@ static xar_file_t _xarAddFile(NSMutableDictionary<NSString *, NSValue *> *fileTa
     return lastParent;
 }
 
-- (void)addRelativeFilePath:(NSString *)relativeFilePath realFilePath:(nullable NSString *)filePath attributes:(SPUDeltaFileAttributes)attributes permissions:(nullable NSNumber *)permissions
+- (void)addRelativeFilePath:(NSString *)relativeFilePath realFilePath:(nullable NSString *)filePath attributes:(SPUDeltaFileAttributes)attributes permissions:(uint16_t)permissions
 {
     xar_file_t newFile = _xarAddFile(self.fileTable, self.x, relativeFilePath, filePath);
     assert(newFile != NULL);
@@ -236,10 +236,7 @@ static xar_file_t _xarAddFile(NSMutableDictionary<NSString *, NSValue *> *fileTa
     }
     
     if ((attributes & SPUDeltaFileAttributesModifyPermissions) != 0) {
-        assert(permissions != nil);
-        if (permissions != nil) {
-            xar_prop_set(newFile, MODIFY_PERMISSIONS_KEY, [NSString stringWithFormat:@"%u", permissions.unsignedShortValue].UTF8String);
-        }
+        xar_prop_set(newFile, MODIFY_PERMISSIONS_KEY, [NSString stringWithFormat:@"%u", permissions].UTF8String);
     }
 }
 
