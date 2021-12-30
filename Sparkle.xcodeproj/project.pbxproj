@@ -218,6 +218,14 @@
 		725CB9571C7120410064365A /* SPUUserDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 725CB9561C7120410064365A /* SPUUserDriver.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		725CB95A1C7121830064365A /* SPUStandardUserDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 725CB9581C7121830064365A /* SPUStandardUserDriver.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		725CB95B1C7121830064365A /* SPUStandardUserDriver.m in Sources */ = {isa = PBXBuildFile; fileRef = 725CB9591C7121830064365A /* SPUStandardUserDriver.m */; };
+		725EE480277BF13B00D820CE /* SPUXarDeltaArchive.m in Sources */ = {isa = PBXBuildFile; fileRef = 725EE47F277BF13B00D820CE /* SPUXarDeltaArchive.m */; };
+		725EE482277BF44A00D820CE /* SPUXarDeltaArchive.m in Sources */ = {isa = PBXBuildFile; fileRef = 725EE47F277BF13B00D820CE /* SPUXarDeltaArchive.m */; };
+		725EE483277C767A00D820CE /* SPUXarDeltaArchive.m in Sources */ = {isa = PBXBuildFile; fileRef = 725EE47F277BF13B00D820CE /* SPUXarDeltaArchive.m */; };
+		725EE486277D375F00D820CE /* SPUDeltaArchive.m in Sources */ = {isa = PBXBuildFile; fileRef = 725EE485277D375F00D820CE /* SPUDeltaArchive.m */; };
+		725EE487277D376000D820CE /* SPUDeltaArchive.m in Sources */ = {isa = PBXBuildFile; fileRef = 725EE485277D375F00D820CE /* SPUDeltaArchive.m */; };
+		725EE488277D398100D820CE /* SPUDeltaArchive.m in Sources */ = {isa = PBXBuildFile; fileRef = 725EE485277D375F00D820CE /* SPUDeltaArchive.m */; };
+		725EE489277D39B400D820CE /* SPUDeltaArchive.m in Sources */ = {isa = PBXBuildFile; fileRef = 725EE485277D375F00D820CE /* SPUDeltaArchive.m */; };
+		725EE48A277D39B400D820CE /* SPUXarDeltaArchive.m in Sources */ = {isa = PBXBuildFile; fileRef = 725EE47F277BF13B00D820CE /* SPUXarDeltaArchive.m */; };
 		725F97771C8A62F500265BE4 /* SUAdHocCodeSigning.m in Sources */ = {isa = PBXBuildFile; fileRef = 725F97751C8A62F500265BE4 /* SUAdHocCodeSigning.m */; };
 		725F97781C8A65AC00265BE4 /* SUAdHocCodeSigning.m in Sources */ = {isa = PBXBuildFile; fileRef = 725F97751C8A62F500265BE4 /* SUAdHocCodeSigning.m */; };
 		725F97841C8AA90000265BE4 /* SUPopUpTitlebarUserDriver.m in Sources */ = {isa = PBXBuildFile; fileRef = 725F97831C8AA90000265BE4 /* SUPopUpTitlebarUserDriver.m */; };
@@ -1132,6 +1140,11 @@
 		725CB9581C7121830064365A /* SPUStandardUserDriver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPUStandardUserDriver.h; sourceTree = "<group>"; };
 		725CB9591C7121830064365A /* SPUStandardUserDriver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SPUStandardUserDriver.m; sourceTree = "<group>"; };
 		725DED72263D10C400E7FA8F /* SUAppcast+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SUAppcast+Private.h"; sourceTree = "<group>"; };
+		725EE47E277BF13A00D820CE /* SPUXarDeltaArchive.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SPUXarDeltaArchive.h; path = Autoupdate/SPUXarDeltaArchive.h; sourceTree = SOURCE_ROOT; };
+		725EE47F277BF13B00D820CE /* SPUXarDeltaArchive.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SPUXarDeltaArchive.m; path = Autoupdate/SPUXarDeltaArchive.m; sourceTree = SOURCE_ROOT; };
+		725EE481277BF17A00D820CE /* SPUDeltaArchiveProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SPUDeltaArchiveProtocol.h; path = Autoupdate/SPUDeltaArchiveProtocol.h; sourceTree = SOURCE_ROOT; };
+		725EE484277D375F00D820CE /* SPUDeltaArchive.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SPUDeltaArchive.h; path = Autoupdate/SPUDeltaArchive.h; sourceTree = SOURCE_ROOT; };
+		725EE485277D375F00D820CE /* SPUDeltaArchive.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SPUDeltaArchive.m; path = Autoupdate/SPUDeltaArchive.m; sourceTree = SOURCE_ROOT; };
 		725F97741C8A62F500265BE4 /* SUAdHocCodeSigning.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUAdHocCodeSigning.h; sourceTree = "<group>"; };
 		725F97751C8A62F500265BE4 /* SUAdHocCodeSigning.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUAdHocCodeSigning.m; sourceTree = "<group>"; };
 		725F97821C8AA90000265BE4 /* SUPopUpTitlebarUserDriver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUPopUpTitlebarUserDriver.h; sourceTree = "<group>"; };
@@ -1760,6 +1773,11 @@
 				7267E5711D3D895B00D1BF90 /* SUBinaryDeltaCommon.m */,
 				7267E5721D3D895B00D1BF90 /* SUBinaryDeltaCreate.h */,
 				7267E5731D3D895B00D1BF90 /* SUBinaryDeltaCreate.m */,
+				725EE481277BF17A00D820CE /* SPUDeltaArchiveProtocol.h */,
+				725EE484277D375F00D820CE /* SPUDeltaArchive.h */,
+				725EE485277D375F00D820CE /* SPUDeltaArchive.m */,
+				725EE47E277BF13A00D820CE /* SPUXarDeltaArchive.h */,
+				725EE47F277BF13B00D820CE /* SPUXarDeltaArchive.m */,
 				7267E5741D3D895B00D1BF90 /* SUBinaryDeltaTool.m */,
 				7267E57D1D3D896700D1BF90 /* SUBinaryDeltaUnarchiver.h */,
 				7267E57E1D3D896700D1BF90 /* SUBinaryDeltaUnarchiver.m */,
@@ -3154,7 +3172,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				725EE482277BF44A00D820CE /* SPUXarDeltaArchive.m in Sources */,
 				7267E5761D3D895B00D1BF90 /* SUBinaryDeltaApply.m in Sources */,
+				725EE487277D376000D820CE /* SPUDeltaArchive.m in Sources */,
 				7267E5781D3D895B00D1BF90 /* SUBinaryDeltaCommon.m in Sources */,
 				7267E57A1D3D895B00D1BF90 /* SUBinaryDeltaCreate.m in Sources */,
 				7267E57C1D3D895B00D1BF90 /* SUBinaryDeltaTool.m in Sources */,
@@ -3168,6 +3188,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				725EE488277D398100D820CE /* SPUDeltaArchive.m in Sources */,
+				725EE483277C767A00D820CE /* SPUXarDeltaArchive.m in Sources */,
 				7269E4982648D3460088C213 /* SPUSkippedUpdate.m in Sources */,
 				721D5ABC25C680A300D23BEA /* SUFlatPackageUnarchiver.m in Sources */,
 				725F97771C8A62F500265BE4 /* SUAdHocCodeSigning.m in Sources */,
@@ -3218,6 +3240,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				725EE489277D39B400D820CE /* SPUDeltaArchive.m in Sources */,
+				725EE48A277D39B400D820CE /* SPUXarDeltaArchive.m in Sources */,
 				721D5B1B25C692BB00D23BEA /* SUFlatPackageUnarchiver.m in Sources */,
 				72464F7C1E2097F600FB341C /* SUOperatingSystem.m in Sources */,
 				7205C44C1E1304CE00E370AE /* Appcast.swift in Sources */,
@@ -3346,6 +3370,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				725EE480277BF13B00D820CE /* SPUXarDeltaArchive.m in Sources */,
 				72EF30C42675CFA1008CE987 /* SPUAppcastItemState.m in Sources */,
 				72EF30C52675CFA1008CE987 /* SPUAppcastItemStateResolver.m in Sources */,
 				72464F701E1F31E000FB341C /* SUOperatingSystem.m in Sources */,
@@ -3359,6 +3384,7 @@
 				7267E5CD1D3D8C7200D1BF90 /* SPUSecureCoding.m in Sources */,
 				7267E5CB1D3D8C6400D1BF90 /* SUAppcastItem.m in Sources */,
 				7267E5751D3D895B00D1BF90 /* SUBinaryDeltaApply.m in Sources */,
+				725EE486277D375F00D820CE /* SPUDeltaArchive.m in Sources */,
 				7267E5771D3D895B00D1BF90 /* SUBinaryDeltaCommon.m in Sources */,
 				7267E5791D3D895B00D1BF90 /* SUBinaryDeltaCreate.m in Sources */,
 				7267E57F1D3D896700D1BF90 /* SUBinaryDeltaUnarchiver.m in Sources */,

@@ -356,19 +356,9 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
 }
 
 // Make sure old version patches still work for simple cases
-- (void)testRegularFileAddedWithAzureVersion
+- (void)testRegularFileAddedWithVersion1Delta
 {
-    XCTAssertTrue([self createAndApplyPatchUsingVersion:SUBinaryDeltaMajorVersion1 beforeDiffHandler:^(NSFileManager *__unused fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
-        NSString *sourceFile = [sourceDirectory stringByAppendingPathComponent:@"A"];
-        NSString *destinationFile = [destinationDirectory stringByAppendingPathComponent:@"A"];
-        NSString *destinationFile2 = [destinationDirectory stringByAppendingPathComponent:@"B"];
-        
-        XCTAssertTrue([[NSData data] writeToFile:sourceFile atomically:YES]);
-        XCTAssertTrue([[NSData dataWithBytes:"loltest" length:7] writeToFile:destinationFile atomically:YES]);
-        XCTAssertTrue([[NSData dataWithBytes:"lol" length:3] writeToFile:destinationFile2 atomically:YES]);
-        
-        XCTAssertFalse([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
-    } afterDiffHandler:nil]);
+    XCTAssertFalse([self createAndApplyPatchUsingVersion:SUBinaryDeltaMajorVersion1 beforeDiffHandler:nil afterDiffHandler:nil]);
 }
 
 - (void)testDirectoryAdded
