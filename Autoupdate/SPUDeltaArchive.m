@@ -15,6 +15,8 @@
 
 #include "AppKitPrevention.h"
 
+SPUDeltaCompressionMode SPUDeltaCompressionModeDefault = SPUDeltaCompressionModeBzip2;
+
 id<SPUDeltaArchiveProtocol> _Nullable SPUDeltaArchiveForReading(NSString *patchFile)
 {
     id<SPUDeltaArchiveProtocol> sparkleArchive = [[SPUSparkleDeltaArchive alloc] initWithPatchFileForReading:patchFile];

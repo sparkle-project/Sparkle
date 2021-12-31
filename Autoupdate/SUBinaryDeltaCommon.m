@@ -19,6 +19,8 @@
 
 #include "AppKitPrevention.h"
 
+SUBinaryDeltaMajorVersion SUBinaryDeltaMajorVersionDefault = SUBinaryDeltaMajorVersion2;
+
 int compareFiles(const FTSENT **a, const FTSENT **b)
 {
     return strcoll((*a)->fts_name, (*b)->fts_name);

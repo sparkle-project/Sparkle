@@ -73,7 +73,7 @@ static BOOL runCreateCommand(NSString *programName, NSArray<NSString *> *args)
 
     SUBinaryDeltaMajorVersion patchVersion =
         !versionComponents ?
-        DEFAULT_DELTA_DIFF_MAJOR_VERSION :
+        SUBinaryDeltaMajorVersionDefault :
         (SUBinaryDeltaMajorVersion)[[versionComponents[1] componentsSeparatedByString:@"."][0] intValue]; // ignore minor version if provided
 
     if (patchVersion < FIRST_DELTA_DIFF_MAJOR_VERSION) {
@@ -125,7 +125,7 @@ static BOOL runCreateCommand(NSString *programName, NSArray<NSString *> *args)
     SPUDeltaCompressionMode compression;
     const char *compressionEnv = getenv("SPARKLE_DELTA_COMPRESSION");
     if (compressionEnv == NULL) {
-        compression = DEFAULT_COMPRESSION_MODE;
+        compression = SPUDeltaCompressionModeDefault;
     } else if (strcmp(compressionEnv, "bzip2") == 0) {
         compression = SPUDeltaCompressionModeBzip2;
     } else {

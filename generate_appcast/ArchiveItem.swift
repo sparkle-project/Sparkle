@@ -27,7 +27,7 @@ class DeltaUpdate {
     class func create(from: ArchiveItem, to: ArchiveItem, archivePath: URL) throws -> DeltaUpdate {
         var applyDiffError: NSError?
 
-        if !createBinaryDelta(from.appPath.path, to.appPath.path, archivePath.path, .version2, .bzip2, DEFAULT_COMPRESSION_LEVEL_FOR_DEFAULT_COMPRESSION_MODE, false, &applyDiffError) {
+        if !createBinaryDelta(from.appPath.path, to.appPath.path, archivePath.path, SUBinaryDeltaMajorVersionDefault, SPUDeltaCompressionModeDefault, DEFAULT_COMPRESSION_LEVEL_FOR_DEFAULT_COMPRESSION_MODE, false, &applyDiffError) {
             throw applyDiffError!
         }
 
