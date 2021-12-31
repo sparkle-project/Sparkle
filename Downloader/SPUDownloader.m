@@ -159,9 +159,18 @@ static NSString *SUDownloadingReason = @"Downloading update related file";
     });
 }
 
-- (void)URLSession:(NSURLSession *)__unused session downloadTask:(NSURLSessionDownloadTask *)__unused downloadTask didFinishDownloadingToURL:(NSURL *)location
+- (void)URLSession:(NSURLSession *)__unused session downloadTask:(NSURLSessionDownloadTask *) downloadTask didFinishDownloadingToURL:(NSURL *)location
 {
-    if (self.mode == SPUDownloadModeTemporary)
+    int statusCode = (int)((NSHTTPURLResponse*)downloadTask.response).statusCode;
+    if ((statusCode < 200) || (statusCode >= 400))
+    {
+        NSString *message = [NSHTTPURLResponse localizedStringForStatusCode:statusCode];
+        if ( message == nil )
+            message = [NSString stringWithFormat: @"(%d)", statusCode];
+        NSError *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUDownloadError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"A network error occurred while downloading the update. %@", message] }];
+        [self.delegate downloaderDidFailWithError:error];
+    }
+    else if (self.mode == SPUDownloadModeTemporary)
     {
         self.downloadFilename = location.path;
         [self downloadDidFinish]; // file is already in a system temp dir
