@@ -91,15 +91,6 @@ static NSDictionary *infoForFile(FTSENT *ent)
               INFO_SIZE_KEY: @(size) };
 }
 
-static bool isSymLink(const FTSENT *ent)
-{
-    if (ent->fts_info == FTS_SL)
-    {
-        return (true);
-    }
-    return false;
-}
-
 static bool aclExists(const FTSENT *ent)
 {
     // macOS does not currently support ACLs for symlinks
