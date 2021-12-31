@@ -306,13 +306,13 @@
     {
         uint64_t currentItemIndex = 0;
         while (YES) {
-            SPUDeltaFileAttributes attributes = 0;
-            if (![self _readBuffer:&attributes length:sizeof(attributes)]) {
+            SPUDeltaItemCommands commands = 0;
+            if (![self _readBuffer:&commands length:sizeof(commands)]) {
                 break;
             }
             
             // Test if we've reached the end marker
-            if (attributes == 0) {
+            if (commands == 0) {
                 break;
             }
             
@@ -320,7 +320,7 @@
             uint16_t decodedMode = 0;
             uint64_t decodedDataLength = 0;
             
-            if ((attributes & SPUDeltaFileAttributesExtract) != 0 || (attributes & SPUDeltaFileAttributesBinaryDiff) != 0) {
+            if ((commands & SPUDeltaItemCommandExtract) != 0 || (commands & SPUDeltaItemCommandBinaryDiff) != 0) {
                 if (![self _readBuffer:&decodedMode length:sizeof(decodedMode)]) {
                     break;
                 }
@@ -332,14 +332,14 @@
                         break;
                     }
                 }
-            } else if ((attributes & SPUDeltaFileAttributesModifyPermissions) != 0) {
+            } else if ((commands & SPUDeltaItemCommandModifyPermissions) != 0) {
                 // Decode file permissions
                 if (![self _readBuffer:&decodedMode length:sizeof(decodedMode)]) {
                     break;
                 }
             }
             
-            SPUDeltaArchiveItem *archiveItem = [[SPUDeltaArchiveItem alloc] initWithRelativeFilePath:relativeFilePaths[currentItemIndex] attributes:attributes permissions:decodedMode];
+            SPUDeltaArchiveItem *archiveItem = [[SPUDeltaArchiveItem alloc] initWithRelativeFilePath:relativeFilePaths[currentItemIndex] commands:commands permissions:decodedMode];
             
             archiveItem.codedDataLength = decodedDataLength;
             
@@ -370,19 +370,19 @@
     NSString *physicalFilePath = item.physicalFilePath;
     assert(physicalFilePath != nil);
     
-    SPUDeltaFileAttributes attributes = item.attributes;
-    assert((attributes & SPUDeltaFileAttributesExtract) != 0 || (attributes & SPUDeltaFileAttributesBinaryDiff) != 0);
+    SPUDeltaItemCommands commands = item.commands;
+    assert((commands & SPUDeltaItemCommandExtract) != 0 || (commands & SPUDeltaItemCommandBinaryDiff) != 0);
     
     uint16_t mode = item.permissions;
     
     NSFileManager *fileManager = [NSFileManager defaultManager];
-    if ((attributes & SPUDeltaFileAttributesBinaryDiff) != 0 || S_ISREG(mode) || S_ISLNK(mode)) {
+    if ((commands & SPUDeltaItemCommandBinaryDiff) != 0 || S_ISREG(mode) || S_ISLNK(mode)) {
         // Handle regular files
         // Binary diffs are always on regular files only
         
         uint64_t decodedLength = item.codedDataLength;
         
-        if ((attributes & SPUDeltaFileAttributesBinaryDiff) != 0 || S_ISREG(mode)) {
+        if ((commands & SPUDeltaItemCommandBinaryDiff) != 0 || S_ISREG(mode)) {
             // Regular files
             
             const char *physicalFilePathString = physicalFilePath.fileSystemRepresentation;
@@ -572,14 +572,14 @@
     
     // Encode the items
     for (SPUDeltaArchiveItem *item in writableItems) {
-        // Store attributes
-        SPUDeltaFileAttributes attributes = item.attributes;
-        if (![self _writeBuffer:&attributes length:sizeof(attributes)]) {
+        // Store commands
+        SPUDeltaItemCommands commands = item.commands;
+        if (![self _writeBuffer:&commands length:sizeof(commands)]) {
             break;
         }
         
         // Check if we need to encode additional data
-        if ((attributes & SPUDeltaFileAttributesExtract) != 0 || (attributes & SPUDeltaFileAttributesBinaryDiff) != 0) {
+        if ((commands & SPUDeltaItemCommandExtract) != 0 || (commands & SPUDeltaItemCommandBinaryDiff) != 0) {
             NSString *physicalPath = item.physicalFilePath;
             assert(physicalPath != nil);
             
@@ -593,7 +593,7 @@
             item.originalMode = originalMode;
             
             uint16_t encodedMode;
-            if ((attributes & SPUDeltaFileAttributesModifyPermissions) != 0) {
+            if ((commands & SPUDeltaItemCommandModifyPermissions) != 0) {
                 uint16_t permissions = item.permissions;
                 encodedMode = (originalMode & ~PERMISSION_FLAGS) | permissions;
             } else {
@@ -615,7 +615,7 @@
                 
                 item.codedDataLength = dataLength;
             }
-        } else if ((attributes & SPUDeltaFileAttributesModifyPermissions) != 0) {
+        } else if ((commands & SPUDeltaItemCommandModifyPermissions) != 0) {
             // Store file permissions
             uint16_t permissions = item.permissions;
             if (![self _writeBuffer:&permissions length:sizeof(permissions)]) {
@@ -629,15 +629,15 @@
     }
     
     // Encode end marker
-    SPUDeltaFileAttributes endAttributes = 0;
-    if (![self _writeBuffer:&endAttributes length:sizeof(endAttributes)]) {
+    SPUDeltaItemCommands endCommand = 0;
+    if (![self _writeBuffer:&endCommand length:sizeof(endCommand)]) {
         return;
     }
     
     // Encode all of our file contents
     for (SPUDeltaArchiveItem *item in writableItems) {
-        SPUDeltaFileAttributes attributes = item.attributes;
-        if ((attributes & SPUDeltaFileAttributesExtract) != 0 || (attributes & SPUDeltaFileAttributesBinaryDiff) != 0) {
+        SPUDeltaItemCommands commands = item.commands;
+        if ((commands & SPUDeltaItemCommandExtract) != 0 || (commands & SPUDeltaItemCommandBinaryDiff) != 0) {
             NSString *physicalPath = item.physicalFilePath;
             assert(physicalPath != nil);
             

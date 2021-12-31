@@ -227,25 +227,25 @@ static xar_file_t _xarAddFile(NSMutableDictionary<NSString *, NSValue *> *fileTa
 {
     NSString *relativeFilePath = item.relativeFilePath;
     NSString *filePath = item.physicalFilePath;
-    SPUDeltaFileAttributes attributes = item.attributes;
+    SPUDeltaItemCommands commands = item.commands;
     uint16_t permissions = item.permissions;
     
     xar_file_t newFile = _xarAddFile(self.fileTable, self.x, relativeFilePath, filePath);
     assert(newFile != NULL);
     
-    if ((attributes & SPUDeltaFileAttributesDelete) != 0) {
+    if ((commands & SPUDeltaItemCommandDelete) != 0) {
         xar_prop_set(newFile, DELETE_KEY, "true");
     }
     
-    if ((attributes & SPUDeltaFileAttributesExtract) != 0) {
+    if ((commands & SPUDeltaItemCommandExtract) != 0) {
         xar_prop_set(newFile, EXTRACT_KEY, "true");
     }
     
-    if ((attributes & SPUDeltaFileAttributesBinaryDiff) != 0) {
+    if ((commands & SPUDeltaItemCommandBinaryDiff) != 0) {
         xar_prop_set(newFile, BINARY_DELTA_KEY, "true");
     }
     
-    if ((attributes & SPUDeltaFileAttributesModifyPermissions) != 0) {
+    if ((commands & SPUDeltaItemCommandModifyPermissions) != 0) {
         xar_prop_set(newFile, MODIFY_PERMISSIONS_KEY, [NSString stringWithFormat:@"%u", permissions].UTF8String);
     }
     
@@ -287,23 +287,23 @@ static xar_file_t _xarAddFile(NSMutableDictionary<NSString *, NSValue *> *fileTa
         
         NSString *relativePath = @(pathCString);
         
-        SPUDeltaFileAttributes attributes = 0;
+        SPUDeltaItemCommands commands = 0;
         {
             const char *value = NULL;
             if (xar_prop_get(file, DELETE_KEY, &value) == 0) {
-                attributes |= SPUDeltaFileAttributesDelete;
+                commands |= SPUDeltaItemCommandDelete;
             }
         }
         {
             const char *value = NULL;
             if (xar_prop_get(file, BINARY_DELTA_KEY, &value) == 0) {
-                attributes |= SPUDeltaFileAttributesBinaryDiff;
+                commands |= SPUDeltaItemCommandBinaryDiff;
             }
         }
         {
             const char *value = NULL;
             if (xar_prop_get(file, EXTRACT_KEY, &value) == 0) {
-                attributes |= SPUDeltaFileAttributesExtract;
+                commands |= SPUDeltaItemCommandExtract;
             }
         }
         
@@ -311,12 +311,12 @@ static xar_file_t _xarAddFile(NSMutableDictionary<NSString *, NSValue *> *fileTa
         {
             const char *value = NULL;
             if (xar_prop_get(file, MODIFY_PERMISSIONS_KEY, &value) == 0) {
-                attributes |= SPUDeltaFileAttributesModifyPermissions;
+                commands |= SPUDeltaItemCommandModifyPermissions;
                 permissions = (uint16_t)[@(value) intValue];
             }
         }
         
-        SPUDeltaArchiveItem *item = [[SPUDeltaArchiveItem alloc] initWithRelativeFilePath:relativePath attributes:attributes permissions:permissions];
+        SPUDeltaArchiveItem *item = [[SPUDeltaArchiveItem alloc] initWithRelativeFilePath:relativePath commands:commands permissions:permissions];
         item.context = file;
         
         itemHandler(item, &exitedEarly);

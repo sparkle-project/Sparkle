@@ -199,8 +199,8 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
         
         // Files that have no property set that we check for will get ignored
         // This is important because they aren't part of the delta, just part of the directory structure
-        SPUDeltaFileAttributes attributes = item.attributes;
-        if ((attributes & SPUDeltaFileAttributesDelete) != 0) {
+        SPUDeltaItemCommands commands = item.commands;
+        if ((commands & SPUDeltaItemCommandDelete) != 0) {
             if (!removeTree(destinationFilePath)) {
                 if (verbose) {
                     fprintf(stderr, "\n");
@@ -215,7 +215,7 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
             removedFile = YES;
         }
 
-        if ((attributes & SPUDeltaFileAttributesBinaryDiff) != 0) {
+        if ((commands & SPUDeltaItemCommandBinaryDiff) != 0) {
             if (!applyBinaryDeltaToFile(archive, item, sourceFilePath, destinationFilePath)) {
                 if (verbose) {
                     fprintf(stderr, "\n");
@@ -230,7 +230,7 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
             if (verbose) {
                 fprintf(stderr, "\n🔨  %s %s", VERBOSE_PATCHED, [relativePath fileSystemRepresentation]);
             }
-        } else if ((attributes & SPUDeltaFileAttributesExtract) != 0) { // extract and permission modifications don't coexist
+        } else if ((commands & SPUDeltaItemCommandExtract) != 0) { // extract and permission modifications don't coexist
             item.physicalFilePath = destinationFilePath;
             if (![archive extractItem:item]) {
                 if (verbose) {
@@ -254,7 +254,7 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
             fprintf(stderr, "\n❌  %s %s", VERBOSE_DELETED, [relativePath fileSystemRepresentation]);
         }
 
-        if ((attributes & SPUDeltaFileAttributesModifyPermissions) != 0) {
+        if ((commands & SPUDeltaItemCommandModifyPermissions) != 0) {
             mode_t mode = (mode_t)item.permissions;
             if (!modifyPermissions(destinationFilePath, mode)) {
                 if (verbose) {

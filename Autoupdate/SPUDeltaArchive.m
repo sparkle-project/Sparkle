@@ -34,19 +34,19 @@ id<SPUDeltaArchiveProtocol> _Nullable SPUDeltaArchiveForReading(NSString *patchF
 
 @synthesize relativeFilePath = _relativeFilePath;
 @synthesize physicalFilePath = _physicalFilePath;
-@synthesize attributes = _attributes;
+@synthesize commands = _commands;
 @synthesize permissions = _permissions;
 @synthesize context = _context;
 @synthesize originalMode = _originalMode;
 @synthesize codedDataLength = _codedDataLength;
 @synthesize encodedCompletionHandler = _encodedCompletionHandler;
 
-- (instancetype)initWithRelativeFilePath:(NSString *)relativeFilePath attributes:(SPUDeltaFileAttributes)attributes permissions:(uint16_t)permissions
+- (instancetype)initWithRelativeFilePath:(NSString *)relativeFilePath commands:(SPUDeltaItemCommands)commands permissions:(uint16_t)permissions
 {
     self = [super init];
     if (self != nil) {
         _relativeFilePath = [relativeFilePath copy];
-        _attributes = attributes;
+        _commands = commands;
         _permissions = permissions;
     }
     return self;

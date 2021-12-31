@@ -493,7 +493,7 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
         id value = [newTreeState valueForKey:key];
 
         if ([(NSObject *)value isEqual:[NSNull null]]) {
-            [archive addItem:[[SPUDeltaArchiveItem alloc] initWithRelativeFilePath:key attributes:SPUDeltaFileAttributesDelete permissions:0]];
+            [archive addItem:[[SPUDeltaArchiveItem alloc] initWithRelativeFilePath:key commands:SPUDeltaItemCommandDelete permissions:0]];
 
             if (verbose) {
                 fprintf(stderr, "\n❌  %s %s", VERBOSE_REMOVED, [key fileSystemRepresentation]);
@@ -506,7 +506,7 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
         if (shouldSkipDeltaCompression(originalInfo, newInfo)) {
             if (shouldSkipExtracting(originalInfo, newInfo)) {
                 if (shouldChangePermissions(originalInfo, newInfo)) {
-                    [archive addItem:[[SPUDeltaArchiveItem alloc] initWithRelativeFilePath:key attributes:SPUDeltaFileAttributesModifyPermissions permissions:[(NSNumber *)newInfo[INFO_PERMISSIONS_KEY] unsignedShortValue]]];
+                    [archive addItem:[[SPUDeltaArchiveItem alloc] initWithRelativeFilePath:key commands:SPUDeltaItemCommandModifyPermissions permissions:[(NSNumber *)newInfo[INFO_PERMISSIONS_KEY] unsignedShortValue]]];
 
                     if (verbose) {
                         fprintf(stderr, "\n👮  %s %s (0%o -> 0%o)", VERBOSE_MODIFIED, [key fileSystemRepresentation], [(NSNumber *)originalInfo[INFO_PERMISSIONS_KEY] unsignedShortValue], [(NSNumber *)newInfo[INFO_PERMISSIONS_KEY] unsignedShortValue]);
@@ -515,9 +515,9 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
             } else {
                 NSString *path = [destination stringByAppendingPathComponent:key];
                 
-                SPUDeltaFileAttributes attributes = shouldDeleteThenExtract(originalInfo, newInfo, majorVersion) ? (SPUDeltaFileAttributesDelete | SPUDeltaFileAttributesExtract) : SPUDeltaFileAttributesExtract;
+                SPUDeltaItemCommands commands = shouldDeleteThenExtract(originalInfo, newInfo, majorVersion) ? (SPUDeltaItemCommandDelete | SPUDeltaItemCommandExtract) : SPUDeltaItemCommandExtract;
                 
-                SPUDeltaArchiveItem *item = [[SPUDeltaArchiveItem alloc] initWithRelativeFilePath:key attributes:attributes permissions:0];
+                SPUDeltaArchiveItem *item = [[SPUDeltaArchiveItem alloc] initWithRelativeFilePath:key commands:commands permissions:0];
                 item.physicalFilePath = path;
                 
                 [archive addItem:item];
@@ -562,9 +562,9 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
         NSNumber *permissions = operation.permissions;
         NSString *relativePath = operation.relativePath;
         
-        SPUDeltaFileAttributes attributes = (permissions != nil) ? (SPUDeltaFileAttributesBinaryDiff | SPUDeltaFileAttributesModifyPermissions) : SPUDeltaFileAttributesBinaryDiff;
+        SPUDeltaItemCommands commands = (permissions != nil) ? (SPUDeltaItemCommandBinaryDiff | SPUDeltaItemCommandModifyPermissions) : SPUDeltaItemCommandBinaryDiff;
         
-        SPUDeltaArchiveItem *item = [[SPUDeltaArchiveItem alloc] initWithRelativeFilePath:relativePath attributes:attributes permissions:permissions.unsignedShortValue];
+        SPUDeltaArchiveItem *item = [[SPUDeltaArchiveItem alloc] initWithRelativeFilePath:relativePath commands:commands permissions:permissions.unsignedShortValue];
         item.physicalFilePath = resultPath;
         
         item.encodedCompletionHandler = ^{

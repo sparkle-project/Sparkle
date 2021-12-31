@@ -13,11 +13,11 @@ NS_ASSUME_NONNULL_BEGIN
 // Attributes for an item we extract/write to the archive
 
 // Note: BinaryDiff cannot coexist together with Delete
-typedef NS_ENUM(uint8_t, SPUDeltaFileAttributes) {
-    SPUDeltaFileAttributesDelete = (1u << 0),
-    SPUDeltaFileAttributesExtract = (1u << 1),
-    SPUDeltaFileAttributesModifyPermissions = (1u << 2),
-    SPUDeltaFileAttributesBinaryDiff = (1u << 3),
+typedef NS_ENUM(uint8_t, SPUDeltaItemCommands) {
+    SPUDeltaItemCommandDelete = (1u << 0),
+    SPUDeltaItemCommandExtract = (1u << 1),
+    SPUDeltaItemCommandModifyPermissions = (1u << 2),
+    SPUDeltaItemCommandBinaryDiff = (1u << 3),
 };
 
 // Compression mode to use during patch creation
@@ -46,11 +46,11 @@ extern SPUDeltaCompressionMode SPUDeltaCompressionModeDefault;
 // Represents an item we read or write to in our delta archive
 @interface SPUDeltaArchiveItem : NSObject
 
-- (instancetype)initWithRelativeFilePath:(NSString *)relativeFilePath attributes:(SPUDeltaFileAttributes)attributes permissions:(uint16_t)permissions;
+- (instancetype)initWithRelativeFilePath:(NSString *)relativeFilePath commands:(SPUDeltaItemCommands)commands permissions:(uint16_t)permissions;
 
 @property (nonatomic, readonly) NSString *relativeFilePath;
 @property (nonatomic, nullable) NSString *physicalFilePath;
-@property (nonatomic, readonly) SPUDeltaFileAttributes attributes;
+@property (nonatomic, readonly) SPUDeltaItemCommands commands;
 @property (nonatomic, readonly) uint16_t permissions;
 @property (nonatomic, nullable, copy) void (^encodedCompletionHandler)(void);
 
