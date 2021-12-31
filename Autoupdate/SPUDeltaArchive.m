@@ -36,7 +36,7 @@ id<SPUDeltaArchiveProtocol> _Nullable SPUDeltaArchiveForReading(NSString *patchF
 @synthesize permissions = _permissions;
 @synthesize context = _context;
 @synthesize originalMode = _originalMode;
-@synthesize decodedDataLength = _decodedDataLength;
+@synthesize codedDataLength = _codedDataLength;
 @synthesize encodedCompletionHandler = _encodedCompletionHandler;
 
 - (instancetype)initWithRelativeFilePath:(NSString *)relativeFilePath attributes:(SPUDeltaFileAttributes)attributes permissions:(uint16_t)permissions

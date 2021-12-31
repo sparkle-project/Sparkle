@@ -46,7 +46,7 @@ typedef NS_ENUM(uint8_t, SPUDeltaFileAttributes) {
 // Private properties
 @property (nonatomic, nullable) const void *context;
 @property (nonatomic) uint16_t originalMode;
-@property (nonatomic) uint64_t decodedDataLength;
+@property (nonatomic) uint64_t codedDataLength;
 
 @end
 

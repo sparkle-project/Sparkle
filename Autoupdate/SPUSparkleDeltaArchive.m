@@ -10,13 +10,13 @@
 #import <bzlib.h>
 #import <sys/stat.h>
 #import <CommonCrypto/CommonDigest.h>
+#import "SUBinaryDeltaCommon.h"
 
 
 #include "AppKitPrevention.h"
 
-#define SPARKLE_FORMAT_MAGIC "spk!"
-
-#define PERMISSION_FLAGS (S_IRWXU | S_IRWXG | S_IRWXO | S_ISUID | S_ISGID | S_ISVTX)
+#define SPARKLE_DELTA_FORMAT_MAGIC "spk!"
+#define PARTIAL_IO_CHUNK_SIZE 16384 // this must be >= PATH_MAX
 
 typedef NS_ENUM(uint8_t, SPUDeltaCompressionMode) {
     SPUDeltaCompressionModeNone = 0,
@@ -59,7 +59,7 @@ typedef NS_ENUM(uint8_t, SPUDeltaCompressionMode) {
             return nil;
         }
         
-        char magic[] = SPARKLE_FORMAT_MAGIC;
+        char magic[] = SPARKLE_DELTA_FORMAT_MAGIC;
         if (fwrite(magic, sizeof(magic) - 1, 1, file) < 1) {
             NSLog(@"Failed to write magic");
             fclose(file);
@@ -112,7 +112,7 @@ typedef NS_ENUM(uint8_t, SPUDeltaCompressionMode) {
             return nil;
         }
         
-        if (strncmp(magic, SPARKLE_FORMAT_MAGIC, sizeof(magic) - 1) != 0) {
+        if (strncmp(magic, SPARKLE_DELTA_FORMAT_MAGIC, sizeof(magic) - 1) != 0) {
             fclose(_file);
             return nil;
         }
@@ -176,7 +176,7 @@ typedef NS_ENUM(uint8_t, SPUDeltaCompressionMode) {
     }
 }
 
-- (BOOL)_readBuffer:(void *)buffer length:(size_t)length
+- (BOOL)_readBuffer:(void *)buffer length:(int32_t)length
 {
     if (self.errorDetected) {
         return NO;
@@ -184,7 +184,7 @@ typedef NS_ENUM(uint8_t, SPUDeltaCompressionMode) {
     
     switch (self.compression) {
         case SPUDeltaCompressionModeNone: {
-            if (fread(buffer, length, 1, self.file) < 1) {
+            if (fread(buffer, (size_t)length, 1, self.file) < 1) {
                 self.errorDetected = YES;
                 return NO;
             } else {
@@ -193,12 +193,12 @@ typedef NS_ENUM(uint8_t, SPUDeltaCompressionMode) {
         }
         case SPUDeltaCompressionModeBzip2: {
             int bzerror = 0;
-            int bytesRead = BZ2_bzRead(&bzerror, self.bzipFile, buffer, (int)length);
+            int bytesRead = BZ2_bzRead(&bzerror, self.bzipFile, buffer, length);
             
             switch (bzerror) {
                 case BZ_OK:
                 case BZ_STREAM_END:
-                    if ((size_t)bytesRead < length) {
+                    if (bytesRead < length) {
                         self.errorDetected = YES;
                         return NO;
                     } else {
@@ -259,9 +259,19 @@ typedef NS_ENUM(uint8_t, SPUDeltaCompressionMode) {
         return nil;
     }
     
-    if (![self _readBuffer:fileTableData length:filePathSectionSize]) {
-        free(fileTableData);
-        return nil;
+    {
+        // Read all the paths in chunks
+        uint64_t bytesLeftoverToCopy = filePathSectionSize;
+        while (bytesLeftoverToCopy > 0) {
+            uint64_t currentBlockSize = (bytesLeftoverToCopy >= PARTIAL_IO_CHUNK_SIZE) ? PARTIAL_IO_CHUNK_SIZE : bytesLeftoverToCopy;
+            
+            if (![self _readBuffer:fileTableData + (filePathSectionSize - bytesLeftoverToCopy) length:(int32_t)currentBlockSize]) {
+                free(fileTableData);
+                return nil;
+            }
+            
+            bytesLeftoverToCopy -= currentBlockSize;
+        }
     }
     
     // Read all relative file paths separated by null terminators
@@ -340,7 +350,7 @@ typedef NS_ENUM(uint8_t, SPUDeltaCompressionMode) {
             
             SPUDeltaArchiveItem *archiveItem = [[SPUDeltaArchiveItem alloc] initWithRelativeFilePath:relativeFilePaths[currentItemIndex] attributes:attributes permissions:decodedMode];
             
-            archiveItem.decodedDataLength = decodedDataLength;
+            archiveItem.codedDataLength = decodedDataLength;
             
             [archiveItems addObject:archiveItem];
             
@@ -379,52 +389,86 @@ typedef NS_ENUM(uint8_t, SPUDeltaCompressionMode) {
         // Handle regular files
         // Binary diffs are always on regular files only
         
-        uint64_t decodedLength = item.decodedDataLength;
-        
-        void *buffer;
-        if (decodedLength == 0) {
-            // Skip over files with empty data
-            buffer = NULL;
-        } else {
-            buffer = calloc(1, decodedLength);
-            if (buffer == NULL) {
-                self.errorDetected = YES;
-                return NO;
-            }
-            
-            if (![self _readBuffer:buffer length:decodedLength]) {
-                return NO;
-            }
-        }
+        uint64_t decodedLength = item.codedDataLength;
         
         if ((attributes & SPUDeltaFileAttributesBinaryDiff) != 0 || S_ISREG(mode)) {
             // Regular files
-            NSData *data = (decodedLength > 0) ? [NSData dataWithBytesNoCopy:buffer length:decodedLength] : [NSData data];
-            if (data == nil) {
-                self.errorDetected = YES;
-                free(buffer);
-                return NO;
-            }
             
-            BOOL writeSuccess = [data writeToFile:physicalFilePath atomically:NO];
-            if (!writeSuccess) {
+            const char *physicalFilePathString = physicalFilePath.fileSystemRepresentation;
+            FILE *outputFile = fopen(physicalFilePathString, "wb");
+            if (outputFile == NULL) {
                 self.errorDetected = YES;
                 return NO;
             }
             
-            if (chmod(physicalFilePath.fileSystemRepresentation, mode) != 0) {
+            if (decodedLength > 0) {
+                // Write out archive contents to file in chunks
+                
+                void *tempBuffer = calloc(1, PARTIAL_IO_CHUNK_SIZE);
+                if (tempBuffer == NULL) {
+                    self.errorDetected = YES;
+                } else {
+                    uint64_t bytesLeftoverToCopy = decodedLength;
+                    while (bytesLeftoverToCopy > 0) {
+                        uint64_t currentBlockSize = (bytesLeftoverToCopy >= PARTIAL_IO_CHUNK_SIZE) ? PARTIAL_IO_CHUNK_SIZE : bytesLeftoverToCopy;
+                        
+                        if (![self _readBuffer:tempBuffer length:(int32_t)currentBlockSize]) {
+                            break;
+                        }
+                        
+                        if (fwrite(tempBuffer, currentBlockSize, 1, outputFile) < 1) {
+                            self.errorDetected = YES;
+                            break;
+                        }
+                        
+                        bytesLeftoverToCopy -= currentBlockSize;
+                    }
+                }
+            }
+            
+            fclose(outputFile);
+            
+            if (self.errorDetected) {
+                return NO;
+            }
+            
+            if (chmod(physicalFilePathString, mode) != 0) {
                 self.errorDetected = YES;
                 return NO;
             }
         } else {
             // Link files
-            NSString *destinationPath = (decodedLength > 0) ? [fileManager stringWithFileSystemRepresentation:buffer length:decodedLength] : @"";
-            if (destinationPath == nil) {
+            
+            if (PARTIAL_IO_CHUNK_SIZE < decodedLength) {
+                // Something is seriously wrong
                 self.errorDetected = YES;
                 return NO;
             }
             
+            void *buffer;
+            if (decodedLength == 0) {
+                buffer = NULL;
+            } else {
+                buffer = calloc(1, decodedLength);
+                if (buffer == NULL) {
+                    self.errorDetected = YES;
+                    return NO;
+                }
+                
+                if (![self _readBuffer:buffer length:(int32_t)decodedLength]) {
+                    free(buffer);
+                    return NO;
+                }
+            }
+            
+            NSString *destinationPath = (buffer != NULL) ? [fileManager stringWithFileSystemRepresentation:buffer length:decodedLength] : @"";
+            
             free(buffer);
+            
+            if (destinationPath == nil) {
+                self.errorDetected = YES;
+                return NO;
+            }
             
             NSError *error = nil;
             if (![fileManager createSymbolicLinkAtPath:physicalFilePath withDestinationPath:destinationPath error:&error]) {
@@ -433,7 +477,8 @@ typedef NS_ENUM(uint8_t, SPUDeltaCompressionMode) {
             }
             
             // We shouldn't fail if setting permissions on symlinks fail
-            // Symbolic link permissions are weird
+            // Apple filesystems have file permissions for symbolic links but other linux file systems don't
+            // So this may have no effect on some file systems over the network
             lchmod(physicalFilePath.fileSystemRepresentation, mode);
         }
     } else if (S_ISDIR(mode)) {
@@ -447,7 +492,7 @@ typedef NS_ENUM(uint8_t, SPUDeltaCompressionMode) {
     return YES;
 }
 
-- (BOOL)_writeBuffer:(void *)buffer length:(size_t)length
+- (BOOL)_writeBuffer:(void *)buffer length:(int32_t)length
 {
     if (self.errorDetected) {
         return NO;
@@ -455,7 +500,7 @@ typedef NS_ENUM(uint8_t, SPUDeltaCompressionMode) {
     
     switch (self.compression) {
         case SPUDeltaCompressionModeNone: {
-            BOOL success = (fwrite(buffer, length, 1, self.file) == 1);
+            BOOL success = (fwrite(buffer, (size_t)length, 1, self.file) == 1);
             if (!success) {
                 self.errorDetected = YES;
             }
@@ -464,7 +509,7 @@ typedef NS_ENUM(uint8_t, SPUDeltaCompressionMode) {
         }
         case SPUDeltaCompressionModeBzip2: {
             int bzerror = 0;
-            BZ2_bzWrite(&bzerror, self.bzipFile, buffer, (int)length);
+            BZ2_bzWrite(&bzerror, self.bzipFile, buffer, length);
             BOOL success = (bzerror == BZ_OK);
             if (!success) {
                 self.errorDetected = YES;
@@ -515,14 +560,17 @@ typedef NS_ENUM(uint8_t, SPUDeltaCompressionMode) {
         return;
     }
     
-    // Write all of the relative path lengths
+    // Write all of the relative paths
     for (SPUDeltaArchiveItem *item in writableItems) {
         NSString *relativePath = item.relativeFilePath;
-        const char *relativePathString = relativePath.UTF8String;
-        char pathBuffer[PATH_MAX + 1] = {0};
-        strncpy(pathBuffer, relativePathString, PATH_MAX);
         
-        if (![self _writeBuffer:pathBuffer length:strlen(pathBuffer) + 1]) {
+        char pathBuffer[PATH_MAX + 1] = {0};
+        if (![relativePath getFileSystemRepresentation:pathBuffer maxLength:PATH_MAX]) {
+            self.errorDetected = YES;
+            break;
+        }
+        
+        if (![self _writeBuffer:pathBuffer length:(int32_t)strlen(pathBuffer) + 1]) {
             break;
         }
     }
@@ -573,6 +621,8 @@ typedef NS_ENUM(uint8_t, SPUDeltaCompressionMode) {
                 if (![self _writeBuffer:&dataLength length:sizeof(dataLength)]) {
                     break;
                 }
+                
+                item.codedDataLength = dataLength;
             }
         } else if ((attributes & SPUDeltaFileAttributesModifyPermissions) != 0) {
             // Store file permissions
@@ -602,15 +652,42 @@ typedef NS_ENUM(uint8_t, SPUDeltaCompressionMode) {
             
             mode_t originalMode = item.originalMode;
             if (S_ISREG(originalMode)) {
-                NSURL *physicalURL = [NSURL fileURLWithPath:physicalPath isDirectory:NO];
-                NSMutableData *contents = [NSMutableData dataWithContentsOfURL:physicalURL];
-                if (contents == nil) {
-                    self.errorDetected = YES;
-                    break;
-                }
+                // Write out file contents to archive in chunks
                 
-                if (![self _writeBuffer:contents.mutableBytes length:contents.length]) {
-                    break;
+                uint64_t totalItemSize = item.codedDataLength;
+                if (totalItemSize > 0) {
+                    FILE *inputFile = fopen(physicalPath.fileSystemRepresentation, "rb");
+                    if (inputFile == NULL) {
+                        self.errorDetected = YES;
+                        break;
+                    }
+                    
+                    uint8_t *tempBuffer = calloc(1, PARTIAL_IO_CHUNK_SIZE);
+                    if (tempBuffer == NULL) {
+                        self.errorDetected = YES;
+                    } else {
+                        uint64_t bytesLeftoverToCopy = totalItemSize;
+                        while (bytesLeftoverToCopy > 0) {
+                            uint64_t currentBlockSize = (bytesLeftoverToCopy >= PARTIAL_IO_CHUNK_SIZE) ? PARTIAL_IO_CHUNK_SIZE : bytesLeftoverToCopy;
+                            
+                            if (fread(tempBuffer, currentBlockSize, 1, inputFile) < 1) {
+                                self.errorDetected = YES;
+                                break;
+                            }
+                            
+                            if (![self _writeBuffer:tempBuffer length:(int32_t)currentBlockSize]) {
+                                break;
+                            }
+                            
+                            bytesLeftoverToCopy -= currentBlockSize;
+                        }
+                    }
+                    
+                    fclose(inputFile);
+                    
+                    if (self.errorDetected) {
+                        break;
+                    }
                 }
             } else if (S_ISLNK(originalMode)) {
                 char linkDestination[PATH_MAX + 1] = {0};
@@ -620,7 +697,7 @@ typedef NS_ENUM(uint8_t, SPUDeltaCompressionMode) {
                     break;
                 }
                 
-                if (![self _writeBuffer:linkDestination length:strlen(linkDestination)]) {
+                if (![self _writeBuffer:linkDestination length:(int32_t)strlen(linkDestination)]) {
                     break;
                 }
             }
