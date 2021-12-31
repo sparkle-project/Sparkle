@@ -253,10 +253,6 @@ static xar_file_t _xarAddFile(NSMutableDictionary<NSString *, NSValue *> *fileTa
     if ((commands & SPUDeltaItemCommandModifyPermissions) != 0) {
         xar_prop_set(newFile, MODIFY_PERMISSIONS_KEY, [NSString stringWithFormat:@"%u", permissions].UTF8String);
     }
-    
-    if (item.encodedCompletionHandler != NULL) {
-        item.encodedCompletionHandler();
-    }
 }
 
 - (void)finishEncodingItems

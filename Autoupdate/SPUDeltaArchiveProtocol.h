@@ -52,7 +52,6 @@ extern SPUDeltaCompressionMode SPUDeltaCompressionModeDefault;
 @property (nonatomic, nullable) NSString *physicalFilePath;
 @property (nonatomic, readonly) SPUDeltaItemCommands commands;
 @property (nonatomic, readonly) uint16_t permissions;
-@property (nonatomic, nullable, copy) void (^encodedCompletionHandler)(void);
 
 // Private properties
 @property (nonatomic, nullable) const void *context;

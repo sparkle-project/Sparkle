@@ -543,6 +543,7 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
 
     [deltaQueue waitUntilAllOperationsAreFinished];
 
+    BOOL deltaOperationsFailed = NO;
     for (CreateBinaryDeltaOperation *operation in deltaOperations) {
         NSString *resultPath = [operation resultPath];
         if (resultPath == nil) {
@@ -552,7 +553,8 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
             if (error != NULL) {
                 *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to create patch from source %@ and destination %@", operation.relativePath, resultPath] }];
             }
-            return NO;
+            deltaOperationsFailed = YES;
+            break;
         }
 
         if (verbose) {
@@ -567,10 +569,6 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
         SPUDeltaArchiveItem *item = [[SPUDeltaArchiveItem alloc] initWithRelativeFilePath:relativePath commands:commands permissions:permissions.unsignedShortValue];
         item.physicalFilePath = resultPath;
         
-        item.encodedCompletionHandler = ^{
-            unlink(resultPath.fileSystemRepresentation);
-        };
-        
         [archive addItem:item];
 
         if (permissions != nil) {
@@ -580,8 +578,24 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
         }
     }
     
-    [archive finishEncodingItems];
+    if (!deltaOperationsFailed) {
+        [archive finishEncodingItems];
+    }
+    
     [archive close];
+    
+    // Clean up operations after the archive has finished encoding
+    for (CreateBinaryDeltaOperation *operation in deltaOperations) {
+        NSString *resultPath = [operation resultPath];
+        if (resultPath != nil) {
+            unlink(resultPath.fileSystemRepresentation);
+        }
+    }
+    
+    if (deltaOperationsFailed) {
+        // We already set an error so let's bail
+        return NO;
+    }
     
     NSError *archiveError = archive.error;
     if (archiveError != nil) {
