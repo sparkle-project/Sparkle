@@ -607,7 +607,7 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
     }];
 }
 
-- (void)testInvalidPermissionsInAfterTree
+- (void)testOddPermissionsInAfterTree
 {
     BOOL success = [self createAndApplyPatchWithBeforeDiffHandler:^(NSFileManager *fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
         NSString *sourceFile = [sourceDirectory stringByAppendingPathComponent:@"A"];
@@ -623,10 +623,9 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
             XCTFail(@"Failed setting file permissions");
         }
         
-        // This would fail for version 1.0
         XCTAssertFalse([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
     } afterDiffHandler:nil];
-    XCTAssertFalse(success);
+    XCTAssertTrue(success);
 }
 
 - (void)testBadPermissionsInBeforeTree
