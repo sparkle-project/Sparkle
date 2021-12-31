@@ -580,12 +580,19 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
         }
     }
     
-    if (![archive finishEncodingItems]) {
-        //...
-        NSLog(@"Failed to finish encoding items...");
-    }
-    
+    [archive finishEncodingItems];
     [archive close];
+    
+    NSError *archiveError = archive.error;
+    if (archiveError != nil) {
+        if (verbose) {
+            fprintf(stderr, "\n");
+        }
+        if (error != NULL) {
+            *error = archiveError;
+        }
+        return NO;
+    }
 
     NSFileManager *filemgr;
     filemgr = [NSFileManager defaultManager];

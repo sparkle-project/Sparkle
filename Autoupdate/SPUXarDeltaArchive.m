@@ -103,6 +103,11 @@ extern char *xar_get_safe_path(xar_file_t f) __attribute__((weak_import));
     }
 }
 
+- (NSError * _Nullable)error
+{
+    return nil;
+}
+
 // This indicates if safe extraction is available at compile time (SDK), but not if it's available at runtime.
 + (BOOL)maySupportSafeExtraction
 {
@@ -254,12 +259,12 @@ static xar_file_t _xarAddFile(NSMutableDictionary<NSString *, NSValue *> *fileTa
     }
 }
 
-- (BOOL)finishEncodingItems
+- (void)finishEncodingItems
 {
-    return YES;
+    // Items are already encoded when they are extracted prior
 }
 
-- (BOOL)enumerateItems:(void (^)(SPUDeltaArchiveItem *, BOOL *))itemHandler
+- (void)enumerateItems:(void (^)(SPUDeltaArchiveItem *, BOOL *))itemHandler
 {
     BOOL exitedEarly = NO;
     xar_iter_t iter = xar_iter_new();
@@ -326,8 +331,6 @@ static xar_file_t _xarAddFile(NSMutableDictionary<NSString *, NSValue *> *fileTa
     }
     
     xar_iter_free(iter);
-    
-    return !exitedEarly;
 }
 
 - (BOOL)extractItem:(SPUDeltaArchiveItem *)item

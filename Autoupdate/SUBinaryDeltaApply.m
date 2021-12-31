@@ -19,15 +19,8 @@
 
 #include "AppKitPrevention.h"
 
-static BOOL applyBinaryDeltaToFile(id<SPUDeltaArchiveProtocol> archive, SPUDeltaArchiveItem *item, NSString *sourceFilePath, NSString *destinationFilePath)
+static BOOL applyBinaryDeltaToFile(NSString *patchFile, NSString *sourceFilePath, NSString *destinationFilePath)
 {
-    NSString *patchFile = temporaryFilename(@"apply-binary-delta");
-    item.physicalFilePath = patchFile;
-    
-    if (![archive extractItem:item]) {
-        return NO;
-    }
-    
     const char *argv[] = {"/usr/bin/bspatch", [sourceFilePath fileSystemRepresentation], [destinationFilePath fileSystemRepresentation], [patchFile fileSystemRepresentation]};
     BOOL success = (bspatch(4, argv) == 0);
     unlink([patchFile fileSystemRepresentation]);
@@ -161,7 +154,12 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
     }
     NSFileManager *fileManager = [[NSFileManager alloc] init];
     
-    if (![archive enumerateItems:^(SPUDeltaArchiveItem *item, BOOL *stop) {
+    // Ensure error is cleared out in advance
+    if (error != NULL) {
+        *error = nil;
+    }
+    
+    [archive enumerateItems:^(SPUDeltaArchiveItem *item, BOOL *stop) {
         NSString *relativePath = item.relativeFilePath;
         
         if ([relativePath.pathComponents containsObject:@".."]) {
@@ -216,7 +214,22 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
         }
 
         if ((commands & SPUDeltaItemCommandBinaryDiff) != 0) {
-            if (!applyBinaryDeltaToFile(archive, item, sourceFilePath, destinationFilePath)) {
+            NSString *tempDiffFile = temporaryFilename(@"apply-binary-delta");
+            item.physicalFilePath = tempDiffFile;
+            
+            if (![archive extractItem:item]) {
+                if (verbose) {
+                    fprintf(stderr, "\n");
+                }
+                if (error != NULL) {
+                    *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Unable to extract diffed file to %@", tempDiffFile], NSUnderlyingErrorKey: (NSError * _Nonnull)archive.error }];
+                }
+                
+                *stop = YES;
+                return;
+            }
+            
+            if (!applyBinaryDeltaToFile(tempDiffFile, sourceFilePath, destinationFilePath)) {
                 if (verbose) {
                     fprintf(stderr, "\n");
                 }
@@ -237,7 +250,7 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
                     fprintf(stderr, "\n");
                 }
                 if (error != NULL) {
-                    *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Unable to extract file to %@", destinationFilePath] }];
+                    *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Unable to extract file to %@", destinationFilePath], NSUnderlyingErrorKey: (NSError * _Nonnull)archive.error }];
                 }
                 *stop = YES;
                 return;
@@ -271,11 +284,21 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
                 fprintf(stderr, "\n👮  %s %s (0%o)", VERBOSE_MODIFIED, [relativePath fileSystemRepresentation], mode);
             }
         }
-    }]) {
-        return NO;
-    }
+    }];
     
     [archive close];
+    
+    // Set error from enumerating items if we have encountered an error and haven't set it yet
+    NSError *archiveError = archive.error;
+    if (archiveError != nil) {
+        if (verbose) {
+            fprintf(stderr, "\n");
+        }
+        if (error != NULL && *error == nil) {
+            *error = archiveError;
+        }
+        return NO;
+    }
 
     progressCallback(5/6.0);
 

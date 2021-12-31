@@ -66,6 +66,9 @@ extern SPUDeltaCompressionMode SPUDeltaCompressionModeDefault;
 
 @property (nonatomic, readonly, class) BOOL maySupportSafeExtraction;
 
+// If non-nil, there was an error with reading or writing data from the archive
+@property (nonatomic, readonly, nullable) NSError *error;
+
 // Closes file for reading/writing, called in -dealloc if it's not called manually
 - (void)close;
 
@@ -75,7 +78,7 @@ extern SPUDeltaCompressionMode SPUDeltaCompressionModeDefault;
 - (nullable SPUDeltaArchiveHeader *)readHeader;
 
 // Enumerate through items in the patch file and read the path, attributes, permissions (if permission attribute is available), and way to stop enumeration
-- (BOOL)enumerateItems:(void (^)(SPUDeltaArchiveItem *item, BOOL *stop))itemHandler;
+- (void)enumerateItems:(void (^)(SPUDeltaArchiveItem *item, BOOL *stop))itemHandler;
 
 // Extract a file item from the patch file to a destination file
 // The item's physical file path must be set as a destination
@@ -91,7 +94,8 @@ extern SPUDeltaCompressionMode SPUDeltaCompressionModeDefault;
 // Permissions are used only if there is a modify permissions attribute
 - (void)addItem:(SPUDeltaArchiveItem *)item;
 
-- (BOOL)finishEncodingItems;
+// Finishes encoding items after having added all of them
+- (void)finishEncodingItems;
 
 @end
 

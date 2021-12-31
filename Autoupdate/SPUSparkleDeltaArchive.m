@@ -17,14 +17,16 @@
 
 #define SPARKLE_DELTA_FORMAT_MAGIC "spk!"
 #define PARTIAL_IO_CHUNK_SIZE 16384 // this must be >= PATH_MAX
+#define SPARKLE_BZIP2_ERROR_DOMAIN @"Sparkle BZIP2"
+#define SPARKLE_DELTA_ARCHIVE_ERROR_DOMAIN @"Sparkle Delta Archive"
 
 @interface SPUSparkleDeltaArchive ()
 
 @property (nonatomic) FILE *file;
 @property (nonatomic) BZFILE *bzipFile;
 @property (nonatomic, readonly) SPUDeltaCompressionMode compression;
-@property (nonatomic) BOOL errorDetected;
 @property (nonatomic, readonly) BOOL writeMode;
+@property (nonatomic) NSError *error;
 
 @property (nonatomic) NSMutableArray<SPUDeltaArchiveItem *> *writableItems;
 
@@ -35,9 +37,9 @@
 @synthesize file = _file;
 @synthesize bzipFile = _bzipFile;
 @synthesize compression = _compression;
-@synthesize errorDetected = _errorDetected;
 @synthesize writeMode = _writeMode;
 @synthesize writableItems = _writableItems;
+@synthesize error = _error;
 
 + (BOOL)maySupportSafeExtraction
 {
@@ -169,14 +171,14 @@
 
 - (BOOL)_readBuffer:(void *)buffer length:(int32_t)length
 {
-    if (self.errorDetected) {
+    if (self.error != nil) {
         return NO;
     }
     
     switch (self.compression) {
         case SPUDeltaCompressionModeNone: {
             if (fread(buffer, (size_t)length, 1, self.file) < 1) {
-                self.errorDetected = YES;
+                self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to read %d uncompressed bytes from archive.", length] }];
                 return NO;
             } else {
                 return YES;
@@ -190,13 +192,16 @@
                 case BZ_OK:
                 case BZ_STREAM_END:
                     if (bytesRead < length) {
-                        self.errorDetected = YES;
+                        self.error = [NSError errorWithDomain:SPARKLE_BZIP2_ERROR_DOMAIN code:0 userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Only %d out of %d expected bytes were read from the bz2 archive.", bytesRead, length] }];
                         return NO;
                     } else {
                         return YES;
                     }
+                case BZ_IO_ERROR:
+                    self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: @"Encountered unexpected IO error when reading compressed bytes from bz2 archive." }];
+                    return NO;
                 default:
-                    self.errorDetected = YES;
+                    self.error = [NSError errorWithDomain:SPARKLE_BZIP2_ERROR_DOMAIN code:bzerror userInfo:@{ NSLocalizedDescriptionKey: @"Encountered unexpected error when reading compressed bytes from bz2 archive." }];
                     return NO;
             }
         }
@@ -230,7 +235,7 @@
 
 - (NSArray<NSString *> *)_readRelativeFilePaths
 {
-    if (self.errorDetected) {
+    if (self.error != nil) {
         return nil;
     }
     
@@ -246,7 +251,7 @@
     
     char *fileTableData = calloc(1, filePathSectionSize);
     if (fileTableData == NULL) {
-        self.errorDetected = YES;
+        self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to calloc() %llu bytes for relative file paths.", filePathSectionSize] }];
         return nil;
     }
     
@@ -273,7 +278,8 @@
         if (fileTableData[index] == '\0') {
             NSString *relativePath = [fileManager stringWithFileSystemRepresentation:&fileTableData[currentStartIndex] length:index - currentStartIndex];
             if (relativePath == nil) {
-                self.errorDetected = YES;
+                self.error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Relative path cannot be decoded as a file system representation: %@", relativePath] }];
+                
                 free(fileTableData);
                 return nil;
             }
@@ -288,17 +294,17 @@
     return relativeFilePaths;
 }
 
-- (BOOL)enumerateItems:(void (^)(SPUDeltaArchiveItem * _Nonnull, BOOL * _Nonnull))itemHandler
+- (void)enumerateItems:(void (^)(SPUDeltaArchiveItem * _Nonnull, BOOL * _Nonnull))itemHandler
 {
     // Parse all relative file paths
     NSArray<NSString *> *relativeFilePaths = [self _readRelativeFilePaths];
     if (relativeFilePaths == nil) {
-        return NO;
+        return;
     }
     
     if (relativeFilePaths.count == 0) {
         // No diff changes
-        return YES;
+        return;
     }
     
     // Parse through all commands
@@ -349,8 +355,8 @@
         }
     }
     
-    if (self.errorDetected) {
-        return NO;
+    if (self.error != nil) {
+        return;
     }
     
     // Feed items back to caller
@@ -361,8 +367,6 @@
             break;
         }
     }
-    
-    return !exitedEarly;
 }
 
 - (BOOL)extractItem:(SPUDeltaArchiveItem *)item
@@ -388,7 +392,7 @@
             const char *physicalFilePathString = physicalFilePath.fileSystemRepresentation;
             FILE *outputFile = fopen(physicalFilePathString, "wb");
             if (outputFile == NULL) {
-                self.errorDetected = YES;
+                self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to fopen() %@", physicalFilePath] }];
                 return NO;
             }
             
@@ -397,7 +401,7 @@
                 
                 void *tempBuffer = calloc(1, PARTIAL_IO_CHUNK_SIZE);
                 if (tempBuffer == NULL) {
-                    self.errorDetected = YES;
+                    self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to calloc() %d bytes for chunk.", PARTIAL_IO_CHUNK_SIZE] }];
                 } else {
                     uint64_t bytesLeftoverToCopy = decodedLength;
                     while (bytesLeftoverToCopy > 0) {
@@ -408,7 +412,7 @@
                         }
                         
                         if (fwrite(tempBuffer, currentBlockSize, 1, outputFile) < 1) {
-                            self.errorDetected = YES;
+                            self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to fwrite() %llu bytes during extraction.", currentBlockSize] }];
                             break;
                         }
                         
@@ -419,12 +423,12 @@
             
             fclose(outputFile);
             
-            if (self.errorDetected) {
+            if (self.error != nil) {
                 return NO;
             }
             
             if (chmod(physicalFilePathString, mode) != 0) {
-                self.errorDetected = YES;
+                self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to chmod() mode %d on %@", mode, physicalFilePath] }];
                 return NO;
             }
         } else {
@@ -432,7 +436,7 @@
             
             if (PARTIAL_IO_CHUNK_SIZE < decodedLength) {
                 // Something is seriously wrong
-                self.errorDetected = YES;
+                self.error = [NSError errorWithDomain:SPARKLE_DELTA_ARCHIVE_ERROR_DOMAIN code:0 userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"PARTIAL_IO_CHUNK_SIZE (%d) < decodedLength (%llu)", PARTIAL_IO_CHUNK_SIZE, decodedLength] }];
                 return NO;
             }
             
@@ -442,7 +446,7 @@
             } else {
                 buffer = calloc(1, decodedLength);
                 if (buffer == NULL) {
-                    self.errorDetected = YES;
+                    self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to calloc() %llu bytes for link %@", decodedLength, physicalFilePath] }];
                     return NO;
                 }
                 
@@ -457,13 +461,13 @@
             free(buffer);
             
             if (destinationPath == nil) {
-                self.errorDetected = YES;
+                self.error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Destination path for link %@ cannot be created in a file system representation: %@",physicalFilePath, destinationPath] }];
                 return NO;
             }
             
-            NSError *error = nil;
-            if (![fileManager createSymbolicLinkAtPath:physicalFilePath withDestinationPath:destinationPath error:&error]) {
-                self.errorDetected = YES;
+            NSError *createLinkError = nil;
+            if (![fileManager createSymbolicLinkAtPath:physicalFilePath withDestinationPath:destinationPath error:&createLinkError]) {
+                self.error = createLinkError;
                 return NO;
             }
             
@@ -473,9 +477,9 @@
             lchmod(physicalFilePath.fileSystemRepresentation, mode);
         }
     } else if (S_ISDIR(mode)) {
-        NSError *error = nil;
-        if (![fileManager createDirectoryAtPath:physicalFilePath withIntermediateDirectories:NO attributes:@{NSFilePosixPermissions: @(mode)} error:&error]) {
-            self.errorDetected = YES;
+        NSError *createDirectoryError = nil;
+        if (![fileManager createDirectoryAtPath:physicalFilePath withIntermediateDirectories:NO attributes:@{NSFilePosixPermissions: @(mode)} error:&createDirectoryError]) {
+            self.error = createDirectoryError;
             return NO;
         }
     }
@@ -485,7 +489,7 @@
 
 - (BOOL)_writeBuffer:(void *)buffer length:(int32_t)length
 {
-    if (self.errorDetected) {
+    if (self.error != nil) {
         return NO;
     }
     
@@ -493,7 +497,7 @@
         case SPUDeltaCompressionModeNone: {
             BOOL success = (fwrite(buffer, (size_t)length, 1, self.file) == 1);
             if (!success) {
-                self.errorDetected = YES;
+                self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to write %d uncompressed bytes.", length] }];
             }
             
             return success;
@@ -501,12 +505,16 @@
         case SPUDeltaCompressionModeBzip2: {
             int bzerror = 0;
             BZ2_bzWrite(&bzerror, self.bzipFile, buffer, length);
-            BOOL success = (bzerror == BZ_OK);
-            if (!success) {
-                self.errorDetected = YES;
+            switch (bzerror) {
+                case BZ_OK:
+                    return YES;
+                case BZ_IO_ERROR:
+                    self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to write %d compressed bz2 bytes due to io error.", length] }];
+                    return NO;
+                default:
+                    self.error = [NSError errorWithDomain:SPARKLE_BZIP2_ERROR_DOMAIN code:bzerror userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to write %d compressed bz2 bytes.", length] }];
+                    return NO;
             }
-            
-            return success;
         }
     }
 }
@@ -528,14 +536,13 @@
     [self.writableItems addObject:item];
 }
 
-- (void)_encodeWritableItems
+- (void)finishEncodingItems
 {
-    NSArray<SPUDeltaArchiveItem *> *writableItems = self.writableItems;
-    if (writableItems == nil) {
+    if (self.error != nil) {
         return;
     }
     
-    self.writableItems = nil;
+    NSArray<SPUDeltaArchiveItem *> *writableItems = self.writableItems;
     
     // Compute length of path section to write
     uint64_t totalPathLength = 0;
@@ -557,7 +564,7 @@
         
         char pathBuffer[PATH_MAX + 1] = {0};
         if (![relativePath getFileSystemRepresentation:pathBuffer maxLength:PATH_MAX]) {
-            self.errorDetected = YES;
+            self.error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Relative path cannot be encoded and expressed as a file system representation: %@", relativePath] }];
             break;
         }
         
@@ -566,7 +573,7 @@
         }
     }
     
-    if (self.errorDetected) {
+    if (self.error != nil) {
         return;
     }
     
@@ -585,7 +592,7 @@
             
             struct stat fileInfo = {0};
             if (lstat(physicalPath.fileSystemRepresentation, &fileInfo) != 0) {
-                self.errorDetected = YES;
+                self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to lstat() on %@", physicalPath] }];
                 break;
             }
 
@@ -624,11 +631,11 @@
         }
     }
     
-    if (self.errorDetected) {
+    if (self.error != nil) {
         return;
     }
     
-    // Encode end marker
+    // Encode end command marker
     SPUDeltaItemCommands endCommand = 0;
     if (![self _writeBuffer:&endCommand length:sizeof(endCommand)]) {
         return;
@@ -649,20 +656,20 @@
                 if (totalItemSize > 0) {
                     FILE *inputFile = fopen(physicalPath.fileSystemRepresentation, "rb");
                     if (inputFile == NULL) {
-                        self.errorDetected = YES;
+                        self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to open file for reading while encoding items: %@", physicalPath] }];
                         break;
                     }
                     
                     uint8_t *tempBuffer = calloc(1, PARTIAL_IO_CHUNK_SIZE);
                     if (tempBuffer == NULL) {
-                        self.errorDetected = YES;
+                        self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to calloc() %d chunk bytes while encoding items", PARTIAL_IO_CHUNK_SIZE] }];
                     } else {
                         uint64_t bytesLeftoverToCopy = totalItemSize;
                         while (bytesLeftoverToCopy > 0) {
                             uint64_t currentBlockSize = (bytesLeftoverToCopy >= PARTIAL_IO_CHUNK_SIZE) ? PARTIAL_IO_CHUNK_SIZE : bytesLeftoverToCopy;
                             
                             if (fread(tempBuffer, currentBlockSize, 1, inputFile) < 1) {
-                                self.errorDetected = YES;
+                                self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to read %llu chunk bytes while encoding items", currentBlockSize] }];
                                 break;
                             }
                             
@@ -676,7 +683,7 @@
                     
                     fclose(inputFile);
                     
-                    if (self.errorDetected) {
+                    if (self.error != nil) {
                         break;
                     }
                 }
@@ -684,7 +691,7 @@
                 char linkDestination[PATH_MAX + 1] = {0};
                 ssize_t linkDestinationLength = readlink(physicalPath.fileSystemRepresentation, linkDestination, PATH_MAX);
                 if (linkDestinationLength < 0) {
-                    self.errorDetected = YES;
+                    self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to readlink() file at %@", physicalPath] }];
                     break;
                 }
                 
@@ -694,17 +701,6 @@
             }
         }
     }
-}
-
-- (BOOL)finishEncodingItems
-{
-    if (self.errorDetected) {
-        return NO;
-    }
-    
-    [self _encodeWritableItems];
-    
-    return !self.errorDetected;
 }
 
 @end
