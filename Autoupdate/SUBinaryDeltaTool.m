@@ -73,7 +73,7 @@ static BOOL runCreateCommand(NSString *programName, NSArray<NSString *> *args)
 
     SUBinaryDeltaMajorVersion patchVersion =
         !versionComponents ?
-        LATEST_DELTA_DIFF_MAJOR_VERSION :
+        DEFAULT_DELTA_DIFF_MAJOR_VERSION :
         (SUBinaryDeltaMajorVersion)[[versionComponents[1] componentsSeparatedByString:@"."][0] intValue]; // ignore minor version if provided
 
     if (patchVersion < FIRST_DELTA_DIFF_MAJOR_VERSION) {

@@ -92,7 +92,13 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
 
 - (BOOL)createAndApplyPatchWithBeforeDiffHandler:(SUDeltaHandler)beforeDiffHandler afterDiffHandler:(SUDeltaHandler)afterDiffHandler
 {
-    return [self createAndApplyPatchUsingVersion:LATEST_DELTA_DIFF_MAJOR_VERSION beforeDiffHandler:beforeDiffHandler afterDiffHandler:afterDiffHandler];
+    XCTAssertEqual(SUBinaryDeltaMajorVersion3, LATEST_DELTA_DIFF_MAJOR_VERSION);
+    
+    BOOL version3DeltaFormatSuccess = [self createAndApplyPatchUsingVersion:SUBinaryDeltaMajorVersion3 beforeDiffHandler:beforeDiffHandler afterDiffHandler:afterDiffHandler];
+    
+    BOOL version2FormatSuccess = [self createAndApplyPatchUsingVersion:SUBinaryDeltaMajorVersion2 beforeDiffHandler:beforeDiffHandler afterDiffHandler:afterDiffHandler];
+    
+    return (version3DeltaFormatSuccess && version2FormatSuccess);
 }
 
 - (void)createAndApplyPatchWithHandler:(SUDeltaHandler)handler
@@ -355,7 +361,7 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
     }];
 }
 
-// Make sure old version patches still work for simple cases
+// Make sure old version patches are no longer supported
 - (void)testRegularFileAddedWithVersion1Delta
 {
     XCTAssertFalse([self createAndApplyPatchUsingVersion:SUBinaryDeltaMajorVersion1 beforeDiffHandler:nil afterDiffHandler:nil]);

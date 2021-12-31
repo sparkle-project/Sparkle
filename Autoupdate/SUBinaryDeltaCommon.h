@@ -42,6 +42,7 @@ typedef NS_ENUM(uint16_t, SUBinaryDeltaMajorVersion)
 #define FIRST_DELTA_DIFF_MAJOR_VERSION SUBinaryDeltaMajorVersion1
 #define FIRST_SUPPORTED_DELTA_MAJOR_VERSION SUBinaryDeltaMajorVersion2
 #define LATEST_DELTA_DIFF_MAJOR_VERSION SUBinaryDeltaMajorVersion3
+#define DEFAULT_DELTA_DIFF_MAJOR_VERSION SUBinaryDeltaMajorVersion2
 
 extern int compareFiles(const FTSENT **a, const FTSENT **b);
 BOOL getRawHashOfTreeWithVersion(unsigned char *hashBuffer, NSString *path, uint16_t majorVersion);
