@@ -50,7 +50,7 @@ extern char *xar_get_safe_path(xar_file_t f) __attribute__((weak_import));
 @synthesize x = _x;
 @synthesize fileTable = _fileTable;
 
-- (nullable instancetype)initWithPatchFileForWriting:(NSString *)patchFile
+- (nullable instancetype)initWithPatchFileForWriting:(NSString *)patchFile compression:(SPUDeltaCompressionMode)compression compressionLevel:(int32_t)compressionLevel
 {
     self = [super init];
     if (self != nil) {
@@ -60,7 +60,20 @@ extern char *xar_get_safe_path(xar_file_t f) __attribute__((weak_import));
         }
         
         _fileTable = [NSMutableDictionary dictionary];
-        xar_opt_set(_x, XAR_OPT_COMPRESSION, "bzip2");
+        
+        switch (compression) {
+            case SPUDeltaCompressionModeNone:
+                break;
+            case SPUDeltaCompressionModeBzip2: {
+                xar_opt_set(_x, XAR_OPT_COMPRESSION, "bzip2");
+                
+                char buffer[256] = {0};
+                snprintf(buffer, sizeof(buffer) - 1, "%d", compressionLevel);
+                xar_opt_set(_x, XAR_OPT_COMPRESSIONARG, buffer);
+                
+                break;
+            }
+        }
     }
     return self;
 }

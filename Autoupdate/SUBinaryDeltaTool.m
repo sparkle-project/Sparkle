@@ -119,9 +119,29 @@ static BOOL runCreateCommand(NSString *programName, NSArray<NSString *> *args)
         fprintf(stderr, "Error: after-tree must be a directory\n");
         return NO;
     }
+    
+    // Until we have a better way of passing/parsing command line options we'll use environment variables
+    
+    SPUDeltaCompressionMode compression;
+    const char *compressionEnv = getenv("SPARKLE_DELTA_COMPRESSION");
+    if (compressionEnv == NULL) {
+        compression = DEFAULT_COMPRESSION_MODE;
+    } else if (strcmp(compressionEnv, "bzip2") == 0) {
+        compression = SPUDeltaCompressionModeBzip2;
+    } else {
+        compression = SPUDeltaCompressionModeNone;
+    }
+    
+    int32_t compressionLevel;
+    const char *compressionLevelEnv = getenv("SPARKLE_DELTA_COMPRESSION_LEVEL");
+    if (compressionLevelEnv == NULL) {
+        compressionLevel = DEFAULT_COMPRESSION_LEVEL_FOR_DEFAULT_COMPRESSION_MODE;
+    } else {
+        compressionLevel = atoi(compressionLevelEnv);
+    }
 
     NSError *createDiffError = nil;
-    if (!createBinaryDelta(sourcePath, destPath, patchPath, patchVersion, verbose, &createDiffError)) {
+    if (!createBinaryDelta(sourcePath, destPath, patchPath, patchVersion, compression, compressionLevel, verbose, &createDiffError)) {
         fprintf(stderr, "%s\n", [createDiffError.localizedDescription UTF8String]);
         return NO;
     }

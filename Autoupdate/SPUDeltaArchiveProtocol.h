@@ -20,6 +20,15 @@ typedef NS_ENUM(uint8_t, SPUDeltaFileAttributes) {
     SPUDeltaFileAttributesBinaryDiff = (1u << 3),
 };
 
+// Compression mode to use during patch creation
+typedef NS_ENUM(uint8_t, SPUDeltaCompressionMode) {
+    SPUDeltaCompressionModeNone = 0,
+    SPUDeltaCompressionModeBzip2 = 1
+};
+
+#define DEFAULT_COMPRESSION_MODE SPUDeltaCompressionModeBzip2
+#define DEFAULT_COMPRESSION_LEVEL_FOR_DEFAULT_COMPRESSION_MODE 9
+
 // Represents header for our archive
 @interface SPUDeltaArchiveHeader : NSObject
 

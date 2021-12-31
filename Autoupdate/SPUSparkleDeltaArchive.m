@@ -18,11 +18,6 @@
 #define SPARKLE_DELTA_FORMAT_MAGIC "spk!"
 #define PARTIAL_IO_CHUNK_SIZE 16384 // this must be >= PATH_MAX
 
-typedef NS_ENUM(uint8_t, SPUDeltaCompressionMode) {
-    SPUDeltaCompressionModeNone = 0,
-    SPUDeltaCompressionModeBzip2 = 1
-};
-
 @interface SPUSparkleDeltaArchive ()
 
 @property (nonatomic) FILE *file;
@@ -49,7 +44,7 @@ typedef NS_ENUM(uint8_t, SPUDeltaCompressionMode) {
     return YES;
 }
 
-- (nullable instancetype)initWithPatchFileForWriting:(NSString *)patchFile
+- (nullable instancetype)initWithPatchFileForWriting:(NSString *)patchFile compression:(SPUDeltaCompressionMode)compression compressionLevel:(int32_t)compressionLevel
 {
     self = [super init];
     if (self != nil) {
@@ -66,18 +61,16 @@ typedef NS_ENUM(uint8_t, SPUDeltaCompressionMode) {
             return nil;
         }
         
-        SPUDeltaCompressionMode compression = SPUDeltaCompressionModeBzip2;
-        // Only one of the bytes is used, but we supply 3 more for alignment purposes
-        uint32_t compressionData = compression;
-        if (fwrite(&compressionData, sizeof(compressionData), 1, file) < 1) {
+        if (fwrite(&compression, sizeof(compression), 1, file) < 1) {
             NSLog(@"Failed to write compression");
             fclose(file);
             return nil;
         }
         
-        if (compressionData == SPUDeltaCompressionModeBzip2) {
+        if (compression == SPUDeltaCompressionModeBzip2) {
             int bzerror = 0;
-            int blockSize100k = 9; // Can be 1 - 9
+            // Compression level can be 1 - 9
+            int blockSize100k = compressionLevel;
             
             BZFILE *bzipFile = BZ2_bzWriteOpen(&bzerror, file, blockSize100k, 0, 0);
             if (bzipFile == NULL) {
@@ -117,13 +110,11 @@ typedef NS_ENUM(uint8_t, SPUDeltaCompressionMode) {
             return nil;
         }
         
-        uint32_t compressionData = 0;
-        if (fread(&compressionData, sizeof(compressionData), 1, _file) < 1) {
+        SPUDeltaCompressionMode compression = 0;
+        if (fread(&compression, sizeof(compression), 1, _file) < 1) {
             fclose(_file);
             return nil;
         }
-        
-        SPUDeltaCompressionMode compression = (SPUDeltaCompressionMode)compressionData;
         
         switch (compression) {
             case SPUDeltaCompressionModeNone:

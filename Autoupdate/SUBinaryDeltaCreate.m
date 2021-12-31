@@ -250,7 +250,7 @@ static BOOL shouldChangePermissions(NSDictionary *originalInfo, NSDictionary *ne
     return YES;
 }
 
-BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchFile, SUBinaryDeltaMajorVersion majorVersion, BOOL verbose, NSError *__autoreleasing *error)
+BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchFile, SUBinaryDeltaMajorVersion majorVersion, SPUDeltaCompressionMode compression, int32_t compressionLevel, BOOL verbose, NSError *__autoreleasing *error)
 {
     assert(source);
     assert(destination);
@@ -457,9 +457,9 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
     
     id<SPUDeltaArchiveProtocol> archive;
     if (majorVersion >= SUBinaryDeltaMajorVersion3) {
-        archive = [[SPUSparkleDeltaArchive alloc] initWithPatchFileForWriting:temporaryFile];
+        archive = [[SPUSparkleDeltaArchive alloc] initWithPatchFileForWriting:temporaryFile compression:compression compressionLevel:compressionLevel];
     } else {
-        archive = [[SPUXarDeltaArchive alloc] initWithPatchFileForWriting:temporaryFile];
+        archive = [[SPUXarDeltaArchive alloc] initWithPatchFileForWriting:temporaryFile compression:compression compressionLevel:compressionLevel];
     }
     
     if (archive == nil) {
