@@ -198,9 +198,8 @@ static BOOL runVersionCommand(NSString *programName, NSArray *args)
             return NO;
         }
         
-        [archive getMajorDeltaVersion:&majorDiffVersion minorDeltaVersion:&minorDiffVersion beforeTreeHash:NULL afterTreeHash:NULL];
-        
-        if (majorDiffVersion < FIRST_DELTA_DIFF_MAJOR_VERSION) {
+        SPUDeltaArchiveHeader *header = [archive readHeader];
+        if (header.majorVersion < FIRST_DELTA_DIFF_MAJOR_VERSION) {
             fprintf(stderr, "Unable to retrieve version information from patch %s\n", [patchFile fileSystemRepresentation]);
             return NO;
         }

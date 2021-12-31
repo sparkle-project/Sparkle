@@ -1,8 +1,8 @@
 //
-//  SPUXarDeltaArchive.h
-//  Autoupdate
+//  SPUSparkleDeltaArchive.h
+//  Sparkle
 //
-//  Created by Mayur Pawashe on 12/28/21.
+//  Created by Mayur Pawashe on 12/30/21.
 //  Copyright © 2021 Sparkle Project. All rights reserved.
 //
 
@@ -12,8 +12,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-// Legacy container format for binary delta archives
-@interface SPUXarDeltaArchive : NSObject <SPUDeltaArchiveProtocol>
+@interface SPUSparkleDeltaArchive : NSObject <SPUDeltaArchiveProtocol>
 
 - (nullable instancetype)initWithPatchFileForWriting:(NSString *)patchFile;
 - (nullable instancetype)initWithPatchFileForReading:(NSString *)patchFile;

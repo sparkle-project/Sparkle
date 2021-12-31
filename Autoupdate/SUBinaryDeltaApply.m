@@ -19,10 +19,12 @@
 
 #include "AppKitPrevention.h"
 
-static BOOL applyBinaryDeltaToFile(id<SPUDeltaArchiveProtocol> archive, const void *item, NSString *sourceFilePath, NSString *destinationFilePath)
+static BOOL applyBinaryDeltaToFile(id<SPUDeltaArchiveProtocol> archive, SPUDeltaArchiveItem *item, NSString *sourceFilePath, NSString *destinationFilePath)
 {
     NSString *patchFile = temporaryFilename(@"apply-binary-delta");
-    if (![archive extractItem:item destination:patchFile]) {
+    item.physicalFilePath = patchFile;
+    
+    if (![archive extractItem:item]) {
         return NO;
     }
     
@@ -42,16 +44,22 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
         return NO;
     }
 
-    SUBinaryDeltaMajorVersion majorDiffVersion = FIRST_DELTA_DIFF_MAJOR_VERSION;
-    uint16_t minorDiffVersion = 0;
-
-    NSString *expectedBeforeHash = nil;
-    NSString *expectedAfterHash = nil;
-
     progressCallback(0/6.0);
     
-    [archive getMajorDeltaVersion:&majorDiffVersion minorDeltaVersion:&minorDiffVersion beforeTreeHash:&expectedBeforeHash afterTreeHash:&expectedAfterHash];
+    SPUDeltaArchiveHeader *header = [archive readHeader];
+    if (header == nil) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadCorruptFileError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to read header from delta.  Giving up."] }];
+        }
+        return NO;
+    }
 
+    SUBinaryDeltaMajorVersion majorDiffVersion = header.majorVersion;
+    uint16_t minorDiffVersion = header.minorVersion;
+
+    unsigned char *expectedBeforeHash = header.beforeTreeHash;
+    unsigned char *expectedAfterHash = header.afterTreeHash;
+    
     if (majorDiffVersion < FIRST_DELTA_DIFF_MAJOR_VERSION) {
         if (error != NULL) {
             *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadCorruptFileError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Unable to identify diff-version %u in delta.  Giving up.", majorDiffVersion] }];
@@ -96,9 +104,9 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
     }
 
     progressCallback(1/6.0);
-
-    NSString *beforeHash = hashOfTreeWithVersion(source, majorDiffVersion);
-    if (!beforeHash) {
+    
+    unsigned char beforeHash[CC_SHA1_DIGEST_LENGTH] = {0};
+    if (!getRawHashOfTreeWithVersion(beforeHash, source, majorDiffVersion)) {
         if (verbose) {
             fprintf(stderr, "\n");
         }
@@ -108,12 +116,12 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
         return NO;
     }
 
-    if (![beforeHash isEqualToString:expectedBeforeHash]) {
+    if (memcmp(beforeHash, expectedBeforeHash, CC_SHA1_DIGEST_LENGTH) != 0) {
         if (verbose) {
             fprintf(stderr, "\n");
         }
         if (error != NULL) {
-            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Source doesn't have expected hash (%@ != %@).  Giving up.", expectedBeforeHash, beforeHash] }];
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Source doesn't have expected hash (%@ != %@).  Giving up.", displayHashFromRawHash(expectedBeforeHash), displayHashFromRawHash(beforeHash)] }];
         }
         return NO;
     }
@@ -153,7 +161,9 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
     }
     NSFileManager *fileManager = [[NSFileManager alloc] init];
     
-    if (![archive enumerateItems:^(const void * _Nonnull item, NSString * _Nonnull relativePath, SPUDeltaFileAttributes attributes, uint16_t permissions, BOOL *stop) {
+    if (![archive enumerateItems:^(SPUDeltaArchiveItem *item, BOOL *stop) {
+        NSString *relativePath = item.relativeFilePath;
+        
         if ([relativePath.pathComponents containsObject:@".."]) {
             if (error != NULL) {
                 *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Relative path '%@' contains '..' path component", relativePath] }];
@@ -189,7 +199,7 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
         
         // Files that have no property set that we check for will get ignored
         // This is important because they aren't part of the delta, just part of the directory structure
-        
+        SPUDeltaFileAttributes attributes = item.attributes;
         if ((attributes & SPUDeltaFileAttributesDelete) != 0) {
             if (!removeTree(destinationFilePath)) {
                 if (verbose) {
@@ -221,7 +231,8 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
                 fprintf(stderr, "\n🔨  %s %s", VERBOSE_PATCHED, [relativePath fileSystemRepresentation]);
             }
         } else if ((attributes & SPUDeltaFileAttributesExtract) != 0) { // extract and permission modifications don't coexist
-            if (![archive extractItem:item destination:destinationFilePath]) {
+            item.physicalFilePath = destinationFilePath;
+            if (![archive extractItem:item]) {
                 if (verbose) {
                     fprintf(stderr, "\n");
                 }
@@ -244,7 +255,7 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
         }
 
         if ((attributes & SPUDeltaFileAttributesModifyPermissions) != 0) {
-            mode_t mode = (mode_t)permissions;
+            mode_t mode = (mode_t)item.permissions;
             if (!modifyPermissions(destinationFilePath, mode)) {
                 if (verbose) {
                     fprintf(stderr, "\n");
@@ -271,8 +282,9 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
     if (verbose) {
         fprintf(stderr, "\nVerifying destination...");
     }
-    NSString *afterHash = hashOfTreeWithVersion(destination, majorDiffVersion);
-    if (afterHash == nil) {
+    
+    unsigned char afterHash[CC_SHA1_DIGEST_LENGTH] = {0};
+    if (!getRawHashOfTreeWithVersion(afterHash, destination, majorDiffVersion)) {
         if (verbose) {
             fprintf(stderr, "\n");
         }
@@ -282,12 +294,12 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
         return NO;
     }
 
-    if (![afterHash isEqualToString:expectedAfterHash]) {
+    if (memcmp(afterHash, expectedAfterHash, CC_SHA1_DIGEST_LENGTH) != 0) {
         if (verbose) {
             fprintf(stderr, "\n");
         }
         if (error != NULL) {
-            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Destination doesn't have expected hash (%@ != %@).  Giving up.", expectedAfterHash, afterHash] }];
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Destination doesn't have expected hash (%@ != %@).  Giving up.", displayHashFromRawHash(expectedAfterHash), displayHashFromRawHash(afterHash)] }];
         }
         removeTree(destination);
         return NO;

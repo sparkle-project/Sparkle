@@ -10,7 +10,8 @@
 #import <Foundation/Foundation.h>
 #include "SUBinaryDeltaCommon.h"
 #import "SPUDeltaArchiveProtocol.h"
-#import "SPUDeltaArchive.h"
+#import "SPUSparkleDeltaArchive.h"
+#import "SPUXarDeltaArchive.h"
 #import <CommonCrypto/CommonDigest.h>
 #include <fcntl.h>
 #include <fts.h>
@@ -193,13 +194,21 @@ static BOOL shouldSkipDeltaCompression(NSDictionary *originalInfo, NSDictionary 
     return NO;
 }
 
-static BOOL shouldDeleteThenExtract(NSDictionary *originalInfo, NSDictionary *newInfo)
+static BOOL shouldDeleteThenExtract(NSDictionary *originalInfo, NSDictionary *newInfo, SUBinaryDeltaMajorVersion majorVersion)
 {
     if (!originalInfo) {
         return NO;
     }
 
     if ([(NSNumber *)originalInfo[INFO_TYPE_KEY] unsignedShortValue] != [(NSNumber *)newInfo[INFO_TYPE_KEY] unsignedShortValue]) {
+        return YES;
+    }
+    
+    // If the same file exists in both old and new trees and they have different content,
+    // we should always issue deleting the old file before extracting the new
+    // I believe xar container in version 2 format automatically did this if the file types were the same
+    // but we don't want to rely on that implicitness
+    if (MAJOR_VERSION_IS_AT_LEAST(majorVersion, SUBinaryDeltaMajorVersion3)) {
         return YES;
     }
 
@@ -328,9 +337,8 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
     }
     fts_close(fts);
 
-    NSString *beforeHash = hashOfTreeWithVersion(source, majorVersion);
-
-    if (!beforeHash) {
+    unsigned char beforeHash[CC_SHA1_DIGEST_LENGTH] = {0};
+    if (!getRawHashOfTreeWithVersion(beforeHash, source, majorVersion)) {
         if (verbose) {
             fprintf(stderr, "\n");
         }
@@ -390,22 +398,9 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
             return NO;
         }
 
-        // We should validate permissions and ACLs even if we don't store the info in the diff in the case of ACLs,
-        // or in the case of permissions if the patch version is 1
-
+        // We should validate ACLs even if we don't store the info in the diff in the case of ACLs
         // We should also not allow files with code signed extended attributes since Apple doesn't recommend inserting these
         // inside an application, and since we don't preserve extended attribitutes anyway
-
-        mode_t permissions = [(NSNumber*)info[INFO_PERMISSIONS_KEY] unsignedShortValue];
-        if (!isSymLink(ent) && !IS_VALID_PERMISSIONS(permissions)) {
-            if (verbose) {
-                fprintf(stderr, "\n");
-            }
-            if (error != NULL) {
-                *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Invalid file permissions after-tree on file %@ (only permissions with modes 0755 and 0644 are supported)", @(ent->fts_path)] }];
-            }
-            return NO;
-        }
 
         if (aclExists(ent)) {
             if (verbose) {
@@ -449,8 +444,8 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
     }
     fts_close(fts);
 
-    NSString *afterHash = hashOfTreeWithVersion(destination, majorVersion);
-    if (!afterHash) {
+    unsigned char afterHash[CC_SHA1_DIGEST_LENGTH] = {0};
+    if (!getRawHashOfTreeWithVersion(afterHash, destination, majorVersion)) {
         if (verbose) {
             fprintf(stderr, "\n");
         }
@@ -469,7 +464,13 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
         fprintf(stderr, "\nWriting to temporary file %s...", [temporaryFile fileSystemRepresentation]);
     }
     
-    id<SPUDeltaArchiveProtocol> archive = SPUDeltaArchiveForWriting(temporaryFile);
+    id<SPUDeltaArchiveProtocol> archive;
+    if (majorVersion >= SUBinaryDeltaMajorVersion3) {
+        archive = [[SPUSparkleDeltaArchive alloc] initWithPatchFileForWriting:temporaryFile];
+    } else {
+        archive = [[SPUXarDeltaArchive alloc] initWithPatchFileForWriting:temporaryFile];
+    }
+    
     if (archive == nil) {
         if (verbose) {
             fprintf(stderr, "\n");
@@ -480,7 +481,8 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
         return NO;
     }
     
-    [archive setMajorVersion:majorVersion minorVersion:minorVersion beforeTreeHash:beforeHash afterTreeHash:afterHash];
+    SPUDeltaArchiveHeader *header = [[SPUDeltaArchiveHeader alloc] initWithMajorVersion:majorVersion minorVersion:minorVersion beforeTreeHash:beforeHash afterTreeHash:afterHash];
+    [archive writeHeader:header];
 
     NSOperationQueue *deltaQueue = [[NSOperationQueue alloc] init];
     NSMutableArray *deltaOperations = [NSMutableArray array];
@@ -500,7 +502,7 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
         id value = [newTreeState valueForKey:key];
 
         if ([(NSObject *)value isEqual:[NSNull null]]) {
-            [archive addRelativeFilePath:key realFilePath:nil attributes:SPUDeltaFileAttributesDelete permissions:0];
+            [archive addItem:[[SPUDeltaArchiveItem alloc] initWithRelativeFilePath:key attributes:SPUDeltaFileAttributesDelete permissions:0]];
 
             if (verbose) {
                 fprintf(stderr, "\n❌  %s %s", VERBOSE_REMOVED, [key fileSystemRepresentation]);
@@ -513,7 +515,7 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
         if (shouldSkipDeltaCompression(originalInfo, newInfo)) {
             if (shouldSkipExtracting(originalInfo, newInfo)) {
                 if (shouldChangePermissions(originalInfo, newInfo)) {
-                    [archive addRelativeFilePath:key realFilePath:nil attributes:SPUDeltaFileAttributesModifyPermissions permissions:[(NSNumber *)newInfo[INFO_PERMISSIONS_KEY] unsignedShortValue]];
+                    [archive addItem:[[SPUDeltaArchiveItem alloc] initWithRelativeFilePath:key attributes:SPUDeltaFileAttributesModifyPermissions permissions:[(NSNumber *)newInfo[INFO_PERMISSIONS_KEY] unsignedShortValue]]];
 
                     if (verbose) {
                         fprintf(stderr, "\n👮  %s %s (0%o -> 0%o)", VERBOSE_MODIFIED, [key fileSystemRepresentation], [(NSNumber *)originalInfo[INFO_PERMISSIONS_KEY] unsignedShortValue], [(NSNumber *)newInfo[INFO_PERMISSIONS_KEY] unsignedShortValue]);
@@ -522,9 +524,12 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
             } else {
                 NSString *path = [destination stringByAppendingPathComponent:key];
                 
-                SPUDeltaFileAttributes attributes = shouldDeleteThenExtract(originalInfo, newInfo) ? (SPUDeltaFileAttributesDelete | SPUDeltaFileAttributesExtract) : SPUDeltaFileAttributesExtract;
+                SPUDeltaFileAttributes attributes = shouldDeleteThenExtract(originalInfo, newInfo, majorVersion) ? (SPUDeltaFileAttributesDelete | SPUDeltaFileAttributesExtract) : SPUDeltaFileAttributesExtract;
                 
-                [archive addRelativeFilePath:key realFilePath:path attributes:attributes permissions:0];
+                SPUDeltaArchiveItem *item = [[SPUDeltaArchiveItem alloc] initWithRelativeFilePath:key attributes:attributes permissions:0];
+                item.physicalFilePath = path;
+                
+                [archive addItem:item];
 
                 if (verbose) {
                     if (originalInfo) {
@@ -568,9 +573,14 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
         
         SPUDeltaFileAttributes attributes = (permissions != nil) ? (SPUDeltaFileAttributesBinaryDiff | SPUDeltaFileAttributesModifyPermissions) : SPUDeltaFileAttributesBinaryDiff;
         
-        [archive addRelativeFilePath:relativePath realFilePath:resultPath attributes:attributes permissions:permissions.unsignedShortValue];
+        SPUDeltaArchiveItem *item = [[SPUDeltaArchiveItem alloc] initWithRelativeFilePath:relativePath attributes:attributes permissions:permissions.unsignedShortValue];
+        item.physicalFilePath = resultPath;
         
-        unlink(resultPath.fileSystemRepresentation);
+        item.encodedCompletionHandler = ^{
+            unlink(resultPath.fileSystemRepresentation);
+        };
+        
+        [archive addItem:item];
 
         if (permissions != nil) {
             if (verbose) {
@@ -578,7 +588,12 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
             }
         }
     }
-
+    
+    if (![archive finishEncodingItems]) {
+        //...
+        NSLog(@"Failed to finish encoding items...");
+    }
+    
     [archive close];
 
     NSFileManager *filemgr;

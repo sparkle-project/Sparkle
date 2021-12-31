@@ -9,7 +9,8 @@
 #import "SPUXarDeltaArchive.h"
 #include <xar/xar.h>
 #include "SUBinaryDeltaCommon.h"
-#include <Availability.h>
+#import <Availability.h>
+#import <CommonCrypto/CommonDigest.h>
 
 
 #include "AppKitPrevention.h"
@@ -95,7 +96,7 @@ extern char *xar_get_safe_path(xar_file_t f) __attribute__((weak_import));
     return HAS_XAR_GET_SAFE_PATH;
 }
 
-- (void)getMajorDeltaVersion:(nullable uint16_t *)outMajorDiffVersion minorDeltaVersion:(nullable uint16_t *)outMinorDiffVersion beforeTreeHash:(NSString * _Nullable __autoreleasing * _Nullable)outBeforeTreeHash afterTreeHash:(NSString * _Nullable __autoreleasing * _Nullable)outAfterTreeHash
+- (nullable SPUDeltaArchiveHeader *)readHeader
 {
     uint16_t majorDiffVersion = FIRST_DELTA_DIFF_MAJOR_VERSION;
     uint16_t minorDiffVersion = 0;
@@ -143,33 +144,24 @@ extern char *xar_get_safe_path(xar_file_t f) __attribute__((weak_import));
         }
     }
     
-    if (outMajorDiffVersion != NULL) {
-        *outMajorDiffVersion = majorDiffVersion;
-    }
+    unsigned char rawExpectedBeforeHash[CC_SHA1_DIGEST_LENGTH] = {0};
+    getRawHashFromDisplayHash(rawExpectedBeforeHash, expectedBeforeHash);
     
-    if (outMinorDiffVersion != NULL) {
-        *outMinorDiffVersion = minorDiffVersion;
-    }
+    unsigned char rawExpectedAfterHash[CC_SHA1_DIGEST_LENGTH] = {0};
+    getRawHashFromDisplayHash(rawExpectedAfterHash, expectedAfterHash);
     
-    if (outBeforeTreeHash != NULL) {
-        *outBeforeTreeHash = expectedBeforeHash;
-    }
-    
-    if (outAfterTreeHash != NULL) {
-        *outAfterTreeHash = expectedAfterHash;
-    }
+    return [[SPUDeltaArchiveHeader alloc] initWithMajorVersion:majorDiffVersion minorVersion:minorDiffVersion beforeTreeHash:rawExpectedBeforeHash afterTreeHash:rawExpectedAfterHash];
 }
 
-
-- (void)setMajorVersion:(uint16_t)majorVersion minorVersion:(uint16_t)minorVersion beforeTreeHash:(NSString *)beforeTreeHash afterTreeHash:(NSString *)afterTreeHash
+- (void)writeHeader:(SPUDeltaArchiveHeader *)header
 {
     xar_subdoc_t attributes = xar_subdoc_new(self.x, BINARY_DELTA_ATTRIBUTES_KEY);
     
-    xar_subdoc_prop_set(attributes, MAJOR_DIFF_VERSION_KEY, [[NSString stringWithFormat:@"%u", majorVersion] UTF8String]);
-    xar_subdoc_prop_set(attributes, MINOR_DIFF_VERSION_KEY, [[NSString stringWithFormat:@"%u", minorVersion] UTF8String]);
+    xar_subdoc_prop_set(attributes, MAJOR_DIFF_VERSION_KEY, [[NSString stringWithFormat:@"%u", header.majorVersion] UTF8String]);
+    xar_subdoc_prop_set(attributes, MINOR_DIFF_VERSION_KEY, [[NSString stringWithFormat:@"%u", header.minorVersion] UTF8String]);
     
-    xar_subdoc_prop_set(attributes, BEFORE_TREE_SHA1_KEY, [beforeTreeHash UTF8String]);
-    xar_subdoc_prop_set(attributes, AFTER_TREE_SHA1_KEY, [afterTreeHash UTF8String]);
+    xar_subdoc_prop_set(attributes, BEFORE_TREE_SHA1_KEY, [displayHashFromRawHash(header.beforeTreeHash) UTF8String]);
+    xar_subdoc_prop_set(attributes, AFTER_TREE_SHA1_KEY, [displayHashFromRawHash(header.afterTreeHash) UTF8String]);
 }
 
 static xar_file_t _xarAddFile(NSMutableDictionary<NSString *, NSValue *> *fileTable, xar_t x, NSString *relativePath, NSString *filePath)
@@ -218,8 +210,13 @@ static xar_file_t _xarAddFile(NSMutableDictionary<NSString *, NSValue *> *fileTa
     return lastParent;
 }
 
-- (void)addRelativeFilePath:(NSString *)relativeFilePath realFilePath:(nullable NSString *)filePath attributes:(SPUDeltaFileAttributes)attributes permissions:(uint16_t)permissions
+- (void)addItem:(SPUDeltaArchiveItem *)item
 {
+    NSString *relativeFilePath = item.relativeFilePath;
+    NSString *filePath = item.physicalFilePath;
+    SPUDeltaFileAttributes attributes = item.attributes;
+    uint16_t permissions = item.permissions;
+    
     xar_file_t newFile = _xarAddFile(self.fileTable, self.x, relativeFilePath, filePath);
     assert(newFile != NULL);
     
@@ -238,9 +235,18 @@ static xar_file_t _xarAddFile(NSMutableDictionary<NSString *, NSValue *> *fileTa
     if ((attributes & SPUDeltaFileAttributesModifyPermissions) != 0) {
         xar_prop_set(newFile, MODIFY_PERMISSIONS_KEY, [NSString stringWithFormat:@"%u", permissions].UTF8String);
     }
+    
+    if (item.encodedCompletionHandler != NULL) {
+        item.encodedCompletionHandler();
+    }
 }
 
-- (BOOL)enumerateItems:(void (^)(const void *, NSString *, SPUDeltaFileAttributes, uint16_t, BOOL *))itemHandler
+- (BOOL)finishEncodingItems
+{
+    return YES;
+}
+
+- (BOOL)enumerateItems:(void (^)(SPUDeltaArchiveItem *, BOOL *))itemHandler
 {
     BOOL exitedEarly = NO;
     xar_iter_t iter = xar_iter_new();
@@ -297,7 +303,10 @@ static xar_file_t _xarAddFile(NSMutableDictionary<NSString *, NSValue *> *fileTa
             }
         }
         
-        itemHandler(file, relativePath, attributes, permissions, &exitedEarly);
+        SPUDeltaArchiveItem *item = [[SPUDeltaArchiveItem alloc] initWithRelativeFilePath:relativePath attributes:attributes permissions:permissions];
+        item.context = file;
+        
+        itemHandler(item, &exitedEarly);
         if (exitedEarly) {
             break;
         }
@@ -308,10 +317,13 @@ static xar_file_t _xarAddFile(NSMutableDictionary<NSString *, NSValue *> *fileTa
     return !exitedEarly;
 }
 
-- (BOOL)extractItem:(const void *)item destination:(NSString *)destinationPath
+- (BOOL)extractItem:(SPUDeltaArchiveItem *)item
 {
-    xar_file_t file = item;
-    return (xar_extract_tofile(self.x, file, destinationPath.fileSystemRepresentation) == 0);
+    assert(item.physicalFilePath != nil);
+    assert(item.context != NULL);
+    
+    xar_file_t file = item.context;
+    return (xar_extract_tofile(self.x, file, item.physicalFilePath.fileSystemRepresentation) == 0);
 }
 
 @end

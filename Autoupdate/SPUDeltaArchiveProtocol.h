@@ -11,12 +11,44 @@
 NS_ASSUME_NONNULL_BEGIN
 
 // Attributes for an item we extract/write to the archive
+
+// Note: BinaryDiff cannot coexist together with Delete
 typedef NS_ENUM(uint8_t, SPUDeltaFileAttributes) {
     SPUDeltaFileAttributesDelete = (1u << 0),
     SPUDeltaFileAttributesExtract = (1u << 1),
     SPUDeltaFileAttributesModifyPermissions = (1u << 2),
     SPUDeltaFileAttributesBinaryDiff = (1u << 3),
 };
+
+// Represents header for our archive
+@interface SPUDeltaArchiveHeader : NSObject
+
+- (instancetype)initWithMajorVersion:(uint16_t)majorVersion minorVersion:(uint16_t)minorVersion beforeTreeHash:(const unsigned char *)beforeTreeHash afterTreeHash:(const unsigned char *)afterTreeHash;
+
+@property (nonatomic, readonly) uint16_t majorVersion;
+@property (nonatomic, readonly) uint16_t minorVersion;
+@property (nonatomic, readonly) unsigned char *beforeTreeHash;
+@property (nonatomic, readonly) unsigned char *afterTreeHash;
+
+@end
+
+// Represents an item we read or write to in our delta archive
+@interface SPUDeltaArchiveItem : NSObject
+
+- (instancetype)initWithRelativeFilePath:(NSString *)relativeFilePath attributes:(SPUDeltaFileAttributes)attributes permissions:(uint16_t)permissions;
+
+@property (nonatomic, readonly) NSString *relativeFilePath;
+@property (nonatomic, nullable) NSString *physicalFilePath;
+@property (nonatomic, readonly) SPUDeltaFileAttributes attributes;
+@property (nonatomic, readonly) uint16_t permissions;
+@property (nonatomic, nullable, copy) void (^encodedCompletionHandler)(void);
+
+// Private properties
+@property (nonatomic, nullable) const void *context;
+@property (nonatomic) uint16_t originalMode;
+@property (nonatomic) uint64_t decodedDataLength;
+
+@end
 
 // A protocol for reading and writing binary delta patches
 @protocol SPUDeltaArchiveProtocol <NSObject>
@@ -29,23 +61,26 @@ typedef NS_ENUM(uint8_t, SPUDeltaFileAttributes) {
 // For reading
 
 // Retrieves metadata for the archive including major/minor version and expected bundle hashes
-- (void)getMajorDeltaVersion:(nullable uint16_t *)outMajorDiffVersion minorDeltaVersion:(nullable uint16_t *)outMinorDiffVersion beforeTreeHash:(NSString * _Nullable __autoreleasing * _Nullable)outBeforeTreeHash afterTreeHash:(NSString * _Nullable __autoreleasing * _Nullable)outAfterTreeHash;
+- (nullable SPUDeltaArchiveHeader *)readHeader;
 
 // Enumerate through items in the patch file and read the path, attributes, permissions (if permission attribute is available), and way to stop enumeration
-- (BOOL)enumerateItems:(void (^)(const void *item, NSString *relativePath, SPUDeltaFileAttributes attributes, uint16_t permissions, BOOL *stop))itemHandler;
+- (BOOL)enumerateItems:(void (^)(SPUDeltaArchiveItem *item, BOOL *stop))itemHandler;
 
 // Extract a file item from the patch file to a destination file
-- (BOOL)extractItem:(const void *)item destination:(NSString *)destinationPath;
+// The item's physical file path must be set as a destination
+- (BOOL)extractItem:(SPUDeltaArchiveItem *)item;
 
 // For writing
 
 // Set metadata for archive including major/minor version and expected bundle hashes
-- (void)setMajorVersion:(uint16_t)majorVersion minorVersion:(uint16_t)minorVersion beforeTreeHash:(NSString *)beforeTreeHash afterTreeHash:(NSString *)afterTreeHash;
+- (void)writeHeader:(SPUDeltaArchiveHeader *)header;
 
 // Add item to patch file
-// File path must be provided if there is a extract or binary delta attribute
+// Physical file path must be provided if there is an extract or binary delta attribute
 // Permissions are used only if there is a modify permissions attribute
-- (void)addRelativeFilePath:(NSString *)relativeFilePath realFilePath:(nullable NSString *)filePath attributes:(SPUDeltaFileAttributes)attributes permissions:(uint16_t)permissions;
+- (void)addItem:(SPUDeltaArchiveItem *)item;
+
+- (BOOL)finishEncodingItems;
 
 @end
 

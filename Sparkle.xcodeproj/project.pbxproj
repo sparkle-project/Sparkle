@@ -328,6 +328,10 @@
 		728337A61C9E6FF40085AA99 /* SPUProbeInstallStatus.h in Headers */ = {isa = PBXBuildFile; fileRef = 728337A41C9E6FF40085AA99 /* SPUProbeInstallStatus.h */; };
 		728337A71C9E6FF40085AA99 /* SPUProbeInstallStatus.m in Sources */ = {isa = PBXBuildFile; fileRef = 728337A51C9E6FF40085AA99 /* SPUProbeInstallStatus.m */; };
 		728638ED1CAF50CE00783084 /* SUConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 61299A5F09CA6EB100B7442F /* SUConstants.m */; };
+		728ED34A277DA23400D9238F /* SPUSparkleDeltaArchive.m in Sources */ = {isa = PBXBuildFile; fileRef = 728ED349277DA23400D9238F /* SPUSparkleDeltaArchive.m */; };
+		728ED34B277DA23400D9238F /* SPUSparkleDeltaArchive.m in Sources */ = {isa = PBXBuildFile; fileRef = 728ED349277DA23400D9238F /* SPUSparkleDeltaArchive.m */; };
+		728ED34C277DA23400D9238F /* SPUSparkleDeltaArchive.m in Sources */ = {isa = PBXBuildFile; fileRef = 728ED349277DA23400D9238F /* SPUSparkleDeltaArchive.m */; };
+		728ED34D277DA23400D9238F /* SPUSparkleDeltaArchive.m in Sources */ = {isa = PBXBuildFile; fileRef = 728ED349277DA23400D9238F /* SPUSparkleDeltaArchive.m */; };
 		729051E41DC82AC0003DEA7F /* SUOperatingSystem.m in Sources */ = {isa = PBXBuildFile; fileRef = 726F2CE41BC9C33D001971A4 /* SUOperatingSystem.m */; };
 		7293A1AE1CEE933800B957A7 /* SPUURLRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = 7293A1AC1CEE933800B957A7 /* SPUURLRequest.h */; };
 		7293A1AF1CEE933800B957A7 /* SPUURLRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 7293A1AD1CEE933800B957A7 /* SPUURLRequest.m */; };
@@ -1239,6 +1243,8 @@
 		728337A41C9E6FF40085AA99 /* SPUProbeInstallStatus.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPUProbeInstallStatus.h; sourceTree = "<group>"; };
 		728337A51C9E6FF40085AA99 /* SPUProbeInstallStatus.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SPUProbeInstallStatus.m; sourceTree = "<group>"; };
 		728638EE1CAF589C00783084 /* ConfigDownloader.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigDownloader.xcconfig; sourceTree = "<group>"; };
+		728ED348277DA23400D9238F /* SPUSparkleDeltaArchive.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SPUSparkleDeltaArchive.h; path = Autoupdate/SPUSparkleDeltaArchive.h; sourceTree = SOURCE_ROOT; };
+		728ED349277DA23400D9238F /* SPUSparkleDeltaArchive.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SPUSparkleDeltaArchive.m; path = Autoupdate/SPUSparkleDeltaArchive.m; sourceTree = SOURCE_ROOT; };
 		7293A1AC1CEE933800B957A7 /* SPUURLRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPUURLRequest.h; sourceTree = "<group>"; };
 		7293A1AD1CEE933800B957A7 /* SPUURLRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SPUURLRequest.m; sourceTree = "<group>"; };
 		729924921DF4A45000DBCDF5 /* SUUpdateValidator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SUUpdateValidator.h; path = Sparkle/SUUpdateValidator.h; sourceTree = SOURCE_ROOT; };
@@ -1776,6 +1782,8 @@
 				725EE481277BF17A00D820CE /* SPUDeltaArchiveProtocol.h */,
 				725EE484277D375F00D820CE /* SPUDeltaArchive.h */,
 				725EE485277D375F00D820CE /* SPUDeltaArchive.m */,
+				728ED348277DA23400D9238F /* SPUSparkleDeltaArchive.h */,
+				728ED349277DA23400D9238F /* SPUSparkleDeltaArchive.m */,
 				725EE47E277BF13A00D820CE /* SPUXarDeltaArchive.h */,
 				725EE47F277BF13B00D820CE /* SPUXarDeltaArchive.m */,
 				7267E5741D3D895B00D1BF90 /* SUBinaryDeltaTool.m */,
@@ -3173,6 +3181,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				725EE482277BF44A00D820CE /* SPUXarDeltaArchive.m in Sources */,
+				728ED34C277DA23400D9238F /* SPUSparkleDeltaArchive.m in Sources */,
 				7267E5761D3D895B00D1BF90 /* SUBinaryDeltaApply.m in Sources */,
 				725EE487277D376000D820CE /* SPUDeltaArchive.m in Sources */,
 				7267E5781D3D895B00D1BF90 /* SUBinaryDeltaCommon.m in Sources */,
@@ -3197,6 +3206,7 @@
 				7267E5EE1D3D915900D1BF90 /* SUBinaryDeltaApply.m in Sources */,
 				7267E5EF1D3D915900D1BF90 /* SUBinaryDeltaCommon.m in Sources */,
 				7267E5F01D3D915900D1BF90 /* SUBinaryDeltaCreate.m in Sources */,
+				728ED34B277DA23400D9238F /* SPUSparkleDeltaArchive.m in Sources */,
 				142E0E0919A83AAC00E4312B /* SUBinaryDeltaTest.m in Sources */,
 				7267E5F11D3D917A00D1BF90 /* SUBinaryDeltaUnarchiver.m in Sources */,
 				F8761EB11ADC5068000C9034 /* SUCodeSigningVerifierTest.m in Sources */,
@@ -3249,6 +3259,7 @@
 				7205C44E1E1304CE00E370AE /* Signatures.swift in Sources */,
 				7205C44F1E1304CE00E370AE /* FeedXML.swift in Sources */,
 				7205C4411E13049400E370AE /* main.swift in Sources */,
+				728ED34D277DA23400D9238F /* SPUSparkleDeltaArchive.m in Sources */,
 				7205C45F1E13066F00E370AE /* SUBinaryDeltaApply.m in Sources */,
 				7205C4621E1306A600E370AE /* SUBinaryDeltaCommon.m in Sources */,
 				FA30773F24CBC3E9007BA37D /* URL+Hashing.swift in Sources */,
@@ -3371,6 +3382,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				725EE480277BF13B00D820CE /* SPUXarDeltaArchive.m in Sources */,
+				728ED34A277DA23400D9238F /* SPUSparkleDeltaArchive.m in Sources */,
 				72EF30C42675CFA1008CE987 /* SPUAppcastItemState.m in Sources */,
 				72EF30C52675CFA1008CE987 /* SPUAppcastItemStateResolver.m in Sources */,
 				72464F701E1F31E000FB341C /* SUOperatingSystem.m in Sources */,

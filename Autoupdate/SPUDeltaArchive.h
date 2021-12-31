@@ -13,6 +13,5 @@
 NS_ASSUME_NONNULL_BEGIN
 
 id<SPUDeltaArchiveProtocol> _Nullable SPUDeltaArchiveForReading(NSString *patchFile);
-id<SPUDeltaArchiveProtocol> _Nullable SPUDeltaArchiveForWriting(NSString *patchFile);
 
 NS_ASSUME_NONNULL_END
