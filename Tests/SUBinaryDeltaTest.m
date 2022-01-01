@@ -430,13 +430,37 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
 
 - (void)testRegularFileMove
 {
-    [self createAndApplyPatchWithHandler:^(NSFileManager *__unused fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
-        NSString *sourceFile = [sourceDirectory stringByAppendingPathComponent:@"A"];
-        NSString *destinationFile = [destinationDirectory stringByAppendingPathComponent:@"B"];
+    [self createAndApplyPatchWithHandler:^(NSFileManager *fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
+        NSString *sourceFile = [sourceDirectory stringByAppendingPathComponent:@"A/B/C/D/E/F/G/H/I/J/K/L/M/N/O/P/Q/R"];
+        NSString *destinationFile = [destinationDirectory stringByAppendingPathComponent:@"A/B/C/D/E/F/G/H/I/J/K/L/M/N/O/P/Q/R2"];
+        
+        [fileManager createDirectoryAtURL:[NSURL fileURLWithPath:sourceFile.stringByDeletingLastPathComponent] withIntermediateDirectories:YES attributes:nil error:NULL];
+        
+        [fileManager createDirectoryAtURL:[NSURL fileURLWithPath:destinationFile.stringByDeletingLastPathComponent] withIntermediateDirectories:YES attributes:nil error:NULL];
         
         NSData *data = [NSData dataWithBytes:"loltes" length:6];
         XCTAssertTrue([data writeToFile:sourceFile atomically:YES]);
         XCTAssertTrue([data writeToFile:destinationFile atomically:YES]);
+        
+        XCTAssertFalse([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
+    }];
+}
+
+- (void)testRegularFileMoveWithFileInPlace
+{
+    [self createAndApplyPatchWithHandler:^(NSFileManager *fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
+        NSString *sourceFile = [sourceDirectory stringByAppendingPathComponent:@"A/B/C/D/E/F/G/H/I/J/K/L/M/N/O/P/Q/R"];
+        NSString *destinationFile = [destinationDirectory stringByAppendingPathComponent:@"A/B/C/D/E/F/G/H/I/J/K/L/M/N/O/P/Q/R2"];
+        NSString *destinationFile2 = [destinationDirectory stringByAppendingPathComponent:@"A/B/C/D/E/F/G/H/I/J/K/L/M/N/O/P/Q/R"];
+        
+        [fileManager createDirectoryAtURL:[NSURL fileURLWithPath:sourceFile.stringByDeletingLastPathComponent] withIntermediateDirectories:YES attributes:nil error:NULL];
+        
+        [fileManager createDirectoryAtURL:[NSURL fileURLWithPath:destinationFile.stringByDeletingLastPathComponent] withIntermediateDirectories:YES attributes:nil error:NULL];
+        
+        NSData *data = [NSData dataWithBytes:"loltes" length:6];
+        XCTAssertTrue([data writeToFile:sourceFile atomically:YES]);
+        XCTAssertTrue([data writeToFile:destinationFile atomically:YES]);
+        XCTAssertTrue([data writeToFile:destinationFile2 atomically:YES]);
         
         XCTAssertFalse([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
     }];
@@ -458,9 +482,13 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
 
 - (void)testRegularFileMoveWithPermissionChange
 {
-    [self createAndApplyPatchWithHandler:^(NSFileManager *__unused fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
-        NSString *sourceFile = [sourceDirectory stringByAppendingPathComponent:@"A"];
-        NSString *destinationFile = [destinationDirectory stringByAppendingPathComponent:@"B"];
+    [self createAndApplyPatchWithHandler:^(NSFileManager *fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
+        NSString *sourceFile = [sourceDirectory stringByAppendingPathComponent:@"A/B/C/D/E/F/G/H/I/J/K/L/M/N/O/P/Q/R"];
+        NSString *destinationFile = [destinationDirectory stringByAppendingPathComponent:@"A/B/C/D/E/F/G/H/I/J/K/L/M/N/O/P/Q/R2"];
+        
+        [fileManager createDirectoryAtURL:[NSURL fileURLWithPath:sourceFile.stringByDeletingLastPathComponent] withIntermediateDirectories:YES attributes:nil error:NULL];
+        
+        [fileManager createDirectoryAtURL:[NSURL fileURLWithPath:destinationFile.stringByDeletingLastPathComponent] withIntermediateDirectories:YES attributes:nil error:NULL];
         
         NSData *data = [NSData dataWithBytes:"loltes" length:6];
         XCTAssertTrue([data writeToFile:sourceFile atomically:YES]);
@@ -497,8 +525,13 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
 - (void)testSymbolicLinkMove
 {
     [self createAndApplyPatchWithHandler:^(NSFileManager *fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
-        NSString *sourceFile = [sourceDirectory stringByAppendingPathComponent:@"A"];
-        NSString *destinationFile = [destinationDirectory stringByAppendingPathComponent:@"B"];
+        
+        NSString *sourceFile = [sourceDirectory stringByAppendingPathComponent:@"A/B/C/D/E/F/G/H/I/J/K/L/M/N/O/P/Q/R"];
+        NSString *destinationFile = [destinationDirectory stringByAppendingPathComponent:@"A/B/C/D/E/F/G/H/I/J/K/L/M/N/O/P/Q/R2"];
+        
+        [fileManager createDirectoryAtURL:[NSURL fileURLWithPath:sourceFile.stringByDeletingLastPathComponent] withIntermediateDirectories:YES attributes:nil error:NULL];
+        
+        [fileManager createDirectoryAtURL:[NSURL fileURLWithPath:destinationFile.stringByDeletingLastPathComponent] withIntermediateDirectories:YES attributes:nil error:NULL];
         
         NSError *error = nil;
         
@@ -543,8 +576,12 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
 - (void)testSymbolicLinkMoveWithPermissionChange
 {
     [self createAndApplyPatchWithHandler:^(NSFileManager *fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
-        NSString *sourceFile = [sourceDirectory stringByAppendingPathComponent:@"A"];
-        NSString *destinationFile = [destinationDirectory stringByAppendingPathComponent:@"B"];
+        NSString *sourceFile = [sourceDirectory stringByAppendingPathComponent:@"A/B/C/D/E/F/G/H/I/J/K/L/M/N/O/P/Q/R"];
+        NSString *destinationFile = [destinationDirectory stringByAppendingPathComponent:@"A/B/C/D/E/F/G/H/I/J/K/L/M/N/O/P/Q/R2"];
+        
+        [fileManager createDirectoryAtURL:[NSURL fileURLWithPath:sourceFile.stringByDeletingLastPathComponent] withIntermediateDirectories:YES attributes:nil error:NULL];
+        
+        [fileManager createDirectoryAtURL:[NSURL fileURLWithPath:destinationFile.stringByDeletingLastPathComponent] withIntermediateDirectories:YES attributes:nil error:NULL];
         
         NSError *error = nil;
         
