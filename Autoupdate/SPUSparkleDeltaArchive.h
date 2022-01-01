@@ -18,6 +18,45 @@ NS_ASSUME_NONNULL_BEGIN
 #define SPARKLE_DELTA_ARCHIVE_ERROR_CODE_BAD_CHUNK_SIZE 3
 #define SPARKLE_DELTA_ARCHIVE_ERROR_CODE_BAD_CLONE_LOOKUP 4
 
+/*
+ Modern container format for binary delta archives.
+ 
+ Delta archive format has four sections which are the header, the relative file path table, the commands, and the data blobs.
+ 
+ The relative file path table records all the file paths the archive needs to know about.
+ The commands are the operations to be recorded (eg: extract, clone, binary diff, delete).
+ The commands may additionally have more metadata such as file permission modes, relative path indexes in the case of clones, or file sizes for the data blobs.
+ The data blobs contain all file data from extract and binary diff outputs.
+ 
+ -- UNCOMPRESSED --
+ 
+ [ HEADER ]
+ magic (length: 4)
+ compression (length: 1)
+ 
+ -- COMPRESSED --
+ 
+ [ HEADER ]
+ majorVersion (length: 2)
+ minorVersion (length: 2)
+ beforeTreeHash (length: 40)
+ afterTreeHash (length: 40)
+ 
+ [ RELATIVE FILE PATH TABLE ]
+ sizeOfRelativeFilePathTable (length: 8 bytes)
+ List of null terminated path strings joined together (N paths)
+ 
+ [ COMMANDS ]
+    [ Command ]
+        Set of command types for entry (length: 1 byte)
+        Additional metadata for command
+    (M commands where M <= N)
+    (Indexes for commands refer to indexes to relative file path table, excluding extraneous trailing entries in relative path table used for clones)
+ 
+ [ DATA BLOBS ]
+ All raw binary data joined together
+ (P number of blobs where P <= M)
+ */
 @interface SPUSparkleDeltaArchive : NSObject <SPUDeltaArchiveProtocol>
 
 - (instancetype)initWithPatchFileForWriting:(NSString *)patchFile compression:(SPUDeltaCompressionMode)compression compressionLevel:(int32_t)compressionLevel;
