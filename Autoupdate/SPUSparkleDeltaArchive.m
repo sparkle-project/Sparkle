@@ -307,16 +307,37 @@
                 break;
             }
             
-            // Test if we've reached the end marker
-            if (commands == 0) {
+            // Test if we're done
+            if (commands == SPUDeltaItemCommandEndMarker) {
                 break;
             }
             
             // Check if we need to decode additional data
             uint16_t decodedMode = 0;
             uint64_t decodedDataLength = 0;
+            NSString *clonedRelativePath = nil;
             
-            if ((commands & SPUDeltaItemCommandExtract) != 0 || (commands & SPUDeltaItemCommandBinaryDiff) != 0) {
+            if ((commands & SPUDeltaItemCommandClone) != 0) {
+                if ((commands & SPUDeltaItemCommandModifyPermissions) != 0) {
+                    // Decode file permission changes for clone
+                    if (![self _readBuffer:&decodedMode length:sizeof(decodedMode)]) {
+                        break;
+                    }
+                }
+                
+                // Decode relative file path for original source file
+                uint32_t cloneRelativePathIndex = 0;
+                if (![self _readBuffer:&cloneRelativePathIndex length:sizeof(cloneRelativePathIndex)]) {
+                    break;
+                }
+                
+                if ((NSUInteger)cloneRelativePathIndex >= relativeFilePaths.count) {
+                    self.error = [NSError errorWithDomain:SPARKLE_DELTA_ARCHIVE_ERROR_DOMAIN code:SPARKLE_DELTA_ARCHIVE_ERROR_CODE_BAD_CLONE_LOOKUP userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Index %u is past relative path table bounds of length %lu", cloneRelativePathIndex, (unsigned long)relativeFilePaths.count] }];
+                    break;
+                }
+                
+                clonedRelativePath = relativeFilePaths[cloneRelativePathIndex];
+            } else if ((commands & SPUDeltaItemCommandExtract) != 0 || (commands & SPUDeltaItemCommandBinaryDiff) != 0) {
                 if (![self _readBuffer:&decodedMode length:sizeof(decodedMode)]) {
                     break;
                 }
@@ -338,6 +359,7 @@
             SPUDeltaArchiveItem *archiveItem = [[SPUDeltaArchiveItem alloc] initWithRelativeFilePath:relativeFilePaths[currentItemIndex] commands:commands permissions:decodedMode];
             
             archiveItem.codedDataLength = decodedDataLength;
+            archiveItem.clonedRelativePath = clonedRelativePath;
             
             [archiveItems addObject:archiveItem];
             
@@ -591,15 +613,55 @@
         return;
     }
     
-    NSArray<SPUDeltaArchiveItem *> *writableItems = self.writableItems;
+    NSMutableArray<SPUDeltaArchiveItem *> *writableItems = self.writableItems;
+    
+    // Build relative path table for tracking file clones
+    NSMutableDictionary<NSString *, NSNumber *> *relativePathToIndexTable = [NSMutableDictionary dictionary];
+    uint32_t currentRelativePathIndex = 0;
+    for (SPUDeltaArchiveItem *item in writableItems) {
+        NSString *relativePath = item.relativeFilePath;
+        
+        relativePathToIndexTable[relativePath] = @(currentRelativePathIndex);
+        currentRelativePathIndex++;
+    }
+    
+    // Clone commands reference relative file paths in this table but sometimes there may not
+    // be an entry to the original source. Fill out any missing entries with info commands
+    NSMutableArray<NSString *> *newClonedPathEntries = [NSMutableArray array];
+    for (SPUDeltaArchiveItem *item in writableItems) {
+        NSString *clonedRelativePath = item.clonedRelativePath;
+        
+        if (clonedRelativePath != nil && relativePathToIndexTable[clonedRelativePath] == nil) {
+            [newClonedPathEntries addObject:clonedRelativePath];
+        }
+    }
+    
+    // Fill out new clone paths we'll need to reference
+    for (NSString *newClonedPathEntry in newClonedPathEntries) {
+        SPUDeltaArchiveItem *newItem = [[SPUDeltaArchiveItem alloc] initWithRelativeFilePath:newClonedPathEntry commands:SPUDeltaItemCommandNone permissions:0];
+        
+        [writableItems addObject:newItem];
+        
+        relativePathToIndexTable[newClonedPathEntry] = @(currentRelativePathIndex);
+        currentRelativePathIndex++;
+    }
     
     // Compute length of path section to write
     uint64_t totalPathLength = 0;
     for (SPUDeltaArchiveItem *item in writableItems) {
         NSString *relativePath = item.relativeFilePath;
-        const char *relativePathString = relativePath.UTF8String;
+        
+        char relativePathString[PATH_MAX + 1] = {0};
+        if (![relativePath getFileSystemRepresentation:relativePathString maxLength:sizeof(relativePathString) - 1]) {
+            self.error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Relative path cannot be retrieved and expressed as a file system representation: %@", relativePath] }];
+            break;
+        }
         
         totalPathLength += strlen(relativePathString) + 1;
+    }
+    
+    if (self.error != nil) {
+        return;
     }
     
     // Write total expected length of path section
@@ -635,7 +697,31 @@
         }
         
         // Check if we need to encode additional data
-        if ((commands & SPUDeltaItemCommandExtract) != 0 || (commands & SPUDeltaItemCommandBinaryDiff) != 0) {
+        if ((commands & SPUDeltaItemCommandClone) != 0) {
+            // Store any desired file permissions changes for the clone
+            if ((commands & SPUDeltaItemCommandModifyPermissions) != 0) {
+                uint16_t permissions = item.permissions;
+                if (![self _writeBuffer:&permissions length:sizeof(permissions)]) {
+                    break;
+                }
+            }
+            
+            // Store index to relative path table
+            NSString *clonedRelativePath = item.clonedRelativePath;
+            assert(clonedRelativePath != nil);
+            
+            NSNumber *relativePathIndex = relativePathToIndexTable[clonedRelativePath];
+            if (relativePathIndex == nil) {
+                // We have quite a problem here
+                self.error = [NSError errorWithDomain:SPARKLE_DELTA_ARCHIVE_ERROR_DOMAIN code:SPARKLE_DELTA_ARCHIVE_ERROR_CODE_BAD_CLONE_LOOKUP userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Relative file path index for %@ could not be located", clonedRelativePath] }];
+                break;
+            }
+            
+            uint32_t relativePathCIndex = relativePathIndex.unsignedIntValue;
+            if (![self _writeBuffer:&relativePathCIndex length:sizeof(relativePathCIndex)]) {
+                break;
+            }
+        } else if ((commands & SPUDeltaItemCommandExtract) != 0 || (commands & SPUDeltaItemCommandBinaryDiff) != 0) {
             NSString *physicalPath = item.physicalFilePath;
             assert(physicalPath != nil);
             
@@ -691,7 +777,7 @@
     }
     
     // Encode end command marker
-    SPUDeltaItemCommands endCommand = 0;
+    SPUDeltaItemCommands endCommand = SPUDeltaItemCommandEndMarker;
     if (![self _writeBuffer:&endCommand length:sizeof(endCommand)]) {
         return;
     }

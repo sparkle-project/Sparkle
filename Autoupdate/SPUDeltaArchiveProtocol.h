@@ -14,10 +14,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 // Note: BinaryDiff cannot coexist together with Delete
 typedef NS_ENUM(uint8_t, SPUDeltaItemCommands) {
+    SPUDeltaItemCommandEndMarker = 0,
     SPUDeltaItemCommandDelete = (1u << 0),
     SPUDeltaItemCommandExtract = (1u << 1),
     SPUDeltaItemCommandModifyPermissions = (1u << 2),
     SPUDeltaItemCommandBinaryDiff = (1u << 3),
+    SPUDeltaItemCommandClone = (1u << 4),
+    SPUDeltaItemCommandNone = (1u << 5)
 };
 
 // Compression mode to use during patch creation
@@ -50,6 +53,7 @@ extern SPUDeltaCompressionMode SPUDeltaCompressionModeDefault;
 
 @property (nonatomic, readonly) NSString *relativeFilePath;
 @property (nonatomic, nullable) NSString *physicalFilePath;
+@property (nonatomic, nullable) NSString *clonedRelativePath;
 @property (nonatomic, readonly) SPUDeltaItemCommands commands;
 @property (nonatomic, readonly) uint16_t permissions;
 

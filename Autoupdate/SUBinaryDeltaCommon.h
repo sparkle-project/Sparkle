@@ -26,6 +26,7 @@
 #define VERBOSE_PATCHED "Patched" // file is patched when applying a patch
 #define VERBOSE_UPDATED "Updated" // file's contents are updated
 #define VERBOSE_MODIFIED "Modified" // file's metadata is modified
+#define VERBOSE_CLONED "Cloned" // file is cloned in content from a differently named file
 
 #define MAJOR_VERSION_IS_AT_LEAST(actualMajor, expectedMajor) (actualMajor >= expectedMajor)
 
@@ -48,6 +49,7 @@ extern SUBinaryDeltaMajorVersion SUBinaryDeltaMajorVersionDefault;
 
 extern int compareFiles(const FTSENT **a, const FTSENT **b);
 BOOL getRawHashOfTreeWithVersion(unsigned char *hashBuffer, NSString *path, uint16_t majorVersion);
+BOOL getRawHashOfTreeAndFileTablesWithVersion(unsigned char *hashBuffer, NSString *path, uint16_t majorVersion, NSMutableDictionary<NSData *, NSMutableArray<NSString *> *> *hashToFileKeyDictionary, NSMutableDictionary<NSString *, NSData *> *fileKeyToHashDictionary);
 NSString *displayHashFromRawHash(const unsigned char *hash);
 void getRawHashFromDisplayHash(unsigned char *hash, NSString *hexHash);
 extern NSString *hashOfTreeWithVersion(NSString *path, uint16_t majorVersion);

@@ -206,7 +206,31 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
             removedFile = YES;
         }
 
-        if ((commands & SPUDeltaItemCommandBinaryDiff) != 0) {
+        if ((commands & SPUDeltaItemCommandClone) != 0) {
+            NSString *clonedRelativePath = item.clonedRelativePath;
+            if ([clonedRelativePath.pathComponents containsObject:@".."]) {
+                if (error != NULL) {
+                    *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Relative path for clone '%@' contains '..' path component", clonedRelativePath] }];
+                }
+                *stop = YES;
+                return;
+            }
+            
+            NSString *clonedOriginalPath = [source stringByAppendingPathComponent:clonedRelativePath];
+            
+            NSError *copyError = nil;
+            if (![fileManager copyItemAtPath:clonedOriginalPath toPath:destinationFilePath error:&copyError]) {
+                if (verbose) {
+                    fprintf(stderr, "\n");
+                }
+                if (error != NULL) {
+                    *error = copyError;
+                }
+                
+                *stop = YES;
+                return;
+            }
+        } else if ((commands & SPUDeltaItemCommandBinaryDiff) != 0) {
             NSString *tempDiffFile = temporaryFilename(@"apply-binary-delta");
             item.physicalFilePath = tempDiffFile;
             

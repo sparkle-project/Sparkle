@@ -140,7 +140,12 @@ static BOOL _hashOfFileContents(unsigned char *hash, FTSENT *ent)
     return YES;
 }
 
-BOOL getRawHashOfTreeWithVersion(unsigned char *hashBuffer, NSString *path, uint16_t __unused majorVersion)
+BOOL getRawHashOfTreeWithVersion(unsigned char *hashBuffer, NSString *path, uint16_t majorVersion)
+{
+    return getRawHashOfTreeAndFileTablesWithVersion(hashBuffer, path, majorVersion, nil, nil);
+}
+
+BOOL getRawHashOfTreeAndFileTablesWithVersion(unsigned char *hashBuffer, NSString *path, uint16_t __unused majorVersion, NSMutableDictionary<NSData *, NSMutableArray<NSString *> *> *hashToFileKeyDictionary, NSMutableDictionary<NSString *, NSData *> *fileKeyToHashDictionary)
 {
     char pathBuffer[PATH_MAX] = { 0 };
     if (![path getFileSystemRepresentation:pathBuffer maxLength:sizeof(pathBuffer)]) {
@@ -174,6 +179,21 @@ BOOL getRawHashOfTreeWithVersion(unsigned char *hashBuffer, NSString *path, uint
             return NO;
         }
         CC_SHA1_Update(&hashContext, fileHash, sizeof(fileHash));
+        
+        if (ent->fts_info == FTS_F || ent->fts_info == FTS_SL) {
+            NSData *hashKey = [NSData dataWithBytes:fileHash length:sizeof(fileHash)];
+            
+            if (hashToFileKeyDictionary != nil) {
+                if (hashToFileKeyDictionary[hashKey] == nil) {
+                    hashToFileKeyDictionary[hashKey] = [NSMutableArray array];
+                }
+                [hashToFileKeyDictionary[hashKey] addObject:relativePath];
+            }
+            
+            if (fileKeyToHashDictionary != nil) {
+                fileKeyToHashDictionary[relativePath] = hashKey;
+            }
+        }
 
         const char *relativePathBytes = [relativePath fileSystemRepresentation];
         CC_SHA1_Update(&hashContext, relativePathBytes, (CC_LONG)strlen(relativePathBytes));

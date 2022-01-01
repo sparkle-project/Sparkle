@@ -250,6 +250,39 @@ static BOOL shouldChangePermissions(NSDictionary *originalInfo, NSDictionary *ne
     return YES;
 }
 
+#define MIN_FILE_SIZE_FOR_CLONE 4
+
+static NSString *cloneableRelativePath(NSDictionary<NSString *, NSData *> *afterFileKeyToHashDictionary, NSDictionary<NSData *, NSArray<NSString *> *> *beforeHashToFileKeyDictionary, NSDictionary *originalTreeState, NSDictionary *newInfo, NSString *key, NSNumber * __autoreleasing *outPermissions)
+{
+    if (afterFileKeyToHashDictionary != nil && [(NSNumber *)newInfo[INFO_SIZE_KEY] unsignedLongLongValue] > MIN_FILE_SIZE_FOR_CLONE) {
+        NSData *keyHash = afterFileKeyToHashDictionary[key];
+        if (keyHash != nil) {
+            for (NSString *oldRelativePath in beforeHashToFileKeyDictionary[keyHash]) {
+                NSDictionary *oldCloneInfo = originalTreeState[oldRelativePath];
+                if (oldCloneInfo != nil) {
+                    if ([(NSNumber *)oldCloneInfo[INFO_TYPE_KEY] unsignedShortValue] == [(NSNumber *)newInfo[INFO_TYPE_KEY] unsignedShortValue]) {
+                        
+                        NSString *clonePath = oldCloneInfo[INFO_PATH_KEY];
+                        NSString *newPath = newInfo[INFO_PATH_KEY];
+                        
+                        if ([[NSFileManager defaultManager] contentsEqualAtPath:clonePath andPath:newPath]) {
+                            NSNumber *newPermissions = newInfo[INFO_PERMISSIONS_KEY];
+                            if ([(NSNumber *)oldCloneInfo[INFO_PERMISSIONS_KEY] unsignedShortValue] != [newPermissions unsignedShortValue]) {
+                                if (outPermissions != NULL) {
+                                    *outPermissions = newPermissions;
+                                }
+                            }
+                            
+                            return oldRelativePath;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return nil;
+}
+
 BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchFile, SUBinaryDeltaMajorVersion majorVersion, SPUDeltaCompressionMode compression, int32_t compressionLevel, BOOL verbose, NSError *__autoreleasing *error)
 {
     assert(source);
@@ -328,8 +361,10 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
     }
     fts_close(fts);
 
+    NSMutableDictionary<NSData *, NSMutableArray<NSString *> *> *beforeHashToFileKeyDictionary = MAJOR_VERSION_IS_AT_LEAST(majorVersion, SUBinaryDeltaMajorVersion3) ? [NSMutableDictionary dictionary] : nil;
+    
     unsigned char beforeHash[CC_SHA1_DIGEST_LENGTH] = {0};
-    if (!getRawHashOfTreeWithVersion(beforeHash, source, majorVersion)) {
+    if (!getRawHashOfTreeAndFileTablesWithVersion(beforeHash, source, majorVersion, beforeHashToFileKeyDictionary, nil)) {
         if (verbose) {
             fprintf(stderr, "\n");
         }
@@ -435,8 +470,10 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
     }
     fts_close(fts);
 
+    NSMutableDictionary<NSString *, NSData *> *afterFileKeyToHashDictionary = MAJOR_VERSION_IS_AT_LEAST(majorVersion, SUBinaryDeltaMajorVersion3) ? [NSMutableDictionary dictionary] : nil;
+    
     unsigned char afterHash[CC_SHA1_DIGEST_LENGTH] = {0};
-    if (!getRawHashOfTreeWithVersion(afterHash, destination, majorVersion)) {
+    if (!getRawHashOfTreeAndFileTablesWithVersion(afterHash, destination, majorVersion, nil, afterFileKeyToHashDictionary)) {
         if (verbose) {
             fprintf(stderr, "\n");
         }
@@ -513,20 +550,45 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
                     }
                 }
             } else {
-                NSString *path = [destination stringByAppendingPathComponent:key];
-                
-                SPUDeltaItemCommands commands = shouldDeleteThenExtract(originalInfo, newInfo, majorVersion) ? (SPUDeltaItemCommandDelete | SPUDeltaItemCommandExtract) : SPUDeltaItemCommandExtract;
-                
-                SPUDeltaArchiveItem *item = [[SPUDeltaArchiveItem alloc] initWithRelativeFilePath:key commands:commands permissions:0];
-                item.physicalFilePath = path;
-                
-                [archive addItem:item];
+                // Check if the new file can be cloned from an old existing one located at a different path
+                NSNumber *newPermissionsFromClone = nil;
+                NSString *clonedRelativePath = cloneableRelativePath(afterFileKeyToHashDictionary, beforeHashToFileKeyDictionary, originalTreeState, newInfo, key, &newPermissionsFromClone);
+                if (clonedRelativePath != nil) {
+                    SPUDeltaItemCommands commands = SPUDeltaItemCommandClone;
+                    if (shouldDeleteThenExtract(originalInfo, newInfo, majorVersion)) {
+                        commands |= SPUDeltaItemCommandDelete;
+                    }
+                    if (newPermissionsFromClone != nil) {
+                        commands |= SPUDeltaItemCommandModifyPermissions;
+                    }
+                    
+                    SPUDeltaArchiveItem *item = [[SPUDeltaArchiveItem alloc] initWithRelativeFilePath:key commands:commands permissions:newPermissionsFromClone.unsignedShortValue];
+                    // Physical path for clones points to the old file
+                    item.physicalFilePath = [source stringByAppendingPathComponent:clonedRelativePath];
+                    item.clonedRelativePath = clonedRelativePath;
+                    
+                    [archive addItem:item];
+                    
+                    if (verbose) {
+                        fprintf(stderr, "\n✂️   %s %s -> %s", VERBOSE_CLONED, [clonedRelativePath fileSystemRepresentation], [key fileSystemRepresentation]);
+                    }
+                } else {
+                    // Otherwise add a new file
+                    NSString *path = [destination stringByAppendingPathComponent:key];
+                    
+                    SPUDeltaItemCommands commands = shouldDeleteThenExtract(originalInfo, newInfo, majorVersion) ? (SPUDeltaItemCommandDelete | SPUDeltaItemCommandExtract) : SPUDeltaItemCommandExtract;
+                    
+                    SPUDeltaArchiveItem *item = [[SPUDeltaArchiveItem alloc] initWithRelativeFilePath:key commands:commands permissions:0];
+                    item.physicalFilePath = path;
+                    
+                    [archive addItem:item];
 
-                if (verbose) {
-                    if (originalInfo) {
-                        fprintf(stderr, "\n✏️  %s %s", VERBOSE_UPDATED, [key fileSystemRepresentation]);
-                    } else {
-                        fprintf(stderr, "\n✅  %s %s", VERBOSE_ADDED, [key fileSystemRepresentation]);
+                    if (verbose) {
+                        if (originalInfo) {
+                            fprintf(stderr, "\n✏️  %s %s", VERBOSE_UPDATED, [key fileSystemRepresentation]);
+                        } else {
+                            fprintf(stderr, "\n✅  %s %s", VERBOSE_ADDED, [key fileSystemRepresentation]);
+                        }
                     }
                 }
             }
