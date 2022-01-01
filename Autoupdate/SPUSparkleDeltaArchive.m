@@ -297,6 +297,13 @@
         return;
     }
     
+    if (relativeFilePaths.count > UINT32_MAX) {
+        // Very unlikely but we should guard against this
+        // Clones rely on 32-bit indexes
+        self.error = [NSError errorWithDomain:SPARKLE_DELTA_ARCHIVE_ERROR_DOMAIN code:SPARKLE_DELTA_ARCHIVE_ERROR_CODE_TOO_MANY_FILES userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"There are too many file entries to apply a patch for (more than %u)", UINT32_MAX] }];
+        return;
+    }
+    
     // Parse through all commands
     NSMutableArray<SPUDeltaArchiveItem *> *archiveItems = [[NSMutableArray alloc] init];
     {
@@ -638,6 +645,13 @@
             relativePathToIndexTable[clonedRelativePath] = @(currentRelativePathIndex);
             currentRelativePathIndex++;
         }
+    }
+    
+    if (relativePathToIndexTable.count > UINT32_MAX) {
+        // Very unlikely but we should guard against this
+        // Clones rely on 32-bit indexes
+        self.error = [NSError errorWithDomain:SPARKLE_DELTA_ARCHIVE_ERROR_DOMAIN code:SPARKLE_DELTA_ARCHIVE_ERROR_CODE_TOO_MANY_FILES userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"There are too many file entries to create a patch for (more than %u)", UINT32_MAX] }];
+        return;
     }
     
     // Compute length of path section to write
