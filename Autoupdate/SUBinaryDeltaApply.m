@@ -230,6 +230,10 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
                 *stop = YES;
                 return;
             }
+            
+            if (verbose) {
+                fprintf(stderr, "\n✂️   %s %s -> %s", VERBOSE_CLONED, [clonedRelativePath fileSystemRepresentation], [relativePath fileSystemRepresentation]);
+            }
         } else if ((commands & SPUDeltaItemCommandBinaryDiff) != 0) {
             NSString *tempDiffFile = temporaryFilename(@"apply-binary-delta");
             item.physicalFilePath = tempDiffFile;
