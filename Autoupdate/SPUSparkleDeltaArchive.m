@@ -351,10 +351,17 @@
                 
                 // Decode data length
                 // Length doesn't matter for directory names (we already track the name in the relative path)
-                if (S_ISREG(decodedMode) || S_ISLNK(decodedMode)) {
+                if (S_ISREG(decodedMode)) {
                     if (![self _readBuffer:&decodedDataLength length:sizeof(decodedDataLength)]) {
                         break;
                     }
+                } else if (S_ISLNK(decodedMode)) {
+                    uint16_t decodedLinkLength = 0;
+                    if (![self _readBuffer:&decodedLinkLength length:sizeof(decodedLinkLength)]) {
+                        break;
+                    }
+                    
+                    decodedDataLength = decodedLinkLength;
                 }
             } else if ((commands & SPUDeltaItemCommandModifyPermissions) != 0) {
                 // Decode file permissions
@@ -464,25 +471,18 @@
                 return NO;
             }
             
-            void *buffer;
-            if (decodedLength == 0) {
-                buffer = NULL;
-            } else {
-                buffer = calloc(1, decodedLength);
-                if (buffer == NULL) {
-                    self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to calloc() %llu bytes for link %@", decodedLength, physicalFilePath] }];
-                    return NO;
-                }
-                
-                if (![self _readBuffer:buffer length:(int32_t)decodedLength]) {
-                    free(buffer);
-                    return NO;
-                }
+            if (decodedLength > PATH_MAX) {
+                // Link is too long
+                self.error = [NSError errorWithDomain:SPARKLE_DELTA_ARCHIVE_ERROR_DOMAIN code:SPARKLE_DELTA_ARCHIVE_ERROR_CODE_LINK_TOO_LONG userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Decoded length for link (%llu) is too long.", decodedLength] }];
+                return NO;
             }
             
-            NSString *destinationPath = (buffer != NULL) ? [fileManager stringWithFileSystemRepresentation:buffer length:decodedLength] : @"";
+            char buffer[PATH_MAX + 1] = {0};
+            if (![self _readBuffer:buffer length:(int32_t)decodedLength]) {
+                return NO;
+            }
             
-            free(buffer);
+            NSString *destinationPath = [fileManager stringWithFileSystemRepresentation:buffer length:decodedLength];
             
             if (destinationPath == nil) {
                 self.error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Destination path for link %@ cannot be created in a file system representation: %@",physicalFilePath, destinationPath] }];
@@ -783,8 +783,21 @@
             
             // Store data length
             // Length doesn't matter for directory names (we already track the name in the relative path)
-            if (S_ISREG(originalMode) || S_ISLNK(originalMode)) {
+            if (S_ISREG(originalMode)) {
                 uint64_t dataLength = (uint64_t)fileInfo.st_size;
+                if (![self _writeBuffer:&dataLength length:sizeof(dataLength)]) {
+                    break;
+                }
+                
+                item.codedDataLength = dataLength;
+            } else if (S_ISLNK(originalMode)) {
+                off_t fileSize = fileInfo.st_size;
+                if (fileSize > UINT16_MAX) {
+                    self.error = [NSError errorWithDomain:SPARKLE_DELTA_ARCHIVE_ERROR_DOMAIN code:SPARKLE_DELTA_ARCHIVE_ERROR_CODE_LINK_TOO_LONG userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Link path has a destination that is too long: %llu bytes", fileSize] }];
+                    break;
+                }
+                
+                uint16_t dataLength = (uint16_t)fileSize;
                 if (![self _writeBuffer:&dataLength length:sizeof(dataLength)]) {
                     break;
                 }
