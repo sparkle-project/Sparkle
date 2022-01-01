@@ -442,6 +442,74 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
     }];
 }
 
+- (void)testRegularFileMoveWithPermissionChange
+{
+    [self createAndApplyPatchWithHandler:^(NSFileManager *__unused fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
+        NSString *sourceFile = [sourceDirectory stringByAppendingPathComponent:@"A"];
+        NSString *destinationFile = [destinationDirectory stringByAppendingPathComponent:@"B"];
+        
+        NSData *data = [NSData dataWithBytes:"loltest" length:7];
+        XCTAssertTrue([data writeToFile:sourceFile atomically:YES]);
+        XCTAssertTrue([data writeToFile:destinationFile atomically:YES]);
+        
+        if (chmod([destinationFile fileSystemRepresentation], 0777) != 0) {
+            NSLog(@"Change Permission Error..");
+            XCTFail(@"Failed setting file permissions");
+        }
+        
+        XCTAssertFalse([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
+    }];
+}
+
+- (void)testSymbolicLinkMove
+{
+    [self createAndApplyPatchWithHandler:^(NSFileManager *fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
+        NSString *sourceFile = [sourceDirectory stringByAppendingPathComponent:@"A"];
+        NSString *destinationFile = [destinationDirectory stringByAppendingPathComponent:@"B"];
+        
+        NSError *error = nil;
+        
+        if (![fileManager createSymbolicLinkAtPath:sourceFile withDestinationPath:@"C" error:&error]) {
+            NSLog(@"Error in creating symlink: %@", error);
+            XCTFail(@"Failed to create symlink");
+        }
+        
+        if (![fileManager createSymbolicLinkAtPath:destinationFile withDestinationPath:@"C" error:&error]) {
+            NSLog(@"Error in creating symlink: %@", error);
+            XCTFail(@"Failed to create symlink");
+        }
+        
+        XCTAssertFalse([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
+    }];
+}
+
+- (void)testSymbolicLinkMoveWithPermissionChange
+{
+    [self createAndApplyPatchWithHandler:^(NSFileManager *fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
+        NSString *sourceFile = [sourceDirectory stringByAppendingPathComponent:@"A"];
+        NSString *destinationFile = [destinationDirectory stringByAppendingPathComponent:@"B"];
+        
+        NSError *error = nil;
+        
+        if (![fileManager createSymbolicLinkAtPath:sourceFile withDestinationPath:@"C" error:&error]) {
+            NSLog(@"Error in creating symlink: %@", error);
+            XCTFail(@"Failed to create symlink");
+        }
+        
+        if (![fileManager createSymbolicLinkAtPath:destinationFile withDestinationPath:@"C" error:&error]) {
+            NSLog(@"Error in creating symlink: %@", error);
+            XCTFail(@"Failed to create symlink");
+        }
+        
+        if (lchmod([destinationFile fileSystemRepresentation], 0777) != 0) {
+            NSLog(@"Change Permission Error..");
+            XCTFail(@"Failed setting file permissions");
+        }
+        
+        XCTAssertFalse([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
+    }];
+}
+
 - (void)testCaseSensitiveRegularFileMove
 {
     [self createAndApplyPatchWithHandler:^(NSFileManager *__unused fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
