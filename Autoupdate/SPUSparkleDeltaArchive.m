@@ -27,6 +27,7 @@
 @property (nonatomic) SPUDeltaCompressionMode compression;
 @property (nonatomic, readonly) BOOL writeMode;
 @property (nonatomic) NSError *error;
+@property (nonatomic) void *partialChunkBuffer;
 
 @property (nonatomic) NSMutableArray<SPUDeltaArchiveItem *> *writableItems;
 @property (nonatomic) int32_t writableCompressionLevel;
@@ -43,6 +44,7 @@
 @synthesize writableItems = _writableItems;
 @synthesize writableCompressionLevel = _writableCompressionLevel;
 @synthesize error = _error;
+@synthesize partialChunkBuffer = _partialChunkBuffer;
 
 + (BOOL)maySupportSafeExtraction
 {
@@ -94,6 +96,19 @@
         fclose(self.file);
         self.file = NULL;
     }
+    
+    free(self.partialChunkBuffer);
+    self.partialChunkBuffer = NULL;
+}
+
+- (BOOL)createPartialChunkBuffer
+{
+    self.partialChunkBuffer = calloc(1, PARTIAL_IO_CHUNK_SIZE);
+    if (self.partialChunkBuffer == NULL) {
+        self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to calloc() %d bytes for partial chunk buffer.", PARTIAL_IO_CHUNK_SIZE] }];
+        return NO;
+    }
+    return YES;
 }
 
 - (BOOL)_readBuffer:(void *)buffer length:(int32_t)length
@@ -137,6 +152,10 @@
 
 - (nullable SPUDeltaArchiveHeader *)readHeader
 {
+    if (![self createPartialChunkBuffer]) {
+        return nil;
+    }
+    
     NSString *patchFile = self.patchFile;
     
     char patchFilePath[PATH_MAX + 1] = {0};
@@ -430,25 +449,22 @@
             if (decodedLength > 0) {
                 // Write out archive contents to file in chunks
                 
-                void *tempBuffer = calloc(1, PARTIAL_IO_CHUNK_SIZE);
-                if (tempBuffer == NULL) {
-                    self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to calloc() %d bytes for chunk.", PARTIAL_IO_CHUNK_SIZE] }];
-                } else {
-                    uint64_t bytesLeftoverToCopy = decodedLength;
-                    while (bytesLeftoverToCopy > 0) {
-                        uint64_t currentBlockSize = (bytesLeftoverToCopy >= PARTIAL_IO_CHUNK_SIZE) ? PARTIAL_IO_CHUNK_SIZE : bytesLeftoverToCopy;
-                        
-                        if (![self _readBuffer:tempBuffer length:(int32_t)currentBlockSize]) {
-                            break;
-                        }
-                        
-                        if (fwrite(tempBuffer, currentBlockSize, 1, outputFile) < 1) {
-                            self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to fwrite() %llu bytes during extraction.", currentBlockSize] }];
-                            break;
-                        }
-                        
-                        bytesLeftoverToCopy -= currentBlockSize;
+                uint64_t bytesLeftoverToCopy = decodedLength;
+                while (bytesLeftoverToCopy > 0) {
+                    uint64_t currentBlockSize = (bytesLeftoverToCopy >= PARTIAL_IO_CHUNK_SIZE) ? PARTIAL_IO_CHUNK_SIZE : bytesLeftoverToCopy;
+                    
+                    void *tempBuffer = self.partialChunkBuffer;
+                    
+                    if (![self _readBuffer:tempBuffer length:(int32_t)currentBlockSize]) {
+                        break;
                     }
+                    
+                    if (fwrite(tempBuffer, currentBlockSize, 1, outputFile) < 1) {
+                        self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to fwrite() %llu bytes during extraction.", currentBlockSize] }];
+                        break;
+                    }
+                    
+                    bytesLeftoverToCopy -= currentBlockSize;
                 }
             }
             
@@ -551,6 +567,10 @@
 
 - (void)writeHeader:(SPUDeltaArchiveHeader *)header
 {
+    if (![self createPartialChunkBuffer]) {
+        return;
+    }
+    
     char patchFilePath[PATH_MAX + 1] = {0};
     if (![self.patchFile getFileSystemRepresentation:patchFilePath maxLength:sizeof(patchFilePath) - 1]) {
         self.error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to open header and represent as a file system representation: %@", self.patchFile] }];
@@ -824,6 +844,7 @@
     }
     
     // Encode all of our file contents
+    void *tempBuffer = self.partialChunkBuffer;
     for (SPUDeltaArchiveItem *item in writableItems) {
         SPUDeltaItemCommands commands = item.commands;
         if ((commands & SPUDeltaItemCommandExtract) != 0 || (commands & SPUDeltaItemCommandBinaryDiff) != 0) {
@@ -848,25 +869,20 @@
                         break;
                     }
                     
-                    uint8_t *tempBuffer = calloc(1, PARTIAL_IO_CHUNK_SIZE);
-                    if (tempBuffer == NULL) {
-                        self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to calloc() %d chunk bytes while encoding items", PARTIAL_IO_CHUNK_SIZE] }];
-                    } else {
-                        uint64_t bytesLeftoverToCopy = totalItemSize;
-                        while (bytesLeftoverToCopy > 0) {
-                            uint64_t currentBlockSize = (bytesLeftoverToCopy >= PARTIAL_IO_CHUNK_SIZE) ? PARTIAL_IO_CHUNK_SIZE : bytesLeftoverToCopy;
-                            
-                            if (fread(tempBuffer, currentBlockSize, 1, inputFile) < 1) {
-                                self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to read %llu chunk bytes while encoding items", currentBlockSize] }];
-                                break;
-                            }
-                            
-                            if (![self _writeBuffer:tempBuffer length:(int32_t)currentBlockSize]) {
-                                break;
-                            }
-                            
-                            bytesLeftoverToCopy -= currentBlockSize;
+                    uint64_t bytesLeftoverToCopy = totalItemSize;
+                    while (bytesLeftoverToCopy > 0) {
+                        uint64_t currentBlockSize = (bytesLeftoverToCopy >= PARTIAL_IO_CHUNK_SIZE) ? PARTIAL_IO_CHUNK_SIZE : bytesLeftoverToCopy;
+                        
+                        if (fread(tempBuffer, currentBlockSize, 1, inputFile) < 1) {
+                            self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to read %llu chunk bytes while encoding items", currentBlockSize] }];
+                            break;
                         }
+                        
+                        if (![self _writeBuffer:tempBuffer length:(int32_t)currentBlockSize]) {
+                            break;
+                        }
+                        
+                        bytesLeftoverToCopy -= currentBlockSize;
                     }
                     
                     fclose(inputFile);
