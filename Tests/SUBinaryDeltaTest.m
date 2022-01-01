@@ -473,6 +473,7 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
         NSString *destinationFile = [destinationDirectory stringByAppendingPathComponent:@"B"];
         
         NSData *data = [self bigData2];
+        XCTAssertTrue([data writeToFile:sourceFile atomically:YES]);
         XCTAssertTrue([data writeToFile:destinationFile atomically:YES]);
         
         XCTAssertFalse([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
