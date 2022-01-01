@@ -38,7 +38,7 @@ NS_ASSUME_NONNULL_BEGIN
  
  -- COMPRESSED --
  
- [ HEADER ]
+ [ HEADER (part 2)]
  majorVersion (length: 2)
  minorVersion (length: 2)
  beforeTreeHash (length: 40)
@@ -52,12 +52,12 @@ NS_ASSUME_NONNULL_BEGIN
     [ Command ]
         Set of command types for entry (length: 1 byte)
         Additional metadata for command
-    (M commands where M <= N)
+    (M commands where M <= N paths)
     (Indexes for commands refer to indexes to relative file path table, excluding extraneous trailing entries in relative path table used for clones)
  
  [ DATA BLOBS ]
  All raw binary data joined together
- (P number of blobs where P <= M)
+ (P number of blobs where P <= M commands)
  */
 @interface SPUSparkleDeltaArchive : NSObject <SPUDeltaArchiveProtocol>
 
