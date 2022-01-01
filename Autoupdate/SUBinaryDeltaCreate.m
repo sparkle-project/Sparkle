@@ -255,7 +255,7 @@ static BOOL shouldChangePermissions(NSDictionary *originalInfo, NSDictionary *ne
 #define MIN_METADATA_SIZE_FOR_CLONE 4
 #define MIN_METADATA_SIZE_FOR_EXTRACT 8
 
-static NSString *cloneableRelativePath(NSDictionary<NSString *, NSData *> *afterFileKeyToHashDictionary, NSDictionary<NSData *, NSArray<NSString *> *> *beforeHashToFileKeyDictionary, NSDictionary *originalTreeState, NSDictionary *newTreeState, NSDictionary *newInfo, NSString *key, NSNumber * __autoreleasing *outPermissions)
+static NSString *cloneableRelativePath(NSDictionary<NSString *, NSData *> *afterFileKeyToHashDictionary, NSDictionary<NSData *, NSArray<NSString *> *> *beforeHashToFileKeyDictionary, NSDictionary *originalTreeState, NSDictionary *newInfo, NSString *key, NSNumber * __autoreleasing *outPermissions)
 {
     if (afterFileKeyToHashDictionary == nil) {
         return nil;
@@ -279,13 +279,10 @@ static NSString *cloneableRelativePath(NSDictionary<NSString *, NSData *> *after
         NSString *clonePath = oldCloneInfo[INFO_PATH_KEY];
         NSString *newPath = newInfo[INFO_PATH_KEY];
         
-        // If the new tree state is not already recording the relative path,
-        // this will incur the cost of adding a new path to the archive.
-        // Make sure this cost is worth paying for
-        if (newTreeState[oldRelativePath] == nil) {
-            if (strlen(oldRelativePath.fileSystemRepresentation) + 1 + MIN_METADATA_SIZE_FOR_CLONE >= [(NSNumber *)newInfo[INFO_SIZE_KEY] unsignedLongLongValue] + MIN_METADATA_SIZE_FOR_EXTRACT) {
-                continue;
-            }
+        // This may incur the cost of adding a new path to the archive.
+        // Make sure this potential cost is worth paying for
+        if (strlen(oldRelativePath.fileSystemRepresentation) + 1 + MIN_METADATA_SIZE_FOR_CLONE >= [(NSNumber *)newInfo[INFO_SIZE_KEY] unsignedLongLongValue] + MIN_METADATA_SIZE_FOR_EXTRACT) {
+            continue;
         }
         
         if (![[NSFileManager defaultManager] contentsEqualAtPath:clonePath andPath:newPath]) {
@@ -574,7 +571,7 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
             } else {
                 // Check if the new file can be cloned from an old existing one located at a different path
                 NSNumber *newPermissionsFromClone = nil;
-                NSString *clonedRelativePath = cloneableRelativePath(afterFileKeyToHashDictionary, beforeHashToFileKeyDictionary, originalTreeState, newTreeState, newInfo, key, &newPermissionsFromClone);
+                NSString *clonedRelativePath = cloneableRelativePath(afterFileKeyToHashDictionary, beforeHashToFileKeyDictionary, originalTreeState, newInfo, key, &newPermissionsFromClone);
                 if (clonedRelativePath != nil) {
                     SPUDeltaItemCommands commands = SPUDeltaItemCommandClone;
                     if (shouldDeleteThenExtract(originalInfo, newInfo, majorVersion)) {
