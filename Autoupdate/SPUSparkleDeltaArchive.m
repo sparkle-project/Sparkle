@@ -50,21 +50,24 @@
 {
     self = [super init];
     if (self != nil) {
-        FILE *file = fopen(patchFile.fileSystemRepresentation, "wb");
+        char patchFilePath[PATH_MAX + 1] = {0};
+        if (![patchFile getFileSystemRepresentation:patchFilePath maxLength:sizeof(patchFilePath) - 1]) {
+            //self.error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to open and represent as a file system representation: %@", patchFile] }];
+            return nil;
+        }
+        
+        FILE *file = fopen(patchFilePath, "wb");
         if (file == NULL) {
-            NSLog(@"Failed to open for writing binary");
             return nil;
         }
         
         char magic[] = SPARKLE_DELTA_FORMAT_MAGIC;
         if (fwrite(magic, sizeof(magic) - 1, 1, file) < 1) {
-            NSLog(@"Failed to write magic");
             fclose(file);
             return nil;
         }
         
         if (fwrite(&compression, sizeof(compression), 1, file) < 1) {
-            NSLog(@"Failed to write compression");
             fclose(file);
             return nil;
         }
@@ -76,7 +79,6 @@
             
             BZFILE *bzipFile = BZ2_bzWriteOpen(&bzerror, file, blockSize100k, 0, 0);
             if (bzipFile == NULL) {
-                NSLog(@"Failed to bz write open: %d", bzerror);
                 fclose(file);
                 return nil;
             }
@@ -96,6 +98,12 @@
 {
     self = [super init];
     if (self != nil) {
+        char patchFilePath[PATH_MAX + 1] = {0};
+        if (![patchFile getFileSystemRepresentation:patchFilePath maxLength:sizeof(patchFilePath) - 1]) {
+            //self.error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to open and represent as a file system representation: %@", patchFile] }];
+            return nil;
+        }
+        
         _file = fopen(patchFile.fileSystemRepresentation, "rb");
         if (_file == NULL) {
             return nil;
@@ -389,7 +397,12 @@
         if ((commands & SPUDeltaItemCommandBinaryDiff) != 0 || S_ISREG(mode)) {
             // Regular files
             
-            const char *physicalFilePathString = physicalFilePath.fileSystemRepresentation;
+            char physicalFilePathString[PATH_MAX + 1] = {0};
+            if (![physicalFilePath getFileSystemRepresentation:physicalFilePathString maxLength:sizeof(physicalFilePathString) - 1]) {
+                self.error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Path to extract cannot be decoded and expressed as a file system representation: %@", physicalFilePath] }];
+                return NO;
+            }
+            
             FILE *outputFile = fopen(physicalFilePathString, "wb");
             if (outputFile == NULL) {
                 self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to fopen() %@", physicalFilePath] }];
@@ -471,10 +484,16 @@
                 return NO;
             }
             
+            char physicalFilePathString[PATH_MAX + 1] = {0};
+            if (![physicalFilePath getFileSystemRepresentation:physicalFilePathString maxLength:sizeof(physicalFilePathString) - 1]) {
+                self.error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Link path to extract cannot be decoded and expressed as a file system representation: %@", physicalFilePath] }];
+                return NO;
+            }
+            
             // We shouldn't fail if setting permissions on symlinks fail
             // Apple filesystems have file permissions for symbolic links but other linux file systems don't
             // So this may have no effect on some file systems over the network
-            lchmod(physicalFilePath.fileSystemRepresentation, mode);
+            lchmod(physicalFilePathString, mode);
         }
     } else if (S_ISDIR(mode)) {
         NSError *createDirectoryError = nil;
@@ -590,8 +609,14 @@
             NSString *physicalPath = item.physicalFilePath;
             assert(physicalPath != nil);
             
+            char physicalFilePathString[PATH_MAX + 1] = {0};
+            if (![physicalPath getFileSystemRepresentation:physicalFilePathString maxLength:sizeof(physicalFilePathString) - 1]) {
+                self.error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Path cannot be decoded and expressed as a file system representation while encoding items: %@", physicalPath] }];
+                break;
+            }
+            
             struct stat fileInfo = {0};
-            if (lstat(physicalPath.fileSystemRepresentation, &fileInfo) != 0) {
+            if (lstat(physicalFilePathString, &fileInfo) != 0) {
                 self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to lstat() on %@", physicalPath] }];
                 break;
             }
@@ -654,7 +679,13 @@
                 
                 uint64_t totalItemSize = item.codedDataLength;
                 if (totalItemSize > 0) {
-                    FILE *inputFile = fopen(physicalPath.fileSystemRepresentation, "rb");
+                    char physicalFilePathString[PATH_MAX + 1] = {0};
+                    if (![physicalPath getFileSystemRepresentation:physicalFilePathString maxLength:sizeof(physicalFilePathString) - 1]) {
+                        self.error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Path to finish encoding cannot be decoded and expressed as a file system representation: %@", physicalPath] }];
+                        break;
+                    }
+                    
+                    FILE *inputFile = fopen(physicalFilePathString, "rb");
                     if (inputFile == NULL) {
                         self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to open file for reading while encoding items: %@", physicalPath] }];
                         break;
@@ -688,8 +719,14 @@
                     }
                 }
             } else if (S_ISLNK(originalMode)) {
+                char physicalFilePathString[PATH_MAX + 1] = {0};
+                if (![physicalPath getFileSystemRepresentation:physicalFilePathString maxLength:sizeof(physicalFilePathString) - 1]) {
+                    self.error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Link path to finish encoding cannot be decoded and expressed as a file system representation: %@", physicalPath] }];
+                    break;
+                }
+                
                 char linkDestination[PATH_MAX + 1] = {0};
-                ssize_t linkDestinationLength = readlink(physicalPath.fileSystemRepresentation, linkDestination, PATH_MAX);
+                ssize_t linkDestinationLength = readlink(physicalFilePathString, linkDestination, PATH_MAX);
                 if (linkDestinationLength < 0) {
                     self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to readlink() file at %@", physicalPath] }];
                     break;
