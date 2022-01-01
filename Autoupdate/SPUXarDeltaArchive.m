@@ -38,54 +38,54 @@ extern char *xar_get_safe_path(xar_file_t f) __attribute__((weak_import));
 #define BINARY_DELTA_KEY "binary-delta"
 #define MODIFY_PERMISSIONS_KEY "mod-permissions"
 
+// Errors
+#define SPARKLE_DELTA_XAR_ARCHIVE_ERROR_DOMAIN @"Sparkle XAR Archive"
+#define SPARKLE_DELTA_XAR_ARCHIVE_ERROR_CODE_OPEN_FAILURE 1
+#define SPARKLE_DELTA_XAR_ARCHIVE_ERROR_CODE_ADD_FAILURE 2
+#define SPARKLE_DELTA_XAR_ARCHIVE_ERROR_CODE_EXTRACT_FAILURE 3
+
 @interface SPUXarDeltaArchive ()
 
 @property (nonatomic) xar_t x;
+@property (nonatomic, readonly) int32_t xarMode;
 @property (nonatomic, readonly) NSMutableDictionary<NSString *, NSValue *> *fileTable;
+@property (nonatomic, readonly) NSString *patchFile;
+@property (nonatomic) NSError *error;
+
+@property (nonatomic, readonly) SPUDeltaCompressionMode writableCompression;
+@property (nonatomic, readonly) int32_t writableCompressionLevel;
 
 @end
 
 @implementation SPUXarDeltaArchive
 
 @synthesize x = _x;
+@synthesize xarMode = _xarMode;
+@synthesize patchFile = _patchFile;
 @synthesize fileTable = _fileTable;
+@synthesize writableCompression = _writableCompression;
+@synthesize writableCompressionLevel = _writableCompressionLevel;
+@synthesize error = _error;
 
-- (nullable instancetype)initWithPatchFileForWriting:(NSString *)patchFile compression:(SPUDeltaCompressionMode)compression compressionLevel:(int32_t)compressionLevel
+- (instancetype)initWithPatchFileForWriting:(NSString *)patchFile compression:(SPUDeltaCompressionMode)compression compressionLevel:(int32_t)compressionLevel
 {
     self = [super init];
     if (self != nil) {
-        _x = xar_open(patchFile.fileSystemRepresentation, WRITE);
-        if (_x == NULL) {
-            return nil;
-        }
-        
+        _patchFile = [patchFile copy];
+        _xarMode = WRITE;
+        _writableCompression = compression;
+        _writableCompressionLevel = compressionLevel;
         _fileTable = [NSMutableDictionary dictionary];
-        
-        switch (compression) {
-            case SPUDeltaCompressionModeNone:
-                break;
-            case SPUDeltaCompressionModeBzip2: {
-                xar_opt_set(_x, XAR_OPT_COMPRESSION, "bzip2");
-                
-                char buffer[256] = {0};
-                snprintf(buffer, sizeof(buffer) - 1, "%d", compressionLevel);
-                xar_opt_set(_x, XAR_OPT_COMPRESSIONARG, buffer);
-                
-                break;
-            }
-        }
     }
     return self;
 }
 
-- (nullable instancetype)initWithPatchFileForReading:(NSString *)patchFile
+- (instancetype)initWithPatchFileForReading:(NSString *)patchFile
 {
     self = [super init];
     if (self != nil) {
-        _x = xar_open(patchFile.fileSystemRepresentation, READ);
-        if (_x == NULL) {
-            return nil;
-        }
+        _patchFile = [patchFile copy];
+        _xarMode = READ;
     }
     return self;
 }
@@ -103,11 +103,6 @@ extern char *xar_get_safe_path(xar_file_t f) __attribute__((weak_import));
     }
 }
 
-- (NSError * _Nullable)error
-{
-    return nil;
-}
-
 // This indicates if safe extraction is available at compile time (SDK), but not if it's available at runtime.
 + (BOOL)maySupportSafeExtraction
 {
@@ -116,6 +111,15 @@ extern char *xar_get_safe_path(xar_file_t f) __attribute__((weak_import));
 
 - (nullable SPUDeltaArchiveHeader *)readHeader
 {
+    NSString *patchFile = self.patchFile;
+    xar_t x = xar_open(patchFile.fileSystemRepresentation, READ);
+    if (x == NULL) {
+        self.error = [NSError errorWithDomain:SPARKLE_DELTA_XAR_ARCHIVE_ERROR_DOMAIN code:SPARKLE_DELTA_XAR_ARCHIVE_ERROR_CODE_OPEN_FAILURE userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to xar_open() file for reading: %@", patchFile] }];
+        return nil;
+    }
+    
+    self.x = x;
+    
     uint16_t majorDiffVersion = FIRST_DELTA_DIFF_MAJOR_VERSION;
     uint16_t minorDiffVersion = 0;
     NSString *expectedBeforeHash = nil;
@@ -173,7 +177,34 @@ extern char *xar_get_safe_path(xar_file_t f) __attribute__((weak_import));
 
 - (void)writeHeader:(SPUDeltaArchiveHeader *)header
 {
-    xar_subdoc_t attributes = xar_subdoc_new(self.x, BINARY_DELTA_ATTRIBUTES_KEY);
+    NSString *patchFile = self.patchFile;
+    
+    xar_t x = xar_open(patchFile.fileSystemRepresentation, WRITE);
+    if (x == NULL) {
+        self.error = [NSError errorWithDomain:SPARKLE_DELTA_XAR_ARCHIVE_ERROR_DOMAIN code:SPARKLE_DELTA_XAR_ARCHIVE_ERROR_CODE_OPEN_FAILURE userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to xar_open() file for writing: %@", patchFile] }];
+        return;
+    }
+    
+    self.x = x;
+    
+    SPUDeltaCompressionMode compression = self.writableCompression;
+    int32_t compressionLevel = self.writableCompressionLevel;
+    
+    switch (compression) {
+        case SPUDeltaCompressionModeNone:
+            break;
+        case SPUDeltaCompressionModeBzip2: {
+            xar_opt_set(x, XAR_OPT_COMPRESSION, "bzip2");
+            
+            char buffer[256] = {0};
+            snprintf(buffer, sizeof(buffer) - 1, "%d", compressionLevel);
+            xar_opt_set(x, XAR_OPT_COMPRESSIONARG, buffer);
+            
+            break;
+        }
+    }
+    
+    xar_subdoc_t attributes = xar_subdoc_new(x, BINARY_DELTA_ATTRIBUTES_KEY);
     
     xar_subdoc_prop_set(attributes, MAJOR_DIFF_VERSION_KEY, [[NSString stringWithFormat:@"%u", header.majorVersion] UTF8String]);
     xar_subdoc_prop_set(attributes, MINOR_DIFF_VERSION_KEY, [[NSString stringWithFormat:@"%u", header.minorVersion] UTF8String]);
@@ -230,13 +261,20 @@ static xar_file_t _xarAddFile(NSMutableDictionary<NSString *, NSValue *> *fileTa
 
 - (void)addItem:(SPUDeltaArchiveItem *)item
 {
+    if (self.error != nil) {
+        return;
+    }
+    
     NSString *relativeFilePath = item.relativeFilePath;
     NSString *filePath = item.physicalFilePath;
     SPUDeltaItemCommands commands = item.commands;
     uint16_t permissions = item.permissions;
     
     xar_file_t newFile = _xarAddFile(self.fileTable, self.x, relativeFilePath, filePath);
-    assert(newFile != NULL);
+    if (newFile == NULL) {
+        self.error = [NSError errorWithDomain:SPARKLE_DELTA_XAR_ARCHIVE_ERROR_DOMAIN code:SPARKLE_DELTA_XAR_ARCHIVE_ERROR_CODE_ADD_FAILURE userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to add xar file entry: %@", relativeFilePath] }];
+        return;
+    }
     
     if ((commands & SPUDeltaItemCommandDelete) != 0) {
         xar_prop_set(newFile, DELETE_KEY, "true");
@@ -262,6 +300,10 @@ static xar_file_t _xarAddFile(NSMutableDictionary<NSString *, NSValue *> *fileTa
 
 - (void)enumerateItems:(void (^)(SPUDeltaArchiveItem *, BOOL *))itemHandler
 {
+    if (self.error != nil) {
+        return;
+    }
+    
     BOOL exitedEarly = NO;
     xar_iter_t iter = xar_iter_new();
     for (xar_file_t file = xar_file_first(self.x, iter); file; file = xar_file_next(iter)) {
@@ -331,11 +373,20 @@ static xar_file_t _xarAddFile(NSMutableDictionary<NSString *, NSValue *> *fileTa
 
 - (BOOL)extractItem:(SPUDeltaArchiveItem *)item
 {
+    if (self.error != nil) {
+        return NO;
+    }
+    
     assert(item.physicalFilePath != nil);
     assert(item.context != NULL);
     
     xar_file_t file = item.context;
-    return (xar_extract_tofile(self.x, file, item.physicalFilePath.fileSystemRepresentation) == 0);
+    if (xar_extract_tofile(self.x, file, item.physicalFilePath.fileSystemRepresentation) != 0) {
+        self.error = [NSError errorWithDomain:SPARKLE_DELTA_XAR_ARCHIVE_ERROR_DOMAIN code:SPARKLE_DELTA_XAR_ARCHIVE_ERROR_CODE_EXTRACT_FAILURE userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to extract xar file entry to %@", item.physicalFilePath] }];
+        return NO;
+    }
+    
+    return YES;
 }
 
 @end

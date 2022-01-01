@@ -12,10 +12,15 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+#define SPARKLE_DELTA_ARCHIVE_ERROR_DOMAIN @"Sparkle Delta Archive"
+#define SPARKLE_DELTA_ARCHIVE_ERROR_CODE_BAD_MAGIC 1
+#define SPARKLE_DELTA_ARCHIVE_ERROR_CODE_BAD_COMPRESSION_VALUE 2
+#define SPARKLE_DELTA_ARCHIVE_ERROR_CODE_BAD_CHUNK_SIZE 3
+
 @interface SPUSparkleDeltaArchive : NSObject <SPUDeltaArchiveProtocol>
 
-- (nullable instancetype)initWithPatchFileForWriting:(NSString *)patchFile compression:(SPUDeltaCompressionMode)compression compressionLevel:(int32_t)compressionLevel;
-- (nullable instancetype)initWithPatchFileForReading:(NSString *)patchFile;
+- (instancetype)initWithPatchFileForWriting:(NSString *)patchFile compression:(SPUDeltaCompressionMode)compression compressionLevel:(int32_t)compressionLevel;
+- (instancetype)initWithPatchFileForReading:(NSString *)patchFile;
 
 @end
 

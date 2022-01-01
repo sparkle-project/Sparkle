@@ -17,17 +17,36 @@
 
 SPUDeltaCompressionMode SPUDeltaCompressionModeDefault = SPUDeltaCompressionModeBzip2;
 
-id<SPUDeltaArchiveProtocol> _Nullable SPUDeltaArchiveForReading(NSString *patchFile)
+id<SPUDeltaArchiveProtocol> SPUDeltaArchiveReadPatchAndHeader(NSString *patchFile, SPUDeltaArchiveHeader * _Nullable __autoreleasing * _Nullable outHeader)
 {
     id<SPUDeltaArchiveProtocol> sparkleArchive = [[SPUSparkleDeltaArchive alloc] initWithPatchFileForReading:patchFile];
     
-    id<SPUDeltaArchiveProtocol> finalArchive;
-    if (sparkleArchive != nil) {
-        finalArchive = sparkleArchive;
+    SPUDeltaArchiveHeader *header = [sparkleArchive readHeader];
+    if (header == nil) {
+        NSError *archiveError = sparkleArchive.error;
+        if (archiveError != nil && [archiveError.domain isEqualToString:SPARKLE_DELTA_ARCHIVE_ERROR_DOMAIN] && archiveError.code == SPARKLE_DELTA_ARCHIVE_ERROR_CODE_BAD_MAGIC) {
+            // Retry with XAR archive if the magic value is unexpected
+            [sparkleArchive close];
+            
+            id<SPUDeltaArchiveProtocol> xarArchive = [[SPUXarDeltaArchive alloc] initWithPatchFileForReading:patchFile];
+            
+            SPUDeltaArchiveHeader *xarHeader = [xarArchive readHeader];
+            if (outHeader != NULL) {
+                *outHeader = xarHeader;
+            }
+            return xarArchive;
+        } else {
+            if (outHeader != NULL) {
+                *outHeader = nil;
+            }
+            return sparkleArchive;
+        }
     } else {
-        finalArchive = [[SPUXarDeltaArchive alloc] initWithPatchFileForReading:patchFile];
+        if (outHeader != NULL) {
+            *outHeader = header;
+        }
+        return sparkleArchive;
     }
-    return finalArchive;
 }
 
 @implementation SPUDeltaArchiveItem

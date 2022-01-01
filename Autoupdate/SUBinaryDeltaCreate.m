@@ -462,18 +462,18 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
         archive = [[SPUXarDeltaArchive alloc] initWithPatchFileForWriting:temporaryFile compression:compression compressionLevel:compressionLevel];
     }
     
-    if (archive == nil) {
+    SPUDeltaArchiveHeader *header = [[SPUDeltaArchiveHeader alloc] initWithMajorVersion:majorVersion minorVersion:minorVersion beforeTreeHash:beforeHash afterTreeHash:afterHash];
+    
+    [archive writeHeader:header];
+    if (archive.error != nil) {
         if (verbose) {
             fprintf(stderr, "\n");
         }
         if (error != NULL) {
-            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to write to %@", temporaryFile] }];
+            *error = archive.error;
         }
         return NO;
     }
-    
-    SPUDeltaArchiveHeader *header = [[SPUDeltaArchiveHeader alloc] initWithMajorVersion:majorVersion minorVersion:minorVersion beforeTreeHash:beforeHash afterTreeHash:afterHash];
-    [archive writeHeader:header];
 
     NSOperationQueue *deltaQueue = [[NSOperationQueue alloc] init];
     NSMutableArray *deltaOperations = [NSMutableArray array];

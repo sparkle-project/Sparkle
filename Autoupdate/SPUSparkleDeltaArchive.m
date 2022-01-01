@@ -18,17 +18,18 @@
 #define SPARKLE_DELTA_FORMAT_MAGIC "spk!"
 #define PARTIAL_IO_CHUNK_SIZE 16384 // this must be >= PATH_MAX
 #define SPARKLE_BZIP2_ERROR_DOMAIN @"Sparkle BZIP2"
-#define SPARKLE_DELTA_ARCHIVE_ERROR_DOMAIN @"Sparkle Delta Archive"
 
 @interface SPUSparkleDeltaArchive ()
 
 @property (nonatomic) FILE *file;
 @property (nonatomic) BZFILE *bzipFile;
-@property (nonatomic, readonly) SPUDeltaCompressionMode compression;
+@property (nonatomic, readonly) NSString *patchFile;
+@property (nonatomic) SPUDeltaCompressionMode compression;
 @property (nonatomic, readonly) BOOL writeMode;
 @property (nonatomic) NSError *error;
 
 @property (nonatomic) NSMutableArray<SPUDeltaArchiveItem *> *writableItems;
+@property (nonatomic) int32_t writableCompressionLevel;
 
 @end
 
@@ -36,9 +37,11 @@
 
 @synthesize file = _file;
 @synthesize bzipFile = _bzipFile;
+@synthesize patchFile = _patchFile;
 @synthesize compression = _compression;
 @synthesize writeMode = _writeMode;
 @synthesize writableItems = _writableItems;
+@synthesize writableCompressionLevel = _writableCompressionLevel;
 @synthesize error = _error;
 
 + (BOOL)maySupportSafeExtraction
@@ -46,108 +49,24 @@
     return YES;
 }
 
-- (nullable instancetype)initWithPatchFileForWriting:(NSString *)patchFile compression:(SPUDeltaCompressionMode)compression compressionLevel:(int32_t)compressionLevel
+- (instancetype)initWithPatchFileForWriting:(NSString *)patchFile compression:(SPUDeltaCompressionMode)compression compressionLevel:(int32_t)compressionLevel
 {
     self = [super init];
     if (self != nil) {
-        char patchFilePath[PATH_MAX + 1] = {0};
-        if (![patchFile getFileSystemRepresentation:patchFilePath maxLength:sizeof(patchFilePath) - 1]) {
-            //self.error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to open and represent as a file system representation: %@", patchFile] }];
-            return nil;
-        }
-        
-        FILE *file = fopen(patchFilePath, "wb");
-        if (file == NULL) {
-            return nil;
-        }
-        
-        char magic[] = SPARKLE_DELTA_FORMAT_MAGIC;
-        if (fwrite(magic, sizeof(magic) - 1, 1, file) < 1) {
-            fclose(file);
-            return nil;
-        }
-        
-        if (fwrite(&compression, sizeof(compression), 1, file) < 1) {
-            fclose(file);
-            return nil;
-        }
-        
-        if (compression == SPUDeltaCompressionModeBzip2) {
-            int bzerror = 0;
-            // Compression level can be 1 - 9
-            int blockSize100k = compressionLevel;
-            
-            BZFILE *bzipFile = BZ2_bzWriteOpen(&bzerror, file, blockSize100k, 0, 0);
-            if (bzipFile == NULL) {
-                fclose(file);
-                return nil;
-            }
-            
-            _bzipFile = bzipFile;
-        }
-        
-        _file = file;
+        _patchFile = [patchFile copy];
         _writableItems = [NSMutableArray array];
         _compression = compression;
+        _writableCompressionLevel = compressionLevel;
         _writeMode = YES;
     }
     return self;
 }
 
-- (nullable instancetype)initWithPatchFileForReading:(NSString *)patchFile
+- (instancetype)initWithPatchFileForReading:(NSString *)patchFile
 {
     self = [super init];
     if (self != nil) {
-        char patchFilePath[PATH_MAX + 1] = {0};
-        if (![patchFile getFileSystemRepresentation:patchFilePath maxLength:sizeof(patchFilePath) - 1]) {
-            //self.error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to open and represent as a file system representation: %@", patchFile] }];
-            return nil;
-        }
-        
-        _file = fopen(patchFile.fileSystemRepresentation, "rb");
-        if (_file == NULL) {
-            return nil;
-        }
-        
-        char magic[5] = {0};
-        if (fread(magic, sizeof(magic) - 1, 1, _file) < 1) {
-            fclose(_file);
-            return nil;
-        }
-        
-        if (strncmp(magic, SPARKLE_DELTA_FORMAT_MAGIC, sizeof(magic) - 1) != 0) {
-            fclose(_file);
-            return nil;
-        }
-        
-        SPUDeltaCompressionMode compression = 0;
-        if (fread(&compression, sizeof(compression), 1, _file) < 1) {
-            fclose(_file);
-            return nil;
-        }
-        
-        switch (compression) {
-            case SPUDeltaCompressionModeNone:
-                break;
-            case SPUDeltaCompressionModeBzip2: {
-                int bzerror = 0;
-                
-                BZFILE *bzipFile = BZ2_bzReadOpen(&bzerror, _file, 0, 0, NULL, 0);
-                if (bzipFile == NULL) {
-                    fclose(_file);
-                    return nil;
-                }
-                
-                _bzipFile = bzipFile;
-                
-                break;
-            }
-            default:
-                fclose(_file);
-                return nil;
-        }
-        
-        _compression = compression;
+        _patchFile = [patchFile copy];
     }
     return self;
 }
@@ -218,6 +137,69 @@
 
 - (nullable SPUDeltaArchiveHeader *)readHeader
 {
+    NSString *patchFile = self.patchFile;
+    
+    char patchFilePath[PATH_MAX + 1] = {0};
+    if (![patchFile getFileSystemRepresentation:patchFilePath maxLength:sizeof(patchFilePath) - 1]) {
+        self.error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to open and represent as a file system representation: %@", patchFile] }];
+        return nil;
+    }
+    
+    FILE *file = fopen(patchFilePath, "rb");
+    if (file == NULL) {
+        self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to open patch file for writing value due to io error: %@", patchFile] }];
+        return nil;
+    }
+    
+    self.file = file;
+    
+    char magic[5] = {0};
+    if (fread(magic, sizeof(magic) - 1, 1, file) < 1) {
+        self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to read magic value from patch file: %@", patchFile] }];
+        return nil;
+    }
+    
+    if (strncmp(magic, SPARKLE_DELTA_FORMAT_MAGIC, sizeof(magic) - 1) != 0) {
+        self.error = [NSError errorWithDomain:SPARKLE_DELTA_ARCHIVE_ERROR_DOMAIN code:SPARKLE_DELTA_ARCHIVE_ERROR_CODE_BAD_MAGIC userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Patch file does not have '%@' magic value", @SPARKLE_DELTA_FORMAT_MAGIC] }];
+        return nil;
+    }
+    
+    SPUDeltaCompressionMode compression = 0;
+    if (fread(&compression, sizeof(compression), 1, file) < 1) {
+        self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to read compression value from patch file: %@", patchFile] }];
+        return nil;
+    }
+    
+    self.compression = compression;
+    
+    switch (compression) {
+        case SPUDeltaCompressionModeNone:
+            break;
+        case SPUDeltaCompressionModeBzip2: {
+            int bzerror = 0;
+            
+            BZFILE *bzipFile = BZ2_bzReadOpen(&bzerror, file, 0, 0, NULL, 0);
+            if (bzipFile == NULL) {
+                switch (bzerror) {
+                    case BZ_IO_ERROR:
+                        self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to open patch as bz2 file due to io error: %@", patchFile] }];
+                        break;
+                    default:
+                        self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:bzerror userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to open patch as bz2 file: %@", patchFile] }];
+                        break;
+                }
+                return nil;
+            }
+            
+            self.bzipFile = bzipFile;
+            
+            break;
+        }
+        default:
+            self.error = [NSError errorWithDomain:SPARKLE_DELTA_ARCHIVE_ERROR_DOMAIN code:SPARKLE_DELTA_ARCHIVE_ERROR_CODE_BAD_COMPRESSION_VALUE userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Compression value read %d is not recognized.", compression] }];
+            return nil;
+    }
+    
     uint16_t majorVersion = 0;
     if (![self _readBuffer:&majorVersion length:sizeof(majorVersion)]) {
         return nil;
@@ -449,7 +431,7 @@
             
             if (PARTIAL_IO_CHUNK_SIZE < decodedLength) {
                 // Something is seriously wrong
-                self.error = [NSError errorWithDomain:SPARKLE_DELTA_ARCHIVE_ERROR_DOMAIN code:0 userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"PARTIAL_IO_CHUNK_SIZE (%d) < decodedLength (%llu)", PARTIAL_IO_CHUNK_SIZE, decodedLength] }];
+                self.error = [NSError errorWithDomain:SPARKLE_DELTA_ARCHIVE_ERROR_DOMAIN code:SPARKLE_DELTA_ARCHIVE_ERROR_CODE_BAD_CHUNK_SIZE userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"PARTIAL_IO_CHUNK_SIZE (%d) < decodedLength (%llu)", PARTIAL_IO_CHUNK_SIZE, decodedLength] }];
                 return NO;
             }
             
@@ -540,6 +522,54 @@
 
 - (void)writeHeader:(SPUDeltaArchiveHeader *)header
 {
+    char patchFilePath[PATH_MAX + 1] = {0};
+    if (![self.patchFile getFileSystemRepresentation:patchFilePath maxLength:sizeof(patchFilePath) - 1]) {
+        self.error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to open header and represent as a file system representation: %@", self.patchFile] }];
+        return;
+    }
+    
+    FILE *file = fopen(patchFilePath, "wb");
+    if (file == NULL) {
+        self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to open patch file for writing: %@", self.patchFile] }];
+        return;
+    }
+    
+    self.file = file;
+    
+    char magic[] = SPARKLE_DELTA_FORMAT_MAGIC;
+    if (fwrite(magic, sizeof(magic) - 1, 1, file) < 1) {
+        self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: @"Failed to write magic value due to io error" }];
+        return;
+    }
+    
+    SPUDeltaCompressionMode compression = self.compression;
+    if (fwrite(&compression, sizeof(compression), 1, file) < 1) {
+        self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: @"Failed to write compression value due to io error" }];
+        return;
+    }
+    
+    if (compression == SPUDeltaCompressionModeBzip2) {
+        int bzerror = 0;
+        // Compression level can be 1 - 9
+        int blockSize100k = self.writableCompressionLevel;
+        
+        BZFILE *bzipFile = BZ2_bzWriteOpen(&bzerror, file, blockSize100k, 0, 0);
+        if (bzipFile == NULL) {
+            switch (bzerror) {
+                case BZ_IO_ERROR:
+                    self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: @"Failed to open bz2 stream for writing due to io error" }];
+                    break;
+                default:
+                    self.error = [NSError errorWithDomain:SPARKLE_BZIP2_ERROR_DOMAIN code:bzerror userInfo:@{ NSLocalizedDescriptionKey: @"Failed to open bz2 stream for writing" }];
+                    break;
+            }
+            
+            return;
+        }
+        
+        self.bzipFile = bzipFile;
+    }
+    
     uint16_t majorVersion = header.majorVersion;
     [self _writeBuffer:&majorVersion length:sizeof(majorVersion)];
     

@@ -29,23 +29,16 @@ static BOOL applyBinaryDeltaToFile(NSString *patchFile, NSString *sourceFilePath
 
 BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFile, BOOL verbose, void (^progressCallback)(double progress), NSError *__autoreleasing *error)
 {
-    id<SPUDeltaArchiveProtocol> archive = SPUDeltaArchiveForReading(patchFile);
-    if (archive == nil) {
+    SPUDeltaArchiveHeader *header = nil;
+    id<SPUDeltaArchiveProtocol> archive = SPUDeltaArchiveReadPatchAndHeader(patchFile, &header);
+    if (archive.error != nil) {
         if (error != NULL) {
-            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Unable to open %@. Giving up.", patchFile] }];
+            *error = archive.error;
         }
         return NO;
     }
 
     progressCallback(0/6.0);
-    
-    SPUDeltaArchiveHeader *header = [archive readHeader];
-    if (header == nil) {
-        if (error != NULL) {
-            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadCorruptFileError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to read header from delta.  Giving up."] }];
-        }
-        return NO;
-    }
 
     SUBinaryDeltaMajorVersion majorDiffVersion = header.majorVersion;
     uint16_t minorDiffVersion = header.minorVersion;

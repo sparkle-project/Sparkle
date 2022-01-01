@@ -212,13 +212,14 @@ static BOOL runVersionCommand(NSString *programName, NSArray *args)
         uint16_t majorDiffVersion = 0;
         uint16_t minorDiffVersion = 0;
         
-        id<SPUDeltaArchiveProtocol> archive = SPUDeltaArchiveForReading(patchFile);
-        if (archive == nil) {
+        SPUDeltaArchiveHeader *header = nil;
+        id<SPUDeltaArchiveProtocol> archive = SPUDeltaArchiveReadPatchAndHeader(patchFile, &header);
+        if (archive.error != nil) {
             fprintf(stderr, "Unable to open patch %s\n", [patchFile fileSystemRepresentation]);
+            fprintf(stderr, "%s\n", archive.error.localizedDescription.UTF8String);
             return NO;
         }
         
-        SPUDeltaArchiveHeader *header = [archive readHeader];
         if (header.majorVersion < FIRST_DELTA_DIFF_MAJOR_VERSION) {
             fprintf(stderr, "Unable to retrieve version information from patch %s\n", [patchFile fileSystemRepresentation]);
             return NO;
