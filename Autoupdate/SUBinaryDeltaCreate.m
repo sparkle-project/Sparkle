@@ -250,14 +250,15 @@ static BOOL shouldChangePermissions(NSDictionary *originalInfo, NSDictionary *ne
     return YES;
 }
 
-// Non-clones require 8 bytes to record data length plus the actual data
-// Clones require a 4 byte index plus the relative file path entry if it's not already being recorded
-#define MIN_METADATA_SIZE_FOR_CLONE 4
-#define MIN_METADATA_SIZE_FOR_EXTRACT 8
-
+#define MIN_SIZE_FOR_CLONE 4096
 static NSString *cloneableRelativePath(NSDictionary<NSString *, NSData *> *afterFileKeyToHashDictionary, NSDictionary<NSData *, NSArray<NSString *> *> *beforeHashToFileKeyDictionary, NSDictionary *originalTreeState, NSDictionary *newInfo, NSString *key, NSNumber * __autoreleasing *outPermissions)
 {
     if (afterFileKeyToHashDictionary == nil) {
+        return nil;
+    }
+    
+    // Avoid clones for small files. Small files can compress very well, sometimes better than tracking clones.
+    if ([(NSNumber *)newInfo[INFO_SIZE_KEY] unsignedLongLongValue] <= MIN_SIZE_FOR_CLONE) {
         return nil;
     }
     
@@ -272,18 +273,12 @@ static NSString *cloneableRelativePath(NSDictionary<NSString *, NSData *> *after
             continue;
         }
         
-        if ([(NSNumber *)oldCloneInfo[INFO_TYPE_KEY] unsignedShortValue] != [(NSNumber *)newInfo[INFO_TYPE_KEY] unsignedShortValue]) {
+        if ([(NSNumber *)oldCloneInfo[INFO_TYPE_KEY] unsignedShortValue] != FTS_F || [(NSNumber *)newInfo[INFO_TYPE_KEY] unsignedShortValue] != FTS_F) {
             continue;
         }
         
         NSString *clonePath = oldCloneInfo[INFO_PATH_KEY];
         NSString *newPath = newInfo[INFO_PATH_KEY];
-        
-        // This may incur the cost of adding a new path to the archive.
-        // Make sure this potential cost is worth paying for
-        if (strlen(oldRelativePath.fileSystemRepresentation) + 1 + MIN_METADATA_SIZE_FOR_CLONE >= [(NSNumber *)newInfo[INFO_SIZE_KEY] unsignedLongLongValue] + MIN_METADATA_SIZE_FOR_EXTRACT) {
-            continue;
-        }
         
         if (![[NSFileManager defaultManager] contentsEqualAtPath:clonePath andPath:newPath]) {
             continue;

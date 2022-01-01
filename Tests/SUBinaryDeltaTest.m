@@ -472,8 +472,7 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
         NSString *sourceFile = [sourceDirectory stringByAppendingPathComponent:@"A"];
         NSString *destinationFile = [destinationDirectory stringByAppendingPathComponent:@"B"];
         
-        NSData *data = [NSData dataWithBytes:"loltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltest" length:553];
-        XCTAssertTrue([data writeToFile:sourceFile atomically:YES]);
+        NSData *data = [self bigData2];
         XCTAssertTrue([data writeToFile:destinationFile atomically:YES]);
         
         XCTAssertFalse([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
@@ -509,7 +508,7 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
         NSString *sourceFile = [sourceDirectory stringByAppendingPathComponent:@"A"];
         NSString *destinationFile = [destinationDirectory stringByAppendingPathComponent:@"B"];
         
-        NSData *data = [NSData dataWithBytes:"loltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltest" length:553];
+        NSData *data = [self bigData2];
         XCTAssertTrue([data writeToFile:sourceFile atomically:YES]);
         XCTAssertTrue([data writeToFile:destinationFile atomically:YES]);
         

@@ -180,7 +180,8 @@ BOOL getRawHashOfTreeAndFileTablesWithVersion(unsigned char *hashBuffer, NSStrin
         }
         CC_SHA1_Update(&hashContext, fileHash, sizeof(fileHash));
         
-        if (ent->fts_info == FTS_F || ent->fts_info == FTS_SL) {
+        // For file hash tables we only track regular files
+        if (ent->fts_info == FTS_F) {
             NSData *hashKey = [NSData dataWithBytes:fileHash length:sizeof(fileHash)];
             
             if (hashToFileKeyDictionary != nil) {
