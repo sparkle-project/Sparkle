@@ -254,32 +254,42 @@ static BOOL shouldChangePermissions(NSDictionary *originalInfo, NSDictionary *ne
 
 static NSString *cloneableRelativePath(NSDictionary<NSString *, NSData *> *afterFileKeyToHashDictionary, NSDictionary<NSData *, NSArray<NSString *> *> *beforeHashToFileKeyDictionary, NSDictionary *originalTreeState, NSDictionary *newInfo, NSString *key, NSNumber * __autoreleasing *outPermissions)
 {
-    if (afterFileKeyToHashDictionary != nil && [(NSNumber *)newInfo[INFO_SIZE_KEY] unsignedLongLongValue] > MIN_FILE_SIZE_FOR_CLONE) {
-        NSData *keyHash = afterFileKeyToHashDictionary[key];
-        if (keyHash != nil) {
-            for (NSString *oldRelativePath in beforeHashToFileKeyDictionary[keyHash]) {
-                NSDictionary *oldCloneInfo = originalTreeState[oldRelativePath];
-                if (oldCloneInfo != nil) {
-                    if ([(NSNumber *)oldCloneInfo[INFO_TYPE_KEY] unsignedShortValue] == [(NSNumber *)newInfo[INFO_TYPE_KEY] unsignedShortValue]) {
-                        
-                        NSString *clonePath = oldCloneInfo[INFO_PATH_KEY];
-                        NSString *newPath = newInfo[INFO_PATH_KEY];
-                        
-                        if ([[NSFileManager defaultManager] contentsEqualAtPath:clonePath andPath:newPath]) {
-                            NSNumber *newPermissions = newInfo[INFO_PERMISSIONS_KEY];
-                            if ([(NSNumber *)oldCloneInfo[INFO_PERMISSIONS_KEY] unsignedShortValue] != [newPermissions unsignedShortValue]) {
-                                if (outPermissions != NULL) {
-                                    *outPermissions = newPermissions;
-                                }
-                            }
-                            
-                            return oldRelativePath;
-                        }
-                    }
-                }
+    if (afterFileKeyToHashDictionary == nil || [(NSNumber *)newInfo[INFO_SIZE_KEY] unsignedLongLongValue] <= MIN_FILE_SIZE_FOR_CLONE) {
+        return nil;
+    }
+    
+    NSData *keyHash = afterFileKeyToHashDictionary[key];
+    if (keyHash == nil) {
+        return nil;
+    }
+    
+    for (NSString *oldRelativePath in beforeHashToFileKeyDictionary[keyHash]) {
+        NSDictionary *oldCloneInfo = originalTreeState[oldRelativePath];
+        if (oldCloneInfo == nil) {
+            continue;
+        }
+        
+        if ([(NSNumber *)oldCloneInfo[INFO_TYPE_KEY] unsignedShortValue] != [(NSNumber *)newInfo[INFO_TYPE_KEY] unsignedShortValue]) {
+            continue;
+        }
+        
+        NSString *clonePath = oldCloneInfo[INFO_PATH_KEY];
+        NSString *newPath = newInfo[INFO_PATH_KEY];
+        
+        if (![[NSFileManager defaultManager] contentsEqualAtPath:clonePath andPath:newPath]) {
+            continue;
+        }
+        
+        NSNumber *newPermissions = newInfo[INFO_PERMISSIONS_KEY];
+        if ([(NSNumber *)oldCloneInfo[INFO_PERMISSIONS_KEY] unsignedShortValue] != [newPermissions unsignedShortValue]) {
+            if (outPermissions != NULL) {
+                *outPermissions = newPermissions;
             }
         }
+        
+        return oldRelativePath;
     }
+    
     return nil;
 }
 
