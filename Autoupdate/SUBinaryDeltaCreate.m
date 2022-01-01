@@ -252,11 +252,12 @@ static BOOL shouldChangePermissions(NSDictionary *originalInfo, NSDictionary *ne
 
 // Non-clones require 8 bytes to record data length plus the actual data
 // Clones require a 4 byte index plus the relative file path entry if it's not already being recorded
-#define MIN_FILE_SIZE_FOR_CLONE 7
+#define MIN_METADATA_SIZE_FOR_CLONE 4
+#define MIN_METADATA_SIZE_FOR_EXTRACT 8
 
 static NSString *cloneableRelativePath(NSDictionary<NSString *, NSData *> *afterFileKeyToHashDictionary, NSDictionary<NSData *, NSArray<NSString *> *> *beforeHashToFileKeyDictionary, NSDictionary *originalTreeState, NSDictionary *newTreeState, NSDictionary *newInfo, NSString *key, NSNumber * __autoreleasing *outPermissions)
 {
-    if (afterFileKeyToHashDictionary == nil || [(NSNumber *)newInfo[INFO_SIZE_KEY] unsignedLongLongValue] <= MIN_FILE_SIZE_FOR_CLONE) {
+    if (afterFileKeyToHashDictionary == nil) {
         return nil;
     }
     
@@ -282,7 +283,7 @@ static NSString *cloneableRelativePath(NSDictionary<NSString *, NSData *> *after
         // this will incur the cost of adding a new path to the archive.
         // Make sure this cost is worth paying for
         if (newTreeState[oldRelativePath] == nil) {
-            if (strlen(oldRelativePath.fileSystemRepresentation) + 1 + MIN_FILE_SIZE_FOR_CLONE >= [(NSNumber *)newInfo[INFO_SIZE_KEY] unsignedLongLongValue]) {
+            if (strlen(oldRelativePath.fileSystemRepresentation) + 1 + MIN_METADATA_SIZE_FOR_CLONE >= [(NSNumber *)newInfo[INFO_SIZE_KEY] unsignedLongLongValue] + MIN_METADATA_SIZE_FOR_EXTRACT) {
                 continue;
             }
         }

@@ -434,7 +434,21 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
         NSString *sourceFile = [sourceDirectory stringByAppendingPathComponent:@"A"];
         NSString *destinationFile = [destinationDirectory stringByAppendingPathComponent:@"B"];
         
-        NSData *data = [NSData dataWithBytes:"loltest" length:7];
+        NSData *data = [NSData dataWithBytes:"loltes" length:6];
+        XCTAssertTrue([data writeToFile:sourceFile atomically:YES]);
+        XCTAssertTrue([data writeToFile:destinationFile atomically:YES]);
+        
+        XCTAssertFalse([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
+    }];
+}
+
+- (void)testRegularLargerFileMove
+{
+    [self createAndApplyPatchWithHandler:^(NSFileManager *__unused fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
+        NSString *sourceFile = [sourceDirectory stringByAppendingPathComponent:@"A"];
+        NSString *destinationFile = [destinationDirectory stringByAppendingPathComponent:@"B"];
+        
+        NSData *data = [NSData dataWithBytes:"loltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltest" length:553];
         XCTAssertTrue([data writeToFile:sourceFile atomically:YES]);
         XCTAssertTrue([data writeToFile:destinationFile atomically:YES]);
         
@@ -448,7 +462,26 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
         NSString *sourceFile = [sourceDirectory stringByAppendingPathComponent:@"A"];
         NSString *destinationFile = [destinationDirectory stringByAppendingPathComponent:@"B"];
         
-        NSData *data = [NSData dataWithBytes:"loltest" length:7];
+        NSData *data = [NSData dataWithBytes:"loltes" length:6];
+        XCTAssertTrue([data writeToFile:sourceFile atomically:YES]);
+        XCTAssertTrue([data writeToFile:destinationFile atomically:YES]);
+        
+        if (chmod([destinationFile fileSystemRepresentation], 0777) != 0) {
+            NSLog(@"Change Permission Error..");
+            XCTFail(@"Failed setting file permissions");
+        }
+        
+        XCTAssertFalse([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
+    }];
+}
+
+- (void)testRegularLargerFileMoveWithPermissionChange
+{
+    [self createAndApplyPatchWithHandler:^(NSFileManager *__unused fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
+        NSString *sourceFile = [sourceDirectory stringByAppendingPathComponent:@"A"];
+        NSString *destinationFile = [destinationDirectory stringByAppendingPathComponent:@"B"];
+        
+        NSData *data = [NSData dataWithBytes:"loltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltest" length:553];
         XCTAssertTrue([data writeToFile:sourceFile atomically:YES]);
         XCTAssertTrue([data writeToFile:destinationFile atomically:YES]);
         
@@ -483,6 +516,30 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
     }];
 }
 
+- (void)testLargerSymbolicLinkMove
+{
+    [self createAndApplyPatchWithHandler:^(NSFileManager *fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
+        NSString *sourceFile = [sourceDirectory stringByAppendingPathComponent:@"A"];
+        NSString *destinationFile = [destinationDirectory stringByAppendingPathComponent:@"B"];
+        
+        NSError *error = nil;
+        
+        NSString *destinationPath = @"loltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltest";
+        
+        if (![fileManager createSymbolicLinkAtPath:sourceFile withDestinationPath:destinationPath error:&error]) {
+            NSLog(@"Error in creating symlink: %@", error);
+            XCTFail(@"Failed to create symlink");
+        }
+        
+        if (![fileManager createSymbolicLinkAtPath:destinationFile withDestinationPath:destinationPath error:&error]) {
+            NSLog(@"Error in creating symlink: %@", error);
+            XCTFail(@"Failed to create symlink");
+        }
+        
+        XCTAssertFalse([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
+    }];
+}
+
 - (void)testSymbolicLinkMoveWithPermissionChange
 {
     [self createAndApplyPatchWithHandler:^(NSFileManager *fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
@@ -497,6 +554,35 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
         }
         
         if (![fileManager createSymbolicLinkAtPath:destinationFile withDestinationPath:@"C" error:&error]) {
+            NSLog(@"Error in creating symlink: %@", error);
+            XCTFail(@"Failed to create symlink");
+        }
+        
+        if (lchmod([destinationFile fileSystemRepresentation], 0777) != 0) {
+            NSLog(@"Change Permission Error..");
+            XCTFail(@"Failed setting file permissions");
+        }
+        
+        XCTAssertFalse([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
+    }];
+}
+
+- (void)testLargerSymbolicLinkMoveWithPermissionChange
+{
+    [self createAndApplyPatchWithHandler:^(NSFileManager *fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
+        NSString *sourceFile = [sourceDirectory stringByAppendingPathComponent:@"A"];
+        NSString *destinationFile = [destinationDirectory stringByAppendingPathComponent:@"B"];
+        
+        NSError *error = nil;
+        
+        NSString *destinationPath = @"loltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltest";
+        
+        if (![fileManager createSymbolicLinkAtPath:sourceFile withDestinationPath:destinationPath error:&error]) {
+            NSLog(@"Error in creating symlink: %@", error);
+            XCTFail(@"Failed to create symlink");
+        }
+        
+        if (![fileManager createSymbolicLinkAtPath:destinationFile withDestinationPath:destinationPath error:&error]) {
             NSLog(@"Error in creating symlink: %@", error);
             XCTFail(@"Failed to create symlink");
         }
@@ -851,6 +937,35 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
     }];
 }
 
+- (void)testLargerRegularFileToSymlinkChange
+{
+    [self createAndApplyPatchWithHandler:^(NSFileManager *fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
+        NSString *sourceFile1 = [sourceDirectory stringByAppendingPathComponent:@"A"];
+        NSString *sourceFile2 = [sourceDirectory stringByAppendingPathComponent:@"B"];
+        
+        NSString *destinationFile1 = [destinationDirectory stringByAppendingPathComponent:@"A"];
+        NSString *destinationFile2 = [destinationDirectory stringByAppendingPathComponent:@"B"];
+        
+        NSData *data = [NSData dataWithBytes:"loltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltest" length:420];
+        
+        XCTAssertTrue([data writeToFile:sourceFile1 atomically:YES]);
+        XCTAssertTrue([data writeToFile:sourceFile2 atomically:YES]);
+        
+        XCTAssertTrue([data writeToFile:destinationFile1 atomically:YES]);
+        
+        NSString *destination = @"loltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltest";
+        
+        NSError *error = nil;
+        if (![fileManager createSymbolicLinkAtPath:destinationFile2 withDestinationPath:destination error:&error]) {
+            NSLog(@"Error in creating symlink: %@", error);
+            XCTFail(@"Failed to create symlink");
+        }
+        
+        // This would fail with version 1.0
+        XCTAssertFalse([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
+    }];
+}
+
 - (void)testSymlinkToRegularFileChange
 {
     [self createAndApplyPatchWithHandler:^(NSFileManager *fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
@@ -860,7 +975,7 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
         NSString *destinationFile1 = [destinationDirectory stringByAppendingPathComponent:@"A"];
         NSString *destinationFile2 = [destinationDirectory stringByAppendingPathComponent:@"B"];
         
-        NSData *data = [NSData dataWithBytes:"loltest" length:7];
+        NSData *data = [NSData dataWithBytes:"loltes" length:6];
         
         XCTAssertTrue([data writeToFile:sourceFile1 atomically:YES]);
         
@@ -877,13 +992,40 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
     }];
 }
 
+- (void)testLargerSymlinkToRegularFileChange
+{
+    [self createAndApplyPatchWithHandler:^(NSFileManager *fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
+        NSString *sourceFile1 = [sourceDirectory stringByAppendingPathComponent:@"A"];
+        NSString *sourceFile2 = [sourceDirectory stringByAppendingPathComponent:@"B"];
+        
+        NSString *destinationFile1 = [destinationDirectory stringByAppendingPathComponent:@"A"];
+        NSString *destinationFile2 = [destinationDirectory stringByAppendingPathComponent:@"B"];
+        
+        NSData *data = [NSData dataWithBytes:"loltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltest" length:420];
+        
+        XCTAssertTrue([data writeToFile:sourceFile1 atomically:YES]);
+        
+        XCTAssertTrue([data writeToFile:destinationFile1 atomically:YES]);
+        XCTAssertTrue([data writeToFile:destinationFile2 atomically:YES]);
+        
+        NSString *destination = @"loltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltestloltest";
+        NSError *error = nil;
+        if (![fileManager createSymbolicLinkAtPath:sourceFile2 withDestinationPath:destination error:&error]) {
+            NSLog(@"Error in creating symlink: %@", error);
+            XCTFail(@"Failed to create symlink");
+        }
+        
+        XCTAssertFalse([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
+    }];
+}
+
 - (void)testRegularFileToDirectoryChange
 {
     [self createAndApplyPatchWithHandler:^(NSFileManager *fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
         NSString *sourceFile = [sourceDirectory stringByAppendingPathComponent:@"A"];
         NSString *destinationFile = [destinationDirectory stringByAppendingPathComponent:@"A"];
         
-        NSData *data = [NSData dataWithBytes:"loltest" length:7];
+        NSData *data = [NSData dataWithBytes:"loltes" length:6];
         XCTAssertTrue([data writeToFile:sourceFile atomically:YES]);
         
         NSError *error = nil;
