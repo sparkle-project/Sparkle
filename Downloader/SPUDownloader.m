@@ -13,6 +13,7 @@
 #import "SPUDownloadData.h"
 #import "SPUDownloadDataPrivate.h"
 #import "SUErrors.h"
+#import "SULocalizations.h"
 
 
 #include "AppKitPrevention.h"
@@ -164,10 +165,8 @@ static NSString *SUDownloadingReason = @"Downloading update related file";
     int statusCode = (int)((NSHTTPURLResponse*)downloadTask.response).statusCode;
     if ((statusCode < 200) || (statusCode >= 400))
     {
-        NSString *message = [NSHTTPURLResponse localizedStringForStatusCode:statusCode];
-        if ( message == nil )
-            message = [NSString stringWithFormat: @"(%d)", statusCode];
-        NSError *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUDownloadError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"A network error occurred while downloading the update. %@", message] }];
+        NSString *message = [NSString stringWithFormat:SULocalizedString(@"A network error occurred while downloading the update. %@ %d", @""), [NSHTTPURLResponse localizedStringForStatusCode:statusCode], statusCode]; 
+        NSError *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUDownloadError userInfo:@{ NSLocalizedDescriptionKey: message }];
         [self.delegate downloaderDidFailWithError:error];
     }
     else if (self.mode == SPUDownloadModeTemporary)
