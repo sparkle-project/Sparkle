@@ -620,6 +620,7 @@
     uint32_t currentRelativePathIndex = 0;
     for (SPUDeltaArchiveItem *item in writableItems) {
         NSString *relativePath = item.relativeFilePath;
+        assert(relativePath != nil);
         
         relativePathToIndexTable[relativePath] = @(currentRelativePathIndex);
         currentRelativePathIndex++;
@@ -633,17 +634,10 @@
         
         if (clonedRelativePath != nil && relativePathToIndexTable[clonedRelativePath] == nil) {
             [newClonedPathEntries addObject:clonedRelativePath];
+            
+            relativePathToIndexTable[clonedRelativePath] = @(currentRelativePathIndex);
+            currentRelativePathIndex++;
         }
-    }
-    
-    // Fill out new clone paths we'll need to reference
-    for (NSString *newClonedPathEntry in newClonedPathEntries) {
-        SPUDeltaArchiveItem *newItem = [[SPUDeltaArchiveItem alloc] initWithRelativeFilePath:newClonedPathEntry commands:SPUDeltaItemCommandNone permissions:0];
-        
-        [writableItems addObject:newItem];
-        
-        relativePathToIndexTable[newClonedPathEntry] = @(currentRelativePathIndex);
-        currentRelativePathIndex++;
     }
     
     // Compute length of path section to write
@@ -654,6 +648,15 @@
         char relativePathString[PATH_MAX + 1] = {0};
         if (![relativePath getFileSystemRepresentation:relativePathString maxLength:sizeof(relativePathString) - 1]) {
             self.error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Relative path cannot be retrieved and expressed as a file system representation: %@", relativePath] }];
+            break;
+        }
+        
+        totalPathLength += strlen(relativePathString) + 1;
+    }
+    for (NSString *clonedPathEntry in newClonedPathEntries) {
+        char relativePathString[PATH_MAX + 1] = {0};
+        if (![clonedPathEntry getFileSystemRepresentation:relativePathString maxLength:sizeof(relativePathString) - 1]) {
+            self.error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Relative path for clone cannot be retrieved and expressed as a file system representation: %@", clonedPathEntry] }];
             break;
         }
         
@@ -676,6 +679,17 @@
         char pathBuffer[PATH_MAX + 1] = {0};
         if (![relativePath getFileSystemRepresentation:pathBuffer maxLength:PATH_MAX]) {
             self.error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Relative path cannot be encoded and expressed as a file system representation: %@", relativePath] }];
+            break;
+        }
+        
+        if (![self _writeBuffer:pathBuffer length:(int32_t)strlen(pathBuffer) + 1]) {
+            break;
+        }
+    }
+    for (NSString *clonedPathEntry in newClonedPathEntries) {
+        char pathBuffer[PATH_MAX + 1] = {0};
+        if (![clonedPathEntry getFileSystemRepresentation:pathBuffer maxLength:PATH_MAX]) {
+            self.error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Relative path for clone cannot be encoded and expressed as a file system representation: %@", clonedPathEntry] }];
             break;
         }
         

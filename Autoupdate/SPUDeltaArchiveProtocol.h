@@ -20,7 +20,6 @@ typedef NS_ENUM(uint8_t, SPUDeltaItemCommands) {
     SPUDeltaItemCommandModifyPermissions = (1u << 2),
     SPUDeltaItemCommandBinaryDiff = (1u << 3),
     SPUDeltaItemCommandClone = (1u << 4),
-    SPUDeltaItemCommandNone = (1u << 5)
 };
 
 // Compression mode to use during patch creation
