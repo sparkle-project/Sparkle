@@ -446,21 +446,23 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
     }];
 }
 
-- (void)testRegularFileMoveWithFileInPlace
+- (void)testLargerRegularFileMoveWithFileInPlace
 {
     [self createAndApplyPatchWithHandler:^(NSFileManager *fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
         NSString *sourceFile = [sourceDirectory stringByAppendingPathComponent:@"A/B/C/D/E/F/G/H/I/J/K/L/M/N/O/P/Q/R"];
         NSString *destinationFile = [destinationDirectory stringByAppendingPathComponent:@"A/B/C/D/E/F/G/H/I/J/K/L/M/N/O/P/Q/R2"];
         NSString *destinationFile2 = [destinationDirectory stringByAppendingPathComponent:@"A/B/C/D/E/F/G/H/I/J/K/L/M/N/O/P/Q/R"];
+        NSString *destinationFile3 = [destinationDirectory stringByAppendingPathComponent:@"A/B/C/D/E/F/G/H/I/J/K/L/M/N/O/P/Q/X"];
         
         [fileManager createDirectoryAtURL:[NSURL fileURLWithPath:sourceFile.stringByDeletingLastPathComponent] withIntermediateDirectories:YES attributes:nil error:NULL];
         
         [fileManager createDirectoryAtURL:[NSURL fileURLWithPath:destinationFile.stringByDeletingLastPathComponent] withIntermediateDirectories:YES attributes:nil error:NULL];
         
-        NSData *data = [NSData dataWithBytes:"loltes" length:6];
+        NSData *data = [self bigData2];
         XCTAssertTrue([data writeToFile:sourceFile atomically:YES]);
         XCTAssertTrue([data writeToFile:destinationFile atomically:YES]);
         XCTAssertTrue([data writeToFile:destinationFile2 atomically:YES]);
+        XCTAssertTrue([data writeToFile:destinationFile3 atomically:YES]);
         
         XCTAssertFalse([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
     }];
