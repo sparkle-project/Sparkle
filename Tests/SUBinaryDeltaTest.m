@@ -1176,7 +1176,7 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
     }];
 }
 
-- (void)testInvalidCodeSignatureExtendedAttributeInBeforeTree
+- (void)testExtendedAttributeInBeforeTree
 {
     BOOL success = [self createAndApplyPatchWithBeforeDiffHandler:^(NSFileManager *__unused fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
         NSString *sourceFile = [sourceDirectory stringByAppendingPathComponent:@"A"];
@@ -1188,14 +1188,14 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
         // the actual data doesn't matter for testing purposes
         const char xattrValue[] = "hello";
         
-        XCTAssertEqual(0, setxattr([sourceFile fileSystemRepresentation], APPLE_CODE_SIGN_XATTR_CODE_DIRECTORY_KEY, xattrValue, sizeof(xattrValue), 0, XATTR_CREATE));
-        XCTAssertEqual(0, setxattr([sourceFile fileSystemRepresentation], APPLE_CODE_SIGN_XATTR_CODE_REQUIREMENTS_KEY, xattrValue, sizeof(xattrValue), 0, XATTR_CREATE));
-        XCTAssertEqual(0, setxattr([sourceFile fileSystemRepresentation], APPLE_CODE_SIGN_XATTR_CODE_SIGNATURE_KEY, xattrValue, sizeof(xattrValue), 0, XATTR_CREATE));
+        XCTAssertEqual(0, setxattr([sourceFile fileSystemRepresentation], "com.apple.cs.CodeDirectory", xattrValue, sizeof(xattrValue), 0, XATTR_CREATE));
+        XCTAssertEqual(0, setxattr([sourceFile fileSystemRepresentation], "com.apple.cs.CodeRequirements", xattrValue, sizeof(xattrValue), 0, XATTR_CREATE));
+        XCTAssertEqual(0, setxattr([sourceFile fileSystemRepresentation], "com.apple.cs.CodeSignature", xattrValue, sizeof(xattrValue), 0, XATTR_CREATE));
     } afterDiffHandler:nil];
     XCTAssertFalse(success);
 }
 
-- (void)testInvalidCodeSignatureExtendedAttributeInAfterTree
+- (void)testExtendedAttributeInAfterTree
 {
     BOOL success = [self createAndApplyPatchWithBeforeDiffHandler:^(NSFileManager *__unused fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
         NSString *sourceFile = [sourceDirectory stringByAppendingPathComponent:@"A"];
@@ -1207,9 +1207,9 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
         // the actual data doesn't matter for testing purposes
         const char xattrValue[] = "hello";
         
-        XCTAssertEqual(0, setxattr([destinationFile fileSystemRepresentation], APPLE_CODE_SIGN_XATTR_CODE_DIRECTORY_KEY, xattrValue, sizeof(xattrValue), 0, XATTR_CREATE));
-        XCTAssertEqual(0, setxattr([destinationFile fileSystemRepresentation], APPLE_CODE_SIGN_XATTR_CODE_REQUIREMENTS_KEY, xattrValue, sizeof(xattrValue), 0, XATTR_CREATE));
-        XCTAssertEqual(0, setxattr([destinationFile fileSystemRepresentation], APPLE_CODE_SIGN_XATTR_CODE_SIGNATURE_KEY, xattrValue, sizeof(xattrValue), 0, XATTR_CREATE));
+        XCTAssertEqual(0, setxattr([destinationFile fileSystemRepresentation], "com.apple.cs.CodeDirectory", xattrValue, sizeof(xattrValue), 0, XATTR_CREATE));
+        XCTAssertEqual(0, setxattr([destinationFile fileSystemRepresentation], "com.apple.cs.CodeRequirements", xattrValue, sizeof(xattrValue), 0, XATTR_CREATE));
+        XCTAssertEqual(0, setxattr([destinationFile fileSystemRepresentation], "com.apple.cs.CodeSignature", xattrValue, sizeof(xattrValue), 0, XATTR_CREATE));
     } afterDiffHandler:nil];
     XCTAssertFalse(success);
 }
