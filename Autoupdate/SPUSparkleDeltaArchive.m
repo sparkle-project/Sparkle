@@ -654,7 +654,9 @@
     }
     
     // Clone commands reference relative file paths in this table but sometimes there may not
-    // be an entry to the original source. Fill out any missing entries with info commands
+    // be an entry if extraction for an original item was skipped. Fill out any missing file path entries.
+    // For example, if A.app has Contents/A and B.app has Contents/A and Contents/A and Contents/B,
+    // where A and B's contents are the same and A is the same in both apps, normally we would not record Contents/A because its extraction was skipped. However now B is a clone of A so we need a record for A.
     NSMutableArray<NSString *> *newClonedPathEntries = [NSMutableArray array];
     for (SPUDeltaArchiveItem *item in writableItems) {
         NSString *clonedRelativePath = item.clonedRelativePath;
