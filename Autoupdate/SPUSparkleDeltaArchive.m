@@ -1079,7 +1079,7 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
         
             compression_status status = compression_stream_process(&_compressionStream, COMPRESSION_STREAM_FINALIZE);
             if (status == COMPRESSION_STATUS_ERROR) {
-                self.error = [NSError errorWithDomain:SPARKLE_COMPRESSION_ERROR_DOMAIN code:COMPRESSION_STATUS_ERROR userInfo:@{ NSLocalizedDescriptionKey: @"Failed to write and close Compression based file" }];
+                self.error = [NSError errorWithDomain:SPARKLE_COMPRESSION_ERROR_DOMAIN code:COMPRESSION_STATUS_ERROR userInfo:@{ NSLocalizedDescriptionKey: @"Failed to write final bits of Compression based file" }];
                 return;
             }
             
