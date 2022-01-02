@@ -1071,7 +1071,6 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
         void *compressionBuffer = self.compressionBuffer;
         FILE *file = self.file;
         
-        _compressionStream.src_ptr = NULL;
         _compressionStream.src_size = 0;
         
         while (_compressionStream.dst_size > 0) {
