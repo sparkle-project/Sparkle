@@ -46,7 +46,7 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
     XCTAssert(YES, @"Pass");
 }
 
-- (BOOL)createAndApplyPatchUsingVersion:(SUBinaryDeltaMajorVersion)majorVersion beforeDiffHandler:(SUDeltaHandler)beforeDiffHandler afterDiffHandler:(SUDeltaHandler)afterDiffHandler
+- (BOOL)createAndApplyPatchUsingVersion:(SUBinaryDeltaMajorVersion)majorVersion compressionMode:(SPUDeltaCompressionMode)compressionMode beforeDiffHandler:(SUDeltaHandler)beforeDiffHandler afterDiffHandler:(SUDeltaHandler)afterDiffHandler
 {
     NSString *sourceDirectory = temporaryDirectory(@"Spąrkle_temp1エンジン");
     NSString *destinationDirectory = temporaryDirectory(@"Spąrkle_temp2エンジン");
@@ -65,7 +65,7 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
     }
     
     NSError *createDiffError = nil;
-    BOOL createdDiff = createBinaryDelta(sourceDirectory, destinationDirectory, diffFile, majorVersion, SPUDeltaCompressionModeDefault, DEFAULT_BZIP2_COMPRESSION_LEVEL, NO, &createDiffError);
+    BOOL createdDiff = createBinaryDelta(sourceDirectory, destinationDirectory, diffFile, majorVersion, compressionMode, DEFAULT_BZIP2_COMPRESSION_LEVEL, NO, &createDiffError);
     if (!createdDiff) {
         NSLog(@"Creating binary diff failed with error: %@", createDiffError);
     } else if (afterDiffHandler != nil) {
@@ -94,11 +94,15 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
 {
     XCTAssertEqual(SUBinaryDeltaMajorVersion3, LATEST_DELTA_DIFF_MAJOR_VERSION);
     
-    BOOL version3DeltaFormatSuccess = [self createAndApplyPatchUsingVersion:SUBinaryDeltaMajorVersion3 beforeDiffHandler:beforeDiffHandler afterDiffHandler:afterDiffHandler];
+    BOOL version3DeltaFormatWithLZMASuccess = [self createAndApplyPatchUsingVersion:SUBinaryDeltaMajorVersion3 compressionMode:SPUDeltaCompressionModeLZMA beforeDiffHandler:beforeDiffHandler afterDiffHandler:afterDiffHandler];
     
-    BOOL version2FormatSuccess = [self createAndApplyPatchUsingVersion:SUBinaryDeltaMajorVersion2 beforeDiffHandler:beforeDiffHandler afterDiffHandler:afterDiffHandler];
+    BOOL version3DeltaFormatWithBZIP2Success = [self createAndApplyPatchUsingVersion:SUBinaryDeltaMajorVersion3 compressionMode:SPUDeltaCompressionModeBzip2 beforeDiffHandler:beforeDiffHandler afterDiffHandler:afterDiffHandler];
     
-    return (version3DeltaFormatSuccess && version2FormatSuccess);
+    BOOL version3DeltaFormatWithZLIBSuccess = [self createAndApplyPatchUsingVersion:SUBinaryDeltaMajorVersion3 compressionMode:SPUDeltaCompressionModeZLIB beforeDiffHandler:beforeDiffHandler afterDiffHandler:afterDiffHandler];
+    
+    BOOL version2FormatSuccess = [self createAndApplyPatchUsingVersion:SUBinaryDeltaMajorVersion2 compressionMode:SPUDeltaCompressionModeDefault beforeDiffHandler:beforeDiffHandler afterDiffHandler:afterDiffHandler];
+    
+    return (version3DeltaFormatWithLZMASuccess && version3DeltaFormatWithBZIP2Success && version3DeltaFormatWithZLIBSuccess && version2FormatSuccess);
 }
 
 - (void)createAndApplyPatchWithHandler:(SUDeltaHandler)handler
@@ -364,7 +368,7 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
 // Make sure old version patches are no longer supported
 - (void)testRegularFileAddedWithVersion1Delta
 {
-    XCTAssertFalse([self createAndApplyPatchUsingVersion:SUBinaryDeltaMajorVersion1 beforeDiffHandler:nil afterDiffHandler:nil]);
+    XCTAssertFalse([self createAndApplyPatchUsingVersion:SUBinaryDeltaMajorVersion1 compressionMode:SPUDeltaCompressionModeDefault beforeDiffHandler:nil afterDiffHandler:nil]);
 }
 
 - (void)testDirectoryAdded
