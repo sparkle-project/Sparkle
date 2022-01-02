@@ -110,7 +110,7 @@ class ArchiveItem: CustomStringConvertible {
             }
             
             var frameworkVersion: String? = nil
-            if let appBundle = Bundle(url: appPath), let frameworksURL = appBundle.sharedFrameworksURL {
+            if let appBundle = Bundle(url: appPath), let frameworksURL = appBundle.privateFrameworksURL {
                 let sparkleBundleURL = frameworksURL.appendingPathComponent("Sparkle").appendingPathExtension("framework")
                 
                 if let sparkleBundle = Bundle(url: sparkleBundleURL), let infoDictionary = sparkleBundle.infoDictionary {
