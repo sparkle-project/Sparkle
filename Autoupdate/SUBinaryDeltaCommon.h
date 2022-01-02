@@ -15,6 +15,10 @@
 
 #define PERMISSION_FLAGS (S_IRWXU | S_IRWXG | S_IRWXO | S_ISUID | S_ISGID | S_ISVTX)
 
+#define APPLE_CODE_SIGN_XATTR_CODE_DIRECTORY_KEY "com.apple.cs.CodeDirectory"
+#define APPLE_CODE_SIGN_XATTR_CODE_REQUIREMENTS_KEY "com.apple.cs.CodeRequirements"
+#define APPLE_CODE_SIGN_XATTR_CODE_SIGNATURE_KEY "com.apple.cs.CodeSignature"
+
 #define VERBOSE_DELETED "Deleted" // file is deleted from the file system when applying a patch
 #define VERBOSE_REMOVED "Removed" // file is set to be removed when creating a patch
 #define VERBOSE_ADDED "Added" // file is added to the patch or file system

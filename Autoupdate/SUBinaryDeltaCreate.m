@@ -108,11 +108,35 @@ static bool aclExists(const FTSENT *ent)
     return false;
 }
 
-static bool extendedAttributeExists(const FTSENT *ent)
+static bool codeSignatureExtendedAttributeExists(const FTSENT *ent)
 {
     const int options = XATTR_NOFOLLOW;
     ssize_t listSize = listxattr(ent->fts_path, NULL, 0, options);
-    return (listSize > 0);
+    if (listSize == -1) {
+        return false;
+    }
+
+    char *buffer = malloc((size_t)listSize);
+    assert(buffer != NULL);
+
+    ssize_t sizeBack = listxattr(ent->fts_path, buffer, (size_t)listSize, options);
+    assert(sizeBack == listSize);
+
+    size_t startCharacterIndex = 0;
+    for (size_t characterIndex = 0; characterIndex < (size_t)listSize; characterIndex++) {
+        if (buffer[characterIndex] == '\0') {
+            char *attribute = &buffer[startCharacterIndex];
+            size_t length = characterIndex - startCharacterIndex;
+            if (strncmp(APPLE_CODE_SIGN_XATTR_CODE_DIRECTORY_KEY, attribute, length) == 0 || strncmp(APPLE_CODE_SIGN_XATTR_CODE_REQUIREMENTS_KEY, attribute, length) == 0 || strncmp(APPLE_CODE_SIGN_XATTR_CODE_SIGNATURE_KEY, attribute, length) == 0) {
+                free(buffer);
+                return true;
+            }
+            startCharacterIndex = characterIndex + 1;
+        }
+    }
+
+    free(buffer);
+    return false;
 }
 
 static NSString *absolutePath(NSString *path)
@@ -339,12 +363,12 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
             return NO;
         }
 
-        if (extendedAttributeExists(ent)) {
+        if (codeSignatureExtendedAttributeExists(ent)) {
             if (verbose) {
                 fprintf(stderr, "\n");
             }
             if (error != NULL) {
-                *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Diffing extended attributes are not supported. Detected extended attribute in before-tree on file %@", @(ent->fts_path)] }];
+                *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Diffing code signed extended attributes are not supported. Detected extended attribute in before-tree on file %@", @(ent->fts_path)] }];
             }
             return NO;
         }
@@ -428,7 +452,7 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
             return NO;
         }
 
-        if (extendedAttributeExists(ent)) {
+        if (codeSignatureExtendedAttributeExists(ent)) {
             if (verbose) {
                 fprintf(stderr, "\n");
             }
