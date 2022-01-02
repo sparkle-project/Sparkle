@@ -64,6 +64,8 @@ extern SPUDeltaCompressionMode SPUDeltaCompressionModeDefault;
 @end
 
 // A protocol for reading and writing binary delta patches
+// Operations must be done in order. The header must first be read or written before any other operations.
+// For reading, file items cannot be extracted out of order.
 @protocol SPUDeltaArchiveProtocol <NSObject>
 
 @property (nonatomic, readonly, class) BOOL maySupportSafeExtraction;
@@ -85,6 +87,8 @@ extern SPUDeltaCompressionMode SPUDeltaCompressionModeDefault;
 // Extract a file item from the patch file to a destination file
 // The item's physical file path must be set as a destination
 - (BOOL)extractItem:(SPUDeltaArchiveItem *)item;
+
+// ------------
 
 // For writing
 

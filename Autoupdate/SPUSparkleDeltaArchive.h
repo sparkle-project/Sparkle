@@ -30,6 +30,9 @@ NS_ASSUME_NONNULL_BEGIN
  The commands may additionally have more metadata such as file permission modes, relative path indexes in the case of clones, or file sizes for the data blobs.
  The data blobs contain all file data from extract and binary diff outputs.
  
+ The implementation design of this archive is such that we do not seek backwards or skip ahead to fetch data.
+ We go through the archive when writing or reading from it in a single pass.
+ 
  -- UNCOMPRESSED --
  
  [ HEADER ]
