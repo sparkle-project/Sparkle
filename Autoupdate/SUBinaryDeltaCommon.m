@@ -19,6 +19,8 @@
 
 #include "AppKitPrevention.h"
 
+SUBinaryDeltaMajorVersion SUBinaryDeltaMajorVersionDefault = SUBinaryDeltaMajorVersion2;
+
 int compareFiles(const FTSENT **a, const FTSENT **b)
 {
     return strcoll((*a)->fts_name, (*b)->fts_name);
@@ -45,6 +47,8 @@ uint16_t latestMinorVersionForMajorVersion(SUBinaryDeltaMajorVersion majorVersio
             return 2;
         case SUBinaryDeltaMajorVersion2:
             return 3;
+        case SUBinaryDeltaMajorVersion3:
+            return 0;
     }
     return 0;
 }
@@ -136,18 +140,23 @@ static BOOL _hashOfFileContents(unsigned char *hash, FTSENT *ent)
     return YES;
 }
 
-NSString *hashOfTreeWithVersion(NSString *path, uint16_t __unused majorVersion)
+BOOL getRawHashOfTreeWithVersion(unsigned char *hashBuffer, NSString *path, uint16_t majorVersion)
+{
+    return getRawHashOfTreeAndFileTablesWithVersion(hashBuffer, path, majorVersion, nil, nil);
+}
+
+BOOL getRawHashOfTreeAndFileTablesWithVersion(unsigned char *hashBuffer, NSString *path, uint16_t __unused majorVersion, NSMutableDictionary<NSData *, NSMutableArray<NSString *> *> *hashToFileKeyDictionary, NSMutableDictionary<NSString *, NSData *> *fileKeyToHashDictionary)
 {
     char pathBuffer[PATH_MAX] = { 0 };
     if (![path getFileSystemRepresentation:pathBuffer maxLength:sizeof(pathBuffer)]) {
-        return nil;
+        return NO;
     }
 
     char *const sourcePaths[] = { pathBuffer, 0 };
     FTS *fts = fts_open(sourcePaths, FTS_PHYSICAL | FTS_NOCHDIR, compareFiles);
     if (!fts) {
         perror("fts_open");
-        return nil;
+        return NO;
     }
 
     CC_SHA1_CTX hashContext;
@@ -167,9 +176,25 @@ NSString *hashOfTreeWithVersion(NSString *path, uint16_t __unused majorVersion)
 
         unsigned char fileHash[CC_SHA1_DIGEST_LENGTH];
         if (!_hashOfFileContents(fileHash, ent)) {
-            return nil;
+            return NO;
         }
         CC_SHA1_Update(&hashContext, fileHash, sizeof(fileHash));
+        
+        // For file hash tables we only track regular files
+        if (ent->fts_info == FTS_F) {
+            NSData *hashKey = [NSData dataWithBytes:fileHash length:sizeof(fileHash)];
+            
+            if (hashToFileKeyDictionary != nil) {
+                if (hashToFileKeyDictionary[hashKey] == nil) {
+                    hashToFileKeyDictionary[hashKey] = [NSMutableArray array];
+                }
+                [hashToFileKeyDictionary[hashKey] addObject:relativePath];
+            }
+            
+            if (fileKeyToHashDictionary != nil) {
+                fileKeyToHashDictionary[relativePath] = hashKey;
+            }
+        }
 
         const char *relativePathBytes = [relativePath fileSystemRepresentation];
         CC_SHA1_Update(&hashContext, relativePathBytes, (CC_LONG)strlen(relativePathBytes));
@@ -188,15 +213,41 @@ NSString *hashOfTreeWithVersion(NSString *path, uint16_t __unused majorVersion)
     }
     fts_close(fts);
 
-    unsigned char hash[CC_SHA1_DIGEST_LENGTH];
-    CC_SHA1_Final(hash, &hashContext);
+    CC_SHA1_Final(hashBuffer, &hashContext);
+    
+    return YES;
+}
 
-    char hexHash[CC_SHA1_DIGEST_LENGTH * 2 + 1];
-    size_t i;
-    for (i = 0; i < CC_SHA1_DIGEST_LENGTH; i++)
+void getRawHashFromDisplayHash(unsigned char *hash, NSString *hexHash)
+{
+    const char *hexString = hexHash.UTF8String;
+    if (hexString == NULL) {
+        return;
+    }
+    
+    for (size_t blockIndex = 0; blockIndex < CC_SHA1_DIGEST_LENGTH; blockIndex++) {
+        const char *currentBlock = hexString + blockIndex * 2;
+        char convertedBlock[3] = {currentBlock[0], currentBlock[1], '\0'};
+        hash[blockIndex] = (unsigned char)strtol(convertedBlock, NULL, 16);
+    }
+}
+
+NSString *displayHashFromRawHash(const unsigned char *hash)
+{
+    char hexHash[CC_SHA1_DIGEST_LENGTH * 2 + 1] = {0};
+    for (size_t i = 0; i < CC_SHA1_DIGEST_LENGTH; i++) {
         sprintf(hexHash + i * 2, "%02x", hash[i]);
-
+    }
     return @(hexHash);
+}
+
+NSString *hashOfTreeWithVersion(NSString *path, uint16_t majorVersion)
+{
+    unsigned char hash[CC_SHA1_DIGEST_LENGTH];
+    if (!getRawHashOfTreeWithVersion(hash, path, majorVersion)) {
+        return nil;
+    }
+    return displayHashFromRawHash(hash);
 }
 
 extern NSString *hashOfTree(NSString *path)

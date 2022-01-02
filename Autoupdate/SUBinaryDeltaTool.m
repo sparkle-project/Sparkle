@@ -73,7 +73,7 @@ static BOOL runCreateCommand(NSString *programName, NSArray<NSString *> *args)
 
     SUBinaryDeltaMajorVersion patchVersion =
         !versionComponents ?
-        LATEST_DELTA_DIFF_MAJOR_VERSION :
+        SUBinaryDeltaMajorVersionDefault :
         (SUBinaryDeltaMajorVersion)[[versionComponents[1] componentsSeparatedByString:@"."][0] intValue]; // ignore minor version if provided
 
     if (patchVersion < FIRST_DELTA_DIFF_MAJOR_VERSION) {
@@ -119,9 +119,37 @@ static BOOL runCreateCommand(NSString *programName, NSArray<NSString *> *args)
         fprintf(stderr, "Error: after-tree must be a directory\n");
         return NO;
     }
+    
+    // Until we have a better way of passing/parsing command line options we'll use environment variables
+    
+    SPUDeltaCompressionMode compression;
+    const char *compressionEnv = getenv("SPARKLE_DELTA_COMPRESSION");
+    if (compressionEnv == NULL) {
+        compression = SPUDeltaCompressionModeDefault;
+    } else if (strcmp(compressionEnv, "bzip2") == 0) {
+        compression = SPUDeltaCompressionModeBzip2;
+    } else if (strcmp(compressionEnv, "lzma") == 0) {
+        compression = SPUDeltaCompressionModeLZMA;
+    } else if (strcmp(compressionEnv, "lzfse") == 0) {
+        compression = SPUDeltaCompressionModeLZFSE;
+    } else if (strcmp(compressionEnv, "lz4") == 0) {
+        compression = SPUDeltaCompressionModeLZ4;
+    } else if (strcmp(compressionEnv, "zlib") == 0) {
+        compression = SPUDeltaCompressionModeZLIB;
+    } else {
+        compression = SPUDeltaCompressionModeNone;
+    }
+    
+    int32_t compressionLevel;
+    const char *compressionLevelEnv = getenv("SPARKLE_DELTA_COMPRESSION_LEVEL");
+    if (compressionLevelEnv == NULL) {
+        compressionLevel = DEFAULT_BZIP2_COMPRESSION_LEVEL;
+    } else {
+        compressionLevel = atoi(compressionLevelEnv);
+    }
 
     NSError *createDiffError = nil;
-    if (!createBinaryDelta(sourcePath, destPath, patchPath, patchVersion, verbose, &createDiffError)) {
+    if (!createBinaryDelta(sourcePath, destPath, patchPath, patchVersion, compression, compressionLevel, verbose, &createDiffError)) {
         fprintf(stderr, "%s\n", [createDiffError.localizedDescription UTF8String]);
         return NO;
     }
@@ -192,15 +220,15 @@ static BOOL runVersionCommand(NSString *programName, NSArray *args)
         uint16_t majorDiffVersion = 0;
         uint16_t minorDiffVersion = 0;
         
-        id<SPUDeltaArchiveProtocol> archive = SPUDeltaArchiveForReading(patchFile);
-        if (archive == nil) {
+        SPUDeltaArchiveHeader *header = nil;
+        id<SPUDeltaArchiveProtocol> archive = SPUDeltaArchiveReadPatchAndHeader(patchFile, &header);
+        if (archive.error != nil) {
             fprintf(stderr, "Unable to open patch %s\n", [patchFile fileSystemRepresentation]);
+            fprintf(stderr, "%s\n", archive.error.localizedDescription.UTF8String);
             return NO;
         }
         
-        [archive getMajorDeltaVersion:&majorDiffVersion minorDeltaVersion:&minorDiffVersion beforeTreeHash:NULL afterTreeHash:NULL];
-        
-        if (majorDiffVersion < FIRST_DELTA_DIFF_MAJOR_VERSION) {
+        if (header.majorVersion < FIRST_DELTA_DIFF_MAJOR_VERSION) {
             fprintf(stderr, "Unable to retrieve version information from patch %s\n", [patchFile fileSystemRepresentation]);
             return NO;
         }

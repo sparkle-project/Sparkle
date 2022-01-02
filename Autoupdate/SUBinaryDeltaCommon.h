@@ -15,9 +15,6 @@
 
 #define PERMISSION_FLAGS (S_IRWXU | S_IRWXG | S_IRWXO | S_ISUID | S_ISGID | S_ISVTX)
 
-#define IS_VALID_PERMISSIONS(mode) \
-    (((mode & PERMISSION_FLAGS) == 0755) || ((mode & PERMISSION_FLAGS) == 0644))
-
 #define APPLE_CODE_SIGN_XATTR_CODE_DIRECTORY_KEY "com.apple.cs.CodeDirectory"
 #define APPLE_CODE_SIGN_XATTR_CODE_REQUIREMENTS_KEY "com.apple.cs.CodeRequirements"
 #define APPLE_CODE_SIGN_XATTR_CODE_SIGNATURE_KEY "com.apple.cs.CodeSignature"
@@ -29,25 +26,32 @@
 #define VERBOSE_PATCHED "Patched" // file is patched when applying a patch
 #define VERBOSE_UPDATED "Updated" // file's contents are updated
 #define VERBOSE_MODIFIED "Modified" // file's metadata is modified
+#define VERBOSE_CLONED "Cloned" // file is cloned in content from a differently named file
 
 #define MAJOR_VERSION_IS_AT_LEAST(actualMajor, expectedMajor) (actualMajor >= expectedMajor)
 
-// Each major version will be assigned a name of a color
 // Changes that break backwards compatibility will have different major versions
 // Changes that affect creating but not applying patches will have different minor versions
-
 typedef NS_ENUM(uint16_t, SUBinaryDeltaMajorVersion)
 {
     // Note: support for creating or applying version 1 deltas have been removed
     SUBinaryDeltaMajorVersion1 = 1,
-    SUBinaryDeltaMajorVersion2 = 2
+    SUBinaryDeltaMajorVersion2 = 2,
+    SUBinaryDeltaMajorVersion3 = 3
 };
+
+// For Swift access
+extern SUBinaryDeltaMajorVersion SUBinaryDeltaMajorVersionDefault;
 
 #define FIRST_DELTA_DIFF_MAJOR_VERSION SUBinaryDeltaMajorVersion1
 #define FIRST_SUPPORTED_DELTA_MAJOR_VERSION SUBinaryDeltaMajorVersion2
-#define LATEST_DELTA_DIFF_MAJOR_VERSION SUBinaryDeltaMajorVersion2
+#define LATEST_DELTA_DIFF_MAJOR_VERSION SUBinaryDeltaMajorVersion3
 
 extern int compareFiles(const FTSENT **a, const FTSENT **b);
+BOOL getRawHashOfTreeWithVersion(unsigned char *hashBuffer, NSString *path, uint16_t majorVersion);
+BOOL getRawHashOfTreeAndFileTablesWithVersion(unsigned char *hashBuffer, NSString *path, uint16_t majorVersion, NSMutableDictionary<NSData *, NSMutableArray<NSString *> *> *hashToFileKeyDictionary, NSMutableDictionary<NSString *, NSData *> *fileKeyToHashDictionary);
+NSString *displayHashFromRawHash(const unsigned char *hash);
+void getRawHashFromDisplayHash(unsigned char *hash, NSString *hexHash);
 extern NSString *hashOfTreeWithVersion(NSString *path, uint16_t majorVersion);
 extern NSString *hashOfTree(NSString *path);
 extern BOOL removeTree(NSString *path);

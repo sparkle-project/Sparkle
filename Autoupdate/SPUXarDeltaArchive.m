@@ -9,7 +9,8 @@
 #import "SPUXarDeltaArchive.h"
 #include <xar/xar.h>
 #include "SUBinaryDeltaCommon.h"
-#include <Availability.h>
+#import <Availability.h>
+#import <CommonCrypto/CommonDigest.h>
 
 
 #include "AppKitPrevention.h"
@@ -37,41 +38,55 @@ extern char *xar_get_safe_path(xar_file_t f) __attribute__((weak_import));
 #define BINARY_DELTA_KEY "binary-delta"
 #define MODIFY_PERMISSIONS_KEY "mod-permissions"
 
+// Errors
+#define SPARKLE_DELTA_XAR_ARCHIVE_ERROR_DOMAIN @"Sparkle XAR Archive"
+#define SPARKLE_DELTA_XAR_ARCHIVE_ERROR_CODE_OPEN_FAILURE 1
+#define SPARKLE_DELTA_XAR_ARCHIVE_ERROR_CODE_ADD_FAILURE 2
+#define SPARKLE_DELTA_XAR_ARCHIVE_ERROR_CODE_EXTRACT_FAILURE 3
+#define SPARKLE_DELTA_XAR_ARCHIVE_ERROR_CODE_UNSUPPORTED_COMPRESSION_FAILURE 4
+
 @interface SPUXarDeltaArchive ()
 
 @property (nonatomic) xar_t x;
+@property (nonatomic, readonly) int32_t xarMode;
 @property (nonatomic, readonly) NSMutableDictionary<NSString *, NSValue *> *fileTable;
+@property (nonatomic, readonly) NSString *patchFile;
+@property (nonatomic) NSError *error;
+
+@property (nonatomic, readonly) SPUDeltaCompressionMode writableCompression;
+@property (nonatomic, readonly) int32_t writableCompressionLevel;
 
 @end
 
 @implementation SPUXarDeltaArchive
 
 @synthesize x = _x;
+@synthesize xarMode = _xarMode;
+@synthesize patchFile = _patchFile;
 @synthesize fileTable = _fileTable;
+@synthesize writableCompression = _writableCompression;
+@synthesize writableCompressionLevel = _writableCompressionLevel;
+@synthesize error = _error;
 
-- (nullable instancetype)initWithPatchFileForWriting:(NSString *)patchFile
+- (instancetype)initWithPatchFileForWriting:(NSString *)patchFile compression:(SPUDeltaCompressionMode)compression compressionLevel:(int32_t)compressionLevel
 {
     self = [super init];
     if (self != nil) {
-        _x = xar_open(patchFile.fileSystemRepresentation, WRITE);
-        if (_x == NULL) {
-            return nil;
-        }
-        
+        _patchFile = [patchFile copy];
+        _xarMode = WRITE;
+        _writableCompression = (compression == SPUDeltaCompressionModeDefault ? SPUDeltaCompressionModeBzip2 : compression);
+        _writableCompressionLevel = compressionLevel;
         _fileTable = [NSMutableDictionary dictionary];
-        xar_opt_set(_x, XAR_OPT_COMPRESSION, "bzip2");
     }
     return self;
 }
 
-- (nullable instancetype)initWithPatchFileForReading:(NSString *)patchFile
+- (instancetype)initWithPatchFileForReading:(NSString *)patchFile
 {
     self = [super init];
     if (self != nil) {
-        _x = xar_open(patchFile.fileSystemRepresentation, READ);
-        if (_x == NULL) {
-            return nil;
-        }
+        _patchFile = [patchFile copy];
+        _xarMode = READ;
     }
     return self;
 }
@@ -95,8 +110,17 @@ extern char *xar_get_safe_path(xar_file_t f) __attribute__((weak_import));
     return HAS_XAR_GET_SAFE_PATH;
 }
 
-- (void)getMajorDeltaVersion:(nullable uint16_t *)outMajorDiffVersion minorDeltaVersion:(nullable uint16_t *)outMinorDiffVersion beforeTreeHash:(NSString * _Nullable __autoreleasing * _Nullable)outBeforeTreeHash afterTreeHash:(NSString * _Nullable __autoreleasing * _Nullable)outAfterTreeHash
+- (nullable SPUDeltaArchiveHeader *)readHeader
 {
+    NSString *patchFile = self.patchFile;
+    xar_t x = xar_open(patchFile.fileSystemRepresentation, READ);
+    if (x == NULL) {
+        self.error = [NSError errorWithDomain:SPARKLE_DELTA_XAR_ARCHIVE_ERROR_DOMAIN code:SPARKLE_DELTA_XAR_ARCHIVE_ERROR_CODE_OPEN_FAILURE userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to xar_open() file for reading: %@", patchFile] }];
+        return nil;
+    }
+    
+    self.x = x;
+    
     uint16_t majorDiffVersion = FIRST_DELTA_DIFF_MAJOR_VERSION;
     uint16_t minorDiffVersion = 0;
     NSString *expectedBeforeHash = nil;
@@ -143,33 +167,59 @@ extern char *xar_get_safe_path(xar_file_t f) __attribute__((weak_import));
         }
     }
     
-    if (outMajorDiffVersion != NULL) {
-        *outMajorDiffVersion = majorDiffVersion;
-    }
+    unsigned char rawExpectedBeforeHash[CC_SHA1_DIGEST_LENGTH] = {0};
+    getRawHashFromDisplayHash(rawExpectedBeforeHash, expectedBeforeHash);
     
-    if (outMinorDiffVersion != NULL) {
-        *outMinorDiffVersion = minorDiffVersion;
-    }
+    unsigned char rawExpectedAfterHash[CC_SHA1_DIGEST_LENGTH] = {0};
+    getRawHashFromDisplayHash(rawExpectedAfterHash, expectedAfterHash);
     
-    if (outBeforeTreeHash != NULL) {
-        *outBeforeTreeHash = expectedBeforeHash;
-    }
-    
-    if (outAfterTreeHash != NULL) {
-        *outAfterTreeHash = expectedAfterHash;
-    }
+    return [[SPUDeltaArchiveHeader alloc] initWithMajorVersion:majorDiffVersion minorVersion:minorDiffVersion beforeTreeHash:rawExpectedBeforeHash afterTreeHash:rawExpectedAfterHash];
 }
 
-
-- (void)setMajorVersion:(uint16_t)majorVersion minorVersion:(uint16_t)minorVersion beforeTreeHash:(NSString *)beforeTreeHash afterTreeHash:(NSString *)afterTreeHash
+- (void)writeHeader:(SPUDeltaArchiveHeader *)header
 {
-    xar_subdoc_t attributes = xar_subdoc_new(self.x, BINARY_DELTA_ATTRIBUTES_KEY);
+    NSString *patchFile = self.patchFile;
     
-    xar_subdoc_prop_set(attributes, MAJOR_DIFF_VERSION_KEY, [[NSString stringWithFormat:@"%u", majorVersion] UTF8String]);
-    xar_subdoc_prop_set(attributes, MINOR_DIFF_VERSION_KEY, [[NSString stringWithFormat:@"%u", minorVersion] UTF8String]);
+    xar_t x = xar_open(patchFile.fileSystemRepresentation, WRITE);
+    if (x == NULL) {
+        self.error = [NSError errorWithDomain:SPARKLE_DELTA_XAR_ARCHIVE_ERROR_DOMAIN code:SPARKLE_DELTA_XAR_ARCHIVE_ERROR_CODE_OPEN_FAILURE userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to xar_open() file for writing: %@", patchFile] }];
+        return;
+    }
     
-    xar_subdoc_prop_set(attributes, BEFORE_TREE_SHA1_KEY, [beforeTreeHash UTF8String]);
-    xar_subdoc_prop_set(attributes, AFTER_TREE_SHA1_KEY, [afterTreeHash UTF8String]);
+    self.x = x;
+    
+    SPUDeltaCompressionMode compression = self.writableCompression;
+    int32_t compressionLevel = self.writableCompressionLevel;
+    
+    switch (compression) {
+        case SPUDeltaCompressionModeNone:
+            break;
+        case SPUDeltaCompressionModeBzip2: {
+            xar_opt_set(x, XAR_OPT_COMPRESSION, "bzip2");
+            
+            char buffer[256] = {0};
+            snprintf(buffer, sizeof(buffer) - 1, "%d", compressionLevel);
+            xar_opt_set(x, XAR_OPT_COMPRESSIONARG, buffer);
+            
+            break;
+        }
+        case SPUDeltaCompressionModeLZMA:
+        case SPUDeltaCompressionModeLZFSE:
+        case SPUDeltaCompressionModeLZ4:
+        case SPUDeltaCompressionModeZLIB: {
+            self.error = [NSError errorWithDomain:SPARKLE_DELTA_XAR_ARCHIVE_ERROR_DOMAIN code:SPARKLE_DELTA_XAR_ARCHIVE_ERROR_CODE_UNSUPPORTED_COMPRESSION_FAILURE userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Version 2 patches only support bzip2 compression."] }];
+            
+            return;
+        }
+    }
+    
+    xar_subdoc_t attributes = xar_subdoc_new(x, BINARY_DELTA_ATTRIBUTES_KEY);
+    
+    xar_subdoc_prop_set(attributes, MAJOR_DIFF_VERSION_KEY, [[NSString stringWithFormat:@"%u", header.majorVersion] UTF8String]);
+    xar_subdoc_prop_set(attributes, MINOR_DIFF_VERSION_KEY, [[NSString stringWithFormat:@"%u", header.minorVersion] UTF8String]);
+    
+    xar_subdoc_prop_set(attributes, BEFORE_TREE_SHA1_KEY, [displayHashFromRawHash(header.beforeTreeHash) UTF8String]);
+    xar_subdoc_prop_set(attributes, AFTER_TREE_SHA1_KEY, [displayHashFromRawHash(header.afterTreeHash) UTF8String]);
 }
 
 static xar_file_t _xarAddFile(NSMutableDictionary<NSString *, NSValue *> *fileTable, xar_t x, NSString *relativePath, NSString *filePath)
@@ -218,30 +268,51 @@ static xar_file_t _xarAddFile(NSMutableDictionary<NSString *, NSValue *> *fileTa
     return lastParent;
 }
 
-- (void)addRelativeFilePath:(NSString *)relativeFilePath realFilePath:(nullable NSString *)filePath attributes:(SPUDeltaFileAttributes)attributes permissions:(uint16_t)permissions
+- (void)addItem:(SPUDeltaArchiveItem *)item
 {
-    xar_file_t newFile = _xarAddFile(self.fileTable, self.x, relativeFilePath, filePath);
-    assert(newFile != NULL);
+    if (self.error != nil) {
+        return;
+    }
     
-    if ((attributes & SPUDeltaFileAttributesDelete) != 0) {
+    NSString *relativeFilePath = item.relativeFilePath;
+    NSString *filePath = item.physicalFilePath;
+    SPUDeltaItemCommands commands = item.commands;
+    uint16_t permissions = item.permissions;
+    
+    xar_file_t newFile = _xarAddFile(self.fileTable, self.x, relativeFilePath, filePath);
+    if (newFile == NULL) {
+        self.error = [NSError errorWithDomain:SPARKLE_DELTA_XAR_ARCHIVE_ERROR_DOMAIN code:SPARKLE_DELTA_XAR_ARCHIVE_ERROR_CODE_ADD_FAILURE userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to add xar file entry: %@", relativeFilePath] }];
+        return;
+    }
+    
+    if ((commands & SPUDeltaItemCommandDelete) != 0) {
         xar_prop_set(newFile, DELETE_KEY, "true");
     }
     
-    if ((attributes & SPUDeltaFileAttributesExtract) != 0) {
+    if ((commands & SPUDeltaItemCommandExtract) != 0) {
         xar_prop_set(newFile, EXTRACT_KEY, "true");
     }
     
-    if ((attributes & SPUDeltaFileAttributesBinaryDiff) != 0) {
+    if ((commands & SPUDeltaItemCommandBinaryDiff) != 0) {
         xar_prop_set(newFile, BINARY_DELTA_KEY, "true");
     }
     
-    if ((attributes & SPUDeltaFileAttributesModifyPermissions) != 0) {
+    if ((commands & SPUDeltaItemCommandModifyPermissions) != 0) {
         xar_prop_set(newFile, MODIFY_PERMISSIONS_KEY, [NSString stringWithFormat:@"%u", permissions].UTF8String);
     }
 }
 
-- (BOOL)enumerateItems:(void (^)(const void *, NSString *, SPUDeltaFileAttributes, uint16_t, BOOL *))itemHandler
+- (void)finishEncodingItems
 {
+    // Items are already encoded when they are extracted prior
+}
+
+- (void)enumerateItems:(void (^)(SPUDeltaArchiveItem *, BOOL *))itemHandler
+{
+    if (self.error != nil) {
+        return;
+    }
+    
     BOOL exitedEarly = NO;
     xar_iter_t iter = xar_iter_new();
     for (xar_file_t file = xar_file_first(self.x, iter); file; file = xar_file_next(iter)) {
@@ -268,23 +339,23 @@ static xar_file_t _xarAddFile(NSMutableDictionary<NSString *, NSValue *> *fileTa
         
         NSString *relativePath = @(pathCString);
         
-        SPUDeltaFileAttributes attributes = 0;
+        SPUDeltaItemCommands commands = 0;
         {
             const char *value = NULL;
             if (xar_prop_get(file, DELETE_KEY, &value) == 0) {
-                attributes |= SPUDeltaFileAttributesDelete;
+                commands |= SPUDeltaItemCommandDelete;
             }
         }
         {
             const char *value = NULL;
             if (xar_prop_get(file, BINARY_DELTA_KEY, &value) == 0) {
-                attributes |= SPUDeltaFileAttributesBinaryDiff;
+                commands |= SPUDeltaItemCommandBinaryDiff;
             }
         }
         {
             const char *value = NULL;
             if (xar_prop_get(file, EXTRACT_KEY, &value) == 0) {
-                attributes |= SPUDeltaFileAttributesExtract;
+                commands |= SPUDeltaItemCommandExtract;
             }
         }
         
@@ -292,26 +363,39 @@ static xar_file_t _xarAddFile(NSMutableDictionary<NSString *, NSValue *> *fileTa
         {
             const char *value = NULL;
             if (xar_prop_get(file, MODIFY_PERMISSIONS_KEY, &value) == 0) {
-                attributes |= SPUDeltaFileAttributesModifyPermissions;
+                commands |= SPUDeltaItemCommandModifyPermissions;
                 permissions = (uint16_t)[@(value) intValue];
             }
         }
         
-        itemHandler(file, relativePath, attributes, permissions, &exitedEarly);
+        SPUDeltaArchiveItem *item = [[SPUDeltaArchiveItem alloc] initWithRelativeFilePath:relativePath commands:commands permissions:permissions];
+        item.context = file;
+        
+        itemHandler(item, &exitedEarly);
         if (exitedEarly) {
             break;
         }
     }
     
     xar_iter_free(iter);
-    
-    return !exitedEarly;
 }
 
-- (BOOL)extractItem:(const void *)item destination:(NSString *)destinationPath
+- (BOOL)extractItem:(SPUDeltaArchiveItem *)item
 {
-    xar_file_t file = item;
-    return (xar_extract_tofile(self.x, file, destinationPath.fileSystemRepresentation) == 0);
+    if (self.error != nil) {
+        return NO;
+    }
+    
+    assert(item.physicalFilePath != nil);
+    assert(item.context != NULL);
+    
+    xar_file_t file = item.context;
+    if (xar_extract_tofile(self.x, file, item.physicalFilePath.fileSystemRepresentation) != 0) {
+        self.error = [NSError errorWithDomain:SPARKLE_DELTA_XAR_ARCHIVE_ERROR_DOMAIN code:SPARKLE_DELTA_XAR_ARCHIVE_ERROR_CODE_EXTRACT_FAILURE userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to extract xar file entry to %@", item.physicalFilePath] }];
+        return NO;
+    }
+    
+    return YES;
 }
 
 @end

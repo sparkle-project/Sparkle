@@ -9,10 +9,11 @@
 #import <Foundation/Foundation.h>
 
 @protocol SPUDeltaArchiveProtocol;
+@class SPUDeltaArchiveHeader;
 
 NS_ASSUME_NONNULL_BEGIN
 
-id<SPUDeltaArchiveProtocol> _Nullable SPUDeltaArchiveForReading(NSString *patchFile);
-id<SPUDeltaArchiveProtocol> _Nullable SPUDeltaArchiveForWriting(NSString *patchFile);
+// Opens patch file for reading and decodes the archive header
+id<SPUDeltaArchiveProtocol> SPUDeltaArchiveReadPatchAndHeader(NSString *patchFile, SPUDeltaArchiveHeader * _Nullable __autoreleasing * _Nullable outHeader);
 
 NS_ASSUME_NONNULL_END
