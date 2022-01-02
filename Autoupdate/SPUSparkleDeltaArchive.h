@@ -57,10 +57,12 @@ NS_ASSUME_NONNULL_BEGIN
         Additional metadata for command
     (M commands where M <= N paths)
     (Indexes for commands refer to indexes to relative file path table, excluding extraneous trailing entries in relative path table used for clones)
+    (Last command denotes a null end marker)
  
  [ DATA BLOBS ]
  All raw binary data joined together
  (P number of blobs where P <= M commands)
+ (Indexes for data blobs refer to indexes for a filtered list of applicable commands that have data content)
  */
 @interface SPUSparkleDeltaArchive : NSObject <SPUDeltaArchiveProtocol>
 
