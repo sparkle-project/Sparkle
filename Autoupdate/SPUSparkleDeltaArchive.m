@@ -11,33 +11,43 @@
 #import <sys/stat.h>
 #import <CommonCrypto/CommonDigest.h>
 #import "SUBinaryDeltaCommon.h"
-
+#import <compression.h>
 
 #include "AppKitPrevention.h"
 
 #define SPARKLE_DELTA_FORMAT_MAGIC "spk!"
 #define PARTIAL_IO_CHUNK_SIZE 16384 // this must be >= PATH_MAX
+#define COMPRESSION_BUFFER_SIZE 65536
 #define SPARKLE_BZIP2_ERROR_DOMAIN @"Sparkle BZIP2"
+#define SPARKLE_COMPRESSION_ERROR_DOMAIN @"Sparkle Compression"
 
 @interface SPUSparkleDeltaArchive ()
 
 @property (nonatomic) FILE *file;
 @property (nonatomic) BZFILE *bzipFile;
+@property (nonatomic) compression_stream compressionStream;
+@property (nonatomic) BOOL initializedCompressionStream;
 @property (nonatomic, readonly) NSString *patchFile;
 @property (nonatomic) SPUDeltaCompressionMode compression;
 @property (nonatomic, readonly) BOOL writeMode;
 @property (nonatomic) NSError *error;
 @property (nonatomic) void *partialChunkBuffer;
+@property (nonatomic) void *compressionBuffer;
 
 @property (nonatomic) NSMutableArray<SPUDeltaArchiveItem *> *writableItems;
 @property (nonatomic) int32_t writableCompressionLevel;
 
 @end
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdirect-ivar-access"
+
 @implementation SPUSparkleDeltaArchive
 
 @synthesize file = _file;
 @synthesize bzipFile = _bzipFile;
+@synthesize compressionStream = _compressionStream;
+@synthesize initializedCompressionStream = _initializedCompressionStream;
 @synthesize patchFile = _patchFile;
 @synthesize compression = _compression;
 @synthesize writeMode = _writeMode;
@@ -45,6 +55,7 @@
 @synthesize writableCompressionLevel = _writableCompressionLevel;
 @synthesize error = _error;
 @synthesize partialChunkBuffer = _partialChunkBuffer;
+@synthesize compressionBuffer = _compressionBuffer;
 
 + (BOOL)maySupportSafeExtraction
 {
@@ -57,7 +68,7 @@
     if (self != nil) {
         _patchFile = [patchFile copy];
         _writableItems = [NSMutableArray array];
-        _compression = compression;
+        _compression = (compression == SPUDeltaCompressionModeDefault) ? SPUDeltaCompressionModeLZMA : compression;
         _writableCompressionLevel = compressionLevel;
         _writeMode = YES;
     }
@@ -81,15 +92,15 @@
 - (void)close
 {
     if (self.bzipFile != NULL) {
-        if (self.writeMode) {
-            int bzerror = 0;
-            BZ2_bzWriteClose64(&bzerror, self.bzipFile, 0, NULL, NULL, NULL, NULL);
-        } else {
+        if (!self.writeMode) {
             int bzerror = 0;
             BZ2_bzReadClose(&bzerror, self.bzipFile);
         }
-
+        
         self.bzipFile = NULL;
+    } else if (self.initializedCompressionStream) {
+        compression_stream_destroy(&_compressionStream);
+        self.initializedCompressionStream = NO;
     }
     
     if (self.file != NULL) {
@@ -99,15 +110,27 @@
     
     free(self.partialChunkBuffer);
     self.partialChunkBuffer = NULL;
+    
+    free(self.compressionBuffer);
+    self.compressionBuffer = NULL;
 }
 
-- (BOOL)createPartialChunkBuffer
+- (BOOL)createBuffers
 {
     self.partialChunkBuffer = calloc(1, PARTIAL_IO_CHUNK_SIZE);
     if (self.partialChunkBuffer == NULL) {
         self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to calloc() %d bytes for partial chunk buffer.", PARTIAL_IO_CHUNK_SIZE] }];
         return NO;
     }
+    
+    if (self.initializedCompressionStream) {
+        self.compressionBuffer = calloc(1, COMPRESSION_BUFFER_SIZE);
+        if (self.compressionBuffer == NULL) {
+            self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to calloc() %d bytes for compression buffer.", COMPRESSION_BUFFER_SIZE] }];
+            return NO;
+        }
+    }
+    
     return YES;
 }
 
@@ -147,15 +170,72 @@
                     return NO;
             }
         }
+        case SPUDeltaCompressionModeLZMA:
+        case SPUDeltaCompressionModeLZFSE:
+        case SPUDeltaCompressionModeLZ4:
+        case SPUDeltaCompressionModeZLIB: {
+            FILE *file = self.file;
+            void *compressionBuffer = self.compressionBuffer;
+            
+            _compressionStream.dst_ptr = buffer;
+            _compressionStream.dst_size = (size_t)length;
+            
+            while (_compressionStream.dst_size > 0) {
+                // Go through the current incomplete chunk before reading another one
+                
+                if (_compressionStream.src_size == 0) {
+                    size_t bytesRead = fread(compressionBuffer, 1, COMPRESSION_BUFFER_SIZE, file);
+                    if (bytesRead < COMPRESSION_BUFFER_SIZE) {
+                        if (feof(file) == 0) {
+                            self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to read %d compressed raw bytes from archive.", length] }];
+                            return NO;
+                        }
+                    }
+                    
+                    // Reset source buffer
+                    _compressionStream.src_ptr = compressionBuffer;
+                    _compressionStream.src_size = bytesRead;
+                }
+                
+                compression_status status = compression_stream_process(&_compressionStream, feof(file) != 0 ? COMPRESSION_STREAM_FINALIZE : 0);
+                if (status == COMPRESSION_STATUS_ERROR) {
+                    self.error = [NSError errorWithDomain:SPARKLE_COMPRESSION_ERROR_DOMAIN code:COMPRESSION_STATUS_ERROR userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to read %d compressed bytes.", length] }];
+                    return NO;
+                }
+                
+                if (status == COMPRESSION_STATUS_END && _compressionStream.dst_size > 0) {
+                    // We're expecting more bytes but we can't read any more bytes
+                    self.error = [NSError errorWithDomain:SPARKLE_DELTA_ARCHIVE_ERROR_DOMAIN code:-1 userInfo:@{ NSLocalizedDescriptionKey: @"Failed to decompress and read bytes because we reached EOF" }];
+                    return NO;
+                }
+            }
+            
+            return YES;
+        }
     }
+}
+
+static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMode compressionMode)
+{
+    switch (compressionMode) {
+    case SPUDeltaCompressionModeLZMA:
+        return COMPRESSION_LZMA;
+    case SPUDeltaCompressionModeLZFSE:
+        return COMPRESSION_LZFSE;
+    case SPUDeltaCompressionModeLZ4:
+        return COMPRESSION_LZ4;
+    case SPUDeltaCompressionModeZLIB:
+        return COMPRESSION_ZLIB;
+    case SPUDeltaCompressionModeNone:
+    case SPUDeltaCompressionModeBzip2:
+        assert(false);
+    }
+    
+    assert(false);
 }
 
 - (nullable SPUDeltaArchiveHeader *)readHeader
 {
-    if (![self createPartialChunkBuffer]) {
-        return nil;
-    }
-    
     NSString *patchFile = self.patchFile;
     
     char patchFilePath[PATH_MAX + 1] = {0};
@@ -214,9 +294,26 @@
             
             break;
         }
+        case SPUDeltaCompressionModeLZMA:
+        case SPUDeltaCompressionModeLZFSE:
+        case SPUDeltaCompressionModeLZ4:
+        case SPUDeltaCompressionModeZLIB: {
+            if (compression_stream_init(&_compressionStream, COMPRESSION_STREAM_DECODE, _compressionAlgorithmForMode(compression)) != COMPRESSION_STATUS_OK) {
+                self.error = [NSError errorWithDomain:SPARKLE_COMPRESSION_ERROR_DOMAIN code:COMPRESSION_STATUS_ERROR userInfo:@{ NSLocalizedDescriptionKey: @"Failed to open compression stream for reading" }];
+                return nil;
+            }
+            
+            self.initializedCompressionStream = YES;
+            
+            break;
+        }
         default:
             self.error = [NSError errorWithDomain:SPARKLE_DELTA_ARCHIVE_ERROR_DOMAIN code:SPARKLE_DELTA_ARCHIVE_ERROR_CODE_BAD_COMPRESSION_VALUE userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Compression value read %d is not recognized.", compression] }];
             return nil;
+    }
+    
+    if (![self createBuffers]) {
+        return nil;
     }
     
     uint16_t majorVersion = 0;
@@ -562,15 +659,39 @@
                     return NO;
             }
         }
+        case SPUDeltaCompressionModeLZMA:
+        case SPUDeltaCompressionModeLZFSE:
+        case SPUDeltaCompressionModeLZ4:
+        case SPUDeltaCompressionModeZLIB: {
+            _compressionStream.src_ptr = buffer;
+            _compressionStream.src_size = (size_t)length;
+            
+            FILE *file = self.file;
+            void *compressionBuffer = self.compressionBuffer;
+            while (_compressionStream.src_size > 0) {
+                // Reset destination buffer
+                _compressionStream.dst_ptr = compressionBuffer;
+                _compressionStream.dst_size = COMPRESSION_BUFFER_SIZE;
+                
+                if (compression_stream_process(&_compressionStream, 0) == COMPRESSION_STATUS_ERROR) {
+                    self.error = [NSError errorWithDomain:SPARKLE_COMPRESSION_ERROR_DOMAIN code:COMPRESSION_STATUS_ERROR userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to write %d compressed bytes.", length] }];
+                    return NO;
+                }
+                
+                size_t compressedBytesWritten = (size_t)(_compressionStream.dst_ptr - (uint8_t *)compressionBuffer);
+                if (compressedBytesWritten > 0 && fwrite(compressionBuffer, compressedBytesWritten, 1, file) < 1) {
+                    self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to write %zu compressed bytes.", compressedBytesWritten] }];
+                    return NO;
+                }
+            }
+            
+            return YES;
+        }
     }
 }
 
 - (void)writeHeader:(SPUDeltaArchiveHeader *)header
 {
-    if (![self createPartialChunkBuffer]) {
-        return;
-    }
-    
     char patchFilePath[PATH_MAX + 1] = {0};
     if (![self.patchFile getFileSystemRepresentation:patchFilePath maxLength:sizeof(patchFilePath) - 1]) {
         self.error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to open header and represent as a file system representation: %@", self.patchFile] }];
@@ -597,26 +718,49 @@
         return;
     }
     
-    if (compression == SPUDeltaCompressionModeBzip2) {
-        int bzerror = 0;
-        // Compression level can be 1 - 9
-        int blockSize100k = self.writableCompressionLevel;
-        
-        BZFILE *bzipFile = BZ2_bzWriteOpen(&bzerror, file, blockSize100k, 0, 0);
-        if (bzipFile == NULL) {
-            switch (bzerror) {
-                case BZ_IO_ERROR:
-                    self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: @"Failed to open bz2 stream for writing due to io error" }];
-                    break;
-                default:
-                    self.error = [NSError errorWithDomain:SPARKLE_BZIP2_ERROR_DOMAIN code:bzerror userInfo:@{ NSLocalizedDescriptionKey: @"Failed to open bz2 stream for writing" }];
-                    break;
+    switch (compression) {
+        case SPUDeltaCompressionModeNone:
+            break;
+        case SPUDeltaCompressionModeBzip2: {
+            int bzerror = 0;
+            // Compression level can be 1 - 9
+            int blockSize100k = self.writableCompressionLevel;
+            
+            BZFILE *bzipFile = BZ2_bzWriteOpen(&bzerror, file, blockSize100k, 0, 0);
+            if (bzipFile == NULL) {
+                switch (bzerror) {
+                    case BZ_IO_ERROR:
+                        self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: @"Failed to open bz2 stream for writing due to io error" }];
+                        break;
+                    default:
+                        self.error = [NSError errorWithDomain:SPARKLE_BZIP2_ERROR_DOMAIN code:bzerror userInfo:@{ NSLocalizedDescriptionKey: @"Failed to open bz2 stream for writing" }];
+                        break;
+                }
+                
+                return;
             }
             
-            return;
+            self.bzipFile = bzipFile;
+            
+            break;
         }
-        
-        self.bzipFile = bzipFile;
+        case SPUDeltaCompressionModeLZMA:
+        case SPUDeltaCompressionModeLZFSE:
+        case SPUDeltaCompressionModeLZ4:
+        case SPUDeltaCompressionModeZLIB: {
+            if (compression_stream_init(&_compressionStream, COMPRESSION_STREAM_ENCODE, _compressionAlgorithmForMode(compression)) != COMPRESSION_STATUS_OK) {
+                self.error = [NSError errorWithDomain:SPARKLE_COMPRESSION_ERROR_DOMAIN code:COMPRESSION_STATUS_ERROR userInfo:@{ NSLocalizedDescriptionKey: @"Failed to open compression stream for writing" }];
+                
+                return;
+            }
+            
+            self.initializedCompressionStream = YES;
+            break;
+        }
+    }
+    
+    if (![self createBuffers]) {
+        return;
     }
     
     uint16_t majorVersion = header.majorVersion;
@@ -913,6 +1057,49 @@
             }
         }
     }
+    
+    // Close up and write final data to compressed streams
+    
+    if (self.bzipFile != NULL) {
+        int bzerror = 0;
+        BZ2_bzWriteClose64(&bzerror, self.bzipFile, 0, NULL, NULL, NULL, NULL);
+        if (bzerror == BZ_IO_ERROR) {
+            self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: @"Failed to write and close bzip2 file due to IO error" }];
+            return;
+        }
+    } else if (self.initializedCompressionStream) {
+        void *compressionBuffer = self.compressionBuffer;
+        FILE *file = self.file;
+        
+        _compressionStream.src_ptr = NULL;
+        _compressionStream.src_size = 0;
+        
+        while (_compressionStream.dst_size > 0) {
+            _compressionStream.dst_ptr = compressionBuffer;
+            _compressionStream.dst_size = COMPRESSION_BUFFER_SIZE;
+        
+            compression_status status = compression_stream_process(&_compressionStream, COMPRESSION_STREAM_FINALIZE);
+            if (status == COMPRESSION_STATUS_ERROR) {
+                self.error = [NSError errorWithDomain:SPARKLE_COMPRESSION_ERROR_DOMAIN code:COMPRESSION_STATUS_ERROR userInfo:@{ NSLocalizedDescriptionKey: @"Failed to write and close Compression based file" }];
+                return;
+            }
+            
+            size_t compressedBytesToWrite = (size_t)(_compressionStream.dst_ptr - (uint8_t *)compressionBuffer);
+            if (compressedBytesToWrite > 0) {
+                if (fwrite(compressionBuffer, compressedBytesToWrite, 1, file) < 1) {
+                    self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: @"Failed to write and close Compression based file due to io error" }];
+                    return;
+                }
+            }
+            
+            if (status == COMPRESSION_STATUS_END) {
+                // We're done
+                break;
+            }
+        }
+    }
 }
 
 @end
+
+#pragma clang diagnostic pop

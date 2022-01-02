@@ -15,7 +15,7 @@
 
 #include "AppKitPrevention.h"
 
-SPUDeltaCompressionMode SPUDeltaCompressionModeDefault = SPUDeltaCompressionModeBzip2;
+SPUDeltaCompressionMode SPUDeltaCompressionModeDefault = (SPUDeltaCompressionMode)UINT8_MAX;
 
 id<SPUDeltaArchiveProtocol> SPUDeltaArchiveReadPatchAndHeader(NSString *patchFile, SPUDeltaArchiveHeader * _Nullable __autoreleasing * _Nullable outHeader)
 {

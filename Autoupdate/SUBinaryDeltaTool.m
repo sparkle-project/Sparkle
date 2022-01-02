@@ -128,14 +128,22 @@ static BOOL runCreateCommand(NSString *programName, NSArray<NSString *> *args)
         compression = SPUDeltaCompressionModeDefault;
     } else if (strcmp(compressionEnv, "bzip2") == 0) {
         compression = SPUDeltaCompressionModeBzip2;
+    } else if (strcmp(compressionEnv, "lzma") == 0) {
+        compression = SPUDeltaCompressionModeLZMA;
+    } else if (strcmp(compressionEnv, "lzfse") == 0) {
+        compression = SPUDeltaCompressionModeLZFSE;
+    } else if (strcmp(compressionEnv, "lz4") == 0) {
+        compression = SPUDeltaCompressionModeLZ4;
+    } else if (strcmp(compressionEnv, "zlib") == 0) {
+        compression = SPUDeltaCompressionModeZLIB;
     } else {
         compression = SPUDeltaCompressionModeNone;
     }
     
     int32_t compressionLevel;
-    const char *compressionLevelEnv = getenv("SPARKLE_DELTA_COMPRESSION_LEVEL");
+    const char *compressionLevelEnv = getenv("SPARKLE_DELTA_BZIP2_COMPRESSION_LEVEL");
     if (compressionLevelEnv == NULL) {
-        compressionLevel = DEFAULT_COMPRESSION_LEVEL_FOR_DEFAULT_COMPRESSION_MODE;
+        compressionLevel = DEFAULT_BZIP2_COMPRESSION_LEVEL;
     } else {
         compressionLevel = atoi(compressionLevelEnv);
     }

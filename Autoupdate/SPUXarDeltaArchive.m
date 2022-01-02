@@ -43,6 +43,7 @@ extern char *xar_get_safe_path(xar_file_t f) __attribute__((weak_import));
 #define SPARKLE_DELTA_XAR_ARCHIVE_ERROR_CODE_OPEN_FAILURE 1
 #define SPARKLE_DELTA_XAR_ARCHIVE_ERROR_CODE_ADD_FAILURE 2
 #define SPARKLE_DELTA_XAR_ARCHIVE_ERROR_CODE_EXTRACT_FAILURE 3
+#define SPARKLE_DELTA_XAR_ARCHIVE_ERROR_CODE_UNSUPPORTED_COMPRESSION_FAILURE 4
 
 @interface SPUXarDeltaArchive ()
 
@@ -73,7 +74,7 @@ extern char *xar_get_safe_path(xar_file_t f) __attribute__((weak_import));
     if (self != nil) {
         _patchFile = [patchFile copy];
         _xarMode = WRITE;
-        _writableCompression = compression;
+        _writableCompression = (compression == SPUDeltaCompressionModeDefault ? SPUDeltaCompressionModeBzip2 : compression);
         _writableCompressionLevel = compressionLevel;
         _fileTable = [NSMutableDictionary dictionary];
     }
@@ -201,6 +202,14 @@ extern char *xar_get_safe_path(xar_file_t f) __attribute__((weak_import));
             xar_opt_set(x, XAR_OPT_COMPRESSIONARG, buffer);
             
             break;
+        }
+        case SPUDeltaCompressionModeLZMA:
+        case SPUDeltaCompressionModeLZFSE:
+        case SPUDeltaCompressionModeLZ4:
+        case SPUDeltaCompressionModeZLIB: {
+            self.error = [NSError errorWithDomain:SPARKLE_DELTA_XAR_ARCHIVE_ERROR_DOMAIN code:SPARKLE_DELTA_XAR_ARCHIVE_ERROR_CODE_UNSUPPORTED_COMPRESSION_FAILURE userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Version 2 patches only support bzip2 compression."] }];
+            
+            return;
         }
     }
     
