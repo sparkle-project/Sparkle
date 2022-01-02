@@ -19,7 +19,7 @@
 
 #include "AppKitPrevention.h"
 
-SUBinaryDeltaMajorVersion SUBinaryDeltaMajorVersionDefault = SUBinaryDeltaMajorVersion2;
+SUBinaryDeltaMajorVersion SUBinaryDeltaMajorVersionDefault = SUBinaryDeltaMajorVersion3;
 
 int compareFiles(const FTSENT **a, const FTSENT **b)
 {

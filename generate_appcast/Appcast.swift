@@ -109,7 +109,22 @@ func makeAppcast(archivesSourceDir: URL, cacheDirectory cacheDir: URL, keys: Pri
                 }
                 if !fm.fileExists(atPath: deltaPath.path) {
                     do {
-                        delta = try DeltaUpdate.create(from: item, to: latestItem, archivePath: deltaPath)
+                        // Decide the most appropriate delta version
+                        let deltaVersion: SUBinaryDeltaMajorVersion
+                        if let frameworkVersion = item.frameworkVersion {
+                            switch comparator.compareVersion(frameworkVersion, toVersion: "2009") {
+                            case .orderedSame:
+                                fallthrough
+                            case .orderedDescending:
+                                deltaVersion = .version3
+                            case .orderedAscending:
+                                deltaVersion = .version2
+                            }
+                        } else {
+                            deltaVersion = SUBinaryDeltaMajorVersionDefault
+                        }
+                        
+                        delta = try DeltaUpdate.create(from: item, to: latestItem, deltaVersion: deltaVersion, archivePath: deltaPath)
                     } catch {
                         print("Could not create delta update", deltaPath.path, error)
                         continue
