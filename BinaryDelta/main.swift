@@ -21,7 +21,7 @@ struct Create: ParsableCommand {
     var compression: String = "default"
     
     @Option(name: .long, help: ArgumentHelp(COMPRESSION_LEVEL_ARGUMENT_DESCRIPTION, valueName: "compression-level"))
-    var compressionLevel: UInt8 = 0
+    var compressionLevel: UInt8 = DEFAULT_DELTA_COMPRESSION_LEVEL
     
     @Argument(help: ArgumentHelp("Path to original bundle to create a patch from."))
     var beforeTree: String

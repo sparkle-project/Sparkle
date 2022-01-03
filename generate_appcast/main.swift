@@ -88,7 +88,7 @@ struct GenerateAppcast: ParsableCommand {
     var deltaCompression: String = "default"
     
     @Option(name: .long, help: ArgumentHelp(COMPRESSION_LEVEL_ARGUMENT_DESCRIPTION, valueName: "delta-compression-level"))
-    var deltaCompressionLevel: UInt8 = 0
+    var deltaCompressionLevel: UInt8 = DEFAULT_DELTA_COMPRESSION_LEVEL
     
     @Option(name: .long, help: ArgumentHelp("The Sparkle channel name that will be used for generating new updates. By default, no channel is used. Old applications need to be using Sparkle 2 to use this feature.", valueName: "channel-name"))
     var channel: String?
