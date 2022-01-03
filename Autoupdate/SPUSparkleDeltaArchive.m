@@ -69,7 +69,16 @@
         _patchFile = [patchFile copy];
         _writableItems = [NSMutableArray array];
         _compression = (compression == SPUDeltaCompressionModeDefault) ? SPUDeltaCompressionModeLZMA : compression;
-        _writableCompressionLevel = compressionLevel;
+        
+        // We only support configuring compression level for bzip2
+        if (_compression == SPUDeltaCompressionModeBzip2) {
+            if (compressionLevel <= 0 || compressionLevel > 9) {
+                _writableCompressionLevel = 9;
+            } else {
+                _writableCompressionLevel = compressionLevel;
+            }
+        }
+        
         _writeMode = YES;
     }
     return self;

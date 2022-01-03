@@ -35,7 +35,7 @@ typedef NS_ENUM(uint8_t, SPUDeltaCompressionMode) {
 // For Swift access
 extern SPUDeltaCompressionMode SPUDeltaCompressionModeDefault;
 
-#define DEFAULT_BZIP2_COMPRESSION_LEVEL 9
+#define DEFAULT_DELTA_COMPRESSION_LEVEL 0
 
 // Represents header for our archive
 @interface SPUDeltaArchiveHeader : NSObject

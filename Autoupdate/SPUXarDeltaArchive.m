@@ -75,7 +75,13 @@ extern char *xar_get_safe_path(xar_file_t f) __attribute__((weak_import));
         _patchFile = [patchFile copy];
         _xarMode = WRITE;
         _writableCompression = (compression == SPUDeltaCompressionModeDefault ? SPUDeltaCompressionModeBzip2 : compression);
-        _writableCompressionLevel = compressionLevel;
+        
+        if (compressionLevel <= 0 || compressionLevel > 9) {
+            _writableCompressionLevel = 9;
+        } else {
+            _writableCompressionLevel = compressionLevel;
+        }
+        
         _fileTable = [NSMutableDictionary dictionary];
     }
     return self;

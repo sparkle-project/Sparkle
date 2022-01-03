@@ -11,7 +11,7 @@ func makeError(code: SUError, _ description: String) -> NSError {
         ])
 }
 
-func makeAppcast(archivesSourceDir: URL, cacheDirectory cacheDir: URL, keys: PrivateKeys, versions: Set<String>?, maximumDeltas: Int, verbose: Bool) throws -> [String: [ArchiveItem]] {
+func makeAppcast(archivesSourceDir: URL, cacheDirectory cacheDir: URL, keys: PrivateKeys, versions: Set<String>?, maximumDeltas: Int, deltaCompressionModeDescription: String, deltaCompressionLevel: Int32, verbose: Bool) throws -> [String: [ArchiveItem]] {
     let comparator = SUStandardVersionComparator()
 
     let allUpdates = (try unarchiveUpdates(archivesSourceDir: archivesSourceDir, archivesDestDir: cacheDir, verbose: verbose))
@@ -124,7 +124,57 @@ func makeAppcast(archivesSourceDir: URL, cacheDirectory cacheDir: URL, keys: Pri
                             deltaVersion = SUBinaryDeltaMajorVersionDefault
                         }
                         
-                        delta = try DeltaUpdate.create(from: item, to: latestItem, deltaVersion: deltaVersion, archivePath: deltaPath)
+                        let requestedDeltaCompressionMode: SPUDeltaCompressionMode
+                        
+                        switch deltaCompressionModeDescription.lowercased() {
+                        case "lzma":
+                            requestedDeltaCompressionMode = SPUDeltaCompressionMode.LZMA
+                        case "zlib":
+                            requestedDeltaCompressionMode = SPUDeltaCompressionMode.ZLIB
+                        case "lz4":
+                            requestedDeltaCompressionMode = SPUDeltaCompressionMode.LZ4
+                        case "lzfse":
+                            requestedDeltaCompressionMode = SPUDeltaCompressionMode.LZFSE
+                        case "bzip2":
+                            requestedDeltaCompressionMode = SPUDeltaCompressionMode.bzip2
+                        case "none":
+                            requestedDeltaCompressionMode = SPUDeltaCompressionMode.none
+                        case "default":
+                            requestedDeltaCompressionMode = SPUDeltaCompressionModeDefault
+                        default:
+                            requestedDeltaCompressionMode = SPUDeltaCompressionModeDefault
+                            print("Warning: Delta compression mode '\(deltaCompressionModeDescription)' not recognized. Using default compression instead..")
+                        }
+                        
+                        // Version 2 formats only support bzip2, none, and default options
+                        let deltaCompressionMode: SPUDeltaCompressionMode
+                        if deltaVersion == .version2 {
+                            switch requestedDeltaCompressionMode {
+                            case .LZFSE:
+                                fallthrough
+                            case .LZ4:
+                                fallthrough
+                            case .LZMA:
+                                fallthrough
+                            case .ZLIB:
+                                deltaCompressionMode = .bzip2
+                                print("Warning: Delta compression mode '\(deltaCompressionModeDescription)' was requested but . Using default compression instead..")
+                            case SPUDeltaCompressionModeDefault:
+                                fallthrough
+                            case .none:
+                                fallthrough
+                            case .bzip2:
+                                deltaCompressionMode = requestedDeltaCompressionMode
+                            @unknown default:
+                                // This shouldn't happen
+                                print("Warning: failed to parse delta compression mode. There is a logic bug in generate_appcast.")
+                                deltaCompressionMode = requestedDeltaCompressionMode
+                            }
+                        } else {
+                            deltaCompressionMode = requestedDeltaCompressionMode
+                        }
+                        
+                        delta = try DeltaUpdate.create(from: item, to: latestItem, deltaVersion: deltaVersion, deltaCompressionMode: deltaCompressionMode, deltaCompressionLevel: deltaCompressionLevel, archivePath: deltaPath)
                     } catch {
                         print("Could not create delta update", deltaPath.path, error)
                         continue
