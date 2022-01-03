@@ -173,7 +173,7 @@ struct GenerateAppcast: ParsableCommand {
             throw ValidationError("--link must be specified if --informational-update-versions is specified.")
         }
         
-        guard deltaCompressionLevel >= 0 && deltaCompressionLevel < 9 else {
+        guard deltaCompressionLevel >= 0 && deltaCompressionLevel <= 9 else {
             throw ValidationError("Invalid --delta-compression-level value was passed.")
         }
         
