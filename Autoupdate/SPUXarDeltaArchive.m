@@ -199,6 +199,7 @@ extern char *xar_get_safe_path(xar_file_t f) __attribute__((weak_import));
     
     switch (compression) {
         case SPUDeltaCompressionModeNone:
+            xar_opt_set(x, XAR_OPT_COMPRESSION, XAR_OPT_VAL_NONE);
             break;
         case SPUDeltaCompressionModeBzip2: {
             xar_opt_set(x, XAR_OPT_COMPRESSION, "bzip2");
