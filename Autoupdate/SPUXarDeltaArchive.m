@@ -53,9 +53,6 @@ extern char *xar_get_safe_path(xar_file_t f) __attribute__((weak_import));
 @property (nonatomic, readonly) NSString *patchFile;
 @property (nonatomic) NSError *error;
 
-@property (nonatomic, readonly) SPUDeltaCompressionMode writableCompression;
-@property (nonatomic, readonly) int32_t writableCompressionLevel;
-
 @end
 
 @implementation SPUXarDeltaArchive
@@ -64,24 +61,14 @@ extern char *xar_get_safe_path(xar_file_t f) __attribute__((weak_import));
 @synthesize xarMode = _xarMode;
 @synthesize patchFile = _patchFile;
 @synthesize fileTable = _fileTable;
-@synthesize writableCompression = _writableCompression;
-@synthesize writableCompressionLevel = _writableCompressionLevel;
 @synthesize error = _error;
 
-- (instancetype)initWithPatchFileForWriting:(NSString *)patchFile compression:(SPUDeltaCompressionMode)compression compressionLevel:(int32_t)compressionLevel
+- (instancetype)initWithPatchFileForWriting:(NSString *)patchFile
 {
     self = [super init];
     if (self != nil) {
         _patchFile = [patchFile copy];
         _xarMode = WRITE;
-        _writableCompression = (compression == SPUDeltaCompressionModeDefault ? SPUDeltaCompressionModeBzip2 : compression);
-        
-        if (compressionLevel <= 0 || compressionLevel > 9) {
-            _writableCompressionLevel = 9;
-        } else {
-            _writableCompressionLevel = compressionLevel;
-        }
-        
         _fileTable = [NSMutableDictionary dictionary];
     }
     return self;
@@ -126,6 +113,23 @@ extern char *xar_get_safe_path(xar_file_t f) __attribute__((weak_import));
     }
     
     self.x = x;
+    
+    SPUDeltaCompressionMode compression;
+    const char *compressionOption = xar_opt_get(x, XAR_OPT_COMPRESSION);
+    if (compressionOption == NULL || strcmp(compressionOption, XAR_OPT_VAL_NONE) == 0) {
+        compression = SPUDeltaCompressionModeNone;
+    } else {
+        compression = SPUDeltaCompressionModeBzip2;
+    }
+    
+    int compressionLevel;
+    const char *compressionArgOption = xar_opt_get(x, XAR_OPT_COMPRESSIONARG);
+    if (compressionArgOption == NULL) {
+        // Assume default
+        compressionLevel = 9;
+    } else {
+        compressionLevel = atoi(compressionArgOption);
+    }
     
     uint16_t majorDiffVersion = SUBinaryDeltaMajorVersionFirst;
     uint16_t minorDiffVersion = 0;
@@ -179,7 +183,7 @@ extern char *xar_get_safe_path(xar_file_t f) __attribute__((weak_import));
     unsigned char rawExpectedAfterHash[CC_SHA1_DIGEST_LENGTH] = {0};
     getRawHashFromDisplayHash(rawExpectedAfterHash, expectedAfterHash);
     
-    return [[SPUDeltaArchiveHeader alloc] initWithMajorVersion:majorDiffVersion minorVersion:minorDiffVersion beforeTreeHash:rawExpectedBeforeHash afterTreeHash:rawExpectedAfterHash];
+    return [[SPUDeltaArchiveHeader alloc] initWithCompression:compression compressionLevel:(uint8_t)compressionLevel majorVersion:majorDiffVersion minorVersion:minorDiffVersion beforeTreeHash:rawExpectedBeforeHash afterTreeHash:rawExpectedAfterHash];
 }
 
 - (void)writeHeader:(SPUDeltaArchiveHeader *)header
@@ -194,8 +198,14 @@ extern char *xar_get_safe_path(xar_file_t f) __attribute__((weak_import));
     
     self.x = x;
     
-    SPUDeltaCompressionMode compression = self.writableCompression;
-    int32_t compressionLevel = self.writableCompressionLevel;
+    SPUDeltaCompressionMode compression = (header.compression == SPUDeltaCompressionModeDefault ? SPUDeltaCompressionModeBzip2 : header.compression);
+    
+    uint8_t compressionLevel;
+    if (header.compressionLevel <= 0 || header.compressionLevel > 9) {
+        compressionLevel = 9;
+    } else {
+        compressionLevel = header.compressionLevel;
+    }
     
     switch (compression) {
         case SPUDeltaCompressionModeNone:

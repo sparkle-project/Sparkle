@@ -79,14 +79,19 @@ id<SPUDeltaArchiveProtocol> SPUDeltaArchiveReadPatchAndHeader(NSString *patchFil
     unsigned char _afterTreeHash[CC_SHA1_DIGEST_LENGTH];
 }
 
+@synthesize compression = _compression;
+@synthesize compressionLevel = _compressionLevel;
 @synthesize majorVersion = _majorVersion;
 @synthesize minorVersion = _minorVersion;
 
-- (instancetype)initWithMajorVersion:(uint16_t)majorVersion minorVersion:(uint16_t)minorVersion beforeTreeHash:(const unsigned char *)beforeTreeHash afterTreeHash:(const unsigned char *)afterTreeHash
+- (instancetype)initWithCompression:(SPUDeltaCompressionMode)compression compressionLevel:(uint8_t)compressionLevel majorVersion:(uint16_t)majorVersion minorVersion:(uint16_t)minorVersion beforeTreeHash:(const unsigned char *)beforeTreeHash afterTreeHash:(const unsigned char *)afterTreeHash
 {
     self = [super init];
     if (self != nil)
     {
+        _compression = compression;
+        _compressionLevel = compressionLevel;
+        
         _majorVersion = majorVersion;
         _minorVersion = minorVersion;
         

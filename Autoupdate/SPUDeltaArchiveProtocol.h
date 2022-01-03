@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "SPUDeltaCompressionMode.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -25,8 +26,10 @@ typedef NS_ENUM(uint8_t, SPUDeltaItemCommands) {
 // Represents header for our archive
 @interface SPUDeltaArchiveHeader : NSObject
 
-- (instancetype)initWithMajorVersion:(uint16_t)majorVersion minorVersion:(uint16_t)minorVersion beforeTreeHash:(const unsigned char *)beforeTreeHash afterTreeHash:(const unsigned char *)afterTreeHash;
+- (instancetype)initWithCompression:(SPUDeltaCompressionMode)compression compressionLevel:(uint8_t)compressionLevel majorVersion:(uint16_t)majorVersion minorVersion:(uint16_t)minorVersion beforeTreeHash:(const unsigned char *)beforeTreeHash afterTreeHash:(const unsigned char *)afterTreeHash;
 
+@property (nonatomic, readonly) SPUDeltaCompressionMode compression;
+@property (nonatomic, readonly) uint8_t compressionLevel;
 @property (nonatomic, readonly) uint16_t majorVersion;
 @property (nonatomic, readonly) uint16_t minorVersion;
 @property (nonatomic, readonly) unsigned char *beforeTreeHash;

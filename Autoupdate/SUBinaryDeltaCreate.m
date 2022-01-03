@@ -297,7 +297,7 @@ static NSString *cloneableRelativePath(NSDictionary<NSString *, NSData *> *after
     return nil;
 }
 
-BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchFile, SUBinaryDeltaMajorVersion majorVersion, SPUDeltaCompressionMode compression, int32_t compressionLevel, BOOL verbose, NSError *__autoreleasing *error)
+BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchFile, SUBinaryDeltaMajorVersion majorVersion, SPUDeltaCompressionMode compression, uint8_t compressionLevel, BOOL verbose, NSError *__autoreleasing *error)
 {
     assert(source);
     assert(destination);
@@ -508,12 +508,12 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
     
     id<SPUDeltaArchiveProtocol> archive;
     if (majorVersion >= SUBinaryDeltaMajorVersion3) {
-        archive = [[SPUSparkleDeltaArchive alloc] initWithPatchFileForWriting:temporaryFile compression:compression compressionLevel:compressionLevel];
+        archive = [[SPUSparkleDeltaArchive alloc] initWithPatchFileForWriting:temporaryFile];
     } else {
-        archive = [[SPUXarDeltaArchive alloc] initWithPatchFileForWriting:temporaryFile compression:compression compressionLevel:compressionLevel];
+        archive = [[SPUXarDeltaArchive alloc] initWithPatchFileForWriting:temporaryFile];
     }
     
-    SPUDeltaArchiveHeader *header = [[SPUDeltaArchiveHeader alloc] initWithMajorVersion:majorVersion minorVersion:minorVersion beforeTreeHash:beforeHash afterTreeHash:afterHash];
+    SPUDeltaArchiveHeader *header = [[SPUDeltaArchiveHeader alloc] initWithCompression:compression compressionLevel:compressionLevel majorVersion:majorVersion minorVersion:minorVersion beforeTreeHash:beforeHash afterTreeHash:afterHash];
     
     [archive writeHeader:header];
     if (archive.error != nil) {

@@ -16,7 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
 // Legacy container format for binary delta archives
 @interface SPUXarDeltaArchive : NSObject <SPUDeltaArchiveProtocol>
 
-- (instancetype)initWithPatchFileForWriting:(NSString *)patchFile compression:(SPUDeltaCompressionMode)compression compressionLevel:(int32_t)compressionLevel;
+- (instancetype)initWithPatchFileForWriting:(NSString *)patchFile;
 - (instancetype)initWithPatchFileForReading:(NSString *)patchFile;
 
 @end

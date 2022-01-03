@@ -24,7 +24,7 @@ class DeltaUpdate {
         return (archiveFileAttributes[.size] as! NSNumber).int64Value
     }
 
-    class func create(from: ArchiveItem, to: ArchiveItem, deltaVersion: SUBinaryDeltaMajorVersion, deltaCompressionMode: SPUDeltaCompressionMode, deltaCompressionLevel: Int32, archivePath: URL) throws -> DeltaUpdate {
+    class func create(from: ArchiveItem, to: ArchiveItem, deltaVersion: SUBinaryDeltaMajorVersion, deltaCompressionMode: SPUDeltaCompressionMode, deltaCompressionLevel: UInt8, archivePath: URL) throws -> DeltaUpdate {
         var applyDiffError: NSError?
 
         if !createBinaryDelta(from.appPath.path, to.appPath.path, archivePath.path, deltaVersion, deltaCompressionMode, deltaCompressionLevel, false, &applyDiffError) {
