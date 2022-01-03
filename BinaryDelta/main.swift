@@ -18,7 +18,7 @@ struct Create: ParsableCommand {
     var verbose: Bool = false
     
     @Option(name: .long, help: ArgumentHelp(COMPRESSION_METHOD_ARGUMENT_DESCRIPTION, valueName: "compression"))
-    var compressionDescription: String = "default"
+    var compression: String = "default"
     
     @Option(name: .long, help: ArgumentHelp(COMPRESSION_LEVEL_ARGUMENT_DESCRIPTION, valueName: "compression-level"))
     var compressionLevel: Int32 = 0
@@ -34,18 +34,18 @@ struct Create: ParsableCommand {
         
     func validate() throws {
         var validCompression: ObjCBool = false
-        let compression = deltaCompressionModeFromDescription(compressionDescription, &validCompression)
+        let compressionMode = deltaCompressionModeFromDescription(compression, &validCompression)
         guard validCompression.boolValue else {
-            fputs("Error: unrecognized compression \(compressionDescription)\n", stderr)
+            fputs("Error: unrecognized compression \(compression)\n", stderr)
             throw ExitCode(1)
         }
         
-        switch compression {
+        switch compressionMode {
         case SPUDeltaCompressionModeDefault:
             break
         case .none:
             guard compressionLevel == 0 else {
-                fputs("Error: compression level must be 0 for compression \(compressionDescription)\n", stderr)
+                fputs("Error: compression level must be 0 for compression \(compression)\n", stderr)
                 throw ExitCode(1)
             }
             break
@@ -63,17 +63,17 @@ struct Create: ParsableCommand {
             fallthrough
         case .ZLIB:
             guard version >= 3 else {
-                fputs("Error: version \(version) patch files do not support compression \(compressionDescription)\n", stderr)
+                fputs("Error: version \(version) patch files do not support compression \(compression)\n", stderr)
                 throw ExitCode(1)
             }
             
             guard compressionLevel == 0 else {
-                fputs("Error: compression level provided must be 0 for compression \(compressionDescription)\n", stderr)
+                fputs("Error: compression level provided must be 0 for compression \(compression)\n", stderr)
                 throw ExitCode(1)
             }
             break
         @unknown default:
-            fputs("Error: unrecognized compression \(compressionDescription)\n", stderr)
+            fputs("Error: unrecognized compression \(compression)\n", stderr)
             throw ExitCode(1)
         }
         
@@ -107,7 +107,7 @@ struct Create: ParsableCommand {
     }
     
     func run() throws {
-        let compression = deltaCompressionModeFromDescription(compressionDescription, nil)
+        let compressionMode = deltaCompressionModeFromDescription(compression, nil)
         
         guard let majorDeltaVersion = SUBinaryDeltaMajorVersion(rawValue: UInt16(version)) else {
             // We shouldn't reach here
@@ -116,7 +116,7 @@ struct Create: ParsableCommand {
         }
         
         var createDiffError: NSError? = nil
-        if !createBinaryDelta(beforeTree, afterTree, patchFile, majorDeltaVersion, compression, compressionLevel, verbose, &createDiffError) {
+        if !createBinaryDelta(beforeTree, afterTree, patchFile, majorDeltaVersion, compressionMode, compressionLevel, verbose, &createDiffError) {
             if let error = createDiffError {
                 fputs("\(error.localizedDescription)\n", stderr)
             } else {
