@@ -22,21 +22,6 @@ typedef NS_ENUM(uint8_t, SPUDeltaItemCommands) {
     SPUDeltaItemCommandClone = (1u << 4),
 };
 
-// Compression mode to use during patch creation
-typedef NS_ENUM(uint8_t, SPUDeltaCompressionMode) {
-    SPUDeltaCompressionModeNone = 0,
-    SPUDeltaCompressionModeBzip2,
-    SPUDeltaCompressionModeLZMA,
-    SPUDeltaCompressionModeLZFSE,
-    SPUDeltaCompressionModeLZ4,
-    SPUDeltaCompressionModeZLIB
-};
-
-// For Swift access
-extern SPUDeltaCompressionMode SPUDeltaCompressionModeDefault;
-
-#define DEFAULT_DELTA_COMPRESSION_LEVEL 0
-
 // Represents header for our archive
 @interface SPUDeltaArchiveHeader : NSObject
 

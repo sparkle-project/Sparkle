@@ -20,6 +20,70 @@
 #include "AppKitPrevention.h"
 
 SUBinaryDeltaMajorVersion SUBinaryDeltaMajorVersionDefault = SUBinaryDeltaMajorVersion3;
+SUBinaryDeltaMajorVersion SUBinaryDeltaMajorVersionLatest = SUBinaryDeltaMajorVersion3;
+SUBinaryDeltaMajorVersion SUBinaryDeltaMajorVersionFirst = SUBinaryDeltaMajorVersion1;
+SUBinaryDeltaMajorVersion SUBinaryDeltaMajorVersionFirstSupported = SUBinaryDeltaMajorVersion2;
+
+SPUDeltaCompressionMode deltaCompressionModeFromDescription(NSString *requestedDescription, BOOL *requestValid)
+{
+    // Set to NO later if request was not valid
+    if (requestValid != NULL) {
+        *requestValid = YES;
+    }
+    
+    SPUDeltaCompressionMode compression;
+    NSString *description = requestedDescription.lowercaseString;
+    
+    if ([description isEqualToString:@"default"]) {
+        compression = SPUDeltaCompressionModeDefault;
+    } else if ([description isEqualToString:@"none"]) {
+        compression = SPUDeltaCompressionModeNone;
+    } else if ([description isEqualToString:@"bzip2"]) {
+        compression = SPUDeltaCompressionModeBzip2;
+    } else if ([description isEqualToString:@"lzma"]) {
+        compression = SPUDeltaCompressionModeLZMA;
+    } else if ([description isEqualToString:@"lzfse"]) {
+        compression = SPUDeltaCompressionModeLZFSE;
+    } else if ([description isEqualToString:@"lz4"]) {
+        compression = SPUDeltaCompressionModeLZ4;
+    } else if ([description isEqualToString:@"zlib"]) {
+        compression = SPUDeltaCompressionModeZLIB;
+    } else {
+        compression = SPUDeltaCompressionModeDefault;
+        
+        if (requestValid != NULL) {
+            *requestValid = NO;
+        }
+    }
+    
+    return compression;
+}
+
+NSString *deltaCompressionStringFromMode(SPUDeltaCompressionMode mode)
+{
+    switch (mode) {
+        case SPUDeltaCompressionModeBzip2:
+            return @"bzip2";
+        case SPUDeltaCompressionModeLZMA:
+            return @"LZMA";
+        case SPUDeltaCompressionModeNone:
+            return @"no";
+        case SPUDeltaCompressionModeLZ4:
+            return @"LZ4";
+        case SPUDeltaCompressionModeLZFSE:
+            return @"LZFSE";
+        case SPUDeltaCompressionModeZLIB:
+            return @"ZLIB";
+        default:
+            break;
+    }
+    
+    if (mode == SPUDeltaCompressionModeDefault) {
+        return @"default";
+    }
+    
+    return @"unknown";
+}
 
 int compareFiles(const FTSENT **a, const FTSENT **b)
 {
@@ -252,7 +316,7 @@ NSString *hashOfTreeWithVersion(NSString *path, uint16_t majorVersion)
 
 extern NSString *hashOfTree(NSString *path)
 {
-    return hashOfTreeWithVersion(path, LATEST_DELTA_DIFF_MAJOR_VERSION);
+    return hashOfTreeWithVersion(path, SUBinaryDeltaMajorVersionLatest);
 }
 
 BOOL removeTree(NSString *path)

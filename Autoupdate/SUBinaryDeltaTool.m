@@ -143,7 +143,7 @@ static BOOL runCreateCommand(NSString *programName, NSArray<NSString *> *args)
     int32_t compressionLevel;
     const char *compressionLevelEnv = getenv("SPARKLE_DELTA_COMPRESSION_LEVEL");
     if (compressionLevelEnv == NULL) {
-        compressionLevel = DEFAULT_BZIP2_COMPRESSION_LEVEL;
+        compressionLevel = 0;
     } else {
         compressionLevel = atoi(compressionLevelEnv);
     }

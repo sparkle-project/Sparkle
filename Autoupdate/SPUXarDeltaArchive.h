@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 
 #import "SPUDeltaArchiveProtocol.h"
+#import "SPUDeltaCompressionMode.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

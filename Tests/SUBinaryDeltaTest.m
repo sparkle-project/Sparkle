@@ -92,7 +92,7 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
 
 - (BOOL)createAndApplyPatchWithBeforeDiffHandler:(SUDeltaHandler)beforeDiffHandler afterDiffHandler:(SUDeltaHandler)afterDiffHandler
 {
-    XCTAssertEqual(SUBinaryDeltaMajorVersion3, LATEST_DELTA_DIFF_MAJOR_VERSION);
+    XCTAssertEqual(SUBinaryDeltaMajorVersion3, SUBinaryDeltaMajorVersionLatest);
     
     BOOL version3DeltaFormatWithLZMASuccess = [self createAndApplyPatchUsingVersion:SUBinaryDeltaMajorVersion3 compressionMode:SPUDeltaCompressionModeLZMA beforeDiffHandler:beforeDiffHandler afterDiffHandler:afterDiffHandler];
     

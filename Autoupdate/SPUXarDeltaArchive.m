@@ -127,7 +127,7 @@ extern char *xar_get_safe_path(xar_file_t f) __attribute__((weak_import));
     
     self.x = x;
     
-    uint16_t majorDiffVersion = FIRST_DELTA_DIFF_MAJOR_VERSION;
+    uint16_t majorDiffVersion = SUBinaryDeltaMajorVersionFirst;
     uint16_t minorDiffVersion = 0;
     NSString *expectedBeforeHash = nil;
     NSString *expectedAfterHash = nil;

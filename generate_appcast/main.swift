@@ -84,10 +84,10 @@ struct GenerateAppcast: ParsableCommand {
     @Option(name: .long, help: ArgumentHelp("The maximum number of delta items to create for the latest update for each minimum required operating system.", valueName: "maximum-deltas"))
     var maximumDeltas: Int = DEFAULT_MAXIMUM_DELTAS
     
-    @Option(name: .long, help: ArgumentHelp("The compression mode to use for generating delta items. Supported modes for version 3 delta files are 'lzma', 'bzip2', 'zlib', 'lzfse', 'lz4', 'none', and 'default'. Note that version 2 delta files only support 'bzip2', 'default', and 'none' so other modes will be ignored if version 2 files need to be generated.", valueName: "delta-compression-mode"))
-    var deltaCompressionMode: String = "default"
+    @Option(name: .long, help: ArgumentHelp(COMPRESSION_METHOD_ARGUMENT_DESCRIPTION, valueName: "delta-compression"))
+    var deltaCompression: String = "default"
     
-    @Option(name: .long, help: ArgumentHelp("The compression level to use for generating delta items. This only applies if the compression mode used is bzip2 which accepts values from 1 - 9. A special value of 0 will use the default compression level.", valueName: "delta-compression-level"))
+    @Option(name: .long, help: ArgumentHelp(COMPRESSION_LEVEL_ARGUMENT_DESCRIPTION, valueName: "delta-compression-level"))
     var deltaCompressionLevel: Int32 = 0
     
     @Option(name: .long, help: ArgumentHelp("The Sparkle channel name that will be used for generating new updates. By default, no channel is used. Old applications need to be using Sparkle 2 to use this feature.", valueName: "channel-name"))
@@ -176,6 +176,12 @@ struct GenerateAppcast: ParsableCommand {
         guard deltaCompressionLevel >= 0 && deltaCompressionLevel < 9 else {
             throw ValidationError("Invalid --delta-compression-level value was passed.")
         }
+        
+        var validCompression: ObjCBool = false
+        let _ = deltaCompressionModeFromDescription(deltaCompression, &validCompression)
+        if !validCompression.boolValue {
+            throw ValidationError("Invalid --delta-compression \(deltaCompression) was passed.")
+        }
     }
     
     func run() throws {
@@ -202,7 +208,7 @@ struct GenerateAppcast: ParsableCommand {
         let keys = loadPrivateKeys(privateDSAKey, privateEdString)
         
         do {
-            let allUpdates = try makeAppcast(archivesSourceDir: archivesSourceDir, cacheDirectory: GenerateAppcast.cacheDirectory, keys: keys, versions: versions, maximumDeltas: maximumDeltas, deltaCompressionModeDescription: deltaCompressionMode, deltaCompressionLevel: deltaCompressionLevel, verbose: verbose)
+            let allUpdates = try makeAppcast(archivesSourceDir: archivesSourceDir, cacheDirectory: GenerateAppcast.cacheDirectory, keys: keys, versions: versions, maximumDeltas: maximumDeltas, deltaCompressionModeDescription: deltaCompression, deltaCompressionLevel: deltaCompressionLevel, verbose: verbose)
             
             // If a URL prefix was provided, set on the archive items
             if downloadURLPrefix != nil || releaseNotesURLPrefix != nil {

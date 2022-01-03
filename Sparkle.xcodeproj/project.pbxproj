@@ -218,6 +218,8 @@
 		725B81FA2781AEAF0041746F /* libcompression.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 725B81F92781AEA40041746F /* libcompression.tbd */; };
 		725B81FB2781CD930041746F /* libcompression.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 725B81F92781AEA40041746F /* libcompression.tbd */; };
 		725B81FC2781CDC20041746F /* libcompression.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 725B81F92781AEA40041746F /* libcompression.tbd */; };
+		725C2EAA2782EC61007CB7B5 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 725C2EA92782EC61007CB7B5 /* main.swift */; };
+		725C2EAC2782EF3C007CB7B5 /* ArgumentParser in Frameworks */ = {isa = PBXBuildFile; productRef = 725C2EAB2782EF3C007CB7B5 /* ArgumentParser */; };
 		725CB9571C7120410064365A /* SPUUserDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 725CB9561C7120410064365A /* SPUUserDriver.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		725CB95A1C7121830064365A /* SPUStandardUserDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 725CB9581C7121830064365A /* SPUStandardUserDriver.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		725CB95B1C7121830064365A /* SPUStandardUserDriver.m in Sources */ = {isa = PBXBuildFile; fileRef = 725CB9591C7121830064365A /* SPUStandardUserDriver.m */; };
@@ -240,7 +242,6 @@
 		7267E5781D3D895B00D1BF90 /* SUBinaryDeltaCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5711D3D895B00D1BF90 /* SUBinaryDeltaCommon.m */; };
 		7267E5791D3D895B00D1BF90 /* SUBinaryDeltaCreate.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5731D3D895B00D1BF90 /* SUBinaryDeltaCreate.m */; };
 		7267E57A1D3D895B00D1BF90 /* SUBinaryDeltaCreate.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5731D3D895B00D1BF90 /* SUBinaryDeltaCreate.m */; };
-		7267E57C1D3D895B00D1BF90 /* SUBinaryDeltaTool.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5741D3D895B00D1BF90 /* SUBinaryDeltaTool.m */; };
 		7267E57F1D3D896700D1BF90 /* SUBinaryDeltaUnarchiver.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E57E1D3D896700D1BF90 /* SUBinaryDeltaUnarchiver.m */; };
 		7267E5861D3D89B300D1BF90 /* SUDiskImageUnarchiver.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5811D3D89B300D1BF90 /* SUDiskImageUnarchiver.m */; };
 		7267E5871D3D89B300D1BF90 /* SUPipedUnarchiver.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5831D3D89B300D1BF90 /* SUPipedUnarchiver.m */; };
@@ -882,7 +883,6 @@
 		5D06E8D00FD68C7C005AE3F6 /* BinaryDelta */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = BinaryDelta; sourceTree = BUILT_PRODUCTS_DIR; };
 		5D06E8DB0FD68CB9005AE3F6 /* bsdiff.c */ = {isa = PBXFileReference; comments = "-Wno-shorten-64-to-32"; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = bsdiff.c; sourceTree = "<group>"; };
 		5D06E8DC0FD68CB9005AE3F6 /* bspatch.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = bspatch.c; sourceTree = "<group>"; };
-		5D06E8F10FD68D21005AE3F6 /* ConfigBinaryDelta.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ConfigBinaryDelta.xcconfig; sourceTree = "<group>"; };
 		5D06E8FB0FD68D61005AE3F6 /* libbz2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libbz2.dylib; path = usr/lib/libbz2.dylib; sourceTree = SDKROOT; };
 		5D1AF5890FD7678C0065DB48 /* libxar.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libxar.1.dylib; path = usr/lib/libxar.1.dylib; sourceTree = SDKROOT; };
 		5D1AF58F0FD767AD0065DB48 /* libxml2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libxml2.dylib; path = usr/lib/libxml2.dylib; sourceTree = SDKROOT; };
@@ -1144,6 +1144,9 @@
 		72563CA9272E1C5400AF39F0 /* .github */ = {isa = PBXFileReference; lastKnownFileType = folder; path = .github; sourceTree = "<group>"; };
 		725B3A81263FBF0C0041AB8E /* testappcast_minimumAutoupdateVersion.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = testappcast_minimumAutoupdateVersion.xml; sourceTree = "<group>"; };
 		725B81F92781AEA40041746F /* libcompression.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libcompression.tbd; path = usr/lib/libcompression.tbd; sourceTree = SDKROOT; };
+		725C2EA82782EC44007CB7B5 /* Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "Bridging-Header.h"; path = "BinaryDelta/Bridging-Header.h"; sourceTree = SOURCE_ROOT; };
+		725C2EA92782EC61007CB7B5 /* main.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = main.swift; path = BinaryDelta/main.swift; sourceTree = SOURCE_ROOT; };
+		725C2EAD278386A8007CB7B5 /* SPUDeltaCompressionMode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SPUDeltaCompressionMode.h; path = Autoupdate/SPUDeltaCompressionMode.h; sourceTree = SOURCE_ROOT; };
 		725CB9561C7120410064365A /* SPUUserDriver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPUUserDriver.h; sourceTree = "<group>"; };
 		725CB9581C7121830064365A /* SPUStandardUserDriver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPUStandardUserDriver.h; sourceTree = "<group>"; };
 		725CB9591C7121830064365A /* SPUStandardUserDriver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SPUStandardUserDriver.m; sourceTree = "<group>"; };
@@ -1166,7 +1169,6 @@
 		7267E5711D3D895B00D1BF90 /* SUBinaryDeltaCommon.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SUBinaryDeltaCommon.m; path = Autoupdate/SUBinaryDeltaCommon.m; sourceTree = SOURCE_ROOT; };
 		7267E5721D3D895B00D1BF90 /* SUBinaryDeltaCreate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SUBinaryDeltaCreate.h; path = Autoupdate/SUBinaryDeltaCreate.h; sourceTree = SOURCE_ROOT; };
 		7267E5731D3D895B00D1BF90 /* SUBinaryDeltaCreate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SUBinaryDeltaCreate.m; path = Autoupdate/SUBinaryDeltaCreate.m; sourceTree = SOURCE_ROOT; };
-		7267E5741D3D895B00D1BF90 /* SUBinaryDeltaTool.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SUBinaryDeltaTool.m; path = Autoupdate/SUBinaryDeltaTool.m; sourceTree = SOURCE_ROOT; };
 		7267E57D1D3D896700D1BF90 /* SUBinaryDeltaUnarchiver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SUBinaryDeltaUnarchiver.h; path = Autoupdate/SUBinaryDeltaUnarchiver.h; sourceTree = SOURCE_ROOT; };
 		7267E57E1D3D896700D1BF90 /* SUBinaryDeltaUnarchiver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SUBinaryDeltaUnarchiver.m; path = Autoupdate/SUBinaryDeltaUnarchiver.m; sourceTree = SOURCE_ROOT; };
 		7267E5801D3D89B300D1BF90 /* SUDiskImageUnarchiver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SUDiskImageUnarchiver.h; path = Autoupdate/SUDiskImageUnarchiver.h; sourceTree = SOURCE_ROOT; };
@@ -1406,6 +1408,7 @@
 			files = (
 				EA1E281922B645D9004AA304 /* libbsdiff.a in Frameworks */,
 				5D06E9050FD68D7D005AE3F6 /* Foundation.framework in Frameworks */,
+				725C2EAC2782EF3C007CB7B5 /* ArgumentParser in Frameworks */,
 				5D06E8FF0FD68D6D005AE3F6 /* libbz2.dylib in Frameworks */,
 				5D1AF58B0FD7678C0065DB48 /* libxar.1.dylib in Frameworks */,
 				5D1AF5900FD767AD0065DB48 /* libxml2.dylib in Frameworks */,
@@ -1788,15 +1791,17 @@
 				7267E5721D3D895B00D1BF90 /* SUBinaryDeltaCreate.h */,
 				7267E5731D3D895B00D1BF90 /* SUBinaryDeltaCreate.m */,
 				725EE481277BF17A00D820CE /* SPUDeltaArchiveProtocol.h */,
+				725C2EAD278386A8007CB7B5 /* SPUDeltaCompressionMode.h */,
 				725EE484277D375F00D820CE /* SPUDeltaArchive.h */,
 				725EE485277D375F00D820CE /* SPUDeltaArchive.m */,
 				728ED348277DA23400D9238F /* SPUSparkleDeltaArchive.h */,
 				728ED349277DA23400D9238F /* SPUSparkleDeltaArchive.m */,
 				725EE47E277BF13A00D820CE /* SPUXarDeltaArchive.h */,
 				725EE47F277BF13B00D820CE /* SPUXarDeltaArchive.m */,
-				7267E5741D3D895B00D1BF90 /* SUBinaryDeltaTool.m */,
 				7267E57D1D3D896700D1BF90 /* SUBinaryDeltaUnarchiver.h */,
 				7267E57E1D3D896700D1BF90 /* SUBinaryDeltaUnarchiver.m */,
+				725C2EA92782EC61007CB7B5 /* main.swift */,
+				725C2EA82782EC44007CB7B5 /* Bridging-Header.h */,
 			);
 			name = "Binary Delta";
 			sourceTree = "<group>";
@@ -2335,7 +2340,6 @@
 				EA1E286822B664FD004AA304 /* CommandLineTool-Debug.xcconfig */,
 				EA1E286722B664FD004AA304 /* CommandLineTool-Release.xcconfig */,
 				EA1E286922B664FD004AA304 /* CommandLineTool-Shared.xcconfig */,
-				5D06E8F10FD68D21005AE3F6 /* ConfigBinaryDelta.xcconfig */,
 				FA1941D00D94A70100DD942E /* ConfigCommon.xcconfig */,
 				149B78631B7D3A0C00D7D62C /* ConfigCommonCoverage.xcconfig */,
 				FA1941CF0D94A70100DD942E /* ConfigCommonDebug.xcconfig */,
@@ -2510,6 +2514,9 @@
 				376769AF23442F320077B8F7 /* PBXTargetDependency */,
 			);
 			name = BinaryDelta;
+			packageProductDependencies = (
+				725C2EAB2782EF3C007CB7B5 /* ArgumentParser */,
+			);
 			productName = BinaryDelta;
 			productReference = 5D06E8D00FD68C7C005AE3F6 /* BinaryDelta */;
 			productType = "com.apple.product-type.tool";
@@ -2846,6 +2853,9 @@
 				LastUpgradeCheck = 1300;
 				ORGANIZATIONNAME = "Sparkle Project";
 				TargetAttributes = {
+					5D06E8CF0FD68C7C005AE3F6 = {
+						LastSwiftMigration = 1320;
+					};
 					612279D80DB5470200AB99EA = {
 						LastSwiftMigration = 0800;
 						TestTargetID = 8DC2EF4F0486A6940098B216;
@@ -3190,11 +3200,11 @@
 			files = (
 				725EE482277BF44A00D820CE /* SPUXarDeltaArchive.m in Sources */,
 				728ED34C277DA23400D9238F /* SPUSparkleDeltaArchive.m in Sources */,
+				725C2EAA2782EC61007CB7B5 /* main.swift in Sources */,
 				7267E5761D3D895B00D1BF90 /* SUBinaryDeltaApply.m in Sources */,
 				725EE487277D376000D820CE /* SPUDeltaArchive.m in Sources */,
 				7267E5781D3D895B00D1BF90 /* SUBinaryDeltaCommon.m in Sources */,
 				7267E57A1D3D895B00D1BF90 /* SUBinaryDeltaCreate.m in Sources */,
-				7267E57C1D3D895B00D1BF90 /* SUBinaryDeltaTool.m in Sources */,
 				726F2CE81BC9C48F001971A4 /* SUConstants.m in Sources */,
 				7267E5EA1D3D90AA00D1BF90 /* SUFileManager.m in Sources */,
 				726F2CE91BC9C499001971A4 /* SUOperatingSystem.m in Sources */,
@@ -3948,8 +3958,14 @@
 		};
 		149B785E1B7D398100D7D62C /* Coverage */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 5D06E8F10FD68D21005AE3F6 /* ConfigBinaryDelta.xcconfig */;
+			baseConfigurationReference = EA1E286722B664FD004AA304 /* CommandLineTool-Release.xcconfig */;
 			buildSettings = {
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				SWIFT_VERSION = 5.0;
 			};
 			name = Coverage;
 		};
@@ -3995,15 +4011,27 @@
 		};
 		5D06E8D20FD68C7D005AE3F6 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 5D06E8F10FD68D21005AE3F6 /* ConfigBinaryDelta.xcconfig */;
+			baseConfigurationReference = EA1E286822B664FD004AA304 /* CommandLineTool-Debug.xcconfig */;
 			buildSettings = {
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
 		5D06E8D30FD68C7D005AE3F6 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 5D06E8F10FD68D21005AE3F6 /* ConfigBinaryDelta.xcconfig */;
+			baseConfigurationReference = EA1E286722B664FD004AA304 /* CommandLineTool-Release.xcconfig */;
 			buildSettings = {
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};
@@ -4590,6 +4618,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		725C2EAB2782EF3C007CB7B5 /* ArgumentParser */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 727DBAE326B5BBFD00111F0C /* XCRemoteSwiftPackageReference "swift-argument-parser" */;
+			productName = ArgumentParser;
+		};
 		727DBAE426B5BBFD00111F0C /* ArgumentParser */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 727DBAE326B5BBFD00111F0C /* XCRemoteSwiftPackageReference "swift-argument-parser" */;
