@@ -19,6 +19,8 @@
 
 #include "AppKitPrevention.h"
 
+// Note: the framework bundle version must be bumped, and generate_appcast must be updated to compare it,
+// when we add/change new major versions and defaults
 SUBinaryDeltaMajorVersion SUBinaryDeltaMajorVersionDefault = SUBinaryDeltaMajorVersion3;
 SUBinaryDeltaMajorVersion SUBinaryDeltaMajorVersionLatest = SUBinaryDeltaMajorVersion3;
 SUBinaryDeltaMajorVersion SUBinaryDeltaMajorVersionFirst = SUBinaryDeltaMajorVersion1;
