@@ -158,7 +158,7 @@ func makeAppcast(archivesSourceDir: URL, cacheDirectory cacheDir: URL, keys: Pri
                                 fallthrough
                             case .ZLIB:
                                 deltaCompressionMode = .bzip2
-                                print("Warning: Delta compression mode '\(deltaCompressionModeDescription)' was requested but . Using default compression instead..")
+                                print("Warning: Delta compression mode '\(deltaCompressionModeDescription)' was requested but ignoring this and using default compression instead for generating version 2 delta file..")
                             case SPUDeltaCompressionModeDefault:
                                 fallthrough
                             case .none:
