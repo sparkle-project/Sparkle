@@ -724,15 +724,29 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
     }
     
     // We only support configuring compression level for bzip2
-    uint8_t compressionLevel;
-    if (compression == SPUDeltaCompressionModeBzip2) {
-        if (header.compressionLevel <= 0 || header.compressionLevel > 9) {
-            compressionLevel = 9;
-        } else {
-            compressionLevel = header.compressionLevel;
-        }
-    } else {
-        compressionLevel = 0;
+    uint8_t compressionLevel = 0;
+    switch (compression) {
+        case SPUDeltaCompressionModeBzip2:
+            // Only 1 - 9 are valid, 0 is a special case for using default 9
+            if (header.compressionLevel <= 0 || header.compressionLevel > 9) {
+                compressionLevel = 9;
+            } else {
+                compressionLevel = header.compressionLevel;
+            }
+            break;
+        // Some supported formats below have a documented level even though it's not customizable
+        // Let's record them in the archive
+        case SPUDeltaCompressionModeLZMA:
+            compressionLevel = 6;
+            break;
+        case SPUDeltaCompressionModeZLIB:
+            compressionLevel = 5;
+            break;
+        // These formats don't have any documented level or aren't applicable
+        case SPUDeltaCompressionModeLZ4:
+        case SPUDeltaCompressionModeLZFSE:
+        case SPUDeltaCompressionModeNone:
+            compressionLevel = 0;
     }
     
     if (fwrite(&compressionLevel, sizeof(compressionLevel), 1, file) < 1) {

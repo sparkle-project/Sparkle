@@ -21,7 +21,7 @@ struct Create: ParsableCommand {
     var compression: String = "default"
     
     @Option(name: .long, help: ArgumentHelp(COMPRESSION_LEVEL_ARGUMENT_DESCRIPTION, valueName: "compression-level"))
-    var compressionLevel: UInt8 = DEFAULT_DELTA_COMPRESSION_LEVEL
+    var compressionLevel: UInt8 = UInt8(DEFAULT_DELTA_COMPRESSION_LEVEL)
     
     @Argument(help: ArgumentHelp("Path to original bundle to create a patch from."))
     var beforeTree: String
@@ -42,7 +42,7 @@ struct Create: ParsableCommand {
         
         switch compressionMode {
         case SPUDeltaCompressionModeDefault:
-            break
+            fallthrough
         case .none:
             guard compressionLevel == 0 else {
                 fputs("Error: compression level must be 0 for compression \(compression)\n", stderr)
@@ -171,9 +171,9 @@ struct Apply: ParsableCommand {
     }
 }
 
-// Output the version of the program or the version from a patch file
-struct Version: ParsableCommand {
-    @Argument(help: ArgumentHelp("Path to patch file to extract version from."))
+// Output information for BinaryDelta or from a patch file
+struct Info: ParsableCommand {
+    @Argument(help: ArgumentHelp("Path to patch file to extract information from."))
     var patchFile : String?
     
     func run() throws {
@@ -192,20 +192,33 @@ struct Version: ParsableCommand {
                     throw ExitCode(1)
                 }
                 
-                fputs("\(header.majorVersion).\(header.minorVersion)\n", stdout)
+                fputs("Patch version \(header.majorVersion).\(header.minorVersion)", stdout)
+                
+                // Print out compression info only if it's available
+                // We can't get compression info from version 2 files
+                if header.compression != SPUDeltaCompressionModeDefault, let compressionDescription = deltaCompressionStringFromMode(header.compression) {
+                    fputs(" using \(compressionDescription) compression", stdout)
+                    
+                    // Compression level isn't available or applicable for all formats
+                    if header.compressionLevel != DEFAULT_DELTA_COMPRESSION_LEVEL {
+                        fputs(" with level \(header.compressionLevel)", stdout)
+                    }
+                }
+                
+                fputs("\n", stdout)
             } else {
                 fputs("Error: Failed to retrieve header due to unknown reason.\n", stderr)
                 throw ExitCode(1)
             }
         } else {
             // Print version of program
-            fputs("\(SUBinaryDeltaMajorVersionLatest.rawValue).\(latestMinorVersionForMajorVersion(SUBinaryDeltaMajorVersionLatest))\n", stdout)
+            fputs("BinaryDelta version \(SUBinaryDeltaMajorVersionLatest.rawValue).\(latestMinorVersionForMajorVersion(SUBinaryDeltaMajorVersionLatest))\n", stdout)
         }
     }
 }
 
 struct BinaryDelta: ParsableCommand {
-    static let configuration = CommandConfiguration(commandName: "BinaryDelta", abstract: "Create and apply small and efficient delta patches between an old and new version of a bundle.", subcommands: [Create.self, Apply.self, Version.self])
+    static let configuration = CommandConfiguration(commandName: "BinaryDelta", abstract: "Create and apply small and efficient delta patches between an old and new version of a bundle.", subcommands: [Create.self, Apply.self, Info.self])
 }
 
 DispatchQueue.global().async(execute: {

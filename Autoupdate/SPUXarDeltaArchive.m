@@ -114,23 +114,6 @@ extern char *xar_get_safe_path(xar_file_t f) __attribute__((weak_import));
     
     self.x = x;
     
-    SPUDeltaCompressionMode compression;
-    const char *compressionOption = xar_opt_get(x, XAR_OPT_COMPRESSION);
-    if (compressionOption == NULL || strcmp(compressionOption, XAR_OPT_VAL_NONE) == 0) {
-        compression = SPUDeltaCompressionModeNone;
-    } else {
-        compression = SPUDeltaCompressionModeBzip2;
-    }
-    
-    int compressionLevel;
-    const char *compressionArgOption = xar_opt_get(x, XAR_OPT_COMPRESSIONARG);
-    if (compressionArgOption == NULL) {
-        // Assume default
-        compressionLevel = 9;
-    } else {
-        compressionLevel = atoi(compressionArgOption);
-    }
-    
     uint16_t majorDiffVersion = SUBinaryDeltaMajorVersionFirst;
     uint16_t minorDiffVersion = 0;
     NSString *expectedBeforeHash = nil;
@@ -183,7 +166,9 @@ extern char *xar_get_safe_path(xar_file_t f) __attribute__((weak_import));
     unsigned char rawExpectedAfterHash[CC_SHA1_DIGEST_LENGTH] = {0};
     getRawHashFromDisplayHash(rawExpectedAfterHash, expectedAfterHash);
     
-    return [[SPUDeltaArchiveHeader alloc] initWithCompression:compression compressionLevel:(uint8_t)compressionLevel majorVersion:majorDiffVersion minorVersion:minorDiffVersion beforeTreeHash:rawExpectedBeforeHash afterTreeHash:rawExpectedAfterHash];
+    // I wasn't able to figure out how to retrieve the compression options from xar,
+    // so we will use default flags to indicate the info isn't available
+    return [[SPUDeltaArchiveHeader alloc] initWithCompression:SPUDeltaCompressionModeDefault compressionLevel:DEFAULT_DELTA_COMPRESSION_LEVEL majorVersion:majorDiffVersion minorVersion:minorDiffVersion beforeTreeHash:rawExpectedBeforeHash afterTreeHash:rawExpectedAfterHash];
 }
 
 - (void)writeHeader:(SPUDeltaArchiveHeader *)header
@@ -201,6 +186,7 @@ extern char *xar_get_safe_path(xar_file_t f) __attribute__((weak_import));
     SPUDeltaCompressionMode compression = (header.compression == SPUDeltaCompressionModeDefault ? SPUDeltaCompressionModeBzip2 : header.compression);
     
     uint8_t compressionLevel;
+    // Only 1 - 9 are valid, 0 is special case to use default level 9
     if (header.compressionLevel <= 0 || header.compressionLevel > 9) {
         compressionLevel = 9;
     } else {
