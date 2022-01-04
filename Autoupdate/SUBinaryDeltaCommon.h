@@ -10,7 +10,7 @@
 #define SUBINARYDELTACOMMON_H
 
 #import <Foundation/Foundation.h>
-
+#import "SPUDeltaCompressionMode.h"
 #include <fts.h>
 
 #define PERMISSION_FLAGS (S_IRWXU | S_IRWXG | S_IRWXO | S_ISUID | S_ISGID | S_ISVTX)
@@ -40,12 +40,17 @@ typedef NS_ENUM(uint16_t, SUBinaryDeltaMajorVersion)
     SUBinaryDeltaMajorVersion3 = 3
 };
 
-// For Swift access
 extern SUBinaryDeltaMajorVersion SUBinaryDeltaMajorVersionDefault;
+extern SUBinaryDeltaMajorVersion SUBinaryDeltaMajorVersionLatest;
+extern SUBinaryDeltaMajorVersion SUBinaryDeltaMajorVersionFirst;
+extern SUBinaryDeltaMajorVersion SUBinaryDeltaMajorVersionFirstSupported;
 
-#define FIRST_DELTA_DIFF_MAJOR_VERSION SUBinaryDeltaMajorVersion1
-#define FIRST_SUPPORTED_DELTA_MAJOR_VERSION SUBinaryDeltaMajorVersion2
-#define LATEST_DELTA_DIFF_MAJOR_VERSION SUBinaryDeltaMajorVersion3
+#define COMPRESSION_METHOD_ARGUMENT_DESCRIPTION @"The compression method to use for generating delta updates. Supported methods for version 3 delta files are 'lzma', 'bzip2', 'zlib', 'lzfse', 'lz4', 'none', and 'default'. Note that version 2 delta files only support 'bzip2', 'none', and 'default' so other methods will be ignored if version 2 files are being generated."
+
+#define COMPRESSION_LEVEL_ARGUMENT_DESCRIPTION @"The compression level to use for generating delta updates. This only applies if the compression method used is bzip2 which accepts values from 1 - 9. A special value of 0 will use the default compression level."
+
+SPUDeltaCompressionMode deltaCompressionModeFromDescription(NSString *description, BOOL *requestValid);
+NSString *deltaCompressionStringFromMode(SPUDeltaCompressionMode mode);
 
 extern int compareFiles(const FTSENT **a, const FTSENT **b);
 BOOL getRawHashOfTreeWithVersion(unsigned char *hashBuffer, NSString *path, uint16_t majorVersion);

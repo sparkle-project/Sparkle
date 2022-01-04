@@ -46,23 +46,23 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
     unsigned char *expectedBeforeHash = header.beforeTreeHash;
     unsigned char *expectedAfterHash = header.afterTreeHash;
     
-    if (majorDiffVersion < FIRST_DELTA_DIFF_MAJOR_VERSION) {
+    if (majorDiffVersion < SUBinaryDeltaMajorVersionFirst) {
         if (error != NULL) {
             *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadCorruptFileError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Unable to identify diff-version %u in delta.  Giving up.", majorDiffVersion] }];
         }
         return NO;
     }
     
-    if (majorDiffVersion < FIRST_SUPPORTED_DELTA_MAJOR_VERSION) {
+    if (majorDiffVersion < SUBinaryDeltaMajorVersionFirstSupported) {
         if (error != NULL) {
             *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadCorruptFileError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Applying version %u patches is no longer supported.", majorDiffVersion] }];
         }
         return NO;
     }
 
-    if (majorDiffVersion > LATEST_DELTA_DIFF_MAJOR_VERSION) {
+    if (majorDiffVersion > SUBinaryDeltaMajorVersionLatest) {
         if (error != NULL) {
-            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"A later version is needed to apply this patch (on major version %u, but patch requests version %u).", LATEST_DELTA_DIFF_MAJOR_VERSION, majorDiffVersion] }];
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"A later version is needed to apply this patch (on major version %u, but patch requests version %u).", SUBinaryDeltaMajorVersionLatest, majorDiffVersion] }];
         }
         return NO;
     }

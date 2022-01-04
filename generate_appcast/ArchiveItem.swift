@@ -24,10 +24,10 @@ class DeltaUpdate {
         return (archiveFileAttributes[.size] as! NSNumber).int64Value
     }
 
-    class func create(from: ArchiveItem, to: ArchiveItem, archivePath: URL) throws -> DeltaUpdate {
+    class func create(from: ArchiveItem, to: ArchiveItem, deltaVersion: SUBinaryDeltaMajorVersion, deltaCompressionMode: SPUDeltaCompressionMode, deltaCompressionLevel: UInt8, archivePath: URL) throws -> DeltaUpdate {
         var applyDiffError: NSError?
 
-        if !createBinaryDelta(from.appPath.path, to.appPath.path, archivePath.path, SUBinaryDeltaMajorVersionDefault, SPUDeltaCompressionModeDefault, DEFAULT_BZIP2_COMPRESSION_LEVEL, false, &applyDiffError) {
+        if !createBinaryDelta(from.appPath.path, to.appPath.path, archivePath.path, deltaVersion, deltaCompressionMode, deltaCompressionLevel, false, &applyDiffError) {
             throw applyDiffError!
         }
 
@@ -40,6 +40,7 @@ class ArchiveItem: CustomStringConvertible {
     // swiftlint:disable identifier_name
     let _shortVersion: String?
     let minimumSystemVersion: String
+    let frameworkVersion: String?
     let archivePath: URL
     let appPath: URL
     let feedURL: URL?
@@ -53,11 +54,12 @@ class ArchiveItem: CustomStringConvertible {
     var downloadUrlPrefix: URL?
     var releaseNotesURLPrefix: URL?
 
-    init(version: String, shortVersion: String?, feedURL: URL?, minimumSystemVersion: String?, publicEdKey: String?, supportsDSA: Bool, appPath: URL, archivePath: URL) throws {
+    init(version: String, shortVersion: String?, feedURL: URL?, minimumSystemVersion: String?, frameworkVersion: String?, publicEdKey: String?, supportsDSA: Bool, appPath: URL, archivePath: URL) throws {
         self.version = version
         self._shortVersion = shortVersion
         self.feedURL = feedURL
         self.minimumSystemVersion = minimumSystemVersion ?? "10.11"
+        self.frameworkVersion = frameworkVersion
         self.archivePath = archivePath
         self.appPath = appPath
         self.supportsDSA = supportsDSA
@@ -106,11 +108,28 @@ class ArchiveItem: CustomStringConvertible {
                     feedURL = feedURL!.appendingPathComponent("appcast.xml")
                 }
             }
+            
+            var frameworkVersion: String? = nil
+            if let appBundle = Bundle(url: appPath), let frameworksURL = appBundle.privateFrameworksURL {
+                let sparkleBundleURL = frameworksURL.appendingPathComponent("Sparkle").appendingPathExtension("framework")
+                
+                if let sparkleBundle = Bundle(url: sparkleBundleURL), let infoDictionary = sparkleBundle.infoDictionary {
+                    frameworkVersion = infoDictionary[kCFBundleVersionKey as String] as? String
+                } else {
+                    // Try legacy SparkleCore framework that was shipping in early 2.0 betas
+                    let sparkleCoreBundleURL = frameworksURL.appendingPathComponent("SparkleCore").appendingPathExtension("framework")
+                    
+                    if let sparkleBundle = Bundle(url: sparkleCoreBundleURL), let infoDictionary = sparkleBundle.infoDictionary {
+                        frameworkVersion = infoDictionary[kCFBundleVersionKey as String] as? String
+                    }
+                }
+            }
 
             try self.init(version: version,
                           shortVersion: shortVersion,
                           feedURL: feedURL,
                           minimumSystemVersion: infoPlist["LSMinimumSystemVersion"] as? String,
+                          frameworkVersion: frameworkVersion,
                           publicEdKey: publicEdKey,
                           supportsDSA: supportsDSA,
                           appPath: appPath,

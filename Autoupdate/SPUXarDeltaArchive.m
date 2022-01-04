@@ -53,9 +53,6 @@ extern char *xar_get_safe_path(xar_file_t f) __attribute__((weak_import));
 @property (nonatomic, readonly) NSString *patchFile;
 @property (nonatomic) NSError *error;
 
-@property (nonatomic, readonly) SPUDeltaCompressionMode writableCompression;
-@property (nonatomic, readonly) int32_t writableCompressionLevel;
-
 @end
 
 @implementation SPUXarDeltaArchive
@@ -64,18 +61,14 @@ extern char *xar_get_safe_path(xar_file_t f) __attribute__((weak_import));
 @synthesize xarMode = _xarMode;
 @synthesize patchFile = _patchFile;
 @synthesize fileTable = _fileTable;
-@synthesize writableCompression = _writableCompression;
-@synthesize writableCompressionLevel = _writableCompressionLevel;
 @synthesize error = _error;
 
-- (instancetype)initWithPatchFileForWriting:(NSString *)patchFile compression:(SPUDeltaCompressionMode)compression compressionLevel:(int32_t)compressionLevel
+- (instancetype)initWithPatchFileForWriting:(NSString *)patchFile
 {
     self = [super init];
     if (self != nil) {
         _patchFile = [patchFile copy];
         _xarMode = WRITE;
-        _writableCompression = (compression == SPUDeltaCompressionModeDefault ? SPUDeltaCompressionModeBzip2 : compression);
-        _writableCompressionLevel = compressionLevel;
         _fileTable = [NSMutableDictionary dictionary];
     }
     return self;
@@ -121,7 +114,7 @@ extern char *xar_get_safe_path(xar_file_t f) __attribute__((weak_import));
     
     self.x = x;
     
-    uint16_t majorDiffVersion = FIRST_DELTA_DIFF_MAJOR_VERSION;
+    uint16_t majorDiffVersion = SUBinaryDeltaMajorVersionFirst;
     uint16_t minorDiffVersion = 0;
     NSString *expectedBeforeHash = nil;
     NSString *expectedAfterHash = nil;
@@ -173,7 +166,9 @@ extern char *xar_get_safe_path(xar_file_t f) __attribute__((weak_import));
     unsigned char rawExpectedAfterHash[CC_SHA1_DIGEST_LENGTH] = {0};
     getRawHashFromDisplayHash(rawExpectedAfterHash, expectedAfterHash);
     
-    return [[SPUDeltaArchiveHeader alloc] initWithMajorVersion:majorDiffVersion minorVersion:minorDiffVersion beforeTreeHash:rawExpectedBeforeHash afterTreeHash:rawExpectedAfterHash];
+    // I wasn't able to figure out how to retrieve the compression options from xar,
+    // so we will use default flags to indicate the info isn't available
+    return [[SPUDeltaArchiveHeader alloc] initWithCompression:SPUDeltaCompressionModeDefault compressionLevel:0 majorVersion:majorDiffVersion minorVersion:minorDiffVersion beforeTreeHash:rawExpectedBeforeHash afterTreeHash:rawExpectedAfterHash];
 }
 
 - (void)writeHeader:(SPUDeltaArchiveHeader *)header
@@ -188,11 +183,19 @@ extern char *xar_get_safe_path(xar_file_t f) __attribute__((weak_import));
     
     self.x = x;
     
-    SPUDeltaCompressionMode compression = self.writableCompression;
-    int32_t compressionLevel = self.writableCompressionLevel;
+    SPUDeltaCompressionMode compression = (header.compression == SPUDeltaCompressionModeDefault ? SPUDeltaCompressionModeBzip2 : header.compression);
+    
+    uint8_t compressionLevel;
+    // Only 1 - 9 are valid, 0 is special case to use default level 9
+    if (header.compressionLevel <= 0 || header.compressionLevel > 9) {
+        compressionLevel = 9;
+    } else {
+        compressionLevel = header.compressionLevel;
+    }
     
     switch (compression) {
         case SPUDeltaCompressionModeNone:
+            xar_opt_set(x, XAR_OPT_COMPRESSION, XAR_OPT_VAL_NONE);
             break;
         case SPUDeltaCompressionModeBzip2: {
             xar_opt_set(x, XAR_OPT_COMPRESSION, "bzip2");

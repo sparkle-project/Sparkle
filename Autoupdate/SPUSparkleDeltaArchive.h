@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 
 #import "SPUDeltaArchiveProtocol.h"
+#import "SPUDeltaCompressionMode.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -66,7 +67,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface SPUSparkleDeltaArchive : NSObject <SPUDeltaArchiveProtocol>
 
-- (instancetype)initWithPatchFileForWriting:(NSString *)patchFile compression:(SPUDeltaCompressionMode)compression compressionLevel:(int32_t)compressionLevel;
+- (instancetype)initWithPatchFileForWriting:(NSString *)patchFile;
 - (instancetype)initWithPatchFileForReading:(NSString *)patchFile;
 
 @end

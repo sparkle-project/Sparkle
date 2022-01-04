@@ -11,7 +11,7 @@ func makeError(code: SUError, _ description: String) -> NSError {
         ])
 }
 
-func makeAppcast(archivesSourceDir: URL, cacheDirectory cacheDir: URL, keys: PrivateKeys, versions: Set<String>?, maximumDeltas: Int, verbose: Bool) throws -> [String: [ArchiveItem]] {
+func makeAppcast(archivesSourceDir: URL, cacheDirectory cacheDir: URL, keys: PrivateKeys, versions: Set<String>?, maximumDeltas: Int, deltaCompressionModeDescription: String, deltaCompressionLevel: UInt8, verbose: Bool) throws -> [String: [ArchiveItem]] {
     let comparator = SUStandardVersionComparator()
 
     let allUpdates = (try unarchiveUpdates(archivesSourceDir: archivesSourceDir, archivesDestDir: cacheDir, verbose: verbose))
@@ -109,7 +109,56 @@ func makeAppcast(archivesSourceDir: URL, cacheDirectory cacheDir: URL, keys: Pri
                 }
                 if !fm.fileExists(atPath: deltaPath.path) {
                     do {
-                        delta = try DeltaUpdate.create(from: item, to: latestItem, archivePath: deltaPath)
+                        // Decide the most appropriate delta version
+                        let deltaVersion: SUBinaryDeltaMajorVersion
+                        if SUBinaryDeltaMajorVersionDefault == .version2 {
+                            // Remove this branch when we change the default delta version to .version3
+                            deltaVersion = .version2
+                        } else if let frameworkVersion = item.frameworkVersion {
+                            switch comparator.compareVersion(frameworkVersion, toVersion: "2009") {
+                            case .orderedSame:
+                                fallthrough
+                            case .orderedDescending:
+                                deltaVersion = .version3
+                            case .orderedAscending:
+                                deltaVersion = .version2
+                            }
+                        } else {
+                            deltaVersion = SUBinaryDeltaMajorVersionDefault
+                            print("Warning: Sparkle.framework version for \(item.appPath.lastPathComponent) (\(item.shortVersion) (\(item.version))) was not found. Falling back to generating delta using default delta version..")
+                        }
+                        
+                        let requestedDeltaCompressionMode = deltaCompressionModeFromDescription(deltaCompressionModeDescription, nil)
+                        
+                        // Version 2 formats only support bzip2, none, and default options
+                        let deltaCompressionMode: SPUDeltaCompressionMode
+                        if deltaVersion == .version2 {
+                            switch requestedDeltaCompressionMode {
+                            case .LZFSE:
+                                fallthrough
+                            case .LZ4:
+                                fallthrough
+                            case .LZMA:
+                                fallthrough
+                            case .ZLIB:
+                                deltaCompressionMode = .bzip2
+                                print("Warning: Delta compression mode '\(deltaCompressionModeDescription)' was requested but using default compression instead because version 2 delta file from version \(item.version) needs to be generated..")
+                            case SPUDeltaCompressionModeDefault:
+                                fallthrough
+                            case .none:
+                                fallthrough
+                            case .bzip2:
+                                deltaCompressionMode = requestedDeltaCompressionMode
+                            @unknown default:
+                                // This shouldn't happen
+                                print("Warning: failed to parse delta compression mode \(deltaCompressionModeDescription). There is a logic bug in generate_appcast.")
+                                deltaCompressionMode = SPUDeltaCompressionModeDefault
+                            }
+                        } else {
+                            deltaCompressionMode = requestedDeltaCompressionMode
+                        }
+                        
+                        delta = try DeltaUpdate.create(from: item, to: latestItem, deltaVersion: deltaVersion, deltaCompressionMode: deltaCompressionMode, deltaCompressionLevel: deltaCompressionLevel, archivePath: deltaPath)
                     } catch {
                         print("Could not create delta update", deltaPath.path, error)
                         continue

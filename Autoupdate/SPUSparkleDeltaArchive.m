@@ -35,7 +35,6 @@
 @property (nonatomic) void *compressionBuffer;
 
 @property (nonatomic) NSMutableArray<SPUDeltaArchiveItem *> *writableItems;
-@property (nonatomic) int32_t writableCompressionLevel;
 
 @end
 
@@ -52,7 +51,6 @@
 @synthesize compression = _compression;
 @synthesize writeMode = _writeMode;
 @synthesize writableItems = _writableItems;
-@synthesize writableCompressionLevel = _writableCompressionLevel;
 @synthesize error = _error;
 @synthesize partialChunkBuffer = _partialChunkBuffer;
 @synthesize compressionBuffer = _compressionBuffer;
@@ -62,14 +60,12 @@
     return YES;
 }
 
-- (instancetype)initWithPatchFileForWriting:(NSString *)patchFile compression:(SPUDeltaCompressionMode)compression compressionLevel:(int32_t)compressionLevel
+- (instancetype)initWithPatchFileForWriting:(NSString *)patchFile
 {
     self = [super init];
     if (self != nil) {
         _patchFile = [patchFile copy];
         _writableItems = [NSMutableArray array];
-        _compression = (compression == SPUDeltaCompressionModeDefault) ? SPUDeltaCompressionModeLZMA : compression;
-        _writableCompressionLevel = compressionLevel;
         _writeMode = YES;
     }
     return self;
@@ -271,6 +267,12 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
     
     self.compression = compression;
     
+    uint8_t compressionLevel = 0;
+    if (fread(&compressionLevel, sizeof(compressionLevel), 1, file) < 1) {
+        self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to read compression level value from patch file: %@", patchFile] }];
+        return nil;
+    }
+    
     switch (compression) {
         case SPUDeltaCompressionModeNone:
             break;
@@ -336,7 +338,7 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
         return nil;
     }
     
-    return [[SPUDeltaArchiveHeader alloc] initWithMajorVersion:majorVersion minorVersion:minorVersion beforeTreeHash:beforeTreeHash afterTreeHash:afterTreeHash];
+    return [[SPUDeltaArchiveHeader alloc] initWithCompression:compression compressionLevel:compressionLevel majorVersion:majorVersion minorVersion:minorVersion beforeTreeHash:beforeTreeHash afterTreeHash:afterTreeHash];
 }
 
 - (NSArray<NSString *> *)_readRelativeFilePaths
@@ -712,9 +714,43 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
         return;
     }
     
-    SPUDeltaCompressionMode compression = self.compression;
+    SPUDeltaCompressionMode compression = (header.compression == SPUDeltaCompressionModeDefault) ? SPUDeltaCompressionModeLZMA : header.compression;
+    
+    self.compression = compression;
+    
     if (fwrite(&compression, sizeof(compression), 1, file) < 1) {
         self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: @"Failed to write compression value due to io error" }];
+        return;
+    }
+    
+    // We only support configuring compression level for bzip2
+    uint8_t compressionLevel = 0;
+    switch (compression) {
+        case SPUDeltaCompressionModeBzip2:
+            // Only 1 - 9 are valid, 0 is a special case for using default 9
+            if (header.compressionLevel <= 0 || header.compressionLevel > 9) {
+                compressionLevel = 9;
+            } else {
+                compressionLevel = header.compressionLevel;
+            }
+            break;
+        // Some supported formats below have a documented level even though it's not customizable
+        // Let's record them in the archive
+        case SPUDeltaCompressionModeLZMA:
+            compressionLevel = 6;
+            break;
+        case SPUDeltaCompressionModeZLIB:
+            compressionLevel = 5;
+            break;
+        // These formats don't have any documented level or aren't applicable
+        case SPUDeltaCompressionModeLZ4:
+        case SPUDeltaCompressionModeLZFSE:
+        case SPUDeltaCompressionModeNone:
+            compressionLevel = 0;
+    }
+    
+    if (fwrite(&compressionLevel, sizeof(compressionLevel), 1, file) < 1) {
+        self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: @"Failed to write compression level value due to io error" }];
         return;
     }
     
@@ -724,7 +760,7 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
         case SPUDeltaCompressionModeBzip2: {
             int bzerror = 0;
             // Compression level can be 1 - 9
-            int blockSize100k = self.writableCompressionLevel;
+            int blockSize100k = (int)compressionLevel;
             
             BZFILE *bzipFile = BZ2_bzWriteOpen(&bzerror, file, blockSize100k, 0, 0);
             if (bzipFile == NULL) {

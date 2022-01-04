@@ -65,7 +65,7 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
     }
     
     NSError *createDiffError = nil;
-    BOOL createdDiff = createBinaryDelta(sourceDirectory, destinationDirectory, diffFile, majorVersion, compressionMode, DEFAULT_BZIP2_COMPRESSION_LEVEL, NO, &createDiffError);
+    BOOL createdDiff = createBinaryDelta(sourceDirectory, destinationDirectory, diffFile, majorVersion, compressionMode, 0, NO, &createDiffError);
     if (!createdDiff) {
         NSLog(@"Creating binary diff failed with error: %@", createDiffError);
     } else if (afterDiffHandler != nil) {
@@ -92,7 +92,7 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
 
 - (BOOL)createAndApplyPatchWithBeforeDiffHandler:(SUDeltaHandler)beforeDiffHandler afterDiffHandler:(SUDeltaHandler)afterDiffHandler
 {
-    XCTAssertEqual(SUBinaryDeltaMajorVersion3, LATEST_DELTA_DIFF_MAJOR_VERSION);
+    XCTAssertEqual(SUBinaryDeltaMajorVersion3, SUBinaryDeltaMajorVersionLatest);
     
     BOOL version3DeltaFormatWithLZMASuccess = [self createAndApplyPatchUsingVersion:SUBinaryDeltaMajorVersion3 compressionMode:SPUDeltaCompressionModeLZMA beforeDiffHandler:beforeDiffHandler afterDiffHandler:afterDiffHandler];
     
