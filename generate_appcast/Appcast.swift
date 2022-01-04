@@ -122,6 +122,7 @@ func makeAppcast(archivesSourceDir: URL, cacheDirectory cacheDir: URL, keys: Pri
                             }
                         } else {
                             deltaVersion = SUBinaryDeltaMajorVersionDefault
+                            print("Warning: Sparkle.framework version for \(item.appPath.lastPathComponent) (\(item.shortVersion) (\(item.version))) was not found. Falling back to generating delta using default delta version..")
                         }
                         
                         let requestedDeltaCompressionMode = deltaCompressionModeFromDescription(deltaCompressionModeDescription, nil)
