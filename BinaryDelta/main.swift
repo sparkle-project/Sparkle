@@ -21,7 +21,7 @@ struct Create: ParsableCommand {
     var compression: String = "default"
     
     @Option(name: .long, help: ArgumentHelp(COMPRESSION_LEVEL_ARGUMENT_DESCRIPTION, valueName: "compression-level"))
-    var compressionLevel: UInt8 = UInt8(DEFAULT_DELTA_COMPRESSION_LEVEL)
+    var compressionLevel: UInt8 = 0
     
     @Argument(help: ArgumentHelp("Path to original bundle to create a patch from."))
     var beforeTree: String
@@ -200,7 +200,7 @@ struct Info: ParsableCommand {
                     fputs(" using \(compressionDescription) compression", stdout)
                     
                     // Compression level isn't available or applicable for all formats
-                    if header.compressionLevel != DEFAULT_DELTA_COMPRESSION_LEVEL {
+                    if header.compressionLevel != 0 {
                         fputs(" with level \(header.compressionLevel)", stdout)
                     }
                 }

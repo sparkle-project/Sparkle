@@ -20,5 +20,3 @@ typedef NS_ENUM(uint8_t, SPUDeltaCompressionMode) {
 
 // For Swift access
 extern SPUDeltaCompressionMode SPUDeltaCompressionModeDefault;
-
-#define DEFAULT_DELTA_COMPRESSION_LEVEL 0
