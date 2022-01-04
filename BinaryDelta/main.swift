@@ -11,8 +11,8 @@ import ArgumentParser
 
 // Create a patch from an old and new bundle
 struct Create: ParsableCommand {
-    @Option(name: .long, help: ArgumentHelp("The major version of the patch to generate. Defaults to the latest version when possible. Older versions will need to be used against applications running older versions of Sparkle however.", valueName: "version"))
-    var version: Int = 3
+    @Option(name: .long, help: ArgumentHelp("The major version of the patch to generate. Defaults to the latest stable version. Older versions will need to be specified for updating from applications using older versions of Sparkle.", valueName: "version"))
+    var version: Int = Int(SUBinaryDeltaMajorVersionDefault.rawValue)
     
     @Flag(name: .customLong("verbose"), help: ArgumentHelp("Enable logging of the changes being archived into the generated patch."))
     var verbose: Bool = false

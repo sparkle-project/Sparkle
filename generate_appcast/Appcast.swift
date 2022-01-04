@@ -111,7 +111,10 @@ func makeAppcast(archivesSourceDir: URL, cacheDirectory cacheDir: URL, keys: Pri
                     do {
                         // Decide the most appropriate delta version
                         let deltaVersion: SUBinaryDeltaMajorVersion
-                        if let frameworkVersion = item.frameworkVersion {
+                        if SUBinaryDeltaMajorVersionDefault == .version2 {
+                            // Remove this branch when we change the default delta version to .version3
+                            deltaVersion = .version2
+                        } else if let frameworkVersion = item.frameworkVersion {
                             switch comparator.compareVersion(frameworkVersion, toVersion: "2009") {
                             case .orderedSame:
                                 fallthrough
