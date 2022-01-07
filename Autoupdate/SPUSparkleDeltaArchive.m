@@ -443,7 +443,7 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
             NSString *clonedRelativePath = nil;
             
             if ((commands & SPUDeltaItemCommandClone) != 0) {
-                if ((commands & SPUDeltaItemCommandModifyPermissions) != 0) {
+                if ((commands & SPUDeltaItemCommandModifyPermissions) != 0 || (commands & SPUDeltaItemCommandBinaryDiff) != 0) {
                     // Decode file permission changes for clone
                     if (![self _readBuffer:&decodedMode length:sizeof(decodedMode)]) {
                         break;
@@ -462,6 +462,12 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
                 }
                 
                 clonedRelativePath = relativeFilePaths[cloneRelativePathIndex];
+                
+                if ((commands & SPUDeltaItemCommandBinaryDiff) != 0) {
+                    if (![self _readBuffer:&decodedDataLength length:sizeof(decodedDataLength)]) {
+                        break;
+                    }
+                }
             } else if ((commands & SPUDeltaItemCommandExtract) != 0 || (commands & SPUDeltaItemCommandBinaryDiff) != 0) {
                 if (![self _readBuffer:&decodedMode length:sizeof(decodedMode)]) {
                     break;
@@ -928,10 +934,38 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
         
         // Check if we need to encode additional data
         if ((commands & SPUDeltaItemCommandClone) != 0) {
+            NSString *physicalPath = item.physicalFilePath;
+            assert(physicalPath != nil);
+            
+            char physicalFilePathString[PATH_MAX + 1] = {0};
+            if (![physicalPath getFileSystemRepresentation:physicalFilePathString maxLength:sizeof(physicalFilePathString) - 1]) {
+                self.error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Path cannot be decoded and expressed as a file system representation while encoding cloned binary diff item: %@", physicalPath] }];
+                break;
+            }
+            
+            struct stat fileInfo = {0};
+            if (lstat(physicalFilePathString, &fileInfo) != 0) {
+                self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to lstat() on %@", physicalPath] }];
+                break;
+            }
+            
             // Store any desired file permissions changes for the clone
-            if ((commands & SPUDeltaItemCommandModifyPermissions) != 0) {
-                uint16_t permissions = item.permissions;
-                if (![self _writeBuffer:&permissions length:sizeof(permissions)]) {
+            // Clones can be binary diffs from other sources too. Since we are creating a
+            // new file in that case (rather than a copy) we want to store file mode as well
+            if ((commands & SPUDeltaItemCommandModifyPermissions) != 0 || (commands & SPUDeltaItemCommandBinaryDiff) != 0) {
+                uint16_t originalMode = fileInfo.st_mode;
+                item.originalMode = originalMode;
+                
+                uint16_t encodedMode;
+                if ((commands & SPUDeltaItemCommandModifyPermissions) != 0) {
+                    uint16_t permissions = item.permissions;
+                    encodedMode = (originalMode & ~PERMISSION_FLAGS) | permissions;
+                } else {
+                    encodedMode = originalMode;
+                }
+                
+                // Store file mode (including desired permissions)
+                if (![self _writeBuffer:&encodedMode length:sizeof(encodedMode)]) {
                     break;
                 }
             }
@@ -950,6 +984,15 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
             uint32_t relativePathCIndex = relativePathIndex.unsignedIntValue;
             if (![self _writeBuffer:&relativePathCIndex length:sizeof(relativePathCIndex)]) {
                 break;
+            }
+            
+            if ((commands & SPUDeltaItemCommandBinaryDiff) != 0) {
+                uint64_t dataLength = (uint64_t)fileInfo.st_size;
+                if (![self _writeBuffer:&dataLength length:sizeof(dataLength)]) {
+                    break;
+                }
+                
+                item.codedDataLength = dataLength;
             }
         } else if ((commands & SPUDeltaItemCommandExtract) != 0 || (commands & SPUDeltaItemCommandBinaryDiff) != 0) {
             NSString *physicalPath = item.physicalFilePath;

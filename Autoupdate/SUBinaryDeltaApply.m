@@ -206,7 +206,7 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
             removedFile = YES;
         }
 
-        if ((commands & SPUDeltaItemCommandClone) != 0) {
+        if ((commands & SPUDeltaItemCommandClone) != 0 && (commands & SPUDeltaItemCommandBinaryDiff) == 0) {
             NSString *clonedRelativePath = item.clonedRelativePath;
             if ([clonedRelativePath.pathComponents containsObject:@".."]) {
                 if (error != NULL) {
@@ -250,7 +250,25 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
                 return;
             }
             
-            if (!applyBinaryDeltaToFile(tempDiffFile, sourceFilePath, destinationFilePath)) {
+            NSString *sourceDiffFilePath;
+            NSString *clonedRelativePath;
+            if ((commands & SPUDeltaItemCommandClone) != 0) {
+                clonedRelativePath = item.clonedRelativePath;
+                if ([clonedRelativePath.pathComponents containsObject:@".."]) {
+                    if (error != NULL) {
+                        *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Relative path for clone '%@' contains '..' path component", clonedRelativePath] }];
+                    }
+                    *stop = YES;
+                    return;
+                }
+                
+                sourceDiffFilePath = [source stringByAppendingPathComponent:clonedRelativePath];
+            } else {
+                sourceDiffFilePath = sourceFilePath;
+                clonedRelativePath = nil;
+            }
+            
+            if (!applyBinaryDeltaToFile(tempDiffFile, sourceDiffFilePath, destinationFilePath)) {
                 if (verbose) {
                     fprintf(stderr, "\n");
                 }
@@ -262,7 +280,11 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
             }
 
             if (verbose) {
-                fprintf(stderr, "\n🔨  %s %s", VERBOSE_PATCHED, [relativePath fileSystemRepresentation]);
+                if ((commands & SPUDeltaItemCommandClone) != 0) {
+                    fprintf(stderr, "\n🔨  %s %s -> %s", VERBOSE_PATCHED, [clonedRelativePath fileSystemRepresentation], [relativePath fileSystemRepresentation]);
+                } else {
+                    fprintf(stderr, "\n🔨  %s %s", VERBOSE_PATCHED, [relativePath fileSystemRepresentation]);
+                }
             }
         } else if ((commands & SPUDeltaItemCommandExtract) != 0) { // extract and permission modifications don't coexist
             item.physicalFilePath = destinationFilePath;
