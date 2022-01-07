@@ -866,6 +866,37 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
     }];
 }
 
+- (void)testFrameworkExecutableVersionChanged
+{
+    [self createAndApplyPatchWithHandler:^(NSFileManager *fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
+        NSString *sourceA = [sourceDirectory stringByAppendingPathComponent:@"Frameworks/Foo.framework/Versions/A/"];
+        NSString *destinationB = [destinationDirectory stringByAppendingPathComponent:@"Frameworks/Foo.framework/Versions/B/"];
+        
+        XCTAssertTrue([fileManager createDirectoryAtPath:sourceA withIntermediateDirectories:YES attributes:NULL error:NULL]);
+        XCTAssertTrue([fileManager createDirectoryAtPath:destinationB withIntermediateDirectories:YES attributes:NULL error:NULL]);
+        
+        NSString *sourceFile = [sourceA stringByAppendingPathComponent:@"A"];
+        NSString *destinationFile = [destinationB stringByAppendingPathComponent:@"A"];
+        
+        XCTAssertTrue([[self bigData1] writeToFile:sourceFile atomically:YES]);
+        XCTAssertTrue([[self bigData2] writeToFile:destinationFile atomically:YES]);
+        
+        NSError *error = nil;
+        if (![fileManager setAttributes:@{NSFilePosixPermissions : @0755} ofItemAtPath:sourceFile error:&error]) {
+            NSLog(@"Change Permission Error: %@", error);
+            XCTFail(@"Failed setting file permissions");
+        }
+        
+        if (![fileManager setAttributes:@{NSFilePosixPermissions : @0755} ofItemAtPath:destinationFile error:&error]) {
+            NSLog(@"Change Permission Error: %@", error);
+            XCTFail(@"Failed setting file permissions");
+        }
+        
+        // This would fail for version 1.0
+        XCTAssertFalse([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
+    }];
+}
+
 - (void)testFrameworkVersionChangedWithPermissionChange
 {
     [self createAndApplyPatchWithHandler:^(NSFileManager *fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
@@ -927,6 +958,44 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
         
         // This would fail for version 1.0
         XCTAssertFalse([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
+    }];
+}
+
+- (void)testDirectoryChangeWithExecutableContentChange
+{
+    [self createAndApplyPatchWithHandler:^(NSFileManager *fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
+        NSString *sourceFile1 = [sourceDirectory stringByAppendingPathComponent:@"A"];
+        NSString *sourceFile2 = [sourceFile1 stringByAppendingPathComponent:@"B"];
+        
+        NSString *destinationFile1 = [destinationDirectory stringByAppendingPathComponent:@"A"];
+        NSString *destinationFile2 = [destinationFile1 stringByAppendingPathComponent:@"B"];
+        
+        NSError *error = nil;
+        if (![fileManager createDirectoryAtPath:sourceFile1 withIntermediateDirectories:NO attributes:nil error:&error]) {
+            NSLog(@"Failed creating directory with error: %@", error);
+            XCTFail("Failed to create directory");
+        }
+        
+        if (![fileManager createDirectoryAtPath:destinationFile1 withIntermediateDirectories:NO attributes:nil error:&error]) {
+            NSLog(@"Failed creating directory with error: %@", error);
+            XCTFail("Failed to create directory");
+        }
+        
+        XCTAssertTrue([[self bigData1] writeToFile:sourceFile2 atomically:YES]);
+        XCTAssertTrue([[self bigData1] writeToFile:destinationFile2 atomically:YES]);
+        
+        if (![fileManager setAttributes:@{NSFilePosixPermissions : @0755} ofItemAtPath:sourceFile1 error:&error]) {
+            NSLog(@"Change Permission Error: %@", error);
+            XCTFail(@"Failed setting file permissions");
+        }
+        
+        if (![fileManager setAttributes:@{NSFilePosixPermissions : @0755} ofItemAtPath:destinationFile1 error:&error]) {
+            NSLog(@"Change Permission Error: %@", error);
+            XCTFail(@"Failed setting file permissions");
+        }
+        
+        // This would fail for version 1.0
+        XCTAssertTrue([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
     }];
 }
 
