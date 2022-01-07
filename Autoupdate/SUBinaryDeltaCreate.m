@@ -748,23 +748,21 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
                 BOOL clonedBinaryDiff = NO;
                 NSString *clonedRelativePath = MAJOR_VERSION_IS_AT_LEAST(majorVersion, SUBinaryDeltaMajorVersion3) ? cloneableRelativePath(afterFileKeyToHashDictionary, beforeHashToFileKeyDictionary, frameworkVersionsSubstitutes, fileSubstitutes, originalTreeState, newInfo, key, &changedPermissionsFromClone, &clonedBinaryDiff) : nil;
                 if (clonedRelativePath != nil) {
-                    SPUDeltaItemCommands commands = SPUDeltaItemCommandClone;
-                    if (shouldDeleteThenExtract(originalInfo, newInfo, majorVersion)) {
-                        commands |= SPUDeltaItemCommandDelete;
-                    }
-                    if (changedPermissionsFromClone != nil) {
-                        commands |= SPUDeltaItemCommandModifyPermissions;
-                    }
-                    
                     if (clonedBinaryDiff) {
-                        commands |= SPUDeltaItemCommandBinaryDiff;
-                        
                         NSDictionary *cloneInfo = originalTreeState[clonedRelativePath];
                         
                         CreateBinaryDeltaOperation *operation = [[CreateBinaryDeltaOperation alloc] initWithRelativePath:key clonedRelativePath:clonedRelativePath oldTree:source newTree:destination oldPermissions:cloneInfo[INFO_PERMISSIONS_KEY] newPermissions:changedPermissionsFromClone];
                         [deltaQueue addOperation:operation];
                         [deltaOperations addObject:operation];
                     } else {
+                        SPUDeltaItemCommands commands = SPUDeltaItemCommandClone;
+                        if (shouldDeleteThenExtract(originalInfo, newInfo, majorVersion)) {
+                            commands |= SPUDeltaItemCommandDelete;
+                        }
+                        if (changedPermissionsFromClone != nil) {
+                            commands |= SPUDeltaItemCommandModifyPermissions;
+                        }
+                        
                         SPUDeltaArchiveItem *item = [[SPUDeltaArchiveItem alloc] initWithRelativeFilePath:key commands:commands permissions:changedPermissionsFromClone.unsignedShortValue];
                         // Physical path for clones points to the old file
                         item.physicalFilePath = [source stringByAppendingPathComponent:clonedRelativePath];
