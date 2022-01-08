@@ -394,6 +394,61 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
     }];
 }
 
+- (void)testDirectoryAddedWithOddPermissions
+{
+    [self createAndApplyPatchWithHandler:^(NSFileManager *fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
+        NSString *sourceFile = [sourceDirectory stringByAppendingPathComponent:@"A"];
+        
+        NSString *destinationFile1 = [destinationDirectory stringByAppendingPathComponent:@"A"];
+        NSString *destinationFile2 = [destinationDirectory stringByAppendingPathComponent:@"B"];
+        NSString *destinationFile3 = [destinationFile2 stringByAppendingPathComponent:@"C"];
+        
+        XCTAssertTrue([[NSData data] writeToFile:sourceFile atomically:YES]);
+        XCTAssertTrue([[NSData dataWithBytes:"loltest" length:7] writeToFile:destinationFile1 atomically:YES]);
+        
+        NSError *error = nil;
+        if (![fileManager createDirectoryAtPath:destinationFile2 withIntermediateDirectories:NO attributes:nil error:&error]) {
+            NSLog(@"Failed creating directory with error: %@", error);
+            XCTFail("Failed to create directory");
+        }
+        
+        XCTAssertTrue([[self bigData2] writeToFile:destinationFile3 atomically:YES]);
+        
+        if (![fileManager setAttributes:@{NSFilePosixPermissions : @0777} ofItemAtPath:destinationFile2 error:&error]) {
+            NSLog(@"Change Permission Error: %@", error);
+            XCTFail(@"Failed setting file permissions");
+        }
+        
+        XCTAssertFalse([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
+    }];
+}
+
+- (void)testDirectoryPermissionsChanged
+{
+    [self createAndApplyPatchWithHandler:^(NSFileManager *fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
+        NSString *sourceDir = [sourceDirectory stringByAppendingPathComponent:@"A"];
+        NSString *destDir = [destinationDirectory stringByAppendingPathComponent:@"A"];
+        
+        NSError *error = nil;
+        if (![fileManager createDirectoryAtPath:sourceDir withIntermediateDirectories:NO attributes:nil error:&error]) {
+            NSLog(@"Failed creating directory with error: %@", error);
+            XCTFail("Failed to create directory");
+        }
+        
+        if (![fileManager createDirectoryAtPath:destDir withIntermediateDirectories:NO attributes:nil error:&error]) {
+            NSLog(@"Failed creating directory with error: %@", error);
+            XCTFail("Failed to create directory");
+        }
+        
+        if (![fileManager setAttributes:@{NSFilePosixPermissions : @0777} ofItemAtPath:destDir error:&error]) {
+            NSLog(@"Change Permission Error: %@", error);
+            XCTFail(@"Failed setting file permissions");
+        }
+        
+        XCTAssertFalse([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
+    }];
+}
+
 - (void)testRegularFileRemoved
 {
     [self createAndApplyPatchWithHandler:^(NSFileManager *__unused fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
