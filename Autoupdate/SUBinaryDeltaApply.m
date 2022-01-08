@@ -237,7 +237,7 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
             }
         } else if ((commands & SPUDeltaItemCommandBinaryDiff) != 0) {
             NSString *tempDiffFile = temporaryFilename(@"apply-binary-delta");
-            item.physicalFilePath = tempDiffFile;
+            item.itemFilePath = tempDiffFile;
             
             if (![archive extractItem:item]) {
                 if (verbose) {
@@ -318,7 +318,7 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
                 }
             }
         } else if ((commands & SPUDeltaItemCommandExtract) != 0) { // extract and permission modifications don't coexist
-            item.physicalFilePath = destinationFilePath;
+            item.itemFilePath = destinationFilePath;
             if (![archive extractItem:item]) {
                 if (verbose) {
                     fprintf(stderr, "\n");

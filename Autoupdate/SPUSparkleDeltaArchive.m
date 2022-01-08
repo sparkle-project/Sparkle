@@ -534,8 +534,8 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
 
 - (BOOL)extractItem:(SPUDeltaArchiveItem *)item
 {
-    NSString *physicalFilePath = item.physicalFilePath;
-    assert(physicalFilePath != nil);
+    NSString *itemFilePath = item.itemFilePath;
+    assert(itemFilePath != nil);
     
     SPUDeltaItemCommands commands = item.commands;
     assert((commands & SPUDeltaItemCommandExtract) != 0 || (commands & SPUDeltaItemCommandBinaryDiff) != 0);
@@ -552,15 +552,15 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
         if ((commands & SPUDeltaItemCommandBinaryDiff) != 0 || S_ISREG(mode)) {
             // Regular files
             
-            char physicalFilePathString[PATH_MAX + 1] = {0};
-            if (![physicalFilePath getFileSystemRepresentation:physicalFilePathString maxLength:sizeof(physicalFilePathString) - 1]) {
-                self.error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Path to extract cannot be decoded and expressed as a file system representation: %@", physicalFilePath] }];
+            char itemFilePathString[PATH_MAX + 1] = {0};
+            if (![itemFilePath getFileSystemRepresentation:itemFilePathString maxLength:sizeof(itemFilePathString) - 1]) {
+                self.error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Path to extract cannot be decoded and expressed as a file system representation: %@", itemFilePath] }];
                 return NO;
             }
             
-            FILE *outputFile = fopen(physicalFilePathString, "wb");
+            FILE *outputFile = fopen(itemFilePathString, "wb");
             if (outputFile == NULL) {
-                self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to fopen() %@", physicalFilePath] }];
+                self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to fopen() %@", itemFilePath] }];
                 return NO;
             }
             
@@ -592,8 +592,8 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
                 return NO;
             }
             
-            if ((commands & SPUDeltaItemCommandExtract) != 0 && chmod(physicalFilePathString, mode) != 0) {
-                self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to chmod() mode %d on %@", mode, physicalFilePath] }];
+            if ((commands & SPUDeltaItemCommandExtract) != 0 && chmod(itemFilePathString, mode) != 0) {
+                self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to chmod() mode %d on %@", mode, itemFilePath] }];
                 return NO;
             }
         } else {
@@ -619,30 +619,30 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
             NSString *destinationPath = [fileManager stringWithFileSystemRepresentation:buffer length:decodedLength];
             
             if (destinationPath == nil) {
-                self.error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Destination path for link %@ cannot be created in a file system representation: %@",physicalFilePath, destinationPath] }];
+                self.error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Destination path for link %@ cannot be created in a file system representation: %@",itemFilePath, destinationPath] }];
                 return NO;
             }
             
             NSError *createLinkError = nil;
-            if (![fileManager createSymbolicLinkAtPath:physicalFilePath withDestinationPath:destinationPath error:&createLinkError]) {
+            if (![fileManager createSymbolicLinkAtPath:itemFilePath withDestinationPath:destinationPath error:&createLinkError]) {
                 self.error = createLinkError;
                 return NO;
             }
             
-            char physicalFilePathString[PATH_MAX + 1] = {0};
-            if (![physicalFilePath getFileSystemRepresentation:physicalFilePathString maxLength:sizeof(physicalFilePathString) - 1]) {
-                self.error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Link path to extract cannot be decoded and expressed as a file system representation: %@", physicalFilePath] }];
+            char itemFilePathString[PATH_MAX + 1] = {0};
+            if (![itemFilePath getFileSystemRepresentation:itemFilePathString maxLength:sizeof(itemFilePathString) - 1]) {
+                self.error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Link path to extract cannot be decoded and expressed as a file system representation: %@", itemFilePath] }];
                 return NO;
             }
             
             // We shouldn't fail if setting permissions on symlinks fail
             // Apple filesystems have file permissions for symbolic links but other linux file systems don't
             // So this may have no effect on some file systems over the network
-            lchmod(physicalFilePathString, mode);
+            lchmod(itemFilePathString, mode);
         }
     } else if (S_ISDIR(mode)) {
         NSError *createDirectoryError = nil;
-        if (![fileManager createDirectoryAtPath:physicalFilePath withIntermediateDirectories:NO attributes:@{NSFilePosixPermissions: @(mode)} error:&createDirectoryError]) {
+        if (![fileManager createDirectoryAtPath:itemFilePath withIntermediateDirectories:NO attributes:@{NSFilePosixPermissions: @(mode)} error:&createDirectoryError]) {
             self.error = createDirectoryError;
             return NO;
         }
@@ -1000,18 +1000,18 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
             }
             
             if ((commands & SPUDeltaItemCommandBinaryDiff) != 0) {
-                NSString *physicalPath = item.physicalFilePath;
-                assert(physicalPath != nil);
+                NSString *itemPath = item.itemFilePath;
+                assert(itemPath != nil);
                 
-                char physicalFilePathString[PATH_MAX + 1] = {0};
-                if (![physicalPath getFileSystemRepresentation:physicalFilePathString maxLength:sizeof(physicalFilePathString) - 1]) {
-                    self.error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Path cannot be decoded and expressed as a file system representation while encoding cloned binary diff item: %@", physicalPath] }];
+                char itemFilePathString[PATH_MAX + 1] = {0};
+                if (![itemPath getFileSystemRepresentation:itemFilePathString maxLength:sizeof(itemFilePathString) - 1]) {
+                    self.error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Path cannot be decoded and expressed as a file system representation while encoding cloned binary diff item: %@", itemPath] }];
                     break;
                 }
                 
                 struct stat fileInfo = {0};
-                if (lstat(physicalFilePathString, &fileInfo) != 0) {
-                    self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to lstat() on %@", physicalPath] }];
+                if (lstat(itemFilePathString, &fileInfo) != 0) {
+                    self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to lstat() on %@", itemPath] }];
                     break;
                 }
                 
@@ -1061,30 +1061,30 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
             // Store data length
             // Length doesn't matter for directory names (we already track the name in the relative path)
             
-            NSString *physicalPath = item.physicalFilePath;
-            assert(physicalPath != nil);
+            NSString *itemPath = item.itemFilePath;
+            assert(itemPath != nil);
             
-            char physicalFilePathString[PATH_MAX + 1] = {0};
-            if (![physicalPath getFileSystemRepresentation:physicalFilePathString maxLength:sizeof(physicalFilePathString) - 1]) {
-                self.error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Path cannot be decoded and expressed as a file system representation while encoding items: %@", physicalPath] }];
+            char itemFilePathString[PATH_MAX + 1] = {0};
+            if (![itemPath getFileSystemRepresentation:itemFilePathString maxLength:sizeof(itemFilePathString) - 1]) {
+                self.error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Path cannot be decoded and expressed as a file system representation while encoding items: %@", itemPath] }];
                 break;
             }
             
-            struct stat physicalFileInfo = {0};
-            if (lstat(physicalFilePathString, &physicalFileInfo) != 0) {
-                self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to lstat() on %@", physicalPath] }];
+            struct stat itemFileInfo = {0};
+            if (lstat(itemFilePathString, &itemFileInfo) != 0) {
+                self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to lstat() on %@", itemPath] }];
                 break;
             }
             
             if ((commands & SPUDeltaItemCommandBinaryDiff) != 0 || S_ISREG(extractMode)) {
-                uint64_t dataLength = (uint64_t)physicalFileInfo.st_size;
+                uint64_t dataLength = (uint64_t)itemFileInfo.st_size;
                 if (![self _writeBuffer:&dataLength length:sizeof(dataLength)]) {
                     break;
                 }
                 
                 item.codedDataLength = dataLength;
             } else if (S_ISLNK(extractMode)) {
-                off_t fileSize = physicalFileInfo.st_size;
+                off_t fileSize = itemFileInfo.st_size;
                 if (fileSize > UINT16_MAX) {
                     self.error = [NSError errorWithDomain:SPARKLE_DELTA_ARCHIVE_ERROR_DOMAIN code:SPARKLE_DELTA_ARCHIVE_ERROR_CODE_LINK_TOO_LONG userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Link path has a destination that is too long: %llu bytes", fileSize] }];
                     break;
@@ -1121,8 +1121,8 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
     for (SPUDeltaArchiveItem *item in writableItems) {
         SPUDeltaItemCommands commands = item.commands;
         if ((commands & SPUDeltaItemCommandExtract) != 0 || (commands & SPUDeltaItemCommandBinaryDiff) != 0) {
-            NSString *physicalPath = item.physicalFilePath;
-            assert(physicalPath != nil);
+            NSString *itemPath = item.itemFilePath;
+            assert(itemPath != nil);
             
             mode_t extractMode = item.extractMode;
             if ((commands & SPUDeltaItemCommandBinaryDiff) != 0 || S_ISREG(extractMode)) {
@@ -1130,15 +1130,15 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
                 
                 uint64_t totalItemSize = item.codedDataLength;
                 if (totalItemSize > 0) {
-                    char physicalFilePathString[PATH_MAX + 1] = {0};
-                    if (![physicalPath getFileSystemRepresentation:physicalFilePathString maxLength:sizeof(physicalFilePathString) - 1]) {
-                        self.error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Path to finish encoding cannot be decoded and expressed as a file system representation: %@", physicalPath] }];
+                    char itemFilePathString[PATH_MAX + 1] = {0};
+                    if (![itemPath getFileSystemRepresentation:itemFilePathString maxLength:sizeof(itemFilePathString) - 1]) {
+                        self.error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Path to finish encoding cannot be decoded and expressed as a file system representation: %@", itemPath] }];
                         break;
                     }
                     
-                    FILE *inputFile = fopen(physicalFilePathString, "rb");
+                    FILE *inputFile = fopen(itemFilePathString, "rb");
                     if (inputFile == NULL) {
-                        self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to open file for reading while encoding items: %@", physicalPath] }];
+                        self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to open file for reading while encoding items: %@", itemPath] }];
                         break;
                     }
                     
@@ -1165,16 +1165,16 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
                     }
                 }
             } else if (S_ISLNK(extractMode)) {
-                char physicalFilePathString[PATH_MAX + 1] = {0};
-                if (![physicalPath getFileSystemRepresentation:physicalFilePathString maxLength:sizeof(physicalFilePathString) - 1]) {
-                    self.error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Link path to finish encoding cannot be decoded and expressed as a file system representation: %@", physicalPath] }];
+                char itemFilePathString[PATH_MAX + 1] = {0};
+                if (![itemPath getFileSystemRepresentation:itemFilePathString maxLength:sizeof(itemFilePathString) - 1]) {
+                    self.error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Link path to finish encoding cannot be decoded and expressed as a file system representation: %@", itemPath] }];
                     break;
                 }
                 
                 char linkDestination[PATH_MAX + 1] = {0};
-                ssize_t linkDestinationLength = readlink(physicalFilePathString, linkDestination, PATH_MAX);
+                ssize_t linkDestinationLength = readlink(itemFilePathString, linkDestination, PATH_MAX);
                 if (linkDestinationLength < 0) {
-                    self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to readlink() file at %@", physicalPath] }];
+                    self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to readlink() file at %@", itemPath] }];
                     break;
                 }
                 

@@ -775,8 +775,8 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
                         
                         SPUDeltaArchiveItem *item = [[SPUDeltaArchiveItem alloc] initWithRelativeFilePath:key commands:commands permissions:(clonePermissionsChanged ? newPermissions.unsignedShortValue : 0)];
                         // Physical path for clones points to the old file
-                        item.physicalFilePath = [source stringByAppendingPathComponent:clonedRelativePath];
-                        item.sourcePath = item.physicalFilePath;
+                        item.itemFilePath = [source stringByAppendingPathComponent:clonedRelativePath];
+                        item.sourcePath = item.itemFilePath;
                         item.clonedRelativePath = clonedRelativePath;
                         
                         [archive addItem:item];
@@ -795,7 +795,7 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
                     }
                     
                     SPUDeltaArchiveItem *item = [[SPUDeltaArchiveItem alloc] initWithRelativeFilePath:key commands:commands permissions:0];
-                    item.physicalFilePath = path;
+                    item.itemFilePath = path;
                     item.sourcePath = path;
                     
                     [archive addItem:item];
@@ -855,7 +855,7 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
         }
         
         SPUDeltaArchiveItem *item = [[SPUDeltaArchiveItem alloc] initWithRelativeFilePath:relativePath commands:commands permissions:permissions.unsignedShortValue];
-        item.physicalFilePath = resultPath;
+        item.itemFilePath = resultPath;
         item.sourcePath = operation._fromPath;
         item.clonedRelativePath = clonedRelativePath;
         

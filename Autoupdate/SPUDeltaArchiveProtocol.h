@@ -43,7 +43,7 @@ typedef NS_ENUM(uint8_t, SPUDeltaItemCommands) {
 - (instancetype)initWithRelativeFilePath:(NSString *)relativeFilePath commands:(SPUDeltaItemCommands)commands permissions:(uint16_t)permissions;
 
 @property (nonatomic, readonly) NSString *relativeFilePath;
-@property (nonatomic, nullable) NSString *physicalFilePath;
+@property (nonatomic, nullable) NSString *itemFilePath;
 @property (nonatomic, nullable) NSString *clonedRelativePath;
 @property (nonatomic, nullable) NSString *sourcePath;
 @property (nonatomic, readonly) SPUDeltaItemCommands commands;

@@ -52,7 +52,7 @@ id<SPUDeltaArchiveProtocol> SPUDeltaArchiveReadPatchAndHeader(NSString *patchFil
 @implementation SPUDeltaArchiveItem
 
 @synthesize relativeFilePath = _relativeFilePath;
-@synthesize physicalFilePath = _physicalFilePath;
+@synthesize itemFilePath = _itemFilePath;
 @synthesize clonedRelativePath = _clonedRelativePath;
 @synthesize sourcePath = _sourcePath;
 @synthesize commands = _commands;
