@@ -52,12 +52,13 @@ id<SPUDeltaArchiveProtocol> SPUDeltaArchiveReadPatchAndHeader(NSString *patchFil
 @implementation SPUDeltaArchiveItem
 
 @synthesize relativeFilePath = _relativeFilePath;
-@synthesize physicalFilePath = _physicalFilePath;
+@synthesize itemFilePath = _itemFilePath;
 @synthesize clonedRelativePath = _clonedRelativePath;
+@synthesize sourcePath = _sourcePath;
 @synthesize commands = _commands;
 @synthesize permissions = _permissions;
-@synthesize context = _context;
-@synthesize originalMode = _originalMode;
+@synthesize xarContext = _xarContext;
+@synthesize extractMode = _extractMode;
 @synthesize codedDataLength = _codedDataLength;
 
 - (instancetype)initWithRelativeFilePath:(NSString *)relativeFilePath commands:(SPUDeltaItemCommands)commands permissions:(uint16_t)permissions

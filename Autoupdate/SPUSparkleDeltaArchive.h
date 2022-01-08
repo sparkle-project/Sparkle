@@ -36,9 +36,10 @@ NS_ASSUME_NONNULL_BEGIN
  
  -- UNCOMPRESSED --
  
- [ HEADER ]
+ [ HEADER (part 1) ]
  magic (length: 4)
  compression (length: 1)
+ compressionLevel (length: 1)
  
  -- COMPRESSED --
  
@@ -48,22 +49,48 @@ NS_ASSUME_NONNULL_BEGIN
  beforeTreeHash (length: 40)
  afterTreeHash (length: 40)
  
- [ RELATIVE FILE PATH TABLE ]
+ [ RELATIVE_FILE_PATH_TABLE ]
  sizeOfRelativeFilePathTable (length: 8 bytes)
  List of null terminated path strings joined together (N paths)
  
  [ COMMANDS ]
     [ Command ]
         Set of command types for entry (length: 1 byte)
-        Additional metadata for command
+        Additional metadata for command (see below section)
     (M commands where M <= N paths)
     (Indexes for commands refer to indexes to relative file path table, excluding extraneous trailing entries in relative path table used for clones)
-    (Last command denotes a null end marker)
+    (Last command must be a ZERO COMMAND (a null terminating command))
  
- [ DATA BLOBS ]
+    [COMMAND METADATA]
+        [COMMAND: DELETE]
+            N/A: no additional data
+ 
+        [COMMAND: MODIFY_PERMISSIONS]
+            fileMode (length: 2)
+ 
+        [COMMAND: CLONE_FILE]
+            sourceRelativePathIndex (length: 4)
+        
+        [COMMAND: EXTRACT_FILE]
+            dataLength (length: 8 for regular files, 2 for symbolic links, 0 for directories)
+        
+        [COMMAND: BINARY_DIFF_FILE]
+            dataLength (length: 8)
+ 
+        Note: These command types may be OR'd or combined. In those cases, different commands
+        that have the same attribute (eg dataLength) are not repeated. This list of metadata is also
+        in order in what will be encoded/decoded first.
+    
+        EXTRACT_FILE and BINARY_DIFF_FILE cannot be combined.
+        CLONE_FILE and EXTRACT_FILE cannot be combined.
+        MODIFY_PERMISSIONS can be combined with either CLONE_FILE, EXTRACT_FILE, BINARY_DIFF_FILE, or just by itself.
+        CLONE_FILE can be combined with BINARY_DIFF_FILE or just by itself.
+        DELETE can be combined with EXTRACT_FILE, BINARY_DIFF_FILE, or just by itself. (we don't currently combine it with BINARY_DIFF_FILE however)
+ 
+ [ DATA_BLOBS ]
  All raw binary data joined together
  (P number of blobs where P <= M commands)
- (Indexes for data blobs refer to indexes for a filtered list of applicable commands that have data content)
+ (Indexes for data blobs correspond to indexes for a filtered list of applicable commands (EXTRACT_FILE, BINARY_DIFF_FILE) that have data content)
  */
 @interface SPUSparkleDeltaArchive : NSObject <SPUDeltaArchiveProtocol>
 

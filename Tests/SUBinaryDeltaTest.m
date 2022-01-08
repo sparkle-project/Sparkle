@@ -304,7 +304,7 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
 
 - (NSData *)bigData1
 {
-    const size_t bufferSize = 4096*10;
+    const size_t bufferSize = 4096*32;
     uint8_t *buffer = calloc(1, bufferSize);
     XCTAssertTrue(buffer != NULL);
     
@@ -313,7 +313,7 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
 
 - (NSData *)bigData2
 {
-    const size_t bufferSize = 4096*10;
+    const size_t bufferSize = 4096*32;
     uint8_t *buffer = calloc(1, bufferSize);
     XCTAssertTrue(buffer != NULL);
     
@@ -390,6 +390,61 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
         }
         
         XCTAssertTrue([[self bigData2] writeToFile:destinationFile3 atomically:YES]);
+        XCTAssertFalse([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
+    }];
+}
+
+- (void)testDirectoryAddedWithOddPermissions
+{
+    [self createAndApplyPatchWithHandler:^(NSFileManager *fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
+        NSString *sourceFile = [sourceDirectory stringByAppendingPathComponent:@"A"];
+        
+        NSString *destinationFile1 = [destinationDirectory stringByAppendingPathComponent:@"A"];
+        NSString *destinationFile2 = [destinationDirectory stringByAppendingPathComponent:@"B"];
+        NSString *destinationFile3 = [destinationFile2 stringByAppendingPathComponent:@"C"];
+        
+        XCTAssertTrue([[NSData data] writeToFile:sourceFile atomically:YES]);
+        XCTAssertTrue([[NSData dataWithBytes:"loltest" length:7] writeToFile:destinationFile1 atomically:YES]);
+        
+        NSError *error = nil;
+        if (![fileManager createDirectoryAtPath:destinationFile2 withIntermediateDirectories:NO attributes:nil error:&error]) {
+            NSLog(@"Failed creating directory with error: %@", error);
+            XCTFail("Failed to create directory");
+        }
+        
+        XCTAssertTrue([[self bigData2] writeToFile:destinationFile3 atomically:YES]);
+        
+        if (![fileManager setAttributes:@{NSFilePosixPermissions : @0777} ofItemAtPath:destinationFile2 error:&error]) {
+            NSLog(@"Change Permission Error: %@", error);
+            XCTFail(@"Failed setting file permissions");
+        }
+        
+        XCTAssertFalse([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
+    }];
+}
+
+- (void)testDirectoryPermissionsChanged
+{
+    [self createAndApplyPatchWithHandler:^(NSFileManager *fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
+        NSString *sourceDir = [sourceDirectory stringByAppendingPathComponent:@"A"];
+        NSString *destDir = [destinationDirectory stringByAppendingPathComponent:@"A"];
+        
+        NSError *error = nil;
+        if (![fileManager createDirectoryAtPath:sourceDir withIntermediateDirectories:NO attributes:nil error:&error]) {
+            NSLog(@"Failed creating directory with error: %@", error);
+            XCTFail("Failed to create directory");
+        }
+        
+        if (![fileManager createDirectoryAtPath:destDir withIntermediateDirectories:NO attributes:nil error:&error]) {
+            NSLog(@"Failed creating directory with error: %@", error);
+            XCTFail("Failed to create directory");
+        }
+        
+        if (![fileManager setAttributes:@{NSFilePosixPermissions : @0777} ofItemAtPath:destDir error:&error]) {
+            NSLog(@"Change Permission Error: %@", error);
+            XCTFail(@"Failed setting file permissions");
+        }
+        
         XCTAssertFalse([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
     }];
 }
@@ -772,6 +827,157 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
     }];
 }
 
+- (void)testBigFilePermissionChangeInDirectoriesWithContentChange
+{
+    [self createAndApplyPatchWithHandler:^(NSFileManager *fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
+        NSString *sourceA = [sourceDirectory stringByAppendingPathComponent:@"Contents/Hello/"];
+        NSString *destinationB = [destinationDirectory stringByAppendingPathComponent:@"Contents/Meek/"];
+        
+        XCTAssertTrue([fileManager createDirectoryAtPath:sourceA withIntermediateDirectories:YES attributes:NULL error:NULL]);
+        XCTAssertTrue([fileManager createDirectoryAtPath:destinationB withIntermediateDirectories:YES attributes:NULL error:NULL]);
+        
+        NSString *sourceFile = [sourceA stringByAppendingPathComponent:@"A"];
+        NSString *destinationFile = [destinationB stringByAppendingPathComponent:@"A"];
+        
+        XCTAssertTrue([[self bigData1] writeToFile:sourceFile atomically:YES]);
+        XCTAssertTrue([[self bigData2] writeToFile:destinationFile atomically:YES]);
+        
+        NSError *error = nil;
+        if (![fileManager setAttributes:@{NSFilePosixPermissions : @0755} ofItemAtPath:destinationFile error:&error]) {
+            NSLog(@"Change Permission Error: %@", error);
+            XCTFail(@"Failed setting file permissions");
+        }
+        
+        // This would fail for version 1.0
+        XCTAssertFalse([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
+    }];
+}
+
+- (void)testBigFileChangeInDirectoriesWithContentChange
+{
+    [self createAndApplyPatchWithHandler:^(NSFileManager *fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
+        NSString *sourceA = [sourceDirectory stringByAppendingPathComponent:@"Contents/Hello/"];
+        NSString *destinationA = [destinationDirectory stringByAppendingPathComponent:@"Contents/Meek/"];
+        
+        XCTAssertTrue([fileManager createDirectoryAtPath:sourceA withIntermediateDirectories:YES attributes:NULL error:NULL]);
+        XCTAssertTrue([fileManager createDirectoryAtPath:destinationA withIntermediateDirectories:YES attributes:NULL error:NULL]);
+        
+        NSString *sourceFile = [sourceA stringByAppendingPathComponent:@"A"];
+        NSString *destinationFile = [destinationA stringByAppendingPathComponent:@"A"];
+        
+        XCTAssertTrue([[self bigData1] writeToFile:sourceFile atomically:YES]);
+        XCTAssertTrue([[self bigData2] writeToFile:destinationFile atomically:YES]);
+        
+        // This would fail for version 1.0
+        XCTAssertFalse([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
+    }];
+}
+
+- (void)testMultipleBigFileChangeInDirectoriesWithContentChange
+{
+    [self createAndApplyPatchWithHandler:^(NSFileManager *fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
+        NSString *sourceA = [sourceDirectory stringByAppendingPathComponent:@"Contents/Hello/"];
+        NSString *sourceA2 = [sourceDirectory stringByAppendingPathComponent:@"Contents/whaat/"];
+        NSString *destinationB = [destinationDirectory stringByAppendingPathComponent:@"Contents/Meek/"];
+        
+        XCTAssertTrue([fileManager createDirectoryAtPath:sourceA withIntermediateDirectories:YES attributes:NULL error:NULL]);
+        XCTAssertTrue([fileManager createDirectoryAtPath:sourceA2 withIntermediateDirectories:YES attributes:NULL error:NULL]);
+        XCTAssertTrue([fileManager createDirectoryAtPath:destinationB withIntermediateDirectories:YES attributes:NULL error:NULL]);
+        
+        NSString *sourceFile = [sourceA stringByAppendingPathComponent:@"A"];
+        NSString *sourceFile2 = [sourceA2 stringByAppendingPathComponent:@"A"];
+        NSString *destinationFile = [destinationB stringByAppendingPathComponent:@"A"];
+        
+        NSMutableData *data2 = [NSMutableData dataWithData:[self bigData1]];
+        uint32_t foo = 100;
+        [data2 appendBytes:&foo length:sizeof(foo)];
+        
+        XCTAssertTrue([[self bigData1] writeToFile:sourceFile atomically:YES]);
+        XCTAssertTrue([data2 writeToFile:sourceFile2 atomically:YES]);
+        XCTAssertTrue([[self bigData2] writeToFile:destinationFile atomically:YES]);
+        
+        // This would fail for version 1.0
+        XCTAssertFalse([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
+    }];
+}
+
+- (void)testFrameworkVersionChanged
+{
+    [self createAndApplyPatchWithHandler:^(NSFileManager *fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
+        NSString *sourceA = [sourceDirectory stringByAppendingPathComponent:@"Frameworks/Foo.framework/Versions/A/"];
+        NSString *destinationB = [destinationDirectory stringByAppendingPathComponent:@"Frameworks/Foo.framework/Versions/B/"];
+        
+        XCTAssertTrue([fileManager createDirectoryAtPath:sourceA withIntermediateDirectories:YES attributes:NULL error:NULL]);
+        XCTAssertTrue([fileManager createDirectoryAtPath:destinationB withIntermediateDirectories:YES attributes:NULL error:NULL]);
+        
+        NSString *sourceFile = [sourceA stringByAppendingPathComponent:@"A"];
+        NSString *destinationFile = [destinationB stringByAppendingPathComponent:@"A"];
+        
+        XCTAssertTrue([[self bigData1] writeToFile:sourceFile atomically:YES]);
+        XCTAssertTrue([[self bigData2] writeToFile:destinationFile atomically:YES]);
+        
+        // This would fail for version 1.0
+        XCTAssertFalse([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
+    }];
+}
+
+- (void)testFrameworkExecutableVersionChanged
+{
+    [self createAndApplyPatchWithHandler:^(NSFileManager *fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
+        NSString *sourceA = [sourceDirectory stringByAppendingPathComponent:@"Frameworks/Foo.framework/Versions/A/"];
+        NSString *destinationB = [destinationDirectory stringByAppendingPathComponent:@"Frameworks/Foo.framework/Versions/B/"];
+        
+        XCTAssertTrue([fileManager createDirectoryAtPath:sourceA withIntermediateDirectories:YES attributes:NULL error:NULL]);
+        XCTAssertTrue([fileManager createDirectoryAtPath:destinationB withIntermediateDirectories:YES attributes:NULL error:NULL]);
+        
+        NSString *sourceFile = [sourceA stringByAppendingPathComponent:@"A"];
+        NSString *destinationFile = [destinationB stringByAppendingPathComponent:@"A"];
+        
+        XCTAssertTrue([[self bigData1] writeToFile:sourceFile atomically:YES]);
+        XCTAssertTrue([[self bigData2] writeToFile:destinationFile atomically:YES]);
+        
+        NSError *error = nil;
+        if (![fileManager setAttributes:@{NSFilePosixPermissions : @0755} ofItemAtPath:sourceFile error:&error]) {
+            NSLog(@"Change Permission Error: %@", error);
+            XCTFail(@"Failed setting file permissions");
+        }
+        
+        if (![fileManager setAttributes:@{NSFilePosixPermissions : @0755} ofItemAtPath:destinationFile error:&error]) {
+            NSLog(@"Change Permission Error: %@", error);
+            XCTFail(@"Failed setting file permissions");
+        }
+        
+        // This would fail for version 1.0
+        XCTAssertFalse([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
+    }];
+}
+
+- (void)testFrameworkVersionChangedWithPermissionChange
+{
+    [self createAndApplyPatchWithHandler:^(NSFileManager *fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
+        NSString *sourceA = [sourceDirectory stringByAppendingPathComponent:@"Frameworks/Foo.framework/Versions/A/"];
+        NSString *destinationB = [destinationDirectory stringByAppendingPathComponent:@"Frameworks/Foo.framework/Versions/B/"];
+        
+        XCTAssertTrue([fileManager createDirectoryAtPath:sourceA withIntermediateDirectories:YES attributes:NULL error:NULL]);
+        XCTAssertTrue([fileManager createDirectoryAtPath:destinationB withIntermediateDirectories:YES attributes:NULL error:NULL]);
+        
+        NSString *sourceFile = [sourceA stringByAppendingPathComponent:@"A"];
+        NSString *destinationFile = [destinationB stringByAppendingPathComponent:@"A"];
+        
+        XCTAssertTrue([[self bigData1] writeToFile:sourceFile atomically:YES]);
+        XCTAssertTrue([[self bigData2] writeToFile:destinationFile atomically:YES]);
+        
+        NSError *error = nil;
+        if (![fileManager setAttributes:@{NSFilePosixPermissions : @0755} ofItemAtPath:destinationFile error:&error]) {
+            NSLog(@"Change Permission Error: %@", error);
+            XCTFail(@"Failed setting file permissions");
+        }
+        
+        // This would fail for version 1.0
+        XCTAssertFalse([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
+    }];
+}
+
 - (void)testDirectoryPermissionChangeWithContentChange
 {
     [self createAndApplyPatchWithHandler:^(NSFileManager *fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
@@ -810,6 +1016,44 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
     }];
 }
 
+- (void)testDirectoryChangeWithExecutableContentChange
+{
+    [self createAndApplyPatchWithHandler:^(NSFileManager *fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
+        NSString *sourceFile1 = [sourceDirectory stringByAppendingPathComponent:@"A"];
+        NSString *sourceFile2 = [sourceFile1 stringByAppendingPathComponent:@"B"];
+        
+        NSString *destinationFile1 = [destinationDirectory stringByAppendingPathComponent:@"A"];
+        NSString *destinationFile2 = [destinationFile1 stringByAppendingPathComponent:@"B"];
+        
+        NSError *error = nil;
+        if (![fileManager createDirectoryAtPath:sourceFile1 withIntermediateDirectories:NO attributes:nil error:&error]) {
+            NSLog(@"Failed creating directory with error: %@", error);
+            XCTFail("Failed to create directory");
+        }
+        
+        if (![fileManager createDirectoryAtPath:destinationFile1 withIntermediateDirectories:NO attributes:nil error:&error]) {
+            NSLog(@"Failed creating directory with error: %@", error);
+            XCTFail("Failed to create directory");
+        }
+        
+        XCTAssertTrue([[self bigData1] writeToFile:sourceFile2 atomically:YES]);
+        XCTAssertTrue([[self bigData1] writeToFile:destinationFile2 atomically:YES]);
+        
+        if (![fileManager setAttributes:@{NSFilePosixPermissions : @0755} ofItemAtPath:sourceFile1 error:&error]) {
+            NSLog(@"Change Permission Error: %@", error);
+            XCTFail(@"Failed setting file permissions");
+        }
+        
+        if (![fileManager setAttributes:@{NSFilePosixPermissions : @0755} ofItemAtPath:destinationFile1 error:&error]) {
+            NSLog(@"Change Permission Error: %@", error);
+            XCTFail(@"Failed setting file permissions");
+        }
+        
+        // This would fail for version 1.0
+        XCTAssertTrue([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
+    }];
+}
+
 - (void)testOddPermissionsInAfterTree
 {
     BOOL success = [self createAndApplyPatchWithBeforeDiffHandler:^(NSFileManager *fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
@@ -821,6 +1065,56 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
         XCTAssertTrue([data writeToFile:destinationFile atomically:YES]);
         
         NSError *error = nil;
+        if (![fileManager setAttributes:@{NSFilePosixPermissions : @0777} ofItemAtPath:destinationFile error:&error]) {
+            NSLog(@"Change Permission Error: %@", error);
+            XCTFail(@"Failed setting file permissions");
+        }
+        
+        XCTAssertFalse([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
+    } afterDiffHandler:nil];
+    XCTAssertTrue(success);
+}
+
+- (void)testOddChangingPermissionsWithBigFilesInBothTrees
+{
+    BOOL success = [self createAndApplyPatchWithBeforeDiffHandler:^(NSFileManager *fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
+        NSString *sourceFile = [sourceDirectory stringByAppendingPathComponent:@"A"];
+        NSString *destinationFile = [destinationDirectory stringByAppendingPathComponent:@"A"];
+        
+        XCTAssertTrue([[self bigData1] writeToFile:sourceFile atomically:YES]);
+        XCTAssertTrue([[self bigData2] writeToFile:destinationFile atomically:YES]);
+        
+        NSError *error = nil;
+        if (![fileManager setAttributes:@{NSFilePosixPermissions : @0777} ofItemAtPath:sourceFile error:&error]) {
+            NSLog(@"Change Permission Error: %@", error);
+            XCTFail(@"Failed setting file permissions");
+        }
+        
+        if (![fileManager setAttributes:@{NSFilePosixPermissions : @0774} ofItemAtPath:destinationFile error:&error]) {
+            NSLog(@"Change Permission Error: %@", error);
+            XCTFail(@"Failed setting file permissions");
+        }
+        
+        XCTAssertFalse([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
+    } afterDiffHandler:nil];
+    XCTAssertTrue(success);
+}
+
+- (void)testOddPermissionsWithBigFilesInBothTrees
+{
+    BOOL success = [self createAndApplyPatchWithBeforeDiffHandler:^(NSFileManager *fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
+        NSString *sourceFile = [sourceDirectory stringByAppendingPathComponent:@"A"];
+        NSString *destinationFile = [destinationDirectory stringByAppendingPathComponent:@"A"];
+        
+        XCTAssertTrue([[self bigData1] writeToFile:sourceFile atomically:YES]);
+        XCTAssertTrue([[self bigData2] writeToFile:destinationFile atomically:YES]);
+        
+        NSError *error = nil;
+        if (![fileManager setAttributes:@{NSFilePosixPermissions : @0777} ofItemAtPath:sourceFile error:&error]) {
+            NSLog(@"Change Permission Error: %@", error);
+            XCTFail(@"Failed setting file permissions");
+        }
+        
         if (![fileManager setAttributes:@{NSFilePosixPermissions : @0777} ofItemAtPath:destinationFile error:&error]) {
             NSLog(@"Change Permission Error: %@", error);
             XCTFail(@"Failed setting file permissions");

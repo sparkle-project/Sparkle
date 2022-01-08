@@ -30,29 +30,40 @@ extern int bsdiff(int argc, const char **argv);
 
 @interface CreateBinaryDeltaOperation : NSOperation
 @property (copy) NSString *relativePath;
+@property (copy) NSString *clonedRelativePath;
 @property (strong) NSString *resultPath;
 @property (strong) NSNumber *oldPermissions;
 @property (strong) NSNumber *permissions;
+@property (nonatomic) BOOL changingPermissions;
 @property (strong) NSString *_fromPath;
 @property (strong) NSString *_toPath;
-- (id)initWithRelativePath:(NSString *)relativePath oldTree:(NSString *)oldTree newTree:(NSString *)newTree oldPermissions:(NSNumber *)oldPermissions newPermissions:(NSNumber *)permissions;
+- (id)initWithRelativePath:(NSString *)relativePath clonedRelativePath:(NSString *)clonedRelativePath oldTree:(NSString *)oldTree newTree:(NSString *)newTree oldPermissions:(NSNumber *)oldPermissions newPermissions:(NSNumber *)permissions changingPermissions:(BOOL)changingPermissions;
 @end
 
 @implementation CreateBinaryDeltaOperation
 @synthesize relativePath = _relativePath;
+@synthesize clonedRelativePath = _clonedRelativePath;
 @synthesize resultPath = _resultPath;
 @synthesize oldPermissions = _oldPermissions;
 @synthesize permissions = _permissions;
+@synthesize changingPermissions = _changingPermissions;
 @synthesize _fromPath = _fromPath;
 @synthesize _toPath = _toPath;
 
-- (id)initWithRelativePath:(NSString *)relativePath oldTree:(NSString *)oldTree newTree:(NSString *)newTree oldPermissions:(NSNumber *)oldPermissions newPermissions:(NSNumber *)permissions
+- (id)initWithRelativePath:(NSString *)relativePath clonedRelativePath:(NSString *)clonedRelativePath oldTree:(NSString *)oldTree newTree:(NSString *)newTree oldPermissions:(NSNumber *)oldPermissions newPermissions:(NSNumber *)permissions changingPermissions:(BOOL)changingPermissions
 {
     if ((self = [super init])) {
         self.relativePath = relativePath;
+        self.clonedRelativePath = clonedRelativePath;
         self.oldPermissions = oldPermissions;
         self.permissions = permissions;
-        self._fromPath = [oldTree stringByAppendingPathComponent:relativePath];
+        self.changingPermissions = changingPermissions;
+        
+        if (clonedRelativePath == nil) {
+            self._fromPath = [oldTree stringByAppendingPathComponent:relativePath];
+        } else {
+            self._fromPath = [oldTree stringByAppendingPathComponent:clonedRelativePath];
+        }
         self._toPath = [newTree stringByAppendingPathComponent:relativePath];
     }
     return self;
@@ -168,17 +179,16 @@ static BOOL shouldSkipDeltaCompression(NSDictionary *originalInfo, NSDictionary 
 
     unsigned short originalInfoType = [(NSNumber *)originalInfo[INFO_TYPE_KEY] unsignedShortValue];
     unsigned short newInfoType = [(NSNumber *)newInfo[INFO_TYPE_KEY] unsignedShortValue];
-    if (originalInfoType != newInfoType) {
-        // File types are different
+    if (originalInfoType != newInfoType || originalInfoType != FTS_F) {
+        // File types are different or they're not regular files
         return YES;
     }
 
     NSString *originalPath = originalInfo[INFO_PATH_KEY];
     NSString *newPath = newInfo[INFO_PATH_KEY];
 
-    // Skip delta if both entries are directories, or if the files/symlinks are equal in content
-    if (originalInfoType == FTS_D || [[NSFileManager defaultManager] contentsEqualAtPath:originalPath andPath:newPath]) {
-        // this is possible if just the permissions have changed but contents have not
+    // Skip delta if the files are equal in content
+    if ([[NSFileManager defaultManager] contentsEqualAtPath:originalPath andPath:newPath]) {
         return YES;
     }
 
@@ -251,48 +261,133 @@ static BOOL shouldChangePermissions(NSDictionary *originalInfo, NSDictionary *ne
 }
 
 #define MIN_SIZE_FOR_CLONE 4096
-static NSString *cloneableRelativePath(NSDictionary<NSString *, NSData *> *afterFileKeyToHashDictionary, NSDictionary<NSData *, NSArray<NSString *> *> *beforeHashToFileKeyDictionary, NSDictionary *originalTreeState, NSDictionary *newInfo, NSString *key, NSNumber * __autoreleasing *outPermissions)
+#define MIN_SIZE_FOR_CLONE_DIFF (4096 * 4)
+static NSString *cloneableRelativePath(NSDictionary<NSString *, NSData *> *afterFileKeyToHashDictionary, NSDictionary<NSData *, NSArray<NSString *> *> *beforeHashToFileKeyDictionary, NSDictionary<NSString *, NSString *> *frameworkVersionsSubstitutes, NSDictionary<NSString *, NSString *> *fileSubstitutes, NSDictionary *originalTreeState, NSDictionary *newInfo, NSString *key, NSNumber * __autoreleasing *outNewPermissions, BOOL *clonePermissionsChanged, BOOL *clonedBinaryDiff)
 {
-    if (afterFileKeyToHashDictionary == nil) {
-        return nil;
-    }
-    
     // Avoid clones for small files. Small files can compress very well, sometimes better than tracking clones.
     if ([(NSNumber *)newInfo[INFO_SIZE_KEY] unsignedLongLongValue] <= MIN_SIZE_FOR_CLONE) {
         return nil;
     }
     
-    NSData *keyHash = afterFileKeyToHashDictionary[key];
-    if (keyHash == nil) {
+    if ([(NSNumber *)newInfo[INFO_TYPE_KEY] unsignedShortValue] != FTS_F) {
         return nil;
     }
     
-    for (NSString *oldRelativePath in beforeHashToFileKeyDictionary[keyHash]) {
-        NSDictionary *oldCloneInfo = originalTreeState[oldRelativePath];
+    {
+        NSData *keyHash = afterFileKeyToHashDictionary[key];
+        if (keyHash != nil) {
+            // Check for identical clones first
+            for (NSString *oldRelativePath in beforeHashToFileKeyDictionary[keyHash]) {
+                NSDictionary *oldCloneInfo = originalTreeState[oldRelativePath];
+                if (oldCloneInfo == nil) {
+                    continue;
+                }
+                
+                if ([(NSNumber *)oldCloneInfo[INFO_TYPE_KEY] unsignedShortValue] != FTS_F) {
+                    continue;
+                }
+                
+                NSString *clonePath = oldCloneInfo[INFO_PATH_KEY];
+                NSString *newPath = newInfo[INFO_PATH_KEY];
+                
+                if (![[NSFileManager defaultManager] contentsEqualAtPath:clonePath andPath:newPath]) {
+                    continue;
+                }
+                
+                NSNumber *newPermissions = newInfo[INFO_PERMISSIONS_KEY];
+                if (outNewPermissions != NULL) {
+                    *outNewPermissions = newPermissions;
+                }
+                
+                if (clonePermissionsChanged != NULL) {
+                    *clonePermissionsChanged = ([(NSNumber *)oldCloneInfo[INFO_PERMISSIONS_KEY] unsignedShortValue] != [newPermissions unsignedShortValue]);
+                }
+                
+                if (clonedBinaryDiff != NULL) {
+                    *clonedBinaryDiff = NO;
+                }
+                
+                return oldRelativePath;
+            }
+        }
+    }
+    
+    // For non-identical files where we do a binary diff, make sure file size matches a more strict file size test
+    if ([(NSNumber *)newInfo[INFO_SIZE_KEY] unsignedLongLongValue] <= MIN_SIZE_FOR_CLONE_DIFF) {
+        return nil;
+    }
+    
+    // Look out for any .framework/Versions/{A -> B} changes
+    for (NSString *frameworkVersionPrefix in frameworkVersionsSubstitutes) {
+        if (![key hasPrefix:frameworkVersionPrefix]) {
+            continue;
+        }
+        
+        NSString *cloneFrameworkSubstitutePrefix = frameworkVersionsSubstitutes[frameworkVersionPrefix];
+        if (cloneFrameworkSubstitutePrefix == nil) {
+            continue;
+        }
+        
+        NSString *cloneRelativeKey = [key stringByReplacingCharactersInRange:NSMakeRange(0, frameworkVersionPrefix.length) withString:cloneFrameworkSubstitutePrefix];
+        
+        NSDictionary *oldCloneInfo = originalTreeState[cloneRelativeKey];
         if (oldCloneInfo == nil) {
             continue;
         }
         
-        if ([(NSNumber *)oldCloneInfo[INFO_TYPE_KEY] unsignedShortValue] != FTS_F || [(NSNumber *)newInfo[INFO_TYPE_KEY] unsignedShortValue] != FTS_F) {
-            continue;
+        NSNumber *newPermissions = newInfo[INFO_PERMISSIONS_KEY];
+        if (outNewPermissions != NULL) {
+            *outNewPermissions = newPermissions;
         }
         
-        NSString *clonePath = oldCloneInfo[INFO_PATH_KEY];
-        NSString *newPath = newInfo[INFO_PATH_KEY];
+        if (clonePermissionsChanged != NULL) {
+            *clonePermissionsChanged = ([(NSNumber *)oldCloneInfo[INFO_PERMISSIONS_KEY] unsignedShortValue] != [newPermissions unsignedShortValue]);
+        }
         
-        if (![[NSFileManager defaultManager] contentsEqualAtPath:clonePath andPath:newPath]) {
-            continue;
+        if (clonedBinaryDiff != NULL) {
+            *clonedBinaryDiff = YES;
+        }
+        
+        return cloneRelativeKey;
+    }
+    
+    // Look out for any changes that involve the same named file moving to another directory
+    do {
+        NSString *cloneRelativeKey = fileSubstitutes[key.lastPathComponent];
+        if (cloneRelativeKey == nil) {
+            break;
+        }
+        
+        NSDictionary *oldCloneInfo = originalTreeState[cloneRelativeKey];
+        if (oldCloneInfo == nil) {
+            break;
+        }
+        
+        uint64_t cloneSize = [(NSNumber *)oldCloneInfo[INFO_SIZE_KEY] unsignedLongValue];
+        uint64_t newSize = [(NSNumber *)newInfo[INFO_SIZE_KEY] unsignedLongValue];
+        uint64_t minSize = MIN(cloneSize, newSize);
+        uint64_t maxSize = MAX(cloneSize, newSize);
+        
+        // Ensure file is at least 60% the same size
+        if (minSize == 0 || maxSize == 0 || (double)minSize / (double)maxSize < 0.60) {
+            break;
         }
         
         NSNumber *newPermissions = newInfo[INFO_PERMISSIONS_KEY];
-        if ([(NSNumber *)oldCloneInfo[INFO_PERMISSIONS_KEY] unsignedShortValue] != [newPermissions unsignedShortValue]) {
-            if (outPermissions != NULL) {
-                *outPermissions = newPermissions;
-            }
+        if (outNewPermissions != NULL) {
+            *outNewPermissions = newPermissions;
         }
         
-        return oldRelativePath;
-    }
+        if (clonePermissionsChanged != NULL) {
+            *clonePermissionsChanged = ([(NSNumber *)oldCloneInfo[INFO_PERMISSIONS_KEY] unsignedShortValue] != [newPermissions unsignedShortValue]);
+        }
+        
+        if (clonedBinaryDiff != NULL) {
+            *clonedBinaryDiff = YES;
+        }
+        
+        return cloneRelativeKey;
+    } while (NO);
     
     return nil;
 }
@@ -539,6 +634,99 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
 
       return originalTreeState[key1] ? NSOrderedAscending : NSOrderedDescending;
     }];
+    
+    // Using a couple of heursitics we track if files have been moved to other locations within the app bundle
+    NSMutableDictionary<NSString *, NSString *> *frameworkVersionsSubstitutes = [NSMutableDictionary dictionary];
+    NSMutableDictionary<NSString *, NSString *> *fileSubstitutes = [NSMutableDictionary dictionary];
+    if (MAJOR_VERSION_IS_AT_LEAST(majorVersion, SUBinaryDeltaMajorVersion3)) {
+        // Heuristic #1: track if an old framework version was removed and a new framework version was added
+        // Keep track of these prefixes in a dictionary
+        // Eg: /Contents/Frameworks/Foo.framework/Versions/B/ (new) -> /Contents/Frameworks/Foo.framework/Versions/A/ (old)
+        
+        NSMutableDictionary<NSString *, NSString *> *oldFrameworkVersions = [NSMutableDictionary dictionary];
+        for (NSString *key in keys) {
+            id value = [newTreeState valueForKey:key];
+            if (![(NSObject *)value isEqual:[NSNull null]]) {
+                continue;
+            }
+            
+            NSDictionary *originalInfo = originalTreeState[key];
+            if ([(NSNumber *)originalInfo[INFO_TYPE_KEY] unsignedShortValue] != FTS_D) {
+                continue;
+            }
+            
+            NSString *keyWithoutLastPathComponent = key.stringByDeletingLastPathComponent;
+            
+            if (![keyWithoutLastPathComponent.lastPathComponent isEqualToString:@"Versions"]) {
+                continue;
+            }
+            
+            NSString *keyWithoutLastLastPathComponent = keyWithoutLastPathComponent.stringByDeletingLastPathComponent;
+            
+            if (![keyWithoutLastLastPathComponent.pathExtension isEqualToString:@"framework"]) {
+                continue;
+            }
+            
+            oldFrameworkVersions[keyWithoutLastLastPathComponent] = key;
+        }
+        
+        for (NSString *key in keys) {
+            id value = [newTreeState valueForKey:key];
+            if ([(NSObject *)value isEqual:[NSNull null]] || originalTreeState[key] != nil) {
+                continue;
+            }
+            
+            NSDictionary *newInfo = value;
+            if ([(NSNumber *)newInfo[INFO_TYPE_KEY] unsignedShortValue] != FTS_D) {
+                continue;
+            }
+            
+            NSString *keyWithoutLastPathComponent = key.stringByDeletingLastPathComponent;
+            
+            if (![keyWithoutLastPathComponent.lastPathComponent isEqualToString:@"Versions"]) {
+                continue;
+            }
+            
+            NSString *keyWithoutLastLastPathComponent = keyWithoutLastPathComponent.stringByDeletingLastPathComponent;
+            
+            if (![keyWithoutLastLastPathComponent.pathExtension isEqualToString:@"framework"]) {
+                continue;
+            }
+            
+            NSString *oldFrameworkVersionKey = oldFrameworkVersions[keyWithoutLastLastPathComponent];
+            if (oldFrameworkVersionKey == nil) {
+                continue;
+            }
+            
+            frameworkVersionsSubstitutes[[key stringByAppendingString:@"/"]] = [oldFrameworkVersionKey stringByAppendingString:@"/"];
+        }
+        
+        // Heuristic #2: Keep a table of removed filenames, collapsing them by the largest file per unique name
+        // This sees if a file has just been moved to another location
+        for (NSString *key in keys) {
+            id value = [newTreeState valueForKey:key];
+            if (![(NSObject *)value isEqual:[NSNull null]]) {
+                continue;
+            }
+            
+            NSDictionary *keyInfo = originalTreeState[key];
+            if ([(NSNumber *)keyInfo[INFO_TYPE_KEY] unsignedShortValue] != FTS_F) {
+                continue;
+            }
+            
+            NSString *lastPathComponent = key.lastPathComponent;
+            
+            NSString *existingKey = fileSubstitutes[lastPathComponent];
+            if (existingKey == nil) {
+                fileSubstitutes[lastPathComponent] = key;
+            } else {
+                NSDictionary *existingKeyInfo = originalTreeState[existingKey];
+                if ([(NSNumber *)keyInfo[INFO_SIZE_KEY] unsignedLongValue] > [(NSNumber *)existingKeyInfo[INFO_SIZE_KEY] unsignedLongValue]) {
+                    fileSubstitutes[lastPathComponent] = key;
+                }
+            }
+        }
+    }
 
     for (NSString *key in keys) {
         id value = [newTreeState valueForKey:key];
@@ -565,35 +753,50 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
                 }
             } else {
                 // Check if the new file can be cloned from an old existing one located at a different path
-                NSNumber *newPermissionsFromClone = nil;
-                NSString *clonedRelativePath = cloneableRelativePath(afterFileKeyToHashDictionary, beforeHashToFileKeyDictionary, originalTreeState, newInfo, key, &newPermissionsFromClone);
+                NSNumber *newPermissions = nil;
+                BOOL clonePermissionsChanged = NO;
+                BOOL clonedBinaryDiff = NO;
+                NSString *clonedRelativePath = MAJOR_VERSION_IS_AT_LEAST(majorVersion, SUBinaryDeltaMajorVersion3) ? cloneableRelativePath(afterFileKeyToHashDictionary, beforeHashToFileKeyDictionary, frameworkVersionsSubstitutes, fileSubstitutes, originalTreeState, newInfo, key, &newPermissions, &clonePermissionsChanged, &clonedBinaryDiff) : nil;
                 if (clonedRelativePath != nil) {
-                    SPUDeltaItemCommands commands = SPUDeltaItemCommandClone;
-                    if (shouldDeleteThenExtract(originalInfo, newInfo, majorVersion)) {
-                        commands |= SPUDeltaItemCommandDelete;
-                    }
-                    if (newPermissionsFromClone != nil) {
-                        commands |= SPUDeltaItemCommandModifyPermissions;
-                    }
-                    
-                    SPUDeltaArchiveItem *item = [[SPUDeltaArchiveItem alloc] initWithRelativeFilePath:key commands:commands permissions:newPermissionsFromClone.unsignedShortValue];
-                    // Physical path for clones points to the old file
-                    item.physicalFilePath = [source stringByAppendingPathComponent:clonedRelativePath];
-                    item.clonedRelativePath = clonedRelativePath;
-                    
-                    [archive addItem:item];
-                    
-                    if (verbose) {
-                        fprintf(stderr, "\n✂️   %s %s -> %s", VERBOSE_CLONED, [clonedRelativePath fileSystemRepresentation], [key fileSystemRepresentation]);
+                    if (clonedBinaryDiff) {
+                        NSDictionary *cloneInfo = originalTreeState[clonedRelativePath];
+                        
+                        CreateBinaryDeltaOperation *operation = [[CreateBinaryDeltaOperation alloc] initWithRelativePath:key clonedRelativePath:clonedRelativePath oldTree:source newTree:destination oldPermissions:cloneInfo[INFO_PERMISSIONS_KEY] newPermissions:newPermissions changingPermissions:clonePermissionsChanged];
+                        [deltaQueue addOperation:operation];
+                        [deltaOperations addObject:operation];
+                    } else {
+                        SPUDeltaItemCommands commands = SPUDeltaItemCommandClone;
+                        if (shouldDeleteThenExtract(originalInfo, newInfo, majorVersion)) {
+                            commands |= SPUDeltaItemCommandDelete;
+                        }
+                        if (clonePermissionsChanged) {
+                            commands |= SPUDeltaItemCommandModifyPermissions;
+                        }
+                        
+                        SPUDeltaArchiveItem *item = [[SPUDeltaArchiveItem alloc] initWithRelativeFilePath:key commands:commands permissions:(clonePermissionsChanged ? newPermissions.unsignedShortValue : 0)];
+                        // Physical path for clones points to the old file
+                        item.itemFilePath = [source stringByAppendingPathComponent:clonedRelativePath];
+                        item.sourcePath = item.itemFilePath;
+                        item.clonedRelativePath = clonedRelativePath;
+                        
+                        [archive addItem:item];
+                        
+                        if (verbose) {
+                            fprintf(stderr, "\n✂️   %s %s -> %s", VERBOSE_CLONED, [clonedRelativePath fileSystemRepresentation], [key fileSystemRepresentation]);
+                        }
                     }
                 } else {
                     // Otherwise add a new file
                     NSString *path = [destination stringByAppendingPathComponent:key];
                     
-                    SPUDeltaItemCommands commands = shouldDeleteThenExtract(originalInfo, newInfo, majorVersion) ? (SPUDeltaItemCommandDelete | SPUDeltaItemCommandExtract) : SPUDeltaItemCommandExtract;
+                    SPUDeltaItemCommands commands = SPUDeltaItemCommandExtract;
+                    if (shouldDeleteThenExtract(originalInfo, newInfo, majorVersion)) {
+                        commands |= SPUDeltaItemCommandDelete;
+                    }
                     
                     SPUDeltaArchiveItem *item = [[SPUDeltaArchiveItem alloc] initWithRelativeFilePath:key commands:commands permissions:0];
-                    item.physicalFilePath = path;
+                    item.itemFilePath = path;
+                    item.sourcePath = path;
                     
                     [archive addItem:item];
 
@@ -607,11 +810,9 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
                 }
             }
         } else {
-            NSNumber *permissions =
-                shouldChangePermissions(originalInfo, newInfo) ?
-                newInfo[INFO_PERMISSIONS_KEY] :
-                nil;
-            CreateBinaryDeltaOperation *operation = [[CreateBinaryDeltaOperation alloc] initWithRelativePath:key oldTree:source newTree:destination oldPermissions:originalInfo[INFO_PERMISSIONS_KEY] newPermissions:permissions];
+            NSNumber *permissions = newInfo[INFO_PERMISSIONS_KEY];
+            
+            CreateBinaryDeltaOperation *operation = [[CreateBinaryDeltaOperation alloc] initWithRelativePath:key clonedRelativePath:nil oldTree:source newTree:destination oldPermissions:originalInfo[INFO_PERMISSIONS_KEY] newPermissions:permissions changingPermissions:shouldChangePermissions(originalInfo, newInfo)];
             [deltaQueue addOperation:operation];
             [deltaOperations addObject:operation];
         }
@@ -633,21 +834,34 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
             break;
         }
 
+        NSString *clonedRelativePath = [operation clonedRelativePath];
         if (verbose) {
-            fprintf(stderr, "\n🔨  %s %s", VERBOSE_DIFFED, [[operation relativePath] fileSystemRepresentation]);
+            if (clonedRelativePath == nil) {
+                fprintf(stderr, "\n🔨  %s %s", VERBOSE_DIFFED, [[operation relativePath] fileSystemRepresentation]);
+            } else {
+                fprintf(stderr, "\n🔨  %s %s -> %s", VERBOSE_DIFFED, [clonedRelativePath fileSystemRepresentation], [[operation relativePath] fileSystemRepresentation]);
+            }
         }
         
         NSNumber *permissions = operation.permissions;
         NSString *relativePath = operation.relativePath;
         
-        SPUDeltaItemCommands commands = (permissions != nil) ? (SPUDeltaItemCommandBinaryDiff | SPUDeltaItemCommandModifyPermissions) : SPUDeltaItemCommandBinaryDiff;
+        SPUDeltaItemCommands commands = SPUDeltaItemCommandBinaryDiff;
+        if (operation.changingPermissions) {
+            commands |= SPUDeltaItemCommandModifyPermissions;
+        }
+        if (clonedRelativePath != nil) {
+            commands |= SPUDeltaItemCommandClone;
+        }
         
         SPUDeltaArchiveItem *item = [[SPUDeltaArchiveItem alloc] initWithRelativeFilePath:relativePath commands:commands permissions:permissions.unsignedShortValue];
-        item.physicalFilePath = resultPath;
+        item.itemFilePath = resultPath;
+        item.sourcePath = operation._fromPath;
+        item.clonedRelativePath = clonedRelativePath;
         
         [archive addItem:item];
 
-        if (permissions != nil) {
+        if (operation.changingPermissions) {
             if (verbose) {
                 fprintf(stderr, "\n👮  %s %s (0%o -> 0%o)", VERBOSE_MODIFIED, relativePath.fileSystemRepresentation, operation.oldPermissions.unsignedShortValue, operation.permissions.unsignedShortValue);
             }

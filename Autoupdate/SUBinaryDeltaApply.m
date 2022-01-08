@@ -15,6 +15,7 @@
 #include "bspatch.h"
 #include <stdio.h>
 #include <stdlib.h>
+#import <sys/stat.h>
 
 
 #include "AppKitPrevention.h"
@@ -206,7 +207,7 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
             removedFile = YES;
         }
 
-        if ((commands & SPUDeltaItemCommandClone) != 0) {
+        if ((commands & SPUDeltaItemCommandClone) != 0 && (commands & SPUDeltaItemCommandBinaryDiff) == 0) {
             NSString *clonedRelativePath = item.clonedRelativePath;
             if ([clonedRelativePath.pathComponents containsObject:@".."]) {
                 if (error != NULL) {
@@ -236,7 +237,7 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
             }
         } else if ((commands & SPUDeltaItemCommandBinaryDiff) != 0) {
             NSString *tempDiffFile = temporaryFilename(@"apply-binary-delta");
-            item.physicalFilePath = tempDiffFile;
+            item.itemFilePath = tempDiffFile;
             
             if (![archive extractItem:item]) {
                 if (verbose) {
@@ -250,7 +251,25 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
                 return;
             }
             
-            if (!applyBinaryDeltaToFile(tempDiffFile, sourceFilePath, destinationFilePath)) {
+            NSString *sourceDiffFilePath;
+            NSString *clonedRelativePath;
+            if ((commands & SPUDeltaItemCommandClone) != 0) {
+                clonedRelativePath = item.clonedRelativePath;
+                if ([clonedRelativePath.pathComponents containsObject:@".."]) {
+                    if (error != NULL) {
+                        *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Relative path for clone '%@' contains '..' path component", clonedRelativePath] }];
+                    }
+                    *stop = YES;
+                    return;
+                }
+                
+                sourceDiffFilePath = [source stringByAppendingPathComponent:clonedRelativePath];
+            } else {
+                sourceDiffFilePath = sourceFilePath;
+                clonedRelativePath = nil;
+            }
+            
+            if (!applyBinaryDeltaToFile(tempDiffFile, sourceDiffFilePath, destinationFilePath)) {
                 if (verbose) {
                     fprintf(stderr, "\n");
                 }
@@ -260,12 +279,46 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
                 *stop = YES;
                 return;
             }
+            
+            // Preserve original file permissions from the original file
+            // Only necessary for clones because applyBinaryDeltaToFile() otherwise preserves
+            // file permissions on the file it's replacing. Also not necessary if we're going to
+            // change permissions later
+            if ((commands & SPUDeltaItemCommandClone) != 0 && (commands & SPUDeltaItemCommandModifyPermissions) == 0) {
+                
+                struct stat sourceFileInfo = {0};
+                if (lstat(sourceDiffFilePath.fileSystemRepresentation, &sourceFileInfo) != 0) {
+                    if (verbose) {
+                        fprintf(stderr, "\n");
+                    }
+                    if (error != NULL) {
+                        *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Unable to retrieve stat info from %@", sourceFilePath] }];
+                    }
+                    *stop = YES;
+                    return;
+                }
+                
+                if (chmod(destinationFilePath.fileSystemRepresentation, sourceFileInfo.st_mode) != 0) {
+                    if (verbose) {
+                        fprintf(stderr, "\n");
+                    }
+                    if (error != NULL) {
+                        *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteNoPermissionError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Unable to modify permissions (%u) on file %@", sourceFileInfo.st_mode, destinationFilePath] }];
+                    }
+                    *stop = YES;
+                    return;
+                }
+            }
 
             if (verbose) {
-                fprintf(stderr, "\n🔨  %s %s", VERBOSE_PATCHED, [relativePath fileSystemRepresentation]);
+                if ((commands & SPUDeltaItemCommandClone) != 0) {
+                    fprintf(stderr, "\n🔨  %s %s -> %s", VERBOSE_PATCHED, [clonedRelativePath fileSystemRepresentation], [relativePath fileSystemRepresentation]);
+                } else {
+                    fprintf(stderr, "\n🔨  %s %s", VERBOSE_PATCHED, [relativePath fileSystemRepresentation]);
+                }
             }
         } else if ((commands & SPUDeltaItemCommandExtract) != 0) { // extract and permission modifications don't coexist
-            item.physicalFilePath = destinationFilePath;
+            item.itemFilePath = destinationFilePath;
             if (![archive extractItem:item]) {
                 if (verbose) {
                     fprintf(stderr, "\n");
