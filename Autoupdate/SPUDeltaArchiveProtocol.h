@@ -42,16 +42,26 @@ typedef NS_ENUM(uint8_t, SPUDeltaItemCommands) {
 
 - (instancetype)initWithRelativeFilePath:(NSString *)relativeFilePath commands:(SPUDeltaItemCommands)commands permissions:(uint16_t)permissions;
 
+// The relative file path of the item, eg /Contents/MacOS/Foo
 @property (nonatomic, readonly) NSString *relativeFilePath;
+// For extraction, the path where the item will be extracted. For creation, the path to the item to add to the archive.
 @property (nonatomic, nullable) NSString *itemFilePath;
+// The relative file path of the originating item for clones. This may be null.
+// For example, if /Contents/Resources/hello/foo.txt moves to /Contents/Resources/hello2/foo.txt, the former is the relative path
 @property (nonatomic, nullable) NSString *clonedRelativePath;
+// The source path of the item to extract file metadata from such as file size.
 @property (nonatomic, nullable) NSString *sourcePath;
+// The commands that describe the actions to take for this item.
 @property (nonatomic, readonly) SPUDeltaItemCommands commands;
+// Provided change in permissions for the SPUDeltaItemCommandModifyPermissions command
 @property (nonatomic, readonly) uint16_t permissions;
 
 // Private properties
-@property (nonatomic, nullable) const void *context;
+// xar_file context for Xar delta archiver
+@property (nonatomic, nullable) const void *xarContext;
+// Tracking mode type of item (regular file, symlink) when encoding items.
 @property (nonatomic) uint16_t extractMode;
+// Tracking length of item's data in data section, when encoding items and when extracting items
 @property (nonatomic) uint64_t codedDataLength;
 
 @end

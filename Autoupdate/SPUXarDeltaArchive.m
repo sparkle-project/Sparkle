@@ -372,7 +372,7 @@ static xar_file_t _xarAddFile(NSMutableDictionary<NSString *, NSValue *> *fileTa
         }
         
         SPUDeltaArchiveItem *item = [[SPUDeltaArchiveItem alloc] initWithRelativeFilePath:relativePath commands:commands permissions:permissions];
-        item.context = file;
+        item.xarContext = file;
         
         itemHandler(item, &exitedEarly);
         if (exitedEarly) {
@@ -390,9 +390,9 @@ static xar_file_t _xarAddFile(NSMutableDictionary<NSString *, NSValue *> *fileTa
     }
     
     assert(item.itemFilePath != nil);
-    assert(item.context != NULL);
+    assert(item.xarContext != NULL);
     
-    xar_file_t file = item.context;
+    xar_file_t file = item.xarContext;
     if (xar_extract_tofile(self.x, file, item.itemFilePath.fileSystemRepresentation) != 0) {
         self.error = [NSError errorWithDomain:SPARKLE_DELTA_XAR_ARCHIVE_ERROR_DOMAIN code:SPARKLE_DELTA_XAR_ARCHIVE_ERROR_CODE_EXTRACT_FAILURE userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to extract xar file entry to %@", item.itemFilePath] }];
         return NO;

@@ -57,7 +57,7 @@ id<SPUDeltaArchiveProtocol> SPUDeltaArchiveReadPatchAndHeader(NSString *patchFil
 @synthesize sourcePath = _sourcePath;
 @synthesize commands = _commands;
 @synthesize permissions = _permissions;
-@synthesize context = _context;
+@synthesize xarContext = _xarContext;
 @synthesize extractMode = _extractMode;
 @synthesize codedDataLength = _codedDataLength;
 
