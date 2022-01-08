@@ -45,12 +45,13 @@ typedef NS_ENUM(uint8_t, SPUDeltaItemCommands) {
 @property (nonatomic, readonly) NSString *relativeFilePath;
 @property (nonatomic, nullable) NSString *physicalFilePath;
 @property (nonatomic, nullable) NSString *clonedRelativePath;
+@property (nonatomic, nullable) NSString *sourcePath;
 @property (nonatomic, readonly) SPUDeltaItemCommands commands;
 @property (nonatomic, readonly) uint16_t permissions;
 
 // Private properties
 @property (nonatomic, nullable) const void *context;
-@property (nonatomic) uint16_t originalMode;
+@property (nonatomic) uint16_t extractMode;
 @property (nonatomic) uint64_t codedDataLength;
 
 @end

@@ -443,7 +443,7 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
             NSString *clonedRelativePath = nil;
             
             if ((commands & SPUDeltaItemCommandClone) != 0) {
-                if ((commands & SPUDeltaItemCommandModifyPermissions) != 0 || (commands & SPUDeltaItemCommandBinaryDiff) != 0) {
+                if ((commands & SPUDeltaItemCommandModifyPermissions) != 0) {
                     // Decode file permission changes for clone
                     if (![self _readBuffer:&decodedMode length:sizeof(decodedMode)]) {
                         break;
@@ -468,7 +468,20 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
                         break;
                     }
                 }
-            } else if ((commands & SPUDeltaItemCommandExtract) != 0 || (commands & SPUDeltaItemCommandBinaryDiff) != 0) {
+            } else if ((commands & SPUDeltaItemCommandBinaryDiff) != 0) {
+                // Decode file permission changes if available
+                if ((commands & SPUDeltaItemCommandModifyPermissions) != 0) {
+                    if (![self _readBuffer:&decodedMode length:sizeof(decodedMode)]) {
+                        break;
+                    }
+                }
+                
+                // Decode data length
+                if (![self _readBuffer:&decodedDataLength length:sizeof(decodedDataLength)]) {
+                    break;
+                }
+            } else if ((commands & SPUDeltaItemCommandExtract) != 0) {
+                // Decode permissions/mode
                 if (![self _readBuffer:&decodedMode length:sizeof(decodedMode)]) {
                     break;
                 }
@@ -579,7 +592,7 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
                 return NO;
             }
             
-            if (chmod(physicalFilePathString, mode) != 0) {
+            if ((commands & SPUDeltaItemCommandExtract) != 0 && chmod(physicalFilePathString, mode) != 0) {
                 self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to chmod() mode %d on %@", mode, physicalFilePath] }];
                 return NO;
             }
@@ -934,34 +947,34 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
         
         // Check if we need to encode additional data
         if ((commands & SPUDeltaItemCommandClone) != 0) {
-            NSString *physicalPath = item.physicalFilePath;
-            assert(physicalPath != nil);
-            
-            char physicalFilePathString[PATH_MAX + 1] = {0};
-            if (![physicalPath getFileSystemRepresentation:physicalFilePathString maxLength:sizeof(physicalFilePathString) - 1]) {
-                self.error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Path cannot be decoded and expressed as a file system representation while encoding cloned binary diff item: %@", physicalPath] }];
-                break;
-            }
-            
-            struct stat fileInfo = {0};
-            if (lstat(physicalFilePathString, &fileInfo) != 0) {
-                self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to lstat() on %@", physicalPath] }];
-                break;
-            }
-            
             // Store any desired file permissions changes for the clone
             // Clones can be binary diffs from other sources too. Since we are creating a
             // new file in that case (rather than a copy) we want to store file mode as well
-            if ((commands & SPUDeltaItemCommandModifyPermissions) != 0 || (commands & SPUDeltaItemCommandBinaryDiff) != 0) {
-                uint16_t originalMode = fileInfo.st_mode;
-                item.originalMode = originalMode;
+            if ((commands & SPUDeltaItemCommandModifyPermissions) != 0) {
+                NSString *sourcePath = item.sourcePath;
+                assert(sourcePath != nil);
+                
+                char sourcePathString[PATH_MAX + 1] = {0};
+                if (![sourcePath getFileSystemRepresentation:sourcePathString maxLength:sizeof(sourcePathString) - 1]) {
+                    self.error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Path cannot be decoded and expressed as a file system representation while encoding cloned binary diff item: %@", sourcePath] }];
+                    break;
+                }
+                
+                struct stat fileInfo = {0};
+                if (lstat(sourcePathString, &fileInfo) != 0) {
+                    self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to lstat() on %@", sourcePath] }];
+                    break;
+                }
+                
+                uint16_t extractMode = fileInfo.st_mode;
+                item.extractMode = extractMode;
                 
                 uint16_t encodedMode;
                 if ((commands & SPUDeltaItemCommandModifyPermissions) != 0) {
                     uint16_t permissions = item.permissions;
-                    encodedMode = (originalMode & ~PERMISSION_FLAGS) | permissions;
+                    encodedMode = (extractMode & ~PERMISSION_FLAGS) | permissions;
                 } else {
-                    encodedMode = originalMode;
+                    encodedMode = extractMode;
                 }
                 
                 // Store file mode (including desired permissions)
@@ -987,6 +1000,21 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
             }
             
             if ((commands & SPUDeltaItemCommandBinaryDiff) != 0) {
+                NSString *physicalPath = item.physicalFilePath;
+                assert(physicalPath != nil);
+                
+                char physicalFilePathString[PATH_MAX + 1] = {0};
+                if (![physicalPath getFileSystemRepresentation:physicalFilePathString maxLength:sizeof(physicalFilePathString) - 1]) {
+                    self.error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Path cannot be decoded and expressed as a file system representation while encoding cloned binary diff item: %@", physicalPath] }];
+                    break;
+                }
+                
+                struct stat fileInfo = {0};
+                if (lstat(physicalFilePathString, &fileInfo) != 0) {
+                    self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to lstat() on %@", physicalPath] }];
+                    break;
+                }
+                
                 uint64_t dataLength = (uint64_t)fileInfo.st_size;
                 if (![self _writeBuffer:&dataLength length:sizeof(dataLength)]) {
                     break;
@@ -995,6 +1023,44 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
                 item.codedDataLength = dataLength;
             }
         } else if ((commands & SPUDeltaItemCommandExtract) != 0 || (commands & SPUDeltaItemCommandBinaryDiff) != 0) {
+            uint16_t extractMode = 0;
+            
+            if ((commands & SPUDeltaItemCommandExtract) != 0 || (commands & SPUDeltaItemCommandModifyPermissions) != 0) {
+                NSString *sourcePath = item.sourcePath;
+                assert(sourcePath != nil);
+                
+                char sourceFilePathString[PATH_MAX + 1] = {0};
+                if (![sourcePath getFileSystemRepresentation:sourceFilePathString maxLength:sizeof(sourceFilePathString) - 1]) {
+                    self.error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Path cannot be decoded and expressed as a file system representation while encoding items: %@", sourcePath] }];
+                    break;
+                }
+                
+                struct stat sourceFileInfo = {0};
+                if (lstat(sourceFilePathString, &sourceFileInfo) != 0) {
+                    self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to lstat() on %@", sourcePath] }];
+                    break;
+                }
+                
+                extractMode = sourceFileInfo.st_mode;
+                item.extractMode = extractMode;
+                
+                uint16_t encodedMode;
+                if ((commands & SPUDeltaItemCommandModifyPermissions) != 0) {
+                    uint16_t permissions = item.permissions;
+                    encodedMode = (extractMode & ~PERMISSION_FLAGS) | permissions;
+                } else {
+                    encodedMode = extractMode;
+                }
+                
+                // Store file mode (including desired permissions)
+                if (![self _writeBuffer:&encodedMode length:sizeof(encodedMode)]) {
+                    break;
+                }
+            }
+            
+            // Store data length
+            // Length doesn't matter for directory names (we already track the name in the relative path)
+            
             NSString *physicalPath = item.physicalFilePath;
             assert(physicalPath != nil);
             
@@ -1004,39 +1070,21 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
                 break;
             }
             
-            struct stat fileInfo = {0};
-            if (lstat(physicalFilePathString, &fileInfo) != 0) {
+            struct stat physicalFileInfo = {0};
+            if (lstat(physicalFilePathString, &physicalFileInfo) != 0) {
                 self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to lstat() on %@", physicalPath] }];
                 break;
             }
-
-            uint16_t originalMode = fileInfo.st_mode;
-            item.originalMode = originalMode;
             
-            uint16_t encodedMode;
-            if ((commands & SPUDeltaItemCommandModifyPermissions) != 0) {
-                uint16_t permissions = item.permissions;
-                encodedMode = (originalMode & ~PERMISSION_FLAGS) | permissions;
-            } else {
-                encodedMode = originalMode;
-            }
-            
-            // Store file mode (including desired permissions)
-            if (![self _writeBuffer:&encodedMode length:sizeof(encodedMode)]) {
-                break;
-            }
-            
-            // Store data length
-            // Length doesn't matter for directory names (we already track the name in the relative path)
-            if (S_ISREG(originalMode)) {
-                uint64_t dataLength = (uint64_t)fileInfo.st_size;
+            if ((commands & SPUDeltaItemCommandBinaryDiff) != 0 || S_ISREG(extractMode)) {
+                uint64_t dataLength = (uint64_t)physicalFileInfo.st_size;
                 if (![self _writeBuffer:&dataLength length:sizeof(dataLength)]) {
                     break;
                 }
                 
                 item.codedDataLength = dataLength;
-            } else if (S_ISLNK(originalMode)) {
-                off_t fileSize = fileInfo.st_size;
+            } else if (S_ISLNK(extractMode)) {
+                off_t fileSize = physicalFileInfo.st_size;
                 if (fileSize > UINT16_MAX) {
                     self.error = [NSError errorWithDomain:SPARKLE_DELTA_ARCHIVE_ERROR_DOMAIN code:SPARKLE_DELTA_ARCHIVE_ERROR_CODE_LINK_TOO_LONG userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Link path has a destination that is too long: %llu bytes", fileSize] }];
                     break;
@@ -1076,8 +1124,8 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
             NSString *physicalPath = item.physicalFilePath;
             assert(physicalPath != nil);
             
-            mode_t originalMode = item.originalMode;
-            if (S_ISREG(originalMode)) {
+            mode_t extractMode = item.extractMode;
+            if ((commands & SPUDeltaItemCommandBinaryDiff) != 0 || S_ISREG(extractMode)) {
                 // Write out file contents to archive in chunks
                 
                 uint64_t totalItemSize = item.codedDataLength;
@@ -1116,7 +1164,7 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
                         break;
                     }
                 }
-            } else if (S_ISLNK(originalMode)) {
+            } else if (S_ISLNK(extractMode)) {
                 char physicalFilePathString[PATH_MAX + 1] = {0};
                 if (![physicalPath getFileSystemRepresentation:physicalFilePathString maxLength:sizeof(physicalFilePathString) - 1]) {
                     self.error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Link path to finish encoding cannot be decoded and expressed as a file system representation: %@", physicalPath] }];

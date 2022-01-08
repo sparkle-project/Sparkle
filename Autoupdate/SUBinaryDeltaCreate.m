@@ -34,9 +34,10 @@ extern int bsdiff(int argc, const char **argv);
 @property (strong) NSString *resultPath;
 @property (strong) NSNumber *oldPermissions;
 @property (strong) NSNumber *permissions;
+@property (nonatomic) BOOL changingPermissions;
 @property (strong) NSString *_fromPath;
 @property (strong) NSString *_toPath;
-- (id)initWithRelativePath:(NSString *)relativePath clonedRelativePath:(NSString *)clonedRelativePath oldTree:(NSString *)oldTree newTree:(NSString *)newTree oldPermissions:(NSNumber *)oldPermissions newPermissions:(NSNumber *)permissions;
+- (id)initWithRelativePath:(NSString *)relativePath clonedRelativePath:(NSString *)clonedRelativePath oldTree:(NSString *)oldTree newTree:(NSString *)newTree oldPermissions:(NSNumber *)oldPermissions newPermissions:(NSNumber *)permissions changingPermissions:(BOOL)changingPermissions;
 @end
 
 @implementation CreateBinaryDeltaOperation
@@ -45,16 +46,18 @@ extern int bsdiff(int argc, const char **argv);
 @synthesize resultPath = _resultPath;
 @synthesize oldPermissions = _oldPermissions;
 @synthesize permissions = _permissions;
+@synthesize changingPermissions = _changingPermissions;
 @synthesize _fromPath = _fromPath;
 @synthesize _toPath = _toPath;
 
-- (id)initWithRelativePath:(NSString *)relativePath clonedRelativePath:(NSString *)clonedRelativePath oldTree:(NSString *)oldTree newTree:(NSString *)newTree oldPermissions:(NSNumber *)oldPermissions newPermissions:(NSNumber *)permissions
+- (id)initWithRelativePath:(NSString *)relativePath clonedRelativePath:(NSString *)clonedRelativePath oldTree:(NSString *)oldTree newTree:(NSString *)newTree oldPermissions:(NSNumber *)oldPermissions newPermissions:(NSNumber *)permissions changingPermissions:(BOOL)changingPermissions
 {
     if ((self = [super init])) {
         self.relativePath = relativePath;
         self.clonedRelativePath = clonedRelativePath;
         self.oldPermissions = oldPermissions;
         self.permissions = permissions;
+        self.changingPermissions = changingPermissions;
         
         if (clonedRelativePath == nil) {
             self._fromPath = [oldTree stringByAppendingPathComponent:relativePath];
@@ -758,7 +761,7 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
                     if (clonedBinaryDiff) {
                         NSDictionary *cloneInfo = originalTreeState[clonedRelativePath];
                         
-                        CreateBinaryDeltaOperation *operation = [[CreateBinaryDeltaOperation alloc] initWithRelativePath:key clonedRelativePath:clonedRelativePath oldTree:source newTree:destination oldPermissions:cloneInfo[INFO_PERMISSIONS_KEY] newPermissions:newPermissions];
+                        CreateBinaryDeltaOperation *operation = [[CreateBinaryDeltaOperation alloc] initWithRelativePath:key clonedRelativePath:clonedRelativePath oldTree:source newTree:destination oldPermissions:cloneInfo[INFO_PERMISSIONS_KEY] newPermissions:newPermissions changingPermissions:clonePermissionsChanged];
                         [deltaQueue addOperation:operation];
                         [deltaOperations addObject:operation];
                     } else {
@@ -773,6 +776,7 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
                         SPUDeltaArchiveItem *item = [[SPUDeltaArchiveItem alloc] initWithRelativeFilePath:key commands:commands permissions:(clonePermissionsChanged ? newPermissions.unsignedShortValue : 0)];
                         // Physical path for clones points to the old file
                         item.physicalFilePath = [source stringByAppendingPathComponent:clonedRelativePath];
+                        item.sourcePath = item.physicalFilePath;
                         item.clonedRelativePath = clonedRelativePath;
                         
                         [archive addItem:item];
@@ -792,6 +796,7 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
                     
                     SPUDeltaArchiveItem *item = [[SPUDeltaArchiveItem alloc] initWithRelativeFilePath:key commands:commands permissions:0];
                     item.physicalFilePath = path;
+                    item.sourcePath = path;
                     
                     [archive addItem:item];
 
@@ -805,11 +810,9 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
                 }
             }
         } else {
-            NSNumber *permissions =
-                shouldChangePermissions(originalInfo, newInfo) ?
-                newInfo[INFO_PERMISSIONS_KEY] :
-                nil;
-            CreateBinaryDeltaOperation *operation = [[CreateBinaryDeltaOperation alloc] initWithRelativePath:key clonedRelativePath:nil oldTree:source newTree:destination oldPermissions:originalInfo[INFO_PERMISSIONS_KEY] newPermissions:permissions];
+            NSNumber *permissions = newInfo[INFO_PERMISSIONS_KEY];
+            
+            CreateBinaryDeltaOperation *operation = [[CreateBinaryDeltaOperation alloc] initWithRelativePath:key clonedRelativePath:nil oldTree:source newTree:destination oldPermissions:originalInfo[INFO_PERMISSIONS_KEY] newPermissions:permissions changingPermissions:shouldChangePermissions(originalInfo, newInfo)];
             [deltaQueue addOperation:operation];
             [deltaOperations addObject:operation];
         }
@@ -844,7 +847,7 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
         NSString *relativePath = operation.relativePath;
         
         SPUDeltaItemCommands commands = SPUDeltaItemCommandBinaryDiff;
-        if (permissions != nil) {
+        if (operation.changingPermissions) {
             commands |= SPUDeltaItemCommandModifyPermissions;
         }
         if (clonedRelativePath != nil) {
@@ -853,11 +856,12 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
         
         SPUDeltaArchiveItem *item = [[SPUDeltaArchiveItem alloc] initWithRelativeFilePath:relativePath commands:commands permissions:permissions.unsignedShortValue];
         item.physicalFilePath = resultPath;
+        item.sourcePath = operation._fromPath;
         item.clonedRelativePath = clonedRelativePath;
         
         [archive addItem:item];
 
-        if (permissions != nil) {
+        if (operation.changingPermissions) {
             if (verbose) {
                 fprintf(stderr, "\n👮  %s %s (0%o -> 0%o)", VERBOSE_MODIFIED, relativePath.fileSystemRepresentation, operation.oldPermissions.unsignedShortValue, operation.permissions.unsignedShortValue);
             }

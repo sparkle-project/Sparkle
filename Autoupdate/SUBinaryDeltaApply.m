@@ -15,6 +15,7 @@
 #include "bspatch.h"
 #include <stdio.h>
 #include <stdlib.h>
+#import <sys/stat.h>
 
 
 #include "AppKitPrevention.h"
@@ -277,6 +278,36 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
                 }
                 *stop = YES;
                 return;
+            }
+            
+            // Preserve original file permissions from the original file
+            // Only necessary for clones because applyBinaryDeltaToFile() otherwise preserves
+            // file permissions on the file it's replacing. Also not necessary if we're going to
+            // change permissions later
+            if ((commands & SPUDeltaItemCommandClone) != 0 && (commands & SPUDeltaItemCommandModifyPermissions) == 0) {
+                
+                struct stat sourceFileInfo = {0};
+                if (lstat(sourceDiffFilePath.fileSystemRepresentation, &sourceFileInfo) != 0) {
+                    if (verbose) {
+                        fprintf(stderr, "\n");
+                    }
+                    if (error != NULL) {
+                        *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Unable to retrieve stat info from %@", sourceFilePath] }];
+                    }
+                    *stop = YES;
+                    return;
+                }
+                
+                if (chmod(destinationFilePath.fileSystemRepresentation, sourceFileInfo.st_mode) != 0) {
+                    if (verbose) {
+                        fprintf(stderr, "\n");
+                    }
+                    if (error != NULL) {
+                        *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteNoPermissionError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Unable to modify permissions (%u) on file %@", sourceFileInfo.st_mode, destinationFilePath] }];
+                    }
+                    *stop = YES;
+                    return;
+                }
             }
 
             if (verbose) {
