@@ -195,21 +195,13 @@ static BOOL shouldSkipDeltaCompression(NSDictionary *originalInfo, NSDictionary 
     return NO;
 }
 
-static BOOL shouldDeleteThenExtract(NSDictionary *originalInfo, NSDictionary *newInfo, SUBinaryDeltaMajorVersion majorVersion)
+static BOOL shouldDeleteThenExtract(NSDictionary *originalInfo, NSDictionary *newInfo)
 {
     if (!originalInfo) {
         return NO;
     }
 
     if ([(NSNumber *)originalInfo[INFO_TYPE_KEY] unsignedShortValue] != [(NSNumber *)newInfo[INFO_TYPE_KEY] unsignedShortValue]) {
-        return YES;
-    }
-    
-    // If the same file exists in both old and new trees and they have different content,
-    // we should always issue deleting the old file before extracting the new
-    // I believe xar container in version 2 format automatically did this if the file types were the same
-    // but we don't want to rely on that implicitness
-    if (MAJOR_VERSION_IS_AT_LEAST(majorVersion, SUBinaryDeltaMajorVersion3)) {
         return YES;
     }
 
@@ -766,9 +758,6 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
                         [deltaOperations addObject:operation];
                     } else {
                         SPUDeltaItemCommands commands = SPUDeltaItemCommandClone;
-                        if (shouldDeleteThenExtract(originalInfo, newInfo, majorVersion)) {
-                            commands |= SPUDeltaItemCommandDelete;
-                        }
                         if (clonePermissionsChanged) {
                             commands |= SPUDeltaItemCommandModifyPermissions;
                         }
@@ -790,7 +779,7 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
                     NSString *path = [destination stringByAppendingPathComponent:key];
                     
                     SPUDeltaItemCommands commands = SPUDeltaItemCommandExtract;
-                    if (shouldDeleteThenExtract(originalInfo, newInfo, majorVersion)) {
+                    if (shouldDeleteThenExtract(originalInfo, newInfo)) {
                         commands |= SPUDeltaItemCommandDelete;
                     }
                     

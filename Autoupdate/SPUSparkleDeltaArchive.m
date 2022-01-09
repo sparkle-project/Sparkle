@@ -623,6 +623,8 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
                 return NO;
             }
             
+            [fileManager removeItemAtPath:itemFilePath error:NULL];
+            
             NSError *createLinkError = nil;
             if (![fileManager createSymbolicLinkAtPath:itemFilePath withDestinationPath:destinationPath error:&createLinkError]) {
                 self.error = createLinkError;

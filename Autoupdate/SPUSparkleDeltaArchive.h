@@ -85,7 +85,7 @@ NS_ASSUME_NONNULL_BEGIN
         CLONE_FILE and EXTRACT_FILE cannot be combined.
         MODIFY_PERMISSIONS can be combined with either CLONE_FILE, EXTRACT_FILE, BINARY_DIFF_FILE, or just by itself.
         CLONE_FILE can be combined with BINARY_DIFF_FILE or just by itself.
-        DELETE can be combined with EXTRACT_FILE, BINARY_DIFF_FILE, or just by itself. (we don't currently combine it with BINARY_DIFF_FILE however)
+        DELETE can be combined with EXTRACT_FILE, or just by itself. It is only combined with EXTRACT_FILE when the file type (regular, directory, or symlink) changes.
  
  [ DATA_BLOBS ]
  All raw binary data joined together
