@@ -23,15 +23,17 @@ class SUTestApplicationTest: XCTestCase
         return runningApplications[0]
     }
 
-    func runTestApplication(testMode: String, expectedFinalVersion: String, launchSleep: UInt32, extractSleep: UInt32) {
+    func runTestApplication(testMode: String, automatic: Bool, expectedFinalVersion: String, launchSleep: UInt32, extractSleep: UInt32) {
         let app = XCUIApplication()
         app.launchArguments = [
             "-AppleLanguages",
             "(en)",
             "-SUHasLaunchedBefore",
-            "NO",
+            automatic ? "YES" : "NO",
             "-SUEnableAutomaticChecks",
-            "NO"
+            automatic ? "YES" : "NO",
+            "-SUAutomaticallyUpdate",
+            automatic ? "YES" : "NO"
         ]
         app.launchEnvironment = ["TEST_MODE": testMode]
         app.launch()
@@ -39,6 +41,7 @@ class SUTestApplicationTest: XCTestCase
         XCTAssertFalse(app.dialogs["alert"].staticTexts["Update succeeded!"].exists, "Update is already installed; please do a clean build")
         
         let initialRunningApplication = runningTestApplication()
+        let bundleURL = initialRunningApplication.bundleURL!
         
         // Give some time for the Test App to initialize its web server, create an update, and start its updater
         sleep(launchSleep)
@@ -54,14 +57,21 @@ class SUTestApplicationTest: XCTestCase
             // in this case click the main menu again to deactivate it
             menuBarsQuery.menuBarItems["Sparkle Test App"].click()
         }
-
-        app.windows["SUUpdateAlert"].buttons["Install Update"].click()
         
-        // Give some time for the update to finish downloading / extracting
-        sleep(extractSleep)
+        if !automatic {
+            app.windows["SUUpdateAlert"].buttons["Install Update"].click()
         
-        app.windows["SUStatus"].buttons["Install and Relaunch"].click()
-
+            // Give some time for the update to finish downloading / extracting
+            sleep(extractSleep)
+            
+            app.windows["SUStatus"].buttons["Install and Relaunch"].click()
+        } else {
+            XCTAssertTrue(app.windows["SUUpdateAlert"].buttons["Install and Relaunch"].exists)
+            
+            // The app should install automatically on termination
+            app.terminate()
+        }
+        
         // Wait for the new updated app to finish launching so we can test if it's the frontmost app
         sleep(10)
 
@@ -70,29 +80,35 @@ class SUTestApplicationTest: XCTestCase
         // Our new updated app should be launched now. Test if it's the active app and the old app is terminated.
         // We used to run into timing issues where the updated app sometimes may not show up as the frontmost one
         XCTAssertTrue(initialRunningApplication.isTerminated)
-
-        let newRunningApplication = self.runningTestApplication()
-        XCTAssertTrue(newRunningApplication.isActive)
         
         // Verify the new bundle version
 
-        let infoCFDictionary = CFBundleCopyInfoDictionaryInDirectory(newRunningApplication.bundleURL! as CFURL)
+        let infoCFDictionary = CFBundleCopyInfoDictionaryInDirectory(bundleURL as CFURL)
         let infoDictionary = infoCFDictionary! as Dictionary
         
         let updatedVersion = infoDictionary[kCFBundleVersionKey] as! String
         XCTAssertEqual(updatedVersion, expectedFinalVersion)
         
         // Clean up
-        newRunningApplication.forceTerminate()
+        if !automatic {
+            let newRunningApplication = self.runningTestApplication()
+            XCTAssertTrue(newRunningApplication.isActive)
+            
+            newRunningApplication.forceTerminate()
+        }
         
         sleep(10)
     }
     
     func test1RegularUpdate() {
-        runTestApplication(testMode: "REGULAR", expectedFinalVersion: "2.0", launchSleep: 60, extractSleep: 30)
+        runTestApplication(testMode: "REGULAR", automatic: false, expectedFinalVersion: "2.0", launchSleep: 60, extractSleep: 30)
     }
     
     func test2DeltaUpdate() {
-        runTestApplication(testMode: "DELTA", expectedFinalVersion: "2.1", launchSleep: 75, extractSleep: 45)
+        runTestApplication(testMode: "DELTA", automatic: false, expectedFinalVersion: "2.1", launchSleep: 75, extractSleep: 45)
+    }
+    
+    func test3AutomaticUpdate() {
+        runTestApplication(testMode: "AUTOMATIC", automatic: true, expectedFinalVersion: "2.2", launchSleep: 75, extractSleep: 30)
     }
 }

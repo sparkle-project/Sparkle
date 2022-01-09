@@ -49,7 +49,7 @@
     // Check if we are already up to date
     NSString *mainBundleVersion = (NSString *)[mainBundle objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey];
     
-    if (([mainBundleVersion hasPrefix:@"2."] && [testMode isEqualToString:@"REGULAR"]) || ([mainBundleVersion isEqualToString:@"2.1"] && [testMode isEqualToString:@"DELTA"])) {
+    if (([mainBundleVersion hasPrefix:@"2."] && [testMode isEqualToString:@"REGULAR"]) || (([mainBundleVersion isEqualToString:@"2.1"] || [mainBundleVersion isEqualToString:@"2.2"]) && [testMode isEqualToString:@"DELTA"]) || ([mainBundleVersion isEqualToString:@"2.2"] && [testMode isEqualToString:@"AUTOMATIC"])) {
         NSAlert *alreadyUpdatedAlert = [[NSAlert alloc] init];
         alreadyUpdatedAlert.messageText = @"Update succeeded!";
         alreadyUpdatedAlert.informativeText = @"This is the updated version of Sparkle Test App.\n\nDelete and rebuild the app to test updates again.";
@@ -125,6 +125,8 @@
         finalUpdatedVersion = @"2.0";
     } else if ([testMode isEqualToString:@"DELTA"]) {
         finalUpdatedVersion = @"2.1";
+    } else if ([testMode isEqualToString:@"AUTOMATIC"]) {
+        finalUpdatedVersion = @"2.2";
     } else {
         assert(false);
     }
@@ -191,48 +193,7 @@
             const unsigned char public_key[32] = {121, 17, 79, 45, 155, 141, 51, 169, 188, 110, 91, 102, 182, 147, 215, 225, 252, 202, 110, 231, 200, 215, 62, 171, 40, 145, 237, 128, 130, 44, 150, 89};
             unsigned char signature[64];
             
-            if ([testMode isEqualToString:@"REGULAR"]) {
-                // Create the archive for our update
-                NSString *zipName = @"Sparkle_Test_App.zip";
-                NSTask *dittoTask = [[NSTask alloc] init];
-                dittoTask.launchPath = @"/usr/bin/ditto";
-                dittoTask.arguments = @[@"-c", @"-k", @"--sequesterRsrc", @"--keepParent", (NSString *)destinationBundleURL.lastPathComponent, zipName];
-                dittoTask.currentDirectoryPath = serverDirectoryPath;
-                [dittoTask launch];
-                [dittoTask waitUntilExit];
-                
-                assert(dittoTask.terminationStatus == 0);
-                
-                NSURL *archiveURL = [serverDirectoryURL URLByAppendingPathComponent:zipName];
-                NSData *archive = [NSData dataWithContentsOfURL:archiveURL];
-                assert(archive != nil);
-
-                ed25519_sign(signature, archive.bytes, archive.length, public_key, self_sign_demo_only_insecure_hack);
-
-                NSString *signatureString = [[NSData dataWithBytes:signature length:64] base64EncodedStringWithOptions:0];
-                
-                // Obtain the file attributes to get the file size of our update later
-                NSError *fileAttributesError = nil;
-                NSString *archiveURLPath = archiveURL.path;
-                assert(archiveURLPath != nil);
-                NSDictionary *archiveFileAttributes = [[NSFileManager defaultManager] attributesOfItemAtPath:archiveURLPath error:&fileAttributesError];
-                if (archiveFileAttributes == nil) {
-                    NSLog(@"Failed to retrieve file attributes from archive with error %@", fileAttributesError);
-                    abort();
-                }
-                
-                NSUInteger numberOfLengthReplacements = [appcastContents replaceOccurrencesOfString:@"$INSERT_ARCHIVE_LENGTH" withString:[NSString stringWithFormat:@"%llu", archiveFileAttributes.fileSize] options:NSLiteralSearch range:NSMakeRange(0, appcastContents.length)];
-                assert(numberOfLengthReplacements == 1);
-                
-                NSUInteger numberOfSignatureReplacements = [appcastContents replaceOccurrencesOfString:@"$INSERT_EDDSA_SIGNATURE" withString:signatureString options:NSLiteralSearch range:NSMakeRange(0, appcastContents.length)];
-                assert(numberOfSignatureReplacements == 1);
-                
-                NSError *writeAppcastError = nil;
-                if (![appcastContents writeToURL:appcastDestinationURL atomically:NO encoding:NSUTF8StringEncoding error:&writeAppcastError]) {
-                    NSLog(@"Failed to write updated appcast with error %@", writeAppcastError);
-                    abort();
-                }
-            } else {
+            if ([testMode isEqualToString:@"DELTA"]) {
                 NSError *deltaCreationError = nil;
                 NSURL *patchURL = [serverDirectoryURL URLByAppendingPathComponent:@"patch.delta"];
                 if (!createBinaryDelta(bundleURL.path, destinationBundleURL.path, patchURL.path, SUBinaryDeltaMajorVersionDefault, SPUDeltaCompressionModeDefault, 0, NO, &deltaCreationError)) {
@@ -265,6 +226,47 @@
                 
                 NSUInteger numberOfFromVersionReplacements = [appcastContents replaceOccurrencesOfString:@"$INSERT_DELTA_FROM_VERSION" withString:mainBundleVersion options:NSLiteralSearch range:NSMakeRange(0, appcastContents.length)];
                 assert(numberOfFromVersionReplacements == 1);
+                
+                NSError *writeAppcastError = nil;
+                if (![appcastContents writeToURL:appcastDestinationURL atomically:NO encoding:NSUTF8StringEncoding error:&writeAppcastError]) {
+                    NSLog(@"Failed to write updated appcast with error %@", writeAppcastError);
+                    abort();
+                }
+            } else {
+                // Create the archive for our update
+                NSString *zipName = @"Sparkle_Test_App.zip";
+                NSTask *dittoTask = [[NSTask alloc] init];
+                dittoTask.launchPath = @"/usr/bin/ditto";
+                dittoTask.arguments = @[@"-c", @"-k", @"--sequesterRsrc", @"--keepParent", (NSString *)destinationBundleURL.lastPathComponent, zipName];
+                dittoTask.currentDirectoryPath = serverDirectoryPath;
+                [dittoTask launch];
+                [dittoTask waitUntilExit];
+                
+                assert(dittoTask.terminationStatus == 0);
+                
+                NSURL *archiveURL = [serverDirectoryURL URLByAppendingPathComponent:zipName];
+                NSData *archive = [NSData dataWithContentsOfURL:archiveURL];
+                assert(archive != nil);
+
+                ed25519_sign(signature, archive.bytes, archive.length, public_key, self_sign_demo_only_insecure_hack);
+
+                NSString *signatureString = [[NSData dataWithBytes:signature length:64] base64EncodedStringWithOptions:0];
+                
+                // Obtain the file attributes to get the file size of our update later
+                NSError *fileAttributesError = nil;
+                NSString *archiveURLPath = archiveURL.path;
+                assert(archiveURLPath != nil);
+                NSDictionary *archiveFileAttributes = [[NSFileManager defaultManager] attributesOfItemAtPath:archiveURLPath error:&fileAttributesError];
+                if (archiveFileAttributes == nil) {
+                    NSLog(@"Failed to retrieve file attributes from archive with error %@", fileAttributesError);
+                    abort();
+                }
+                
+                NSUInteger numberOfLengthReplacements = [appcastContents replaceOccurrencesOfString:@"$INSERT_ARCHIVE_LENGTH" withString:[NSString stringWithFormat:@"%llu", archiveFileAttributes.fileSize] options:NSLiteralSearch range:NSMakeRange(0, appcastContents.length)];
+                assert(numberOfLengthReplacements == 2);
+                
+                NSUInteger numberOfSignatureReplacements = [appcastContents replaceOccurrencesOfString:@"$INSERT_EDDSA_SIGNATURE" withString:signatureString options:NSLiteralSearch range:NSMakeRange(0, appcastContents.length)];
+                assert(numberOfSignatureReplacements == 2);
                 
                 NSError *writeAppcastError = nil;
                 if (![appcastContents writeToURL:appcastDestinationURL atomically:NO encoding:NSUTF8StringEncoding error:&writeAppcastError]) {
@@ -329,6 +331,8 @@
 {
     if ([self.testMode isEqualToString:@"DELTA"]) {
         return [NSSet setWithObject:@"delta"];
+    } else if ([self.testMode isEqualToString:@"AUTOMATIC"]) {
+        return [NSSet setWithObject:@"automatic"];
     } else {
         return [NSSet set];
     }

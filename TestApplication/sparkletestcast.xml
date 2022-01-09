@@ -5,6 +5,23 @@
     <description>Most recent changes with links to updates.</description>
     <language>en</language>
         <item>
+        <title>Version 2.2</title>
+        <sparkle:version>2.2</sparkle:version>
+        <link>https://sparkle-project.org</link>
+        <sparkle:channel>automatic</sparkle:channel>
+        <sparkle:fullReleaseNotesLink>releasenotes.html</sparkle:fullReleaseNotesLink>
+        <description>
+          <![CDATA[
+            <ul>
+              <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</li>
+            </ul>
+          ]]>
+        </description>
+        <pubDate>Sat, 26 Jul 2014 15:20:11 +0000</pubDate>
+        <enclosure url="http://localhost:1337/Sparkle_Test_App.zip" length="$INSERT_ARCHIVE_LENGTH" type="application/octet-stream" sparkle:edSignature="$INSERT_EDDSA_SIGNATURE" />
+        </item>
+    
+        <item>
           <title>Version 2.1</title>
           <sparkle:version>2.1</sparkle:version>
           <link>https://sparkle-project.org</link>
