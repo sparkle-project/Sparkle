@@ -415,6 +415,7 @@
 		72F0EC4B278A5BB2002A876A /* libxar.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 726E07681CA616A4001A286B /* libxar.tbd */; };
 		72F0EC4C278A5BB9002A876A /* libbz2.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 726E076A1CA616B3001A286B /* libbz2.tbd */; };
 		72F0EC4D278A5BCA002A876A /* libbsdiff.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EA1E280F22B64522004AA304 /* libbsdiff.a */; };
+		72F0EC4E278A73C6002A876A /* SUFileManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5E41D3D90AA00D1BF90 /* SUFileManager.m */; };
 		72F94F581CC44DE1002DEE68 /* SPUXPCServiceInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 72F94F561CC44DE1002DEE68 /* SPUXPCServiceInfo.h */; };
 		72F94F591CC44DE1002DEE68 /* SPUXPCServiceInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 72F94F571CC44DE1002DEE68 /* SPUXPCServiceInfo.m */; };
 		72F94F5A1CC450DE002DEE68 /* SUInstallerLauncher.m in Sources */ = {isa = PBXBuildFile; fileRef = 726E07B11CAF08D6001A286B /* SUInstallerLauncher.m */; };
@@ -3269,6 +3270,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				72F0EC4E278A73C6002A876A /* SUFileManager.m in Sources */,
 				72F0EC48278A5B95002A876A /* SPUDeltaArchive.m in Sources */,
 				72F0EC49278A5B95002A876A /* SPUSparkleDeltaArchive.m in Sources */,
 				72F0EC4A278A5B95002A876A /* SPUXarDeltaArchive.m in Sources */,
