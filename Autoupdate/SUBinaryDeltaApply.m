@@ -219,6 +219,9 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
             
             NSString *clonedOriginalPath = [source stringByAppendingPathComponent:clonedRelativePath];
             
+            // Ensure there isn't an item already at our destination
+            [fileManager removeItemAtPath:destinationFilePath error:NULL];
+            
             NSError *copyError = nil;
             if (![fileManager copyItemAtPath:clonedOriginalPath toPath:destinationFilePath error:&copyError]) {
                 if (verbose) {
