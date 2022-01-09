@@ -406,6 +406,15 @@
 		72EF30C42675CFA1008CE987 /* SPUAppcastItemState.m in Sources */ = {isa = PBXBuildFile; fileRef = 72EF30BB2675CF38008CE987 /* SPUAppcastItemState.m */; };
 		72EF30C52675CFA1008CE987 /* SPUAppcastItemStateResolver.m in Sources */ = {isa = PBXBuildFile; fileRef = 72EF30BC2675CF38008CE987 /* SPUAppcastItemStateResolver.m */; };
 		72EF30C7267C716A008CE987 /* SUAppcastItem+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 72EF30C6267C716A008CE987 /* SUAppcastItem+Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		72F0EC45278A55CA002A876A /* screenshot.png in Resources */ = {isa = PBXBuildFile; fileRef = 72F0EC44278A55CA002A876A /* screenshot.png */; };
+		72F0EC46278A5B87002A876A /* SUBinaryDeltaCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5711D3D895B00D1BF90 /* SUBinaryDeltaCommon.m */; };
+		72F0EC47278A5B87002A876A /* SUBinaryDeltaCreate.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5731D3D895B00D1BF90 /* SUBinaryDeltaCreate.m */; };
+		72F0EC48278A5B95002A876A /* SPUDeltaArchive.m in Sources */ = {isa = PBXBuildFile; fileRef = 725EE485277D375F00D820CE /* SPUDeltaArchive.m */; };
+		72F0EC49278A5B95002A876A /* SPUSparkleDeltaArchive.m in Sources */ = {isa = PBXBuildFile; fileRef = 728ED349277DA23400D9238F /* SPUSparkleDeltaArchive.m */; };
+		72F0EC4A278A5B95002A876A /* SPUXarDeltaArchive.m in Sources */ = {isa = PBXBuildFile; fileRef = 725EE47F277BF13B00D820CE /* SPUXarDeltaArchive.m */; };
+		72F0EC4B278A5BB2002A876A /* libxar.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 726E07681CA616A4001A286B /* libxar.tbd */; };
+		72F0EC4C278A5BB9002A876A /* libbz2.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 726E076A1CA616B3001A286B /* libbz2.tbd */; };
+		72F0EC4D278A5BCA002A876A /* libbsdiff.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EA1E280F22B64522004AA304 /* libbsdiff.a */; };
 		72F94F581CC44DE1002DEE68 /* SPUXPCServiceInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 72F94F561CC44DE1002DEE68 /* SPUXPCServiceInfo.h */; };
 		72F94F591CC44DE1002DEE68 /* SPUXPCServiceInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 72F94F571CC44DE1002DEE68 /* SPUXPCServiceInfo.m */; };
 		72F94F5A1CC450DE002DEE68 /* SUInstallerLauncher.m in Sources */ = {isa = PBXBuildFile; fileRef = 726E07B11CAF08D6001A286B /* SUInstallerLauncher.m */; };
@@ -1331,6 +1340,7 @@
 		72EF30BC2675CF38008CE987 /* SPUAppcastItemStateResolver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SPUAppcastItemStateResolver.m; sourceTree = "<group>"; };
 		72EF30BD2675CF38008CE987 /* SPUAppcastItemState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPUAppcastItemState.h; sourceTree = "<group>"; };
 		72EF30C6267C716A008CE987 /* SUAppcastItem+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SUAppcastItem+Private.h"; sourceTree = "<group>"; };
+		72F0EC44278A55CA002A876A /* screenshot.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = screenshot.png; sourceTree = "<group>"; };
 		72F94ED51CC3441A002DEE68 /* ConfigInstallerLauncherDebug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigInstallerLauncherDebug.xcconfig; sourceTree = "<group>"; };
 		72F94ED61CC344A7002DEE68 /* ConfigDownloaderDebug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigDownloaderDebug.xcconfig; sourceTree = "<group>"; };
 		72F94EDA1CC36C37002DEE68 /* ConfigTestAppDebug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigTestAppDebug.xcconfig; sourceTree = "<group>"; };
@@ -1436,6 +1446,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				72F0EC4D278A5BCA002A876A /* libbsdiff.a in Frameworks */,
+				72F0EC4C278A5BB9002A876A /* libbz2.tbd in Frameworks */,
+				72F0EC4B278A5BB2002A876A /* libxar.tbd in Frameworks */,
 				5A06357423FE33A400478A72 /* libed25519.a in Frameworks */,
 				14950073195FCE4E00BC5B5B /* AppKit.framework in Frameworks */,
 				14950072195FCE4B00BC5B5B /* Foundation.framework in Frameworks */,
@@ -1974,6 +1987,7 @@
 				72E45CF51B640DAE005C701A /* SUUpdateSettingsWindowController.m */,
 				72E45CF61B640DAE005C701A /* SUUpdateSettingsWindowController.xib */,
 				61B5F90409C4CEE200B25A18 /* TestApplication-Info.plist */,
+				72F0EC44278A55CA002A876A /* screenshot.png */,
 			);
 			name = "Test Application";
 			path = TestApplication;
@@ -3052,6 +3066,7 @@
 				72E45CFC1B641961005C701A /* sparkletestcast.xml in Resources */,
 				725F97A61C8B304D00265BE4 /* SUInstallUpdateViewController.xib in Resources */,
 				723ABE02259A9E9E00BDB4FA /* MainMenu.xib in Resources */,
+				72F0EC45278A55CA002A876A /* screenshot.png in Resources */,
 				72E45CF81B640DAE005C701A /* SUUpdateSettingsWindowController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -3254,6 +3269,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				72F0EC48278A5B95002A876A /* SPUDeltaArchive.m in Sources */,
+				72F0EC49278A5B95002A876A /* SPUSparkleDeltaArchive.m in Sources */,
+				72F0EC4A278A5B95002A876A /* SPUXarDeltaArchive.m in Sources */,
+				72F0EC46278A5B87002A876A /* SUBinaryDeltaCommon.m in Sources */,
+				72F0EC47278A5B87002A876A /* SUBinaryDeltaCreate.m in Sources */,
 				61B5F93009C4CFDC00B25A18 /* main.m in Sources */,
 				726F2CEB1BC9C733001971A4 /* SUConstants.m in Sources */,
 				725F97A51C8B304D00265BE4 /* SUInstallUpdateViewController.m in Sources */,

@@ -8,6 +8,9 @@
 
 import XCTest
 
+// The debugger may catch the Test app receiving a SIGTERM signal when Sparkle quits the app before installing the new one
+// So you may have better luck running these tests from the command line without the debugger attached:
+// xcodebuild -scheme UITests -configuration Debug test
 class SUTestApplicationTest: XCTestCase
 {
     // TODO: don't hardcode bundle ID?
@@ -20,16 +23,17 @@ class SUTestApplicationTest: XCTestCase
         return runningApplications[0]
     }
 
-    // The debugger may catch the Test app receiving a SIGTERM signal when Sparkle quits the app before installing the new one
-    // So you may have better luck running this test from the command line without the debugger attached:
-    // xcodebuild -scheme UITests -configuration Debug test
-    func testRegularUpdate()
-    {
+    func runTestApplication(testMode: String, expectedFinalVersion: String, launchSleep: UInt32, extractSleep: UInt32) {
         let app = XCUIApplication()
         app.launchArguments = [
             "-AppleLanguages",
-            "(en)"
+            "(en)",
+            "-SUHasLaunchedBefore",
+            "NO",
+            "-SUEnableAutomaticChecks",
+            "NO"
         ]
+        app.launchEnvironment = ["TEST_MODE": testMode]
         app.launch()
         
         XCTAssertFalse(app.dialogs["alert"].staticTexts["Update succeeded!"].exists, "Update is already installed; please do a clean build")
@@ -37,7 +41,7 @@ class SUTestApplicationTest: XCTestCase
         let initialRunningApplication = runningTestApplication()
         
         // Give some time for the Test App to initialize its web server, create an update, and start its updater
-        sleep(60)
+        sleep(launchSleep)
         
         let menuBarsQuery = app.menuBars
         menuBarsQuery.menuBarItems["Sparkle Test App"].click()
@@ -54,7 +58,7 @@ class SUTestApplicationTest: XCTestCase
         app.windows["SUUpdateAlert"].buttons["Install Update"].click()
         
         // Give some time for the update to finish downloading / extracting
-        sleep(30)
+        sleep(extractSleep)
         
         app.windows["SUStatus"].buttons["Install and Relaunch"].click()
 
@@ -76,9 +80,19 @@ class SUTestApplicationTest: XCTestCase
         let infoDictionary = infoCFDictionary! as Dictionary
         
         let updatedVersion = infoDictionary[kCFBundleVersionKey] as! String
-        XCTAssertEqual(updatedVersion, "2.0")
+        XCTAssertEqual(updatedVersion, expectedFinalVersion)
         
         // Clean up
         newRunningApplication.forceTerminate()
+        
+        sleep(10)
+    }
+    
+    func test1RegularUpdate() {
+        runTestApplication(testMode: "REGULAR", expectedFinalVersion: "2.0", launchSleep: 60, extractSleep: 30)
+    }
+    
+    func test2DeltaUpdate() {
+        runTestApplication(testMode: "DELTA", expectedFinalVersion: "2.1", launchSleep: 75, extractSleep: 45)
     }
 }
