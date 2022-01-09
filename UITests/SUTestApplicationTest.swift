@@ -33,7 +33,9 @@ class SUTestApplicationTest: XCTestCase
             "-SUEnableAutomaticChecks",
             automatic ? "YES" : "NO",
             "-SUAutomaticallyUpdate",
-            automatic ? "YES" : "NO"
+            automatic ? "YES" : "NO",
+            "-SUScheduledCheckInterval",
+            "60"
         ]
         app.launchEnvironment = ["TEST_MODE": testMode]
         app.launch()
