@@ -462,6 +462,7 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
     }
     fts_close(fts);
 
+    // This dictionary will help us keep track of clones
     NSMutableDictionary<NSData *, NSMutableArray<NSString *> *> *beforeHashToFileKeyDictionary = MAJOR_VERSION_IS_AT_LEAST(majorVersion, SUBinaryDeltaMajorVersion3) ? [NSMutableDictionary dictionary] : nil;
     
     unsigned char beforeHash[CC_SHA1_DIGEST_LENGTH] = {0};
@@ -551,7 +552,16 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
 
         NSDictionary *oldInfo = originalTreeState[key];
 
-        if ([info isEqual:oldInfo]) {
+        BOOL hasEqualInfo;
+        if (![info isEqual:oldInfo]) {
+            hasEqualInfo = NO;
+        } else {
+            NSString *originalPath = oldInfo[INFO_PATH_KEY];
+            NSString *newPath = info[INFO_PATH_KEY];
+            hasEqualInfo = [[NSFileManager defaultManager] contentsEqualAtPath:originalPath andPath:newPath];
+        }
+        
+        if (hasEqualInfo) {
             [newTreeState removeObjectForKey:key];
         } else {
             newTreeState[key] = info;
@@ -571,6 +581,7 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
     }
     fts_close(fts);
 
+    // This dictionary will help us keep track of clones
     NSMutableDictionary<NSString *, NSData *> *afterFileKeyToHashDictionary = MAJOR_VERSION_IS_AT_LEAST(majorVersion, SUBinaryDeltaMajorVersion3) ? [NSMutableDictionary dictionary] : nil;
     
     unsigned char afterHash[CC_SHA1_DIGEST_LENGTH] = {0};
