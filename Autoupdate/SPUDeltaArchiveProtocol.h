@@ -40,7 +40,7 @@ typedef NS_ENUM(uint8_t, SPUDeltaItemCommands) {
 // Represents an item we read or write to in our delta archive
 @interface SPUDeltaArchiveItem : NSObject
 
-- (instancetype)initWithRelativeFilePath:(NSString *)relativeFilePath commands:(SPUDeltaItemCommands)commands permissions:(uint16_t)permissions;
+- (instancetype)initWithRelativeFilePath:(NSString *)relativeFilePath commands:(SPUDeltaItemCommands)commands mode:(uint16_t)mode;
 
 // The relative file path of the item, eg /Contents/MacOS/Foo
 @property (nonatomic, readonly) NSString *relativeFilePath;
@@ -53,14 +53,12 @@ typedef NS_ENUM(uint8_t, SPUDeltaItemCommands) {
 @property (nonatomic, nullable) NSString *sourcePath;
 // The commands that describe the actions to take for this item.
 @property (nonatomic, readonly) SPUDeltaItemCommands commands;
-// Provided change in permissions for the SPUDeltaItemCommandModifyPermissions command
-@property (nonatomic, readonly) uint16_t permissions;
+// Provided change in permissions for item or tracking file mode for the item
+@property (nonatomic) uint16_t mode;
 
 // Private properties
 // xar_file context for Xar delta archiver
 @property (nonatomic, nullable) const void *xarContext;
-// Tracking mode type of item (regular file, symlink) when encoding items.
-@property (nonatomic) uint16_t extractMode;
 // Tracking length of item's data in data section, when encoding items and when extracting items
 @property (nonatomic) uint64_t codedDataLength;
 
