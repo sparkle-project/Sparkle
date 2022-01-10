@@ -106,7 +106,11 @@ extern char *xar_get_safe_path(xar_file_t f) __attribute__((weak_import));
 - (nullable SPUDeltaArchiveHeader *)readHeader
 {
     NSString *patchFile = self.patchFile;
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+    // Sparkle's XAR delta archives have been superceded by Sparkle's own format
     xar_t x = xar_open(patchFile.fileSystemRepresentation, READ);
+#pragma clang diagnostic pop
     if (x == NULL) {
         self.error = [NSError errorWithDomain:SPARKLE_DELTA_XAR_ARCHIVE_ERROR_DOMAIN code:SPARKLE_DELTA_XAR_ARCHIVE_ERROR_CODE_OPEN_FAILURE userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to xar_open() file for reading: %@", patchFile] }];
         return nil;
@@ -175,7 +179,11 @@ extern char *xar_get_safe_path(xar_file_t f) __attribute__((weak_import));
 {
     NSString *patchFile = self.patchFile;
     
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+    // Sparkle's XAR delta archives have been superceded by Sparkle's own format
     xar_t x = xar_open(patchFile.fileSystemRepresentation, WRITE);
+#pragma clang diagnostic pop
     if (x == NULL) {
         self.error = [NSError errorWithDomain:SPARKLE_DELTA_XAR_ARCHIVE_ERROR_DOMAIN code:SPARKLE_DELTA_XAR_ARCHIVE_ERROR_CODE_OPEN_FAILURE userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to xar_open() file for writing: %@", patchFile] }];
         return;

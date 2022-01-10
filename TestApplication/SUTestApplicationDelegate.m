@@ -16,7 +16,7 @@
 #import "SUPopUpTitlebarUserDriver.h"
 #import "SUBinaryDeltaCreate.h"
 
-@interface SUTestApplicationDelegate () <SPUUpdaterDelegate>
+@interface SUTestApplicationDelegate () <NSMenuItemValidation, SPUUpdaterDelegate>
 
 @property (nonatomic) SPUUpdater *updater;
 @property (nonatomic) SUUpdateSettingsWindowController *updateSettingsWindowController;
