@@ -56,18 +56,17 @@ id<SPUDeltaArchiveProtocol> SPUDeltaArchiveReadPatchAndHeader(NSString *patchFil
 @synthesize clonedRelativePath = _clonedRelativePath;
 @synthesize sourcePath = _sourcePath;
 @synthesize commands = _commands;
-@synthesize permissions = _permissions;
 @synthesize xarContext = _xarContext;
-@synthesize extractMode = _extractMode;
+@synthesize mode = _mode;
 @synthesize codedDataLength = _codedDataLength;
 
-- (instancetype)initWithRelativeFilePath:(NSString *)relativeFilePath commands:(SPUDeltaItemCommands)commands permissions:(uint16_t)permissions
+- (instancetype)initWithRelativeFilePath:(NSString *)relativeFilePath commands:(SPUDeltaItemCommands)commands mode:(uint16_t)mode
 {
     self = [super init];
     if (self != nil) {
         _relativeFilePath = [relativeFilePath copy];
         _commands = commands;
-        _permissions = permissions;
+        _mode = mode;
     }
     return self;
 }

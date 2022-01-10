@@ -345,7 +345,7 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
         }
 
         if ((commands & SPUDeltaItemCommandModifyPermissions) != 0) {
-            mode_t mode = (mode_t)item.permissions;
+            mode_t mode = (mode_t)item.mode;
             if (!modifyPermissions(destinationFilePath, mode)) {
                 if (verbose) {
                     fprintf(stderr, "\n");
@@ -358,7 +358,7 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
             }
 
             if (verbose) {
-                fprintf(stderr, "\n👮  %s %s (0%o)", VERBOSE_MODIFIED, [relativePath fileSystemRepresentation], mode);
+                fprintf(stderr, "\n👮  %s %s (0%o)", VERBOSE_MODIFIED, [relativePath fileSystemRepresentation], mode & PERMISSION_FLAGS);
             }
         }
     }];

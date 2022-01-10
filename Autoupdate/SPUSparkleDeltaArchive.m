@@ -507,7 +507,7 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
                 }
             }
             
-            SPUDeltaArchiveItem *archiveItem = [[SPUDeltaArchiveItem alloc] initWithRelativeFilePath:relativeFilePaths[currentItemIndex] commands:commands permissions:decodedMode];
+            SPUDeltaArchiveItem *archiveItem = [[SPUDeltaArchiveItem alloc] initWithRelativeFilePath:relativeFilePaths[currentItemIndex] commands:commands mode:decodedMode];
             
             archiveItem.codedDataLength = decodedDataLength;
             archiveItem.clonedRelativePath = clonedRelativePath;
@@ -540,7 +540,7 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
     SPUDeltaItemCommands commands = item.commands;
     assert((commands & SPUDeltaItemCommandExtract) != 0 || (commands & SPUDeltaItemCommandBinaryDiff) != 0);
     
-    uint16_t mode = item.permissions;
+    uint16_t mode = item.mode;
     
     NSFileManager *fileManager = [NSFileManager defaultManager];
     if ((commands & SPUDeltaItemCommandBinaryDiff) != 0 || S_ISREG(mode) || S_ISLNK(mode)) {
@@ -969,15 +969,14 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
                 }
                 
                 uint16_t extractMode = fileInfo.st_mode;
-                item.extractMode = extractMode;
-                
                 uint16_t encodedMode;
                 if ((commands & SPUDeltaItemCommandModifyPermissions) != 0) {
-                    uint16_t permissions = item.permissions;
-                    encodedMode = (extractMode & ~PERMISSION_FLAGS) | permissions;
+                    encodedMode = (extractMode & ~PERMISSION_FLAGS) | item.mode;
                 } else {
                     encodedMode = extractMode;
                 }
+                
+                item.mode = extractMode;
                 
                 // Store file mode (including desired permissions)
                 if (![self _writeBuffer:&encodedMode length:sizeof(encodedMode)]) {
@@ -1044,15 +1043,15 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
                 }
                 
                 extractMode = sourceFileInfo.st_mode;
-                item.extractMode = extractMode;
                 
                 uint16_t encodedMode;
                 if ((commands & SPUDeltaItemCommandModifyPermissions) != 0) {
-                    uint16_t permissions = item.permissions;
-                    encodedMode = (extractMode & ~PERMISSION_FLAGS) | permissions;
+                    encodedMode = (extractMode & ~PERMISSION_FLAGS) | item.mode;
                 } else {
                     encodedMode = extractMode;
                 }
+                
+                item.mode = extractMode;
                 
                 // Store file mode (including desired permissions)
                 if (![self _writeBuffer:&encodedMode length:sizeof(encodedMode)]) {
@@ -1101,8 +1100,8 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
             }
         } else if ((commands & SPUDeltaItemCommandModifyPermissions) != 0) {
             // Store file permissions
-            uint16_t permissions = item.permissions;
-            if (![self _writeBuffer:&permissions length:sizeof(permissions)]) {
+            uint16_t mode = item.mode;
+            if (![self _writeBuffer:&mode length:sizeof(mode)]) {
                 break;
             }
         }
@@ -1126,7 +1125,7 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
             NSString *itemPath = item.itemFilePath;
             assert(itemPath != nil);
             
-            mode_t extractMode = item.extractMode;
+            mode_t extractMode = item.mode;
             if ((commands & SPUDeltaItemCommandBinaryDiff) != 0 || S_ISREG(extractMode)) {
                 // Write out file contents to archive in chunks
                 

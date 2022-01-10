@@ -735,7 +735,7 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
         id value = [newTreeState valueForKey:key];
 
         if ([(NSObject *)value isEqual:[NSNull null]]) {
-            [archive addItem:[[SPUDeltaArchiveItem alloc] initWithRelativeFilePath:key commands:SPUDeltaItemCommandDelete permissions:0]];
+            [archive addItem:[[SPUDeltaArchiveItem alloc] initWithRelativeFilePath:key commands:SPUDeltaItemCommandDelete mode:0]];
 
             if (verbose) {
                 fprintf(stderr, "\n❌  %s %s", VERBOSE_REMOVED, [key fileSystemRepresentation]);
@@ -748,7 +748,7 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
         if (shouldSkipDeltaCompression(originalInfo, newInfo)) {
             if (shouldSkipExtracting(originalInfo, newInfo)) {
                 if (shouldChangePermissions(originalInfo, newInfo)) {
-                    [archive addItem:[[SPUDeltaArchiveItem alloc] initWithRelativeFilePath:key commands:SPUDeltaItemCommandModifyPermissions permissions:[(NSNumber *)newInfo[INFO_PERMISSIONS_KEY] unsignedShortValue]]];
+                    [archive addItem:[[SPUDeltaArchiveItem alloc] initWithRelativeFilePath:key commands:SPUDeltaItemCommandModifyPermissions mode:[(NSNumber *)newInfo[INFO_PERMISSIONS_KEY] unsignedShortValue]]];
 
                     if (verbose) {
                         fprintf(stderr, "\n👮  %s %s (0%o -> 0%o)", VERBOSE_MODIFIED, [key fileSystemRepresentation], [(NSNumber *)originalInfo[INFO_PERMISSIONS_KEY] unsignedShortValue], [(NSNumber *)newInfo[INFO_PERMISSIONS_KEY] unsignedShortValue]);
@@ -773,7 +773,7 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
                             commands |= SPUDeltaItemCommandModifyPermissions;
                         }
                         
-                        SPUDeltaArchiveItem *item = [[SPUDeltaArchiveItem alloc] initWithRelativeFilePath:key commands:commands permissions:(clonePermissionsChanged ? newPermissions.unsignedShortValue : 0)];
+                        SPUDeltaArchiveItem *item = [[SPUDeltaArchiveItem alloc] initWithRelativeFilePath:key commands:commands mode:(clonePermissionsChanged ? newPermissions.unsignedShortValue : 0)];
                         // Physical path for clones points to the old file
                         item.itemFilePath = [source stringByAppendingPathComponent:clonedRelativePath];
                         item.sourcePath = item.itemFilePath;
@@ -794,7 +794,7 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
                         commands |= SPUDeltaItemCommandDelete;
                     }
                     
-                    SPUDeltaArchiveItem *item = [[SPUDeltaArchiveItem alloc] initWithRelativeFilePath:key commands:commands permissions:0];
+                    SPUDeltaArchiveItem *item = [[SPUDeltaArchiveItem alloc] initWithRelativeFilePath:key commands:commands mode:0];
                     item.itemFilePath = path;
                     item.sourcePath = path;
                     
@@ -843,7 +843,7 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
             }
         }
         
-        NSNumber *permissions = operation.permissions;
+        NSNumber *mode = operation.permissions;
         NSString *relativePath = operation.relativePath;
         
         SPUDeltaItemCommands commands = SPUDeltaItemCommandBinaryDiff;
@@ -854,7 +854,7 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
             commands |= SPUDeltaItemCommandClone;
         }
         
-        SPUDeltaArchiveItem *item = [[SPUDeltaArchiveItem alloc] initWithRelativeFilePath:relativePath commands:commands permissions:permissions.unsignedShortValue];
+        SPUDeltaArchiveItem *item = [[SPUDeltaArchiveItem alloc] initWithRelativeFilePath:relativePath commands:commands mode:mode.unsignedShortValue];
         item.itemFilePath = resultPath;
         item.sourcePath = operation._fromPath;
         item.clonedRelativePath = clonedRelativePath;

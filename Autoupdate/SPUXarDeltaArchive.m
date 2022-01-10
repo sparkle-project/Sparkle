@@ -280,7 +280,7 @@ static xar_file_t _xarAddFile(NSMutableDictionary<NSString *, NSValue *> *fileTa
     NSString *relativeFilePath = item.relativeFilePath;
     NSString *filePath = item.itemFilePath;
     SPUDeltaItemCommands commands = item.commands;
-    uint16_t permissions = item.permissions;
+    uint16_t mode = item.mode;
     
     xar_file_t newFile = _xarAddFile(self.fileTable, self.x, relativeFilePath, filePath);
     if (newFile == NULL) {
@@ -301,7 +301,7 @@ static xar_file_t _xarAddFile(NSMutableDictionary<NSString *, NSValue *> *fileTa
     }
     
     if ((commands & SPUDeltaItemCommandModifyPermissions) != 0) {
-        xar_prop_set(newFile, MODIFY_PERMISSIONS_KEY, [NSString stringWithFormat:@"%u", permissions].UTF8String);
+        xar_prop_set(newFile, MODIFY_PERMISSIONS_KEY, [NSString stringWithFormat:@"%u", mode].UTF8String);
     }
 }
 
@@ -362,16 +362,16 @@ static xar_file_t _xarAddFile(NSMutableDictionary<NSString *, NSValue *> *fileTa
             }
         }
         
-        uint16_t permissions = 0;
+        uint16_t mode = 0;
         {
             const char *value = NULL;
             if (xar_prop_get(file, MODIFY_PERMISSIONS_KEY, &value) == 0) {
                 commands |= SPUDeltaItemCommandModifyPermissions;
-                permissions = (uint16_t)[@(value) intValue];
+                mode = (uint16_t)[@(value) intValue];
             }
         }
         
-        SPUDeltaArchiveItem *item = [[SPUDeltaArchiveItem alloc] initWithRelativeFilePath:relativePath commands:commands permissions:permissions];
+        SPUDeltaArchiveItem *item = [[SPUDeltaArchiveItem alloc] initWithRelativeFilePath:relativePath commands:commands mode:mode];
         item.xarContext = file;
         
         itemHandler(item, &exitedEarly);
