@@ -4,7 +4,51 @@
     <title>Sparkle Test App Changelog</title>
     <description>Most recent changes with links to updates.</description>
     <language>en</language>
-      <item>
+        <item>
+        <title>Version 2.2</title>
+        <sparkle:version>2.2</sparkle:version>
+        <link>https://sparkle-project.org</link>
+        <sparkle:channel>automatic</sparkle:channel>
+        <sparkle:fullReleaseNotesLink>releasenotes.html</sparkle:fullReleaseNotesLink>
+        <description>
+          <![CDATA[
+            <ul>
+              <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</li>
+            </ul>
+          ]]>
+        </description>
+        <pubDate>Sat, 26 Jul 2014 15:20:11 +0000</pubDate>
+        <enclosure url="http://localhost:1337/Sparkle_Test_App.zip" length="$INSERT_ARCHIVE_LENGTH" type="application/octet-stream" sparkle:edSignature="$INSERT_EDDSA_SIGNATURE" />
+        </item>
+    
+        <item>
+          <title>Version 2.1</title>
+          <sparkle:version>2.1</sparkle:version>
+          <link>https://sparkle-project.org</link>
+          <sparkle:channel>delta</sparkle:channel>
+          <sparkle:fullReleaseNotesLink>releasenotes.html</sparkle:fullReleaseNotesLink>
+          <description>
+            <![CDATA[
+              <ul>
+                <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</li>
+                <li>Suspendisse sed felis ac ante ultrices rhoncus. Etiam quis elit vel nibh placerat facilisis in id leo.</li>
+              </ul>
+            ]]>
+          </description>
+          <pubDate>Sat, 26 Jul 2014 15:20:11 +0000</pubDate>
+          <!-- Note: this file won't actually exist to ensure delta update works -->
+          <enclosure url="http://localhost:1337/Sparkle_Test_App.zip" length="100000" type="application/octet-stream" sparkle:edSignature="ootgYIwmnS1wa7Q/5SXDXnOVdKnjkjrFhm/D7ukW77k=" />
+          
+          <sparkle:deltas>
+              <enclosure url="http://localhost:1337/patch.delta"
+                            sparkle:deltaFrom="$INSERT_DELTA_FROM_VERSION"
+                            length="$INSERT_DELTA_ARCHIVE_LENGTH"
+                            type="application/octet-stream"
+                            sparkle:edSignature="$INSERT_DELTA_EDDSA_SIGNATURE" />
+          </sparkle:deltas>
+        </item>
+        
+        <item>
         <title>Version 2.0</title>
         <sparkle:version>2.0</sparkle:version>
         <link>https://sparkle-project.org</link>
@@ -21,6 +65,6 @@
         </description>
         <pubDate>Sat, 26 Jul 2014 15:20:11 +0000</pubDate>
         <enclosure url="http://localhost:1337/Sparkle_Test_App.zip" length="$INSERT_ARCHIVE_LENGTH" type="application/octet-stream" sparkle:edSignature="$INSERT_EDDSA_SIGNATURE" />
-      </item>
+        </item>
   </channel>
 </rss>

@@ -8,33 +8,20 @@
 
 #import "SUBinaryDeltaApply.h"
 #import "SUBinaryDeltaCommon.h"
-#include <CommonCrypto/CommonDigest.h>
+#import "SPUDeltaArchiveProtocol.h"
+#import "SPUDeltaArchive.h"
+#import <CommonCrypto/CommonDigest.h>
 #import <Foundation/Foundation.h>
 #include "bspatch.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <xar/xar.h>
-#include <Availability.h>
+#import <sys/stat.h>
 
 
 #include "AppKitPrevention.h"
 
-#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 120000
-    #define HAS_XAR_GET_SAFE_PATH 1
-#else
-    #define HAS_XAR_GET_SAFE_PATH 0
-#endif
-
-#if HAS_XAR_GET_SAFE_PATH
-// This is preferred over xar_get_path (which is deprecated) when it's available
-// Don't use OS availability for this API
-extern char *xar_get_safe_path(xar_file_t f) __attribute__((weak_import));
-#endif
-
-static BOOL applyBinaryDeltaToFile(xar_t x, xar_file_t file, NSString *sourceFilePath, NSString *destinationFilePath)
+static BOOL applyBinaryDeltaToFile(NSString *patchFile, NSString *sourceFilePath, NSString *destinationFilePath)
 {
-    NSString *patchFile = temporaryFilename(@"apply-binary-delta");
-    xar_extract_tofile(x, file, [patchFile fileSystemRepresentation]);
     const char *argv[] = {"/usr/bin/bspatch", [sourceFilePath fileSystemRepresentation], [destinationFilePath fileSystemRepresentation], [patchFile fileSystemRepresentation]};
     BOOL success = (bspatch(4, argv) == 0);
     unlink([patchFile fileSystemRepresentation]);
@@ -43,102 +30,55 @@ static BOOL applyBinaryDeltaToFile(xar_t x, xar_file_t file, NSString *sourceFil
 
 BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFile, BOOL verbose, void (^progressCallback)(double progress), NSError *__autoreleasing *error)
 {
-    xar_t x = xar_open([patchFile fileSystemRepresentation], READ);
-    if (!x) {
+    SPUDeltaArchiveHeader *header = nil;
+    id<SPUDeltaArchiveProtocol> archive = SPUDeltaArchiveReadPatchAndHeader(patchFile, &header);
+    if (archive.error != nil) {
         if (error != NULL) {
-            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Unable to open %@. Giving up.", patchFile] }];
+            *error = archive.error;
         }
         return NO;
     }
 
-    SUBinaryDeltaMajorVersion majorDiffVersion = FIRST_DELTA_DIFF_MAJOR_VERSION;
-    int minorDiffVersion = 0;
-
-    NSString *expectedBeforeHashv1 = nil;
-    NSString *expectedAfterHashv1 = nil;
-
-    NSString *expectedNewBeforeHash = nil;
-    NSString *expectedNewAfterHash = nil;
-
     progressCallback(0/6.0);
 
-    xar_subdoc_t subdoc;
-    for (subdoc = xar_subdoc_first(x); subdoc; subdoc = xar_subdoc_next(subdoc)) {
-        if (!strcmp(xar_subdoc_name(subdoc), BINARY_DELTA_ATTRIBUTES_KEY)) {
-            const char *value = 0;
+    SUBinaryDeltaMajorVersion majorDiffVersion = header.majorVersion;
+    uint16_t minorDiffVersion = header.minorVersion;
 
-            // available in version 2.0 or later
-            xar_subdoc_prop_get(subdoc, MAJOR_DIFF_VERSION_KEY, &value);
-            if (value)
-                majorDiffVersion = (SUBinaryDeltaMajorVersion)[@(value) intValue];
-
-            // available in version 2.0 or later
-            xar_subdoc_prop_get(subdoc, MINOR_DIFF_VERSION_KEY, &value);
-            if (value)
-                minorDiffVersion = [@(value) intValue];
-
-            // available in version 2.0 or later
-            xar_subdoc_prop_get(subdoc, BEFORE_TREE_SHA1_KEY, &value);
-            if (value)
-                expectedNewBeforeHash = @(value);
-
-            // available in version 2.0 or later
-            xar_subdoc_prop_get(subdoc, AFTER_TREE_SHA1_KEY, &value);
-            if (value)
-                expectedNewAfterHash = @(value);
-
-            // only available in version 1.0
-            xar_subdoc_prop_get(subdoc, BEFORE_TREE_SHA1_OLD_KEY, &value);
-            if (value)
-                expectedBeforeHashv1 = @(value);
-
-            // only available in version 1.0
-            xar_subdoc_prop_get(subdoc, AFTER_TREE_SHA1_OLD_KEY, &value);
-            if (value)
-                expectedAfterHashv1 = @(value);
-        }
-    }
-
-    if (majorDiffVersion < FIRST_DELTA_DIFF_MAJOR_VERSION) {
-        xar_close(x);
-        
+    unsigned char *expectedBeforeHash = header.beforeTreeHash;
+    unsigned char *expectedAfterHash = header.afterTreeHash;
+    
+    if (majorDiffVersion < SUBinaryDeltaMajorVersionFirst) {
         if (error != NULL) {
             *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadCorruptFileError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Unable to identify diff-version %u in delta.  Giving up.", majorDiffVersion] }];
         }
         return NO;
     }
-
-    if (majorDiffVersion > LATEST_DELTA_DIFF_MAJOR_VERSION) {
-        xar_close(x);
-        
+    
+    if (majorDiffVersion < SUBinaryDeltaMajorVersionFirstSupported) {
         if (error != NULL) {
-            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"A later version is needed to apply this patch (on major version %u, but patch requests version %u).", LATEST_DELTA_DIFF_MAJOR_VERSION, majorDiffVersion] }];
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadCorruptFileError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Applying version %u patches is no longer supported.", majorDiffVersion] }];
+        }
+        return NO;
+    }
+
+    if (majorDiffVersion > SUBinaryDeltaMajorVersionLatest) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"A later version is needed to apply this patch (on major version %u, but patch requests version %u).", SUBinaryDeltaMajorVersionLatest, majorDiffVersion] }];
         }
         return NO;
     }
     
-#if HAS_XAR_GET_SAFE_PATH
     // Reject patches that did not generate valid hierarchical xar container paths
     // These will not succeed to patch using recent versions of BinaryDelta
-    if ((majorDiffVersion == SUBinaryDeltaMajorVersion2 && minorDiffVersion < 3) || (majorDiffVersion == SUBinaryDeltaMajorVersion1 && minorDiffVersion < 2)) {
-        xar_close(x);
-        
+    if ([[archive class] maySupportSafeExtraction] && majorDiffVersion == SUBinaryDeltaMajorVersion2 && minorDiffVersion < 3) {
         if (error != NULL) {
             *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadCorruptFileError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"This patch version (%u.%u) is too old and potentially unsafe to apply. Please re-generate the patch using the latest version of BinaryDelta or generate_appcast. New version %u.%u patches will still be compatible with older versions of Sparkle.", majorDiffVersion, minorDiffVersion, majorDiffVersion, latestMinorVersionForMajorVersion(majorDiffVersion)] }];
         }
         
         return NO;
     }
-#endif
 
-    BOOL usesNewTreeHash = MAJOR_VERSION_IS_AT_LEAST(majorDiffVersion, SUBinaryDeltaMajorVersion2);
-
-    NSString *expectedBeforeHash = usesNewTreeHash ? expectedNewBeforeHash : expectedBeforeHashv1;
-    NSString *expectedAfterHash = usesNewTreeHash ? expectedNewAfterHash : expectedAfterHashv1;
-
-    if (!expectedBeforeHash || !expectedAfterHash) {
-        xar_close(x);
-        
+    if (expectedBeforeHash == nil || expectedAfterHash == nil) {
         if (error != NULL) {
             *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadCorruptFileError userInfo:@{ NSLocalizedDescriptionKey: @"Unable to find before-sha1 or after-sha1 metadata in delta.  Giving up." }];
         }
@@ -151,11 +91,9 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
     }
 
     progressCallback(1/6.0);
-
-    NSString *beforeHash = hashOfTreeWithVersion(source, majorDiffVersion);
-    if (!beforeHash) {
-        xar_close(x);
-        
+    
+    unsigned char beforeHash[CC_SHA1_DIGEST_LENGTH] = {0};
+    if (!getRawHashOfTreeWithVersion(beforeHash, source, majorDiffVersion)) {
         if (verbose) {
             fprintf(stderr, "\n");
         }
@@ -165,14 +103,12 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
         return NO;
     }
 
-    if (![beforeHash isEqualToString:expectedBeforeHash]) {
-        xar_close(x);
-        
+    if (memcmp(beforeHash, expectedBeforeHash, CC_SHA1_DIGEST_LENGTH) != 0) {
         if (verbose) {
             fprintf(stderr, "\n");
         }
         if (error != NULL) {
-            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Source doesn't have expected hash (%@ != %@).  Giving up.", expectedBeforeHash, beforeHash] }];
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Source doesn't have expected hash (%@ != %@).  Giving up.", displayHashFromRawHash(expectedBeforeHash), displayHashFromRawHash(beforeHash)] }];
         }
         return NO;
     }
@@ -184,8 +120,6 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
     progressCallback(2/6.0);
 
     if (!removeTree(destination)) {
-        xar_close(x);
-        
         if (verbose) {
             fprintf(stderr, "\n");
         }
@@ -198,8 +132,6 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
     progressCallback(3/6.0);
 
     if (!copyTree(source, destination)) {
-        xar_close(x);
-        
         if (verbose) {
             fprintf(stderr, "\n");
         }
@@ -211,48 +143,29 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
 
     progressCallback(4/6.0);
 
-    BOOL hasExtractKeyAvailable = MAJOR_VERSION_IS_AT_LEAST(majorDiffVersion, SUBinaryDeltaMajorVersion2);
-
     if (verbose) {
         fprintf(stderr, "\nPatching...");
     }
     NSFileManager *fileManager = [[NSFileManager alloc] init];
-    xar_file_t file;
-    xar_iter_t iter = xar_iter_new();
-    for (file = xar_file_first(x, iter); file; file = xar_file_next(iter)) {
-        char *pathCString;
-#if HAS_XAR_GET_SAFE_PATH
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunguarded-availability-new"
-        if (xar_get_safe_path != NULL) {
-            pathCString = xar_get_safe_path(file);
-        }
-#pragma clang diagnostic pop
-        else
-#endif
-        {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-            pathCString = xar_get_path(file);
-#pragma clang diagnostic pop
-        }
+    
+    // Ensure error is cleared out in advance
+    if (error != NULL) {
+        *error = nil;
+    }
+    
+    [archive enumerateItems:^(SPUDeltaArchiveItem *item, BOOL *stop) {
+        NSString *relativePath = item.relativeFilePath;
         
-        if (pathCString == NULL) {
-            continue;
-        }
-        
-        NSString *path = @(pathCString);
-        if ([path.pathComponents containsObject:@".."]) {
-            xar_close(x);
-            
+        if ([relativePath.pathComponents containsObject:@".."]) {
             if (error != NULL) {
-                *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Relative path '%@' contains '..' path component", path] }];
+                *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Relative path '%@' contains '..' path component", relativePath] }];
             }
-            return NO;
+            *stop = YES;
+            return;
         }
         
-        NSString *sourceFilePath = [source stringByAppendingPathComponent:path];
-        NSString *destinationFilePath = [destination stringByAppendingPathComponent:path];
+        NSString *sourceFilePath = [source stringByAppendingPathComponent:relativePath];
+        NSString *destinationFilePath = [destination stringByAppendingPathComponent:relativePath];
         {
             NSString *destinationParentDirectory = destinationFilePath.stringByDeletingLastPathComponent;
             NSDictionary<NSFileAttributeKey, id> *destinationParentDirectoryAttributes = [fileManager attributesOfItemAtPath:destinationParentDirectory error:NULL];
@@ -263,12 +176,11 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
                 // If it's inside a symlink, this is not good in any circumstance
                 NSString *fileType = destinationParentDirectoryAttributes[NSFileType];
                 if ([fileType isEqualToString:NSFileTypeSymbolicLink]) {
-                    xar_close(x);
-                    
                     if (error != NULL) {
                         *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to create patch because '%@' cannot be a symbolic link.", destinationParentDirectory] }];
                     }
-                    return NO;
+                    *stop = YES;
+                    return;
                 }
             }
         }
@@ -279,100 +191,200 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
         
         // Files that have no property set that we check for will get ignored
         // This is important because they aren't part of the delta, just part of the directory structure
-
-        const char *value;
-        if (!xar_prop_get(file, DELETE_KEY, &value) || (!hasExtractKeyAvailable && !xar_prop_get(file, DELETE_THEN_EXTRACT_OLD_KEY, &value))) {
+        SPUDeltaItemCommands commands = item.commands;
+        if ((commands & SPUDeltaItemCommandDelete) != 0) {
             if (!removeTree(destinationFilePath)) {
-                xar_close(x);
-                
                 if (verbose) {
                     fprintf(stderr, "\n");
                 }
                 if (error != NULL) {
-                    *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"%@ or %@: failed to remove %@", @DELETE_KEY, @DELETE_THEN_EXTRACT_OLD_KEY, destination] }];
+                    *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"delete: failed to remove %@", destination] }];
                 }
-                return NO;
-            }
-            if (!hasExtractKeyAvailable && !xar_prop_get(file, DELETE_KEY, &value)) {
-                if (verbose) {
-                    fprintf(stderr, "\n❌  %s %s", VERBOSE_DELETED, [path fileSystemRepresentation]);
-                }
-                continue;
+                *stop = YES;
+                return;
             }
 
             removedFile = YES;
         }
 
-        if (!xar_prop_get(file, BINARY_DELTA_KEY, &value)) {
-            if (!applyBinaryDeltaToFile(x, file, sourceFilePath, destinationFilePath)) {
-                xar_close(x);
+        if ((commands & SPUDeltaItemCommandClone) != 0 && (commands & SPUDeltaItemCommandBinaryDiff) == 0) {
+            NSString *clonedRelativePath = item.clonedRelativePath;
+            if ([clonedRelativePath.pathComponents containsObject:@".."]) {
+                if (error != NULL) {
+                    *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Relative path for clone '%@' contains '..' path component", clonedRelativePath] }];
+                }
+                *stop = YES;
+                return;
+            }
+            
+            NSString *clonedOriginalPath = [source stringByAppendingPathComponent:clonedRelativePath];
+            
+            // Ensure there isn't an item already at our destination
+            [fileManager removeItemAtPath:destinationFilePath error:NULL];
+            
+            NSError *copyError = nil;
+            if (![fileManager copyItemAtPath:clonedOriginalPath toPath:destinationFilePath error:&copyError]) {
+                if (verbose) {
+                    fprintf(stderr, "\n");
+                }
+                if (error != NULL) {
+                    *error = copyError;
+                }
                 
+                *stop = YES;
+                return;
+            }
+            
+            if (verbose) {
+                fprintf(stderr, "\n✂️   %s %s -> %s", VERBOSE_CLONED, [clonedRelativePath fileSystemRepresentation], [relativePath fileSystemRepresentation]);
+            }
+        } else if ((commands & SPUDeltaItemCommandBinaryDiff) != 0) {
+            NSString *tempDiffFile = temporaryFilename(@"apply-binary-delta");
+            item.itemFilePath = tempDiffFile;
+            
+            if (![archive extractItem:item]) {
+                if (verbose) {
+                    fprintf(stderr, "\n");
+                }
+                if (error != NULL) {
+                    *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Unable to extract diffed file to %@", tempDiffFile], NSUnderlyingErrorKey: (NSError * _Nonnull)archive.error }];
+                }
+                
+                *stop = YES;
+                return;
+            }
+            
+            NSString *sourceDiffFilePath;
+            NSString *clonedRelativePath;
+            if ((commands & SPUDeltaItemCommandClone) != 0) {
+                clonedRelativePath = item.clonedRelativePath;
+                if ([clonedRelativePath.pathComponents containsObject:@".."]) {
+                    if (error != NULL) {
+                        *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Relative path for clone '%@' contains '..' path component", clonedRelativePath] }];
+                    }
+                    *stop = YES;
+                    return;
+                }
+                
+                sourceDiffFilePath = [source stringByAppendingPathComponent:clonedRelativePath];
+            } else {
+                sourceDiffFilePath = sourceFilePath;
+                clonedRelativePath = nil;
+            }
+            
+            if (!applyBinaryDeltaToFile(tempDiffFile, sourceDiffFilePath, destinationFilePath)) {
                 if (verbose) {
                     fprintf(stderr, "\n");
                 }
                 if (error != NULL) {
                     *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Unable to patch %@ to destination %@", sourceFilePath, destinationFilePath] }];
                 }
-                return NO;
+                *stop = YES;
+                return;
+            }
+            
+            // Preserve original file permissions from the original file
+            // Only necessary for clones because applyBinaryDeltaToFile() otherwise preserves
+            // file permissions on the file it's replacing. Also not necessary if we're going to
+            // change permissions later
+            if ((commands & SPUDeltaItemCommandClone) != 0 && (commands & SPUDeltaItemCommandModifyPermissions) == 0) {
+                
+                struct stat sourceFileInfo = {0};
+                if (lstat(sourceDiffFilePath.fileSystemRepresentation, &sourceFileInfo) != 0) {
+                    if (verbose) {
+                        fprintf(stderr, "\n");
+                    }
+                    if (error != NULL) {
+                        *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Unable to retrieve stat info from %@", sourceFilePath] }];
+                    }
+                    *stop = YES;
+                    return;
+                }
+                
+                if (chmod(destinationFilePath.fileSystemRepresentation, sourceFileInfo.st_mode) != 0) {
+                    if (verbose) {
+                        fprintf(stderr, "\n");
+                    }
+                    if (error != NULL) {
+                        *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteNoPermissionError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Unable to modify permissions (%u) on file %@", sourceFileInfo.st_mode, destinationFilePath] }];
+                    }
+                    *stop = YES;
+                    return;
+                }
             }
 
             if (verbose) {
-                fprintf(stderr, "\n🔨  %s %s", VERBOSE_PATCHED, [path fileSystemRepresentation]);
+                if ((commands & SPUDeltaItemCommandClone) != 0) {
+                    fprintf(stderr, "\n🔨  %s %s -> %s", VERBOSE_PATCHED, [clonedRelativePath fileSystemRepresentation], [relativePath fileSystemRepresentation]);
+                } else {
+                    fprintf(stderr, "\n🔨  %s %s", VERBOSE_PATCHED, [relativePath fileSystemRepresentation]);
+                }
             }
-        } else if ((hasExtractKeyAvailable && !xar_prop_get(file, EXTRACT_KEY, &value)) || (!hasExtractKeyAvailable && xar_prop_get(file, MODIFY_PERMISSIONS_KEY, &value))) { // extract and permission modifications don't coexist
-
-            if (xar_extract_tofile(x, file, [destinationFilePath fileSystemRepresentation]) != 0) {
-                xar_close(x);
-                
+        } else if ((commands & SPUDeltaItemCommandExtract) != 0) { // extract and permission modifications don't coexist
+            item.itemFilePath = destinationFilePath;
+            if (![archive extractItem:item]) {
                 if (verbose) {
                     fprintf(stderr, "\n");
                 }
                 if (error != NULL) {
-                    *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Unable to extract file to %@", destinationFilePath] }];
+                    *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Unable to extract file to %@", destinationFilePath], NSUnderlyingErrorKey: (NSError * _Nonnull)archive.error }];
                 }
-                return NO;
+                *stop = YES;
+                return;
             }
 
             if (verbose) {
                 if (fileExisted) {
-                    fprintf(stderr, "\n✏️  %s %s", VERBOSE_UPDATED, [path fileSystemRepresentation]);
+                    fprintf(stderr, "\n✏️  %s %s", VERBOSE_UPDATED, [relativePath fileSystemRepresentation]);
                 } else {
-                    fprintf(stderr, "\n✅  %s %s", VERBOSE_ADDED, [path fileSystemRepresentation]);
+                    fprintf(stderr, "\n✅  %s %s", VERBOSE_ADDED, [relativePath fileSystemRepresentation]);
                 }
             }
         } else if (verbose && removedFile) {
-            fprintf(stderr, "\n❌  %s %s", VERBOSE_DELETED, [path fileSystemRepresentation]);
+            fprintf(stderr, "\n❌  %s %s", VERBOSE_DELETED, [relativePath fileSystemRepresentation]);
         }
 
-        if (!xar_prop_get(file, MODIFY_PERMISSIONS_KEY, &value)) {
-            mode_t mode = (mode_t)[[NSString stringWithUTF8String:value] intValue];
+        if ((commands & SPUDeltaItemCommandModifyPermissions) != 0) {
+            mode_t mode = (mode_t)item.permissions;
             if (!modifyPermissions(destinationFilePath, mode)) {
-                xar_close(x);
-                
                 if (verbose) {
                     fprintf(stderr, "\n");
                 }
                 if (error != NULL) {
-                    *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteNoPermissionError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Unable to modify permissions (%@) on file %@", @(value), destinationFilePath] }];
+                    *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteNoPermissionError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Unable to modify permissions (%u) on file %@", mode, destinationFilePath] }];
                 }
-                return NO;
+                *stop = YES;
+                return;
             }
 
             if (verbose) {
-                fprintf(stderr, "\n👮  %s %s (0%o)", VERBOSE_MODIFIED, [path fileSystemRepresentation], mode);
+                fprintf(stderr, "\n👮  %s %s (0%o)", VERBOSE_MODIFIED, [relativePath fileSystemRepresentation], mode);
             }
         }
-    }
+    }];
     
-    xar_close(x);
+    [archive close];
+    
+    // Set error from enumerating items if we have encountered an error and haven't set it yet
+    NSError *archiveError = archive.error;
+    if (archiveError != nil) {
+        if (verbose) {
+            fprintf(stderr, "\n");
+        }
+        if (error != NULL && *error == nil) {
+            *error = archiveError;
+        }
+        return NO;
+    }
 
     progressCallback(5/6.0);
 
     if (verbose) {
         fprintf(stderr, "\nVerifying destination...");
     }
-    NSString *afterHash = hashOfTreeWithVersion(destination, majorDiffVersion);
-    if (!afterHash) {
+    
+    unsigned char afterHash[CC_SHA1_DIGEST_LENGTH] = {0};
+    if (!getRawHashOfTreeWithVersion(afterHash, destination, majorDiffVersion)) {
         if (verbose) {
             fprintf(stderr, "\n");
         }
@@ -382,12 +394,12 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
         return NO;
     }
 
-    if (![afterHash isEqualToString:expectedAfterHash]) {
+    if (memcmp(afterHash, expectedAfterHash, CC_SHA1_DIGEST_LENGTH) != 0) {
         if (verbose) {
             fprintf(stderr, "\n");
         }
         if (error != NULL) {
-            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Destination doesn't have expected hash (%@ != %@).  Giving up.", expectedAfterHash, afterHash] }];
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Destination doesn't have expected hash (%@ != %@).  Giving up.", displayHashFromRawHash(expectedAfterHash), displayHashFromRawHash(afterHash)] }];
         }
         removeTree(destination);
         return NO;

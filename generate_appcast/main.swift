@@ -84,6 +84,12 @@ struct GenerateAppcast: ParsableCommand {
     @Option(name: .long, help: ArgumentHelp("The maximum number of delta items to create for the latest update for each minimum required operating system.", valueName: "maximum-deltas"))
     var maximumDeltas: Int = DEFAULT_MAXIMUM_DELTAS
     
+    @Option(name: .long, help: ArgumentHelp(COMPRESSION_METHOD_ARGUMENT_DESCRIPTION, valueName: "delta-compression"))
+    var deltaCompression: String = "default"
+    
+    @Option(name: .long, help: ArgumentHelp(COMPRESSION_LEVEL_ARGUMENT_DESCRIPTION, valueName: "delta-compression-level"))
+    var deltaCompressionLevel: UInt8 = 0
+    
     @Option(name: .long, help: ArgumentHelp("The Sparkle channel name that will be used for generating new updates. By default, no channel is used. Old applications need to be using Sparkle 2 to use this feature.", valueName: "channel-name"))
     var channel: String?
     
@@ -166,6 +172,16 @@ struct GenerateAppcast: ParsableCommand {
         guard (informationalUpdateVersions == nil) || (link != nil) else {
             throw ValidationError("--link must be specified if --informational-update-versions is specified.")
         }
+        
+        guard deltaCompressionLevel >= 0 && deltaCompressionLevel <= 9 else {
+            throw ValidationError("Invalid --delta-compression-level value was passed.")
+        }
+        
+        var validCompression: ObjCBool = false
+        let _ = deltaCompressionModeFromDescription(deltaCompression, &validCompression)
+        if !validCompression.boolValue {
+            throw ValidationError("Invalid --delta-compression \(deltaCompression) was passed.")
+        }
     }
     
     func run() throws {
@@ -192,7 +208,7 @@ struct GenerateAppcast: ParsableCommand {
         let keys = loadPrivateKeys(privateDSAKey, privateEdString)
         
         do {
-            let allUpdates = try makeAppcast(archivesSourceDir: archivesSourceDir, cacheDirectory: GenerateAppcast.cacheDirectory, keys: keys, versions: versions, maximumDeltas: maximumDeltas, verbose: verbose)
+            let allUpdates = try makeAppcast(archivesSourceDir: archivesSourceDir, cacheDirectory: GenerateAppcast.cacheDirectory, keys: keys, versions: versions, maximumDeltas: maximumDeltas, deltaCompressionModeDescription: deltaCompression, deltaCompressionLevel: deltaCompressionLevel, verbose: verbose)
             
             // If a URL prefix was provided, set on the archive items
             if downloadURLPrefix != nil || releaseNotesURLPrefix != nil {
