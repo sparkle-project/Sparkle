@@ -168,9 +168,8 @@ static char SUAppleQuarantineIdentifier[] = "com.apple.quarantine";
 
 - (BOOL)_getVolumeID:(out id _Nullable __autoreleasing * _Nonnull)outVolumeIdentifier ofItemAtURL:(NSURL *)url
 {
-    id volumeIdentifier = nil;
     NSError *error = nil;
-    return [url getResourceValue:&volumeIdentifier forKey:NSURLVolumeIdentifierKey error:&error];
+    return [url getResourceValue:outVolumeIdentifier forKey:NSURLVolumeIdentifierKey error:&error];
 }
 
 - (BOOL)moveItemAtURL:(NSURL *)sourceURL toURL:(NSURL *)destinationURL error:(NSError *__autoreleasing *)error
