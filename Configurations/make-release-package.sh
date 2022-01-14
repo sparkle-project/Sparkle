@@ -48,8 +48,8 @@ if [ "$ACTION" = "" ] ; then
         mkdir -p "$CONFIGURATION_BUILD_DIR/staging/Entitlements"
         mkdir -p "$CONFIGURATION_BUILD_DIR/staging-spm/Entitlements"
         
-        cp -R "$SRCROOT/Downloader/org.sparkle-project.Downloader.entitlements" "$CONFIGURATION_BUILD_DIR/staging/Entitlements"
-        cp -R "$SRCROOT/Downloader/org.sparkle-project.Downloader.entitlements" "$CONFIGURATION_BUILD_DIR/staging-spm/Entitlements"
+        cp -R "$SRCROOT/Downloader/org.sparkle-project.Downloader.entitlements" "$CONFIGURATION_BUILD_DIR/staging/Entitlements/$DOWNLOADER_BUNDLE_ID.entitlements"
+        cp -R "$SRCROOT/Downloader/org.sparkle-project.Downloader.entitlements" "$CONFIGURATION_BUILD_DIR/staging-spm/Entitlements/$DOWNLOADER_BUNDLE_ID.entitlements"
     fi
 
     mkdir -p "$CONFIGURATION_BUILD_DIR/staging/Symbols"
@@ -66,8 +66,8 @@ if [ "$ACTION" = "" ] ; then
         cp -R "$CONFIGURATION_BUILD_DIR/Sparkle.framework.dSYM" "$CONFIGURATION_BUILD_DIR/staging/Symbols"
         cp -R "$CONFIGURATION_BUILD_DIR/Autoupdate.dSYM" "$CONFIGURATION_BUILD_DIR/staging/Symbols"
         cp -R "$CONFIGURATION_BUILD_DIR/Updater.app.dSYM" "$CONFIGURATION_BUILD_DIR/staging/Symbols"
-        cp -R "$CONFIGURATION_BUILD_DIR/org.sparkle-project.InstallerLauncher.xpc.dSYM" "$CONFIGURATION_BUILD_DIR/staging/Symbols"
-        cp -R "$CONFIGURATION_BUILD_DIR/org.sparkle-project.Downloader.xpc.dSYM" "$CONFIGURATION_BUILD_DIR/staging/Symbols"
+        cp -R "$CONFIGURATION_BUILD_DIR/${INSTALLER_LAUNCHER_BUNDLE_ID}.xpc.dSYM" "$CONFIGURATION_BUILD_DIR/staging/Symbols"
+        cp -R "$CONFIGURATION_BUILD_DIR/${DOWNLOADER_BUNDLE_ID}.xpc.dSYM" "$CONFIGURATION_BUILD_DIR/staging/Symbols"
     fi
     cp -R "$CONFIGURATION_BUILD_DIR/staging/bin" "$CONFIGURATION_BUILD_DIR/staging-spm"
     cp -R "$CONFIGURATION_BUILD_DIR/staging/Symbols" "$CONFIGURATION_BUILD_DIR/staging-spm"
