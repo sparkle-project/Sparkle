@@ -518,6 +518,8 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
         return NO;
     }
 
+    uint32_t warningsCount = 0;
+    const uint32_t maxWarningsToPrint = 16;
     while ((ent = fts_read(fts))) {
         if (ent->fts_info != FTS_F && ent->fts_info != FTS_SL && ent->fts_info != FTS_D) {
             continue;
@@ -563,12 +565,23 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
             return NO;
         }
         
-        if (ent->fts_info == FTS_SL) {
+        if (warningsCount < maxWarningsToPrint) {
             uint16_t permissions = (ent->fts_statp->st_mode & PERMISSION_FLAGS);
-            if (permissions != VALID_SYMBOLIC_LINK_PERMISSIONS) {
-                if (verbose) {
-                    fprintf(stderr, "\nwarning: file permissions %o of symbolic link '%s' won't be preserved in the delta update (only permissions with mode 0755 are supported for symbolic links).", permissions, ent->fts_path);
+            if (ent->fts_info == FTS_SL) {
+                if (permissions != VALID_SYMBOLIC_LINK_PERMISSIONS) {
+                    fprintf(stderr, "\nWarning: file permissions %o of symbolic link '%s' won't be preserved in the delta update (only permissions with mode 0755 are supported for symbolic links).", permissions, ent->fts_path);
+                    
+                    warningsCount++;
                 }
+            } else if (permissions != 0755 && permissions != 0644) {
+                // This could indicate something is wrong inside of the bundle so it's worth warning the user about
+                fprintf(stderr, "\nWarning: detected irregular file permissions %o for '%s'", permissions, ent->fts_path);
+                
+                warningsCount++;
+            }
+            
+            if (warningsCount == maxWarningsToPrint) {
+                fprintf(stderr, "\nWarning: encountered too many warnings.. Ignoring the rest..");
             }
         }
 
