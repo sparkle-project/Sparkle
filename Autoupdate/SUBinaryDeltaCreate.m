@@ -569,13 +569,13 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
             uint16_t permissions = (ent->fts_statp->st_mode & PERMISSION_FLAGS);
             if (ent->fts_info == FTS_SL) {
                 if (permissions != VALID_SYMBOLIC_LINK_PERMISSIONS) {
-                    fprintf(stderr, "\nWarning: file permissions %o of symbolic link '%s' won't be preserved in the delta update (only permissions with mode 0755 are supported for symbolic links).", permissions, ent->fts_path);
+                    fprintf(stderr, "\nWarning: file permissions 0%o of symbolic link '%s' won't be preserved in the delta update (only permissions with mode 0755 are supported for symbolic links).", permissions, ent->fts_path);
                     
                     warningsCount++;
                 }
             } else if (permissions != 0755 && permissions != 0644) {
                 // This could indicate something is wrong inside of the bundle so it's worth warning the user about
-                fprintf(stderr, "\nWarning: detected irregular file permissions %o for '%s'", permissions, ent->fts_path);
+                fprintf(stderr, "\nWarning: detected irregular file permissions 0%o for '%s'", permissions, ent->fts_path);
                 
                 warningsCount++;
             }
