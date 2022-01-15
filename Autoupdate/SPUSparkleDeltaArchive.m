@@ -1042,7 +1042,14 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
                     break;
                 }
                 
-                extractMode = sourceFileInfo.st_mode;
+                // For symbolic links we always default to 0755 when adding new items
+                // Symbolic link permissions can get more easily lost when moving to other (linux) filesystems,
+                // so we only support the macOS default
+                if (S_ISLNK(sourceFileInfo.st_mode)) {
+                    extractMode = (sourceFileInfo.st_mode & ~PERMISSION_FLAGS) | VALID_SYMBOLIC_LINK_PERMISSIONS;
+                } else {
+                    extractMode = sourceFileInfo.st_mode;
+                }
                 
                 uint16_t encodedMode;
                 if ((commands & SPUDeltaItemCommandModifyPermissions) != 0) {

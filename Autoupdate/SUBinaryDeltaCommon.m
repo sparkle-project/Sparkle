@@ -266,16 +266,16 @@ BOOL getRawHashOfTreeAndFileTablesWithVersion(unsigned char *hashBuffer, NSStrin
         CC_SHA1_Update(&hashContext, relativePathBytes, (CC_LONG)strlen(relativePathBytes));
 
         uint16_t mode = ent->fts_statp->st_mode;
-        // permission of symlinks is irrelevant and can't be changed.
-        // hardcoding a value helps avoid differences between filesystems.
-        if (ent->fts_info == FTS_SL) {
-            mode = 0755;
-        }
         uint16_t type = ent->fts_info;
         uint16_t permissions = mode & PERMISSION_FLAGS;
+        
+        // permission of symlinks are 0777 on some linux file systems and can't be changed,
+        // differing from the 0755 macOS default.
+        // hardcoding a value helps avoid differences between filesystems.
+        uint16_t hashedPermissions = (ent->fts_info == FTS_SL) ? VALID_SYMBOLIC_LINK_PERMISSIONS : permissions;
 
         CC_SHA1_Update(&hashContext, &type, sizeof(type));
-        CC_SHA1_Update(&hashContext, &permissions, sizeof(permissions));
+        CC_SHA1_Update(&hashContext, &hashedPermissions, sizeof(hashedPermissions));
     }
     fts_close(fts);
 
