@@ -46,7 +46,7 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
     XCTAssert(YES, @"Pass");
 }
 
-- (BOOL)createAndApplyPatchUsingVersion:(SUBinaryDeltaMajorVersion)majorVersion compressionMode:(SPUDeltaCompressionMode)compressionMode beforeDiffHandler:(SUDeltaHandler)beforeDiffHandler afterDiffHandler:(SUDeltaHandler)afterDiffHandler
+- (BOOL)createAndApplyPatchUsingVersion:(SUBinaryDeltaMajorVersion)majorVersion compressionMode:(SPUDeltaCompressionMode)compressionMode beforeDiffHandler:(SUDeltaHandler)beforeDiffHandler afterDiffHandler:(SUDeltaHandler)afterDiffHandler afterPatchHandler:(SUDeltaHandler)afterPatchHandler
 {
     NSString *sourceDirectory = temporaryDirectory(@"Spąrkle_temp1エンジン");
     NSString *destinationDirectory = temporaryDirectory(@"Spąrkle_temp2エンジン");
@@ -77,6 +77,10 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
     if (createdDiff) {
         if (applyBinaryDelta(sourceDirectory, patchDirectory, diffFile, NO, ^(__unused double progress){}, &applyDiffError)) {
             appliedDiff = YES;
+            
+            if (afterPatchHandler != nil) {
+                afterPatchHandler(fileManager, destinationDirectory, patchDirectory);
+            }
         } else {
             NSLog(@"Applying binary diff failed with error: %@", applyDiffError);
         }
@@ -90,24 +94,29 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
     return appliedDiff;
 }
 
-- (BOOL)createAndApplyPatchWithBeforeDiffHandler:(SUDeltaHandler)beforeDiffHandler afterDiffHandler:(SUDeltaHandler)afterDiffHandler
+- (BOOL)createAndApplyPatchWithBeforeDiffHandler:(SUDeltaHandler)beforeDiffHandler afterDiffHandler:(SUDeltaHandler)afterDiffHandler afterPatchHandler:(SUDeltaHandler)afterPatchHandler
+{
+    return [self createAndApplyPatchWithBeforeDiffHandler:beforeDiffHandler afterDiffHandler:afterDiffHandler afterPatchHandler:afterPatchHandler testingVersion2Delta:YES];
+}
+
+- (BOOL)createAndApplyPatchWithBeforeDiffHandler:(SUDeltaHandler)beforeDiffHandler afterDiffHandler:(SUDeltaHandler)afterDiffHandler afterPatchHandler:(SUDeltaHandler)afterPatchHandler testingVersion2Delta:(BOOL)testingVersion2Delta
 {
     XCTAssertEqual(SUBinaryDeltaMajorVersion3, SUBinaryDeltaMajorVersionLatest);
     
-    BOOL version3DeltaFormatWithLZMASuccess = [self createAndApplyPatchUsingVersion:SUBinaryDeltaMajorVersion3 compressionMode:SPUDeltaCompressionModeLZMA beforeDiffHandler:beforeDiffHandler afterDiffHandler:afterDiffHandler];
+    BOOL version3DeltaFormatWithLZMASuccess = [self createAndApplyPatchUsingVersion:SUBinaryDeltaMajorVersion3 compressionMode:SPUDeltaCompressionModeLZMA beforeDiffHandler:beforeDiffHandler afterDiffHandler:afterDiffHandler afterPatchHandler:afterPatchHandler];
     
-    BOOL version3DeltaFormatWithBZIP2Success = [self createAndApplyPatchUsingVersion:SUBinaryDeltaMajorVersion3 compressionMode:SPUDeltaCompressionModeBzip2 beforeDiffHandler:beforeDiffHandler afterDiffHandler:afterDiffHandler];
+    BOOL version3DeltaFormatWithBZIP2Success = [self createAndApplyPatchUsingVersion:SUBinaryDeltaMajorVersion3 compressionMode:SPUDeltaCompressionModeBzip2 beforeDiffHandler:beforeDiffHandler afterDiffHandler:afterDiffHandler afterPatchHandler:afterPatchHandler];
     
-    BOOL version3DeltaFormatWithZLIBSuccess = [self createAndApplyPatchUsingVersion:SUBinaryDeltaMajorVersion3 compressionMode:SPUDeltaCompressionModeZLIB beforeDiffHandler:beforeDiffHandler afterDiffHandler:afterDiffHandler];
+    BOOL version3DeltaFormatWithZLIBSuccess = [self createAndApplyPatchUsingVersion:SUBinaryDeltaMajorVersion3 compressionMode:SPUDeltaCompressionModeZLIB beforeDiffHandler:beforeDiffHandler afterDiffHandler:afterDiffHandler afterPatchHandler:afterPatchHandler];
     
-    BOOL version2FormatSuccess = [self createAndApplyPatchUsingVersion:SUBinaryDeltaMajorVersion2 compressionMode:SPUDeltaCompressionModeDefault beforeDiffHandler:beforeDiffHandler afterDiffHandler:afterDiffHandler];
+    BOOL version2FormatSuccess = !testingVersion2Delta || [self createAndApplyPatchUsingVersion:SUBinaryDeltaMajorVersion2 compressionMode:SPUDeltaCompressionModeDefault beforeDiffHandler:beforeDiffHandler afterDiffHandler:afterDiffHandler afterPatchHandler:afterPatchHandler];
     
     return (version3DeltaFormatWithLZMASuccess && version3DeltaFormatWithBZIP2Success && version3DeltaFormatWithZLIBSuccess && version2FormatSuccess);
 }
 
 - (void)createAndApplyPatchWithHandler:(SUDeltaHandler)handler
 {
-    BOOL success = [self createAndApplyPatchWithBeforeDiffHandler:handler afterDiffHandler:nil];
+    BOOL success = [self createAndApplyPatchWithBeforeDiffHandler:handler afterDiffHandler:nil afterPatchHandler:nil];
     XCTAssertTrue(success);
 }
 
@@ -198,7 +207,6 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
             XCTFail("Failed to create directory");
         }
         
-        // This would fail for version 1.0
         XCTAssertFalse([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
     }];
 }
@@ -247,7 +255,7 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
 
 - (void)testNonexistantSymlinkPermissionDiff
 {
-    [self createAndApplyPatchWithHandler:^(NSFileManager *fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
+    [self createAndApplyPatchWithBeforeDiffHandler:^(NSFileManager *fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
         NSString *sourceFile = [sourceDirectory stringByAppendingPathComponent:@"A"];
         NSString *destinationFile = [destinationDirectory stringByAppendingPathComponent:@"A"];
         
@@ -267,7 +275,65 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
             XCTFail(@"Failed setting file permissions");
         }
         
+        // 0755 and 0777 should result in the same hash
         XCTAssertTrue([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
+    } afterDiffHandler:nil afterPatchHandler:^(NSFileManager *fileManager, NSString * __unused sourceDirectory, NSString *destinationDirectory) {
+        NSString *destinationFile = [destinationDirectory stringByAppendingPathComponent:@"A"];
+        
+        NSError *error = nil;
+        NSDictionary *attributes = [fileManager attributesOfItemAtPath:destinationFile error:&error];
+        if (attributes == nil) {
+            NSLog(@"Failed to retrieve attributes with error: %@", error);
+            XCTFail("Failed to retrieve symlink attributes");
+        }
+        
+        NSNumber *permissionAttribute = attributes[NSFilePosixPermissions];
+        XCTAssertNotNil(permissionAttribute);
+        
+        unsigned short permissions = permissionAttribute.unsignedShortValue & PERMISSION_FLAGS;
+        XCTAssertEqual(permissions, VALID_SYMBOLIC_LINK_PERMISSIONS);
+    }];
+}
+
+- (void)testNonexistantSymlinkPermissionBadDiff
+{
+    // Even though destination has a 0777 symlink permission, we only respect 0755 for symlinks
+    [self createAndApplyPatchWithBeforeDiffHandler:^(NSFileManager *fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
+        NSString *sourceFile = [sourceDirectory stringByAppendingPathComponent:@"A"];
+        NSString *destinationFile = [destinationDirectory stringByAppendingPathComponent:@"A"];
+        
+        NSError *error = nil;
+        if (![fileManager createSymbolicLinkAtPath:sourceFile withDestinationPath:@"B" error:&error]) {
+            NSLog(@"Failed creating empty symlink to source with error: %@", error);
+            XCTFail("Failed to create empty symlink");
+        }
+        
+        if (![fileManager createSymbolicLinkAtPath:destinationFile withDestinationPath:@"B" error:&error]) {
+            NSLog(@"Failed creating empty symlink to destination with error: %@", error);
+            XCTFail("Failed to create empty symlink");
+        }
+        
+        if (lchmod([destinationFile fileSystemRepresentation], 0777) != 0) {
+            NSLog(@"Change Permission Error..");
+            XCTFail(@"Failed setting file permissions");
+        }
+        
+        XCTAssertTrue([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
+    } afterDiffHandler:nil afterPatchHandler:^(NSFileManager *fileManager, NSString * __unused sourceDirectory, NSString *destinationDirectory) {
+        NSString *destinationFile = [destinationDirectory stringByAppendingPathComponent:@"A"];
+        
+        NSError *error = nil;
+        NSDictionary *attributes = [fileManager attributesOfItemAtPath:destinationFile error:&error];
+        if (attributes == nil) {
+            NSLog(@"Failed to retrieve attributes with error: %@", error);
+            XCTFail("Failed to retrieve symlink attributes");
+        }
+        
+        NSNumber *permissionAttribute = attributes[NSFilePosixPermissions];
+        XCTAssertNotNil(permissionAttribute);
+        
+        unsigned short permissions = permissionAttribute.unsignedShortValue & PERMISSION_FLAGS;
+        XCTAssertEqual(permissions, VALID_SYMBOLIC_LINK_PERMISSIONS);
     }];
 }
 
@@ -298,7 +364,7 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
         NSString *sourceFile = [sourceDirectory stringByAppendingPathComponent:@"A"];
         
         XCTAssertTrue([[NSData dataWithBytes:"testt" length:5] writeToFile:sourceFile atomically:YES]);
-    }];
+    } afterPatchHandler:nil];
     XCTAssertFalse(success);
 }
 
@@ -368,7 +434,7 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
 // Make sure old version patches are no longer supported
 - (void)testRegularFileAddedWithVersion1Delta
 {
-    XCTAssertFalse([self createAndApplyPatchUsingVersion:SUBinaryDeltaMajorVersion1 compressionMode:SPUDeltaCompressionModeDefault beforeDiffHandler:nil afterDiffHandler:nil]);
+    XCTAssertFalse([self createAndApplyPatchUsingVersion:SUBinaryDeltaMajorVersion1 compressionMode:SPUDeltaCompressionModeDefault beforeDiffHandler:nil afterDiffHandler:nil afterPatchHandler:nil]);
 }
 
 - (void)testDirectoryAdded
@@ -732,7 +798,7 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
 
 - (void)testAddingSymlink
 {
-    [self createAndApplyPatchWithHandler:^(NSFileManager *fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
+    [self createAndApplyPatchWithBeforeDiffHandler:^(NSFileManager *fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
         NSString *destinationFile = [destinationDirectory stringByAppendingPathComponent:@"A"];
         
         NSError *error = nil;
@@ -742,7 +808,59 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
         }
         
         XCTAssertFalse([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
+    } afterDiffHandler:nil afterPatchHandler:^(NSFileManager *fileManager, NSString * __unused sourceDirectory, NSString *destinationDirectory) {
+        NSString *destinationFile = [destinationDirectory stringByAppendingPathComponent:@"A"];
+        
+        NSError *error = nil;
+        NSDictionary *attributes = [fileManager attributesOfItemAtPath:destinationFile error:&error];
+        if (attributes == nil) {
+            NSLog(@"Failed to retrieve attributes with error: %@", error);
+            XCTFail("Failed to retrieve symlink attributes");
+        }
+        
+        NSNumber *permissionAttribute = attributes[NSFilePosixPermissions];
+        XCTAssertNotNil(permissionAttribute);
+        
+        // Test default symlink permissons are correct
+        unsigned short permissions = permissionAttribute.unsignedShortValue & PERMISSION_FLAGS;
+        XCTAssertEqual(permissions, VALID_SYMBOLIC_LINK_PERMISSIONS);
     }];
+}
+
+- (void)testAddingSymlinkWithWrongPermissions
+{
+    [self createAndApplyPatchWithBeforeDiffHandler:^(NSFileManager *fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
+        NSString *destinationFile = [destinationDirectory stringByAppendingPathComponent:@"A"];
+        
+        NSError *error = nil;
+        if (![fileManager createSymbolicLinkAtPath:destinationFile withDestinationPath:@"B" error:&error]) {
+            NSLog(@"Error in creating symlink: %@", error);
+            XCTFail(@"Failed to create symlink");
+        }
+        
+        if (lchmod([destinationFile fileSystemRepresentation], 0777) != 0) {
+            NSLog(@"Change Permission Error..");
+            XCTFail(@"Failed setting file permissions");
+        }
+        
+        XCTAssertFalse([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
+    } afterDiffHandler:nil afterPatchHandler:^(NSFileManager *fileManager, NSString * __unused sourceDirectory, NSString *destinationDirectory) {
+        NSString *destinationFile = [destinationDirectory stringByAppendingPathComponent:@"A"];
+        
+        NSError *error = nil;
+        NSDictionary *attributes = [fileManager attributesOfItemAtPath:destinationFile error:&error];
+        if (attributes == nil) {
+            NSLog(@"Failed to retrieve attributes with error: %@", error);
+            XCTFail("Failed to retrieve symlink attributes");
+        }
+        
+        NSNumber *permissionAttribute = attributes[NSFilePosixPermissions];
+        XCTAssertNotNil(permissionAttribute);
+        
+        // Test that we only respect valid symlink permissions for >= version 3 deltas
+        unsigned short permissions = permissionAttribute.unsignedShortValue & PERMISSION_FLAGS;
+        XCTAssertEqual(permissions, VALID_SYMBOLIC_LINK_PERMISSIONS);
+    } testingVersion2Delta:NO];
 }
 
 - (void)testSmallFilePermissionChangeWithNoContentChange
@@ -761,7 +879,6 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
             XCTFail(@"Failed setting file permissions");
         }
         
-        // This would fail for version 1.0
         XCTAssertFalse([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
     }];
 }
@@ -782,7 +899,6 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
             XCTFail(@"Failed setting file permissions");
         }
         
-        // This would fail for version 1.0
         XCTAssertFalse([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
     }];
 }
@@ -802,7 +918,6 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
             XCTFail(@"Failed setting file permissions");
         }
         
-        // This would fail for version 1.0
         XCTAssertFalse([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
     }];
 }
@@ -822,7 +937,6 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
             XCTFail(@"Failed setting file permissions");
         }
         
-        // This would fail for version 1.0
         XCTAssertFalse([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
     }];
 }
@@ -848,7 +962,6 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
             XCTFail(@"Failed setting file permissions");
         }
         
-        // This would fail for version 1.0
         XCTAssertFalse([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
     }];
 }
@@ -868,7 +981,6 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
         XCTAssertTrue([[self bigData1] writeToFile:sourceFile atomically:YES]);
         XCTAssertTrue([[self bigData2] writeToFile:destinationFile atomically:YES]);
         
-        // This would fail for version 1.0
         XCTAssertFalse([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
     }];
 }
@@ -896,7 +1008,6 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
         XCTAssertTrue([data2 writeToFile:sourceFile2 atomically:YES]);
         XCTAssertTrue([[self bigData2] writeToFile:destinationFile atomically:YES]);
         
-        // This would fail for version 1.0
         XCTAssertFalse([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
     }];
 }
@@ -916,7 +1027,6 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
         XCTAssertTrue([[self bigData1] writeToFile:sourceFile atomically:YES]);
         XCTAssertTrue([[self bigData2] writeToFile:destinationFile atomically:YES]);
         
-        // This would fail for version 1.0
         XCTAssertFalse([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
     }];
 }
@@ -947,7 +1057,6 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
             XCTFail(@"Failed setting file permissions");
         }
         
-        // This would fail for version 1.0
         XCTAssertFalse([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
     }];
 }
@@ -973,7 +1082,6 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
             XCTFail(@"Failed setting file permissions");
         }
         
-        // This would fail for version 1.0
         XCTAssertFalse([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
     }];
 }
@@ -1011,7 +1119,6 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
             XCTFail(@"Failed setting file permissions");
         }
         
-        // This would fail for version 1.0
         XCTAssertFalse([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
     }];
 }
@@ -1049,7 +1156,6 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
             XCTFail(@"Failed setting file permissions");
         }
         
-        // This would fail for version 1.0
         XCTAssertTrue([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
     }];
 }
@@ -1071,7 +1177,7 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
         }
         
         XCTAssertFalse([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
-    } afterDiffHandler:nil];
+    } afterDiffHandler:nil afterPatchHandler:nil];
     XCTAssertTrue(success);
 }
 
@@ -1096,7 +1202,7 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
         }
         
         XCTAssertFalse([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
-    } afterDiffHandler:nil];
+    } afterDiffHandler:nil afterPatchHandler:nil];
     XCTAssertTrue(success);
 }
 
@@ -1121,7 +1227,7 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
         }
         
         XCTAssertFalse([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
-    } afterDiffHandler:nil];
+    } afterDiffHandler:nil afterPatchHandler:nil];
     XCTAssertTrue(success);
 }
 
@@ -1141,7 +1247,6 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
             XCTFail(@"Failed setting file permissions");
         }
         
-        // This would fail for version 1.0
         XCTAssertFalse([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
     }];
 }
@@ -1166,7 +1271,7 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
         XCTAssertEqual(0, acl_set_link_np([sourceFile fileSystemRepresentation], ACL_TYPE_EXTENDED, acl));
         
         XCTAssertEqual(0, acl_free(acl));
-    } afterDiffHandler:nil];
+    } afterDiffHandler:nil afterPatchHandler:nil];
     
     XCTAssertFalse(success);
 }
@@ -1192,7 +1297,7 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
         
         XCTAssertEqual(0, acl_free(acl));
         
-    } afterDiffHandler:nil];
+    } afterDiffHandler:nil afterPatchHandler:nil];
     
     XCTAssertFalse(success);
 }
@@ -1217,7 +1322,7 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
         XCTAssertEqual(0, acl_set_link_np([sourceFile fileSystemRepresentation], ACL_TYPE_EXTENDED, acl));
         
         XCTAssertEqual(0, acl_free(acl));
-    } afterDiffHandler:nil];
+    } afterDiffHandler:nil afterPatchHandler:nil];
     
     XCTAssertFalse(success);
 }
@@ -1242,7 +1347,7 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
         XCTAssertEqual(0, acl_set_link_np([destinationFile fileSystemRepresentation], ACL_TYPE_EXTENDED, acl));
         
         XCTAssertEqual(0, acl_free(acl));
-    } afterDiffHandler:nil];
+    } afterDiffHandler:nil afterPatchHandler:nil];
     
     XCTAssertFalse(success);
 }
@@ -1489,7 +1594,7 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
         XCTAssertEqual(0, setxattr([sourceFile fileSystemRepresentation], APPLE_CODE_SIGN_XATTR_CODE_DIRECTORY_KEY, xattrValue, sizeof(xattrValue), 0, XATTR_CREATE));
         XCTAssertEqual(0, setxattr([sourceFile fileSystemRepresentation], APPLE_CODE_SIGN_XATTR_CODE_REQUIREMENTS_KEY, xattrValue, sizeof(xattrValue), 0, XATTR_CREATE));
         XCTAssertEqual(0, setxattr([sourceFile fileSystemRepresentation], APPLE_CODE_SIGN_XATTR_CODE_SIGNATURE_KEY, xattrValue, sizeof(xattrValue), 0, XATTR_CREATE));
-    } afterDiffHandler:nil];
+    } afterDiffHandler:nil afterPatchHandler:nil];
     XCTAssertFalse(success);
 }
 
@@ -1508,7 +1613,7 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
         XCTAssertEqual(0, setxattr([destinationFile fileSystemRepresentation], APPLE_CODE_SIGN_XATTR_CODE_DIRECTORY_KEY, xattrValue, sizeof(xattrValue), 0, XATTR_CREATE));
         XCTAssertEqual(0, setxattr([destinationFile fileSystemRepresentation], APPLE_CODE_SIGN_XATTR_CODE_REQUIREMENTS_KEY, xattrValue, sizeof(xattrValue), 0, XATTR_CREATE));
         XCTAssertEqual(0, setxattr([destinationFile fileSystemRepresentation], APPLE_CODE_SIGN_XATTR_CODE_SIGNATURE_KEY, xattrValue, sizeof(xattrValue), 0, XATTR_CREATE));
-    } afterDiffHandler:nil];
+    } afterDiffHandler:nil afterPatchHandler:nil];
     XCTAssertFalse(success);
 }
 

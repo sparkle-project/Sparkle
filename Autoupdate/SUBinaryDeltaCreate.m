@@ -240,12 +240,25 @@ static BOOL shouldChangePermissions(NSDictionary *originalInfo, NSDictionary *ne
     if (!originalInfo) {
         return NO;
     }
+    
+    unsigned short originalInfoType = [(NSNumber *)originalInfo[INFO_TYPE_KEY] unsignedShortValue];
+    unsigned short newInfoType = [(NSNumber *)newInfo[INFO_TYPE_KEY] unsignedShortValue];
 
-    if ([(NSNumber *)originalInfo[INFO_TYPE_KEY] unsignedShortValue] != [(NSNumber *)newInfo[INFO_TYPE_KEY] unsignedShortValue]) {
+    if (originalInfoType != newInfoType) {
         return NO;
     }
+    
+    unsigned short oldPermissions = [(NSNumber *)originalInfo[INFO_PERMISSIONS_KEY] unsignedShortValue];
+    unsigned short newPermissions = [(NSNumber *)newInfo[INFO_PERMISSIONS_KEY] unsignedShortValue];
 
-    if ([(NSNumber *)originalInfo[INFO_PERMISSIONS_KEY] unsignedShortValue] == [(NSNumber *)newInfo[INFO_PERMISSIONS_KEY] unsignedShortValue]) {
+    if (oldPermissions == newPermissions) {
+        return NO;
+    }
+    
+    // We don't track new permissions on symbolic links that aren't the 0755 macOS default
+    // Some linux / remotely mounted filesystems may not track permissions on symlinks and use 0777
+    // We don't want to pick up bad permissions
+    if (newInfoType == FTS_SL && newPermissions != VALID_SYMBOLIC_LINK_PERMISSIONS) {
         return NO;
     }
 
@@ -505,6 +518,8 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
         return NO;
     }
 
+    uint32_t warningsCount = 0;
+    const uint32_t maxWarningsToPrint = 16;
     while ((ent = fts_read(fts))) {
         if (ent->fts_info != FTS_F && ent->fts_info != FTS_SL && ent->fts_info != FTS_D) {
             continue;
@@ -548,6 +563,26 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
                 *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Diffing code signed extended attributes are not supported. Detected extended attribute in after-tree on file %@", @(ent->fts_path)] }];
             }
             return NO;
+        }
+        
+        if (warningsCount < maxWarningsToPrint) {
+            uint16_t permissions = (ent->fts_statp->st_mode & PERMISSION_FLAGS);
+            if (ent->fts_info == FTS_SL) {
+                if (permissions != VALID_SYMBOLIC_LINK_PERMISSIONS) {
+                    fprintf(stderr, "\nWarning: file permissions 0%o of symbolic link '%s' won't be preserved in the delta update (only permissions with mode 0755 are supported for symbolic links).", permissions, ent->fts_path);
+                    
+                    warningsCount++;
+                }
+            } else if (permissions != 0755 && permissions != 0644) {
+                // This could indicate something is wrong inside of the bundle so it's worth warning the user about
+                fprintf(stderr, "\nWarning: detected irregular file permissions 0%o for '%s'", permissions, ent->fts_path);
+                
+                warningsCount++;
+            }
+            
+            if (warningsCount == maxWarningsToPrint) {
+                fprintf(stderr, "\nWarning: encountered too many warnings.. Ignoring the rest..");
+            }
         }
 
         NSDictionary *oldInfo = originalTreeState[key];
