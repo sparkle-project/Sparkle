@@ -33,7 +33,7 @@ typedef NS_ENUM(NSInteger, SUCharacterType) {
     kNumberType,
     kStringType,
     kPeriodSeparatorType,
-    kPunctiationSeparatorType,
+    kPunctuationSeparatorType,
     kWhitespaceSeparatorType,
     kDashType,
 };
@@ -49,7 +49,7 @@ typedef NS_ENUM(NSInteger, SUCharacterType) {
     } else if ([[NSCharacterSet whitespaceAndNewlineCharacterSet] characterIsMember:[character characterAtIndex:0]]) {
         return kWhitespaceSeparatorType;
     } else if ([[NSCharacterSet punctuationCharacterSet] characterIsMember:[character characterAtIndex:0]]) {
-        return kPunctiationSeparatorType;
+        return kPunctuationSeparatorType;
     } else {
         return kStringType;
     }
@@ -63,7 +63,7 @@ typedef NS_ENUM(NSInteger, SUCharacterType) {
         case kDashType:
             return NO;
         case kPeriodSeparatorType:
-        case kPunctiationSeparatorType:
+        case kPunctuationSeparatorType:
         case kWhitespaceSeparatorType:
             return YES;
     }
@@ -78,11 +78,11 @@ typedef NS_ENUM(NSInteger, SUCharacterType) {
         case kDashType:
             return (typeA == typeB);
         case kPeriodSeparatorType:
-        case kPunctiationSeparatorType:
+        case kPunctuationSeparatorType:
         case kWhitespaceSeparatorType: {
             switch (typeB) {
                 case kPeriodSeparatorType:
-                case kPunctiationSeparatorType:
+                case kPunctuationSeparatorType:
                 case kWhitespaceSeparatorType:
                     return YES;
                 case kNumberType:
