@@ -165,7 +165,7 @@ static void _hashOfBuffer(unsigned char *hash, const char *buffer, ssize_t buffe
     CC_SHA1_Final(hash, &hashContext);
 }
 
-static BOOL _hashOfFileContents(unsigned char *hash, FTSENT *ent)
+static BOOL _hashOfFileContents(unsigned char *hash, FTSENT *ent, void *tempBuffer, size_t tempBufferSize)
 {
     if (ent->fts_info == FTS_SL) {
         char linkDestination[MAXPATHLEN + 1];
@@ -177,27 +177,37 @@ static BOOL _hashOfFileContents(unsigned char *hash, FTSENT *ent)
 
         _hashOfBuffer(hash, linkDestination, linkDestinationLength);
     } else if (ent->fts_info == FTS_F) {
-        int fileDescriptor = open(ent->fts_path, O_RDONLY);
-        if (fileDescriptor == -1) {
-            perror("open");
-            return NO;
-        }
-
         ssize_t fileSize = ent->fts_statp->st_size;
-        if (fileSize == 0) {
+        if (fileSize <= 0) {
             _hashOfBuffer(hash, NULL, 0);
         } else {
-            void *buffer = mmap(0, (size_t)fileSize, PROT_READ, MAP_FILE | MAP_PRIVATE, fileDescriptor, 0);
-            if (buffer == (void *)-1) {
-                close(fileDescriptor);
-                perror("mmap");
+            FILE *file = fopen(ent->fts_path, "rb");
+            if (file == NULL) {
+                perror("fopen");
                 return NO;
             }
-
-            _hashOfBuffer(hash, buffer, fileSize);
-            munmap(buffer, (size_t)fileSize);
+            
+            CC_SHA1_CTX hashContext;
+            CC_SHA1_Init(&hashContext);
+            
+            size_t bytesLeft = (size_t)fileSize;
+            while (bytesLeft > 0) {
+                size_t bytesToConsume = (bytesLeft >= tempBufferSize) ? tempBufferSize : bytesLeft;
+                
+                if (fread(tempBuffer, bytesToConsume, 1, file) < 1) {
+                    perror("fread");
+                    fclose(file);
+                    return NO;
+                }
+                
+                CC_SHA1_Update(&hashContext, tempBuffer, (CC_LONG)bytesToConsume);
+                bytesLeft -= bytesToConsume;
+            }
+            
+            CC_SHA1_Final(hash, &hashContext);
+            
+            fclose(file);
         }
-        close(fileDescriptor);
     } else if (ent->fts_info == FTS_D) {
         memset(hash, 0xdd, CC_SHA1_DIGEST_LENGTH);
     } else {
@@ -215,6 +225,13 @@ BOOL getRawHashOfTreeAndFileTablesWithVersion(unsigned char *hashBuffer, NSStrin
 {
     char pathBuffer[PATH_MAX] = { 0 };
     if (![path getFileSystemRepresentation:pathBuffer maxLength:sizeof(pathBuffer)]) {
+        return NO;
+    }
+    
+    const size_t tempBufferSize = 16384;
+    void *tempBuffer = calloc(1, tempBufferSize);
+    if (tempBuffer == NULL) {
+        perror("calloc");
         return NO;
     }
 
@@ -241,7 +258,7 @@ BOOL getRawHashOfTreeAndFileTablesWithVersion(unsigned char *hashBuffer, NSStrin
             continue;
 
         unsigned char fileHash[CC_SHA1_DIGEST_LENGTH];
-        if (!_hashOfFileContents(fileHash, ent)) {
+        if (!_hashOfFileContents(fileHash, ent, tempBuffer, tempBufferSize)) {
             return NO;
         }
         CC_SHA1_Update(&hashContext, fileHash, sizeof(fileHash));
@@ -277,6 +294,9 @@ BOOL getRawHashOfTreeAndFileTablesWithVersion(unsigned char *hashBuffer, NSStrin
         CC_SHA1_Update(&hashContext, &type, sizeof(type));
         CC_SHA1_Update(&hashContext, &hashedPermissions, sizeof(hashedPermissions));
     }
+    
+    free(tempBuffer);
+    
     fts_close(fts);
 
     CC_SHA1_Final(hashBuffer, &hashContext);
