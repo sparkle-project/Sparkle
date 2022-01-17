@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="18122" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="19529" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="18122"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19529"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -49,14 +49,14 @@
                         </connections>
                     </textField>
                     <progressIndicator verticalHuggingPriority="750" maxValue="100" bezeled="NO" indeterminate="YES" style="bar" translatesAutoresizingMaskIntoConstraints="NO" id="11">
-                        <rect key="frame" x="107" y="47" width="275" height="20"/>
+                        <rect key="frame" x="107" y="47" width="273" height="20"/>
                         <connections>
                             <binding destination="-2" name="maxValue" keyPath="maxProgressValue" id="13"/>
                             <binding destination="-2" name="value" keyPath="progressValue" previousBinding="13" id="27"/>
                         </connections>
                     </progressIndicator>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="12">
-                        <rect key="frame" x="272" y="12" width="114" height="32"/>
+                        <rect key="frame" x="273" y="12" width="114" height="32"/>
                         <constraints>
                             <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="100" id="3tI-Ef-LLb"/>
                         </constraints>
@@ -86,7 +86,7 @@
                     </textField>
                 </subviews>
                 <constraints>
-                    <constraint firstAttribute="trailing" secondItem="11" secondAttribute="trailing" constant="18" id="1eu-lX-1HN"/>
+                    <constraint firstAttribute="trailing" secondItem="11" secondAttribute="trailing" constant="20" id="1eu-lX-1HN"/>
                     <constraint firstItem="12" firstAttribute="top" secondItem="11" secondAttribute="bottom" constant="9" id="3RZ-xs-4zc"/>
                     <constraint firstItem="8" firstAttribute="leading" secondItem="7" secondAttribute="trailing" constant="20" id="5bq-w6-BOU"/>
                     <constraint firstItem="7" firstAttribute="top" secondItem="6" secondAttribute="top" constant="15" id="9Mg-Ac-X6m"/>
@@ -97,7 +97,7 @@
                     <constraint firstItem="7" firstAttribute="leading" secondItem="6" secondAttribute="leading" constant="24" id="ZLG-dr-gmv"/>
                     <constraint firstAttribute="bottom" secondItem="12" secondAttribute="bottom" constant="19" id="iY3-LJ-ivz"/>
                     <constraint firstItem="12" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="16" secondAttribute="trailing" constant="25" id="k07-gJ-v9t"/>
-                    <constraint firstAttribute="trailing" secondItem="12" secondAttribute="trailing" constant="21" id="onJ-J5-mra"/>
+                    <constraint firstAttribute="trailing" secondItem="12" secondAttribute="trailing" constant="20" id="onJ-J5-mra"/>
                     <constraint firstAttribute="trailing" secondItem="8" secondAttribute="trailing" constant="19" id="pHi-Hm-GAw"/>
                     <constraint firstItem="8" firstAttribute="top" secondItem="6" secondAttribute="top" constant="15" id="tAo-wJ-XR0"/>
                 </constraints>
