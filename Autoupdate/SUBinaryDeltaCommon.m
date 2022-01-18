@@ -227,18 +227,19 @@ BOOL getRawHashOfTreeAndFileTablesWithVersion(unsigned char *hashBuffer, NSStrin
     if (![path getFileSystemRepresentation:pathBuffer maxLength:sizeof(pathBuffer)]) {
         return NO;
     }
-    
+
     const size_t tempBufferSize = 16384;
     void *tempBuffer = calloc(1, tempBufferSize);
     if (tempBuffer == NULL) {
         perror("calloc");
         return NO;
     }
-
+    
     char *const sourcePaths[] = { pathBuffer, 0 };
     FTS *fts = fts_open(sourcePaths, FTS_PHYSICAL | FTS_NOCHDIR, compareFiles);
     if (!fts) {
         perror("fts_open");
+        free(tempBuffer);
         return NO;
     }
 
@@ -259,6 +260,8 @@ BOOL getRawHashOfTreeAndFileTablesWithVersion(unsigned char *hashBuffer, NSStrin
 
         unsigned char fileHash[CC_SHA1_DIGEST_LENGTH];
         if (!_hashOfFileContents(fileHash, ent, tempBuffer, tempBufferSize)) {
+            fts_close(fts);
+            free(tempBuffer);
             return NO;
         }
         CC_SHA1_Update(&hashContext, fileHash, sizeof(fileHash));
