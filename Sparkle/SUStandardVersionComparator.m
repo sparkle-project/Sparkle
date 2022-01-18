@@ -32,34 +32,75 @@
 typedef NS_ENUM(NSInteger, SUCharacterType) {
     kNumberType,
     kStringType,
-    kSeparatorType,
+    kPeriodSeparatorType,
+    kPunctuationSeparatorType,
+    kWhitespaceSeparatorType,
     kDashType,
 };
 
 - (SUCharacterType)typeOfCharacter:(NSString *)character
 {
     if ([character isEqualToString:@"."]) {
-        return kSeparatorType;
+        return kPeriodSeparatorType;
     } else if ([character isEqualToString:@"-"]) {
         return kDashType;
     } else if ([[NSCharacterSet decimalDigitCharacterSet] characterIsMember:[character characterAtIndex:0]]) {
         return kNumberType;
     } else if ([[NSCharacterSet whitespaceAndNewlineCharacterSet] characterIsMember:[character characterAtIndex:0]]) {
-        return kSeparatorType;
+        return kWhitespaceSeparatorType;
     } else if ([[NSCharacterSet punctuationCharacterSet] characterIsMember:[character characterAtIndex:0]]) {
-        return kSeparatorType;
+        return kPunctuationSeparatorType;
     } else {
         return kStringType;
     }
 }
 
-- (NSArray *)splitVersionString:(NSString *)version
+- (BOOL)isSeparatorType:(SUCharacterType)characterType
+{
+    switch (characterType) {
+        case kNumberType:
+        case kStringType:
+        case kDashType:
+            return NO;
+        case kPeriodSeparatorType:
+        case kPunctuationSeparatorType:
+        case kWhitespaceSeparatorType:
+            return YES;
+    }
+}
+
+// If type A and type B are some sort of separator, consider them to be equal
+- (BOOL)isEqualCharacterTypeClassForTypeA:(SUCharacterType)typeA typeB:(SUCharacterType)typeB
+{
+    switch (typeA) {
+        case kNumberType:
+        case kStringType:
+        case kDashType:
+            return (typeA == typeB);
+        case kPeriodSeparatorType:
+        case kPunctuationSeparatorType:
+        case kWhitespaceSeparatorType: {
+            switch (typeB) {
+                case kPeriodSeparatorType:
+                case kPunctuationSeparatorType:
+                case kWhitespaceSeparatorType:
+                    return YES;
+                case kNumberType:
+                case kStringType:
+                case kDashType:
+                    return NO;
+            }
+        }
+    }
+}
+
+- (NSMutableArray<NSString *> *)splitVersionString:(NSString *)version
 {
     NSString *character;
     NSMutableString *s;
     NSUInteger i, n;
     SUCharacterType oldType, newType;
-    NSMutableArray *parts = [NSMutableArray array];
+    NSMutableArray<NSString *> *parts = [NSMutableArray array];
     if ([version length] == 0) {
         // Nothing to do here
         return parts;
@@ -73,7 +114,7 @@ typedef NS_ENUM(NSInteger, SUCharacterType) {
         if (newType == kDashType) {
             break;
         }
-        if (oldType != newType || oldType == kSeparatorType) {
+        if (oldType != newType || [self isSeparatorType:oldType]) {
             // We've reached a new segment
             NSString *aPart = [[NSString alloc] initWithString:s];
             [parts addObject:aPart];
@@ -90,10 +131,64 @@ typedef NS_ENUM(NSInteger, SUCharacterType) {
     return parts;
 }
 
+// This returns the count of number and period parts at the beginning of the version
+// See -balanceVersionPartsA:partsB below
+- (NSUInteger)countOfNumberAndPeriodStartingParts:(NSArray<NSString *> *)parts
+{
+    NSUInteger count = 0;
+    for (NSString *part in parts) {
+        SUCharacterType characterType = [self typeOfCharacter:part];
+        
+        if (characterType == kNumberType || characterType == kPeriodSeparatorType) {
+            count++;
+        } else {
+            break;
+        }
+    }
+    return count;
+}
+
+// See -balanceVersionPartsA:partsB below
+- (void)addNumberAndPeriodPartsToParts:(NSMutableArray<NSString *> *)toParts toNumberAndPeriodPartsCount:(NSUInteger)toNumberAndPeriodPartsCount fromParts:(NSArray<NSString *> *)fromParts fromNumberAndPeriodPartsCount:(NSUInteger)fromNumberAndPeriodPartsCount
+{
+    NSUInteger partsCountDifference = (fromNumberAndPeriodPartsCount - toNumberAndPeriodPartsCount);
+    
+    for (NSUInteger insertionIndex = toNumberAndPeriodPartsCount; insertionIndex < toNumberAndPeriodPartsCount + partsCountDifference; insertionIndex++) {
+        SUCharacterType typeA = [self typeOfCharacter:fromParts[insertionIndex]];
+        if (typeA == kPeriodSeparatorType) {
+            [toParts insertObject:@"." atIndex:insertionIndex];
+        } else if (typeA == kNumberType) {
+            [toParts insertObject:@"0" atIndex:insertionIndex];
+        } else {
+            // It should not be possible to get here
+            assert(false);
+        }
+    }
+}
+
+// If one version starts with "1.0.0" and the other starts with "1.1" we make sure they're balanced
+// such that the latter version now becomes "1.1.0". This helps ensure that versions like "1.0" and "1.0.0" are equal.
+- (void)balanceVersionPartsA:(NSMutableArray<NSString *> *)partsA partsB:(NSMutableArray<NSString *> *)partsB
+{
+    NSUInteger partANumberAndPeriodPartsCount = [self countOfNumberAndPeriodStartingParts:partsA];
+    NSUInteger partBNumberAndPeriodPartsCount = [self countOfNumberAndPeriodStartingParts:partsB];;
+    
+    if (partANumberAndPeriodPartsCount > partBNumberAndPeriodPartsCount) {
+        [self addNumberAndPeriodPartsToParts:partsB toNumberAndPeriodPartsCount:partBNumberAndPeriodPartsCount fromParts:partsA fromNumberAndPeriodPartsCount:partANumberAndPeriodPartsCount];
+    } else if (partBNumberAndPeriodPartsCount > partANumberAndPeriodPartsCount) {
+        [self addNumberAndPeriodPartsToParts:partsA toNumberAndPeriodPartsCount:partANumberAndPeriodPartsCount fromParts:partsB fromNumberAndPeriodPartsCount:partBNumberAndPeriodPartsCount];
+    }
+}
+
 - (NSComparisonResult)compareVersion:(NSString *)versionA toVersion:(NSString *)versionB
 {
-    NSArray *partsA = [self splitVersionString:versionA];
-    NSArray *partsB = [self splitVersionString:versionB];
+    NSMutableArray<NSString *> *splitPartsA = [self splitVersionString:versionA];
+    NSMutableArray<NSString *> *splitPartsB = [self splitVersionString:versionB];
+    
+    [self balanceVersionPartsA:splitPartsA partsB:splitPartsB];
+    
+    NSArray<NSString *> *partsA = splitPartsA;
+    NSArray<NSString *> *partsB = splitPartsB;
 
     NSString *partA, *partB;
     NSUInteger i, n;
@@ -109,7 +204,7 @@ typedef NS_ENUM(NSInteger, SUCharacterType) {
         typeB = [self typeOfCharacter:partB];
 
         // Compare types
-        if (typeA == typeB) {
+        if ([self isEqualCharacterTypeClassForTypeA:typeA typeB:typeB]) {
             // Same type; we can compare
             if (typeA == kNumberType) {
                 valueA = [partA longLongValue];
