@@ -409,9 +409,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         // We start the update checks and register as observer for changes after the prompt finishes
     } else {
         // We check if the user's said they want updates, or they haven't said anything, and the default is set to checking.
-        // shapiro: we want updates immediately upon login
-        //[self scheduleNextUpdateCheckFiringImmediately:NO usingCurrentDate:YES];
-        [self scheduleNextUpdateCheckFiringImmediately:YES usingCurrentDate:YES];
+        [self scheduleNextUpdateCheckFiringImmediately:NO usingCurrentDate:YES];
     }
 }
 
