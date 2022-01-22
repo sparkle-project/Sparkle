@@ -217,7 +217,7 @@
     }
 }
 
-- (void)showInstallingUpdate
+- (void)showInstallingUpdateWithApplicationTerminated:(BOOL)__unused applicationTerminated
 {
     if (self.verbose) {
         fprintf(stderr, "Installing Update...\n");
@@ -235,11 +235,6 @@
 
 - (void)dismissUpdateInstallation
 {
-}
-
-- (void)showSendingTerminationSignal
-{
-    // We are already showing that the update is installing, so there is no need to do anything here
 }
 
 @end

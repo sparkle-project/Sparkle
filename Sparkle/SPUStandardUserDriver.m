@@ -464,12 +464,20 @@
     [self.statusController setProgressValue:progress];
 }
 
-- (void)showInstallingUpdate
+- (void)showInstallingUpdateWithApplicationTerminated:(BOOL)applicationTerminated
 {
     assert(NSThread.isMainThread);
     
-    [self.statusController beginActionWithTitle:SULocalizedString(@"Installing update...", @"Take care not to overflow the status window.") maxProgressValue:0.0 statusText:nil];
-    [self.statusController setButtonEnabled:NO];
+    if (applicationTerminated) {
+        [self.statusController beginActionWithTitle:SULocalizedString(@"Installing update...", @"Take care not to overflow the status window.") maxProgressValue:0.0 statusText:nil];
+        [self.statusController setButtonEnabled:NO];
+    } else {
+        // The "quit" event can always be canceled or delayed by the application we're updating
+        // So we can't easily predict how long the installation will take or if it won't happen right away
+        // We close our status window because we don't want it persisting for too long and have it obscure other windows
+        [self.statusController close];
+        self.statusController = nil;
+    }
 }
 
 - (void)showUpdateInstalledAndRelaunched:(BOOL)relaunched acknowledgement:(void (^)(void))acknowledgement
@@ -512,17 +520,6 @@
 }
 
 #pragma mark Aborting Everything
-
-- (void)showSendingTerminationSignal
-{
-    assert(NSThread.isMainThread);
-    
-    // The "quit" event can always be canceled or delayed by the application we're updating
-    // So we can't easily predict how long the installation will take or if it won't happen right away
-    // We close our status window because we don't want it persisting for too long and have it obscure other windows
-    [self.statusController close];
-    self.statusController = nil;
-}
 
 - (void)dismissUpdateInstallation
 {

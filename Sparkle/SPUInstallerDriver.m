@@ -310,11 +310,7 @@
         
         [self.delegate installerWillFinishInstallationAndRelaunch:self.relaunch];
         
-        [self.delegate installerDidStartInstalling];
-        
-        if (!hasTargetTerminated) {
-            [self.delegate installerIsSendingAppTerminationSignal];
-        }
+        [self.delegate installerDidStartInstallingWithApplicationTerminated:hasTargetTerminated];
     } else if (identifier == SPUInstallationFinishedStage3) {
         self.currentStage = identifier;
         

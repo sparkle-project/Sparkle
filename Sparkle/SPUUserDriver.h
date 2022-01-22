@@ -218,26 +218,16 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
 /**
  * Show the user that the update is installing
  *
- * Let the user know that the update is currently installing. Sparkle uses this to show an indeterminate progress bar.
+ * Let the user know that the update is currently installing.
  *
  * Before this point, `-showReadyToInstallAndRelaunch:` or  `-showUpdateFoundWithAppcastItem:state:reply:` will be called.
+ *
+ * @param applicationTerminated Indicates if the application has been terminated already.
+ * If the application hasn't been terminated, a quit event is sent to the running application before installing the update.
+ * If the application or user delays or cancels termination, there may be an indefinite period of time before the application fully quits.
+ * It is up to the implementor whether or not to decide to continue showing installation progress in this case.
  */
-- (void)showInstallingUpdate;
-
-/**
- * Show or dismiss progress while a termination signal is being sent to the application from Sparkle's installer
- *
- * Terminating and relaunching the application (if requested to be relaunched) may happen quickly,
- * or it may take some time to perform the final installation, or the termination signal can be canceled or delayed by the application or user.
- *
- * It is up to the implementor whether or not to decide to continue showing installation progress
- * or dismissing UI that won't remain obscuring other parts of the user interface.
- *
- * Before this point, `-showInstallingUpdate` will be called.
- *
- * This will not be invoked if the application that is being updated is already terminated.
- */
-- (void)showSendingTerminationSignal;
+- (void)showInstallingUpdateWithApplicationTerminated:(BOOL)applicationTerminated;
 
 /**
  * Show the user that the update installation finished
@@ -248,7 +238,7 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  * the updater's lifetime is tied to the application it is updating. This implementation must not try to reference
  * the old bundle prior to the installation, which will no longer be around.
  *
- * Before this point, `-showSendingTerminationSignal` or `-showReadyToInstallAndRelaunch:` may be called.
+ * Before this point, `-showInstallingUpdateWithApplicationTerminated:` will be called.
  *
  * @param relaunched Indicates if the update was relaunched.
  * @param acknowledgement Acknowledge to the updater that the finished installation was shown.
@@ -286,7 +276,11 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
 
 - (void)showUpdateInstallationDidFinishWithAcknowledgement:(void (^)(void))acknowledgement __deprecated_msg("Implement -showUpdateInstalledAndRelaunched:acknowledgement: instead");
 
-- (void)dismissUserInitiatedUpdateCheck __deprecated_msg("Transition to new UI appropriately when a new update is shown, when no update is found, or when an update error occurs.");;
+- (void)dismissUserInitiatedUpdateCheck __deprecated_msg("Transition to new UI appropriately when a new update is shown, when no update is found, or when an update error occurs.");
+
+- (void)showInstallingUpdate __deprecated_msg("Implement -showInstallingUpdateWithApplicationTerminated: instead.");
+
+- (void)showSendingTerminationSignal __deprecated_msg("Implement -showInstallingUpdateWithApplicationTerminated: instead.");
 
 @end
 
