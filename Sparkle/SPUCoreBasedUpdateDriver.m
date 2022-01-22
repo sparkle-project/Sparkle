@@ -261,10 +261,10 @@
     [self.delegate coreDriverIsRequestingAbortUpdateWithError:error];
 }
 
-- (void)installerDidStartInstalling
+- (void)installerDidStartInstallingWithApplicationTerminated:(BOOL)applicationTerminated
 {
-    if ([self.delegate respondsToSelector:@selector(installerDidStartInstalling)]) {
-        [self.delegate installerDidStartInstalling];
+    if ([self.delegate respondsToSelector:@selector(installerDidStartInstallingWithApplicationTerminated:)]) {
+        [self.delegate installerDidStartInstallingWithApplicationTerminated:applicationTerminated];
     }
 }
 
@@ -321,14 +321,6 @@
         [self.delegate installerDidFinishInstallationAndRelaunched:relaunched acknowledgement:acknowledgement];
     } else {
         acknowledgement();
-    }
-}
-
-- (void)installerIsSendingAppTerminationSignal
-{
-    // If they don't respond or do anything, we'll just install after the user terminates the app anyway
-    if ([self.delegate respondsToSelector:@selector(installerIsSendingAppTerminationSignal)]) {
-        [self.delegate installerIsSendingAppTerminationSignal];
     }
 }
 

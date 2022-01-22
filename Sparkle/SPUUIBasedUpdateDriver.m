@@ -310,9 +310,24 @@
     [self.userDriver showDownloadDidStartExtractingUpdate];
 }
 
-- (void)installerDidStartInstalling
+- (void)installerDidStartInstallingWithApplicationTerminated:(BOOL)applicationTerminated
 {
-    [self.userDriver showInstallingUpdate];
+    if ([self.userDriver respondsToSelector:@selector(showInstallingUpdateWithApplicationTerminated:)]) {
+        [self.userDriver showInstallingUpdateWithApplicationTerminated:applicationTerminated];
+    } else {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+        if ([self.userDriver respondsToSelector:@selector(showInstallingUpdate)]) {
+            [self.userDriver showInstallingUpdate];
+        }
+        
+        if (!applicationTerminated) {
+            if ([self.userDriver respondsToSelector:@selector(showSendingTerminationSignal)]) {
+                [self.userDriver showSendingTerminationSignal];
+            }
+        }
+#pragma clang diagnostic pop
+    }
 }
 
 - (void)installerDidExtractUpdateWithProgress:(double)progress
@@ -329,11 +344,6 @@
             });
         }];
     }
-}
-
-- (void)installerIsSendingAppTerminationSignal
-{
-    [self.userDriver showSendingTerminationSignal];
 }
 
 - (void)installerDidFinishInstallationAndRelaunched:(BOOL)relaunched acknowledgement:(void(^)(void))acknowledgement

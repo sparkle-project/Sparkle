@@ -38,11 +38,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)coreDriverDidStartExtractingUpdate;
 
-- (void)installerDidStartInstalling;
+- (void)installerDidStartInstallingWithApplicationTerminated:(BOOL)applicationTerminated;
 
 - (void)installerDidExtractUpdateWithProgress:(double)progress;
-
-- (void)installerIsSendingAppTerminationSignal;
 
 - (void)installerDidFinishInstallationAndRelaunched:(BOOL)relaunched acknowledgement:(void(^)(void))acknowledgement;
 

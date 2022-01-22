@@ -191,13 +191,13 @@
             NSString *fromPath = [mountPoint stringByAppendingPathComponent:item];
             NSString *toPath = [[self.archivePath stringByDeletingLastPathComponent] stringByAppendingPathComponent:item];
             
-            // We skip any files in the DMG which are not readable.
+            itemsCopied += 1.0;
+            [notifier notifyProgress:0.5 + itemsCopied/(totalItems*2.0)];
+            
+            // We skip any files in the DMG which are not readable but include the item in the progress
             if (![manager isReadableFileAtPath:fromPath]) {
                 continue;
             }
-            
-            itemsCopied += 1.0;
-            [notifier notifyProgress:0.5 + itemsCopied/(totalItems*2.0)];
 
             SULog(SULogLevelDefault, @"copyItemAtPath:%@ toPath:%@", fromPath, toPath);
 

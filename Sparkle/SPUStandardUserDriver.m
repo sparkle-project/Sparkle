@@ -42,6 +42,9 @@
 @property (nonatomic) SUStatusController *statusController;
 @property (nonatomic) SUUpdatePermissionPrompt *permissionPrompt;
 
+@property (nonatomic) uint64_t expectedContentLength;
+@property (nonatomic) uint64_t bytesDownloaded;
+
 @end
 
 @implementation SPUStandardUserDriver
@@ -56,6 +59,8 @@
 @synthesize activeUpdateAlert = _activeUpdateAlert;
 @synthesize statusController = _statusController;
 @synthesize permissionPrompt = _permissionPrompt;
+@synthesize expectedContentLength = _expectedContentLength;
+@synthesize bytesDownloaded = _bytesDownloaded;
 
 #pragma mark Birth
 
@@ -366,8 +371,12 @@
     self.cancellation = cancellation;
     
     [self createAndShowStatusController];
-    [self.statusController beginActionWithTitle:SULocalizedString(@"Downloading update...", @"Take care not to overflow the status window.") maxProgressValue:0.0 statusText:nil];
+    
+    [self.statusController beginActionWithTitle:SULocalizedString(@"Downloading update...", @"Take care not to overflow the status window.") maxProgressValue:1.0 statusText:nil];
+    [self.statusController setProgressValue:0.0];
     [self.statusController setButtonTitle:SULocalizedString(@"Cancel", nil) target:self action:@selector(cancelDownload:) isDefault:NO];
+    
+    self.bytesDownloaded = 0;
 }
 
 - (void)cancelDownload:(id)__unused sender
@@ -382,7 +391,10 @@
 {
     assert(NSThread.isMainThread);
     
-    [self.statusController setMaxProgressValue:expectedContentLength];
+    self.expectedContentLength = expectedContentLength;
+    if (expectedContentLength == 0) {
+        [self.statusController setMaxProgressValue:0.0];
+    }
 }
 
 - (NSString *)localizedStringFromByteCount:(long long)value
@@ -419,18 +431,17 @@
 {
     assert(NSThread.isMainThread);
     
-    double newProgressValue = [self.statusController progressValue] + (double)length;
+    self.bytesDownloaded += length;
     
-    // In case our expected content length was incorrect
-    if (newProgressValue > [self.statusController maxProgressValue]) {
-        [self.statusController setMaxProgressValue:newProgressValue];
+    if (self.expectedContentLength > 0.0) {
+        double newProgressValue = (double)self.bytesDownloaded / (double)self.expectedContentLength;
+        
+        [self.statusController setProgressValue:MIN(newProgressValue, 1.0)];
+        
+        [self.statusController setStatusText:[NSString stringWithFormat:SULocalizedString(@"%@ of %@", nil), [self localizedStringFromByteCount:(long long)self.bytesDownloaded], [self localizedStringFromByteCount:(long long)MAX(self.bytesDownloaded, self.expectedContentLength)]]];
+    } else {
+        [self.statusController setStatusText:[NSString stringWithFormat:SULocalizedString(@"%@ downloaded", nil), [self localizedStringFromByteCount:(long long)self.bytesDownloaded]]];
     }
-    
-    [self.statusController setProgressValue:newProgressValue];
-    if ([self.statusController maxProgressValue] > 0.0)
-        [self.statusController setStatusText:[NSString stringWithFormat:SULocalizedString(@"%@ of %@", nil), [self localizedStringFromByteCount:(long long)self.statusController.progressValue], [self localizedStringFromByteCount:(long long)self.statusController.maxProgressValue]]];
-    else
-        [self.statusController setStatusText:[NSString stringWithFormat:SULocalizedString(@"%@ downloaded", nil), [self localizedStringFromByteCount:(long long)self.statusController.progressValue]]];
 }
 
 - (void)showDownloadDidStartExtractingUpdate
@@ -440,7 +451,8 @@
     self.cancellation = nil;
     
     [self createAndShowStatusController];
-    [self.statusController beginActionWithTitle:SULocalizedString(@"Extracting update...", @"Take care not to overflow the status window.") maxProgressValue:0.0 statusText:nil];
+    [self.statusController beginActionWithTitle:SULocalizedString(@"Extracting update...", @"Take care not to overflow the status window.") maxProgressValue:1.0 statusText:nil];
+    [self.statusController setProgressValue:0.0];
     [self.statusController setButtonTitle:SULocalizedString(@"Cancel", nil) target:nil action:nil isDefault:NO];
     [self.statusController setButtonEnabled:NO];
 }
@@ -449,18 +461,23 @@
 {
     assert(NSThread.isMainThread);
     
-    if ([self.statusController maxProgressValue] == 0.0) {
-        [self.statusController setMaxProgressValue:1];
-    }
     [self.statusController setProgressValue:progress];
 }
 
-- (void)showInstallingUpdate
+- (void)showInstallingUpdateWithApplicationTerminated:(BOOL)applicationTerminated
 {
     assert(NSThread.isMainThread);
     
-    [self.statusController beginActionWithTitle:SULocalizedString(@"Installing update...", @"Take care not to overflow the status window.") maxProgressValue:0.0 statusText:nil];
-    [self.statusController setButtonEnabled:NO];
+    if (applicationTerminated) {
+        [self.statusController beginActionWithTitle:SULocalizedString(@"Installing update...", @"Take care not to overflow the status window.") maxProgressValue:0.0 statusText:nil];
+        [self.statusController setButtonEnabled:NO];
+    } else {
+        // The "quit" event can always be canceled or delayed by the application we're updating
+        // So we can't easily predict how long the installation will take or if it won't happen right away
+        // We close our status window because we don't want it persisting for too long and have it obscure other windows
+        [self.statusController close];
+        self.statusController = nil;
+    }
 }
 
 - (void)showUpdateInstalledAndRelaunched:(BOOL)relaunched acknowledgement:(void (^)(void))acknowledgement
@@ -503,17 +520,6 @@
 }
 
 #pragma mark Aborting Everything
-
-- (void)showSendingTerminationSignal
-{
-    assert(NSThread.isMainThread);
-    
-    // The "quit" event can always be canceled or delayed by the application we're updating
-    // So we can't easily predict how long the installation will take or if it won't happen right away
-    // We close our status window because we don't want it persisting for too long and have it obscure other windows
-    [self.statusController close];
-    self.statusController = nil;
-}
 
 - (void)dismissUpdateInstallation
 {

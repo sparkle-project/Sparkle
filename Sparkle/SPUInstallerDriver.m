@@ -43,7 +43,6 @@
 @property (nonatomic, readonly) NSBundle *applicationBundle;
 @property (nonatomic, weak, readonly) id<SPUInstallerDriverDelegate> delegate;
 @property (nonatomic) SPUInstallerMessageType currentStage;
-@property (nonatomic) BOOL startedInstalling;
 
 @property (nonatomic) id<SUInstallerConnectionProtocol> installerConnection;
 
@@ -70,7 +69,6 @@
 @synthesize applicationBundle = _applicationBundle;
 @synthesize delegate = _delegate;
 @synthesize currentStage = _currentStage;
-@synthesize startedInstalling = _startedInstalling;
 @synthesize installerConnection = _installerConnection;
 @synthesize extractionAttempts = _extractionAttempts;
 @synthesize postponedOnce = _postponedOnce;
@@ -278,9 +276,6 @@
         self.currentStage = identifier;
     } else if (identifier == SPUInstallationStartedStage1) {
         self.currentStage = identifier;
-        [self.delegate installerDidStartInstalling];
-        self.startedInstalling = YES;
-        
     } else if (identifier == SPUInstallationFinishedStage1) {
         self.currentStage = identifier;
         
@@ -308,12 +303,6 @@
     } else if (identifier == SPUInstallationFinishedStage2) {
         self.currentStage = identifier;
         
-        if (!self.startedInstalling) {
-            // It's possible we can start from resuming to stage 2 rather than doing stage 1 again, so we should notify to start installing if we haven't done so already
-            self.startedInstalling = YES;
-            [self.delegate installerDidStartInstalling];
-        }
-        
         BOOL hasTargetTerminated = NO;
         if (data.length >= sizeof(uint8_t)) {
             hasTargetTerminated = (BOOL)*((const uint8_t *)data.bytes);
@@ -321,9 +310,7 @@
         
         [self.delegate installerWillFinishInstallationAndRelaunch:self.relaunch];
         
-        if (!hasTargetTerminated) {
-            [self.delegate installerIsSendingAppTerminationSignal];
-        }
+        [self.delegate installerDidStartInstallingWithApplicationTerminated:hasTargetTerminated];
     } else if (identifier == SPUInstallationFinishedStage3) {
         self.currentStage = identifier;
         

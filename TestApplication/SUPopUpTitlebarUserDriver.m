@@ -251,15 +251,14 @@
     [self addUpdateButtonWithTitle:[NSString stringWithFormat:@"Extracting (%d%%)…", (int)(progress * 100)]];
 }
 
-- (void)showInstallingUpdate
+- (void)showInstallingUpdateWithApplicationTerminated:(BOOL)applicationTerminated
 {
-    [self addUpdateButtonWithTitle:@"Installing…"];
-}
-
-- (void)showSendingTerminationSignal
-{
-    // In case our termination request fails or is delayed
-    [self removeUpdateButton];
+    if (applicationTerminated) {
+        [self addUpdateButtonWithTitle:@"Installing…"];
+    } else {
+        // In case our termination request fails or is delayed
+        [self removeUpdateButton];
+    }
 }
 
 - (void)showUpdateInstalledAndRelaunched:(BOOL)__unused relaunched acknowledgement:(void (^)(void))acknowledgement
