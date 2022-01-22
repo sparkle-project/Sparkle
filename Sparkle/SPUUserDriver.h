@@ -198,15 +198,6 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
 - (void)showExtractionReceivedProgress:(double)progress;
 
 /**
- * Show the user that the update is installing
- *
- * Let the user know that the update is currently installing. Sparkle uses this to show an indeterminate progress bar.
- *
- * Before this point, `-showExtractionReceivedProgress:` may be called.
- */
-- (void)showInstallingUpdate;
-
-/**
  * Show the user that the update is ready to install & relaunch
  *
  * Let the user know that the update is ready to install and relaunch, and ask them whether they want to proceed.
@@ -218,11 +209,20 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  *
  * A reply of `SPUUserUpdateChoiceSkip` cancels the current update that has begun installing and dismisses the update. In this circumstance, the update is canceled but this update version is not skipped in the future.
  *
- * Before this point, `-showInstallingUpdate` will be called.
+ * Before this point, `-showExtractionReceivedProgress:` or  `-showUpdateFoundWithAppcastItem:state:reply:` may be called.
  *
  * @param reply The reply which indicates if the update should be installed, dismissed, or skipped. See above discussion for more details.
  */
 - (void)showReadyToInstallAndRelaunch:(void (^)(SPUUserUpdateChoice))reply;
+
+/**
+ * Show the user that the update is installing
+ *
+ * Let the user know that the update is currently installing. Sparkle uses this to show an indeterminate progress bar.
+ *
+ * Before this point, `-showReadyToInstallAndRelaunch:` or  `-showUpdateFoundWithAppcastItem:state:reply:` will be called.
+ */
+- (void)showInstallingUpdate;
 
 /**
  * Show or dismiss progress while a termination signal is being sent to the application from Sparkle's installer
@@ -232,6 +232,8 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  *
  * It is up to the implementor whether or not to decide to continue showing installation progress
  * or dismissing UI that won't remain obscuring other parts of the user interface.
+ *
+ * Before this point, `-showInstallingUpdate` will be called.
  *
  * This will not be invoked if the application that is being updated is already terminated.
  */
