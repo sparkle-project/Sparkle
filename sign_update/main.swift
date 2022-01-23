@@ -89,8 +89,8 @@ struct SignUpdate: ParsableCommand {
     var verifySignature: String?
     
     static var configuration: CommandConfiguration = CommandConfiguration(
-        abstract: "Sign or verify an update using your private EdDSA (ed25519) key.",
-        discussion: "The private EdDSA key is automatically read from the Keychain if no <private-key> or <private-key-file> is specified.\n\nThis tool will output an EdDSA signature and length attributes to use for your update's appcast item enclosure.")
+        abstract: "Sign or verify an update using your EdDSA (ed25519) keys.",
+        discussion: "The EdDSA keys are automatically read from the Keychain if no <private-key> or <private-key-file> is specified.\n\nWhen signing, this tool will output an EdDSA signature and length attributes to use for your update's appcast item enclosure.")
     
     func validate() throws {
         guard privateKey == nil || privateKeyFile == nil else {
