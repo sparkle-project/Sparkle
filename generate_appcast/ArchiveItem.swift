@@ -35,6 +35,7 @@ class DeltaUpdate {
         let fileManager = FileManager.default
         
         let tempApplyToPath = to.appPath.deletingLastPathComponent().appendingPathComponent(".temp_" + to.appPath.lastPathComponent)
+        let _ = try? fileManager.removeItem(at: tempApplyToPath)
         
         var applyDiffError: NSError?
         if !applyBinaryDelta(from.appPath.path, tempApplyToPath.path, archivePath.path, false, { _ in
