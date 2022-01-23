@@ -46,6 +46,8 @@ func loadPrivateKeys(_ account: String, _ privateDSAKey: SecKey?, _ privateEdStr
     return PrivateKeys(privateDSAKey: privateDSAKey, privateEdKey: privateEdKey, publicEdKey: publicEdKey)
 }
 
+let DEFAULT_MAX_CDATA_THRESHOLD = 1000
+
 struct GenerateAppcast: ParsableCommand {
     static let programName = "generate_appcast"
     static let programNamePath: String = CommandLine.arguments.first ?? "./\(programName)"
@@ -123,6 +125,10 @@ struct GenerateAppcast: ParsableCommand {
     @Flag(help: .hidden)
     var verbose: Bool = false
     
+    // CDATA text must contain <= this number of characters
+    @Option(name: .customLong("max-cdata-threshold"), help: .hidden)
+    var maxCDATAThreshold: Int = DEFAULT_MAX_CDATA_THRESHOLD
+    
     static var configuration = CommandConfiguration(
         abstract: "Generate appcast from a directory of Sparkle update archives.",
         discussion: """
@@ -132,7 +138,7 @@ struct GenerateAppcast: ParsableCommand {
         Old entries in the appcast are kept intact. Otherwise, a new appcast file will be generated and written.
         
         .html files that have the same filename as an archive (except for the file extension) will be used for release notes for that item.
-        If the contents of these files are short (< \(CDATA_HTML_FRAGMENT_THRESHOLD) characters) and do not include a DOCTYPE or body tags, they will be treated as embedded CDATA release notes.
+        If the contents of these files are short (< \(DEFAULT_MAX_CDATA_THRESHOLD) characters) and do not include a DOCTYPE or body tags, they will be treated as embedded CDATA release notes.
         
         For new update entries, Sparkle infers the minimum system OS requirement based on your update's LSMinimumSystemVersion provided
         by your application's Info.plist. If none is found, \(programName) defaults to Sparkle's own minimum system requirement (macOS 10.11).
@@ -242,7 +248,7 @@ struct GenerateAppcast: ParsableCommand {
                                                                 relativeTo: archivesSourceDir)
 
                 // Write the appcast
-                let (numNewUpdates, numExistingUpdates) = try writeAppcast(appcastDestPath: appcastDestPath, updates: updates, newVersions: versions, maxNewVersionsInFeed: maxNewVersionsInFeed, fullReleaseNotesLink: fullReleaseNotesURL, link: link, newChannel: channel, majorVersion: majorVersion, phasedRolloutInterval: phasedRolloutInterval, criticalUpdateVersion: criticalUpdateVersion, informationalUpdateVersions: informationalUpdateVersions)
+                let (numNewUpdates, numExistingUpdates) = try writeAppcast(appcastDestPath: appcastDestPath, updates: updates, newVersions: versions, maxNewVersionsInFeed: maxNewVersionsInFeed, fullReleaseNotesLink: fullReleaseNotesURL, maxCDATAThreshold: maxCDATAThreshold, link: link, newChannel: channel, majorVersion: majorVersion, phasedRolloutInterval: phasedRolloutInterval, criticalUpdateVersion: criticalUpdateVersion, informationalUpdateVersions: informationalUpdateVersions)
 
                 // Inform the user, pluralizing "update" if necessary
                 let pluralizeUpdates = { $0 == 1 ? "update" : "updates" }

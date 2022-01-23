@@ -5,9 +5,6 @@
 
 import Foundation
 
-// CDATA text must contain less characters than this threshold
-let CDATA_HTML_FRAGMENT_THRESHOLD = 1000
-
 class DeltaUpdate {
     let fromVersion: String
     let archivePath: URL
@@ -25,11 +22,26 @@ class DeltaUpdate {
     }
 
     class func create(from: ArchiveItem, to: ArchiveItem, deltaVersion: SUBinaryDeltaMajorVersion, deltaCompressionMode: SPUDeltaCompressionMode, deltaCompressionLevel: UInt8, archivePath: URL) throws -> DeltaUpdate {
-        var applyDiffError: NSError?
+        var createDiffError: NSError?
 
-        if !createBinaryDelta(from.appPath.path, to.appPath.path, archivePath.path, deltaVersion, deltaCompressionMode, deltaCompressionLevel, false, &applyDiffError) {
+        if !createBinaryDelta(from.appPath.path, to.appPath.path, archivePath.path, deltaVersion, deltaCompressionMode, deltaCompressionLevel, false, &createDiffError) {
+            throw createDiffError!
+        }
+        
+        // Ensure applying the diff also succeeds
+        let fileManager = FileManager.default
+        
+        let tempApplyToPath = to.appPath.deletingLastPathComponent().appendingPathComponent(".temp_" + to.appPath.lastPathComponent)
+        let _ = try? fileManager.removeItem(at: tempApplyToPath)
+        
+        var applyDiffError: NSError?
+        if !applyBinaryDelta(from.appPath.path, tempApplyToPath.path, archivePath.path, false, { _ in
+        }, &applyDiffError) {
+            let _ = try? fileManager.removeItem(at: archivePath)
             throw applyDiffError!
         }
+        
+        let _ = try? fileManager.removeItem(at: tempApplyToPath)
 
         return DeltaUpdate(fromVersion: from.version, archivePath: archivePath)
     }
@@ -190,9 +202,9 @@ class ArchiveItem: CustomStringConvertible {
         return releaseNotes
     }
 
-    private func getReleaseNotesAsHTMLFragment(_ path: URL) -> String?  {
+    private func getReleaseNotesAsHTMLFragment(_ path: URL, _ maxCDATAThreshold: Int) -> String?  {
         if let html = try? String(contentsOf: path) {
-            if html.utf8.count < CDATA_HTML_FRAGMENT_THRESHOLD &&
+            if html.utf8.count <= maxCDATAThreshold &&
                 !html.localizedCaseInsensitiveContains("<!DOCTYPE") &&
                 !html.localizedCaseInsensitiveContains("<body") {
                 return html
@@ -200,20 +212,20 @@ class ArchiveItem: CustomStringConvertible {
         }
         return nil
     }
-
-    var releaseNotesHTML: String? {
+    
+    func releaseNotesHTML(maxCDATAThreshold: Int) -> String? {
         if let path = self.releaseNotesPath {
-            return self.getReleaseNotesAsHTMLFragment(path)
+            return self.getReleaseNotesAsHTMLFragment(path, maxCDATAThreshold)
         }
         return nil
     }
-
-    var releaseNotesURL: URL? {
+    
+    func releaseNotesURL(maxCDATAThreshold: Int) -> URL? {
         guard let path = self.releaseNotesPath else {
             return nil
         }
         // The file is already used as inline description
-        if self.getReleaseNotesAsHTMLFragment(path) != nil {
+        if self.getReleaseNotesAsHTMLFragment(path, maxCDATAThreshold) != nil {
             return nil
         }
         return self.releaseNoteURL(for: path.lastPathComponent)
