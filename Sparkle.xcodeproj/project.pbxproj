@@ -340,6 +340,7 @@
 		7293A1AE1CEE933800B957A7 /* SPUURLRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = 7293A1AC1CEE933800B957A7 /* SPUURLRequest.h */; };
 		7293A1AF1CEE933800B957A7 /* SPUURLRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 7293A1AD1CEE933800B957A7 /* SPUURLRequest.m */; };
 		7293A1B11CEE9B9F00B957A7 /* SPUURLRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 7293A1AD1CEE933800B957A7 /* SPUURLRequest.m */; };
+		729743AB279D1BD2009910B2 /* SUCodeSigningVerifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5991D3D8A5A00D1BF90 /* SUCodeSigningVerifier.m */; };
 		729924941DF4A45000DBCDF5 /* SUUpdateValidator.m in Sources */ = {isa = PBXBuildFile; fileRef = 729924931DF4A45000DBCDF5 /* SUUpdateValidator.m */; };
 		729F7EAC27366353004592DC /* test-links.xml in Resources */ = {isa = PBXBuildFile; fileRef = 729F7EAB27366353004592DC /* test-links.xml */; };
 		729F7EAF273F1840004592DC /* SPUUserAgent+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 729F7EAD273F1840004592DC /* SPUUserAgent+Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
@@ -3290,6 +3291,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				729743AB279D1BD2009910B2 /* SUCodeSigningVerifier.m in Sources */,
 				725EE489277D39B400D820CE /* SPUDeltaArchive.m in Sources */,
 				725EE48A277D39B400D820CE /* SPUXarDeltaArchive.m in Sources */,
 				721D5B1B25C692BB00D23BEA /* SUFlatPackageUnarchiver.m in Sources */,

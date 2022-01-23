@@ -73,7 +73,7 @@ class ArchiveItem: CustomStringConvertible {
         self.deltas = []
     }
 
-    convenience init(fromArchive archivePath: URL, unarchivedDir: URL) throws {
+    convenience init(fromArchive archivePath: URL, unarchivedDir: URL, validateBundle: Bool) throws {
         let resourceKeys = [URLResourceKey.typeIdentifierKey]
         let items = try FileManager.default.contentsOfDirectory(at: unarchivedDir, includingPropertiesForKeys: resourceKeys, options: .skipsHiddenFiles)
 
@@ -90,6 +90,12 @@ class ArchiveItem: CustomStringConvertible {
             }
 
             let appPath = bundles[0]
+            
+            // If requested to validate the bundle, ensure it is properly signed
+            if validateBundle && SUCodeSigningVerifier.bundle(atURLIsCodeSigned: appPath) {
+                try SUCodeSigningVerifier.codeSignatureIsValid(atBundleURL: appPath, checkNestedCode: true)
+            }
+            
             guard let infoPlist = NSDictionary(contentsOf: appPath.appendingPathComponent("Contents/Info.plist")) else {
                 throw makeError(code: .unarchivingError, "No plist \(appPath.path)")
             }
