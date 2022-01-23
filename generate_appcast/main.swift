@@ -9,7 +9,7 @@
 import Foundation
 import ArgumentParser
 
-func loadPrivateKeys(_ privateDSAKey: SecKey?, _ privateEdString: String?) -> PrivateKeys {
+func loadPrivateKeys(_ account: String, _ privateDSAKey: SecKey?, _ privateEdString: String?) -> PrivateKeys {
     var privateEdKey: Data?
     var publicEdKey: Data?
     var item: CFTypeRef?
@@ -28,14 +28,14 @@ func loadPrivateKeys(_ privateDSAKey: SecKey?, _ privateEdString: String?) -> Pr
         let res = SecItemCopyMatching([
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: "https://sparkle-project.org",
-            kSecAttrAccount as String: "ed25519",
+            kSecAttrAccount as String: account,
             kSecAttrProtocol as String: kSecAttrProtocolSSH,
             kSecReturnData as String: kCFBooleanTrue!,
         ] as CFDictionary, &item)
         if res == errSecSuccess, let encoded = item as? Data, let data = Data(base64Encoded: encoded) {
             keys = data
         } else {
-            print("Warning: Private key not found in the Keychain (\(res)). Please run the generate_keys tool")
+            print("Warning: Private key for account \(account) not found in the Keychain (\(res)). Please run the generate_keys tool")
         }
     }
 
@@ -53,6 +53,9 @@ struct GenerateAppcast: ParsableCommand {
     
     static let DEFAULT_MAX_NEW_VERSIONS_IN_FEED = 5
     static let DEFAULT_MAXIMUM_DELTAS = 5
+    
+    @Option(help: ArgumentHelp("The account name in your keychain associated with your private EdDSA (ed25519) key to use for signing new updates."))
+    var account : String = "ed25519"
     
     @Option(name: .customShort("s"), help: ArgumentHelp("The private EdDSA string (128 characters). If not specified, the private EdDSA key will be read from the Keychain instead.", valueName: "private-EdDSA-key"))
     var privateEdString : String?
@@ -205,7 +208,7 @@ struct GenerateAppcast: ParsableCommand {
             privateDSAKey = nil
         }
         
-        let keys = loadPrivateKeys(privateDSAKey, privateEdString)
+        let keys = loadPrivateKeys(account, privateDSAKey, privateEdString)
         
         do {
             let allUpdates = try makeAppcast(archivesSourceDir: archivesSourceDir, cacheDirectory: GenerateAppcast.cacheDirectory, keys: keys, versions: versions, maximumDeltas: maximumDeltas, deltaCompressionModeDescription: deltaCompression, deltaCompressionLevel: deltaCompressionLevel, verbose: verbose)
