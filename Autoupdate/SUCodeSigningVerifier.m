@@ -128,6 +128,11 @@ finally:
 
 + (BOOL)codeSignatureIsValidAtBundleURL:(NSURL *)bundleURL error:(NSError *__autoreleasing *)error
 {
+    return [self codeSignatureIsValidAtBundleURL:bundleURL checkNestedCode:NO error:error];
+}
+
++ (BOOL)codeSignatureIsValidAtBundleURL:(NSURL *)bundleURL checkNestedCode:(BOOL)checkNestedCode error:(NSError *__autoreleasing *)error
+{
     OSStatus result;
     SecStaticCodeRef staticCode = NULL;
     CFErrorRef cfError = NULL;
@@ -143,8 +148,12 @@ finally:
         goto finally;
     }
 
-    // See in -codeSignatureAtBundleURL:matchesSignatureAtBundleURL:error: for why kSecCSCheckNestedCode is not passed
+    // See in -codeSignatureAtBundleURL:matchesSignatureAtBundleURL:error: for why kSecCSCheckNestedCode is not always passed
     SecCSFlags flags = (SecCSFlags) (kSecCSDefaultFlags | kSecCSCheckAllArchitectures);
+    if (checkNestedCode) {
+        flags |= kSecCSCheckNestedCode;
+    }
+    
     result = SecStaticCodeCheckValidityWithErrors(staticCode, flags, NULL, &cfError);
     
     if (result != errSecSuccess) {

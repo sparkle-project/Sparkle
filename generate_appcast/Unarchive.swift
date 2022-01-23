@@ -43,7 +43,7 @@ func unarchive(itemPath: URL, archiveDestDir: URL, callback: @escaping (Error?) 
     }
 }
 
-func unarchiveUpdates(archivesSourceDir: URL, archivesDestDir: URL, verbose: Bool) throws -> [ArchiveItem] {
+func unarchiveUpdates(archivesSourceDir: URL, archivesDestDir: URL, disableNestedCodeCheck: Bool, verbose: Bool) throws -> [ArchiveItem] {
     if verbose {
         print("Unarchiving to temp directory", archivesDestDir.path)
     }
@@ -71,9 +71,9 @@ func unarchiveUpdates(archivesSourceDir: URL, archivesDestDir: URL, verbose: Boo
             continue
         }
 
-        let addItem = {
+        let addItem = { (validateBundle: Bool) in
             do {
-                let item = try ArchiveItem(fromArchive: itemPath, unarchivedDir: archiveDestDir)
+                let item = try ArchiveItem(fromArchive: itemPath, unarchivedDir: archiveDestDir, validateBundle: validateBundle, disableNestedCodeCheck: disableNestedCodeCheck)
                 if verbose {
                     print("Found archive", item)
                 }
@@ -81,21 +81,19 @@ func unarchiveUpdates(archivesSourceDir: URL, archivesDestDir: URL, verbose: Boo
                 unarchived.append(item)
                 objc_sync_exit(unarchived)
             } catch {
-                if verbose {
-                    print("Skipped", item, error)
-                }
+                print("Skipped", item, error)
             }
         }
 
         if fileManager.fileExists(atPath: archiveDestDir.path) {
-            addItem()
+            addItem(false)
         } else {
             group.enter()
             unarchive(itemPath: itemPath, archiveDestDir: archiveDestDir) { (error: Error?) in
                 if let error = error {
                     print("Could not unarchive", itemPath.path, error)
                 } else {
-                    addItem()
+                    addItem(true)
                 }
                 group.leave()
             }

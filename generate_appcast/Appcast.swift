@@ -11,10 +11,10 @@ func makeError(code: SUError, _ description: String) -> NSError {
         ])
 }
 
-func makeAppcast(archivesSourceDir: URL, cacheDirectory cacheDir: URL, keys: PrivateKeys, versions: Set<String>?, maximumDeltas: Int, deltaCompressionModeDescription: String, deltaCompressionLevel: UInt8, verbose: Bool) throws -> [String: [ArchiveItem]] {
+func makeAppcast(archivesSourceDir: URL, cacheDirectory cacheDir: URL, keys: PrivateKeys, versions: Set<String>?, maximumDeltas: Int, deltaCompressionModeDescription: String, deltaCompressionLevel: UInt8, disableNestedCodeCheck: Bool, verbose: Bool) throws -> [String: [ArchiveItem]] {
     let comparator = SUStandardVersionComparator()
 
-    let allUpdates = (try unarchiveUpdates(archivesSourceDir: archivesSourceDir, archivesDestDir: cacheDir, verbose: verbose))
+    let allUpdates = (try unarchiveUpdates(archivesSourceDir: archivesSourceDir, archivesDestDir: cacheDir, disableNestedCodeCheck: disableNestedCodeCheck, verbose: verbose))
         .sorted(by: {
             .orderedDescending == comparator.compareVersion($0.version, toVersion: $1.version)
         })
@@ -108,6 +108,22 @@ func makeAppcast(archivesSourceDir: URL, cacheDirectory cacheDir: URL, keys: Pri
                     continue
                 }
                 if !fm.fileExists(atPath: deltaPath.path) {
+                    // Test if old and new app have the same code signing signature. If not, omit a warning.
+                    // This is a good time to do this check because our delta handling code sets a marker
+                    // to avoid this path each time generate_appcast is called.
+                    let oldAppCodeSigned = SUCodeSigningVerifier.bundle(atURLIsCodeSigned: item.appPath)
+                    let newAppCodeSigned = SUCodeSigningVerifier.bundle(atURLIsCodeSigned: latestItem.appPath)
+                    
+                    if oldAppCodeSigned != newAppCodeSigned && !newAppCodeSigned {
+                        print("Warning: New app is not code signed but older version (\(item)) is: \(latestItem)")
+                    } else if oldAppCodeSigned && newAppCodeSigned {
+                        do {
+                            try SUCodeSigningVerifier.codeSignature(atBundleURL: item.appPath, matchesSignatureAtBundleURL: latestItem.appPath)
+                        } catch {
+                            print("Warning: found mismatch code signing identity between \(item) and \(latestItem)")
+                        }
+                    }
+                        
                     do {
                         // Decide the most appropriate delta version
                         let deltaVersion: SUBinaryDeltaMajorVersion

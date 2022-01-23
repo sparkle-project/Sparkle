@@ -129,6 +129,9 @@ struct GenerateAppcast: ParsableCommand {
     @Option(name: .customLong("max-cdata-threshold"), help: .hidden)
     var maxCDATAThreshold: Int = DEFAULT_MAX_CDATA_THRESHOLD
     
+    @Flag(name: .customLong("disable-nested-code-check"), help: .hidden)
+    var disableNestedCodeCheck: Bool = false
+    
     static var configuration = CommandConfiguration(
         abstract: "Generate appcast from a directory of Sparkle update archives.",
         discussion: """
@@ -217,7 +220,7 @@ struct GenerateAppcast: ParsableCommand {
         let keys = loadPrivateKeys(account, privateDSAKey, privateEdString)
         
         do {
-            let allUpdates = try makeAppcast(archivesSourceDir: archivesSourceDir, cacheDirectory: GenerateAppcast.cacheDirectory, keys: keys, versions: versions, maximumDeltas: maximumDeltas, deltaCompressionModeDescription: deltaCompression, deltaCompressionLevel: deltaCompressionLevel, verbose: verbose)
+            let allUpdates = try makeAppcast(archivesSourceDir: archivesSourceDir, cacheDirectory: GenerateAppcast.cacheDirectory, keys: keys, versions: versions, maximumDeltas: maximumDeltas, deltaCompressionModeDescription: deltaCompression, deltaCompressionLevel: deltaCompressionLevel, disableNestedCodeCheck: disableNestedCodeCheck, verbose: verbose)
             
             // If a URL prefix was provided, set on the archive items
             if downloadURLPrefix != nil || releaseNotesURLPrefix != nil {
