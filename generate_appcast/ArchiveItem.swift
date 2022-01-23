@@ -5,9 +5,6 @@
 
 import Foundation
 
-// CDATA text must contain less characters than this threshold
-let CDATA_HTML_FRAGMENT_THRESHOLD = 1000
-
 class DeltaUpdate {
     let fromVersion: String
     let archivePath: URL
@@ -199,9 +196,9 @@ class ArchiveItem: CustomStringConvertible {
         return releaseNotes
     }
 
-    private func getReleaseNotesAsHTMLFragment(_ path: URL) -> String?  {
+    private func getReleaseNotesAsHTMLFragment(_ path: URL, _ maxCDATAThreshold: Int) -> String?  {
         if let html = try? String(contentsOf: path) {
-            if html.utf8.count < CDATA_HTML_FRAGMENT_THRESHOLD &&
+            if html.utf8.count <= maxCDATAThreshold &&
                 !html.localizedCaseInsensitiveContains("<!DOCTYPE") &&
                 !html.localizedCaseInsensitiveContains("<body") {
                 return html
@@ -209,20 +206,20 @@ class ArchiveItem: CustomStringConvertible {
         }
         return nil
     }
-
-    var releaseNotesHTML: String? {
+    
+    func releaseNotesHTML(maxCDATAThreshold: Int) -> String? {
         if let path = self.releaseNotesPath {
-            return self.getReleaseNotesAsHTMLFragment(path)
+            return self.getReleaseNotesAsHTMLFragment(path, maxCDATAThreshold)
         }
         return nil
     }
-
-    var releaseNotesURL: URL? {
+    
+    func releaseNotesURL(maxCDATAThreshold: Int) -> URL? {
         guard let path = self.releaseNotesPath else {
             return nil
         }
         // The file is already used as inline description
-        if self.getReleaseNotesAsHTMLFragment(path) != nil {
+        if self.getReleaseNotesAsHTMLFragment(path, maxCDATAThreshold) != nil {
             return nil
         }
         return self.releaseNoteURL(for: path.lastPathComponent)
