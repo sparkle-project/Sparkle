@@ -25,11 +25,25 @@ class DeltaUpdate {
     }
 
     class func create(from: ArchiveItem, to: ArchiveItem, deltaVersion: SUBinaryDeltaMajorVersion, deltaCompressionMode: SPUDeltaCompressionMode, deltaCompressionLevel: UInt8, archivePath: URL) throws -> DeltaUpdate {
-        var applyDiffError: NSError?
+        var createDiffError: NSError?
 
-        if !createBinaryDelta(from.appPath.path, to.appPath.path, archivePath.path, deltaVersion, deltaCompressionMode, deltaCompressionLevel, false, &applyDiffError) {
+        if !createBinaryDelta(from.appPath.path, to.appPath.path, archivePath.path, deltaVersion, deltaCompressionMode, deltaCompressionLevel, false, &createDiffError) {
+            throw createDiffError!
+        }
+        
+        // Ensure applying the diff also succeeds
+        let fileManager = FileManager.default
+        
+        let tempApplyToPath = to.appPath.deletingLastPathComponent().appendingPathComponent(".temp_" + to.appPath.lastPathComponent)
+        
+        var applyDiffError: NSError?
+        if !applyBinaryDelta(from.appPath.path, tempApplyToPath.path, archivePath.path, false, { _ in
+        }, &applyDiffError) {
+            let _ = try? fileManager.removeItem(at: archivePath)
             throw applyDiffError!
         }
+        
+        let _ = try? fileManager.removeItem(at: tempApplyToPath)
 
         return DeltaUpdate(fromVersion: from.version, archivePath: archivePath)
     }
