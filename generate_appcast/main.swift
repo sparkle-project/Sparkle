@@ -129,7 +129,7 @@ struct GenerateAppcast: ParsableCommand {
     @Option(name: .customLong("max-cdata-threshold"), help: .hidden)
     var maxCDATAThreshold: Int = DEFAULT_MAX_CDATA_THRESHOLD
     
-    @Option(name: .customLong("disable-nested-code-check"), help: .hidden)
+    @Flag(name: .customLong("disable-nested-code-check"), help: .hidden)
     var disableNestedCodeCheck: Bool = false
     
     static var configuration = CommandConfiguration(
