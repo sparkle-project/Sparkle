@@ -49,7 +49,7 @@ func extractVersion(parent: XMLNode) -> String? {
     return nil
 }
 
-func writeAppcast(appcastDestPath: URL, updates: [ArchiveItem], newVersions: Set<String>?, maxNewVersionsInFeed: Int, fullReleaseNotesLink: String?, link: String?, newChannel: String?, majorVersion: String?, phasedRolloutInterval: Int?, criticalUpdateVersion: String?, informationalUpdateVersions: [String]?) throws -> (numNewUpdates: Int, numExistingUpdates: Int) {
+func writeAppcast(appcastDestPath: URL, updates: [ArchiveItem], newVersions: Set<String>?, maxNewVersionsInFeed: Int, fullReleaseNotesLink: String?, maxCDATAThreshold: Int, link: String?, newChannel: String?, majorVersion: String?, phasedRolloutInterval: Int?, criticalUpdateVersion: String?, informationalUpdateVersions: [String]?) throws -> (numNewUpdates: Int, numExistingUpdates: Int) {
     let appBaseName = updates[0].appPath.deletingPathExtension().lastPathComponent
 
     let sparkleNS = "http://www.andymatuschak.org/xml-namespaces/sparkle"
@@ -232,7 +232,7 @@ func writeAppcast(appcastDestPath: URL, updates: [ArchiveItem], newVersions: Set
         }
         shortVersionElement?.setChildren([text(update.shortVersion)])
 
-        if let html = update.releaseNotesHTML {
+        if let html = update.releaseNotesHTML(maxCDATAThreshold: maxCDATAThreshold) {
             let descElement = findOrCreateElement(name: "description", parent: item)
             let cdata = XMLNode(kind: .text, options: .nodeIsCDATA)
             cdata.stringValue = html
@@ -260,7 +260,7 @@ func writeAppcast(appcastDestPath: URL, updates: [ArchiveItem], newVersions: Set
             .contains(where: { $0.name == SUXMLLanguage }) }
         let relElement = results?.first
         
-        if let url = update.releaseNotesURL {
+        if let url = update.releaseNotesURL(maxCDATAThreshold: maxCDATAThreshold) {
             // The update includes a valid release notes URL
             if let existingReleaseNotesElement = relElement {
                 // The existing item includes a release notes element. Update it.
