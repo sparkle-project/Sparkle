@@ -11,10 +11,10 @@ func makeError(code: SUError, _ description: String) -> NSError {
         ])
 }
 
-func makeAppcast(archivesSourceDir: URL, cacheDirectory cacheDir: URL, keys: PrivateKeys, versions: Set<String>?, maximumDeltas: Int, deltaCompressionModeDescription: String, deltaCompressionLevel: UInt8, verbose: Bool) throws -> [String: [ArchiveItem]] {
+func makeAppcast(archivesSourceDir: URL, cacheDirectory cacheDir: URL, keys: PrivateKeys, versions: Set<String>?, maximumDeltas: Int, deltaCompressionModeDescription: String, deltaCompressionLevel: UInt8, disableNestedCodeCheck: Bool, verbose: Bool) throws -> [String: [ArchiveItem]] {
     let comparator = SUStandardVersionComparator()
 
-    let allUpdates = (try unarchiveUpdates(archivesSourceDir: archivesSourceDir, archivesDestDir: cacheDir, verbose: verbose))
+    let allUpdates = (try unarchiveUpdates(archivesSourceDir: archivesSourceDir, archivesDestDir: cacheDir, disableNestedCodeCheck: disableNestedCodeCheck, verbose: verbose))
         .sorted(by: {
             .orderedDescending == comparator.compareVersion($0.version, toVersion: $1.version)
         })

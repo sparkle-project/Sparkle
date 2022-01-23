@@ -85,7 +85,7 @@ class ArchiveItem: CustomStringConvertible {
         self.deltas = []
     }
 
-    convenience init(fromArchive archivePath: URL, unarchivedDir: URL, validateBundle: Bool) throws {
+    convenience init(fromArchive archivePath: URL, unarchivedDir: URL, validateBundle: Bool, disableNestedCodeCheck: Bool) throws {
         let resourceKeys = [URLResourceKey.typeIdentifierKey]
         let items = try FileManager.default.contentsOfDirectory(at: unarchivedDir, includingPropertiesForKeys: resourceKeys, options: .skipsHiddenFiles)
 
@@ -105,7 +105,7 @@ class ArchiveItem: CustomStringConvertible {
             
             // If requested to validate the bundle, ensure it is properly signed
             if validateBundle && SUCodeSigningVerifier.bundle(atURLIsCodeSigned: appPath) {
-                try SUCodeSigningVerifier.codeSignatureIsValid(atBundleURL: appPath, checkNestedCode: true)
+                try SUCodeSigningVerifier.codeSignatureIsValid(atBundleURL: appPath, checkNestedCode: !disableNestedCodeCheck)
             }
             
             guard let infoPlist = NSDictionary(contentsOf: appPath.appendingPathComponent("Contents/Info.plist")) else {

@@ -43,7 +43,7 @@ func unarchive(itemPath: URL, archiveDestDir: URL, callback: @escaping (Error?) 
     }
 }
 
-func unarchiveUpdates(archivesSourceDir: URL, archivesDestDir: URL, verbose: Bool) throws -> [ArchiveItem] {
+func unarchiveUpdates(archivesSourceDir: URL, archivesDestDir: URL, disableNestedCodeCheck: Bool, verbose: Bool) throws -> [ArchiveItem] {
     if verbose {
         print("Unarchiving to temp directory", archivesDestDir.path)
     }
@@ -73,7 +73,7 @@ func unarchiveUpdates(archivesSourceDir: URL, archivesDestDir: URL, verbose: Boo
 
         let addItem = { (validateBundle: Bool) in
             do {
-                let item = try ArchiveItem(fromArchive: itemPath, unarchivedDir: archiveDestDir, validateBundle: validateBundle)
+                let item = try ArchiveItem(fromArchive: itemPath, unarchivedDir: archiveDestDir, validateBundle: validateBundle, disableNestedCodeCheck: disableNestedCodeCheck)
                 if verbose {
                     print("Found archive", item)
                 }
