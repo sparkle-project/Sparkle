@@ -159,10 +159,16 @@
                 NSMutableSet *informationalUpdateVersions = [NSMutableSet set];
                 NSEnumerator *childEnum = [[node children] objectEnumerator];
                 for (NSXMLNode *child in childEnum) {
-                    if ([child.name isEqualToString:SUAppcastAttributeVersion]) {
+                    if ([child.name isEqualToString:SUAppcastElementVersion]) {
                         NSString *version = child.stringValue;
                         if (version != nil) {
                             [informationalUpdateVersions addObject:version];
+                        }
+                    } else if ([child.name isEqualToString:SUAppcastElementBelowVersion]) {
+                        NSString *version = child.stringValue;
+                        if (version != nil) {
+                            // Denote version is used as an upper bound by using '<'
+                            [informationalUpdateVersions addObject:[NSString stringWithFormat:@"<%@", version]];
                         }
                     }
                 }

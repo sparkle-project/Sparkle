@@ -91,6 +91,7 @@ NSString *const SUAppcastElementTags = @"sparkle:tags";
 NSString *const SUAppcastElementPhasedRolloutInterval = @"sparkle:phasedRolloutInterval";
 NSString *const SUAppcastElementInformationalUpdate = @"sparkle:informationalUpdate";
 NSString *const SUAppcastElementChannel = @"sparkle:channel";
+NSString *const SUAppcastElementBelowVersion = @"sparkle:belowVersion";
 
 NSString *const SURSSAttributeURL = @"url";
 NSString *const SURSSAttributeLength = @"length";

@@ -94,6 +94,7 @@ extern NSString *const SUAppcastElementTags;
 extern NSString *const SUAppcastElementPhasedRolloutInterval;
 extern NSString *const SUAppcastElementInformationalUpdate;
 extern NSString *const SUAppcastElementChannel;
+extern NSString *const SUAppcastElementBelowVersion;
 
 extern NSString *const SURSSAttributeURL;
 extern NSString *const SURSSAttributeLength;

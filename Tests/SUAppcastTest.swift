@@ -205,6 +205,16 @@ class SUAppcastTest: XCTestCase {
                 }
             }
             
+            // Test informational updates from version 2.3
+            do {
+                let hostVersion = "2.3"
+                let stateResolver = SPUAppcastItemStateResolver(hostVersion: hostVersion, applicationVersionComparator: versionComparator, standardVersionComparator: versionComparator)
+                
+                let appcast = try SUAppcast(xmlData: testData, relativeTo: nil, stateResolver: stateResolver)
+                
+                XCTAssertFalse(appcast.items[1].isInformationOnlyUpdate)
+            }
+            
             // Test informational updates from version 2.4
             do {
                 let hostVersion = "2.4"
@@ -233,6 +243,36 @@ class SUAppcastTest: XCTestCase {
                 let appcast = try SUAppcast(xmlData: testData, relativeTo: nil, stateResolver: stateResolver)
                 
                 XCTAssertFalse(appcast.items[1].isInformationOnlyUpdate)
+            }
+            
+            // Test informational updates from version 0.5
+            do {
+                let hostVersion = "0.5"
+                let stateResolver = SPUAppcastItemStateResolver(hostVersion: hostVersion, applicationVersionComparator: versionComparator, standardVersionComparator: versionComparator)
+                
+                let appcast = try SUAppcast(xmlData: testData, relativeTo: nil, stateResolver: stateResolver)
+                
+                XCTAssertFalse(appcast.items[1].isInformationOnlyUpdate)
+            }
+            
+            // Test informational updates from version 0.4
+            do {
+                let hostVersion = "0.4"
+                let stateResolver = SPUAppcastItemStateResolver(hostVersion: hostVersion, applicationVersionComparator: versionComparator, standardVersionComparator: versionComparator)
+                
+                let appcast = try SUAppcast(xmlData: testData, relativeTo: nil, stateResolver: stateResolver)
+                
+                XCTAssertTrue(appcast.items[1].isInformationOnlyUpdate)
+            }
+            
+            // Test informational updates from version 0.0
+            do {
+                let hostVersion = "0.0"
+                let stateResolver = SPUAppcastItemStateResolver(hostVersion: hostVersion, applicationVersionComparator: versionComparator, standardVersionComparator: versionComparator)
+                
+                let appcast = try SUAppcast(xmlData: testData, relativeTo: nil, stateResolver: stateResolver)
+                
+                XCTAssertTrue(appcast.items[1].isInformationOnlyUpdate)
             }
             
         } catch let err as NSError {
