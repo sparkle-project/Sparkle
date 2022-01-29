@@ -335,9 +335,8 @@
 {
     NSString *skippedMajorVersion = skippedUpdate.majorVersion;
     
-    if (!hostPassesSkippedMajorVersion && skippedMajorVersion != nil && [versionComparator compareVersion:skippedMajorVersion toVersion:ui.versionString] != NSOrderedDescending) {
-        // Item is on a greater or equal version than a major version we've skipped
-        // So we skip this item
+    if (!hostPassesSkippedMajorVersion && skippedMajorVersion != nil && ui.minimumAutoupdateVersion != nil && [versionComparator compareVersion:skippedMajorVersion toVersion:(NSString * _Nonnull)ui.minimumAutoupdateVersion] != NSOrderedAscending) {
+        // If skipped major version is >= than the item's minimumAutoupdateVersion, we can skip the item.
         return YES;
     }
     
