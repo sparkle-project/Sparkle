@@ -432,6 +432,104 @@ class SUAppcastTest: XCTestCase {
         }
     }
     
+    func testMinimumAutoupdateVersionAdvancedSkipping() {
+        let testURL = Bundle(for: SUAppcastTest.self).url(forResource: "testappcast_minimumAutoupdateVersionSkipping", withExtension: "xml")!
+        
+        do {
+            let testData = try Data(contentsOf: testURL)
+            
+            let versionComparator = SUStandardVersionComparator()
+            
+            do {
+                // Test appcast without a filter
+                
+                let hostVersion = "1.0"
+                
+                let stateResolver = SPUAppcastItemStateResolver(hostVersion: hostVersion, applicationVersionComparator: versionComparator, standardVersionComparator: versionComparator)
+                let appcast = try SUAppcast(xmlData: testData, relativeTo: nil, stateResolver: stateResolver)
+                
+                XCTAssertEqual(5, appcast.items.count)
+            }
+            
+            let currentDate = Date()
+            // Because 3.0 has minimum autoupdate version of 3.0, and 4.0 has minimum autoupdate version of 4.0, we should be offered 2.0
+            do {
+                let hostVersion = "1.0"
+                
+                let stateResolver = SPUAppcastItemStateResolver(hostVersion: hostVersion, applicationVersionComparator: versionComparator, standardVersionComparator: versionComparator)
+                let appcast = try SUAppcast(xmlData: testData, relativeTo: nil, stateResolver: stateResolver)
+                
+                let supportedAppcast = SUAppcastDriver.filterSupportedAppcast(appcast, phasedUpdateGroup: nil, skippedUpdate: nil, currentDate: currentDate, hostVersion: hostVersion, versionComparator: versionComparator, testOSVersion: true, testMinimumAutoupdateVersion: true)
+                
+                XCTAssertEqual(1, supportedAppcast.items.count)
+                
+                let bestAppcastItem = SUAppcastDriver.bestItem(fromAppcastItems: supportedAppcast.items, getDeltaItem: nil, withHostVersion: hostVersion, comparator: versionComparator)
+                
+                XCTAssertEqual(bestAppcastItem.versionString, "2.0")
+            }
+            
+            // Allow minimum autoupdate version to fail and only skip major version "3.0"
+            // This should skip all 3.x versions, but not 4.x versions nor 2.x versions
+            do {
+                let hostVersion = "1.0"
+                
+                let stateResolver = SPUAppcastItemStateResolver(hostVersion: hostVersion, applicationVersionComparator: versionComparator, standardVersionComparator: versionComparator)
+                let appcast = try SUAppcast(xmlData: testData, relativeTo: nil, stateResolver: stateResolver)
+                
+                let skippedUpdate = SPUSkippedUpdate(minorVersion: nil, majorVersion: "3.0")
+                
+                let supportedAppcast = SUAppcastDriver.filterSupportedAppcast(appcast, phasedUpdateGroup: nil, skippedUpdate: skippedUpdate, currentDate: currentDate, hostVersion: hostVersion, versionComparator: versionComparator, testOSVersion: true, testMinimumAutoupdateVersion: false)
+            
+                XCTAssertEqual(3, supportedAppcast.items.count)
+                
+                let bestAppcastItem = SUAppcastDriver.bestItem(fromAppcastItems: supportedAppcast.items, getDeltaItem: nil, withHostVersion: hostVersion, comparator: versionComparator)
+                
+                XCTAssertEqual(bestAppcastItem.versionString, "4.1")
+            }
+            
+            // Allow minimum autoupdate version to pass and only skip major version "3.0"
+            // This should only return back the latest minor version available
+            do {
+                let hostVersion = "1.0"
+                
+                let stateResolver = SPUAppcastItemStateResolver(hostVersion: hostVersion, applicationVersionComparator: versionComparator, standardVersionComparator: versionComparator)
+                let appcast = try SUAppcast(xmlData: testData, relativeTo: nil, stateResolver: stateResolver)
+                
+                let skippedUpdate = SPUSkippedUpdate(minorVersion: nil, majorVersion: "3.0")
+                
+                let supportedAppcast = SUAppcastDriver.filterSupportedAppcast(appcast, phasedUpdateGroup: nil, skippedUpdate: skippedUpdate, currentDate: currentDate, hostVersion: hostVersion, versionComparator: versionComparator, testOSVersion: true, testMinimumAutoupdateVersion: true)
+            
+                XCTAssertEqual(1, supportedAppcast.items.count)
+                
+                let bestAppcastItem = SUAppcastDriver.bestItem(fromAppcastItems: supportedAppcast.items, getDeltaItem: nil, withHostVersion: hostVersion, comparator: versionComparator)
+                
+                XCTAssertEqual(bestAppcastItem.versionString, "2.0")
+            }
+            
+            // Allow minimum autoupdate version to fail and only skip major version "4.0"
+            // This should skip all 3.x versions and 4.x versions but not 2.x versions
+            do {
+                let hostVersion = "1.0"
+                
+                let stateResolver = SPUAppcastItemStateResolver(hostVersion: hostVersion, applicationVersionComparator: versionComparator, standardVersionComparator: versionComparator)
+                let appcast = try SUAppcast(xmlData: testData, relativeTo: nil, stateResolver: stateResolver)
+                
+                let skippedUpdate = SPUSkippedUpdate(minorVersion: nil, majorVersion: "4.0")
+                
+                let supportedAppcast = SUAppcastDriver.filterSupportedAppcast(appcast, phasedUpdateGroup: nil, skippedUpdate: skippedUpdate, currentDate: currentDate, hostVersion: hostVersion, versionComparator: versionComparator, testOSVersion: true, testMinimumAutoupdateVersion: false)
+            
+                XCTAssertEqual(1, supportedAppcast.items.count)
+                
+                let bestAppcastItem = SUAppcastDriver.bestItem(fromAppcastItems: supportedAppcast.items, getDeltaItem: nil, withHostVersion: hostVersion, comparator: versionComparator)
+                
+                XCTAssertEqual(bestAppcastItem.versionString, "2.0")
+            }
+        } catch let err as NSError {
+            NSLog("%@", err)
+            XCTFail(err.localizedDescription)
+        }
+    }
+    
     func testPhasedGroupRollouts() {
         let testURL = Bundle(for: SUAppcastTest.self).url(forResource: "testappcast_phasedRollout", withExtension: "xml")!
         
