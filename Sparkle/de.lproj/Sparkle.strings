@@ -155,9 +155,6 @@
 /* Skipping major upgrade */
 "Skip Upgrade" = "Update überspringen";
 
-/* Confirmation message for skipping major upgrade and future updates */
-"Skipping this major upgrade will opt out of alerts for future updates." = "Wenn du dieses Hauptupdate überspringst, wirst du keine Hinweise für zukünftige Updates erhalten.";
-
 /* (No Comment) */
 "The update checker failed to start correctly. You should contact the app developer to report this issue and verify that you have the latest version" = "Das Aktualisierungsprogramm wurde nicht richtig gestartet. Du solltest den App-Entwickler kontaktieren, um diesen Fehler zu melden und zu prüfen, ob du die neueste Version hast.";
 

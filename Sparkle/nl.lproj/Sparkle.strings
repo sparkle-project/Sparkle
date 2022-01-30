@@ -155,9 +155,6 @@
 /* Skipping major upgrade */
 "Skip Upgrade" = "Sla update over";
 
-/* Confirmation message for skipping major upgrade and future updates */
-"Skipping this major upgrade will opt out of alerts for future updates." = "Als je deze hoofdupdate overslaat, zul je geen meldingen voor toekomstige updates ontvangen.";
-
 /* (No Comment) */
 "The update checker failed to start correctly. You should contact the app developer to report this issue and verify that you have the latest version" = "Het bijwerkprogramma is niet goed gestart. Je kunt wellicht met de app-ontwikkelaar contact opnemen om de fout te melden en te controleren dat je de nieuwste versie hebt";
 
