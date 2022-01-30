@@ -42,6 +42,7 @@ extern NSString *const SURelaunchHostBundleKey;
 extern NSString *const SUShowReleaseNotesKey;
 extern NSString *const SUSkippedMinorVersionKey;
 extern NSString *const SUSkippedMajorVersionKey;
+extern NSString *const SUSkippedMajorSubreleaseVersionKey;
 extern NSString *const SUScheduledCheckIntervalKey;
 extern NSString *const SULastCheckTimeKey;
 extern NSString *const SUExpectsDSASignatureKey;
@@ -95,6 +96,7 @@ extern NSString *const SUAppcastElementPhasedRolloutInterval;
 extern NSString *const SUAppcastElementInformationalUpdate;
 extern NSString *const SUAppcastElementChannel;
 extern NSString *const SUAppcastElementBelowVersion;
+extern NSString *const SUAppcastElementIgnoreSkippedUpgradesBelowVersion;
 
 extern NSString *const SURSSAttributeURL;
 extern NSString *const SURSSAttributeLength;

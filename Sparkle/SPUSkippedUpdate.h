@@ -27,11 +27,13 @@ NS_ASSUME_NONNULL_BEGIN
 + (void)skipUpdate:(SUAppcastItem *)updateItem host:(SUHost *)host;
 
 // At least one of minorVersion or majorVersion should be non-nil
-- (instancetype)initWithMinorVersion:(nullable NSString *)minorVersion majorVersion:(nullable NSString *)majorVersion;
+- (instancetype)initWithMinorVersion:(nullable NSString *)minorVersion majorVersion:(nullable NSString *)majorVersion majorSubreleaseVersion:(nullable NSString *)majorSubreleaseVersion;
 
-// At least one of these version properties will be non-nil
+// At least one of these two version properties will be non-nil
 @property (nonatomic, readonly, nullable) NSString *minorVersion;
 @property (nonatomic, readonly, nullable) NSString *majorVersion;
+
+@property (nonatomic, readonly, nullable) NSString *majorSubreleaseVersion;
 
 @end
 

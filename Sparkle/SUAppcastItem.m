@@ -73,6 +73,7 @@ static NSString *SUAppcastItemStateKey = @"SUAppcastItemState";
 @synthesize propertiesDictionary = _propertiesDictionary;
 @synthesize installationType = _installationType;
 @synthesize minimumAutoupdateVersion = _minimumAutoupdateVersion;
+@synthesize ignoreSkippedUpgradesBelowVersion = _ignoreSkippedUpgradesBelowVersion;
 @synthesize phasedRolloutInterval = _phasedRolloutInterval;
 @synthesize state = _state;
 @synthesize hasCriticalInformation = _hasCriticalInformation;
@@ -115,6 +116,7 @@ static NSString *SUAppcastItemStateKey = @"SUAppcastItemState";
         _maximumSystemVersion = [(NSString *)[decoder decodeObjectOfClass:[NSString class] forKey:SUAppcastItemMaximumSystemVersionKey] copy];
         _minimumSystemVersion = [(NSString *)[decoder decodeObjectOfClass:[NSString class] forKey:SUAppcastItemMinimumSystemVersionKey] copy];
         _minimumAutoupdateVersion = [(NSString *)[decoder decodeObjectOfClass:[NSString class] forKey:SUAppcastElementMinimumAutoupdateVersion] copy];
+        _ignoreSkippedUpgradesBelowVersion = [(NSString *)[decoder decodeObjectOfClass:[NSString class] forKey:SUAppcastElementIgnoreSkippedUpgradesBelowVersion] copy];
         _releaseNotesURL = [decoder decodeObjectOfClass:[NSURL class] forKey:SUAppcastItemReleaseNotesURLKey];
         _fullReleaseNotesURL = [decoder decodeObjectOfClass:[NSURL class] forKey:SUAppcastItemFullReleaseNotesURLKey];
         _title = [(NSString *)[decoder decodeObjectOfClass:[NSString class] forKey:SUAppcastItemTitleKey] copy];
@@ -181,6 +183,10 @@ static NSString *SUAppcastItemStateKey = @"SUAppcastItemState";
     
     if (self.minimumAutoupdateVersion != nil) {
         [encoder encodeObject:self.minimumAutoupdateVersion forKey:SUAppcastElementMinimumAutoupdateVersion];
+    }
+    
+    if (self.ignoreSkippedUpgradesBelowVersion != nil) {
+        [encoder encodeObject:self.ignoreSkippedUpgradesBelowVersion forKey:SUAppcastElementIgnoreSkippedUpgradesBelowVersion];
     }
     
     if (self.state != nil) {
@@ -462,6 +468,8 @@ static NSString *SUAppcastItemStateKey = @"SUAppcastItemState";
         _minimumSystemVersion = [(NSString *)[dict objectForKey:SUAppcastElementMinimumSystemVersion] copy];
         _maximumSystemVersion = [(NSString *)[dict objectForKey:SUAppcastElementMaximumSystemVersion] copy];
         _minimumAutoupdateVersion = [(NSString *)[dict objectForKey:SUAppcastElementMinimumAutoupdateVersion] copy];
+        
+        _ignoreSkippedUpgradesBelowVersion = [(NSString *)[dict objectForKey:SUAppcastElementIgnoreSkippedUpgradesBelowVersion] copy];
         
         NSString *channel = [dict objectForKey:SUAppcastElementChannel];
         if (channel != nil) {
