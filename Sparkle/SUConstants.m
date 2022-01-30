@@ -38,6 +38,7 @@ NSString *const SURelaunchHostBundleKey = @"SURelaunchHostBundle";
 NSString *const SUShowReleaseNotesKey = @"SUShowReleaseNotes";
 NSString *const SUSkippedMinorVersionKey = @"SUSkippedVersion";
 NSString *const SUSkippedMajorVersionKey = @"SUSkippedMajorVersion";
+NSString *const SUSkippedMajorSubreleaseVersionKey = @"SUSkippedMajorSubreleaseVersion";
 NSString *const SUScheduledCheckIntervalKey = @"SUScheduledCheckInterval";
 NSString *const SULastCheckTimeKey = @"SULastCheckTime";
 NSString *const SUExpectsDSASignatureKey = @"SUExpectsDSASignature";
@@ -92,6 +93,7 @@ NSString *const SUAppcastElementPhasedRolloutInterval = @"sparkle:phasedRolloutI
 NSString *const SUAppcastElementInformationalUpdate = @"sparkle:informationalUpdate";
 NSString *const SUAppcastElementChannel = @"sparkle:channel";
 NSString *const SUAppcastElementBelowVersion = @"sparkle:belowVersion";
+NSString *const SUAppcastElementIgnoreSkippedUpgradesBelowVersion = @"sparkle:ignoreSkippedUpgradesBelowVersion";
 
 NSString *const SURSSAttributeURL = @"url";
 NSString *const SURSSAttributeLength = @"length";

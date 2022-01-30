@@ -18,13 +18,15 @@
 
 @synthesize minorVersion = _minorVersion;
 @synthesize majorVersion = _majorVersion;
+@synthesize majorSubreleaseVersion = _majorSubreleaseVersion;
 
-- (instancetype)initWithMinorVersion:(nullable NSString *)minorVersion majorVersion:(nullable NSString *)majorVersion
+- (instancetype)initWithMinorVersion:(nullable NSString *)minorVersion majorVersion:(nullable NSString *)majorVersion majorSubreleaseVersion:(nullable NSString *)majorSubreleaseVersion
 {
     self = [super init];
     if (self != nil) {
         _minorVersion = [minorVersion copy];
         _majorVersion = [majorVersion copy];
+        _majorSubreleaseVersion = [majorSubreleaseVersion copy];
         
         assert(_minorVersion != nil || _majorVersion != nil);
     }
@@ -35,9 +37,10 @@
 {
     NSString *minorVersion = [host objectForUserDefaultsKey:SUSkippedMinorVersionKey];
     NSString *majorVersion = [host objectForUserDefaultsKey:SUSkippedMajorVersionKey];
+    NSString *majorSubreleaseVersion = [host objectForUserDefaultsKey:SUSkippedMajorSubreleaseVersionKey];
     
     if (minorVersion != nil || majorVersion != nil) {
-        return [[SPUSkippedUpdate alloc] initWithMinorVersion:minorVersion majorVersion:majorVersion];
+        return [[SPUSkippedUpdate alloc] initWithMinorVersion:minorVersion majorVersion:majorVersion majorSubreleaseVersion:majorSubreleaseVersion];
     } else {
         return nil;
     }
@@ -47,17 +50,20 @@
 {
     [host setObject:nil forUserDefaultsKey:SUSkippedMinorVersionKey];
     [host setObject:nil forUserDefaultsKey:SUSkippedMajorVersionKey];
+    [host setObject:nil forUserDefaultsKey:SUSkippedMajorSubreleaseVersionKey];
 }
 
 + (void)skipUpdate:(SUAppcastItem *)updateItem host:(SUHost *)host
 {
+    NSString *version = updateItem.versionString;
+    
     if (updateItem.majorUpgrade) {
         NSString *majorVersion = updateItem.minimumAutoupdateVersion;
         assert(majorVersion != nil);
         
         [host setObject:majorVersion forUserDefaultsKey:SUSkippedMajorVersionKey];
+        [host setObject:version forUserDefaultsKey:SUSkippedMajorSubreleaseVersionKey];
     } else {
-        NSString *version = updateItem.versionString;
         [host setObject:version forUserDefaultsKey:SUSkippedMinorVersionKey];
     }
 }
