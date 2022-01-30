@@ -101,13 +101,16 @@ struct GenerateAppcast: ParsableCommand {
     @Option(name: .long, help: ArgumentHelp("The last major or minimum autoupdate sparkle:version that will be used for generating new updates. By default, no last major version is used.", valueName: "major-version"))
     var majorVersion: String?
     
+    @Option(name: .long, help: ArgumentHelp("Ignore skipped major upgrades below this specified version. Only applicable for major upgrades.", valueName: "below-version"))
+    var ignoreSkippedUpgradesBelowVersion: String?
+    
     @Option(name: .long, help: ArgumentHelp("The phased rollout interval in seconds that will be used for generating new updates. By default, no phased rollout interval is used.", valueName: "phased-rollout-interval"), transform: { Int($0) })
     var phasedRolloutInterval: Int?
     
     @Option(name: .long, help: ArgumentHelp("The last critical update sparkle:version that will be used for generating new updates. An empty string argument will treat this update as critical coming from any application version. By default, no last critical update version is used. Old applications need to be using Sparkle 2 to use this feature.", valueName: "critical-update-version"))
     var criticalUpdateVersion: String?
     
-    @Option(name: .long, help: ArgumentHelp("A comma delimited list of application sparkle:version's that will see newly generated updates as being informational only. An empty string argument will treat this update as informational coming from any application version. By default, updates are not informational only. --link must also be provided. Old applications need to be using Sparkle 2 to use this feature.", valueName: "informational-update-versions"), transform: { $0.components(separatedBy: ",").filter({$0.count > 0}) })
+    @Option(name: .long, help: ArgumentHelp("A comma delimited list of application sparkle:version's that will see newly generated updates as being informational only. An empty string argument will treat this update as informational coming from any application version. Prefix a version string with '<' to indicate (eg \"<2.5\") to indicate older versions than the one specified should treat the update as informational only. By default, updates are not informational only. --link must also be provided. Old applications need to be using Sparkle 2 to use this feature, and 2.1 or later to use the '<' upper bound feature.", valueName: "informational-update-versions"), transform: { $0.components(separatedBy: ",").filter({$0.count > 0}) })
     var informationalUpdateVersions: [String]?
     
     @Option(name: .customShort("o"), help: ArgumentHelp("Path to filename for the generated appcast (allowed when only one will be created).", valueName: "output-path"), transform: { URL(fileURLWithPath: $0) })
@@ -251,7 +254,7 @@ struct GenerateAppcast: ParsableCommand {
                                                                 relativeTo: archivesSourceDir)
 
                 // Write the appcast
-                let (numNewUpdates, numExistingUpdates) = try writeAppcast(appcastDestPath: appcastDestPath, updates: updates, newVersions: versions, maxNewVersionsInFeed: maxNewVersionsInFeed, fullReleaseNotesLink: fullReleaseNotesURL, maxCDATAThreshold: maxCDATAThreshold, link: link, newChannel: channel, majorVersion: majorVersion, phasedRolloutInterval: phasedRolloutInterval, criticalUpdateVersion: criticalUpdateVersion, informationalUpdateVersions: informationalUpdateVersions)
+                let (numNewUpdates, numExistingUpdates) = try writeAppcast(appcastDestPath: appcastDestPath, updates: updates, newVersions: versions, maxNewVersionsInFeed: maxNewVersionsInFeed, fullReleaseNotesLink: fullReleaseNotesURL, maxCDATAThreshold: maxCDATAThreshold, link: link, newChannel: channel, majorVersion: majorVersion, ignoreSkippedUpgradesBelowVersion: ignoreSkippedUpgradesBelowVersion, phasedRolloutInterval: phasedRolloutInterval, criticalUpdateVersion: criticalUpdateVersion, informationalUpdateVersions: informationalUpdateVersions)
 
                 // Inform the user, pluralizing "update" if necessary
                 let pluralizeUpdates = { $0 == 1 ? "update" : "updates" }

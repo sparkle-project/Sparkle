@@ -49,7 +49,7 @@ func extractVersion(parent: XMLNode) -> String? {
     return nil
 }
 
-func writeAppcast(appcastDestPath: URL, updates: [ArchiveItem], newVersions: Set<String>?, maxNewVersionsInFeed: Int, fullReleaseNotesLink: String?, maxCDATAThreshold: Int, link: String?, newChannel: String?, majorVersion: String?, phasedRolloutInterval: Int?, criticalUpdateVersion: String?, informationalUpdateVersions: [String]?) throws -> (numNewUpdates: Int, numExistingUpdates: Int) {
+func writeAppcast(appcastDestPath: URL, updates: [ArchiveItem], newVersions: Set<String>?, maxNewVersionsInFeed: Int, fullReleaseNotesLink: String?, maxCDATAThreshold: Int, link: String?, newChannel: String?, majorVersion: String?, ignoreSkippedUpgradesBelowVersion: String?, phasedRolloutInterval: Int?, criticalUpdateVersion: String?, informationalUpdateVersions: [String]?) throws -> (numNewUpdates: Int, numExistingUpdates: Int) {
     let appBaseName = updates[0].appPath.deletingPathExtension().lastPathComponent
 
     let sparkleNS = "http://www.andymatuschak.org/xml-namespaces/sparkle"
@@ -188,6 +188,12 @@ func writeAppcast(appcastDestPath: URL, updates: [ArchiveItem], newVersions: Set
                 item.addChild(minimumAutoupdateVersionElement)
             }
             
+            // Set ignore skipped upgrades below version
+            if let ignoreSkippedUpgradesBelowVersion = ignoreSkippedUpgradesBelowVersion, let ignoreSkippedUpgradesBelowVersionElement = XMLElement.element(withName: SUAppcastElementIgnoreSkippedUpgradesBelowVersion, uri: sparkleNS) as? XMLElement {
+                ignoreSkippedUpgradesBelowVersionElement.setChildren([text(ignoreSkippedUpgradesBelowVersion)])
+                item.addChild(ignoreSkippedUpgradesBelowVersionElement)
+            }
+            
             // Set phased rollout interval
             if let phasedRolloutInterval = phasedRolloutInterval,
                let phasedRolloutIntervalElement = XMLElement.element(withName: SUAppcastElementPhasedRolloutInterval, uri: sparkleNS) as? XMLElement {
@@ -208,8 +214,17 @@ func writeAppcast(appcastDestPath: URL, updates: [ArchiveItem], newVersions: Set
             if let informationalUpdateVersions = informationalUpdateVersions,
                let informationalUpdateElement = XMLElement.element(withName: SUAppcastElementInformationalUpdate, uri: sparkleNS) as? XMLElement {
                 let versionElements: [XMLElement] = informationalUpdateVersions.compactMap({ informationalUpdateVersion in
-                    let element = XMLElement.element(withName: SUAppcastAttributeVersion, uri: sparkleNS) as? XMLElement
-                    element?.setChildren([text(informationalUpdateVersion)])
+                    let element: XMLElement?
+                    let informationalVersionText: String
+                    if informationalUpdateVersion.hasPrefix("<") {
+                        element = XMLElement.element(withName: SUAppcastElementBelowVersion, uri: sparkleNS) as? XMLElement
+                        informationalVersionText = String(informationalUpdateVersion.dropFirst())
+                    } else {
+                        element = XMLElement.element(withName: SUAppcastElementVersion, uri: sparkleNS) as? XMLElement
+                        informationalVersionText = informationalUpdateVersion
+                    }
+                    
+                    element?.setChildren([text(informationalVersionText)])
                     return element
                 })
                 
