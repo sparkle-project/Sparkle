@@ -289,7 +289,7 @@ SU_EXPORT @interface SUAppcastItem : NSObject<NSSecureCoding>
  
  This is extracted from the @c <sparkle:ignoreSkippedUpgradesBelowVersion> element.
  
- Old applications must be using Sparkle 2.1, otherwise this property will be ignored.
+ Old applications must be using Sparkle 2.1 or later, otherwise this property will be ignored.
  */
 @property (nonatomic, readonly, nullable) NSString *ignoreSkippedUpgradesBelowVersion;
 
