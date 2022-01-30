@@ -85,7 +85,7 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  * If the state.stage is `SPUUserUpdateStateInstalling`, the installing update is also preserved after dismissing. In this state however, the update will also still be installed after the application is terminated.
  *
  * A reply of `SPUUserUpdateChoiceSkip` skips this particular version and won't notify the user again, unless they initiate an update check themselves.
- * If @c appcastItem.majorUpgrade is YES, the major update and any future minor updates to that major release are skipped.
+ * If @c appcastItem.majorUpgrade is YES, the major update and any future minor updates to that major release are skipped, unless a future minor update specifies a `<sparkle:ignoreSkippedUpgradesBelowVersion>` requirement.
  * If the state.stage is `SPUUpdateStateInstalling`, the installation is also canceled when the update is skipped.
  *
  * @param appcastItem The Appcast Item containing information that reflects the new update.
