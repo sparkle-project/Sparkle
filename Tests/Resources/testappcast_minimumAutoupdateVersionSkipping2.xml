@@ -29,6 +29,8 @@
     </item>
     <item>
         <title>Version 2.0</title>
+        <!-- this should have no effect because there is no minimumAutoupdateVersion -->
+        <sparkle:ignoreSkippedUpgradesBelowVersion>2.0</sparkle:ignoreSkippedUpgradesBelowVersion>
         <sparkle:version>2.0</sparkle:version>
         <enclosure url="http://localhost:1337/Sparkle_Test_App.zip" length="1346234" />
     </item>
