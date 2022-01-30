@@ -268,6 +268,8 @@ SU_EXPORT @interface SUAppcastItem : NSObject<NSSecureCoding>
  If the update is a `majorUpgrade` and the update is skipped by the user, other future update alerts with the same `minimumAutoupdateVersion` will also be skipped automatically unless an update specifies `ignoreSkippedUpgradesBelowVersion`.
  
  This version string corresponds to the application's @c CFBundleVersion
+ 
+ This is extracted from the @c <sparkle:minimumAutoupdateVersion> element.
  */
 @property (copy, readonly, nullable) NSString *minimumAutoupdateVersion;
 
@@ -284,6 +286,10 @@ SU_EXPORT @interface SUAppcastItem : NSObject<NSSecureCoding>
  This can only be applied if the update is a `majorUpgrade`.
  
  This version string corresponds to the application's @c CFBundleVersion
+ 
+ This is extracted from the @c <sparkle:ignoreSkippedUpgradesBelowVersion> element.
+ 
+ Old applications must be using Sparkle 2.1, otherwise this property will be ignored.
  */
 @property (nonatomic, readonly, nullable) NSString *ignoreSkippedUpgradesBelowVersion;
 
