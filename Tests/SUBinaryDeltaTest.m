@@ -1102,7 +1102,7 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
         NSString *destinationFile = [destinationDirectory stringByAppendingPathComponent:@"A"];
         NSString *destinationFile2 = [destinationDirectory stringByAppendingPathComponent:@"A2"];
         
-        // Both files should have file system compression applied
+        // Both files should not have file system compression applied
         {
             struct stat statStruct = {0};
             int result = lstat(destinationFile.fileSystemRepresentation, &statStruct);
