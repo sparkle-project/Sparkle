@@ -1012,6 +1012,118 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
     }];
 }
 
+- (void)testFileSystemCompression
+{
+    [self createAndApplyPatchWithBeforeDiffHandler:^(NSFileManager *__unused fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
+        NSString *sourceFile = [sourceDirectory stringByAppendingPathComponent:@"A"];
+        NSString *destinationFile = [destinationDirectory stringByAppendingPathComponent:@"A"];
+        NSString *destinationFile2 = [destinationDirectory stringByAppendingPathComponent:@"A2"];
+        
+        XCTAssertTrue([[self bigData1] writeToFile:sourceFile atomically:YES]);
+        XCTAssertTrue([[self bigData2] writeToFile:destinationFile atomically:YES]);
+        
+        {
+            // We only track executable files to decide if we want to apply file system compression over the entire bundle
+            int lchmodResult = lchmod(destinationFile.fileSystemRepresentation, 0755);
+            XCTAssertEqual(lchmodResult, 0);
+        }
+        
+        NSTask *dittoTask = [[NSTask alloc] init];
+        
+        if (@available(macOS 10.13, *)) {
+            dittoTask.executableURL = [NSURL fileURLWithPath:@"/usr/bin/ditto" isDirectory:NO];
+        } else {
+            dittoTask.launchPath = @"/usr/bin/ditto";
+        }
+        
+        dittoTask.arguments = @[@"--hfsCompression", destinationFile, destinationFile2];
+        
+        NSError *launchError = nil;
+        if (@available(macOS 10.13, *)) {
+            BOOL launched = [dittoTask launchAndReturnError:&launchError];
+            if (!launched) {
+                XCTFail(@"Failed to launch ditto: %@", launchError);
+            }
+        } else {
+            [dittoTask launch];
+        }
+        [dittoTask waitUntilExit];
+        
+        XCTAssertEqual(dittoTask.terminationStatus, 0);
+        
+        XCTAssertFalse([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
+    } afterDiffHandler:nil afterPatchHandler:^(NSFileManager *__unused fileManager, NSString *__unused sourceDirectory, NSString *destinationDirectory) {
+        
+        NSString *destinationFile = [destinationDirectory stringByAppendingPathComponent:@"A"];
+        NSString *destinationFile2 = [destinationDirectory stringByAppendingPathComponent:@"A2"];
+        
+        // Both files should have file system compression applied
+        {
+            struct stat statStruct = {0};
+            int result = lstat(destinationFile.fileSystemRepresentation, &statStruct);
+            XCTAssertEqual(result, 0);
+            
+            if ((statStruct.st_flags & UF_COMPRESSED) == 0) {
+                XCTFail(@"First destination file is not compressed!");
+            }
+        }
+        {
+            struct stat statStruct = {0};
+            int result = lstat(destinationFile2.fileSystemRepresentation, &statStruct);
+            XCTAssertEqual(result, 0);
+            
+            if ((statStruct.st_flags & UF_COMPRESSED) == 0) {
+                XCTFail(@"Second destination file is not compressed!");
+            }
+        }
+    } testingVersion2Delta:NO];
+}
+
+- (void)testNoFileSystemCompression
+{
+    [self createAndApplyPatchWithBeforeDiffHandler:^(NSFileManager *__unused fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
+        NSString *sourceFile = [sourceDirectory stringByAppendingPathComponent:@"A"];
+        NSString *destinationFile = [destinationDirectory stringByAppendingPathComponent:@"A"];
+        NSString *destinationFile2 = [destinationDirectory stringByAppendingPathComponent:@"A2"];
+        
+        XCTAssertTrue([[self bigData1] writeToFile:sourceFile atomically:YES]);
+        XCTAssertTrue([[self bigData2] writeToFile:destinationFile atomically:YES]);
+        XCTAssertTrue([[self bigData2] writeToFile:destinationFile2 atomically:YES]);
+        
+        {
+            // We only usually track executable files to decide if we want to apply file system compression over the entire bundle
+            int lchmodResult = lchmod(destinationFile.fileSystemRepresentation, 0755);
+            XCTAssertEqual(lchmodResult, 0);
+        }
+        
+        XCTAssertFalse([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
+    } afterDiffHandler:nil afterPatchHandler:^(NSFileManager *__unused fileManager, NSString *__unused sourceDirectory, NSString *destinationDirectory) {
+        
+        NSString *destinationFile = [destinationDirectory stringByAppendingPathComponent:@"A"];
+        NSString *destinationFile2 = [destinationDirectory stringByAppendingPathComponent:@"A2"];
+        
+        // Both files should have file system compression applied
+        {
+            struct stat statStruct = {0};
+            int result = lstat(destinationFile.fileSystemRepresentation, &statStruct);
+            XCTAssertEqual(result, 0);
+            
+            if ((statStruct.st_flags & UF_COMPRESSED) != 0) {
+                XCTFail(@"First destination file is compressed!");
+            }
+        }
+        {
+            struct stat statStruct = {0};
+            int result = lstat(destinationFile2.fileSystemRepresentation, &statStruct);
+            XCTAssertEqual(result, 0);
+            
+            if ((statStruct.st_flags & UF_COMPRESSED) != 0) {
+                XCTFail(@"Second destination file is compressed!");
+            }
+        }
+    } testingVersion2Delta:NO];
+}
+
 - (void)testFrameworkVersionChanged
 {
     [self createAndApplyPatchWithHandler:^(NSFileManager *fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
