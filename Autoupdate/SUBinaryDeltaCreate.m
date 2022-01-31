@@ -590,10 +590,10 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
         // If we find any executable files that are using file system compression, that is sufficient
         // for recording that the applier should re-apply file system compression.
         // We check for executable files because they are likely candidates to be compressed.
-        if (!foundFilesystemCompression && ent->fts_info == FTS_F && (ent->fts_statp->st_mode & (S_IXUSR | S_IXGRP | S_IXOTH)) != 0 && (ent->fts_statp->st_flags & UF_COMPRESSED) != 0) {
+        if (!foundFilesystemCompression && MAJOR_VERSION_IS_AT_LEAST(majorVersion, SUBinaryDeltaMajorVersion3) && ent->fts_info == FTS_F && (ent->fts_statp->st_mode & (S_IXUSR | S_IXGRP | S_IXOTH)) != 0 && (ent->fts_statp->st_flags & UF_COMPRESSED) != 0) {
             foundFilesystemCompression = true;
             
-            if (verbose && MAJOR_VERSION_IS_AT_LEAST(majorVersion, SUBinaryDeltaMajorVersion3)) {
+            if (verbose) {
                 fprintf(stderr, " File system compression detected.");
             }
         }
