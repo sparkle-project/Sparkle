@@ -172,7 +172,7 @@ extern char *xar_get_safe_path(xar_file_t f) __attribute__((weak_import));
     
     // I wasn't able to figure out how to retrieve the compression options from xar,
     // so we will use default flags to indicate the info isn't available
-    return [[SPUDeltaArchiveHeader alloc] initWithCompression:SPUDeltaCompressionModeDefault compressionLevel:0 majorVersion:majorDiffVersion minorVersion:minorDiffVersion beforeTreeHash:rawExpectedBeforeHash afterTreeHash:rawExpectedAfterHash];
+    return [[SPUDeltaArchiveHeader alloc] initWithCompression:SPUDeltaCompressionModeDefault compressionLevel:0 fileSystemCompression:false majorVersion:majorDiffVersion minorVersion:minorDiffVersion beforeTreeHash:rawExpectedBeforeHash afterTreeHash:rawExpectedAfterHash];
 }
 
 - (void)writeHeader:(SPUDeltaArchiveHeader *)header
