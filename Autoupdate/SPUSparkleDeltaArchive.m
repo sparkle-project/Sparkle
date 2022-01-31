@@ -780,7 +780,7 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
     SparkleDeltaArchiveMetadata metadata = {.compressionLevel = compressionLevel, .fileSystemCompression = header.fileSystemCompression};
     
     if (fwrite(&metadata, sizeof(metadata), 1, file) < 1) {
-        self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: @"Failed to write metadatavalue due to io error" }];
+        self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: @"Failed to write metadata value due to io error" }];
         return;
     }
     
