@@ -28,7 +28,7 @@ static BOOL applyBinaryDeltaToFile(NSString *patchFile, NSString *sourceFilePath
     return success;
 }
 
-BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFile, BOOL verbose, void (^progressCallback)(double progress), NSError *__autoreleasing *error)
+BOOL applyBinaryDelta(NSString *source, NSString *finalDestination, NSString *patchFile, BOOL verbose, void (^progressCallback)(double progress), NSError *__autoreleasing *error)
 {
     SPUDeltaArchiveHeader *header = nil;
     id<SPUDeltaArchiveProtocol> archive = SPUDeltaArchiveReadPatchAndHeader(patchFile, &header);
@@ -39,7 +39,7 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
         return NO;
     }
 
-    progressCallback(0/6.0);
+    progressCallback(0/7.0);
 
     SUBinaryDeltaMajorVersion majorDiffVersion = header.majorVersion;
     uint16_t minorDiffVersion = header.minorVersion;
@@ -90,7 +90,7 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
         fprintf(stderr, "Verifying source...");
     }
 
-    progressCallback(1/6.0);
+    progressCallback(1/7.0);
     
     unsigned char beforeHash[CC_SHA1_DIGEST_LENGTH] = {0};
     if (!getRawHashOfTreeWithVersion(beforeHash, source, majorDiffVersion)) {
@@ -117,7 +117,17 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
         fprintf(stderr, "\nCopying files...");
     }
 
-    progressCallback(2/6.0);
+    progressCallback(2/7.0);
+    
+    // Make a temporary destination path if necessary
+    // If we want to apply file system compression after we're done applying, we'll need to use a different
+    // temporary path
+    NSString *destination;
+    if (header.fileSystemCompression) {
+        destination = [finalDestination.stringByDeletingLastPathComponent stringByAppendingPathComponent:[NSString stringWithFormat:@".tmp.%@", finalDestination.lastPathComponent]];
+    } else {
+        destination = finalDestination;
+    }
 
     if (!removeTree(destination)) {
         if (verbose) {
@@ -129,7 +139,7 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
         return NO;
     }
 
-    progressCallback(3/6.0);
+    progressCallback(3/7.0);
 
     if (!copyTree(source, destination)) {
         if (verbose) {
@@ -141,7 +151,7 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
         return NO;
     }
 
-    progressCallback(4/6.0);
+    progressCallback(4/7.0);
 
     if (verbose) {
         fprintf(stderr, "\nPatching...");
@@ -374,23 +384,85 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
         if (error != NULL && *error == nil) {
             *error = archiveError;
         }
+        removeTree(destination);
         return NO;
     }
 
-    progressCallback(5/6.0);
-
+    progressCallback(5/7.0);
+    
+    // Re-apply file system compression is requested
+    if (header.fileSystemCompression) {
+        if (verbose) {
+            fprintf(stderr, "\nApplying file system compression...");
+        }
+        
+        NSTask *dittoTask = [[NSTask alloc] init];
+        
+        if (@available(macOS 10.13, *)) {
+            dittoTask.executableURL = [NSURL fileURLWithPath:@"/usr/bin/ditto" isDirectory:NO];
+        } else {
+            dittoTask.launchPath = @"/usr/bin/ditto";
+        }
+        
+        dittoTask.arguments = @[@"--hfsCompression", destination, finalDestination];
+        
+        // If we fail to apply file system compression, we will try falling back to not doing this
+        BOOL failedToApplyFileSystemCompression = NO;
+        
+        if (@available(macOS 10.13, *)) {
+            NSError *launchError = nil;
+            if (![dittoTask launchAndReturnError:&launchError]) {
+                failedToApplyFileSystemCompression = YES;
+                
+                fprintf(stderr, "\nWarning: failed to launch ditto task for file compression: %s", launchError.localizedDescription.UTF8String);
+            }
+        } else {
+            @try {
+                [dittoTask launch];
+            } @catch (NSException *exception) {
+                failedToApplyFileSystemCompression = YES;
+                
+                fprintf(stderr, "\nWarning: failed to launch ditto task for file compression: %s", exception.reason.UTF8String);
+            }
+        }
+        
+        if (!failedToApplyFileSystemCompression) {
+            [dittoTask waitUntilExit];
+            
+            if (dittoTask.terminationStatus != 0) {
+                failedToApplyFileSystemCompression = YES;
+                
+                fprintf(stderr, "\nWarning: ditto task for file compression returned exit status %d", dittoTask.terminationStatus);
+            }
+        }
+        
+        if (failedToApplyFileSystemCompression) {
+            // Try to replace bundle normally
+            if (![fileManager replaceItemAtURL:[NSURL fileURLWithPath:finalDestination] withItemAtURL:[NSURL fileURLWithPath:destination isDirectory:YES] backupItemName:nil options:0 resultingItemURL:NULL error:error]) {
+                removeTree(destination);
+                return NO;
+            }
+        } else {
+            // Remove original copy
+            [fileManager removeItemAtURL:[NSURL fileURLWithPath:destination isDirectory:YES] error:NULL];
+        }
+    }
+    
+    progressCallback(6/7.0);
+    
     if (verbose) {
         fprintf(stderr, "\nVerifying destination...");
     }
     
     unsigned char afterHash[CC_SHA1_DIGEST_LENGTH] = {0};
-    if (!getRawHashOfTreeWithVersion(afterHash, destination, majorDiffVersion)) {
+    if (!getRawHashOfTreeWithVersion(afterHash, finalDestination, majorDiffVersion)) {
         if (verbose) {
             fprintf(stderr, "\n");
         }
         if (error != NULL) {
-            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Unable to calculate hash of tree %@", destination] }];
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Unable to calculate hash of tree %@", finalDestination] }];
         }
+        removeTree(finalDestination);
         return NO;
     }
 
@@ -401,11 +473,11 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
         if (error != NULL) {
             *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Destination doesn't have expected hash (%@ != %@).  Giving up.", displayHashFromRawHash(expectedAfterHash), displayHashFromRawHash(afterHash)] }];
         }
-        removeTree(destination);
+        removeTree(finalDestination);
         return NO;
     }
 
-    progressCallback(6/6.0);
+    progressCallback(7/7.0);
 
     if (verbose) {
         fprintf(stderr, "\nDone!\n");

@@ -517,6 +517,8 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
         }
         return NO;
     }
+    
+    bool foundFilesystemCompression = false;
 
     uint32_t warningsCount = 0;
     const uint32_t maxWarningsToPrint = 16;
@@ -584,6 +586,17 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
                 fprintf(stderr, "\nWarning: encountered too many warnings.. Ignoring the rest..");
             }
         }
+        
+        // If we find any executable files that are using file system compression, that is sufficient
+        // for recording that the applier should re-apply file system compression.
+        // We check for executable files because they are likely candidates to be compressed.
+        if (!foundFilesystemCompression && ent->fts_info == FTS_F && (ent->fts_statp->st_mode & (S_IXUSR | S_IXGRP | S_IXOTH)) != 0 && (ent->fts_statp->st_flags & UF_COMPRESSED) != 0) {
+            foundFilesystemCompression = true;
+            
+            if (verbose && MAJOR_VERSION_IS_AT_LEAST(majorVersion, SUBinaryDeltaMajorVersion3)) {
+                fprintf(stderr, " File system compression detected.");
+            }
+        }
 
         NSDictionary *oldInfo = originalTreeState[key];
 
@@ -646,7 +659,7 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
         archive = [[SPUXarDeltaArchive alloc] initWithPatchFileForWriting:temporaryFile];
     }
     
-    SPUDeltaArchiveHeader *header = [[SPUDeltaArchiveHeader alloc] initWithCompression:compression compressionLevel:compressionLevel majorVersion:majorVersion minorVersion:minorVersion beforeTreeHash:beforeHash afterTreeHash:afterHash];
+    SPUDeltaArchiveHeader *header = [[SPUDeltaArchiveHeader alloc] initWithCompression:compression compressionLevel:compressionLevel fileSystemCompression:foundFilesystemCompression majorVersion:majorVersion minorVersion:minorVersion beforeTreeHash:beforeHash afterTreeHash:afterHash];
     
     [archive writeHeader:header];
     if (archive.error != nil) {

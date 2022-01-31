@@ -39,7 +39,12 @@ NS_ASSUME_NONNULL_BEGIN
  [ HEADER (part 1) ]
  magic (length: 4)
  compression (length: 1)
- compressionLevel (length: 1)
+ metadata (See format below. length: 1)
+ 
+    -- METADATA --
+    compressionLevel (bits [0, 4])
+    (bits [5, 6] reserved)
+    fileSystemCompression (bit 7)
  
  -- COMPRESSED --
  

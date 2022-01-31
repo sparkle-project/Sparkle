@@ -21,6 +21,13 @@
 #define SPARKLE_BZIP2_ERROR_DOMAIN @"Sparkle BZIP2"
 #define SPARKLE_COMPRESSION_ERROR_DOMAIN @"Sparkle Compression"
 
+typedef struct
+{
+    uint8_t compressionLevel : 4;
+    uint8_t reserved : 3;
+    bool fileSystemCompression : 1;
+} SparkleDeltaArchiveMetadata;
+
 @interface SPUSparkleDeltaArchive ()
 
 @property (nonatomic) FILE *file;
@@ -267,8 +274,8 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
     
     self.compression = compression;
     
-    uint8_t compressionLevel = 0;
-    if (fread(&compressionLevel, sizeof(compressionLevel), 1, file) < 1) {
+    SparkleDeltaArchiveMetadata metadata = {0};
+    if (fread(&metadata, sizeof(metadata), 1, file) < 1) {
         self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to read compression level value from patch file: %@", patchFile] }];
         return nil;
     }
@@ -338,7 +345,7 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
         return nil;
     }
     
-    return [[SPUDeltaArchiveHeader alloc] initWithCompression:compression compressionLevel:compressionLevel majorVersion:majorVersion minorVersion:minorVersion beforeTreeHash:beforeTreeHash afterTreeHash:afterTreeHash];
+    return [[SPUDeltaArchiveHeader alloc] initWithCompression:compression compressionLevel:metadata.compressionLevel fileSystemCompression:metadata.fileSystemCompression majorVersion:majorVersion minorVersion:minorVersion beforeTreeHash:beforeTreeHash afterTreeHash:afterTreeHash];
 }
 
 - (NSArray<NSString *> *)_readRelativeFilePaths
@@ -770,8 +777,10 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
             compressionLevel = 0;
     }
     
-    if (fwrite(&compressionLevel, sizeof(compressionLevel), 1, file) < 1) {
-        self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: @"Failed to write compression level value due to io error" }];
+    SparkleDeltaArchiveMetadata metadata = {.compressionLevel = compressionLevel, .fileSystemCompression = header.fileSystemCompression};
+    
+    if (fwrite(&metadata, sizeof(metadata), 1, file) < 1) {
+        self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: @"Failed to write metadatavalue due to io error" }];
         return;
     }
     
