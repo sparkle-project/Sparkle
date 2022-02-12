@@ -177,6 +177,7 @@ SU_EXPORT @interface SPUUpdater : NSObject
  this permission request is not performed however.
  
  Setting this property will persist in the host bundle's user defaults.
+ Only set this property if you need dynamic behavior (e.g. user preferences).
  
  The update schedule cycle will be reset in a short delay after the property's new value is set.
  This is to allow reverting this property without kicking off a schedule change immediately

@@ -12,8 +12,10 @@
   * Add sparkle:belowVersion element for informational updates (Zorg) (#2080)
   * Add option to allow developers to ignore/reset user skipped upgrades (Zorg) (#2081)
 * Fix progress bar and button alignment for checking updates (Zorg) (#2066)
+  * This deprecates `-[SPUUserDriver showInstallingUpdate]` and `-[SPUUserDriver showSendingTerminationSignal]` in favor for `-[SPUUserDriver showInstallingUpdateWithApplicationTerminated:]`
 * Fix unsteady progress when installing updates (Zorg) (#2072)
 * Check http statusCode in didFinishDownloadingToURL (Eric Shapiro, Zorg) (#2049, #2073)
+* Use strcoll_l() for locale-independent comparisons for delta updates (Dan Rigdon-Bel) (#2087)
 * Fix version compare not treating '2.1.0' and '2.1' as being equal (Zorg) (#2065)
 * Add verify and account options for signing updates (Zorg) (#2074)
 * Add delta patch and Apple code signing verification in generate_appcast (Zorg) (#2076, #2077)
@@ -22,6 +24,8 @@
 * Fix make release failing when customizing XPC_SERVICE_BUNDLE_ID_PREFIX (Zorg) (#2060)
 * Preserve the Entitlements directory in podspec (digitalMoksha) (#2062)
 * Add hidden option to generate_appcast to set max CDATA threshold (Zorg) (#2075)
+
+This update introduces a new major format for [delta updates](https://sparkle-project.org/documentation/delta-updates/), which migrates away from deprecated APIs (xar) and creates smaller patches. If you don't use `generate_appcast`, please check the [compatibility notes for creating delta updates](https://sparkle-project.org/documentation/delta-updates/#compatibility).
 
 # 2.0.0
 
