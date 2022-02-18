@@ -340,6 +340,11 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
     [self checkForUpdatesWithDriver:theUpdateDriver];
 }
 
+- (void)checkForUpdatesInBackgroundWithoutUi
+{
+    [self checkForUpdatesWithDriver:[[SUAutomaticUpdateDriver alloc] initWithUpdater:self]];
+}
+
 - (IBAction)checkForUpdates:(id)__unused sender
 {
     if (self.driver && [self.driver isInterruptible]) {

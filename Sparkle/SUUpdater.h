@@ -85,6 +85,8 @@ SU_EXPORT @interface SUUpdater : NSObject
  */
 - (void)checkForUpdatesInBackground;
 
+- (void)checkForUpdatesInBackgroundWithoutUi;
+
 /*!
  A property indicating whether or not to check for updates automatically.
 
