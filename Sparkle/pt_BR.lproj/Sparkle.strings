@@ -1,51 +1,110 @@
-"%1$@ %2$@ has been downloaded and is ready to use! This is an important update; would you like to install it and relaunch %1$@ now?" = "O app %1$@ %2$@ foi baixado e está pronto para uso! Esta é uma atualização importante; deseja instalar e reabrir o app %1$@ agora?";
-
-"%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "O app %1$@ %2$@ foi baixado e está pronto para uso! Deseja instalar e reabrir o app %1$@ agora?";
-
-"%1$@ can't be updated, because it was opened from a read-only or a temporary location." = "O app %1$@ não pode ser atualizado porque foi aberto de um volume somente leitura ou local temporário.";
-
-"Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "Use o Finder para copiar o app %1$@ para a pasta Aplicativos, reabra-o e tente novamente.";
-
+/* (No Comment) */
 "%@ %@ is currently the newest version available." = "%1$@ %2$@ é a versão mais recente disponível.";
 
-"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%1$@ %2$@ é a versão mais recente disponível.\n(Você está usando a versão %3$@.)";
+/* Critical downloadable update */
+"%@ %@ is now available--you have %@. This is an important update; would you like to download it now?" = "O app %1$@ %2$@ está disponível — sua versão é %3$@. Esta é uma atualização importante. Deseja baixá-la agora?";
 
 /* Description text for SUUpdateAlert when the update is downloadable. */
-"%@ %@ is now available--you have %@. Would you like to download it now?" = "%1$@ %2$@ está disponível — sua versão é %3$@. Deseja baixá-la agora?";
+"%@ %@ is now available--you have %@. Would you like to download it now?" = "O app %1$@ %2$@ está disponível — sua versão é %3$@. Deseja baixá-lo agora?";
 
 /* Description text for SUUpdateAlert when the update informational with no download. */
-"%@ %@ is now available--you have %@. Would you like to learn more about this update on the web?" = "%1$@ %2$@ está disponível — sua versão é %3$@. Deseja saber mais sobre esta atualização na web?";
+"%@ %@ is now available--you have %@. Would you like to learn more about this update on the web?" = "O app %1$@ %2$@ está disponível — sua versão é %3$@. Deseja saber mais sobre esta atualização na web?";
 
+/* (No Comment) */
 "%@ downloaded" = "%@ baixados";
 
+/* (No Comment) */
+"%@ is now updated to version %@!" = "O app %@ foi atualizado para a versão %@!";
+
+/* (No Comment) */
+"%@ is now updated!" = "O app %@ foi atualizado!";
+
+/* (No Comment) */
 "%@ of %@" = "%1$@ de %2$@";
 
+/* (No Comment) */
+"%1$@ %2$@ has been downloaded and is ready to use! This is an important update; would you like to install it and relaunch %1$@ now?" = "O app %1$@ %2$@ foi baixado e está pronto para uso! Esta é uma atualização importante; deseja instalar e reabrir o app %1$@ agora?";
+
+/* (No Comment) */
+"%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "O app %1$@ %2$@ foi baixado e está pronto para uso! Deseja instalar e reabrir o app %1$@ agora?";
+
+/* (No Comment) */
+"%1$@ %2$@ is available but your macOS version is too new for this update. This update only supports up to macOS %3$@." = "O app %1$@ %2$@ está disponível, mas a versão do macOS é nova demais para esta atualização, que oferece compatibilidade até o macOS %3$@.";
+
+/* (No Comment) */
+"%1$@ %2$@ is available but your macOS version is too old to install it. At least macOS %3$@ is required." = "O app %1$@ %2$@ está disponível, mas a versão do macOS é antiga demais para instalá-lo. Você deve ter, no mínimo, o macOS %3$@.";
+
+/* (No Comment) */
+"%1$@ can't be updated, because it was opened from a read-only or a temporary location." = "O app %1$@ não pode ser atualizado porque foi aberto de um volume somente leitura ou local temporário.";
+
+/* (No Comment) */
+"%1$@ can’t be updated if it’s running from the location it was downloaded to." = "O app %1$@ não pode ser atualizado se ele estiver aberto do local onde foi baixado.";
+
+/* Authorization message shown when app wants permission to update another app / bundle. */
+"%1$@ wants permission to update %2$@." = "O app %1$@ deseja permissão para atualizar o app %2$@.";
+
+/* Authorization message shown when app wants permission to update itself. */
+"%1$@ wants permission to update." = "O app %1$@ deseja permissão para atualizar.";
+
+/* (No Comment) */
 "A new version of %@ is available!" = "Uma nova versão do app %@ está disponível!";
 
+/* (No Comment) */
 "A new version of %@ is ready to install!" = "Uma nova versão do app %@ está pronta para ser instalada!";
 
-"An error occurred in retrieving update information. Please try again later." = "Ocorreu um erro ao obter informações da atualização. Tente novamente mais tarde.";
+/* (No Comment) */
+"An error occurred in retrieving update information. Please try again later." = "Ocorreu um erro ao obter informações de atualização. Tente novamente mais tarde.";
 
+/* (No Comment) */
+"An error occurred while connecting to the installer. Please try again later." = "Ocorreu um erro ao conectar-se ao instalador. Tente novamente mais tarde.";
+
+/* (No Comment) */
+"An error occurred while downloading the update feed." = "Ocorreu um erro ao baixar o feed de atualização.";
+
+/* (No Comment) */
 "An error occurred while downloading the update. Please try again later." = "Ocorreu um erro ao baixar a atualização. Tente novamente mais tarde.";
 
+/* (No Comment) */
 "An error occurred while extracting the archive. Please try again later." = "Ocorreu um erro ao extrair o arquivo comprimido. Tente novamente mais tarde.";
 
+/* (No Comment) */
 "An error occurred while installing the update. Please try again later." = "Ocorreu um erro ao instalar a atualização. Tente novamente mais tarde.";
 
+/* (No Comment) */
+"An error occurred while launching the installer. Please try again later." = "Ocorreu um erro ao abrir o instalador. Tente novamente mais tarde.";
+
+/* (No Comment) */
 "An error occurred while parsing the update feed." = "Ocorreu um erro ao analisar o feed de atualização.";
 
+/* (No Comment) */
 "An error occurred while relaunching %1$@, but the new version will be available next time you run %1$@." = "Ocorreu um erro ao reabrir o app %1$@. A nova versão estará disponível da próxima vez que você abrir o app %1$@.";
 
-"An important update to %@ is ready to install" = "Uma atualização importante do app %@ está pronta para ser instalada!";
+/* (No Comment) */
+"An error occurred while running the updater. Please try again later." = "Ocorreu um erro ao abrir o atualizador. Tente novamente mais tarde.";
+
+/* (No Comment) */
+"An error occurred while starting the installer. Please try again later." = "Ocorreu um erro ao iniciar o instalador. Tente novamente mais tarde.";
+
+/* (No Comment) */
+"An important update to %@ is ready to install" = "Uma atualização importante do app %@ está pronta para ser instalada";
+
+/* Title confirmation for skipping major upgrade and future updates */
+"Are you sure you want to skip this upgrade?" = "Tem certeza de que deseja ignorar esta atualização?";
 
 /* the unit for bytes */
 "B" = "B";
 
+/* (No Comment) */
 "Cancel" = "Cancelar";
 
+/* (No Comment) */
 "Cancel Update" = "Cancelar Atualização";
 
+/* (No Comment) */
 "Checking for updates..." = "Buscando atualizações…";
+
+/* Not skipping a major upgrade */
+"Don't Skip" = "Não Ignorar";
 
 /* Take care not to overflow the status window. */
 "Downloading update..." = "Baixando atualização…";
@@ -53,10 +112,17 @@
 /* Take care not to overflow the status window. */
 "Extracting update..." = "Extraindo atualização…";
 
+/* (No Comment) */
+"Failed to resume installing update." = "Falha ao retomar a instalação da atualização.";
+
 /* the unit for gigabytes */
 "GB" = "GB";
 
+/* (No Comment) */
 "Install and Relaunch" = "Instalar e Reabrir";
+
+/* (No Comment) */
+"Install on Quit" = "Instalar ao Encerrar";
 
 /* Take care not to overflow the status window. */
 "Installing update..." = "Instalando atualização…";
@@ -65,7 +131,7 @@
 "KB" = "KB";
 
 /* Alternative name for "Install" button if we have a paid update or other update
- without a download but with a URL. */
+	without a download but with a URL. */
 "Learn More..." = "Saber Mais…";
 
 /* the unit for megabytes */
@@ -74,20 +140,54 @@
 /* OK button. */
 "OK" = "OK";
 
+/* (No Comment) */
+"Quit %1$@, move it into your Applications folder, relaunch it from there and try again." = "Encerre o app %1$@, mova-o para a pasta Aplicativos, reabra-o e tente novamente.";
+
 /* Status message on progress window once download has finished. */
 "Ready to Install" = "Pronto para Instalar";
 
 /* Message that is optionally shown at startup to allow users to turn on/off update checks. */
-"Should %1$@ automatically check for updates? You can always check for updates manually from the %1$@ menu." = "Deseja que o app %1$@ busque atualizações automaticamente? Você pode buscar atualizações manualmente, através do menu %1$@.";
+"Should %1$@ automatically check for updates? You can always check for updates manually from the %1$@ menu." = "Deseja que o app %1$@ busque atualizações automaticamente? Você também pode buscar atualizações manualmente no menu %1$@.";
 
-"The update is improperly signed." = "A atualização está assinada incorretamente.";
+/* Skipping major upgrade */
+"Skip Upgrade" = "Ignorar Atualização";
 
+/* (No Comment) */
+"The update checker failed to start correctly. You should contact the app developer to report this issue and verify that you have the latest version" = "Houve uma falha ao iniciar a busca de atualizações. Contate o desenvolvedor do app para comunicar esse problema e verifique se você tem a versão mais recente.";
+
+/* (No Comment) */
+"The update is improperly signed and could not be validated. Please try again later or contact the app developer." = "A atualização foi assinada incorretamente e não pôde ser validada. Tente novamente mais tarde ou contate o desenvolvedor do app.";
+
+/* (No Comment) */
+"The update is improperly signed." = "A atualização foi assinada incorretamente.";
+
+/* (No Comment) */
+"Unable to Check For Updates" = "Não Foi Possível Buscar Atualizações";
+
+/* (No Comment) */
 "Update Error!" = "Erro de atualização!";
 
+/* (No Comment) */
+"Update Installed" = "Atualização Instalada";
+
+/* (No Comment) */
 "Updating %@" = "Atualizando o app %@";
 
+/* (No Comment) */
+"Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "Use o Finder para copiar o app %1$@ para a pasta Aplicativos, reabra-o e tente novamente.";
+
+/* Used when a new update is not found */
+"Version History" = "Histórico de Versões";
+
 /* 'Error' message when the user checks for updates but is already current or the feed doesn't contain any updates. (not necessarily shown in UI) */
-"You already have the newest version of %@." = "Você já possui a versão mais recente do app %@.";
+"You already have the newest version of %@." = "Você já tem a versão mais recente do app %@.";
 
 /* Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates. */
 "You're up-to-date!" = "O app está atualizado!";
+
+/* (No Comment) */
+"Your macOS version is too new" = "A versão do macOS é nova demais";
+
+/* (No Comment) */
+"Your macOS version is too old" = "A versão do macOS é antiga demais";
+
