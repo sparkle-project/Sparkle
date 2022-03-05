@@ -38,6 +38,8 @@ NS_ASSUME_NONNULL_BEGIN
   */
 SU_EXPORT @interface SPUStandardUpdaterController : NSObject
 {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wobjc-interface-ivars"
     /**
      * Interface builder outlet for the updater's delegate.
      */
@@ -47,6 +49,7 @@ SU_EXPORT @interface SPUStandardUpdaterController : NSObject
      * Interface builder outlet for the user driver's delegate.
      */
     IBOutlet __weak id<SPUStandardUserDriverDelegate> userDriverDelegate;
+#pragma clang diagnostic pop
 }
 
 /**
