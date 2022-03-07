@@ -21,6 +21,7 @@
 #import "SUOperatingSystem.h"
 #import "SPUUserUpdateState.h"
 #import "SUErrors.h"
+#include <time.h>
 
 #import <AppKit/AppKit.h>
 
@@ -45,6 +46,8 @@
 @property (nonatomic) uint64_t expectedContentLength;
 @property (nonatomic) uint64_t bytesDownloaded;
 
+@property (nonatomic, readonly) uint64_t initializationTime;
+
 @end
 
 @implementation SPUStandardUserDriver
@@ -61,6 +64,7 @@
 @synthesize permissionPrompt = _permissionPrompt;
 @synthesize expectedContentLength = _expectedContentLength;
 @synthesize bytesDownloaded = _bytesDownloaded;
+@synthesize initializationTime = _initializationTime;
 
 #pragma mark Birth
 
@@ -72,6 +76,10 @@
         _oldHostName = _host.name;
         _oldHostBundleURL = hostBundle.bundleURL;
         _delegate = delegate;
+        
+        if (@available(macOS 10.12, *)) {
+            _initializationTime = clock_gettime_nsec_np(CLOCK_UPTIME_RAW);
+        }
     }
     return self;
 }
@@ -97,7 +105,7 @@
 
 #pragma mark Update Alert Focus
 
-- (void)setUpFocusForActiveUpdateAlertWithUserInitiation:(BOOL)userInitiated
+- (void)setUpFocusForActiveUpdateAlertAllowingImmediateInstallButtonFocus:(BOOL)allowImmediateInstallButtonFocus
 {
     // Make sure the window is loaded in any case
     [self.activeUpdateAlert window];
@@ -105,23 +113,48 @@
     // If the app is a menubar app or the like, we need to focus it first and alter the
     // update prompt to behave like a normal window. Otherwise if the window were hidden
     // there may be no way for the application to be activated to make it visible again.
-    if ([SUApplicationInfo isBackgroundApplication:[NSApplication sharedApplication]]) {
+    BOOL isBackgroundApp = [SUApplicationInfo isBackgroundApplication:[NSApplication sharedApplication]];
+    if (isBackgroundApp) {
         [NSApp activateIgnoringOtherApps:YES];
-    }
-    
-    // Only show the update alert if the app is active; otherwise, we'll wait until it is.
-    if ([NSApp isActive]) {
-        [self.activeUpdateAlert setInstallButtonFocus:userInitiated];
+        
         [self.activeUpdateAlert showWindow:nil];
+        [self.activeUpdateAlert setInstallButtonFocus:allowImmediateInstallButtonFocus];
     } else {
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:NSApplicationDidBecomeActiveNotification object:NSApp];
+        // Only show the update alert if the app is active; otherwise, we'll wait until it is.
+        BOOL observeApplicationActiveState;
+        if ([NSApp isActive]) {
+            [self.activeUpdateAlert setInstallButtonFocus:allowImmediateInstallButtonFocus];
+            [self.activeUpdateAlert showWindow:nil];
+            
+            // We will set the install focus if the user comes back to the app,
+            // but not for background applications because they re-activate in a strange way
+            observeApplicationActiveState = !allowImmediateInstallButtonFocus;
+        } else {
+            // We will show the update alert when the user comes back to the app
+            [self.activeUpdateAlert setInstallButtonFocus:YES];
+            observeApplicationActiveState = YES;
+        }
+        
+        if (observeApplicationActiveState) {
+            [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:NSApplicationDidBecomeActiveNotification object:NSApp];
+        }
     }
+}
+
+- (void)_removeApplicationBecomeActiveObserver
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:NSApplicationDidBecomeActiveNotification object:NSApp];
 }
 
 - (void)applicationDidBecomeActive:(NSNotification *)__unused aNotification
 {
-    [self.activeUpdateAlert showWindow:nil];
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:NSApplicationDidBecomeActiveNotification object:NSApp];
+    if (self.activeUpdateAlert.window.visible) {
+        [self.activeUpdateAlert setInstallButtonFocus:YES];
+    } else {
+        [self.activeUpdateAlert showWindow:nil];
+    }
+    
+    [self _removeApplicationBecomeActiveObserver];
 }
 
 #pragma mark Update Found
@@ -143,7 +176,21 @@
         weakSelf.activeUpdateAlert = nil;
     }];
     
-    [self setUpFocusForActiveUpdateAlertWithUserInitiation:state.userInitiated];
+    BOOL allowInstallButtonFocus;
+    if (state.userInitiated) {
+        allowInstallButtonFocus = YES;
+    } else {
+        if (@available(macOS 10.12, *)) {
+            uint64_t currentTime = clock_gettime_nsec_np(CLOCK_UPTIME_RAW);
+            uint64_t timeElapsedSinceInitialization = currentTime - self.initializationTime;
+            
+            // Allow the install button to focus if 1.5 or less seconds have passed since initialization
+            allowInstallButtonFocus = (timeElapsedSinceInitialization <= 1500000000ULL);
+        } else {
+            allowInstallButtonFocus = NO;
+        }
+    }
+    [self setUpFocusForActiveUpdateAlertAllowingImmediateInstallButtonFocus:allowInstallButtonFocus];
 }
 
 - (void)showUpdateReleaseNotesWithDownloadData:(SPUDownloadData *)downloadData
@@ -166,7 +213,7 @@
 - (void)showUpdateInFocus
 {
     if (self.activeUpdateAlert != nil) {
-        [self setUpFocusForActiveUpdateAlertWithUserInitiation:YES];
+        [self setUpFocusForActiveUpdateAlertAllowingImmediateInstallButtonFocus:YES];
     } else if (self.permissionPrompt != nil) {
         [self.permissionPrompt showWindow:nil];
     } else if (self.statusController != nil) {
@@ -208,7 +255,7 @@
     
     self.cancellation = cancellation;
     
-    self.checkingController = [[SUStatusController alloc] initWithHost:self.host];
+    self.checkingController = [[SUStatusController alloc] initWithHost:self.host minimizable:NO];
     [[self.checkingController window] center]; // Force the checking controller to load its window.
     [self.checkingController beginActionWithTitle:SULocalizedString(@"Checking for updates...", nil) maxProgressValue:0.0 statusText:nil];
     [self.checkingController setButtonTitle:SULocalizedString(@"Cancel", nil) target:self action:@selector(cancelCheckForUpdates:) isDefault:NO];
@@ -338,10 +385,6 @@
         [delegate standardUserDriverWillShowModalAlert];
     }
     
-    // When showing a modal alert we need to ensure that background applications
-    // are focused to inform the user since there is no dock icon to notify them.
-    if ([SUApplicationInfo isBackgroundApplication:[NSApplication sharedApplication]]) { [[NSApplication sharedApplication] activateIgnoringOtherApps:YES]; }
-    
     [alert setIcon:[SUApplicationInfo bestIconForHost:self.host]];
     
     NSModalResponse response = [alert runModal];
@@ -359,7 +402,7 @@
 - (void)createAndShowStatusController
 {
     if (self.statusController == nil) {
-        self.statusController = [[SUStatusController alloc] initWithHost:self.host];
+        self.statusController = [[SUStatusController alloc] initWithHost:self.host minimizable:YES];
         [self.statusController showWindow:self];
     }
 }
@@ -544,6 +587,8 @@
         [self.activeUpdateAlert close];
         self.activeUpdateAlert = nil;
     }
+    
+    [self _removeApplicationBecomeActiveObserver];
 }
 
 @end
