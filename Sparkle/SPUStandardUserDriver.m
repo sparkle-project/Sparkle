@@ -21,6 +21,7 @@
 #import "SUOperatingSystem.h"
 #import "SPUUserUpdateState.h"
 #import "SUErrors.h"
+#include <time.h>
 
 #import <AppKit/AppKit.h>
 
@@ -45,6 +46,8 @@
 @property (nonatomic) uint64_t expectedContentLength;
 @property (nonatomic) uint64_t bytesDownloaded;
 
+@property (nonatomic, readonly) uint64_t initializationTime;
+
 @end
 
 @implementation SPUStandardUserDriver
@@ -61,6 +64,7 @@
 @synthesize permissionPrompt = _permissionPrompt;
 @synthesize expectedContentLength = _expectedContentLength;
 @synthesize bytesDownloaded = _bytesDownloaded;
+@synthesize initializationTime = _initializationTime;
 
 #pragma mark Birth
 
@@ -72,6 +76,10 @@
         _oldHostName = _host.name;
         _oldHostBundleURL = hostBundle.bundleURL;
         _delegate = delegate;
+        
+        if (@available(macOS 10.12, *)) {
+            _initializationTime = clock_gettime_nsec_np(CLOCK_UPTIME_RAW);
+        }
     }
     return self;
 }
@@ -97,7 +105,7 @@
 
 #pragma mark Update Alert Focus
 
-- (void)setUpFocusForActiveUpdateAlertWithUserInitiation:(BOOL)userInitiated
+- (void)setUpFocusForActiveUpdateAlertAllowingInstallButtonFocus:(BOOL)allowInstallButtonFocus
 {
     // Make sure the window is loaded in any case
     [self.activeUpdateAlert window];
@@ -111,7 +119,7 @@
     
     // Only show the update alert if the app is active; otherwise, we'll wait until it is.
     if ([NSApp isActive]) {
-        [self.activeUpdateAlert setInstallButtonFocus:userInitiated];
+        [self.activeUpdateAlert setInstallButtonFocus:allowInstallButtonFocus];
         [self.activeUpdateAlert showWindow:nil];
     } else {
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:NSApplicationDidBecomeActiveNotification object:NSApp];
@@ -143,7 +151,21 @@
         weakSelf.activeUpdateAlert = nil;
     }];
     
-    [self setUpFocusForActiveUpdateAlertWithUserInitiation:state.userInitiated];
+    BOOL allowInstallButtonFocus;
+    if (state.userInitiated) {
+        allowInstallButtonFocus = YES;
+    } else {
+        if (@available(macOS 10.12, *)) {
+            uint64_t currentTime = clock_gettime_nsec_np(CLOCK_UPTIME_RAW);
+            uint64_t timeElapsedSinceInitialization = currentTime - self.initializationTime;
+            
+            // Allow the install button to focus if 1.5 or less seconds have passed since initialization
+            allowInstallButtonFocus = (timeElapsedSinceInitialization <= 1500000000ULL);
+        } else {
+            allowInstallButtonFocus = NO;
+        }
+    }
+    [self setUpFocusForActiveUpdateAlertAllowingInstallButtonFocus:allowInstallButtonFocus];
 }
 
 - (void)showUpdateReleaseNotesWithDownloadData:(SPUDownloadData *)downloadData
@@ -166,7 +188,7 @@
 - (void)showUpdateInFocus
 {
     if (self.activeUpdateAlert != nil) {
-        [self setUpFocusForActiveUpdateAlertWithUserInitiation:YES];
+        [self setUpFocusForActiveUpdateAlertAllowingInstallButtonFocus:YES];
     } else if (self.permissionPrompt != nil) {
         [self.permissionPrompt showWindow:nil];
     } else if (self.statusController != nil) {
