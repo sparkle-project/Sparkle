@@ -105,7 +105,7 @@
 
 #pragma mark Update Alert Focus
 
-- (void)setUpFocusForActiveUpdateAlertAllowingInstallButtonFocus:(BOOL)allowInstallButtonFocus
+- (void)setUpFocusForActiveUpdateAlertAllowingImmediateInstallButtonFocus:(BOOL)allowImmediateInstallButtonFocus
 {
     // Make sure the window is loaded in any case
     [self.activeUpdateAlert window];
@@ -118,18 +118,36 @@
     }
     
     // Only show the update alert if the app is active; otherwise, we'll wait until it is.
+    BOOL observeApplicationActiveState;
     if ([NSApp isActive]) {
-        [self.activeUpdateAlert setInstallButtonFocus:allowInstallButtonFocus];
+        [self.activeUpdateAlert setInstallButtonFocus:allowImmediateInstallButtonFocus];
         [self.activeUpdateAlert showWindow:nil];
+        
+        // We will set the install focus if the user comes back to the app
+        observeApplicationActiveState = !allowImmediateInstallButtonFocus;
     } else {
+        observeApplicationActiveState = YES;
+    }
+    
+    if (observeApplicationActiveState) {
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:NSApplicationDidBecomeActiveNotification object:NSApp];
     }
 }
 
+- (void)_removeApplicationBecomeActiveObserver
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:NSApplicationDidBecomeActiveNotification object:NSApp];
+}
+
 - (void)applicationDidBecomeActive:(NSNotification *)__unused aNotification
 {
-    [self.activeUpdateAlert showWindow:nil];
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:NSApplicationDidBecomeActiveNotification object:NSApp];
+    if (self.activeUpdateAlert.window.visible) {
+        [self.activeUpdateAlert setInstallButtonFocus:YES];
+    } else {
+        [self.activeUpdateAlert showWindow:nil];
+    }
+    
+    [self _removeApplicationBecomeActiveObserver];
 }
 
 #pragma mark Update Found
@@ -165,7 +183,7 @@
             allowInstallButtonFocus = NO;
         }
     }
-    [self setUpFocusForActiveUpdateAlertAllowingInstallButtonFocus:allowInstallButtonFocus];
+    [self setUpFocusForActiveUpdateAlertAllowingImmediateInstallButtonFocus:allowInstallButtonFocus];
 }
 
 - (void)showUpdateReleaseNotesWithDownloadData:(SPUDownloadData *)downloadData
@@ -188,7 +206,7 @@
 - (void)showUpdateInFocus
 {
     if (self.activeUpdateAlert != nil) {
-        [self setUpFocusForActiveUpdateAlertAllowingInstallButtonFocus:YES];
+        [self setUpFocusForActiveUpdateAlertAllowingImmediateInstallButtonFocus:YES];
     } else if (self.permissionPrompt != nil) {
         [self.permissionPrompt showWindow:nil];
     } else if (self.statusController != nil) {
@@ -562,6 +580,8 @@
         [self.activeUpdateAlert close];
         self.activeUpdateAlert = nil;
     }
+    
+    [self _removeApplicationBecomeActiveObserver];
 }
 
 @end
