@@ -338,10 +338,6 @@
         [delegate standardUserDriverWillShowModalAlert];
     }
     
-    // When showing a modal alert we need to ensure that background applications
-    // are focused to inform the user since there is no dock icon to notify them.
-    if ([SUApplicationInfo isBackgroundApplication:[NSApplication sharedApplication]]) { [[NSApplication sharedApplication] activateIgnoringOtherApps:YES]; }
-    
     [alert setIcon:[SUApplicationInfo bestIconForHost:self.host]];
     
     NSModalResponse response = [alert runModal];
