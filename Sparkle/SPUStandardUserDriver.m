@@ -208,7 +208,7 @@
     
     self.cancellation = cancellation;
     
-    self.checkingController = [[SUStatusController alloc] initWithHost:self.host];
+    self.checkingController = [[SUStatusController alloc] initWithHost:self.host minimizable:NO];
     [[self.checkingController window] center]; // Force the checking controller to load its window.
     [self.checkingController beginActionWithTitle:SULocalizedString(@"Checking for updates...", nil) maxProgressValue:0.0 statusText:nil];
     [self.checkingController setButtonTitle:SULocalizedString(@"Cancel", nil) target:self action:@selector(cancelCheckForUpdates:) isDefault:NO];
@@ -355,7 +355,7 @@
 - (void)createAndShowStatusController
 {
     if (self.statusController == nil) {
-        self.statusController = [[SUStatusController alloc] initWithHost:self.host];
+        self.statusController = [[SUStatusController alloc] initWithHost:self.host minimizable:YES];
         [self.statusController showWindow:self];
     }
 }

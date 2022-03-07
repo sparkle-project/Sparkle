@@ -22,6 +22,7 @@ static NSString *const SUStatusControllerTouchBarIndentifier = @"" SPARKLE_BUNDL
 @property (copy) NSString *title, *buttonTitle;
 @property (strong) SUHost *host;
 @property NSButton *touchBarButton;
+@property (nonatomic, readonly) BOOL minimizable;
 @end
 
 @implementation SUStatusController
@@ -35,13 +36,15 @@ static NSString *const SUStatusControllerTouchBarIndentifier = @"" SPARKLE_BUNDL
 @synthesize progressBar;
 @synthesize statusTextField;
 @synthesize touchBarButton;
+@synthesize minimizable = _minimizable;
 
-- (instancetype)initWithHost:(SUHost *)aHost
+- (instancetype)initWithHost:(SUHost *)aHost minimizable:(BOOL)minimizable
 {
     self = [super initWithWindowNibName:@"SUStatus" owner:self];
 	if (self)
 	{
         self.host = aHost;
+        _minimizable = minimizable;
         [self setShouldCascadeWindows:NO];
     }
     return self;
@@ -53,6 +56,9 @@ static NSString *const SUStatusControllerTouchBarIndentifier = @"" SPARKLE_BUNDL
 {
     [[self window] center];
     [[self window] setFrameAutosaveName:@"SUStatusFrame"];
+    if (self.minimizable) {
+        self.window.styleMask |= NSWindowStyleMaskMiniaturizable;
+    }
     [self.progressBar setUsesThreadedAnimation:YES];
 
     if ([SUOperatingSystem isOperatingSystemAtLeastVersion:(NSOperatingSystemVersion){10, 11, 0}]) {
