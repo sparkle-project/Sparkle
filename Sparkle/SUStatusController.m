@@ -51,10 +51,6 @@ static NSString *const SUStatusControllerTouchBarIndentifier = @"" SPARKLE_BUNDL
 
 - (void)windowDidLoad
 {
-    if ([SUApplicationInfo isBackgroundApplication:[NSApplication sharedApplication]]) {
-        [[self window] setLevel:NSFloatingWindowLevel];
-    }
-
     [[self window] center];
     [[self window] setFrameAutosaveName:@"SUStatusFrame"];
     [self.progressBar setUsesThreadedAnimation:YES];
