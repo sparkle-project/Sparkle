@@ -221,7 +221,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     SUHost *mainBundleHost = self.mainBundleHost;
     if (validateXPCServices) {
         // Check that all enabled XPC Services are embedded
-        NSArray<NSString *> *xpcServiceIDs = @[@INSTALLER_LAUNCHER_BUNDLE_ID, @DOWNLOADER_BUNDLE_ID, @INSTALLER_CONNECTION_BUNDLE_ID, @INSTALLER_STATUS_BUNDLE_ID];
+        NSArray<NSString *> *xpcServiceIDs = @[@INSTALLER_LAUNCHER_NAME, @DOWNLOADER_NAME, @INSTALLER_CONNECTION_NAME, @INSTALLER_STATUS_NAME];
         NSArray<NSString *> *xpcServiceEnabledKeys = @[SUEnableInstallerLauncherServiceKey, SUEnableDownloaderServiceKey, SUEnableInstallerConnectionServiceKey, SUEnableInstallerStatusServiceKey];
         NSUInteger xpcServiceCount = xpcServiceIDs.count;
         
@@ -275,7 +275,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
             
             NSBundle *downloaderBundle;
             if ([mainBundleHost boolForInfoDictionaryKey:SUEnableDownloaderServiceKey]) {
-                NSURL *downloaderServiceBundleURL = [[[self.sparkleBundle.bundleURL URLByAppendingPathComponent:@"XPCServices"] URLByAppendingPathComponent:@DOWNLOADER_BUNDLE_ID] URLByAppendingPathExtension:@"xpc"];
+                NSURL *downloaderServiceBundleURL = [[[self.sparkleBundle.bundleURL URLByAppendingPathComponent:@"XPCServices"] URLByAppendingPathComponent:@DOWNLOADER_NAME] URLByAppendingPathExtension:@"xpc"];
                 downloaderBundle = [NSBundle bundleWithURL:downloaderServiceBundleURL];
             } else {
                 downloaderBundle = nil;
