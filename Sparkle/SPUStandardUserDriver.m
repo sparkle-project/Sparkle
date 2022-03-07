@@ -113,24 +113,31 @@
     // If the app is a menubar app or the like, we need to focus it first and alter the
     // update prompt to behave like a normal window. Otherwise if the window were hidden
     // there may be no way for the application to be activated to make it visible again.
-    if ([SUApplicationInfo isBackgroundApplication:[NSApplication sharedApplication]]) {
+    BOOL isBackgroundApp = [SUApplicationInfo isBackgroundApplication:[NSApplication sharedApplication]];
+    if (isBackgroundApp) {
         [NSApp activateIgnoringOtherApps:YES];
-    }
-    
-    // Only show the update alert if the app is active; otherwise, we'll wait until it is.
-    BOOL observeApplicationActiveState;
-    if ([NSApp isActive]) {
-        [self.activeUpdateAlert setInstallButtonFocus:allowImmediateInstallButtonFocus];
-        [self.activeUpdateAlert showWindow:nil];
         
-        // We will set the install focus if the user comes back to the app
-        observeApplicationActiveState = !allowImmediateInstallButtonFocus;
+        [self.activeUpdateAlert showWindow:nil];
+        [self.activeUpdateAlert setInstallButtonFocus:allowImmediateInstallButtonFocus];
     } else {
-        observeApplicationActiveState = YES;
-    }
-    
-    if (observeApplicationActiveState) {
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:NSApplicationDidBecomeActiveNotification object:NSApp];
+        // Only show the update alert if the app is active; otherwise, we'll wait until it is.
+        BOOL observeApplicationActiveState;
+        if ([NSApp isActive]) {
+            [self.activeUpdateAlert setInstallButtonFocus:allowImmediateInstallButtonFocus];
+            [self.activeUpdateAlert showWindow:nil];
+            
+            // We will set the install focus if the user comes back to the app,
+            // but not for background applications because they re-activate in a strange way
+            observeApplicationActiveState = !allowImmediateInstallButtonFocus;
+        } else {
+            // We will show the update alert when the user comes back to the app
+            [self.activeUpdateAlert setInstallButtonFocus:YES];
+            observeApplicationActiveState = YES;
+        }
+        
+        if (observeApplicationActiveState) {
+            [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:NSApplicationDidBecomeActiveNotification object:NSApp];
+        }
     }
 }
 
