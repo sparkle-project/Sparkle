@@ -326,7 +326,7 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
     }
 
     if (self.updateItem.informationOnlyUpdate) {
-        [self.installButton setTitle:SULocalizedString(@"Learn More...", @"Alternate title for 'Install Update' button when there's no download in RSS feed.")];
+        [self.installButton setTitle:SULocalizedString(@"Learn More…", @"Alternate title for 'Install Update' button when there's no download in RSS feed.")];
         [self.installButton setAction:@selector(openInfoURL:)];
     }
 
@@ -423,16 +423,16 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
     NSString *finalString = nil;
 
     if (self.updateItem.informationOnlyUpdate) {
-        finalString = [NSString stringWithFormat:SULocalizedString(@"%@ %@ is now available--you have %@. Would you like to learn more about this update on the web?", @"Description text for SUUpdateAlert when the update informational with no download."), self.host.name, updateItemVersion, hostVersion];
+        finalString = [NSString stringWithFormat:SULocalizedString(@"%@ %@ is now available—you have %@. Would you like to learn more about this update on the web?", @"Description text for SUUpdateAlert when the update informational with no download."), self.host.name, updateItemVersion, hostVersion];
     } else if (self.updateItem.criticalUpdate) {
         if (self.state.stage == SPUUserUpdateStageNotDownloaded) {
-            finalString = [NSString stringWithFormat:SULocalizedString(@"%@ %@ is now available--you have %@. This is an important update; would you like to download it now?", @"Description text for SUUpdateAlert when the critical update is downloadable."), self.host.name, updateItemVersion, hostVersion];
+            finalString = [NSString stringWithFormat:SULocalizedString(@"%@ %@ is now available—you have %@. This is an important update; would you like to download it now?", @"Description text for SUUpdateAlert when the critical update is downloadable."), self.host.name, updateItemVersion, hostVersion];
         } else {
             finalString = [NSString stringWithFormat:SULocalizedString(@"%1$@ %2$@ has been downloaded and is ready to use! This is an important update; would you like to install it and relaunch %1$@ now?", @"Description text for SUUpdateAlert when the critical update has already been downloaded and ready to install."), self.host.name, updateItemVersion];
         }
     } else {
         if (self.state.stage == SPUUserUpdateStageNotDownloaded) {
-            finalString = [NSString stringWithFormat:SULocalizedString(@"%@ %@ is now available--you have %@. Would you like to download it now?", @"Description text for SUUpdateAlert when the update is downloadable."), self.host.name, updateItemVersion, hostVersion];
+            finalString = [NSString stringWithFormat:SULocalizedString(@"%@ %@ is now available—you have %@. Would you like to download it now?", @"Description text for SUUpdateAlert when the update is downloadable."), self.host.name, updateItemVersion, hostVersion];
         } else {
             finalString = [NSString stringWithFormat:SULocalizedString(@"%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?", @"Description text for SUUpdateAlert when the update has already been downloaded and ready to install."), self.host.name, updateItemVersion];
         }

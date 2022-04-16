@@ -257,7 +257,7 @@
     
     self.checkingController = [[SUStatusController alloc] initWithHost:self.host minimizable:NO];
     [[self.checkingController window] center]; // Force the checking controller to load its window.
-    [self.checkingController beginActionWithTitle:SULocalizedString(@"Checking for updates...", nil) maxProgressValue:0.0 statusText:nil];
+    [self.checkingController beginActionWithTitle:SULocalizedString(@"Checking for updates…", nil) maxProgressValue:0.0 statusText:nil];
     [self.checkingController setButtonTitle:SULocalizedString(@"Cancel", nil) target:self action:@selector(cancelCheckForUpdates:) isDefault:NO];
     [self.checkingController showWindow:self];
     
@@ -360,7 +360,7 @@
             case SPUNoUpdateFoundReasonSystemIsTooNew:
                 if (latestAppcastItem.infoURL != nil) {
                     // Show the user the product's link if available
-                    [alert addButtonWithTitle:SULocalizedString(@"Learn More...", nil)];
+                    [alert addButtonWithTitle:SULocalizedString(@"Learn More…", nil)];
                     
                     secondaryAction = ^{
                         [[NSWorkspace sharedWorkspace] openURL:(NSURL * _Nonnull)latestAppcastItem.infoURL];
@@ -415,7 +415,7 @@
     
     [self createAndShowStatusController];
     
-    [self.statusController beginActionWithTitle:SULocalizedString(@"Downloading update...", @"Take care not to overflow the status window.") maxProgressValue:1.0 statusText:nil];
+    [self.statusController beginActionWithTitle:SULocalizedString(@"Downloading update…", @"Take care not to overflow the status window.") maxProgressValue:1.0 statusText:nil];
     [self.statusController setProgressValue:0.0];
     [self.statusController setButtonTitle:SULocalizedString(@"Cancel", nil) target:self action:@selector(cancelDownload:) isDefault:NO];
     
@@ -467,7 +467,7 @@
     self.cancellation = nil;
     
     [self createAndShowStatusController];
-    [self.statusController beginActionWithTitle:SULocalizedString(@"Extracting update...", @"Take care not to overflow the status window.") maxProgressValue:1.0 statusText:nil];
+    [self.statusController beginActionWithTitle:SULocalizedString(@"Extracting update…", @"Take care not to overflow the status window.") maxProgressValue:1.0 statusText:nil];
     [self.statusController setProgressValue:0.0];
     [self.statusController setButtonTitle:SULocalizedString(@"Cancel", nil) target:nil action:nil isDefault:NO];
     [self.statusController setButtonEnabled:NO];
@@ -485,7 +485,7 @@
     assert(NSThread.isMainThread);
     
     if (applicationTerminated) {
-        [self.statusController beginActionWithTitle:SULocalizedString(@"Installing update...", @"Take care not to overflow the status window.") maxProgressValue:0.0 statusText:nil];
+        [self.statusController beginActionWithTitle:SULocalizedString(@"Installing update…", @"Take care not to overflow the status window.") maxProgressValue:0.0 statusText:nil];
         [self.statusController setButtonEnabled:NO];
     } else {
         // The "quit" event can always be canceled or delayed by the application we're updating
@@ -525,7 +525,7 @@
         }
         
         if (hostVersion != nil) {
-            alert.informativeText = [NSString stringWithFormat:SULocalizedString(@"%@ is now updated to version %@!", nil), hostName, hostVersion];
+            alert.informativeText = [NSString stringWithFormat:SULocalizedString(@"%@ is now updated to version %@!", nil), hostName, hostVersion];
         } else {
             alert.informativeText = [NSString stringWithFormat:SULocalizedString(@"%@ is now updated!", nil), hostName];
         }
