@@ -60,13 +60,7 @@ static NSString *const SUStatusControllerTouchBarIndentifier = @"" SPARKLE_BUNDL
         self.window.styleMask |= NSWindowStyleMaskMiniaturizable;
     }
     [self.progressBar setUsesThreadedAnimation:YES];
-
-    if ([SUOperatingSystem isOperatingSystemAtLeastVersion:(NSOperatingSystemVersion){10, 11, 0}]) {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wpartial-availability"
-        [self.statusTextField setFont:[NSFont monospacedDigitSystemFontOfSize:0 weight:NSFontWeightRegular]];
-#pragma clang diagnostic pop
-    }
+    [self.statusTextField setFont:[NSFont monospacedDigitSystemFontOfSize:0 weight:NSFontWeightRegular]];
 }
 
 - (NSString *)windowTitle

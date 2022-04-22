@@ -440,50 +440,23 @@
     }
 }
 
-- (NSString *)localizedStringFromByteCount:(long long)value
-{
-    if (![SUOperatingSystem isOperatingSystemAtLeastVersion:(NSOperatingSystemVersion){10, 8, 0}]) {
-        if (value < 1000) {
-            return [NSString stringWithFormat:@"%.0lf %@", value / 1.0,
-                    SULocalizedString(@"B", @"the unit for bytes")];
-        }
-        
-        if (value < 1000 * 1000) {
-            return [NSString stringWithFormat:@"%.0lf %@", value / 1000.0,
-                    SULocalizedString(@"KB", @"the unit for kilobytes")];
-        }
-        
-        if (value < 1000 * 1000 * 1000) {
-            return [NSString stringWithFormat:@"%.1lf %@", value / 1000.0 / 1000.0,
-                    SULocalizedString(@"MB", @"the unit for megabytes")];
-        }
-        
-        return [NSString stringWithFormat:@"%.2lf %@", value / 1000.0 / 1000.0 / 1000.0,
-                SULocalizedString(@"GB", @"the unit for gigabytes")];
-    }
-    
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wpartial-availability"
-    NSByteCountFormatter *formatter = [[NSByteCountFormatter alloc] init];
-    [formatter setZeroPadsFractionDigits:YES];
-    return [formatter stringFromByteCount:value];
-#pragma clang diagnostic pop
-}
-
 - (void)showDownloadDidReceiveDataOfLength:(uint64_t)length
 {
     assert(NSThread.isMainThread);
-    
+
     self.bytesDownloaded += length;
-    
+
+    NSByteCountFormatter *formatter = [[NSByteCountFormatter alloc] init];
+    [formatter setZeroPadsFractionDigits:YES];
+
     if (self.expectedContentLength > 0.0) {
         double newProgressValue = (double)self.bytesDownloaded / (double)self.expectedContentLength;
         
         [self.statusController setProgressValue:MIN(newProgressValue, 1.0)];
         
-        [self.statusController setStatusText:[NSString stringWithFormat:SULocalizedString(@"%@ of %@", nil), [self localizedStringFromByteCount:(long long)self.bytesDownloaded], [self localizedStringFromByteCount:(long long)MAX(self.bytesDownloaded, self.expectedContentLength)]]];
+        [self.statusController setStatusText:[NSString stringWithFormat:SULocalizedString(@"%@ of %@", @"The download progress in units of bytes, e.g. 100 KB of 1,0 MB"), [formatter stringFromByteCount:(long long)self.bytesDownloaded], [formatter stringFromByteCount:(long long)MAX(self.bytesDownloaded, self.expectedContentLength)]]];
     } else {
-        [self.statusController setStatusText:[NSString stringWithFormat:SULocalizedString(@"%@ downloaded", nil), [self localizedStringFromByteCount:(long long)self.bytesDownloaded]]];
+        [self.statusController setStatusText:[NSString stringWithFormat:SULocalizedString(@"%@ downloaded", @"The download progress in a unit of bytes, e.g. 100 KB"), [formatter stringFromByteCount:(long long)self.bytesDownloaded]]];
     }
 }
 
