@@ -1401,6 +1401,9 @@
 		EA1E287622B666EB004AA304 /* sign_update */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = sign_update; sourceTree = BUILT_PRODUCTS_DIR; };
 		EA1E287822B666EB004AA304 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		EA1E287F22B667D8004AA304 /* Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Bridging-Header.h"; sourceTree = "<group>"; };
+		F67C9B7B281410B600740813 /* hu */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = hu; path = hu.lproj/Sparkle.strings; sourceTree = "<group>"; };
+		F67C9B7C281410B600740813 /* hu */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = hu; path = hu.lproj/SUUpdateAlert.strings; sourceTree = "<group>"; };
+		F6E11510281410D10003736C /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/Sparkle.strings; sourceTree = "<group>"; };
 		F8761EB01ADC5068000C9034 /* SUCodeSigningVerifierTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUCodeSigningVerifierTest.m; sourceTree = "<group>"; };
 		F8761EB21ADC50EB000C9034 /* SparkleTestCodeSignApp.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = SparkleTestCodeSignApp.zip; sourceTree = "<group>"; };
 		FA1941CA0D94A70100DD942E /* ConfigFrameworkDebug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ConfigFrameworkDebug.xcconfig; sourceTree = "<group>"; };
@@ -3798,6 +3801,8 @@
 				723ABCD7259A9A9D00BDB4FA /* Base */,
 				72E1DACB25B3E8DF0001BA6D /* hr */,
 				726FD2CC25F4BE5F00123BC6 /* fa */,
+				F67C9B7B281410B600740813 /* hu */,
+				F6E11510281410D10003736C /* ar */,
 			);
 			name = Sparkle.strings;
 			sourceTree = "<group>";
@@ -3837,6 +3842,7 @@
 				723ABD68259A9C6300BDB4FA /* tr */,
 				723ABD69259A9C6600BDB4FA /* uk */,
 				72E1DAB625B3E8AE0001BA6D /* hr */,
+				F67C9B7C281410B600740813 /* hu */,
 			);
 			name = SUUpdateAlert.xib;
 			sourceTree = "<group>";
