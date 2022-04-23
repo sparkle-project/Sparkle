@@ -1,18 +1,18 @@
 "%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ завантажений і готовий до використання! Бажаєте встановити і перезавантажити %1$@?";
 
-"%1$@ can't be updated, because it was opened from a read-only or a temporary location." = "Під час роботи з %1$@ з тому, що призначений лише для читання, наприклад, образу диска чи оптичного диску, його неможливо оновити.";
+"%1$@ can’t be updated, because it was opened from a read-only or a temporary location." = "Під час роботи з %1$@ з тому, що призначений лише для читання, наприклад, образу диска чи оптичного диску, його неможливо оновити.";
 
 "Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "Перемістіть %1$@ у папку з програмами, перезавантажте його звідти і спробуйте ще раз.";
 
 "%@ %@ is currently the newest version available." = "У данний момент %1$@ %2$@ є останньою версією.";
 
-"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%У данний момент %1$@ %2$@ є останньою версією.\n(You are currently running version %3$@.)";
+"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%У данний момент %1$@ %2$@ є останньою версією.\n(You are currently running version %3$@.)";
 
 /* Description text for SUUpdateAlert when the update is downloadable. */
-"%@ %@ is now available--you have %@. Would you like to download it now?" = "%1$@ %2$@ доступна – ви маєте %3$@. Бажаєте завантажити її зараз?";
+"%@ %@ is now available—you have %@. Would you like to download it now?" = "%1$@ %2$@ доступна – ви маєте %3$@. Бажаєте завантажити її зараз?";
 
 /* Description text for SUUpdateAlert when the update informational with no download. */
-"%@ %@ is now available--you have %@. Would you like to learn more about this update on the web?" = "%1$@ %2$@ is now available--you have %3$@. Would you like to learn more about this update on the web?";
+"%@ %@ is now available—you have %@. Would you like to learn more about this update on the web?" = "%1$@ %2$@ is now available—you have %3$@. Would you like to learn more about this update on the web?";
 
 "%@ downloaded" = "%@ завантажено";
 
@@ -41,13 +41,13 @@
 
 "Cancel Update" = "Відмінити оновлення";
 
-"Checking for updates..." = "Перевіряю наявність оновлень…";
+"Checking for updates…" = "Перевіряю наявність оновлень…";
 
 /* Take care not to overflow the status window. */
-"Downloading update..." = "Завантажую оновлення…";
+"Downloading update…" = "Завантажую оновлення…";
 
 /* Take care not to overflow the status window. */
-"Extracting update..." = "Розпаковую оновлення…";
+"Extracting update…" = "Розпаковую оновлення…";
 
 /* the unit for gigabytes */
 "GB" = "ГБ";
@@ -55,7 +55,7 @@
 "Install and Relaunch" = "Встановити та перезавантажити";
 
 /* Take care not to overflow the status window. */
-"Installing update..." = "Встановлюю оновлення…";
+"Installing update…" = "Встановлюю оновлення…";
 
 /* the unit for kilobytes */
 "KB" = "КБ";
@@ -75,9 +75,9 @@
 
 "You already have the newest version of %@." = "Ви вже користуєтесь останньою версією програми %@.";
 
-"You're up-to-date!" = "У вас остання версія!";
+"You’re up-to-date!" = "У вас остання версія!";
 
 /* Alternative name for "Install" button if we have a paid update or other update
 	without a download but with a URL. */
 
-"Learn More..." = "Дізнатись більше…";
+"Learn More…" = "Дізнатись більше…";

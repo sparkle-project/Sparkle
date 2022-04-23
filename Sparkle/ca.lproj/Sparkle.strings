@@ -1,6 +1,6 @@
 "%@ of %@" = "%1$@ de %2$@";
 
-"%1$@ can't be updated, because it was opened from a read-only or a temporary location." = "%1$@ no es pot actualitzar quan funciona des d'un disc d'imatge.";
+"%1$@ can’t be updated, because it was opened from a read-only or a temporary location." = "%1$@ no es pot actualitzar quan funciona des d'un disc d'imatge.";
 
 "Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "Moveu %1$@ al vostre directori Aplicacions, reinicieu-lo, i torneu a provar-ho.";
 
@@ -8,13 +8,13 @@
 
 "%@ %@ is currently the newest version available." = "%@ %@ és la versió disponible més actual.";
 
-"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%@ %@ és la versió disponible més actual.\n(You are currently running version %@.)";
+"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%@ %@ és la versió disponible més actual.\n(You are currently running version %@.)";
 
 /* Description text for SUUpdateAlert when the update is downloadable. */
-"%@ %@ is now available--you have %@. Would you like to download it now?" = "%@ %@ està disponible (ara teniu %@). Voleu actualitzar?";
+"%@ %@ is now available—you have %@. Would you like to download it now?" = "%@ %@ està disponible (ara teniu %@). Voleu actualitzar?";
 
 /* Description text for SUUpdateAlert when the update informational with no download. */
-"%@ %@ is now available--you have %@. Would you like to learn more about this update on the web?" = "%1$@ %2$@ is now available--you have %3$@. Would you like to learn more about this update on the web?";
+"%@ %@ is now available—you have %@. Would you like to learn more about this update on the web?" = "%1$@ %2$@ is now available—you have %3$@. Would you like to learn more about this update on the web?";
 
 "%@ does not have permission to write to the application's directory! Are you running off a disk image? If not, ask your system administrator for help." = "%@ no té permís per escriure al directori d'aplicacions! Esteu executant el programa des d'un disc d'imatge? Si no és així, demaneu ajuda al vostre administrador.";
 
@@ -36,15 +36,15 @@
 
 "Check for updates on startup?" = "Comprovar si hi ha actualitzacions a l'inici?";
 
-"Downloading update..." = "Descarregant l'actualització…";
+"Downloading update…" = "Descarregant l'actualització…";
 
-"Extracting update..." = "Extraient l'actualització…";
+"Extracting update…" = "Extraient l'actualització…";
 
 "Install and Relaunch" = "Instal·la i reinicia";
 
 "Install on Quit" = "Reinicia el programa més tard";
 
-"Installing update..." = "Instal·lant l'actualització…";
+"Installing update…" = "Instal·lant l'actualització…";
 
 "No" = "No";
 
@@ -60,5 +60,5 @@
 
 "Yes" = "Sí";
 
-"You're up-to-date!" = "Ja esteu al dia!";
+"You’re up-to-date!" = "Ja esteu al dia!";
 

@@ -4,13 +4,13 @@
 
 "%@ %@ is currently the newest version available." = "%1$@ %2$@ on uusin saatavilla oleva versio.";
 
-"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%1$@ %2$@ on uusin saatavilla oleva versio.\n(You are currently running version %3$@.)";
+"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%1$@ %2$@ on uusin saatavilla oleva versio.\n(You are currently running version %3$@.)";
 
 /* Description text for SUUpdateAlert when the update is downloadable. */
-"%@ %@ is now available--you have %@. Would you like to download it now?" = "%1$@ %2$@ on nyt saatavilla (sinulla on %3$@). Haluatko ladata sen nyt?";
+"%@ %@ is now available—you have %@. Would you like to download it now?" = "%1$@ %2$@ on nyt saatavilla (sinulla on %3$@). Haluatko ladata sen nyt?";
 
 /* Description text for SUUpdateAlert when the update informational with no download. */
-"%@ %@ is now available--you have %@. Would you like to learn more about this update on the web?" = "%1$@ %2$@ is now available--you have %3$@. Would you like to learn more about this update on the web?";
+"%@ %@ is now available—you have %@. Would you like to learn more about this update on the web?" = "%1$@ %2$@ is now available—you have %3$@. Would you like to learn more about this update on the web?";
 
 "%@ does not have permission to write to the application's directory! Are you running off a disk image? If not, ask your system administrator for help." = "Käyttäjällä %@ ei ole oikeuksia ohjelman kansioon! Ajatko ohjelmaa levytiedostosta? Jos et, kysy apua järjestelmän ylläpitäjältä.";
 
@@ -34,15 +34,15 @@
 
 "Check for updates on startup?" = "Tarkista päivityksiä käynnistyksen yhteydessä?";
 
-"Checking for updates..." = "Tarkistetaan päivityksiä…";
+"Checking for updates…" = "Tarkistetaan päivityksiä…";
 
-"Downloading update..." = "Haen päivitystä…";
+"Downloading update…" = "Haen päivitystä…";
 
-"Extracting update..." = "Puran päivitystä…";
+"Extracting update…" = "Puran päivitystä…";
 
 "Install and Relaunch" = "Asenna ja käynnistä ohjelma uudelleen";
 
-"Installing update..." = "Asennan päivityksen…";
+"Installing update…" = "Asennan päivityksen…";
 
 "No" = "Ei";
 
@@ -58,5 +58,5 @@
 
 "Yes" = "Kyllä";
 
-"You're up-to-date!" = "Sinulla on viimeisin versio!";
+"You’re up-to-date!" = "Sinulla on viimeisin versio!";
 

@@ -2,7 +2,7 @@
 
 "%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "Aplikace %1$@ %2$@ byla stažena a je připravena k použití po příštím spuštění! Přejete si aplikaci %1$@ nyní nainstalovat a znovu spustit?";
 
-"%1$@ can't be updated, because it was opened from a read-only or a temporary location." = "Aplikace %1$@ nemůže být aktualizována, protože je spuštěna z dočasného umístění nebo z umístění, na které nelze zapisovat.";
+"%1$@ can’t be updated, because it was opened from a read-only or a temporary location." = "Aplikace %1$@ nemůže být aktualizována, protože je spuštěna z dočasného umístění nebo z umístění, na které nelze zapisovat.";
 
 "Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "Přesuňte %1$@ do složky Aplikace a spusťte ji z tohoto umístění znovu.";
 
@@ -12,13 +12,13 @@
 
 "%@ %@ is currently the newest version available." = "%1$@ %2$@ je nejnovější dostupná verze";
 
-"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%1$@ %2$@ je nejnovější dostupná verze.\n(Aktuálně používáte verzi %3$@.)";
+"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%1$@ %2$@ je nejnovější dostupná verze.\n(Aktuálně používáte verzi %3$@.)";
 
 /* Description text for SUUpdateAlert when the update is downloadable. */
-"%@ %@ is now available--you have %@. Would you like to download it now?" = "Je k dispozici %1$@ %2$@ - nainstalována je %3$@. Přejete si nyní stáhnout aktualizaci?";
+"%@ %@ is now available—you have %@. Would you like to download it now?" = "Je k dispozici %1$@ %2$@ - nainstalována je %3$@. Přejete si nyní stáhnout aktualizaci?";
 
 /* Description text for SUUpdateAlert when the update informational with no download. */
-"%@ %@ is now available--you have %@. Would you like to learn more about this update on the web?" = "%1$@ %2$@ je nyní k dispozici – nainstalována je %3$@. Přejete si zobrazit o této aktualizaci další informace?";
+"%@ %@ is now available—you have %@. Would you like to learn more about this update on the web?" = "%1$@ %2$@ je nyní k dispozici – nainstalována je %3$@. Přejete si zobrazit o této aktualizaci další informace?";
 
 "%@ downloaded" = "staženo %@";
 
@@ -49,13 +49,13 @@
 
 "Cancel Update" = "Zrušit aktualizaci";
 
-"Checking for updates..." = "Hledání aktualizací…";
+"Checking for updates…" = "Hledání aktualizací…";
 
 /* Take care not to overflow the status window. */
-"Downloading update..." = "Stahuje se aktualizace…";
+"Downloading update…" = "Stahuje se aktualizace…";
 
 /* Take care not to overflow the status window. */
-"Extracting update..." = "Rozbaluje se aktualizace…";
+"Extracting update…" = "Rozbaluje se aktualizace…";
 
 /* the unit for gigabytes */
 "GB" = "GB";
@@ -65,14 +65,14 @@
 "Install on Quit" = "Instalovat a ukončit";
 
 /* Take care not to overflow the status window. */
-"Installing update..." = "Instaluje se aktualizace…";
+"Installing update…" = "Instaluje se aktualizace…";
 
 /* the unit for kilobytes */
 "KB" = "KB";
 
 /* Alternative name for "Install" button if we have a paid update or other update
 	without a download but with a URL. */
-"Learn More..." = "Další informace…";
+"Learn More…" = "Další informace…";
 
 /* the unit for megabytes */
 "MB" = "MB";
@@ -96,4 +96,4 @@
 "You already have the newest version of %@." = "Máte nainstalovanou nejnovější verzi aplikace @.";
 
 /* Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates. */
-"You're up-to-date!" = "Vaše verze je aktuální!";
+"You’re up-to-date!" = "Vaše verze je aktuální!";

@@ -2,7 +2,7 @@
 
 "%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ a été téléchargé. Voulez-vous l’installer et relancer %1$@ maintenant ?";
 
-"%1$@ can't be updated, because it was opened from a read-only or a temporary location." = "%1$@ ne peut pas être mis à jour quand il fonctionne à partir d’un volume en lecture seule, comme une image disque ou un lecteur optique.";
+"%1$@ can’t be updated, because it was opened from a read-only or a temporary location." = "%1$@ ne peut pas être mis à jour quand il fonctionne à partir d’un volume en lecture seule, comme une image disque ou un lecteur optique.";
 
 "Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "Déplacez %1$@ dans votre dossier Applications, relancez-le à partir de là et réessayez.";
 
@@ -12,13 +12,13 @@
 
 "%@ %@ is currently the newest version available." = "%1$@ %2$@ est la version la plus récente disponible.";
 
-"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%1$@ %2$@ est la version la plus récente disponible.\n(Vous utilisez actuellement la version %3$@)";
+"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%1$@ %2$@ est la version la plus récente disponible.\n(Vous utilisez actuellement la version %3$@)";
 
 /* Description text for SUUpdateAlert when the update is downloadable. */
-"%@ %@ is now available--you have %@. Would you like to download it now?" = "%1$@ %2$@ est disponible ; vous utilisez la version %3$@. Voulez-vous le télécharger maintenant ?";
+"%@ %@ is now available—you have %@. Would you like to download it now?" = "%1$@ %2$@ est disponible ; vous utilisez la version %3$@. Voulez-vous le télécharger maintenant ?";
 
 /* Description text for SUUpdateAlert when the update informational with no download. */
-"%@ %@ is now available--you have %@. Would you like to learn more about this update on the web?" = "%1$@ %2$@ est disponible ; vous utilisez la version %3$@. Voulez-vous en savoir plus sur cette mise à jour sur Internet ?";
+"%@ %@ is now available—you have %@. Would you like to learn more about this update on the web?" = "%1$@ %2$@ est disponible ; vous utilisez la version %3$@. Voulez-vous en savoir plus sur cette mise à jour sur Internet ?";
 
 "%@ downloaded" = "%@ téléchargé";
 
@@ -49,13 +49,13 @@
 
 "Cancel Update" = "Annuler la mise à jour";
 
-"Checking for updates..." = "Recherche de mises à jour…";
+"Checking for updates…" = "Recherche de mises à jour…";
 
 /* Take care not to overflow the status window. */
-"Downloading update..." = "Téléchargement de la mise à jour…";
+"Downloading update…" = "Téléchargement de la mise à jour…";
 
 /* Take care not to overflow the status window. */
-"Extracting update..." = "Extraction de la mise à jour…";
+"Extracting update…" = "Extraction de la mise à jour…";
 
 /* the unit for gigabytes */
 "GB" = "Go";
@@ -63,7 +63,7 @@
 "Install and Relaunch" = "Installer et relancer";
 
 /* Take care not to overflow the status window. */
-"Installing update..." = "Installation de la mise à jour…";
+"Installing update…" = "Installation de la mise à jour…";
 
 /* the unit for kilobytes */
 "KB" = "ko";
@@ -83,12 +83,12 @@
 
 "You already have the newest version of %@." = "Vous possédez déjà la version la plus récente de %@.";
 
-"You're up-to-date!" = "Votre logiciel est à jour !";
+"You’re up-to-date!" = "Votre logiciel est à jour !";
 
 /* Alternative name for "Install" button if we have a paid update or other update
 	without a download but with a URL. */
 
-"Learn More..." = "En savoir plus…";
+"Learn More…" = "En savoir plus…";
 
 "The update is improperly signed." = "La signature numérique de la mise à jour est incorrecte";
 

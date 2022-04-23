@@ -1,18 +1,18 @@
 "%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ è stato scaricato ed è pronto per essere utilizzato! Desideri installare e riavviare  %1$@ ora?";
 
-"%1$@ can't be updated, because it was opened from a read-only or a temporary location." = "Impossibile aggiornare %1$@ quando viene eseguito da un volume di sola lettura come un’immagine disco o un’unità ottica.";
+"%1$@ can’t be updated, because it was opened from a read-only or a temporary location." = "Impossibile aggiornare %1$@ quando viene eseguito da un volume di sola lettura come un’immagine disco o un’unità ottica.";
 
 "Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "Spostare %1$@ nella Cartella Applicazioni, riavviarlo e riprovare.";
 
 "%@ %@ is currently the newest version available." = "%1$@ %2$@ è la versione più recente attualmente disponibile.";
 
-"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%1$@ %2$@ è la versione più recente attualmente disponibile.\n(You are currently running version %3$@.)";
+"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%1$@ %2$@ è la versione più recente attualmente disponibile.\n(You are currently running version %3$@.)";
 
 /* Description text for SUUpdateAlert when the update is downloadable. */
-"%@ %@ is now available--you have %@. Would you like to download it now?" = "%1$@ %2$@ è disponbile; disponi della versione %3$@. Desideri eseguire l’aggiornamento ora?";
+"%@ %@ is now available—you have %@. Would you like to download it now?" = "%1$@ %2$@ è disponbile; disponi della versione %3$@. Desideri eseguire l’aggiornamento ora?";
 
 /* Description text for SUUpdateAlert when the update informational with no download. */
-"%@ %@ is now available--you have %@. Would you like to learn more about this update on the web?" = "%1$@ %2$@ is now available--you have %3$@. Would you like to learn more about this update on the web?";
+"%@ %@ is now available—you have %@. Would you like to learn more about this update on the web?" = "%1$@ %2$@ is now available—you have %3$@. Would you like to learn more about this update on the web?";
 
 "%@ downloaded" = "%@ scaricato";
 
@@ -41,13 +41,13 @@
 
 "Cancel Update" = "Annulla Aggiornamento";
 
-"Checking for updates..." = "Controllo aggiornamenti in corso…";
+"Checking for updates…" = "Controllo aggiornamenti in corso…";
 
 /* Take care not to overflow the status window. */
-"Downloading update..." = "Scaricamento dell’aggiornamento…";
+"Downloading update…" = "Scaricamento dell’aggiornamento…";
 
 /* Take care not to overflow the status window. */
-"Extracting update..." = "Estrazione dell’aggiornamento…";
+"Extracting update…" = "Estrazione dell’aggiornamento…";
 
 /* the unit for gigabytes */
 "GB" = "GB";
@@ -55,7 +55,7 @@
 "Install and Relaunch" = "Installa e Riavvia";
 
 /* Take care not to overflow the status window. */
-"Installing update..." = "Installazione aggiornamento in corso…";
+"Installing update…" = "Installazione aggiornamento in corso…";
 
 /* the unit for kilobytes */
 "KB" = "KB";
@@ -75,9 +75,9 @@
 
 "You already have the newest version of %@." = "Disponi della versione più recente di %@.";
 
-"You're up-to-date!" = "La tua applicazione è aggiornata!";
+"You’re up-to-date!" = "La tua applicazione è aggiornata!";
 
 /* Alternative name for "Install" button if we have a paid update or other update
 	without a download but with a URL. */
 
-"Learn More..." = "Ulteriori informazioni…";
+"Learn More…" = "Ulteriori informazioni…";

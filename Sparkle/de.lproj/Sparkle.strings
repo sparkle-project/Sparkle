@@ -2,22 +2,22 @@
 "%@ %@ is currently the newest version available." = "%1$@ %2$@ ist zurzeit die neueste verfügbare Version.";
 
 /* (No Comment) */
-"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%1$@ %2$@ ist zurzeit die neueste verfügbare Version.\n(Die derzeit installierte Version ist %3$@.)";
+"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%1$@ %2$@ ist zurzeit die neueste verfügbare Version.\n(Die derzeit installierte Version ist %3$@.)";
 
 /* Critical downloadable update */
-"%@ %@ is now available--you have %@. This is an important update; would you like to download it now?" = "%1$@ %2$@ ist verfügbar – du verwendest Version %3$@. Dies ist ein wichtiges Update. Möchtest du die neue Version jetzt laden?";
+"%@ %@ is now available—you have %@. This is an important update; would you like to download it now?" = "%1$@ %2$@ ist verfügbar – du verwendest Version %3$@. Dies ist ein wichtiges Update. Möchtest du die neue Version jetzt laden?";
 
 /* Description text for SUUpdateAlert when the update is downloadable. */
-"%@ %@ is now available--you have %@. Would you like to download it now?" = "%1$@ %2$@ ist verfügbar – du verwendest Version %3$@. Möchtest du die neue Version jetzt laden?";
+"%@ %@ is now available—you have %@. Would you like to download it now?" = "%1$@ %2$@ ist verfügbar – du verwendest Version %3$@. Möchtest du die neue Version jetzt laden?";
 
 /* Description text for SUUpdateAlert when the update informational with no download. */
-"%@ %@ is now available--you have %@. Would you like to learn more about this update on the web?" = "%1$@ %2$@ ist verfügbar – du verwendest Version %3$@. Möchtest du mehr über dieses Update erfahren?";
+"%@ %@ is now available—you have %@. Would you like to learn more about this update on the web?" = "%1$@ %2$@ ist verfügbar – du verwendest Version %3$@. Möchtest du mehr über dieses Update erfahren?";
 
 /* (No Comment) */
 "%@ downloaded" = "%@ geladen";
 
 /* (No Comment) */
-"%@ is now updated to version %@!" = "%@ ist aktualisiert auf Version %@!";
+"%@ is now updated to version %@!" = "%@ ist aktualisiert auf Version %@!";
 
 /* (No Comment) */
 "%@ is now updated!" = "%@ ist aktualisiert!";
@@ -32,13 +32,13 @@
 "%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ wurde geladen und steht zur Installation bereit! Möchtest du %1$@ jetzt durch die neue Version ersetzen und neu starten?";
 
 /* (No Comment) */
-"%1$@ %2$@ is available but your macOS version is too new for this update. This update only supports up to macOS %3$@." = "%1$@ %2$@ ist verfügbar, aber deine Version von macOS ist zu neu für dieses Update. Das Update unterstützt nur bis macOS %3$@.";
+"%1$@ %2$@ is available but your macOS version is too new for this update. This update only supports up to macOS %3$@." = "%1$@ %2$@ ist verfügbar, aber deine Version von macOS ist zu neu für dieses Update. Das Update unterstützt nur bis macOS %3$@.";
 
 /* (No Comment) */
-"%1$@ %2$@ is available but your macOS version is too old to install it. At least macOS %3$@ is required." = "%1$@ %2$@ ist verfügbar, aber deine Version von macOS ist zu alt, um das Update zu installieren. Es wird mindestens macOS %3$@ benötigt.";
+"%1$@ %2$@ is available but your macOS version is too old to install it. At least macOS %3$@ is required." = "%1$@ %2$@ ist verfügbar, aber deine Version von macOS ist zu alt, um das Update zu installieren. Es wird mindestens macOS %3$@ benötigt.";
 
 /* (No Comment) */
-"%1$@ can't be updated, because it was opened from a read-only or a temporary location." = "%1$@ kann nicht aktualisiert werden, da es aus dem Downloads-Order, oder von einer DMG-Datei oder einem Laufwerk ohne Schreibzugriff gestartet wurde.";
+"%1$@ can’t be updated, because it was opened from a read-only or a temporary location." = "%1$@ kann nicht aktualisiert werden, da es aus dem Downloads-Order, oder von einer DMG-Datei oder einem Laufwerk ohne Schreibzugriff gestartet wurde.";
 
 /* (No Comment) */
 "%1$@ can’t be updated if it’s running from the location it was downloaded to." = "„%1$@“ kann nicht aktualisiert werden, wenn das Programm von dem Ort ausgeführt wird, an den es heruntergeladen wurde.";
@@ -104,16 +104,16 @@
 "Cancel Update" = "Aktualisierung abbrechen";
 
 /* (No Comment) */
-"Checking for updates..." = "Nach Updates suchen …";
+"Checking for updates…" = "Nach Updates suchen …";
 
 /* Not skipping a major upgrade */
 "Don't Skip" = "Nicht überspringen";
 
 /* Take care not to overflow the status window. */
-"Downloading update..." = "Update laden …";
+"Downloading update…" = "Update laden …";
 
 /* Take care not to overflow the status window. */
-"Extracting update..." = "Update entpacken …";
+"Extracting update…" = "Update entpacken …";
 
 /* (No Comment) */
 "Failed to resume installing update." = "Das Fortsetzen der Installation ist fehlgeschlagen.";
@@ -128,14 +128,14 @@
 "Install on Quit" = "Installieren beim Beenden";
 
 /* Take care not to overflow the status window. */
-"Installing update..." = "Update installieren …";
+"Installing update…" = "Update installieren …";
 
 /* the unit for kilobytes */
 "KB" = "KB";
 
 /* Alternative name for "Install" button if we have a paid update or other update
 	without a download but with a URL. */
-"Learn More..." = "Mehr über …";
+"Learn More…" = "Mehr über …";
 
 /* the unit for megabytes */
 "MB" = "MB";
@@ -156,7 +156,7 @@
 "Skip Upgrade" = "Update überspringen";
 
 /* (No Comment) */
-"The update checker failed to start correctly. You should contact the app developer to report this issue and verify that you have the latest version" = "Das Aktualisierungsprogramm wurde nicht richtig gestartet. Du solltest den App-Entwickler kontaktieren, um diesen Fehler zu melden und zu prüfen, ob du die neueste Version hast.";
+"The update checker failed to start correctly. You should contact the app developer to report this issue and verify that you have the latest version." = "Das Aktualisierungsprogramm wurde nicht richtig gestartet. Du solltest den App-Entwickler kontaktieren, um diesen Fehler zu melden und zu prüfen, ob du die neueste Version hast.";
 
 /* (No Comment) */
 "The update is improperly signed and could not be validated. Please try again later or contact the app developer." = "Das Update ist nicht ordnungsgemäß signiert und konnte nicht überprüft werden. Bitte versuche es später erneut oder kontaktiere den App-Entwickler.";
@@ -186,7 +186,7 @@
 "You already have the newest version of %@." = "Du hast bereits die neueste Version von %@.";
 
 /* Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates. */
-"You're up-to-date!" = "Du bist auf dem neuesten Stand!";
+"You’re up-to-date!" = "Du bist auf dem neuesten Stand!";
 
 /* (No Comment) */
 "Your macOS version is too new" = "Deine Version von macOS ist zu neu";

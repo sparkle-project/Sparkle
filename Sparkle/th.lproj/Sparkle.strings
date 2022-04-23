@@ -1,18 +1,18 @@
 "%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ ได้ถูกดาวน์โหลดและพร้อมใช้งานแล้ว คุณต้องการติดตั้งและเริ่ม %1$@ ใหม่เดี๋ยวนี้หรือไม่";
 
-"%1$@ can't be updated, because it was opened from a read-only or a temporary location." = "%1$@ ไม่สามารถรับการอัพเดทได้เมื่อถูกเรียกจากดิสก์แบบอ่านอย่างเดียวหรือซีดีรอม ย้าย";
+"%1$@ can’t be updated, because it was opened from a read-only or a temporary location." = "%1$@ ไม่สามารถรับการอัพเดทได้เมื่อถูกเรียกจากดิสก์แบบอ่านอย่างเดียวหรือซีดีรอม ย้าย";
 
 "Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "%1$@ ไปยังโฟลเดอร์แอปพลิเคชัน และเรียกใช้งาน จากนั้นลองใหม่อีกครั้ง";
 
 "%@ %@ is currently the newest version available." = "%1$@ %2$@ เป็นเวอร์ชั่นใหม่ล่าสุดแล้ว";
 
-"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%1$@ %2$@ เป็นเวอร์ชั่นใหม่ล่าสุดแล้ว\n(You are currently running version %3$@.)";
+"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%1$@ %2$@ เป็นเวอร์ชั่นใหม่ล่าสุดแล้ว\n(You are currently running version %3$@.)";
 
 /* Description text for SUUpdateAlert when the update is downloadable. */
-"%@ %@ is now available--you have %@. Would you like to download it now?" = "%1$@ %2$@ พร้อมให้ดาวน์โหลดแล้ว (คุณมีเวอร์ชั่น %3$@) ต้องการดาวน์โหลดเลยหรือไม่";
+"%@ %@ is now available—you have %@. Would you like to download it now?" = "%1$@ %2$@ พร้อมให้ดาวน์โหลดแล้ว (คุณมีเวอร์ชั่น %3$@) ต้องการดาวน์โหลดเลยหรือไม่";
 
 /* Description text for SUUpdateAlert when the update informational with no download. */
-"%@ %@ is now available--you have %@. Would you like to learn more about this update on the web?" = "%1$@ %2$@ is now available--you have %3$@. Would you like to learn more about this update on the web?";
+"%@ %@ is now available—you have %@. Would you like to learn more about this update on the web?" = "%1$@ %2$@ is now available—you have %3$@. Would you like to learn more about this update on the web?";
 
 "%@ downloaded" = "ดาวน์โหลด %@ เสร็จสิ้น";
 
@@ -41,13 +41,13 @@
 
 "Cancel Update" = "ยกเลิกอัพเดท";
 
-"Checking for updates..." = "ตรวจสอบอัพเดท…";
+"Checking for updates…" = "ตรวจสอบอัพเดท…";
 
 /* Take care not to overflow the status window. */
-"Downloading update..." = "กำลังดาวน์โหลดอัพเดท…";
+"Downloading update…" = "กำลังดาวน์โหลดอัพเดท…";
 
 /* Take care not to overflow the status window. */
-"Extracting update..." = "กำลังแตกไฟล์อัพเดท…";
+"Extracting update…" = "กำลังแตกไฟล์อัพเดท…";
 
 /* the unit for gigabytes */
 "GB" = "GB";
@@ -55,7 +55,7 @@
 "Install and Relaunch" = "ติดตั้งและเริ่มแอปพลิเคชันใหม่";
 
 /* Take care not to overflow the status window. */
-"Installing update..." = "กำลังติดตั้งอัพเดท…";
+"Installing update…" = "กำลังติดตั้งอัพเดท…";
 
 /* the unit for kilobytes */
 "KB" = "KB";
@@ -80,9 +80,9 @@
 "You already have the newest version of %@." = "คุณมีเวอร์ชั่นล่าสุดของ %@ แล้ว";
 
 /* Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates. */
-"You're up-to-date!" = "คุณมีเวอร์ชั่นล่าสุดแล้ว!";
+"You’re up-to-date!" = "คุณมีเวอร์ชั่นล่าสุดแล้ว!";
 
 /* Alternative name for "Install" button if we have a paid update or other update
 	without a download but with a URL. */
-"Learn More..." = "เรียนรู้เพิ่มเติม…";
+"Learn More…" = "เรียนรู้เพิ่มเติม…";
 

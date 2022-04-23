@@ -4,13 +4,13 @@
 
 "%@ %@ is currently the newest version available." = "%@ %@ er nýjasta útgáfan sem er fáanleg þessa stundina.";
 
-"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%@ %@ er nýjasta útgáfan sem er fáanleg þessa stundina.\n(You are currently running version %@.)";
+"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%@ %@ er nýjasta útgáfan sem er fáanleg þessa stundina.\n(You are currently running version %@.)";
 
 /* Description text for SUUpdateAlert when the update is downloadable. */
-"%@ %@ is now available--you have %@. Would you like to download it now?" = "Útgafa %2$@ af %1$@ er nú fáanlegt en þú ert með %3$@. Viltu sækja hana núna?";
+"%@ %@ is now available—you have %@. Would you like to download it now?" = "Útgafa %2$@ af %1$@ er nú fáanlegt en þú ert með %3$@. Viltu sækja hana núna?";
 
 /* Description text for SUUpdateAlert when the update informational with no download. */
-"%@ %@ is now available--you have %@. Would you like to learn more about this update on the web?" = "%1$@ %2$@ is now available--you have %3$@. Would you like to learn more about this update on the web?";
+"%@ %@ is now available—you have %@. Would you like to learn more about this update on the web?" = "%1$@ %2$@ is now available—you have %3$@. Would you like to learn more about this update on the web?";
 
 "%@ does not have permission to write to the application's directory! Are you running off a disk image? If not, ask your system administrator for help." = "%@ hefur ekki heimild til að skrifa í möppu forritsins! Ertu að keyra forritið af diskmynd? Ef ekki skaltu ráðfæra þig við kerfisstjórann.";
 
@@ -32,13 +32,13 @@
 
 "Check for updates on startup?" = "Athuga með uppfærslur í ræsingu?";
 
-"Downloading update..." = "Sækja nýja útgáfu…";
+"Downloading update…" = "Sækja nýja útgáfu…";
 
-"Extracting update..." = "Afþjappa uppfærslu…";
+"Extracting update…" = "Afþjappa uppfærslu…";
 
 "Install and Relaunch" = "Setja upp og ræsa aftur";
 
-"Installing update..." = "Set inn uppfærslu…";
+"Installing update…" = "Set inn uppfærslu…";
 
 "Ready to Install" = "Innsetning reiðubúin";
 
@@ -54,5 +54,5 @@
 
 "Yes" = "Já";
 
-"You're up-to-date!" = "Það er allt uppfært hjá þér!";
+"You’re up-to-date!" = "Það er allt uppfært hjá þér!";
 

@@ -1,18 +1,18 @@
 "%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ er hentet og klar til brug! Vil du installere og genstarte %1$@ nu?";
 
-"%1$@ can't be updated, because it was opened from a read-only or a temporary location." = "%1$@ kan ikke opdateres når det køres fra en kun læsbar enhed.";
+"%1$@ can’t be updated, because it was opened from a read-only or a temporary location." = "%1$@ kan ikke opdateres når det køres fra en kun læsbar enhed.";
 
 "Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "Flyt %1$@ til mappen Programmer, genstart derfra og prøv igen.";
 
 "%@ %@ is currently the newest version available." = "%1$@ %2$@ er den aktuelle version.";
 
-"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%1$@ %2$@ er den aktuelle version.\n(Du kører lige nu version %3$@.)";
+"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%1$@ %2$@ er den aktuelle version.\n(Du kører lige nu version %3$@.)";
 
 /* Description text for SUUpdateAlert when the update is downloadable. */
-"%@ %@ is now available--you have %@. Would you like to download it now?" = "%1$@ %2$@ er tilgængelig! Du har %3$@. Skal den hentes nu?";
+"%@ %@ is now available—you have %@. Would you like to download it now?" = "%1$@ %2$@ er tilgængelig! Du har %3$@. Skal den hentes nu?";
 
 /* Description text for SUUpdateAlert when the update informational with no download. */
-"%@ %@ is now available--you have %@. Would you like to learn more about this update on the web?" = "%1$@ %2$@ er tilgængelig--du har %3$@. Vil du lære mere om denne opdatering på web?";
+"%@ %@ is now available—you have %@. Would you like to learn more about this update on the web?" = "%1$@ %2$@ er tilgængelig--du har %3$@. Vil du lære mere om denne opdatering på web?";
 
 "%@ downloaded" = "%@ hentet";
 
@@ -41,13 +41,13 @@
 
 "Cancel Update" = "Annuller opdatering";
 
-"Checking for updates..." = "Søger efter opdateringer…";
+"Checking for updates…" = "Søger efter opdateringer…";
 
 /* Take care not to overflow the status window. */
-"Downloading update..." = "Henter opdatering…";
+"Downloading update…" = "Henter opdatering…";
 
 /* Take care not to overflow the status window. */
-"Extracting update..." = "Udpakker arkiver…";
+"Extracting update…" = "Udpakker arkiver…";
 
 /* the unit for gigabytes */
 "GB" = "GB";
@@ -55,7 +55,7 @@
 "Install and Relaunch" = "Installer og genstart";
 
 /* Take care not to overflow the status window. */
-"Installing update..." = "Installerer opdatering…";
+"Installing update…" = "Installerer opdatering…";
 
 /* the unit for kilobytes */
 "KB" = "KB";
@@ -80,9 +80,9 @@
 "You already have the newest version of %@." = "Du har den seneste version af %@.";
 
 /* Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates. */
-"You're up-to-date!" = "Der er ingen opdateringer";
+"You’re up-to-date!" = "Der er ingen opdateringer";
 
 /* Alternative name for "Install" button if we have a paid update or other update
 	without a download but with a URL. */
-"Learn More..." = "Læs mere…";
+"Learn More…" = "Læs mere…";
 

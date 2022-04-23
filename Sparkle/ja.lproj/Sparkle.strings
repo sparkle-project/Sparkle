@@ -2,7 +2,7 @@
 
 "%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@がダウンロードされました! 今すぐ %1$@ をインストールして再起動しますか?";
 
-"%1$@ can't be updated, because it was opened from a read-only or a temporary location." = "%1$@は読み出し専用またはテンポラリな場所で開かれているためアップデートできません。";
+"%1$@ can’t be updated, because it was opened from a read-only or a temporary location." = "%1$@は読み出し専用またはテンポラリな場所で開かれているためアップデートできません。";
 
 "Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "%1$@をアプリケーションフォルダに移動し、そこから再起動したあとやり直してください。";
 
@@ -12,7 +12,7 @@
 
 "%@ %@ is currently the newest version available." = "%1$@ %2$@は現在入手できる最新バージョンです。";
 
-"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%1$@ %2$@は現在入手できる最新バージョンです。\n（現在使用中のバージョンは%3$@です。）";
+"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%1$@ %2$@は現在入手できる最新バージョンです。\n（現在使用中のバージョンは%3$@です。）";
 
 "An error occurred while running the updater. Please try again later." = "アップデータを実行中にエラーが発生しました。あとでやり直してください。";
 
@@ -24,18 +24,18 @@
 
 "Update Installed" = "アップデートがインストールされました";
 
-"%@ is now updated to version %@!" = "%@はバージョン%@にアップデートされました!";
+"%@ is now updated to version %@!" = "%@はバージョン%@にアップデートされました!";
 
 "%@ is now updated!" = "%@はアップデートされました!";
 
 /* Description text for SUUpdateAlert when the update is downloadable. */
-"%@ %@ is now available--you have %@. Would you like to download it now?" = "%1$@ %2$@が入手できます（使用中のバージョンは%3$@です）。今すぐダウンロードしますか?";
+"%@ %@ is now available—you have %@. Would you like to download it now?" = "%1$@ %2$@が入手できます（使用中のバージョンは%3$@です）。今すぐダウンロードしますか?";
 
 /* Description text for SUUpdateAlert when the update informational with no download. */
-"%@ %@ is now available--you have %@. Would you like to learn more about this update on the web?" = "%1$@ %2$@が入手できます（使用中のバージョンは%3$@です）。このアップデートの詳しい情報をWebで確認しますか?";
+"%@ %@ is now available—you have %@. Would you like to learn more about this update on the web?" = "%1$@ %2$@が入手できます（使用中のバージョンは%3$@です）。このアップデートの詳しい情報をWebで確認しますか?";
 
 /* Critical downloadable update */
-"%@ %@ is now available--you have %@. This is an important update; would you like to download it now?" = "%1$@ %2$@が入手できます（使用中のバージョンは%3$@です）。これは重要なアップデートです。今すぐダウンロードしますか?";
+"%@ %@ is now available—you have %@. This is an important update; would you like to download it now?" = "%1$@ %2$@が入手できます（使用中のバージョンは%3$@です）。これは重要なアップデートです。今すぐダウンロードしますか?";
 
 "%@ downloaded" = "%@ダウンロード済み";
 
@@ -70,13 +70,13 @@
 
 "Cancel Update" = "アップデートを中止";
 
-"Checking for updates..." = "アップデートを確認しています…";
+"Checking for updates…" = "アップデートを確認しています…";
 
 /* Take care not to overflow the status window. */
-"Downloading update..." = "アップデートをダウンロードしています…";
+"Downloading update…" = "アップデートをダウンロードしています…";
 
 /* Take care not to overflow the status window. */
-"Extracting update..." = "アップデートを展開しています…";
+"Extracting update…" = "アップデートを展開しています…";
 
 /* the unit for gigabytes */
 "GB" = "GB";
@@ -86,7 +86,7 @@
 "Install on Quit" = "終了時にインストール";
 
 /* Take care not to overflow the status window. */
-"Installing update..." = "アップデートをインストールしています…";
+"Installing update…" = "アップデートをインストールしています…";
 
 /* Title confirmation for skipping major upgrade and future updates */
 "Are you sure you want to skip this upgrade?" = "このアップグレードをスキップしてもよろしいですか?";
@@ -102,7 +102,7 @@
 
 /* Alternative name for "Install" button if we have a paid update or other update
 	without a download but with a URL. */
-"Learn More..." = "詳しい情報…";
+"Learn More…" = "詳しい情報…";
 
 /* the unit for megabytes */
 "MB" = "MB";
@@ -126,4 +126,4 @@
 "You already have the newest version of %@." = "すでに最新バージョンの%@を使用しています。";
 
 /* Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates. */
-"You're up-to-date!" = "最新版を使用しています!";
+"You’re up-to-date!" = "最新版を使用しています!";

@@ -2,7 +2,7 @@
 
 "%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ بارگیری شده و آمادهٔ استفاده است! آیا اکنون مایل به نصب و بازکردن دوبارهٔ %1$@ هستید؟";
 
-"%1$@ can't be updated, because it was opened from a read-only or a temporary location." = "%1$@ نمی‌تواند به‌روزرسانی شود، زیرا از محلی با سطح دسترسی فقط-خواندن یا موقت باز شده است";
+"%1$@ can’t be updated, because it was opened from a read-only or a temporary location." = "%1$@ نمی‌تواند به‌روزرسانی شود، زیرا از محلی با سطح دسترسی فقط-خواندن یا موقت باز شده است";
 
 "Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "از Finder برای کپی کردن %1$@ به پوشهٔ برنامه استفاده کنید، سپس %1$@ را دوباره باز کرده و مجدداً امتحان کنید.";
 
@@ -12,13 +12,13 @@
 
 "%@ %@ is currently the newest version available." = "%1$@ %2$@ در حال حاضر جدیدترین نسخهٔ موجود است";
 
-"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%1$@ %2$@ در حال حاضر جدیدترین نسخه است.\n(شما در حال اجرای نسخهٔ %3$@ هستید.)";
+"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%1$@ %2$@ در حال حاضر جدیدترین نسخه است.\n(شما در حال اجرای نسخهٔ %3$@ هستید.)";
 
 /* Description text for SUUpdateAlert when the update is downloadable. */
-"%@ %@ is now available--you have %@. Would you like to download it now?" = "%1$@ %2$@ اکنون در دسترس است-- نسخهٔ شما: %3$@. اکنون می‌خواهید آن را دریافت کنید؟";
+"%@ %@ is now available—you have %@. Would you like to download it now?" = "%1$@ %2$@ اکنون در دسترس است-- نسخهٔ شما: %3$@. اکنون می‌خواهید آن را دریافت کنید؟";
 
 /* Description text for SUUpdateAlert when the update informational with no download. */
-"%@ %@ is now available--you have %@. Would you like to learn more about this update on the web?" = "%1$@ %2$@ اکنون در دسترس است-- نسخهٔ شما: %3$@. می‌خواهید در مورد آن بیشتر یاد بگیرید؟";
+"%@ %@ is now available—you have %@. Would you like to learn more about this update on the web?" = "%1$@ %2$@ اکنون در دسترس است-- نسخهٔ شما: %3$@. می‌خواهید در مورد آن بیشتر یاد بگیرید؟";
 
 "%@ downloaded" = "دانلود شده است %@";
 
@@ -49,13 +49,13 @@
 
 "Cancel Update" = "لغو به‌روزرسانی";
 
-"Checking for updates..." = "بررسی وجود به‌روزرسانی";
+"Checking for updates…" = "بررسی وجود به‌روزرسانی";
 
 /* Take care not to overflow the status window. */
-"Downloading update..." = "در حال بارگیری به‌روزرسانی";
+"Downloading update…" = "در حال بارگیری به‌روزرسانی";
 
 /* Take care not to overflow the status window. */
-"Extracting update..." = "در حال بازکردن بستهٔ به‌روزرسانی";
+"Extracting update…" = "در حال بازکردن بستهٔ به‌روزرسانی";
 
 /* the unit for gigabytes */
 "GB" = "گیگابایت";
@@ -63,14 +63,14 @@
 "Install and Relaunch" = "نصب و بازکردن دوباره";
 
 /* Take care not to overflow the status window. */
-"Installing update..." = "در حال نصب به‌روزرسانی";
+"Installing update…" = "در حال نصب به‌روزرسانی";
 
 /* the unit for kilobytes */
 "KB" = "کیلوبایت";
 
 /* Alternative name for "Install" button if we have a paid update or other update
 	without a download but with a URL. */
-"Learn More..." = "یادگیری بیشتر...";
+"Learn More…" = "یادگیری بیشتر…";
 
 /* the unit for megabytes */
 "MB" = "مگابایت";
@@ -94,4 +94,4 @@
 "You already have the newest version of %@." = "شما در حال استفاده از جدیدترین نسخهٔ %@ هستید.";
 
 /* Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates. */
-"You're up-to-date!" = "برنامهٔ شما به‌روز است";
+"You’re up-to-date!" = "برنامهٔ شما به‌روز است";
