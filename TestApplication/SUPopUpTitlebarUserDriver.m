@@ -53,7 +53,7 @@
     if (self.updateButton == nil) {
         NSButton *updateButton = [[NSButton alloc] initWithFrame:NSMakeRect(0, 0, 160, 100)];
         updateButton.title = title;
-        updateButton.bezelStyle = NSRecessedBezelStyle;
+        updateButton.bezelStyle = NSBezelStyleRecessed;
         
         self.updateButton = updateButton;
     } else {

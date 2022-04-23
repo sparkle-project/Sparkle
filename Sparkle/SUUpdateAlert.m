@@ -165,7 +165,7 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
     // Stick a nice big spinner in the middle of the web view until the page is loaded.
     NSRect frame = [[self.webView.view superview] frame];
     self.releaseNotesSpinner = [[NSProgressIndicator alloc] initWithFrame:NSMakeRect(NSMidX(frame) - 16, NSMidY(frame) - 16, 32, 32)];
-    [self.releaseNotesSpinner setStyle:NSProgressIndicatorSpinningStyle];
+    [self.releaseNotesSpinner setStyle:NSProgressIndicatorStyleSpinning];
     [self.releaseNotesSpinner startAnimation:self];
     [[self.webView.view superview] addSubview:self.releaseNotesSpinner];
     
