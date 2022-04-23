@@ -69,7 +69,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Otherwise on failure you may need to re-try using move operations. This operation will fail on non-apfs volumes or volumes that don't support rename swapping.
  * Both originalItemURL and newItemURL must exist.
  */
-- (BOOL)swapItemAtURL:(NSURL *)originalItemURL withItemAtURL:(NSURL *)newItemURL error:(NSError **)error __OSX_AVAILABLE(10.13);
+- (BOOL)swapItemAtURL:(NSURL *)originalItemURL withItemAtURL:(NSURL *)newItemURL error:(NSError **)error API_AVAILABLE(macos(10.13));
 
 /**
  * Copies an item from a source to a destination
