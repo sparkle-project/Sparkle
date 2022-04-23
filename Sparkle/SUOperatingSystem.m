@@ -12,14 +12,9 @@
 
 @implementation SUOperatingSystem
 
-+ (NSOperatingSystemVersion)operatingSystemVersion
-{
-    return [[NSProcessInfo processInfo] operatingSystemVersion];
-}
-
 + (NSString *)systemVersionString
 {
-    NSOperatingSystemVersion version = self.operatingSystemVersion;
+    NSOperatingSystemVersion version = [[NSProcessInfo processInfo] operatingSystemVersion];
     return [NSString stringWithFormat:@"%ld.%ld.%ld", (long)version.majorVersion, (long)version.minorVersion, (long)version.patchVersion];
 }
 

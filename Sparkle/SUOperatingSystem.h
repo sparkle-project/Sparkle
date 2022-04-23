@@ -9,7 +9,6 @@
 
 @interface SUOperatingSystem : NSObject
 
-+ (NSOperatingSystemVersion)operatingSystemVersion;
 + (NSString *)systemVersionString;
 
 @end
