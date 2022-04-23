@@ -119,7 +119,7 @@
 "Should %1$@ automatically check for updates? You can always check for updates manually from the %1$@ menu." = "Wil je dat %1$@ automatisch naar updates zoekt? Je kunt altijd nog handmatig zoeken naar updates via het %1$@-menu.";
 
 /* No comment provided by engineer. */
-"The update checker failed to start correctly. You should contact the app developer to report this issue and verify that you have the latest version." = "Het bijwerkprogramma is niet goed gestart. Je kunt wellicht met de app-ontwikkelaar contact opnemen om de fout te melden en te controleren dat je de nieuwste versie hebt";
+"The update checker failed to start correctly. You should contact the app developer to report this issue and verify that you have the latest version." = "De updatezoeker is niet goed gestart. Je kunt wellicht met de app-ontwikkelaar contact opnemen om de fout te melden en te controleren dat je de nieuwste versie hebt.";
 
 /* No comment provided by engineer. */
 "The update is improperly signed and could not be validated. Please try again later or contact the app developer." = "De update is onjuist gesigneerd en kan niet worden gecontroleerd. Probeer het later opnieuw of neem contact op met de app-ontwikkelaar.";
