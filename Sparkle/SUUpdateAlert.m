@@ -26,7 +26,6 @@
 #import "SPUDownloadData.h"
 #import "SUApplicationInfo.h"
 #import "SPUUpdaterSettings.h"
-#import "SUTouchBarForwardDeclarations.h"
 #import "SUTouchBarButtonGroup.h"
 #import "SPUXPCServiceInfo.h"
 #import "SPUUserUpdateState.h"
