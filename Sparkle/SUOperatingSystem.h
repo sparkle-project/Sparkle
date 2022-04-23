@@ -7,14 +7,6 @@
 
 #import <Foundation/Foundation.h>
 
-#if __MAC_OS_X_VERSION_MAX_ALLOWED < 101000
-typedef struct {
-    NSInteger majorVersion;
-    NSInteger minorVersion;
-    NSInteger patchVersion;
-} NSOperatingSystemVersion;
-#endif
-
 @interface SUOperatingSystem : NSObject
 
 + (NSOperatingSystemVersion)operatingSystemVersion;
