@@ -17,18 +17,6 @@
     return [[NSProcessInfo processInfo] operatingSystemVersion];
 }
 
-+ (BOOL)isOperatingSystemAtLeastVersion:(NSOperatingSystemVersion)version
-{
-    const NSOperatingSystemVersion systemVersion = self.operatingSystemVersion;
-    if (systemVersion.majorVersion == version.majorVersion) {
-        if (systemVersion.minorVersion == version.minorVersion) {
-            return systemVersion.patchVersion >= version.patchVersion;
-        }
-        return systemVersion.minorVersion >= version.minorVersion;
-    }
-    return systemVersion.majorVersion >= version.majorVersion;
-}
-
 + (NSString *)systemVersionString
 {
     NSOperatingSystemVersion version = self.operatingSystemVersion;

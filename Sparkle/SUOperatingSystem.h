@@ -10,7 +10,6 @@
 @interface SUOperatingSystem : NSObject
 
 + (NSOperatingSystemVersion)operatingSystemVersion;
-+ (BOOL)isOperatingSystemAtLeastVersion:(NSOperatingSystemVersion)version;
 + (NSString *)systemVersionString;
 
 @end
