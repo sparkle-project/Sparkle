@@ -12,6 +12,7 @@
 #import "SUBundleIcon.h"
 #import "SUHost.h"
 #import <AppKit/AppKit.h>
+#import <UniformTypeIdentifiers/UniformTypeIdentifiers.h>
 
 @implementation SUApplicationInfo
 
@@ -36,9 +37,14 @@
         // this asumption may not be correct (eg. even though we're not the main bundle, it could be still be a regular app)
         // but still better than nothing if no icon was included
         BOOL isMainBundle = [host.bundle isEqualTo:[NSBundle mainBundle]];
-        
-        NSString *fileType = isMainBundle ? (__bridge NSString *)kUTTypeApplication : (__bridge NSString *)kUTTypeBundle;
-        icon = [[NSWorkspace sharedWorkspace] iconForFileType:fileType];
+
+        if (@available(macOS 11, *)) {
+            UTType *contentType = isMainBundle ? UTTypeApplication : UTTypeBundle;
+            icon = [[NSWorkspace sharedWorkspace] iconForContentType:contentType];
+        } else {
+            NSString *fileType = isMainBundle ? (__bridge NSString *)kUTTypeApplication : (__bridge NSString *)kUTTypeBundle;
+            icon = [[NSWorkspace sharedWorkspace] iconForFileType:fileType];
+        }
     }
     return icon;
 }

@@ -4,6 +4,7 @@
 //
 
 import Foundation
+import UniformTypeIdentifiers
 
 class DeltaUpdate {
     let fromVersion: String
@@ -86,12 +87,21 @@ class ArchiveItem: CustomStringConvertible {
     }
 
     convenience init(fromArchive archivePath: URL, unarchivedDir: URL, validateBundle: Bool, disableNestedCodeCheck: Bool) throws {
-        let resourceKeys = [URLResourceKey.typeIdentifierKey]
+        let resourceKeys: [URLResourceKey]
+        if #available(macOS 11, *) {
+            resourceKeys = [.contentTypeKey]
+        } else {
+            resourceKeys = [.typeIdentifierKey]
+        }
         let items = try FileManager.default.contentsOfDirectory(at: unarchivedDir, includingPropertiesForKeys: resourceKeys, options: .skipsHiddenFiles)
 
         let bundles = items.filter({
             if let resourceValues = try? $0.resourceValues(forKeys: Set(resourceKeys)) {
-                return UTTypeConformsTo(resourceValues.typeIdentifier! as CFString, kUTTypeBundle)
+                if #available(macOS 11, *) {
+                    return resourceValues.contentType!.conforms(to: .bundle)
+                } else {
+                    return UTTypeConformsTo(resourceValues.typeIdentifier! as CFString, kUTTypeBundle)
+                }
             } else {
                 return false
             }
