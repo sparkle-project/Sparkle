@@ -256,8 +256,11 @@ BOOL getRawHashOfTreeAndFileTablesWithVersion(unsigned char *hashBuffer, NSStrin
             continue;
 
         NSString *relativePath = pathRelativeToDirectory(normalizedPath, stringWithFileSystemRepresentation(ent->fts_path));
-        if (relativePath.length == 0)
+        
+        // Ignore icon resource fork data
+        if (relativePath.length == 0 || [relativePath isEqualToString:CUSTOM_ICON_PATH]) {
             continue;
+        }
 
         unsigned char fileHash[CC_SHA1_DIGEST_LENGTH];
         if (!_hashOfFileContents(fileHash, ent, tempBuffer, tempBufferSize)) {
