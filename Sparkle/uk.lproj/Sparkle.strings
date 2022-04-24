@@ -1,83 +1,83 @@
-"%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ завантажений і готовий до використання! Бажаєте встановити і перезавантажити %1$@?";
-
-"%1$@ can't be updated, because it was opened from a read-only or a temporary location." = "Під час роботи з %1$@ з тому, що призначений лише для читання, наприклад, образу диска чи оптичного диску, його неможливо оновити.";
-
-"Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "Перемістіть %1$@ у папку з програмами, перезавантажте його звідти і спробуйте ще раз.";
-
+/* No comment provided by engineer. */
 "%@ %@ is currently the newest version available." = "У данний момент %1$@ %2$@ є останньою версією.";
 
-"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%У данний момент %1$@ %2$@ є останньою версією.\n(You are currently running version %3$@.)";
+/* No comment provided by engineer. */
+"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%У данний момент %1$@ %2$@ є останньою версією.\n(You are currently running version %3$@.)";
 
 /* Description text for SUUpdateAlert when the update is downloadable. */
-"%@ %@ is now available--you have %@. Would you like to download it now?" = "%1$@ %2$@ доступна – ви маєте %3$@. Бажаєте завантажити її зараз?";
+"%@ %@ is now available—you have %@. Would you like to download it now?" = "%1$@ %2$@ доступна – ви маєте %3$@. Бажаєте завантажити її зараз?";
 
-/* Description text for SUUpdateAlert when the update informational with no download. */
-"%@ %@ is now available--you have %@. Would you like to learn more about this update on the web?" = "%1$@ %2$@ is now available--you have %3$@. Would you like to learn more about this update on the web?";
-
+/* The download progress in a unit of bytes, e.g. 100 KB */
 "%@ downloaded" = "%@ завантажено";
 
+/* The download progress in units of bytes, e.g. 100 KB of 1,0 MB */
 "%@ of %@" = "%1$@ із %2$@";
 
+/* Description text for SUUpdateAlert when the update has already been downloaded and ready to install. */
+"%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ завантажений і готовий до використання! Бажаєте встановити і перезавантажити %1$@?";
+
+/* No comment provided by engineer. */
+"%1$@ can’t be updated, because it was opened from a read-only or a temporary location." = "Під час роботи з %1$@ з тому, що призначений лише для читання, наприклад, образу диска чи оптичного диску, його неможливо оновити.";
+
+/* No comment provided by engineer. */
 "A new version of %@ is available!" = "Доступна нова версія %@!";
 
+/* No comment provided by engineer. */
 "A new version of %@ is ready to install!" = "Нова версія %@ готова до встановлення!";
 
+/* No comment provided by engineer. */
 "An error occurred in retrieving update information. Please try again later." = "Виникла помилка при отриманні інформації про оновлення. Спробуйте ще раз пізніше.";
 
+/* No comment provided by engineer. */
 "An error occurred while downloading the update. Please try again later." = "Виникла помилка при завантаження оновлення. Спробуйте ще раз пізніше.";
 
+/* No comment provided by engineer. */
 "An error occurred while extracting the archive. Please try again later." = "Виникла помилка при розпаковуванні архіву. Спробуйте ще раз пізніше.";
 
-"An error occurred while installing the update. Please try again later." = "Виникла помилка при встановленні оновлення. Спробуйте ще раз пізніше.";
-
+/* No comment provided by engineer. */
 "An error occurred while parsing the update feed." = "Виникла помилка розбору каналу оновлень.";
 
-"An error occurred while relaunching %1$@, but the new version will be available next time you run %1$@." = "Виникла помилка при перезавантаженні %1$@, але наступного разу при завантаження %1$@ буде доступна нова версія.";
-
-/* the unit for bytes */
-"B" = "Б";
-
+/* No comment provided by engineer. */
 "Cancel" = "Відмінити";
 
+/* No comment provided by engineer. */
 "Cancel Update" = "Відмінити оновлення";
 
-"Checking for updates..." = "Перевіряю наявність оновлень…";
+/* No comment provided by engineer. */
+"Checking for updates…" = "Перевіряю наявність оновлень…";
 
 /* Take care not to overflow the status window. */
-"Downloading update..." = "Завантажую оновлення…";
+"Downloading update…" = "Завантажую оновлення…";
 
 /* Take care not to overflow the status window. */
-"Extracting update..." = "Розпаковую оновлення…";
+"Extracting update…" = "Розпаковую оновлення…";
 
-/* the unit for gigabytes */
-"GB" = "ГБ";
-
+/* No comment provided by engineer. */
 "Install and Relaunch" = "Встановити та перезавантажити";
 
 /* Take care not to overflow the status window. */
-"Installing update..." = "Встановлюю оновлення…";
+"Installing update…" = "Встановлюю оновлення…";
 
-/* the unit for kilobytes */
-"KB" = "КБ";
+/* Alternate title for 'Install Update' button when there's no download in RSS feed. */
+"Learn More…" = "Дізнатись більше…";
 
-/* the unit for megabytes */
-"MB" = "МБ";
-
+/* No comment provided by engineer. */
 "OK" = "OK";
 
+/* No comment provided by engineer. */
 "Ready to Install" = "Готовий до встановлення";
 
+/* No comment provided by engineer. */
 "Should %1$@ automatically check for updates? You can always check for updates manually from the %1$@ menu." = "Чи повинен %1$@ автоматично виконувати перевірку на оновлення? Ви завжди можете самостійно перевірити оновлення у меню %1$@.";
 
+/* No comment provided by engineer. */
 "Update Error!" = "Помилка оновлення!";
 
+/* No comment provided by engineer. */
 "Updating %@" = "Оновлюю %@";
 
-"You already have the newest version of %@." = "Ви вже користуєтесь останньою версією програми %@.";
+/* No comment provided by engineer. */
+"Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "Перемістіть %1$@ у папку з програмами, перезавантажте його звідти і спробуйте ще раз.";
 
-"You're up-to-date!" = "У вас остання версія!";
-
-/* Alternative name for "Install" button if we have a paid update or other update
-	without a download but with a URL. */
-
-"Learn More..." = "Дізнатись більше…";
+/* Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates. */
+"You’re up-to-date!" = "У вас остання версія!";

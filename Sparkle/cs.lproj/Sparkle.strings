@@ -1,99 +1,101 @@
-"%1$@ %2$@ has been downloaded and is ready to use! This is an important update; would you like to install it and relaunch %1$@ now?" = "Aplikace %1$@ %2$@ byla stažena a je připravena k použití po příštím spuštění! Toto je důležitá aktualizace; přejete si aplikaci %1$@ nyní nainstalovat a znovu spustit?";
-
-"%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "Aplikace %1$@ %2$@ byla stažena a je připravena k použití po příštím spuštění! Přejete si aplikaci %1$@ nyní nainstalovat a znovu spustit?";
-
-"%1$@ can't be updated, because it was opened from a read-only or a temporary location." = "Aplikace %1$@ nemůže být aktualizována, protože je spuštěna z dočasného umístění nebo z umístění, na které nelze zapisovat.";
-
-"Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "Přesuňte %1$@ do složky Aplikace a spusťte ji z tohoto umístění znovu.";
-
-"Quit %1$@, move it into your Applications folder, relaunch it from there and try again." = "Ukončete %1$@, spusťte %1$@ ze složky Aplikace a spusťte aktualizaci znovu.";
-
-"%1$@ can’t be updated if it’s running from the location it was downloaded to." = "Aplikace %1$@ nemůže být aktualizována pokud je spuštěna z umístění, ve kterém je stažena.";
-
+/* No comment provided by engineer. */
 "%@ %@ is currently the newest version available." = "%1$@ %2$@ je nejnovější dostupná verze";
 
-"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%1$@ %2$@ je nejnovější dostupná verze.\n(Aktuálně používáte verzi %3$@.)";
+/* No comment provided by engineer. */
+"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%1$@ %2$@ je nejnovější dostupná verze.\n(Aktuálně používáte verzi %3$@.)";
 
 /* Description text for SUUpdateAlert when the update is downloadable. */
-"%@ %@ is now available--you have %@. Would you like to download it now?" = "Je k dispozici %1$@ %2$@ - nainstalována je %3$@. Přejete si nyní stáhnout aktualizaci?";
+"%@ %@ is now available—you have %@. Would you like to download it now?" = "Je k dispozici %1$@ %2$@ - nainstalována je %3$@. Přejete si nyní stáhnout aktualizaci?";
 
 /* Description text for SUUpdateAlert when the update informational with no download. */
-"%@ %@ is now available--you have %@. Would you like to learn more about this update on the web?" = "%1$@ %2$@ je nyní k dispozici – nainstalována je %3$@. Přejete si zobrazit o této aktualizaci další informace?";
+"%@ %@ is now available—you have %@. Would you like to learn more about this update on the web?" = "%1$@ %2$@ je nyní k dispozici – nainstalována je %3$@. Přejete si zobrazit o této aktualizaci další informace?";
 
+/* The download progress in a unit of bytes, e.g. 100 KB */
 "%@ downloaded" = "staženo %@";
 
+/* The download progress in units of bytes, e.g. 100 KB of 1,0 MB */
 "%@ of %@" = "%1$@ z %2$@";
 
+/* Description text for SUUpdateAlert when the critical update has already been downloaded and ready to install. */
+"%1$@ %2$@ has been downloaded and is ready to use! This is an important update; would you like to install it and relaunch %1$@ now?" = "Aplikace %1$@ %2$@ byla stažena a je připravena k použití po příštím spuštění! Toto je důležitá aktualizace; přejete si aplikaci %1$@ nyní nainstalovat a znovu spustit?";
+
+/* Description text for SUUpdateAlert when the update has already been downloaded and ready to install. */
+"%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "Aplikace %1$@ %2$@ byla stažena a je připravena k použití po příštím spuštění! Přejete si aplikaci %1$@ nyní nainstalovat a znovu spustit?";
+
+/* No comment provided by engineer. */
+"%1$@ can’t be updated if it’s running from the location it was downloaded to." = "Aplikace %1$@ nemůže být aktualizována pokud je spuštěna z umístění, ve kterém je stažena.";
+
+/* No comment provided by engineer. */
+"%1$@ can’t be updated, because it was opened from a read-only or a temporary location." = "Aplikace %1$@ nemůže být aktualizována, protože je spuštěna z dočasného umístění nebo z umístění, na které nelze zapisovat.";
+
+/* No comment provided by engineer. */
 "A new version of %@ is available!" = "Je dostupná nová verze aplikace %@!";
 
+/* No comment provided by engineer. */
 "A new version of %@ is ready to install!" = "Nová verze %@ je připravena k instalaci!";
 
+/* No comment provided by engineer. */
 "An error occurred in retrieving update information. Please try again later." = "Při získávání údajů o aktualizaci se vyskytla chyba. Zkuste to prosím později.";
 
+/* No comment provided by engineer. */
 "An error occurred while downloading the update. Please try again later." = "Při stahování souboru se vyskytla chyba. Zkuste to prosím později.";
 
+/* No comment provided by engineer. */
 "An error occurred while extracting the archive. Please try again later." = "Při rozbalování archivu se vyskytla chyba. Zkuste to prosím později.";
 
-"An error occurred while installing the update. Please try again later." = "Při instalaci aktualizace se vyskytla chyba. Zkuste to prosím později.";
-
+/* No comment provided by engineer. */
 "An error occurred while parsing the update feed." = "Při zpracování údajů o aktualizaci se vyskytla chyba. Zkuste to prosím později.";
 
-"An error occurred while relaunching %1$@, but the new version will be available next time you run %1$@." = "Vyskytla se chyba při novém spouštění aplikace %1$@, nová verze bude dostupná při dalším spuštění %1$@.";
-
+/* No comment provided by engineer. */
 "An important update to %@ is ready to install" = "Důležitá aktualizace %@ je připravena k instalaci";
 
-/* the unit for bytes */
-"B" = "B";
-
+/* No comment provided by engineer. */
 "Cancel" = "Zrušit";
 
+/* No comment provided by engineer. */
 "Cancel Update" = "Zrušit aktualizaci";
 
-"Checking for updates..." = "Hledání aktualizací…";
+/* No comment provided by engineer. */
+"Checking for updates…" = "Hledání aktualizací…";
 
 /* Take care not to overflow the status window. */
-"Downloading update..." = "Stahuje se aktualizace…";
+"Downloading update…" = "Stahuje se aktualizace…";
 
 /* Take care not to overflow the status window. */
-"Extracting update..." = "Rozbaluje se aktualizace…";
+"Extracting update…" = "Rozbaluje se aktualizace…";
 
-/* the unit for gigabytes */
-"GB" = "GB";
-
+/* No comment provided by engineer. */
 "Install and Relaunch" = "Instalovat a znovu spustit";
 
+/* Alternate title for 'Remind Me Later' button when downloaded updates can be resumed */
 "Install on Quit" = "Instalovat a ukončit";
 
 /* Take care not to overflow the status window. */
-"Installing update..." = "Instaluje se aktualizace…";
+"Installing update…" = "Instaluje se aktualizace…";
 
-/* the unit for kilobytes */
-"KB" = "KB";
+/* Alternate title for 'Install Update' button when there's no download in RSS feed. */
+"Learn More…" = "Další informace…";
 
-/* Alternative name for "Install" button if we have a paid update or other update
-	without a download but with a URL. */
-"Learn More..." = "Další informace…";
-
-/* the unit for megabytes */
-"MB" = "MB";
-
-/* OK button. */
+/* No comment provided by engineer. */
 "OK" = "OK";
 
-/* Status message on progress window once download has finished. */
+/* No comment provided by engineer. */
+"Quit %1$@, move it into your Applications folder, relaunch it from there and try again." = "Ukončete %1$@, spusťte %1$@ ze složky Aplikace a spusťte aktualizaci znovu.";
+
+/* No comment provided by engineer. */
 "Ready to Install" = "Připraveno k instalaci";
 
-/* Message that is optionally shown at startup to allow users to turn on/off update checks. */
+/* No comment provided by engineer. */
 "Should %1$@ automatically check for updates? You can always check for updates manually from the %1$@ menu." = "Přejete si, aby aplikace %1$@ automaticky vyhledávala aktualizace? Tuto volbu můžete kdykoliv změnit v nabídce %1$@.";
 
-"The update is improperly signed." = "Tato aktualizace je nesprávně podepsána.";
-
+/* No comment provided by engineer. */
 "Update Error!" = "Chyba při aktualizaci!";
 
+/* No comment provided by engineer. */
 "Updating %@" = "Aktualizuje se %@";
 
-/* 'Error' message when the user checks for updates but is already current or the feed doesn't contain any updates. (not necessarily shown in UI) */
-"You already have the newest version of %@." = "Máte nainstalovanou nejnovější verzi aplikace @.";
+/* No comment provided by engineer. */
+"Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "Přesuňte %1$@ do složky Aplikace a spusťte ji z tohoto umístění znovu.";
 
 /* Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates. */
-"You're up-to-date!" = "Vaše verze je aktuální!";
+"You’re up-to-date!" = "Vaše verze je aktuální!";
