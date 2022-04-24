@@ -10,12 +10,6 @@
 
 #import "SUTouchBarButtonGroup.h"
 
-#if __MAC_OS_X_VERSION_MAX_ALLOWED < 101200
-@interface NSButton (SierraSDK)
-+ (instancetype)buttonWithTitle:(NSString*)title target:(id)target action:(SEL)action;
-@end
-#endif
-
 @implementation SUTouchBarButtonGroup
 
 @synthesize buttons = _buttons;

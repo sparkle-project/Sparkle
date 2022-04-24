@@ -132,7 +132,6 @@
 		7205C4621E1306A600E370AE /* SUBinaryDeltaCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5711D3D895B00D1BF90 /* SUBinaryDeltaCommon.m */; };
 		7205C4631E1306B500E370AE /* libxar.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 726E07681CA616A4001A286B /* libxar.tbd */; };
 		7205C4641E1306BE00E370AE /* libbz2.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 726E076A1CA616B3001A286B /* libbz2.tbd */; };
-		720767D31E2EE9C200F9A850 /* SUTouchBarForwardDeclarations.h in Headers */ = {isa = PBXBuildFile; fileRef = 720767D21E2EE9C200F9A850 /* SUTouchBarForwardDeclarations.h */; };
 		720AC2A42618E85700E25A3E /* SPUInstallationInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5B51D3D8AEE00D1BF90 /* SPUInstallationInfo.m */; };
 		720AC2C92618E89500E25A3E /* SUAppcastItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 61B5FC5409C5182000B25A18 /* SUAppcastItem.m */; };
 		720AC2DC2618E8A500E25A3E /* SPUSecureCoding.m in Sources */ = {isa = PBXBuildFile; fileRef = 726E075B1CA3A6D6001A286B /* SPUSecureCoding.m */; };
@@ -970,7 +969,6 @@
 		7205C46E1E13254500E370AE /* ConfigUITestDebug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigUITestDebug.xcconfig; sourceTree = "<group>"; };
 		7205C46F1E13255900E370AE /* ConfigUITestRelease.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigUITestRelease.xcconfig; sourceTree = "<group>"; };
 		720767D11E2EB86200F9A850 /* AppKitPrevention.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppKitPrevention.h; sourceTree = "<group>"; };
-		720767D21E2EE9C200F9A850 /* SUTouchBarForwardDeclarations.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUTouchBarForwardDeclarations.h; sourceTree = "<group>"; };
 		720B16421C66433D006985FB /* UITests-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "UITests-Info.plist"; path = "UITests/UITests-Info.plist"; sourceTree = SOURCE_ROOT; };
 		720B16431C66433D006985FB /* SUTestApplicationTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SUTestApplicationTest.swift; path = UITests/SUTestApplicationTest.swift; sourceTree = SOURCE_ROOT; };
 		720B4C2325EBFAFD005A0592 /* link-tools.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "link-tools.sh"; sourceTree = "<group>"; };
@@ -1912,7 +1910,6 @@
 				723AC036259DBF1B00BDB4FA /* Web View */,
 				612DCBAD0D488BC60015DBEA /* SUUpdatePermissionPrompt.h */,
 				612DCBAE0D488BC60015DBEA /* SUUpdatePermissionPrompt.m */,
-				720767D21E2EE9C200F9A850 /* SUTouchBarForwardDeclarations.h */,
 				723C8A521E2D60DB00C14942 /* SUTouchBarButtonGroup.h */,
 				723C8A531E2D60DB00C14942 /* SUTouchBarButtonGroup.m */,
 				3772FEA813DE0B6B00F79537 /* SUVersionDisplayProtocol.h */,
@@ -2462,7 +2459,6 @@
 				61B5FC7009C51F4A00B25A18 /* SUAppcastItem.h in Headers */,
 				725602D51C83551C00DAA70E /* SUApplicationInfo.h in Headers */,
 				7214B8811D456A8500CB5CED /* SUBundleIcon.h in Headers */,
-				720767D31E2EE9C200F9A850 /* SUTouchBarForwardDeclarations.h in Headers */,
 				55E6F33319EC9F6C00005E76 /* SUErrors.h in Headers */,
 				14652F8419A978C200959E44 /* SUExport.h in Headers */,
 				7267E5E51D3D90AA00D1BF90 /* SUFileManager.h in Headers */,

@@ -26,7 +26,6 @@
 #import "SPUDownloadData.h"
 #import "SUApplicationInfo.h"
 #import "SPUUpdaterSettings.h"
-#import "SUTouchBarForwardDeclarations.h"
 #import "SUTouchBarButtonGroup.h"
 #import "SPUXPCServiceInfo.h"
 #import "SPUUserUpdateState.h"
@@ -153,14 +152,12 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 {
     [self adaptReleaseNotesAppearance];
 
-#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 101400
     if (@available(macOS 10.14, *)) {
         if (!self.observingAppearance) {
             [self.webView.view addObserver:self forKeyPath:@"effectiveAppearance" options:0 context:nil];
             self.observingAppearance = YES;
         }
     }
-#endif
     
     // Stick a nice big spinner in the middle of the web view until the page is loaded.
     NSRect frame = [[self.webView.view superview] frame];
@@ -187,29 +184,24 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(__attribute__((unused)) NSDictionary<NSKeyValueChangeKey,id> *)change context:(__attribute__((unused)) void *)context {
-#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 101400
     if (@available(macOS 10.14, *)) {
         if (object == self.webView.view && [keyPath isEqualToString:@"effectiveAppearance"]) {
             [self adaptReleaseNotesAppearance];
         }
     }
-#endif
 }
 
 - (void)dealloc {
-#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 101400
     if (@available(macOS 10.14, *)) {
         if (self.observingAppearance) {
             [self.webView.view removeObserver:self forKeyPath:@"effectiveAppearance"];
             self.observingAppearance = NO;
         }
     }
-#endif
 }
 
 - (void)adaptReleaseNotesAppearance
 {
-#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 101400
     if (@available(macOS 10.14, *))
     {
         NSAppearanceName bestAppearance = [self.webView.view.effectiveAppearance bestMatchFromAppearancesWithNames:@[NSAppearanceNameAqua, NSAppearanceNameDarkAqua]];
@@ -241,7 +233,6 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
             [self.webView setDrawsBackground:YES];
         }
     }
-#endif
 }
 
 - (void)showUpdateReleaseNotesWithDownloadData:(SPUDownloadData *)downloadData

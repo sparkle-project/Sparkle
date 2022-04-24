@@ -13,7 +13,6 @@
 #import "SUApplicationInfo.h"
 #import "SULocalizations.h"
 #import "SUOperatingSystem.h"
-#import "SUTouchBarForwardDeclarations.h"
 #import "SUTouchBarButtonGroup.h"
 
 static NSString *const SUStatusControllerTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDENTIFIER ".SUStatusController";
