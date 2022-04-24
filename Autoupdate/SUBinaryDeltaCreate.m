@@ -440,6 +440,16 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
         if (![key length]) {
             continue;
         }
+        
+        if ([key isEqualToString:CUSTOM_ICON_PATH]) {
+            if (verbose) {
+                fprintf(stderr, "\n");
+            }
+            if (error != NULL) {
+                *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Diffing bundles with a custom icon set via a resource fork is not supported. Detected presence of %@", @(ent->fts_path)] }];
+            }
+            return NO;
+        }
 
         NSDictionary *info = infoForFile(ent);
         if (!info) {
@@ -530,6 +540,16 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
         NSString *key = pathRelativeToDirectory(destination, stringWithFileSystemRepresentation(ent->fts_path));
         if (![key length]) {
             continue;
+        }
+        
+        if ([key isEqualToString:CUSTOM_ICON_PATH]) {
+            if (verbose) {
+                fprintf(stderr, "\n");
+            }
+            if (error != NULL) {
+                *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Diffing bundles with a custom icon set via a resource fork is not supported. Detected presence of %@", @(ent->fts_path)] }];
+            }
+            return NO;
         }
 
         NSDictionary *info = infoForFile(ent);

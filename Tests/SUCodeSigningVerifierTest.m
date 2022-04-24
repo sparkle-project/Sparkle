@@ -47,7 +47,6 @@
     [super setUp];
 
     NSBundle *unitTestBundle = [NSBundle bundleForClass:[self class]];
-    NSString *unitTestBundleIdentifier = unitTestBundle.bundleIdentifier;
     NSString *zippedAppURL = [unitTestBundle pathForResource:@"SparkleTestCodeSignApp" ofType:@"zip"];
 
     SUFileManager *fileManager = [[SUFileManager alloc] init];
