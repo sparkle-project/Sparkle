@@ -28,6 +28,10 @@
 #import "SPUAppcastItemStateResolver+Private.h"
 #import "SPUAppcastItemState.h"
 
+// For statfs()
+#include <sys/param.h>
+#include <sys/mount.h>
+
 
 #include "AppKitPrevention.h"
 
@@ -107,11 +111,11 @@
     [self.delegate didFailToFetchAppcastWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUDownloadError userInfo:userInfo]];
 }
 
-- (SUAppcastItem * _Nullable)preferredUpdateForRegularAppcastItem:(SUAppcastItem * _Nullable)regularItem secondaryUpdate:(SUAppcastItem * __autoreleasing _Nullable *)secondaryUpdate
+- (SUAppcastItem * _Nullable)preferredUpdateForRegularAppcastItem:(SUAppcastItem * _Nullable)regularItem secondaryUpdate:(SUAppcastItem * __autoreleasing _Nullable *)secondaryUpdate systemSupportsDeltaUpdates:(BOOL (^)(void))systemSupportsDeltaUpdates
 {
     SUAppcastItem *deltaItem = (regularItem != nil) ? [[self class] deltaUpdateFromAppcastItem:regularItem hostVersion:self.host.version] : nil;
     
-    if (deltaItem != nil) {
+    if (deltaItem != nil && systemSupportsDeltaUpdates()) {
         if (secondaryUpdate != NULL) {
             *secondaryUpdate = regularItem;
         }
@@ -124,7 +128,7 @@
     }
 }
 
-- (SUAppcastItem *)retrieveBestAppcastItemFromAppcast:(SUAppcast *)appcast versionComparator:(id<SUVersionComparison>)versionComparator secondaryUpdate:(SUAppcastItem * __autoreleasing _Nullable *)secondaryAppcastItem
+- (SUAppcastItem *)retrieveBestAppcastItemFromAppcast:(SUAppcast *)appcast versionComparator:(id<SUVersionComparison>)versionComparator secondaryUpdate:(SUAppcastItem * __autoreleasing _Nullable *)secondaryAppcastItem systemSupportsDeltaUpdates:(BOOL (^)(void))systemSupportsDeltaUpdates
 {
     // Find the best valid update in the appcast by asking the delegate
     // Don't ask the delegate if the appcast has no items though
@@ -168,7 +172,7 @@
     // Retrieve the preferred primary and secondary update items
     // In the case of a delta update, the preferred primary item will be the delta update,
     // and the secondary item will be the regular update.
-    return [self preferredUpdateForRegularAppcastItem:regularItem secondaryUpdate:secondaryAppcastItem];
+    return [self preferredUpdateForRegularAppcastItem:regularItem secondaryUpdate:secondaryAppcastItem systemSupportsDeltaUpdates:systemSupportsDeltaUpdates];
 }
 
 - (void)appcastDidFinishLoading:(SUAppcast *)loadedAppcast inBackground:(BOOL)background
@@ -205,8 +209,31 @@
     // downloaded and installed with less disturbance
     SUAppcast *passesMinimumAutoupdateAppcast = [[self class] filterSupportedAppcast:macOSAppcast phasedUpdateGroup:phasedUpdateGroup skippedUpdate:skippedUpdate currentDate:currentDate hostVersion:self.host.version versionComparator:applicationVersionComparator testOSVersion:YES testMinimumAutoupdateVersion:YES];
     
+    // Delta updates are not supported on fat32 and exfat systems
+    // This is because they do not preserve permissions at all, which we require
+    // We shouldn't download delta updates in cases where we can detect they aren't supported
+    __block NSNumber *systemSupportsDeltaUpdatesCachedResult = nil;
+    BOOL (^systemSupportsDeltaUpdates)(void) = ^{
+        if (systemSupportsDeltaUpdatesCachedResult != nil) {
+            return systemSupportsDeltaUpdatesCachedResult.boolValue;
+        }
+        
+        struct statfs volumeInfo = {0};
+        NSURL *hostBundleURL = self.host.bundle.bundleURL;
+        if (statfs(hostBundleURL.fileSystemRepresentation, &volumeInfo) == 0) {
+            if (strncmp("msdos", volumeInfo.f_fstypename, sizeof(volumeInfo.f_fstypename)) == 0 ||
+                strncmp("exfat", volumeInfo.f_fstypename, sizeof(volumeInfo.f_fstypename)) == 0) {
+                systemSupportsDeltaUpdatesCachedResult = @NO;
+                return NO;
+            }
+        }
+        
+        systemSupportsDeltaUpdatesCachedResult = @YES;
+        return YES;
+    };
+    
     SUAppcastItem *secondaryItemPassesMinimumAutoupdate = nil;
-    SUAppcastItem *primaryItemPassesMinimumAutoupdate = [self retrieveBestAppcastItemFromAppcast:passesMinimumAutoupdateAppcast versionComparator:applicationVersionComparator secondaryUpdate:&secondaryItemPassesMinimumAutoupdate];
+    SUAppcastItem *primaryItemPassesMinimumAutoupdate = [self retrieveBestAppcastItemFromAppcast:passesMinimumAutoupdateAppcast versionComparator:applicationVersionComparator secondaryUpdate:&secondaryItemPassesMinimumAutoupdate systemSupportsDeltaUpdates:systemSupportsDeltaUpdates];
     
     // If we weren't able to find a valid update, try to find an update that
     // doesn't pass the minimum autoupdate version
@@ -215,7 +242,7 @@
     if (![self isItemNewer:primaryItemPassesMinimumAutoupdate]) {
         SUAppcast *failsMinimumAutoupdateAppcast = [[self class] filterSupportedAppcast:macOSAppcast phasedUpdateGroup:phasedUpdateGroup skippedUpdate:skippedUpdate currentDate:currentDate hostVersion:self.host.version versionComparator:applicationVersionComparator testOSVersion:YES testMinimumAutoupdateVersion:NO];
         
-        finalPrimaryItem = [self retrieveBestAppcastItemFromAppcast:failsMinimumAutoupdateAppcast versionComparator:applicationVersionComparator secondaryUpdate:&finalSecondaryItem];
+        finalPrimaryItem = [self retrieveBestAppcastItemFromAppcast:failsMinimumAutoupdateAppcast versionComparator:applicationVersionComparator secondaryUpdate:&finalSecondaryItem systemSupportsDeltaUpdates:systemSupportsDeltaUpdates];
     } else {
         finalPrimaryItem = primaryItemPassesMinimumAutoupdate;
         finalSecondaryItem = secondaryItemPassesMinimumAutoupdate;
@@ -230,7 +257,7 @@
         // This excludes newer backgrounded updates that fail because they are skipped or not in current phased rollout group
         SUAppcast *notFoundAppcast = [[self class] filterSupportedAppcast:macOSAppcast phasedUpdateGroup:phasedUpdateGroup skippedUpdate:skippedUpdate currentDate:currentDate hostVersion:self.host.version versionComparator:applicationVersionComparator testOSVersion:NO testMinimumAutoupdateVersion:NO];
         
-        SUAppcastItem *notFoundPrimaryItem = [self retrieveBestAppcastItemFromAppcast:notFoundAppcast versionComparator:applicationVersionComparator secondaryUpdate:nil];
+        SUAppcastItem *notFoundPrimaryItem = [self retrieveBestAppcastItemFromAppcast:notFoundAppcast versionComparator:applicationVersionComparator secondaryUpdate:nil systemSupportsDeltaUpdates:systemSupportsDeltaUpdates];
         
         NSComparisonResult hostToLatestAppcastItemComparisonResult;
         if (notFoundPrimaryItem != nil) {
