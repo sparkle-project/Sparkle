@@ -8,12 +8,6 @@
 
 #import <Foundation/Foundation.h>
 
-#if __MAC_OS_X_VERSION_MAX_ALLOWED < 1090
-@interface NSData (SUSignatureVerifier)
-- (id)initWithBase64Encoding:(NSString *)base64String;
-@end
-#endif
-
 NS_ASSUME_NONNULL_BEGIN
 
 typedef NS_ENUM(uint8_t, SUSigningInputStatus) {

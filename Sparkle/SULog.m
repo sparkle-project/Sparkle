@@ -10,18 +10,7 @@
 
 #include <asl.h>
 #include <Availability.h>
-
-#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 101200
 #include <os/log.h>
-#else
-
-typedef struct os_log_s *os_log_t;
-#define os_log_create(subsystem, category) nil
-
-#define os_log(log, format, ...)
-#define os_log_error(log, format, ...)
-
-#endif
 
 #include "AppKitPrevention.h"
 #import "SUOperatingSystem.h"
@@ -45,10 +34,11 @@ void SULog(SULogLevel level, NSString *format, ...)
     dispatch_once(&onceToken, ^{
         NSBundle *mainBundle = [NSBundle mainBundle];
 
-        hasOSLogging = [SUOperatingSystem isOperatingSystemAtLeastVersion:(NSOperatingSystemVersion){10, 12, 0}];
-#if __MAC_OS_X_VERSION_MAX_ALLOWED < 101200
-        hasOSLogging = NO;
-#endif
+        if (@available(macOS 10.12, *)) {
+            hasOSLogging = YES;
+        } else {
+            hasOSLogging = NO;
+        }
 
         if (hasOSLogging) {
             const char *subsystem = SPARKLE_BUNDLE_IDENTIFIER;

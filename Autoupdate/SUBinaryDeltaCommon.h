@@ -31,6 +31,9 @@
 
 #define MAJOR_VERSION_IS_AT_LEAST(actualMajor, expectedMajor) (actualMajor >= expectedMajor)
 
+// Relative path of custom icon data that may be set on a bundle via a resource fork
+#define CUSTOM_ICON_PATH @"/Icon\r"
+
 // Changes that break backwards compatibility will have different major versions
 // Changes that affect creating but not applying patches will have different minor versions
 typedef NS_ENUM(uint16_t, SUBinaryDeltaMajorVersion)

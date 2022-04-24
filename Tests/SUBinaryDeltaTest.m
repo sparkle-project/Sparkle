@@ -1729,4 +1729,58 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
     XCTAssertFalse(success);
 }
 
+- (void)testCreatingPatchWithCustomIconInBeforeTree
+{
+    BOOL success = [self createAndApplyPatchWithBeforeDiffHandler:^(NSFileManager *__unused fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
+        NSString *sourceFile = [sourceDirectory stringByAppendingPathComponent:@"A"];
+        NSString *destinationFile = [destinationDirectory stringByAppendingPathComponent:@"A"];
+        
+        XCTAssertTrue([[NSData data] writeToFile:sourceFile atomically:YES]);
+        XCTAssertTrue([[NSData dataWithBytes:"loltest" length:7] writeToFile:destinationFile atomically:YES]);
+        
+        NSImage *iconImage = [NSImage imageNamed:NSImageNameAdvanced];
+        XCTAssertNotNil(iconImage);
+        
+        BOOL setIcon = [[NSWorkspace sharedWorkspace] setIcon:iconImage forFile:sourceDirectory options:0];
+        XCTAssertTrue(setIcon);
+    } afterDiffHandler:nil afterPatchHandler:nil];
+    XCTAssertFalse(success);
+}
+
+- (void)testCreatingPatchWithCustomIconInAfterTree
+{
+    BOOL success = [self createAndApplyPatchWithBeforeDiffHandler:^(NSFileManager *__unused fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
+        NSString *sourceFile = [sourceDirectory stringByAppendingPathComponent:@"A"];
+        NSString *destinationFile = [destinationDirectory stringByAppendingPathComponent:@"A"];
+        
+        XCTAssertTrue([[NSData data] writeToFile:sourceFile atomically:YES]);
+        XCTAssertTrue([[NSData dataWithBytes:"loltest" length:7] writeToFile:destinationFile atomically:YES]);
+        
+        NSImage *iconImage = [NSImage imageNamed:NSImageNameAdvanced];
+        XCTAssertNotNil(iconImage);
+        
+        BOOL setIcon = [[NSWorkspace sharedWorkspace] setIcon:iconImage forFile:destinationDirectory options:0];
+        XCTAssertTrue(setIcon);
+    } afterDiffHandler:nil afterPatchHandler:nil];
+    XCTAssertFalse(success);
+}
+
+- (void)testApplyingPatchAfterSettingCustomIcon
+{
+    BOOL success = [self createAndApplyPatchWithBeforeDiffHandler:^(NSFileManager *__unused fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
+        NSString *sourceFile = [sourceDirectory stringByAppendingPathComponent:@"A"];
+        NSString *destinationFile = [destinationDirectory stringByAppendingPathComponent:@"A"];
+        
+        XCTAssertTrue([[NSData data] writeToFile:sourceFile atomically:YES]);
+        XCTAssertTrue([[NSData dataWithBytes:"loltest" length:7] writeToFile:destinationFile atomically:YES]);
+    } afterDiffHandler:^(NSFileManager *__unused fileManager, NSString *sourceDirectory, NSString *__unused destinationDirectory) {
+        NSImage *iconImage = [NSImage imageNamed:NSImageNameAdvanced];
+        XCTAssertNotNil(iconImage);
+        
+        BOOL setIcon = [[NSWorkspace sharedWorkspace] setIcon:iconImage forFile:sourceDirectory options:0];
+        XCTAssertTrue(setIcon);
+    } afterPatchHandler:nil];
+    XCTAssertTrue(success);
+}
+
 @end

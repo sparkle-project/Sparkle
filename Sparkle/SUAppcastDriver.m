@@ -28,6 +28,10 @@
 #import "SPUAppcastItemStateResolver+Private.h"
 #import "SPUAppcastItemState.h"
 
+// For statfs()
+#include <sys/param.h>
+#include <sys/mount.h>
+
 
 #include "AppKitPrevention.h"
 
@@ -42,6 +46,9 @@
 @end
 
 @implementation SUAppcastDriver
+{
+    NSNumber * _Nullable _systemSupportsDeltaUpdates; // BOOL
+}
 
 @synthesize host = _host;
 @synthesize updater = _updater;
@@ -111,7 +118,27 @@
 {
     SUAppcastItem *deltaItem = (regularItem != nil) ? [[self class] deltaUpdateFromAppcastItem:regularItem hostVersion:self.host.version] : nil;
     
-    if (deltaItem != nil) {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdirect-ivar-access"
+    if (deltaItem != nil && _systemSupportsDeltaUpdates == nil) {
+        // Delta updates are not supported on fat32 and exfat systems
+        // This is because they do not preserve permissions at all, which we require
+        // We shouldn't download delta updates in cases where we can detect they aren't supported
+        struct statfs volumeInfo = {0};
+        NSURL *hostBundleURL = self.host.bundle.bundleURL;
+        if (statfs(hostBundleURL.fileSystemRepresentation, &volumeInfo) == 0) {
+            if (strncmp("msdos", volumeInfo.f_fstypename, sizeof(volumeInfo.f_fstypename)) == 0 ||
+                strncmp("exfat", volumeInfo.f_fstypename, sizeof(volumeInfo.f_fstypename)) == 0) {
+                _systemSupportsDeltaUpdates = @NO;
+            } else {
+                _systemSupportsDeltaUpdates = @YES;
+            }
+        } else {
+            _systemSupportsDeltaUpdates = @YES;
+        }
+    }
+    
+    if (deltaItem != nil && _systemSupportsDeltaUpdates.boolValue) {
         if (secondaryUpdate != NULL) {
             *secondaryUpdate = regularItem;
         }
@@ -122,6 +149,7 @@
         }
         return regularItem;
     }
+#pragma clang diagnostic pop
 }
 
 - (SUAppcastItem *)retrieveBestAppcastItemFromAppcast:(SUAppcast *)appcast versionComparator:(id<SUVersionComparison>)versionComparator secondaryUpdate:(SUAppcastItem * __autoreleasing _Nullable *)secondaryAppcastItem
