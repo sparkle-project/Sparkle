@@ -60,7 +60,7 @@
     
 #if SPARKLE_BUILD_UI_BITS
     // Detect as early as possible if the shift key is held down
-    BOOL shiftKeyHeldDown = ([NSEvent modifierFlags] & NSShiftKeyMask) != 0;
+    BOOL shiftKeyHeldDown = ([NSEvent modifierFlags] & NSEventModifierFlagShift) != 0;
 #endif
     
     // Apple's file manager may not work well over the network (on macOS 10.11.4 as of writing this), but at the same time

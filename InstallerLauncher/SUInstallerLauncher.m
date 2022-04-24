@@ -17,6 +17,7 @@
 #import "SUHost.h"
 #import <ImageIO/ImageIO.h>
 #import <ServiceManagement/ServiceManagement.h>
+#import <UniformTypeIdentifiers/UniformTypeIdentifiers.h>
 
 #include "AppKitPrevention.h"
 
@@ -207,7 +208,13 @@
                             NSString *path = [[NSString alloc] initWithUTF8String:pathBuffer];
                             tempIconDestinationURL = [NSURL fileURLWithPath:path];
                             
-                            CGImageDestinationRef imageDestination = CGImageDestinationCreateWithURL((CFURLRef)tempIconDestinationURL, kUTTypePNG, 1, NULL);
+                            CGImageDestinationRef imageDestination = NULL;
+                            if (@available(macOS 11, *)) {
+                                CFStringRef uti = (__bridge CFStringRef)[UTTypePNG identifier];
+                                imageDestination = CGImageDestinationCreateWithURL((CFURLRef)tempIconDestinationURL, uti, 1, NULL);
+                            } else {
+                                imageDestination = CGImageDestinationCreateWithURL((CFURLRef)tempIconDestinationURL, kUTTypePNG, 1, NULL);
+                            }
                             if (imageDestination != NULL) {
                                 CGImageDestinationAddImageFromSource(imageDestination, imageSource, imageIndex, (CFDictionaryRef)@{});
                                 if (CGImageDestinationFinalize(imageDestination)) {
