@@ -13,6 +13,7 @@
 #import "SPUInstallerDriver.h"
 #import "SPUDownloadDriver.h"
 #import "SULog.h"
+#import "SULog+NSError.h"
 #import "SUErrors.h"
 #import "SPUResumableUpdate.h"
 #import "SPUDownloadedUpdate.h"
@@ -247,18 +248,25 @@
 
 - (void)downloadDriverDidFailToDownloadFileWithError:(NSError *)error
 {
-    if ([self.updaterDelegate respondsToSelector:@selector((updater:failedToDownloadUpdate:error:))]) {
-        NSError *errorToReport = [error.userInfo objectForKey:NSUnderlyingErrorKey];
-        if (errorToReport == nil) {
-            errorToReport = error;
+    if ([self.updateItem isDeltaUpdate]) {
+        SULog(SULogLevelError, @"Failed to download delta update. Falling back to regular update...");
+        SULogError(error);
+        
+        [self fallBackAndDownloadRegularUpdate];
+    } else {
+        if ([self.updaterDelegate respondsToSelector:@selector((updater:failedToDownloadUpdate:error:))]) {
+            NSError *errorToReport = [error.userInfo objectForKey:NSUnderlyingErrorKey];
+            if (errorToReport == nil) {
+                errorToReport = error;
+            }
+            
+            [self.updaterDelegate updater:self.updater
+                               failedToDownloadUpdate:self.updateItem
+                                                error:errorToReport];
         }
         
-        [self.updaterDelegate updater:self.updater
-                           failedToDownloadUpdate:self.updateItem
-                                            error:errorToReport];
+        [self.delegate coreDriverIsRequestingAbortUpdateWithError:error];
     }
-    
-    [self.delegate coreDriverIsRequestingAbortUpdateWithError:error];
 }
 
 - (void)installerDidStartInstallingWithApplicationTerminated:(BOOL)applicationTerminated
@@ -335,20 +343,25 @@
     [self.delegate basicDriverIsRequestingAbortUpdateWithError:error];
 }
 
-- (void)installerDidFailToApplyDeltaUpdate
+- (void)fallBackAndDownloadRegularUpdate
 {
     SUAppcastItem *secondaryUpdateItem = self.secondaryUpdateItem;
     assert(secondaryUpdateItem != nil);
     
     BOOL backgroundDownload = self.downloadDriver.inBackground;
     
-    [self clearDownloadedUpdate];
-    
     // Fall back to the non-delta update. Note that we don't want to trigger another update was found event.
     self.updateItem = secondaryUpdateItem;
     self.secondaryUpdateItem = nil;
     
     [self downloadUpdateFromAppcastItem:secondaryUpdateItem secondaryAppcastItem:nil inBackground:backgroundDownload];
+}
+
+- (void)installerDidFailToApplyDeltaUpdate
+{
+    [self clearDownloadedUpdate];
+    
+    [self fallBackAndDownloadRegularUpdate];
 }
 
 - (void)abortUpdateAndShowNextUpdateImmediately:(BOOL)shouldShowUpdateImmediately error:(nullable NSError *)error
