@@ -54,5 +54,11 @@
         <sparkle:version>6.0</sparkle:version>
         <enclosure url="http://localhost:1337/Sparkle_Test_App.zip" length="1346234" sparkle:os="windows" />
     </item>
+    <!-- An invalid release with top level delta item -->
+    <item>
+        <title>Version 7.0</title>
+        <sparkle:version>7.0</sparkle:version>
+        <enclosure url="http://localhost:1337/Sparkle_Test_App.zip" length="1346234" sparkle:deltaFrom="5.0" sparkle:edSignature="..." />
+    </item>
   </channel>
 </rss>

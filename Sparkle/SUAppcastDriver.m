@@ -168,7 +168,6 @@
             regularItemFromDelegate = nil;
             delegateOptedOutOfSelection = NO;
         } else {
-            assert(!candidateItem.deltaUpdate);
             if (candidateItem.deltaUpdate) {
                 // Client would have to go out of their way to examine the .deltaUpdates to return one
                 // We need them to give us a regular update item back instead..
@@ -278,6 +277,12 @@
         // We will never care about other OS's
         BOOL macOSUpdate = [item isMacOsUpdate];
         if (!macOSUpdate) {
+            return NO;
+        }
+        
+        // Delta updates cannot be top-level entries
+        BOOL isDeltaUpdate = [item isDeltaUpdate];
+        if (isDeltaUpdate) {
             return NO;
         }
         

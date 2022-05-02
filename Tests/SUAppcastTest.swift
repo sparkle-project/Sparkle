@@ -91,7 +91,7 @@ class SUAppcastTest: XCTestCase {
             let stateResolver = SPUAppcastItemStateResolver(hostVersion: hostVersion, applicationVersionComparator: versionComparator, standardVersionComparator: versionComparator)
             
             let appcast = try SUAppcast(xmlData: testData, relativeTo: nil, stateResolver: stateResolver)
-            XCTAssertEqual(5, appcast.items.count)
+            XCTAssertEqual(6, appcast.items.count)
             
             do {
                 let filteredAppcast = SUAppcastDriver.filterAppcast(appcast, forMacOSAndAllowedChannels: ["beta", "nightly"])
