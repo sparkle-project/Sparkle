@@ -150,7 +150,7 @@ typedef NS_ENUM(int, CLIErrorExitStatus) {
             }
             
             if (error != NULL) {
-                *error = [NSError errorWithDomain:SPARKLE_CLI_ERROR_DOMAIN code:CLIErrorCodeCannotPerformCheck userInfo:@{ NSLocalizedDescriptionKey: @"A new update check cannot be performed because updating this bundle will require user authorization. Please use --interactive to allow this." }];
+                *error = [NSError errorWithDomain:SPARKLE_CLI_ERROR_DOMAIN code:CLIErrorCodeCannotPerformCheck userInfo:@{ NSLocalizedDescriptionKey: @"A new update check cannot be performed because updating this bundle will require user authorization. Please use --interactive or run as root to allow this." }];
             }
             
             return NO;
@@ -171,6 +171,14 @@ typedef NS_ENUM(int, CLIErrorExitStatus) {
     if (updateItem.majorUpgrade && !self.allowMajorUpgrades) {
         if (error != NULL) {
             *error = [NSError errorWithDomain:SPARKLE_CLI_ERROR_DOMAIN code:CLIErrorCodeCannotInstallMajorUpgrade userInfo:@{ NSLocalizedDescriptionKey: @"Major upgrade available but not allowed to install it. Pass --allow-major-upgrades to allow this." }];
+        }
+        
+        return NO;
+    }
+    
+    if (geteuid() == 0 && [updateItem.installationType isEqualToString:SPUInstallationTypeInteractivePackage]) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:SPARKLE_CLI_ERROR_DOMAIN code:CLIErrorCodeCannotInstallPackage userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"A new interactive based package-based update has been found (%@), but installing interactive package-based updates under root is not supported. Please use --interactive under the normal user to install this.", updateItem.versionString] }];
         }
         
         return NO;

@@ -55,8 +55,8 @@ int main(int argc, char **argv)
 {
     @autoreleasepool
     {
-        if (geteuid() == 0) {
-            fprintf(stderr, "Error: Running as root is not supported\n");
+        if (geteuid() == 0 && [@(getenv("USER")) isEqualToString:@"root"]) {
+            fprintf(stderr, "Error: Running as root with $USER set to 'root' is not supported. If you want to run sparkle-cli as root, please specify $USER as the user name the app may run in.\n");
             return EXIT_FAILURE;
         }
         
