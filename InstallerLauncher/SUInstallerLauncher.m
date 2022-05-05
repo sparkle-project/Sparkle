@@ -105,7 +105,7 @@
     return (submittedJob == true);
 }
 
-- (SUInstallerLauncherStatus)submitInstallerAtPath:(NSString *)installerPath withHostBundle:(NSBundle *)hostBundle updaterIdentifier:(NSString *)updaterIdentifier userName:(NSString *)userName homeDirectory:(NSString *)homeDirectory authorizationPrompt:(NSString *)authorizationPrompt inSystemDomain:(BOOL)systemDomain
+- (SUInstallerLauncherStatus)submitInstallerAtPath:(NSString *)installerPath withHostBundle:(NSBundle *)hostBundle updaterIdentifier:(NSString *)updaterIdentifier userName:(NSString *)userName homeDirectory:(NSString *)homeDirectory authorizationPrompt:(NSString *)authorizationPrompt inSystemDomain:(BOOL)systemDomain rootUser:(BOOL)rootUser
 {
     SUFileManager *fileManager = [[SUFileManager alloc] init];
     
@@ -132,7 +132,7 @@
     
     BOOL canceledAuthorization = NO;
     BOOL failedToUseSystemDomain = NO;
-    if (auth != NULL && systemDomain && geteuid() != 0) {
+    if (auth != NULL && systemDomain && !rootUser) {
         // See Apple's 'EvenBetterAuthorizationSample' sample code and
         // https://developer.apple.com/library/mac/technotes/tn2095/_index.html#//apple_ref/doc/uid/DTS10003110-CH1-SECTION7
         // We can set a custom right name for authenticating as an administrator
@@ -384,7 +384,11 @@ static BOOL SPUSystemNeedsAuthorizationAccess(NSString *path, NSString *installa
 - (void)launchInstallerWithHostBundlePath:(NSString *)hostBundlePath updaterIdentifier:(NSString *)updaterIdentifier authorizationPrompt:(NSString *)authorizationPrompt installationType:(NSString *)installationType allowingDriverInteraction:(BOOL)allowingDriverInteraction completion:(void (^)(SUInstallerLauncherStatus, BOOL))completionHandler
 {
     dispatch_async(dispatch_get_main_queue(), ^{
+        // We could do a sort of preflight Authorization test instead of testing if we are running as root,
+        // but I think this is not necessarily a better approach. We have to chown() the launcher cache directory later on,
+        // and that is not necessarily related to a preflight test. It's more related to being ran under a root / different user from the active GUI session
         BOOL rootUser = (geteuid() == 0);
+        
         BOOL needsSystemAuthorization = SPUSystemNeedsAuthorizationAccess(hostBundlePath, installationType);
         BOOL inSystemDomain = (needsSystemAuthorization || rootUser);
         
@@ -504,7 +508,7 @@ static BOOL SPUSystemNeedsAuthorizationAccess(NSString *path, NSString *installa
             return;
         }
         
-        SUInstallerLauncherStatus installerStatus = [self submitInstallerAtPath:installerPath withHostBundle:hostBundle updaterIdentifier:updaterIdentifier userName:userName homeDirectory:homeDirectory authorizationPrompt:authorizationPrompt inSystemDomain:inSystemDomain];
+        SUInstallerLauncherStatus installerStatus = [self submitInstallerAtPath:installerPath withHostBundle:hostBundle updaterIdentifier:updaterIdentifier userName:userName homeDirectory:homeDirectory authorizationPrompt:authorizationPrompt inSystemDomain:inSystemDomain rootUser:rootUser];
         
         BOOL submittedProgressTool = NO;
         if (installerStatus == SUInstallerLauncherSuccess) {
