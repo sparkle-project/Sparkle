@@ -65,8 +65,12 @@
 - (void)displayHTMLReleaseNotes:(NSData *)releaseNotes
 {
     // Note: this is the only API we rely on here that references AppKit
-    NSAttributedString *attributedString = [[NSAttributedString alloc] initWithHTML:releaseNotes documentAttributes:nil];
-    [self displayReleaseNotes:attributedString.string.UTF8String];
+    // We shouldn't invoke it when the calling process is ran under root.
+    // If only there was an API to translated HTML -> text that didn't rely on AppKit..
+    if (geteuid() != 0) {
+        NSAttributedString *attributedString = [[NSAttributedString alloc] initWithHTML:releaseNotes documentAttributes:nil];
+        [self displayReleaseNotes:attributedString.string.UTF8String];
+    }
 }
 
 - (void)displayPlainTextReleaseNotes:(NSData *)releaseNotes encoding:(NSStringEncoding)encoding
