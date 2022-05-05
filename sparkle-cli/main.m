@@ -33,7 +33,7 @@ static void printUsage(char **argv)
     fprintf(stderr, "  To check if an update is available without installing, use --%s.\n\n", PROBE_FLAG);
     fprintf(stderr, "  if no updates are available now, or if the last update check was recently\n  (unless --%s is specified) then nothing is done.\n\n", CHECK_NOW_FLAG);
     fprintf(stderr, "  If update permission is requested and --%s is not\n  specified, then checking for updates is aborted.\n\n", GRANT_AUTOMATIC_CHECKING_FLAG);
-    fprintf(stderr, "  Unless --%s is specified, this tool will not request for escalated\n  authorization. Running as root is not supported.\n\n", INTERACTIVE_FLAG);
+    fprintf(stderr, "  Unless --%s is specified, this tool will not request for escalated\n  authorization.\n\n", INTERACTIVE_FLAG);
     fprintf(stderr, "  If --%s is specified, this tool will exit leaving a spawned process\n  for finishing the installation after the target application terminates.\n\n", DEFER_FLAG);
     fprintf(stderr, "  Please specify --%s if you intend to use this tool in an automated way.\n", USER_AGENT_NAME);
     fprintf(stderr, "Options:\n");
@@ -55,11 +55,6 @@ int main(int argc, char **argv)
 {
     @autoreleasepool
     {
-        if (geteuid() == 0 && [@(getenv("USER")) isEqualToString:@"root"]) {
-            fprintf(stderr, "Error: Running as root with $USER set to 'root' is not supported. If you want to run sparkle-cli as root, please specify $USER as the user name the app may run in.\n");
-            return EXIT_FAILURE;
-        }
-        
         struct option longOptions[] = {
             {APPLICATION_FLAG, required_argument, NULL, 0},
             {CHANNELS_FLAG, required_argument, NULL, 0},

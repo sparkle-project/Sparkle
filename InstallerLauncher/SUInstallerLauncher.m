@@ -18,6 +18,8 @@
 #import <ImageIO/ImageIO.h>
 #import <ServiceManagement/ServiceManagement.h>
 #import <UniformTypeIdentifiers/UniformTypeIdentifiers.h>
+#import <SystemConfiguration/SystemConfiguration.h>
+
 
 #include "AppKitPrevention.h"
 
@@ -71,6 +73,8 @@
             }
         }
         
+        // If we are running as the root user, there is no need to explicitly set the UserName / GroupName keys
+        // because we are submitting under the user domain, which should automatically use the the console user.
         NSMutableDictionary *jobDictionary = [[NSMutableDictionary alloc] init];
         jobDictionary[@"Label"] = label;
         jobDictionary[@"ProgramArguments"] = arguments;
@@ -80,12 +84,6 @@
         jobDictionary[@"NICE"] = @0;
         jobDictionary[@"LaunchOnlyOnce"] = @YES;
         jobDictionary[@"MachServices"] = @{SPUStatusInfoServiceNameForBundleIdentifier(hostBundleIdentifier) : @YES};
-        
-        if (geteuid() == 0) {
-            jobDictionary[@"UserName"] = @(getenv("USER"));
-            // TODO: should this be hardcoded to staff or we fetch the group somehow..?
-            jobDictionary[@"GroupName"] = @"staff";
-        }
         
         CFErrorRef submitError = NULL;
 #pragma clang diagnostic push
@@ -107,7 +105,7 @@
     return (submittedJob == true);
 }
 
-- (SUInstallerLauncherStatus)submitInstallerAtPath:(NSString *)installerPath withHostBundle:(NSBundle *)hostBundle updaterIdentifier:(NSString *)updaterIdentifier authorizationPrompt:(NSString *)authorizationPrompt inSystemDomain:(BOOL)systemDomain
+- (SUInstallerLauncherStatus)submitInstallerAtPath:(NSString *)installerPath withHostBundle:(NSBundle *)hostBundle updaterIdentifier:(NSString *)updaterIdentifier userName:(NSString *)userName homeDirectory:(NSString *)homeDirectory authorizationPrompt:(NSString *)authorizationPrompt inSystemDomain:(BOOL)systemDomain
 {
     SUFileManager *fileManager = [[SUFileManager alloc] init];
     
@@ -116,14 +114,6 @@
     
     NSString *hostBundleIdentifier = hostBundle.bundleIdentifier;
     assert(hostBundleIdentifier != nil);
-    
-    // TODO: this may be wrong if framework is run as root (only matters for pkg installations with custom scripts)
-    NSString *homeDirectory = NSHomeDirectory();
-    assert(homeDirectory != nil);
-    
-    // TODO: this may be wrong if framework is run as root (only matters for pkg installations with custom scripts)
-    NSString *userName = NSUserName();
-    assert(userName != nil);
     
     // The first argument has to be the path to the program, and the second is a host identifier so that the installer knows what mach services to host
     // The third and forth arguments are for home directory and user name which only pkg installer scripts may need
@@ -394,8 +384,16 @@ static BOOL SPUSystemNeedsAuthorizationAccess(NSString *path, NSString *installa
 - (void)launchInstallerWithHostBundlePath:(NSString *)hostBundlePath updaterIdentifier:(NSString *)updaterIdentifier authorizationPrompt:(NSString *)authorizationPrompt installationType:(NSString *)installationType allowingDriverInteraction:(BOOL)allowingDriverInteraction completion:(void (^)(SUInstallerLauncherStatus, BOOL))completionHandler
 {
     dispatch_async(dispatch_get_main_queue(), ^{
+        BOOL rootUser = (geteuid() == 0);
         BOOL needsSystemAuthorization = SPUSystemNeedsAuthorizationAccess(hostBundlePath, installationType);
-        BOOL inSystemDomain = (needsSystemAuthorization || geteuid() == 0);
+        BOOL inSystemDomain = (needsSystemAuthorization || rootUser);
+        
+        // As the root user (not normal path), we don't support installing interactive pkg's
+        if (rootUser && [installationType isEqualToString:SPUInstallationTypeInteractivePackage]) {
+            SULog(SULogLevelError, @"Installing interactive packages is not supported under the root user.");
+            completionHandler(SUInstallerLauncherFailure, inSystemDomain);
+            return;
+        }
         
         NSBundle *hostBundle = [NSBundle bundleWithPath:hostBundlePath];
         if (hostBundle == nil) {
@@ -454,14 +452,43 @@ static BOOL SPUSystemNeedsAuthorizationAccess(NSString *path, NSString *installa
         
         SUFileManager *fileManager = [[SUFileManager alloc] init];
         
-        if (geteuid() == 0) {
-            NSError *changeGroupError = NULL;
-            // TODO: this is not really correct
-            // The intent is that we need to chown()/chgrp() the cache directory to so it matches the normal $USER..
-            // This allows the updater app to be able to own the app and clean up the cache directory and itself
-            // For now assume the progress tool (Updater.app) is owned by the normal user, and not root.
-            if (![fileManager changeOwnerAndGroupOfItemAtRootURL:[NSURL fileURLWithPath:launcherCachePath] toMatchURL:[NSURL fileURLWithPath:progressToolResourcePath] error:&changeGroupError]) {
-                SULog(SULogLevelError, @"Failed to change owner and group for launcher cache directory: %@", changeGroupError);
+        NSString *userName;
+        NSString *homeDirectory;
+        if (!rootUser) {
+            // Normal path
+            homeDirectory = NSHomeDirectory();
+            assert(homeDirectory != nil);
+            
+            userName = NSUserName();
+            assert(userName != nil);
+        } else {
+            // As the root user we need to obtain the user name and home directory reflecting
+            // the user's console session.
+            
+            uid_t uid = 0;
+            gid_t gid = 0;
+            CFStringRef userNameRef = SCDynamicStoreCopyConsoleUser(NULL, &uid, &gid);
+            if (userNameRef == NULL) {
+                SULog(SULogLevelError, @"Failed to retrieve user name from the console user");
+                completionHandler(SUInstallerLauncherFailure, inSystemDomain);
+                return;
+            }
+            
+            userName = (NSString *)CFBridgingRelease(userNameRef);
+            homeDirectory = NSHomeDirectoryForUser(userName);
+            if (homeDirectory == nil) {
+                SULog(SULogLevelError, @"Failed to retrieve home directory for user: %@", userName);
+                
+                completionHandler(SUInstallerLauncherFailure, inSystemDomain);
+                return;
+            }
+            
+            // Ensure the console user has ownership of the launcher cache directory
+            // Otherwise the updater may not launch and not be able to clean up itself
+            NSError *changeOwnerAndGroupError = nil;
+            if (![fileManager changeOwnerAndGroupOfItemAtURL:[NSURL fileURLWithPath:launcherCachePath] ownerID:uid groupID:gid error:&changeOwnerAndGroupError]) {
+                SULog(SULogLevelError, @"Failed to change owner and group for launcher cache directory: %@", changeOwnerAndGroupError);
+                
                 completionHandler(SUInstallerLauncherFailure, inSystemDomain);
                 return;
             }
@@ -477,7 +504,7 @@ static BOOL SPUSystemNeedsAuthorizationAccess(NSString *path, NSString *installa
             return;
         }
         
-        SUInstallerLauncherStatus installerStatus = [self submitInstallerAtPath:installerPath withHostBundle:hostBundle updaterIdentifier:updaterIdentifier authorizationPrompt:authorizationPrompt inSystemDomain:inSystemDomain];
+        SUInstallerLauncherStatus installerStatus = [self submitInstallerAtPath:installerPath withHostBundle:hostBundle updaterIdentifier:updaterIdentifier userName:userName homeDirectory:homeDirectory authorizationPrompt:authorizationPrompt inSystemDomain:inSystemDomain];
         
         BOOL submittedProgressTool = NO;
         if (installerStatus == SUInstallerLauncherSuccess) {
