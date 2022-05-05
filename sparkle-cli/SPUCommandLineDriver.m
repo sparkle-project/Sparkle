@@ -17,7 +17,8 @@
 typedef NS_ENUM(NSInteger, CLIErrorCode) {
     CLIErrorCodeCannotPerformCheck = 1,
     CLIErrorCodeCannotInstallPackage,
-    CLIErrorCodeCannotInstallMajorUpgrade
+    CLIErrorCodeCannotInstallMajorUpgrade,
+    CLIErrorCodeCannotInstallInteractivePackageAsRoot
 };
 
 typedef NS_ENUM(int, CLIErrorExitStatus) {
@@ -176,12 +177,25 @@ typedef NS_ENUM(int, CLIErrorExitStatus) {
         return NO;
     }
     
-    if (!self.interactive && ![updateItem.installationType isEqualToString:SPUInstallationTypeApplication]) {
-        if (error != NULL) {
-            *error = [NSError errorWithDomain:SPARKLE_CLI_ERROR_DOMAIN code:CLIErrorCodeCannotInstallPackage userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"A new package-based update has been found (%@), but installing it will require user authorization. Please use --interactive to allow this.", updateItem.versionString] }];
+    if (!self.interactive) {
+        BOOL rootUser = (geteuid() == 0);
+        if (!rootUser) {
+            if (![updateItem.installationType isEqualToString:SPUInstallationTypeApplication]) {
+                // Any package based updates will require authorization and therefore interaction
+                if (error != NULL) {
+                    *error = [NSError errorWithDomain:SPARKLE_CLI_ERROR_DOMAIN code:CLIErrorCodeCannotInstallPackage userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"A new package-based update has been found (%@), but installing it will require user authorization. Please use --interactive to allow this.", updateItem.versionString] }];
+                }
+                return NO;
+            }
+        } else {
+            if ([updateItem.installationType isEqualToString:SPUInstallationTypeInteractivePackage]) {
+                // If we are root, only interactive package installs require interaction
+                if (error != NULL) {
+                    *error = [NSError errorWithDomain:SPARKLE_CLI_ERROR_DOMAIN code:CLIErrorCodeCannotInstallInteractivePackageAsRoot userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"A new interactive based package-based update has been found (%@), but installing it will require user interaction. Please use --interactive to allow this.", updateItem.versionString] }];
+                }
+                return NO;
+            }
         }
-        
-        return NO;
     }
     
     return YES;
