@@ -390,14 +390,10 @@ static BOOL SPUSystemNeedsAuthorizationAccess(NSString *path, NSString *installa
         BOOL rootUser = (geteuid() == 0);
         
         BOOL needsSystemAuthorization = SPUSystemNeedsAuthorizationAccess(hostBundlePath, installationType);
-        BOOL inSystemDomain = (needsSystemAuthorization || rootUser);
         
-        // As the root user (not normal path), we don't support installing interactive pkg's
-        if (rootUser && [installationType isEqualToString:SPUInstallationTypeInteractivePackage]) {
-            SULog(SULogLevelError, @"Installing interactive packages is not supported under the root user.");
-            completionHandler(SUInstallerLauncherFailure, inSystemDomain);
-            return;
-        }
+        // If we are the root user we use the system domain even if we don't need escalated authorization
+        // Unless we are dealing with an interactive pkg (I can't wait to drop support for these)
+        BOOL inSystemDomain = (needsSystemAuthorization || (rootUser && ![installationType isEqualToString:SPUInstallationTypeInteractivePackage]));
         
         NSBundle *hostBundle = [NSBundle bundleWithPath:hostBundlePath];
         if (hostBundle == nil) {
