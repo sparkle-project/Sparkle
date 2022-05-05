@@ -366,19 +366,22 @@ BOOL SPUSystemNeedsAuthorizationAccessForBundlePath(NSString *bundlePath)
     return needsAuthorization;
 }
 
-static BOOL SPUSystemNeedsAuthorizationAccess(NSString *path, NSString *installationType)
+static BOOL SPUUsesSystemDomainForBundlePath(NSString *path, NSString *installationType, BOOL rootUser)
 {
-    BOOL needsAuthorization;
-    if ([installationType isEqualToString:SPUInstallationTypeGuidedPackage]) {
-        needsAuthorization = YES;
-    } else if ([installationType isEqualToString:SPUInstallationTypeInteractivePackage]) {
-        needsAuthorization = NO;
+    if (!rootUser) {
+        if ([installationType isEqualToString:SPUInstallationTypeGuidedPackage]) {
+            return YES;
+        } else if ([installationType isEqualToString:SPUInstallationTypeInteractivePackage]) {
+            return NO;
+        } else {
+            return SPUSystemNeedsAuthorizationAccessForBundlePath(path);
+        }
     } else {
-        needsAuthorization = SPUSystemNeedsAuthorizationAccessForBundlePath(path);
+        // If we are the root user we use the system domain even if we don't need escalated authorization
+        // Unless we are dealing with an interactive pkg (I can't wait to drop support for these)
+        return ![installationType isEqualToString:SPUInstallationTypeInteractivePackage];
     }
-    return needsAuthorization;
 }
-
 
 // Note: do not pass untrusted information such as paths to the installer and progress agent tools, when we can find them ourselves here
 - (void)launchInstallerWithHostBundlePath:(NSString *)hostBundlePath updaterIdentifier:(NSString *)updaterIdentifier authorizationPrompt:(NSString *)authorizationPrompt installationType:(NSString *)installationType allowingDriverInteraction:(BOOL)allowingDriverInteraction completion:(void (^)(SUInstallerLauncherStatus, BOOL))completionHandler
@@ -389,11 +392,7 @@ static BOOL SPUSystemNeedsAuthorizationAccess(NSString *path, NSString *installa
         // and that is not necessarily related to a preflight test. It's more related to being ran under a root / different user from the active GUI session
         BOOL rootUser = (geteuid() == 0);
         
-        BOOL needsSystemAuthorization = SPUSystemNeedsAuthorizationAccess(hostBundlePath, installationType);
-        
-        // If we are the root user we use the system domain even if we don't need escalated authorization
-        // Unless we are dealing with an interactive pkg (I can't wait to drop support for these)
-        BOOL inSystemDomain = (needsSystemAuthorization || (rootUser && ![installationType isEqualToString:SPUInstallationTypeInteractivePackage]));
+        BOOL inSystemDomain = SPUUsesSystemDomainForBundlePath(hostBundlePath, installationType, rootUser);
         
         NSBundle *hostBundle = [NSBundle bundleWithPath:hostBundlePath];
         if (hostBundle == nil) {
@@ -404,8 +403,8 @@ static BOOL SPUSystemNeedsAuthorizationAccess(NSString *path, NSString *installa
             return;
         }
         
-        // if we need to use the system authorization and we aren't allowed interaction, then try sometime later when interaction is allowed
-        if (needsSystemAuthorization && !allowingDriverInteraction) {
+        // if we need to use the system authorization from non-root and we aren't allowed interaction, then try sometime later when interaction is allowed
+        if (inSystemDomain && !rootUser && !allowingDriverInteraction) {
             completionHandler(SUInstallerLauncherAuthorizeLater, inSystemDomain);
             return;
         }
