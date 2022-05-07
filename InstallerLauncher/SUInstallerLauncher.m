@@ -377,9 +377,9 @@ static BOOL SPUUsesSystemDomainForBundlePath(NSString *path, NSString *installat
             return SPUSystemNeedsAuthorizationAccessForBundlePath(path);
         }
     } else {
-        // If we are the root user we use the system domain even if we don't need escalated authorization
-        // Unless we are dealing with an interactive pkg (I can't wait to drop support for these)
-        return ![installationType isEqualToString:SPUInstallationTypeInteractivePackage];
+        // If we are the root user we use the system domain even if we don't need escalated authorization.
+        // Note interactive package installations are not supported as root.
+        return YES;
     }
 }
 

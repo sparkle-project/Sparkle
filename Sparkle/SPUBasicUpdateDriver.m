@@ -18,6 +18,7 @@
 #import "SPUResumableUpdate.h"
 #import "SPUAppcastItemState.h"
 #import "SUAppcastItem+Private.h"
+#import "SPUInstallationType.h"
 
 
 #include "AppKitPrevention.h"
@@ -139,21 +140,31 @@
 - (void)notifyFoundValidUpdateWithAppcastItem:(SUAppcastItem *)updateItem secondaryAppcastItem:(SUAppcastItem * _Nullable)secondaryUpdateItem systemDomain:(NSNumber * _Nullable)systemDomain resuming:(BOOL)resuming
 {
     if (!self.aborted) {
-        // If the update is not being resumed from a prior session, give the delegate a chance to bail
-        NSError *shouldNotProceedError = nil;
-        if (!resuming && [self.updaterDelegate respondsToSelector:@selector(updater:shouldProceedWithUpdate:updateCheck:error:)] && ![self.updaterDelegate updater:self.updater shouldProceedWithUpdate:updateItem updateCheck:self.updateCheck error:&shouldNotProceedError]) {
-            [self.delegate basicDriverIsRequestingAbortUpdateWithError:shouldNotProceedError];
-        } else {
-            [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidFindValidUpdateNotification
-                                                                object:self.updater
-                                                              userInfo:@{ SUUpdaterAppcastItemNotificationKey: updateItem }];
-            
-            if ([self.updaterDelegate respondsToSelector:@selector((updater:didFindValidUpdate:))]) {
-                [self.updaterDelegate updater:self.updater didFindValidUpdate:updateItem];
+        if (!resuming) {
+            // interactive pkg based updates are not supported under root user
+            if ([updateItem.installationType isEqualToString:SPUInstallationTypeInteractivePackage] && geteuid() == 0) {
+                [self.delegate basicDriverIsRequestingAbortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey: SULocalizedString(@"Interactive based packages cannot be installed as the root user.", nil) }]];
+                return;
+            } else {
+                // Give the delegate a chance to bail
+                
+                NSError *shouldNotProceedError = nil;
+                if ([self.updaterDelegate respondsToSelector:@selector(updater:shouldProceedWithUpdate:updateCheck:error:)] && ![self.updaterDelegate updater:self.updater shouldProceedWithUpdate:updateItem updateCheck:self.updateCheck error:&shouldNotProceedError]) {
+                    [self.delegate basicDriverIsRequestingAbortUpdateWithError:shouldNotProceedError];
+                    return;
+                }
             }
-            
-            [self.delegate basicDriverDidFindUpdateWithAppcastItem:updateItem secondaryAppcastItem:secondaryUpdateItem systemDomain:systemDomain];
         }
+        
+        [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidFindValidUpdateNotification
+                                                            object:self.updater
+                                                          userInfo:@{ SUUpdaterAppcastItemNotificationKey: updateItem }];
+        
+        if ([self.updaterDelegate respondsToSelector:@selector((updater:didFindValidUpdate:))]) {
+            [self.updaterDelegate updater:self.updater didFindValidUpdate:updateItem];
+        }
+        
+        [self.delegate basicDriverDidFindUpdateWithAppcastItem:updateItem secondaryAppcastItem:secondaryUpdateItem systemDomain:systemDomain];
     }
 }
 
