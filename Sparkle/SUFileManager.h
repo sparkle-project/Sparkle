@@ -109,6 +109,18 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)changeOwnerAndGroupOfItemAtRootURL:(NSURL *)targetURL toMatchURL:(NSURL *)matchURL error:(NSError **)error;
 
 /**
+ Changes the owner and group ID of an item at a specified target URL
+ @param targetURL A URL pointing to the target item whose owner and group IDs to alter. The item at this URL must exist.
+ @param ownerID The new owner ID to set on the item.
+ @param groupID The new group ID to set on the item.
+ @param error If an error occurs, upon returns contains an NSError object that describes the problem. If you are not interested in possible errors, you may pass in NULL.
+ @return YES if the target item's owner and group IDs have changed, otherwise NO along with a populated error object.
+ 
+ Unlike -changeOwnerAndGroupOfItemAtRootURL:toMatchURL:error: this method does not recursively try to change the owner and group IDs if the target item is a directory.
+ */
+- (BOOL)changeOwnerAndGroupOfItemAtURL:(NSURL *)targetURL ownerID:(uid_t)ownerID groupID:(gid_t)groupID error:(NSError * __autoreleasing *)error;
+
+/**
  * Updates the modification and access time of an item at a specified target URL to the current time
  * @param targetURL A URL pointing to the target item whose modification and access time to update. The item at this URL must exist.
  * @param error If an error occurs, upon returns contains an NSError object that describes the problem. If you are not interested in possible errors, you may pass in NULL.

@@ -243,7 +243,7 @@ static char SUAppleQuarantineIdentifier[] = "com.apple.quarantine";
     return YES;
 }
 
-- (BOOL)_changeOwnerAndGroupOfItemAtURL:(NSURL *)targetURL ownerID:(NSNumber *)ownerID groupID:(NSNumber *)groupID error:(NSError * __autoreleasing *)error
+- (BOOL)changeOwnerAndGroupOfItemAtURL:(NSURL *)targetURL ownerID:(uid_t)ownerID groupID:(gid_t)groupID error:(NSError * __autoreleasing *)error
 {
     char path[PATH_MAX] = {0};
     if (![targetURL.path getFileSystemRepresentation:path maxLength:sizeof(path)]) {
@@ -262,12 +262,12 @@ static char SUAppleQuarantineIdentifier[] = "com.apple.quarantine";
     }
     
     // We use fchown instead of chown because the latter can follow symbolic links
-    BOOL success = (fchown(fileDescriptor, ownerID.unsignedIntValue, groupID.unsignedIntValue) == 0);
+    BOOL success = (fchown(fileDescriptor, ownerID, groupID) == 0);
     close(fileDescriptor);
     
     if (!success) {
         if (error != NULL) {
-            *error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to change owner & group for %@ with owner ID %u and group ID %u.", targetURL.path.lastPathComponent, ownerID.unsignedIntValue, groupID.unsignedIntValue] }];
+            *error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to change owner & group for %@ with owner ID %u and group ID %u.", targetURL.path.lastPathComponent, ownerID, groupID] }];
         }
     }
 
@@ -341,14 +341,14 @@ static char SUAppleQuarantineIdentifier[] = "com.apple.quarantine";
     // If we can't change both the new owner & group, try to only change the owner
     // If this works, this is sufficient enough for performing the update
     NSNumber *groupIDToUse;
-    if (![self _changeOwnerAndGroupOfItemAtURL:targetURL ownerID:ownerID groupID:groupID error:NULL]) {
+    if (![self changeOwnerAndGroupOfItemAtURL:targetURL ownerID:ownerID.unsignedIntValue groupID:groupID.unsignedIntValue error:NULL]) {
         if ((targetOwnerID != nil && [ownerID isEqualToNumber:targetOwnerID])) {
             // Assume they're the same even if we don't check every file recursively
             // Speeds up the common case like above
             return YES;
         }
         
-        if (![self _changeOwnerAndGroupOfItemAtURL:targetURL ownerID:ownerID groupID:targetGroupID error:error]) {
+        if (![self changeOwnerAndGroupOfItemAtURL:targetURL ownerID:ownerID.unsignedIntValue groupID:targetGroupID.unsignedIntValue error:error]) {
             return NO;
         }
         
@@ -360,7 +360,7 @@ static char SUAppleQuarantineIdentifier[] = "com.apple.quarantine";
     if (isTargetADirectory) {
         NSDirectoryEnumerator *directoryEnumerator = [_fileManager enumeratorAtURL:targetURL includingPropertiesForKeys:nil options:(NSDirectoryEnumerationOptions)0 errorHandler:nil];
         for (NSURL *url in directoryEnumerator) {
-            if (![self _changeOwnerAndGroupOfItemAtURL:url ownerID:ownerID groupID:groupIDToUse error:error]) {
+            if (![self changeOwnerAndGroupOfItemAtURL:url ownerID:ownerID.unsignedIntValue groupID:groupIDToUse.unsignedIntValue error:error]) {
                 return NO;
             }
         }
