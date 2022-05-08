@@ -115,7 +115,8 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
 
 #pragma mark Update Alert Focus
 
-- (void)setUpActiveUpdateAlertRequestingFocus:(BOOL)requestingFocus
+// updateItem should be non-nil when showing update for first time for scheduled updates
+- (void)setUpActiveUpdateAlertRequestingFocus:(BOOL)requestingFocus appcastItem:(SUAppcastItem * _Nullable)updateItem
 {
     // Make sure the window is loaded in any case
     [self.activeUpdateAlert window];
@@ -127,13 +128,28 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
     // there may be no way for the application to be activated to make it visible again.
     BOOL isBackgroundApp = [SUApplicationInfo isBackgroundApplication:[NSApplication sharedApplication]];
     if (isBackgroundApp) {
-        [NSApp activateIgnoringOtherApps:YES];
+        BOOL handleShowingUpdates;
+        if (updateItem != nil && [self.delegate respondsToSelector:@selector(standardUserDriverShouldShowAlertForScheduledUpdate:inFocusNow:)]) {
+            handleShowingUpdates = [self.delegate standardUserDriverShouldShowAlertForScheduledUpdate:(SUAppcastItem * _Nonnull)updateItem inFocusNow:requestingFocus];
+        } else {
+            handleShowingUpdates = YES;
+        }
         
-        [self.activeUpdateAlert showWindow:nil];
-        [self.activeUpdateAlert setInstallButtonFocus:requestingFocus];
+        // For background applications we always have install button in focus
+        [self.activeUpdateAlert setInstallButtonFocus:YES];
+        
+        // If we don't handle showing updates, the delegate will handle it later
+        if (handleShowingUpdates) {
+            if (requestingFocus) {
+                [NSApp activateIgnoringOtherApps:YES];
+            }
+            
+            [self.activeUpdateAlert showWindow:nil];
+        }
     } else {
         // Only show the update alert if the app is active and if it's an an opportune time; otherwise, we'll wait until the app becomes active and the time is right
-        BOOL observeApplicationActiveState;
+        BOOL driverShowingUpdateNow;
+        BOOL registerScheduledUpdateCheckDelay;
         if ([NSApp isActive]) {
             // If the system has been inactive for several minutes, allow the update alert to show up immediately. We assume it's likely the user isn't at their computer in this case.
             CFTimeInterval timeSinceLastEvent;
@@ -144,23 +160,41 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
             }
             
             if (requestingFocus || timeSinceLastEvent >= SUScheduledUpdateIdleEventLeewayInterval) {
-                [self.activeUpdateAlert showWindow:nil];
-                [self.activeUpdateAlert setInstallButtonFocus:YES];
-                
-                observeApplicationActiveState = NO;
+                driverShowingUpdateNow = YES;
+                registerScheduledUpdateCheckDelay = NO;
             } else {
-                // If the application does not become inactive and active again within a threshold,
-                // we will give up and show the update
-                [self performSelector:@selector(showScheduledUpdateAlertAfterDelay) withObject:nil afterDelay:SUScheduledUpdateActiveAppLeewayInterval];
-                observeApplicationActiveState = YES;
+                registerScheduledUpdateCheckDelay = YES;
+                driverShowingUpdateNow = NO;
             }
         } else {
             // We will show the update alert when the user comes back to the app
-            observeApplicationActiveState = YES;
+            driverShowingUpdateNow = NO;
+            registerScheduledUpdateCheckDelay = NO;
         }
         
-        if (observeApplicationActiveState) {
-            [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:NSApplicationDidBecomeActiveNotification object:NSApp];
+        BOOL handleShowingUpdates;
+        if (updateItem != nil && [self.delegate respondsToSelector:@selector(standardUserDriverShouldShowAlertForScheduledUpdate:inFocusNow:)]) {
+            handleShowingUpdates = [self.delegate standardUserDriverShouldShowAlertForScheduledUpdate:(SUAppcastItem * _Nonnull)updateItem inFocusNow:driverShowingUpdateNow];
+        } else {
+            handleShowingUpdates = YES;
+        }
+        
+        if (!handleShowingUpdates) {
+            // Let the delegate handle showing the update alert later
+            [self.activeUpdateAlert setInstallButtonFocus:YES];
+        } else {
+            if (!driverShowingUpdateNow) {
+                if (registerScheduledUpdateCheckDelay) {
+                    // If the application does not become inactive and active again within a threshold,
+                    // we will give up and show the update
+                    [self performSelector:@selector(showScheduledUpdateAlertAfterDelay) withObject:nil afterDelay:SUScheduledUpdateActiveAppLeewayInterval];
+                }
+                
+                [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:NSApplicationDidBecomeActiveNotification object:NSApp];
+            } else {
+                [self.activeUpdateAlert showWindow:nil];
+                [self.activeUpdateAlert setInstallButtonFocus:YES];
+            }
         }
     }
 }
@@ -205,8 +239,14 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
     }
     
     __weak SPUStandardUserDriver *weakSelf = self;
+    __weak id<SPUStandardUserDriverDelegate> weakDelegate = self.delegate;
     self.activeUpdateAlert = [[SUUpdateAlert alloc] initWithAppcastItem:appcastItem state:state host:self.host versionDisplayer:versionDisplayer completionBlock:^(SPUUserUpdateChoice choice) {
         reply(choice);
+        
+        id<SPUStandardUserDriverDelegate> strongDelegate = weakDelegate;
+        if (strongDelegate != nil && [strongDelegate respondsToSelector:@selector(standardUserDriverWillCloseAlertForUpdate:)]) {
+            [strongDelegate standardUserDriverWillCloseAlertForUpdate:appcastItem];
+        }
         weakSelf.activeUpdateAlert = nil;
     }];
     
@@ -226,7 +266,7 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
             allowInstallButtonFocus = NO;
         }
     }
-    [self setUpActiveUpdateAlertRequestingFocus:allowInstallButtonFocus];
+    [self setUpActiveUpdateAlertRequestingFocus:allowInstallButtonFocus appcastItem:(state.userInitiated ? nil : appcastItem)];
 }
 
 - (void)showUpdateReleaseNotesWithDownloadData:(SPUDownloadData *)downloadData
@@ -249,7 +289,7 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
 - (void)showUpdateInFocus
 {
     if (self.activeUpdateAlert != nil) {
-        [self setUpActiveUpdateAlertRequestingFocus:YES];
+        [self setUpActiveUpdateAlertRequestingFocus:YES appcastItem:nil];
     } else if (self.permissionPrompt != nil) {
         [self.permissionPrompt showWindow:nil];
     } else if (self.statusController != nil) {

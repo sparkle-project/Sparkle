@@ -16,7 +16,10 @@
 #endif
 #import <Sparkle/SUExport.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @protocol SUVersionDisplay;
+@class SUAppcastItem;
 
 /**
  A protocol for Sparkle's standard user driver's delegate
@@ -59,7 +62,7 @@ SU_EXPORT @protocol SPUStandardUserDriverDelegate <NSObject>
  
  @param item The appcast item corresponding to the latest version available.
  */
-- (void)standardUserDriverShowVersionHistoryForAppcastItem:(SUAppcastItem *_Nonnull)item;
+- (void)standardUserDriverShowVersionHistoryForAppcastItem:(SUAppcastItem *)item;
 
 /**
  Specifies whether or not the download, extraction, and installing status windows allows to be minimized.
@@ -71,4 +74,46 @@ SU_EXPORT @protocol SPUStandardUserDriverDelegate <NSObject>
  */
 - (BOOL)standardUserDriverAllowsMinimizableStatusWindow;
 
+/**
+ Specifies if the standard user driver should handle showing a new update alert.
+ 
+ This is called before the standard user driver handles showing an alert for a new update that is found.
+ If you return @c YES, the update may not be shown immediately or in utmost focus. In these cases, @c inFocus is @c NO.
+ 
+ For regular non-background applications, when @c inFocusNow is @c NO the standard user driver will prefer to show the update the next time
+ the user comes back to the application. This is to minimize disrupting the user when they are actively using your application.
+ Rarely, if an opportune time is unavailable after a threshold of elapsed time, the standard user driver may have to show an alert when the application is active however.
+ When @c inFocusNow is @c YES the application is active, and either the updater / application just launched or the user's system was idle for an elapsed threshold.
+ 
+ For non-background applications, when @c inFocusNow is @c NO, the standard user driver will show the update but not in utmost focus.
+ This is to prevent a background application window from stealing focus from another foreground application without the user explicitly making this decision. If @c inFocusNow is @c YES the updater / application just launched.
+ 
+ If you return @c NO the standard user driver will not handle showing the update alert but Sparkle's user driver session will still be running.
+ At some point you may call -[SPUStandardUserDriver showUpdateInFocus] to bring up the update alert.
+ In this case, you may want to show a UI indicator in your application that will show this update in focus.
+ You may want to dismiss UI indicators in -standardUserDriverWillCloseAlertForUpdate:
+ 
+ If you return @c YES you may still want to intercept this method. For example, you can publish a user notification when the application is not active.
+ 
+ @param update The update the standard user driver should show.
+ @param inFocusNow If @c inFocusNow is @c YES, then the standard user driver will show the update immediately in utmost focus. See discussion for more details.
+ 
+ @return @c YES if the standard user should automatically handle showing the update (default behavior), otherwise @c NO.
+ */
+- (BOOL)standardUserDriverShouldShowAlertForScheduledUpdate:(SUAppcastItem *)update inFocusNow:(BOOL)inFocusNow;
+
+/**
+ Called before an alert window for an update is closed.
+ 
+ The user has either started to install an update, dismiss it, or skip the update.
+ 
+ This may be useful to intercept for dismissing custom UI indicators introduced when implementing
+ -standardUserDriverShouldShowAlertForScheduledUpdate:inFocusNow:
+ 
+ @param update The update corresponding to the update alert window the standard user driver is closing.
+ */
+- (void)standardUserDriverWillCloseAlertForUpdate:(SUAppcastItem *)update;
+
 @end
+
+NS_ASSUME_NONNULL_END
