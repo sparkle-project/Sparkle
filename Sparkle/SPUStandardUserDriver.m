@@ -25,6 +25,11 @@
 
 #import <AppKit/AppKit.h>
 
+// The amount of time we wait until the app becomes inactive and active again to show an update prompt at an opportune time.
+static const NSTimeInterval SUScheduledUpdateActiveAppLeewayInterval = DEBUG ? 60.0 * 2 : 30 * 60.0;
+// The amount of time the app is allowed to be idle for us to consider showing an update prompt right away when the app is active
+static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 30.0 : 5 * 60.0;
+
 @interface SPUStandardUserDriver ()
 
 @property (nonatomic, readonly) SUHost *host;
@@ -105,10 +110,12 @@
 
 #pragma mark Update Alert Focus
 
-- (void)setUpFocusForActiveUpdateAlertAllowingImmediateInstallButtonFocus:(BOOL)allowImmediateInstallButtonFocus
+- (void)setUpActiveUpdateAlertRequestingFocus:(BOOL)requestingFocus
 {
     // Make sure the window is loaded in any case
     [self.activeUpdateAlert window];
+    
+    [self _removeScheduledUpdateAlertAfterDelay];
     
     // If the app is a menubar app or the like, we need to focus it first and alter the
     // update prompt to behave like a normal window. Otherwise if the window were hidden
@@ -118,20 +125,32 @@
         [NSApp activateIgnoringOtherApps:YES];
         
         [self.activeUpdateAlert showWindow:nil];
-        [self.activeUpdateAlert setInstallButtonFocus:allowImmediateInstallButtonFocus];
+        [self.activeUpdateAlert setInstallButtonFocus:requestingFocus];
     } else {
-        // Only show the update alert if the app is active; otherwise, we'll wait until it is.
+        // Only show the update alert if the app is active and if it's an an opportune time; otherwise, we'll wait until the app becomes active and the time is right
         BOOL observeApplicationActiveState;
         if ([NSApp isActive]) {
-            [self.activeUpdateAlert setInstallButtonFocus:allowImmediateInstallButtonFocus];
-            [self.activeUpdateAlert showWindow:nil];
+            // If the system has been inactive for several minutes, allow the update alert to show up immediately. We assume it's likely the user isn't at their computer in this case.
+            CFTimeInterval timeSinceLastEvent;
+            if (!requestingFocus) {
+                timeSinceLastEvent = CGEventSourceSecondsSinceLastEventType(kCGEventSourceStateHIDSystemState, kCGAnyInputEventType);
+            } else {
+                timeSinceLastEvent = 0;
+            }
             
-            // We will set the install focus if the user comes back to the app,
-            // but not for background applications because they re-activate in a strange way
-            observeApplicationActiveState = !allowImmediateInstallButtonFocus;
+            if (requestingFocus || timeSinceLastEvent >= SUScheduledUpdateIdleEventLeewayInterval) {
+                [self.activeUpdateAlert showWindow:nil];
+                [self.activeUpdateAlert setInstallButtonFocus:YES];
+                
+                observeApplicationActiveState = NO;
+            } else {
+                // If the application does not become inactive and active again within a threshold,
+                // we will give up and show the update
+                [self performSelector:@selector(showScheduledUpdateAlertAfterDelay) withObject:nil afterDelay:SUScheduledUpdateActiveAppLeewayInterval];
+                observeApplicationActiveState = YES;
+            }
         } else {
             // We will show the update alert when the user comes back to the app
-            [self.activeUpdateAlert setInstallButtonFocus:YES];
             observeApplicationActiveState = YES;
         }
         
@@ -146,13 +165,23 @@
     [[NSNotificationCenter defaultCenter] removeObserver:self name:NSApplicationDidBecomeActiveNotification object:NSApp];
 }
 
+- (void)_removeScheduledUpdateAlertAfterDelay
+{
+    [[self class] cancelPreviousPerformRequestsWithTarget:self selector:@selector(showScheduledUpdateAlertAfterDelay) object:nil];
+}
+
+- (void)showScheduledUpdateAlertAfterDelay
+{
+    [self.activeUpdateAlert showWindow:nil];
+    [self.activeUpdateAlert setInstallButtonFocus:NO];
+}
+
 - (void)applicationDidBecomeActive:(NSNotification *)__unused aNotification
 {
-    if (self.activeUpdateAlert.window.visible) {
-        [self.activeUpdateAlert setInstallButtonFocus:YES];
-    } else {
-        [self.activeUpdateAlert showWindow:nil];
-    }
+    [self _removeScheduledUpdateAlertAfterDelay];
+    
+    [self.activeUpdateAlert showWindow:nil];
+    [self.activeUpdateAlert setInstallButtonFocus:YES];
     
     [self _removeApplicationBecomeActiveObserver];
 }
@@ -184,13 +213,13 @@
             uint64_t currentTime = clock_gettime_nsec_np(CLOCK_UPTIME_RAW);
             uint64_t timeElapsedSinceInitialization = currentTime - self.initializationTime;
             
-            // Allow the install button to focus if 1.5 or less seconds have passed since initialization
-            allowInstallButtonFocus = (timeElapsedSinceInitialization <= 1500000000ULL);
+            // Allow the install button to focus if 3 or less seconds have passed since initialization
+            allowInstallButtonFocus = (timeElapsedSinceInitialization <= 3000000000ULL);
         } else {
             allowInstallButtonFocus = NO;
         }
     }
-    [self setUpFocusForActiveUpdateAlertAllowingImmediateInstallButtonFocus:allowInstallButtonFocus];
+    [self setUpActiveUpdateAlertRequestingFocus:allowInstallButtonFocus];
 }
 
 - (void)showUpdateReleaseNotesWithDownloadData:(SPUDownloadData *)downloadData
@@ -213,7 +242,7 @@
 - (void)showUpdateInFocus
 {
     if (self.activeUpdateAlert != nil) {
-        [self setUpFocusForActiveUpdateAlertAllowingImmediateInstallButtonFocus:YES];
+        [self setUpActiveUpdateAlertRequestingFocus:YES];
     } else if (self.permissionPrompt != nil) {
         [self.permissionPrompt showWindow:nil];
     } else if (self.statusController != nil) {
@@ -562,6 +591,7 @@
     }
     
     [self _removeApplicationBecomeActiveObserver];
+    [self _removeScheduledUpdateAlertAfterDelay];
 }
 
 @end
