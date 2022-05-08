@@ -61,4 +61,14 @@ SU_EXPORT @protocol SPUStandardUserDriverDelegate <NSObject>
  */
 - (void)standardUserDriverShowVersionHistoryForAppcastItem:(SUAppcastItem *_Nonnull)item;
 
+/**
+ Specifies whether or not the download, extraction, and installing status windows allows to be minimized.
+ 
+ By default, the status window showing the current status of the update (download, extraction, ready to install) is allowed to be minimized
+ for regular application bundle updates.
+ 
+ @return @c YES if the status window is allowed to be minimized (default behavior), otherwise @c NO.
+ */
+- (BOOL)standardUserDriverAllowsMinimizableStatusWindow;
+
 @end

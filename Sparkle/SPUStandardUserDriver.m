@@ -21,7 +21,9 @@
 #import "SUOperatingSystem.h"
 #import "SPUUserUpdateState.h"
 #import "SUErrors.h"
+#import "SPUInstallationType.h"
 #include <time.h>
+
 
 #import <AppKit/AppKit.h>
 
@@ -53,6 +55,8 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
 
 @property (nonatomic, readonly) uint64_t initializationTime;
 
+@property (nonatomic) BOOL regularApplicationUpdate;
+
 @end
 
 @implementation SPUStandardUserDriver
@@ -70,6 +74,7 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
 @synthesize expectedContentLength = _expectedContentLength;
 @synthesize bytesDownloaded = _bytesDownloaded;
 @synthesize initializationTime = _initializationTime;
+@synthesize regularApplicationUpdate = _regularApplicationUpdate;
 
 #pragma mark Birth
 
@@ -204,6 +209,8 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
         reply(choice);
         weakSelf.activeUpdateAlert = nil;
     }];
+    
+    self.regularApplicationUpdate = [appcastItem.installationType isEqualToString:SPUInstallationTypeApplication];
     
     BOOL allowInstallButtonFocus;
     if (state.userInitiated) {
@@ -431,7 +438,18 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
 - (void)createAndShowStatusController
 {
     if (self.statusController == nil) {
-        self.statusController = [[SUStatusController alloc] initWithHost:self.host minimizable:YES];
+        // We will make the status window minimizable for regular app updates which are often
+        // quick and atomic to install on quit. But we won't do this for package based updates.
+        BOOL minimizable;
+        if (!self.regularApplicationUpdate) {
+            minimizable = NO;
+        } else if ([self.delegate respondsToSelector:@selector(standardUserDriverAllowsMinimizableStatusWindow)]) {
+            minimizable = [self.delegate standardUserDriverAllowsMinimizableStatusWindow];
+        } else {
+            minimizable = YES;
+        }
+        
+        self.statusController = [[SUStatusController alloc] initWithHost:self.host minimizable:minimizable];
         [self.statusController showWindow:self];
     }
 }
