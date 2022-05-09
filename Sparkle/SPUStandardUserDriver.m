@@ -121,7 +121,7 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
 - (void)_logGentleScheduledUpdateReminderWarningIfNeeded
 {
     id<SPUStandardUserDriverDelegate> delegate = self.delegate;
-    if (!_loggedGentleUpdateReminderWarning && (![delegate respondsToSelector:@selector(supportsGentleScheduledUpdateReminders)] || ![delegate supportsGentleScheduledUpdateReminders])) {
+    if (!_loggedGentleUpdateReminderWarning && (![delegate respondsToSelector:@selector(supportsGentleScheduledUpdateReminders)] || !delegate.supportsGentleScheduledUpdateReminders)) {
         BOOL isBackgroundApp = [SUApplicationInfo isBackgroundApplication:[NSApplication sharedApplication]];
         if (isBackgroundApp) {
             SULog(SULogLevelError, @"Warning: Background app automatically schedules for update checks but does not implement gentle scheduled update reminders. Please visit ... and implement -[SPUStandardUserDriverDelegate supportsGentleScheduledUpdateReminders]. This warning will only be logged once.");

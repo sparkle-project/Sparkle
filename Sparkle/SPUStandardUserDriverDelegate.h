@@ -82,7 +82,7 @@ SU_EXPORT @protocol SPUStandardUserDriverDelegate <NSObject>
  
  @return @c YES if gentle scheduled update reminders are implemented by standard user driver delegate, otherwise @c NO (default).
  */
-- (BOOL)supportsGentleScheduledUpdateReminders;
+@property (nonatomic, readonly) BOOL supportsGentleScheduledUpdateReminders;
 
 /**
  Specifies if the standard user driver should handle showing a new update alert.
