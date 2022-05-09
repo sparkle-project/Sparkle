@@ -22,6 +22,7 @@
 #import "SPUUserUpdateState.h"
 #import "SUErrors.h"
 #import "SPUInstallationType.h"
+#import "SULog.h"
 #include <time.h>
 
 
@@ -55,11 +56,13 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
 
 @property (nonatomic, readonly) uint64_t initializationTime;
 
-@property (nonatomic) BOOL regularApplicationUpdate;
-
 @end
 
 @implementation SPUStandardUserDriver
+{
+    BOOL _loggedGentleUpdateReminderWarning;
+    BOOL _regularApplicationUpdate;
+}
 
 @synthesize host = _host;
 @synthesize oldHostName = _oldHostName;
@@ -74,7 +77,6 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
 @synthesize expectedContentLength = _expectedContentLength;
 @synthesize bytesDownloaded = _bytesDownloaded;
 @synthesize initializationTime = _initializationTime;
-@synthesize regularApplicationUpdate = _regularApplicationUpdate;
 
 #pragma mark Birth
 
@@ -114,6 +116,20 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
 }
 
 #pragma mark Update Alert Focus
+
+// This private method is used by SPUUpdater when scheduling for update checks
+- (void)_logGentleScheduledUpdateReminderWarningIfNeeded
+{
+    id<SPUStandardUserDriverDelegate> delegate = self.delegate;
+    if (!_loggedGentleUpdateReminderWarning && (![delegate respondsToSelector:@selector(supportsGentleScheduledUpdateReminders)] || ![delegate supportsGentleScheduledUpdateReminders])) {
+        BOOL isBackgroundApp = [SUApplicationInfo isBackgroundApplication:[NSApplication sharedApplication]];
+        if (isBackgroundApp) {
+            SULog(SULogLevelError, @"Warning: Background app automatically schedules for update checks but does not implement gentle scheduled update reminders. Please visit ... and implement -[SPUStandardUserDriverDelegate supportsGentleScheduledUpdateReminders]. This warning will only be logged once.");
+            
+            _loggedGentleUpdateReminderWarning = YES;
+        }
+    }
+}
 
 // updateItem should be non-nil when showing update for first time for scheduled updates
 - (void)setUpActiveUpdateAlertRequestingFocus:(BOOL)requestingFocus appcastItem:(SUAppcastItem * _Nullable)updateItem
@@ -250,7 +266,7 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
         weakSelf.activeUpdateAlert = nil;
     }];
     
-    self.regularApplicationUpdate = [appcastItem.installationType isEqualToString:SPUInstallationTypeApplication];
+    _regularApplicationUpdate = [appcastItem.installationType isEqualToString:SPUInstallationTypeApplication];
     
     BOOL allowInstallButtonFocus;
     if (state.userInitiated) {
@@ -481,7 +497,7 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
         // We will make the status window minimizable for regular app updates which are often
         // quick and atomic to install on quit. But we won't do this for package based updates.
         BOOL minimizable;
-        if (!self.regularApplicationUpdate) {
+        if (!_regularApplicationUpdate) {
             minimizable = NO;
         } else if ([self.delegate respondsToSelector:@selector(standardUserDriverAllowsMinimizableStatusWindow)]) {
             minimizable = [self.delegate standardUserDriverAllowsMinimizableStatusWindow];

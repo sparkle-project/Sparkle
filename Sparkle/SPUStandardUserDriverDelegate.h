@@ -75,6 +75,16 @@ SU_EXPORT @protocol SPUStandardUserDriverDelegate <NSObject>
 - (BOOL)standardUserDriverAllowsMinimizableStatusWindow;
 
 /**
+ Declares whether or not gentle scheduled update reminders are supported.
+ 
+ The delegate may implement scheduled update reminders that are presented in a gentle manner by implementing
+ `-standardUserDriverShouldShowAlertForScheduledUpdate:inFocusNow:`
+ 
+ @return @c YES if gentle scheduled update reminders are implemented by standard user driver delegate, otherwise @c NO (default).
+ */
+- (BOOL)supportsGentleScheduledUpdateReminders;
+
+/**
  Specifies if the standard user driver should handle showing a new update alert.
  
  This is called before the standard user driver handles showing an alert for a new update that is found.
@@ -89,9 +99,9 @@ SU_EXPORT @protocol SPUStandardUserDriverDelegate <NSObject>
  This is to prevent a background application window from stealing focus from another foreground application without the user explicitly making this decision. If @c inFocusNow is @c YES the updater / application just launched.
  
  If you return @c NO the standard user driver will not handle showing the update alert but Sparkle's user driver session will still be running.
- At some point you may call -[SPUStandardUserDriver showUpdateInFocus] to bring up the update alert.
- In this case, you may want to show a UI indicator in your application that will show this update in focus.
- You may want to dismiss UI indicators in -standardUserDriverWillCloseAlertForUpdate:
+ At some point you may call `-[SPUStandardUpdateController checkForUpdates:]` or `-[SPUUpdater checkForUpdates]` to bring up the update alert in focus.
+ In this case, you may want to show an additional UI indicator in your application that will show this update in focus.
+ You may want to dismiss additional UI indicators in `-standardUserDriverWillCloseAlertForUpdate:`
  
  If you return @c YES you may still want to intercept this method. For example, you can publish a user notification when the application is not active.
  
@@ -108,7 +118,7 @@ SU_EXPORT @protocol SPUStandardUserDriverDelegate <NSObject>
  The user has either started to install an update, dismiss it, or skip the update.
  
  This may be useful to intercept for dismissing custom UI indicators introduced when implementing
- -standardUserDriverShouldShowAlertForScheduledUpdate:inFocusNow:
+ `-standardUserDriverShouldShowAlertForScheduledUpdate:inFocusNow:`
  
  @param update The update corresponding to the update alert window the standard user driver is closing.
  */
