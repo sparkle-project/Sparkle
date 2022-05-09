@@ -124,6 +124,13 @@ SU_EXPORT @protocol SPUStandardUserDriverDelegate <NSObject>
  */
 - (void)standardUserDriverWillCloseAlertForUpdate:(SUAppcastItem *)update;
 
+/**
+ Called after the alert window for a new update has become the key window.
+ 
+ This may be a good time to dismiss additional reminders (e.g. notifications) for the new update.
+ */
+- (void)standardUserDriverDidMakeAlertWindowKeyForUpdate:(SUAppcastItem *)update;
+
 @end
 
 NS_ASSUME_NONNULL_END

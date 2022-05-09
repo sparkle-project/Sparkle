@@ -264,6 +264,11 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
             [strongDelegate standardUserDriverWillCloseAlertForUpdate:appcastItem];
         }
         weakSelf.activeUpdateAlert = nil;
+    } didBecomeKeyBlock:^{
+        id<SPUStandardUserDriverDelegate> strongDelegate = weakDelegate;
+        if ([strongDelegate respondsToSelector:@selector(standardUserDriverDidMakeAlertWindowKeyForUpdate:)]) {
+            [strongDelegate standardUserDriverDidMakeAlertWindowKeyForUpdate:appcastItem];
+        }
     }];
     
     _regularApplicationUpdate = [appcastItem.installationType isEqualToString:SPUInstallationTypeApplication];

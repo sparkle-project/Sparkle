@@ -58,6 +58,9 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 @end
 
 @implementation SUUpdateAlert
+{
+    void (^_didBecomeKeyBlock)(void);
+}
 
 @synthesize completionBlock = _completionBlock;
 @synthesize state = _state;
@@ -82,7 +85,7 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 
 @synthesize webView = _webView;
 
-- (instancetype)initWithAppcastItem:(SUAppcastItem *)item state:(SPUUserUpdateState *)state host:(SUHost *)aHost versionDisplayer:(id <SUVersionDisplay>)aVersionDisplayer completionBlock:(void (^)(SPUUserUpdateChoice))block
+- (instancetype)initWithAppcastItem:(SUAppcastItem *)item state:(SPUUserUpdateState *)state host:(SUHost *)aHost versionDisplayer:(id <SUVersionDisplay>)aVersionDisplayer completionBlock:(void (^)(SPUUserUpdateChoice))completionBlock didBecomeKeyBlock:(void (^)(void))didBecomeKeyBlock
 {
     self = [super initWithWindowNibName:@"SUUpdateAlert"];
     if (self != nil) {
@@ -91,7 +94,8 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
         versionDisplayer = aVersionDisplayer;
         
         _state = state;
-        _completionBlock = [block copy];
+        _completionBlock = [completionBlock copy];
+        _didBecomeKeyBlock = [didBecomeKeyBlock copy];
         
         SPUUpdaterSettings *updaterSettings = [[SPUUpdaterSettings alloc] initWithHostBundle:host.bundle];
         _allowsAutomaticUpdates = updaterSettings.allowsAutomaticUpdates && updaterSettings.automaticallyChecksForUpdates && !item.informationOnlyUpdate;
@@ -365,6 +369,13 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
     }
 
     [self.window center];
+}
+
+- (void)windowDidBecomeKey:(NSNotification *)__unused note
+{
+    if (_didBecomeKeyBlock != NULL) {
+        _didBecomeKeyBlock();
+    }
 }
 
 - (BOOL)windowShouldClose:(NSNotification *) __unused note
