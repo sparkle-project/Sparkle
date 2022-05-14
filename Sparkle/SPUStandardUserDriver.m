@@ -60,6 +60,7 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
 
 @implementation SPUStandardUserDriver
 {
+    NSValue *_updateAlertWindowFrameValue;
     BOOL _loggedGentleUpdateReminderWarning;
     BOOL _regularApplicationUpdate;
 }
@@ -263,7 +264,17 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
         if (strongDelegate != nil && [strongDelegate respondsToSelector:@selector(standardUserDriverWillCloseAlertForUpdate:)]) {
             [strongDelegate standardUserDriverWillCloseAlertForUpdate:appcastItem];
         }
-        weakSelf.activeUpdateAlert = nil;
+        
+        SPUStandardUserDriver *strongSelf = weakSelf;
+        if (strongSelf != nil) {
+            // Record the window frame of the update alert right before we deallocate it
+            // So we can center future status window to where the update alert last was
+            NSWindow *updateAlertWindow = strongSelf.activeUpdateAlert.window;
+            if (updateAlertWindow != nil) {
+                strongSelf->_updateAlertWindowFrameValue = [NSValue valueWithRect:updateAlertWindow.frame];
+            }
+            strongSelf.activeUpdateAlert = nil;
+        }
     } didBecomeKeyBlock:^{
         id<SPUStandardUserDriverDelegate> strongDelegate = weakDelegate;
         if ([strongDelegate respondsToSelector:@selector(standardUserDriverDidMakeAlertWindowKeyForUpdate:)]) {
@@ -352,7 +363,7 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
     
     self.cancellation = cancellation;
     
-    self.checkingController = [[SUStatusController alloc] initWithHost:self.host minimizable:NO];
+    self.checkingController = [[SUStatusController alloc] initWithHost:self.host centerPointValue:nil minimizable:NO];
     [[self.checkingController window] center]; // Force the checking controller to load its window.
     [self.checkingController beginActionWithTitle:SULocalizedString(@"Checking for updates…", nil) maxProgressValue:0.0 statusText:nil];
     [self.checkingController setButtonTitle:SULocalizedString(@"Cancel", nil) target:self action:@selector(cancelCheckForUpdates:) isDefault:NO];
@@ -510,7 +521,17 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
             minimizable = YES;
         }
         
-        self.statusController = [[SUStatusController alloc] initWithHost:self.host minimizable:minimizable];
+        NSValue *centerPointValue;
+        if (_updateAlertWindowFrameValue != nil) {
+            NSRect updateAlertFrame = _updateAlertWindowFrameValue.rectValue;
+            NSPoint centerPoint = NSMakePoint(updateAlertFrame.origin.x + updateAlertFrame.size.width / 2.0, updateAlertFrame.origin.y + updateAlertFrame.size.height / 2.0);
+            
+            centerPointValue = [NSValue valueWithPoint:centerPoint];
+        } else {
+            centerPointValue = nil;
+        }
+        
+        self.statusController = [[SUStatusController alloc] initWithHost:self.host centerPointValue:centerPointValue minimizable:minimizable];
         [self.statusController showWindow:self];
     }
 }
