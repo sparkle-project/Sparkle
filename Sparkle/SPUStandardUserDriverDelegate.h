@@ -78,7 +78,7 @@ SU_EXPORT @protocol SPUStandardUserDriverDelegate <NSObject>
  Declares whether or not gentle scheduled update reminders are supported.
  
  The delegate may implement scheduled update reminders that are presented in a gentle manner by implementing
- `-standardUserDriverShouldShowAlertForScheduledUpdate:inFocusNow:`
+ `-standardUserDriverShouldShowUpdateAlertForScheduledUpdate:inFocusNow:`
  
  @return @c YES if gentle scheduled update reminders are implemented by standard user driver delegate, otherwise @c NO (default).
  */
@@ -101,7 +101,7 @@ SU_EXPORT @protocol SPUStandardUserDriverDelegate <NSObject>
  If you return @c NO the standard user driver will not handle showing the update alert but Sparkle's user driver session will still be running.
  At some point you may call `-[SPUStandardUpdateController checkForUpdates:]` or `-[SPUUpdater checkForUpdates]` to bring up the update alert in focus.
  In this case, you may want to show an additional UI indicator in your application that will show this update in focus.
- You may want to dismiss additional UI indicators in `-standardUserDriverWillCloseAlertForUpdate:`
+ You may want to dismiss additional UI indicators in `-standardUserDriverWillCloseUpdateAlertForUpdate:`
  
  If you return @c YES you may still want to intercept this method. For example, you can publish a user notification when the application is not active.
  
@@ -110,7 +110,7 @@ SU_EXPORT @protocol SPUStandardUserDriverDelegate <NSObject>
  
  @return @c YES if the standard user should automatically handle showing the update (default behavior), otherwise @c NO.
  */
-- (BOOL)standardUserDriverShouldShowAlertForScheduledUpdate:(SUAppcastItem *)update inFocusNow:(BOOL)inFocusNow;
+- (BOOL)standardUserDriverShouldShowUpdateAlertForScheduledUpdate:(SUAppcastItem *)update inFocusNow:(BOOL)inFocusNow;
 
 /**
  Called before an alert window for an update is closed.
@@ -118,18 +118,18 @@ SU_EXPORT @protocol SPUStandardUserDriverDelegate <NSObject>
  The user has either started to install an update, dismiss it, or skip the update.
  
  This may be useful to intercept for dismissing custom UI indicators introduced when implementing
- `-standardUserDriverShouldShowAlertForScheduledUpdate:inFocusNow:`
+ `-standardUserDriverShouldShowUpdateAlertForScheduledUpdate:inFocusNow:`
  
  @param update The update corresponding to the update alert window the standard user driver is closing.
  */
-- (void)standardUserDriverWillCloseAlertForUpdate:(SUAppcastItem *)update;
+- (void)standardUserDriverWillCloseUpdateAlertForUpdate:(SUAppcastItem *)update;
 
 /**
  Called after the alert window for a new update has become the key window.
  
  This may be a good time to dismiss additional reminders (e.g. notifications) for the new update.
  */
-- (void)standardUserDriverDidMakeAlertWindowKeyForUpdate:(SUAppcastItem *)update;
+- (void)standardUserDriverDidMakeUpdateAlertWindowKeyForUpdate:(SUAppcastItem *)update;
 
 @end
 

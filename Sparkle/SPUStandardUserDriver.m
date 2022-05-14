@@ -146,8 +146,8 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
     BOOL isBackgroundApp = [SUApplicationInfo isBackgroundApplication:[NSApplication sharedApplication]];
     if (isBackgroundApp) {
         BOOL handleShowingUpdates;
-        if (updateItem != nil && [self.delegate respondsToSelector:@selector(standardUserDriverShouldShowAlertForScheduledUpdate:inFocusNow:)]) {
-            handleShowingUpdates = [self.delegate standardUserDriverShouldShowAlertForScheduledUpdate:(SUAppcastItem * _Nonnull)updateItem inFocusNow:requestingFocus];
+        if (updateItem != nil && [self.delegate respondsToSelector:@selector(standardUserDriverShouldShowUpdateAlertForScheduledUpdate:inFocusNow:)]) {
+            handleShowingUpdates = [self.delegate standardUserDriverShouldShowUpdateAlertForScheduledUpdate:(SUAppcastItem * _Nonnull)updateItem inFocusNow:requestingFocus];
         } else {
             handleShowingUpdates = YES;
         }
@@ -190,8 +190,8 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
         }
         
         BOOL handleShowingUpdates;
-        if (updateItem != nil && [self.delegate respondsToSelector:@selector(standardUserDriverShouldShowAlertForScheduledUpdate:inFocusNow:)]) {
-            handleShowingUpdates = [self.delegate standardUserDriverShouldShowAlertForScheduledUpdate:(SUAppcastItem * _Nonnull)updateItem inFocusNow:driverShowingUpdateNow];
+        if (updateItem != nil && [self.delegate respondsToSelector:@selector(standardUserDriverShouldShowUpdateAlertForScheduledUpdate:inFocusNow:)]) {
+            handleShowingUpdates = [self.delegate standardUserDriverShouldShowUpdateAlertForScheduledUpdate:(SUAppcastItem * _Nonnull)updateItem inFocusNow:driverShowingUpdateNow];
         } else {
             handleShowingUpdates = YES;
         }
@@ -261,8 +261,8 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
         reply(choice);
         
         id<SPUStandardUserDriverDelegate> strongDelegate = weakDelegate;
-        if (strongDelegate != nil && [strongDelegate respondsToSelector:@selector(standardUserDriverWillCloseAlertForUpdate:)]) {
-            [strongDelegate standardUserDriverWillCloseAlertForUpdate:appcastItem];
+        if (strongDelegate != nil && [strongDelegate respondsToSelector:@selector(standardUserDriverWillCloseUpdateAlertForUpdate:)]) {
+            [strongDelegate standardUserDriverWillCloseUpdateAlertForUpdate:appcastItem];
         }
         
         SPUStandardUserDriver *strongSelf = weakSelf;
@@ -277,8 +277,8 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
         }
     } didBecomeKeyBlock:^{
         id<SPUStandardUserDriverDelegate> strongDelegate = weakDelegate;
-        if ([strongDelegate respondsToSelector:@selector(standardUserDriverDidMakeAlertWindowKeyForUpdate:)]) {
-            [strongDelegate standardUserDriverDidMakeAlertWindowKeyForUpdate:appcastItem];
+        if ([strongDelegate respondsToSelector:@selector(standardUserDriverDidMakeUpdateAlertWindowKeyForUpdate:)]) {
+            [strongDelegate standardUserDriverDidMakeUpdateAlertWindowKeyForUpdate:appcastItem];
         }
     }];
     
