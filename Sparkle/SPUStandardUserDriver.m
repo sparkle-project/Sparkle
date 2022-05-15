@@ -90,11 +90,16 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
         _oldHostBundleURL = hostBundle.bundleURL;
         _delegate = delegate;
         
-        if (@available(macOS 10.12, *)) {
-            _initializationTime = clock_gettime_nsec_np(CLOCK_UPTIME_RAW);
-        }
+        [self _resetInitializationTime];
     }
     return self;
+}
+
+- (void)_resetInitializationTime
+{
+    if (@available(macOS 10.12, *)) {
+        _initializationTime = clock_gettime_nsec_np(CLOCK_UPTIME_RAW);
+    }
 }
 
 #pragma mark Update Permission
@@ -109,6 +114,8 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
     
     __weak __typeof__(self) weakSelf = self;
     self.permissionPrompt = [[SUUpdatePermissionPrompt alloc] initPromptWithHost:self.host request:request reply:^(SUUpdatePermissionResponse *response) {
+        [weakSelf _resetInitializationTime];
+        
         reply(response);
         weakSelf.permissionPrompt = nil;
     }];
