@@ -132,7 +132,7 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
     if (!_loggedGentleUpdateReminderWarning && (![delegate respondsToSelector:@selector(supportsGentleScheduledUpdateReminders)] || !delegate.supportsGentleScheduledUpdateReminders)) {
         BOOL isBackgroundApp = [SUApplicationInfo isBackgroundApplication:[NSApplication sharedApplication]];
         if (isBackgroundApp) {
-            SULog(SULogLevelError, @"Warning: Background app automatically schedules for update checks but does not implement gentle reminders. Please visit https://sparkle-project.org/documentation/gentle-reminders and implement -[SPUStandardUserDriverDelegate supportsGentleScheduledUpdateReminders]. This warning will only be logged once.");
+            SULog(SULogLevelError, @"Warning: Background app automatically schedules for update checks but does not implement gentle reminders. Please visit https://sparkle-project.org/documentation/gentle-reminders for more information. This warning will only be logged once.");
             
             _loggedGentleUpdateReminderWarning = YES;
         }
