@@ -153,6 +153,8 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
     // there may be no way for the application to be activated to make it visible again.
     BOOL isBackgroundApp = [SUApplicationInfo isBackgroundApplication:[NSApplication sharedApplication]];
     if (isBackgroundApp) {
+        BOOL backgroundAppWasActive = [NSApp isActive];
+        
         BOOL handleShowingUpdates;
         if (updateItem != nil && [self.delegate respondsToSelector:@selector(standardUserDriverShouldShowUpdateAlertForScheduledUpdate:inFocusNow:)]) {
             handleShowingUpdates = [self.delegate standardUserDriverShouldShowUpdateAlertForScheduledUpdate:(SUAppcastItem * _Nonnull)updateItem inFocusNow:requestingFocus];
@@ -170,9 +172,19 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
         if (handleShowingUpdates) {
             if (requestingFocus) {
                 [NSApp activateIgnoringOtherApps:YES];
+                
+                [self.activeUpdateAlert showWindow:nil];
+            } else {
+                if (backgroundAppWasActive) {
+                    // If the background app was active, show the update alert but
+                    // show it behind other windows. This is not too different when
+                    // the background app is not active and we show the window in the background
+                    // (which is really the common case)
+                    [self.activeUpdateAlert.window orderBack:nil];
+                } else {
+                    [self.activeUpdateAlert showWindow:nil];
+                }
             }
-            
-            [self.activeUpdateAlert showWindow:nil];
         }
     } else {
         // Only show the update alert if the app is active and if it's an an opportune time; otherwise, we'll wait until the app becomes active and the time is right

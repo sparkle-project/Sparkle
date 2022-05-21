@@ -96,7 +96,7 @@ SU_EXPORT @protocol SPUStandardUserDriverDelegate <NSObject>
  When @c inFocusNow is @c YES the application is active, and either the updater / application just launched or the user's system was idle for an elapsed threshold.
  
  For backgrounded applications (which do not appear in the Dock), when @c inFocusNow is @c NO, the standard user driver will show the update but not in utmost focus.
- This is to prevent a background application window from stealing focus from another foreground application without the user explicitly making this decision. If @c inFocusNow is @c YES the updater / application just launched.
+ This is to prevent a background application window from stealing focus from another window or foreground application without the user explicitly making this decision. If @c inFocusNow is @c YES the updater / application just launched.
  
  If you return @c NO the standard user driver will not handle showing the update alert but Sparkle's user driver session will still be running.
  At some point you may call `-[SPUStandardUpdateController checkForUpdates:]` or `-[SPUUpdater checkForUpdates]` to bring up the update alert in focus.
