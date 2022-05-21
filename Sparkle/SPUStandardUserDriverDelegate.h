@@ -95,7 +95,7 @@ SU_EXPORT @protocol SPUStandardUserDriverDelegate <NSObject>
  Rarely, if an opportune time is unavailable after a threshold of elapsed time, the standard user driver may have to show an alert when the application is active however.
  When @c inFocusNow is @c YES the application is active, and either the updater / application just launched or the user's system was idle for an elapsed threshold.
  
- For non-background applications, when @c inFocusNow is @c NO, the standard user driver will show the update but not in utmost focus.
+ For backgrounded applications (which do not appear in the Dock), when @c inFocusNow is @c NO, the standard user driver will show the update but not in utmost focus.
  This is to prevent a background application window from stealing focus from another foreground application without the user explicitly making this decision. If @c inFocusNow is @c YES the updater / application just launched.
  
  If you return @c NO the standard user driver will not handle showing the update alert but Sparkle's user driver session will still be running.
@@ -113,23 +113,32 @@ SU_EXPORT @protocol SPUStandardUserDriverDelegate <NSObject>
 - (BOOL)standardUserDriverShouldShowUpdateAlertForScheduledUpdate:(SUAppcastItem *)update inFocusNow:(BOOL)inFocusNow;
 
 /**
- Called before an alert window for an update is closed.
+ Called when a new update first receives attention from the user.
  
- The user has either started to install an update, dismiss it, or skip the update.
+ This occurs either when the user first brings the update alert in utmost focus or when the user makes a choice to install an update or dismiss/skip it.
+ 
+ This may be useful to intercept for dismissing custom attention-based UI indicators (e.g, user notifications) introduced when implementing
+ `-standardUserDriverShouldShowUpdateAlertForScheduledUpdate:inFocusNow:`
+ 
+ For custom UI indicators that need to still be on screen after the user has started to install an update, please see `standardUserDriverWillFinishUpdateSession`.
+ 
+ @param update The new update that the user gave attention to.
+ */
+- (void)standardUserDriverDidReceiveUserAttentionForUpdate:(SUAppcastItem *)update;
+
+/**
+ Called before the standard user driver session will finish its current update session.
+ 
+ This may occur after the user has dismissed / skipped a new update or after an update error has occurred.
+ For updaters updating external/other bundles, this may also be called after an update has been successfully installed.
  
  This may be useful to intercept for dismissing custom UI indicators introduced when implementing
  `-standardUserDriverShouldShowUpdateAlertForScheduledUpdate:inFocusNow:`
  
- @param update The update corresponding to the update alert window the standard user driver is closing.
+ For UI indicators that need to be dismissed when the user has given attention to a new update alert,
+ please see `standardUserDriverDidReceiveUserAttentionForUpdate:`
  */
-- (void)standardUserDriverWillCloseUpdateAlertForUpdate:(SUAppcastItem *)update;
-
-/**
- Called after the alert window for a new update has become the key window.
- 
- This may be a good time to dismiss additional reminders (e.g. notifications) for the new update.
- */
-- (void)standardUserDriverDidMakeUpdateAlertWindowKeyForUpdate:(SUAppcastItem *)update;
+- (void)standardUserDriverWillFinishUpdateSession;
 
 @end
 

@@ -63,6 +63,7 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
     NSValue *_updateAlertWindowFrameValue;
     BOOL _loggedGentleUpdateReminderWarning;
     BOOL _regularApplicationUpdate;
+    BOOL _updateReceivedUserAttention;
 }
 
 @synthesize host = _host;
@@ -158,6 +159,9 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
         } else {
             handleShowingUpdates = YES;
         }
+        
+        // Note: the delegate may decide to make the app show up in the Dock and not backgrounded now
+        // If this case were to occur, this still doesn't change any of the logic below however
         
         // For background applications we always have install button in focus
         [self.activeUpdateAlert setInstallButtonFocus:YES];
@@ -267,13 +271,18 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
     self.activeUpdateAlert = [[SUUpdateAlert alloc] initWithAppcastItem:appcastItem state:state host:self.host versionDisplayer:versionDisplayer completionBlock:^(SPUUserUpdateChoice choice) {
         reply(choice);
         
-        id<SPUStandardUserDriverDelegate> strongDelegate = weakDelegate;
-        if (strongDelegate != nil && [strongDelegate respondsToSelector:@selector(standardUserDriverWillCloseUpdateAlertForUpdate:)]) {
-            [strongDelegate standardUserDriverWillCloseUpdateAlertForUpdate:appcastItem];
-        }
-        
         SPUStandardUserDriver *strongSelf = weakSelf;
+        
         if (strongSelf != nil) {
+            if (!strongSelf->_updateReceivedUserAttention) {
+                strongSelf->_updateReceivedUserAttention = YES;
+                
+                id<SPUStandardUserDriverDelegate> strongDelegate = weakDelegate;
+                if (strongDelegate != nil && [strongDelegate respondsToSelector:@selector(standardUserDriverDidReceiveUserAttentionForUpdate:)]) {
+                    [strongDelegate standardUserDriverDidReceiveUserAttentionForUpdate:appcastItem];
+                }
+            }
+            
             // Record the window frame of the update alert right before we deallocate it
             // So we can center future status window to where the update alert last was
             NSWindow *updateAlertWindow = strongSelf.activeUpdateAlert.window;
@@ -283,9 +292,14 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
             strongSelf.activeUpdateAlert = nil;
         }
     } didBecomeKeyBlock:^{
-        id<SPUStandardUserDriverDelegate> strongDelegate = weakDelegate;
-        if ([strongDelegate respondsToSelector:@selector(standardUserDriverDidMakeUpdateAlertWindowKeyForUpdate:)]) {
-            [strongDelegate standardUserDriverDidMakeUpdateAlertWindowKeyForUpdate:appcastItem];
+        SPUStandardUserDriver *strongSelf = weakSelf;
+        if (strongSelf != nil && !strongSelf->_updateReceivedUserAttention) {
+            strongSelf->_updateReceivedUserAttention = YES;
+            
+            id<SPUStandardUserDriverDelegate> strongDelegate = weakDelegate;
+            if ([strongDelegate respondsToSelector:@selector(standardUserDriverDidReceiveUserAttentionForUpdate:)]) {
+                [strongDelegate standardUserDriverDidReceiveUserAttentionForUpdate:appcastItem];
+            }
         }
     }];
     
@@ -677,6 +691,12 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
 {
     assert(NSThread.isMainThread);
     
+    id<SPUStandardUserDriverDelegate> delegate = self.delegate;
+    if ([delegate respondsToSelector:@selector(standardUserDriverWillFinishUpdateSession)]) {
+        [delegate standardUserDriverWillFinishUpdateSession];
+    }
+    
+    _updateReceivedUserAttention = NO;
     self.installUpdateHandler = nil;
     self.cancellation = nil;
     
