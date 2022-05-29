@@ -107,6 +107,8 @@ SU_EXPORT @protocol SPUStandardUserDriverDelegate <NSObject>
  
  This method is not called for user-initiated update checks. The standard user driver always handles those.
  
+ Visit https://sparkle-project.org/documentation/gentle-reminders for more information and examples.
+ 
  @param update The update the standard user driver should show.
  @param immediateFocus If @c immediateFocus is @c YES, then the standard user driver proposes to show the update in immediate and utmost focus. See discussion for more details.
  
@@ -122,7 +124,7 @@ SU_EXPORT @protocol SPUStandardUserDriverDelegate <NSObject>
  and it may be shown some time after this method is called when a better opportunity opens up (e.g, when the user comes back to the app).
  For a background (dockless) running app, the update alert will always show up immediately but behind other running applications.
  
- If the delegate declared it is handling showing the update by returning @c NO in `-standardUserDriverShouldHandleShowingScheduledUpdate:andInImmediateFocus:`
+ If the delegate declared it handles showing the update by returning @c NO in `-standardUserDriverShouldHandleShowingScheduledUpdate:andInImmediateFocus:`
  then the delegate should handle showing update reminders in this method, or at some later point.
  In this case, `handleShowingUpdate` will be @c NO.
  To bring the update alert in focus, you may call `-[SPUStandardUpdateController checkForUpdates:]` or `-[SPUUpdater checkForUpdates]`
@@ -133,6 +135,8 @@ SU_EXPORT @protocol SPUStandardUserDriverDelegate <NSObject>
  In this case, it may still be useful for the delegate to intercept this method right before a new update will be shown.
  
  This method is not called when bringing an update that has already been presented back in focus.
+ 
+ Visit https://sparkle-project.org/documentation/gentle-reminders for more information and examples.
  
  @param handleShowingUpdate @c YES if the standard user driver handles showing the update, otherwise @c NO if the delegate handles showing the update.
  @param update The update that will be shown.
