@@ -20,6 +20,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol SUVersionDisplay;
 @class SUAppcastItem;
+@class SPUUserUpdateState;
 
 /**
  A protocol for Sparkle's standard user driver's delegate
@@ -77,40 +78,67 @@ SU_EXPORT @protocol SPUStandardUserDriverDelegate <NSObject>
 /**
  Declares whether or not gentle scheduled update reminders are supported.
  
- The delegate may implement scheduled update reminders that are presented in a gentle manner by implementing
- `-standardUserDriverShouldShowUpdateAlertForScheduledUpdate:inFocusNow:`
+ The delegate may implement scheduled update reminders that are presented in a gentle manner by implementing one or both of:
+ `-standardUserDriverWillShowUpdate:state:` and `-standardUserDriverShouldHandleShowingUpdateAlertForScheduledUpdate:andInImmediateFocus:`
  
  @return @c YES if gentle scheduled update reminders are implemented by standard user driver delegate, otherwise @c NO (default).
  */
 @property (nonatomic, readonly) BOOL supportsGentleScheduledUpdateReminders;
 
 /**
- Specifies if the standard user driver should handle showing a new update alert.
+ Specifies if the standard user driver should handle showing a new scheduled update, or if its delegate should handle showing the update instead.
  
- This is called before the standard user driver handles showing an alert for a new update that is found.
- If you return @c YES, the update may not be shown immediately or in utmost focus. In these cases, @c inFocus is @c NO.
+ If you implement this method and return @c NO the delegate is then responsible for showing the update,
+ which must be implemented and done in `-standardUserDriverWillHandleShowingUpdate:forUpdate:state:`
+ The motivation for the delegate being responsible for showing updates is to override Sparkle's default behavior
+ and add gentle reminders for new updates.
  
- For regular non-background applications, when @c inFocusNow is @c NO the standard user driver will prefer to show the update the next time
- the user comes back to the application. This is to minimize disrupting the user when they are actively using your application.
- Rarely, if an opportune time is unavailable after a threshold of elapsed time, the standard user driver may have to show an alert when the application is active however.
- When @c inFocusNow is @c YES the application is active, and either the updater / application just launched or the user's system was idle for an elapsed threshold.
+ Returning @c YES is the default behavior and allows the standard user driver to handle showing the update.
  
- For backgrounded applications (which do not appear in the Dock), when @c inFocusNow is @c NO, the standard user driver will show the update but not in utmost focus.
- This is to prevent a background application window from stealing focus from another window or foreground application without the user explicitly making this decision. If @c inFocusNow is @c YES the updater / application just launched.
+ If the standard user driver handles showing the update, `immediateFocus` reflects whether or not it will show the update in immediate and utmost focus.
+ The standard user driver may choose show the update in immediate and utmost focus when the app was launched recently
+ or the system has been idle for some time. If `immediateFocus` is @c NO the standard user driver may want to defer showing the update for some time
+ until a better opportunity comes up (e.g, when the user comes back to the app).
+ For background running applications, when `immediateFocus` is  @c NO the standard user driver will always want to show
+ the update alert immediately, but behind other running applications.
  
- If you return @c NO the standard user driver will not handle showing the update alert but Sparkle's user driver session will still be running.
- At some point you may call `-[SPUStandardUpdateController checkForUpdates:]` or `-[SPUUpdater checkForUpdates]` to bring up the update alert in focus.
- In this case, you may want to show an additional UI indicator in your application that will show this update in focus.
- You may want to dismiss additional UI indicators in `-standardUserDriverWillCloseUpdateAlertForUpdate:`
+ There should be no side effects made when implementing this method so you should just return @c YES or @c NO
+ You will also want to implement `-standardUserDriverWillHandleShowingUpdate:forUpdate:state:` for adding additional update reminders.
  
- If you return @c YES you may still want to intercept this method. For example, you can publish a user notification when the application is not active.
+ This method is not called for user-initiated update checks. The standard user driver always handles those.
  
  @param update The update the standard user driver should show.
- @param inFocusNow If @c inFocusNow is @c YES, then the standard user driver will show the update immediately in utmost focus. See discussion for more details.
+ @param immediateFocus If @c immediateFocus is @c YES, then the standard user driver proposes to show the update in immediate and utmost focus. See discussion for more details.
  
- @return @c YES if the standard user should automatically handle showing the update (default behavior), otherwise @c NO.
+ @return @c YES if the standard user should handle showing the scheduled update (default behavior), otherwise @c NO if the delegate handles showing it.
  */
-- (BOOL)standardUserDriverShouldShowUpdateAlertForScheduledUpdate:(SUAppcastItem *)update inFocusNow:(BOOL)inFocusNow;
+- (BOOL)standardUserDriverShouldHandleShowingScheduledUpdate:(SUAppcastItem *)update andInImmediateFocus:(BOOL)immediateFocus;
+
+/**
+ Called before an update will be shown to the user.
+ 
+ If the standard user driver handles showing the update, `handleShowingUpdate` will be @c YES
+ In this case, if the update is not user initiated (`state.userInitiated` is @c NO) then the standard user driver may defer showing the update,
+ and it may be shown some time after this method is called when a better opportunity opens up (e.g, when the user comes back to the app).
+ For a background (dockless) running app, the update alert will always show up immediately but behind other running applications.
+ 
+ If the delegate declared it is handling showing the update by returning @c NO in `-standardUserDriverShouldHandleShowingScheduledUpdate:andInImmediateFocus:`
+ then the delegate should handle showing update reminders in this method, or at some later point.
+ In this case, `handleShowingUpdate` will be @c NO.
+ To bring the update alert in focus, you may call `-[SPUStandardUpdateController checkForUpdates:]` or `-[SPUUpdater checkForUpdates]`
+ You may want to show additional UI indicators in your application that will show this update in focus
+ and want to dismiss additional UI indicators in `-standardUserDriverWillFinishUpdateSession` or `-standardUserDriverDidReceiveUserAttentionForUpdate:`
+  
+ If `state.userInitiated` is @c YES then the standard user driver always handles showing the new update and `handleShowingUpdate` will be @c YES.
+ In this case, it may still be useful for the delegate to intercept this method right before a new update will be shown.
+ 
+ This method is not called when bringing an update that has already been presented back in focus.
+ 
+ @param handleShowingUpdate @c YES if the standard user driver handles showing the update, otherwise @c NO if the delegate handles showing the update.
+ @param update The update that will be shown.
+ @param state The user state of the update which includes if the update check was initiated by the user.
+ */
+- (void)standardUserDriverWillHandleShowingUpdate:(BOOL)handleShowingUpdate forUpdate:(SUAppcastItem *)update state:(SPUUserUpdateState *)state;
 
 /**
  Called when a new update first receives attention from the user.
