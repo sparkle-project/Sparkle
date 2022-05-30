@@ -24,6 +24,7 @@
 #import "SPUInstallationType.h"
 #import "SULog.h"
 #include <time.h>
+#import <IOKit/pwr_mgt/IOPMLib.h>
 
 
 #import <AppKit/AppKit.h>
@@ -190,15 +191,48 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
         BOOL showingUpdateInBack;
         BOOL activatingApp;
         if ([NSApp isActive]) {
-            // If the system has been inactive for several minutes, allow the update alert to show up immediately. We assume it's likely the user isn't at their computer in this case.
-            CFTimeInterval timeSinceLastEvent;
-            if (!appNearUpdaterInitialization && !backgroundApp) {
-                timeSinceLastEvent = CGEventSourceSecondsSinceLastEventType(kCGEventSourceStateHIDSystemState, kCGAnyInputEventType);
-            } else {
-                timeSinceLastEvent = 0;
+            BOOL systemHasBeenIdle;
+            {
+                // If the system has been inactive for several minutes, allow the update alert to show up immediately. We assume it's likely the user isn't at their computer in this case.
+                CFTimeInterval timeSinceLastEvent;
+                if (!appNearUpdaterInitialization && !backgroundApp) {
+                    timeSinceLastEvent = CGEventSourceSecondsSinceLastEventType(kCGEventSourceStateHIDSystemState, kCGAnyInputEventType);
+                    
+                    if (timeSinceLastEvent >= SUScheduledUpdateIdleEventLeewayInterval) {
+                        // Make sure there's no active power management assertions preventing
+                        // the display from sleeping by the current application.
+                        // If there is, then the app may still actively be in use
+                        CFDictionaryRef cfAssertions = NULL;
+                        if (IOPMCopyAssertionsByProcess(&cfAssertions) == kIOReturnSuccess) {
+                            NSDictionary<NSNumber *, NSArray<NSDictionary<NSString *, id> *> *> *assertions = CFBridgingRelease(cfAssertions);
+                            
+                            pid_t currentProcessIdentifier = NSRunningApplication.currentApplication.processIdentifier;
+                            
+                            NSNumber *processIdentifierKey = @(currentProcessIdentifier);
+                            NSArray<NSDictionary<NSString *, id> *> *currentProcessAssertions = assertions[processIdentifierKey];
+                            
+                            BOOL foundNoDisplaySleepAssertion = NO;
+                            for (NSDictionary<NSString *, id> *assertion in currentProcessAssertions) {
+                                NSString *assertionType = assertion[(NSString *)kIOPMAssertionTypeKey];
+                                if ([assertionType isEqualToString:(NSString *)kIOPMAssertionTypeNoDisplaySleep]) {
+                                    foundNoDisplaySleepAssertion = YES;
+                                    break;
+                                }
+                            }
+                            
+                            systemHasBeenIdle = !foundNoDisplaySleepAssertion;
+                        } else {
+                            systemHasBeenIdle = NO;
+                        }
+                    } else {
+                        systemHasBeenIdle = NO;
+                    }
+                } else {
+                    systemHasBeenIdle = NO;
+                }
             }
             
-            if (appNearUpdaterInitialization || timeSinceLastEvent >= SUScheduledUpdateIdleEventLeewayInterval) {
+            if (appNearUpdaterInitialization || systemHasBeenIdle) {
                 driverShowingUpdateNow = YES;
                 immediateFocus = YES;
                 showingUpdateInBack = NO;
