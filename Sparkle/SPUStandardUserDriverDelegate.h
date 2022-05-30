@@ -97,10 +97,10 @@ SU_EXPORT @protocol SPUStandardUserDriverDelegate <NSObject>
  
  If the standard user driver handles showing the update, `immediateFocus` reflects whether or not it will show the update in immediate and utmost focus.
  The standard user driver may choose show the update in immediate and utmost focus when the app was launched recently
- or the system has been idle for some time. If `immediateFocus` is @c NO the standard user driver may want to defer showing the update for some time
- until a better opportunity comes up (e.g, when the user comes back to the app).
+ or the system has been idle for some time. If `immediateFocus` is @c NO the standard user driver may want to
+ defer showing the update until the user comes back to the app.
  For background running applications, when `immediateFocus` is  @c NO the standard user driver will always want to show
- the update alert immediately, but behind other running applications.
+ the update alert immediately, but behind other running applications or behind the app's own windows if it's currently active.
  
  There should be no side effects made when implementing this method so you should just return @c YES or @c NO
  You will also want to implement `-standardUserDriverWillHandleShowingUpdate:forUpdate:state:` for adding additional update reminders.
@@ -121,8 +121,9 @@ SU_EXPORT @protocol SPUStandardUserDriverDelegate <NSObject>
  
  If the standard user driver handles showing the update, `handleShowingUpdate` will be @c YES
  In this case, if the update is not user initiated (`state.userInitiated` is @c NO) then the standard user driver may defer showing the update,
- and it may be shown some time after this method is called when a better opportunity opens up (e.g, when the user comes back to the app).
- For a background (dockless) running app, the update alert will always show up immediately but behind other running applications.
+ and it may be shown when the user comes back to the app.
+ For a background (dockless) running app, the update alert will always show up immediately but behind other running applications or behind
+ its own windows if the app is currently active.
  
  If the delegate declared it handles showing the update by returning @c NO in `-standardUserDriverShouldHandleShowingScheduledUpdate:andInImmediateFocus:`
  then the delegate should handle showing update reminders in this method, or at some later point.
