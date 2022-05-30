@@ -28,8 +28,6 @@
 
 #import <AppKit/AppKit.h>
 
-// The amount of time we wait until the app becomes inactive and active again to show an update prompt at an opportune time.
-static const NSTimeInterval SUScheduledUpdateActiveAppLeewayInterval = DEBUG ? 60.0 * 2 : 30 * 60.0;
 // The amount of time the app is allowed to be idle for us to consider showing an update prompt right away when the app is active
 static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 30.0 : 5 * 60.0;
 
