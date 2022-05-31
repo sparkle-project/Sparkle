@@ -24,6 +24,7 @@
 #import "SPUInstallationType.h"
 #import "SULog.h"
 #include <time.h>
+#include <mach/mach_time.h>
 #import <IOKit/pwr_mgt/IOPMLib.h>
 
 
@@ -53,12 +54,12 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
 @property (nonatomic) uint64_t expectedContentLength;
 @property (nonatomic) uint64_t bytesDownloaded;
 
-@property (nonatomic, readonly) uint64_t initializationTime;
-
 @end
 
 @implementation SPUStandardUserDriver
 {
+    mach_timebase_info_data_t _timebaseInfo;
+    double _initializationTime;
     id<NSObject> _applicationBecameActiveAfterUpdateAlertBecameKeyObserver;
     NSValue *_updateAlertWindowFrameValue;
     BOOL _updateAlertWindowWasInactive;
@@ -79,7 +80,6 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
 @synthesize permissionPrompt = _permissionPrompt;
 @synthesize expectedContentLength = _expectedContentLength;
 @synthesize bytesDownloaded = _bytesDownloaded;
-@synthesize initializationTime = _initializationTime;
 
 #pragma mark Birth
 
@@ -92,16 +92,31 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
         _oldHostBundleURL = hostBundle.bundleURL;
         _delegate = delegate;
         
-        [self _resetInitializationTime];
+        kern_return_t timebaseInfoResult = mach_timebase_info(&_timebaseInfo);
+        if (timebaseInfoResult != KERN_SUCCESS) {
+            SULog(SULogLevelError, @"Error: failed to fill mach_timebase_info() with error %d", timebaseInfoResult);
+            
+            _timebaseInfo.numer = 0;
+            _timebaseInfo.denom = 0;
+        } else {
+            [self _resetInitializationTime];
+        }
     }
     return self;
 }
 
+- (double)currentTime
+{
+    if (_timebaseInfo.denom > 0) {
+        return (1.0 * mach_absolute_time() * _timebaseInfo.numer / _timebaseInfo.denom);
+    } else {
+        return 0.0;
+    }
+}
+
 - (void)_resetInitializationTime
 {
-    if (@available(macOS 10.12, *)) {
-        _initializationTime = clock_gettime_nsec_np(CLOCK_UPTIME_RAW);
-    }
+    _initializationTime = [self currentTime];
 }
 
 #pragma mark Update Permission
@@ -162,24 +177,13 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
         [self.activeUpdateAlert setInstallButtonFocus:YES];
     } else {
         // Handle scheduled update check
+        uint64_t timeElapsedSinceInitialization = (uint64_t)([self currentTime] - _initializationTime);
         
-        BOOL appNearUpdaterInitialization;
-        if (@available(macOS 10.12, *)) {
-            uint64_t currentTime = clock_gettime_nsec_np(CLOCK_UPTIME_RAW);
-            uint64_t timeElapsedSinceInitialization = currentTime - self.initializationTime;
-            
-            // Give scheduled update alerts priority if 3 or less seconds have passed since initialization
-            appNearUpdaterInitialization = (timeElapsedSinceInitialization <= 3000000000ULL);
-            
-            // We will always show an update alert at the right time
-            [self.activeUpdateAlert setInstallButtonFocus:YES];
-        } else {
-            // This will result in update alerts always getting priority,
-            // but this is equivalent to what older versions of Sparkle did
-            appNearUpdaterInitialization = YES;
-            
-            [self.activeUpdateAlert setInstallButtonFocus:NO];
-        }
+        // Give scheduled update alerts priority if 3 or less seconds have passed since initialization
+        BOOL appNearUpdaterInitialization = (timeElapsedSinceInitialization <= 3000000000ULL);
+        
+        // We will always show an update alert at the right time
+        [self.activeUpdateAlert setInstallButtonFocus:YES];
         
         // If the delegate doesn't override our behavior:
         // For regular applications, only show the update alert if the app is active and if it's an an opportune time, otherwise, we'll wait until the app becomes active again.
