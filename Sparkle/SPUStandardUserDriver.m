@@ -194,6 +194,7 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
             BOOL systemHasBeenIdle;
             {
                 // If the system has been inactive for several minutes, allow the update alert to show up immediately. We assume it's likely the user isn't at their computer in this case.
+                // Note this is not done for background running applications.
                 CFTimeInterval timeSinceLastEvent;
                 if (!appNearUpdaterInitialization && !backgroundApp) {
                     timeSinceLastEvent = CGEventSourceSecondsSinceLastEventType(kCGEventSourceStateHIDSystemState, kCGAnyInputEventType);
@@ -214,7 +215,9 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
                             BOOL foundNoDisplaySleepAssertion = NO;
                             for (NSDictionary<NSString *, id> *assertion in currentProcessAssertions) {
                                 NSString *assertionType = assertion[(NSString *)kIOPMAssertionTypeKey];
-                                if ([assertionType isEqualToString:(NSString *)kIOPMAssertionTypeNoDisplaySleep]) {
+                                NSNumber *assertionLevel = assertion[(NSString *)kIOPMAssertionLevelKey];
+                                if ([assertionType isEqualToString:(NSString *)kIOPMAssertionTypeNoDisplaySleep] && [assertionLevel isEqual:@(kIOPMAssertionLevelOn)]) {
+                                    
                                     foundNoDisplaySleepAssertion = YES;
                                     break;
                                 }
