@@ -37,7 +37,7 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 @property (strong) SUAppcastItem *updateItem;
 @property (strong) SUHost *host;
 @property (nonatomic) BOOL allowsAutomaticUpdates;
-@property (nonatomic, copy, nullable) void(^completionBlock)(SPUUserUpdateChoice);
+@property (nonatomic, copy, nullable) void(^completionBlock)(SPUUserUpdateChoice, NSRect, BOOL);
 @property (nonatomic) SPUUserUpdateState *state;
 
 @property (strong) NSProgressIndicator *releaseNotesSpinner;
@@ -85,7 +85,7 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 
 @synthesize webView = _webView;
 
-- (instancetype)initWithAppcastItem:(SUAppcastItem *)item state:(SPUUserUpdateState *)state host:(SUHost *)aHost versionDisplayer:(id <SUVersionDisplay>)aVersionDisplayer completionBlock:(void (^)(SPUUserUpdateChoice))completionBlock didBecomeKeyBlock:(void (^)(void))didBecomeKeyBlock
+- (instancetype)initWithAppcastItem:(SUAppcastItem *)item state:(SPUUserUpdateState *)state host:(SUHost *)aHost versionDisplayer:(id <SUVersionDisplay>)aVersionDisplayer completionBlock:(void (^)(SPUUserUpdateChoice, NSRect, BOOL))completionBlock didBecomeKeyBlock:(void (^)(void))didBecomeKeyBlock
 {
     self = [super initWithWindowNibName:@"SUUpdateAlert"];
     if (self != nil) {
@@ -121,10 +121,14 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 {
     [self.webView stopLoading];
     [self.webView.view removeFromSuperview]; // Otherwise it gets sent Esc presses (why?!) and gets very confused.
+    
+    BOOL wasKeyWindow = self.window.keyWindow;
+    NSRect windowFrame = self.window.frame;
+    
     [self close];
     
     if (self.completionBlock != nil) {
-        self.completionBlock(choice);
+        self.completionBlock(choice, windowFrame, wasKeyWindow);
         self.completionBlock = nil;
     }
 }

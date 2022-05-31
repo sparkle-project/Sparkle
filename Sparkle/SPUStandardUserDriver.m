@@ -61,6 +61,7 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
 {
     id<NSObject> _applicationBecameActiveAfterUpdateAlertBecameKeyObserver;
     NSValue *_updateAlertWindowFrameValue;
+    BOOL _updateAlertWindowWasInactive;
     BOOL _loggedGentleUpdateReminderWarning;
     BOOL _regularApplicationUpdate;
     BOOL _updateReceivedUserAttention;
@@ -335,7 +336,7 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
     
     __weak SPUStandardUserDriver *weakSelf = self;
     __weak id<SPUStandardUserDriverDelegate> weakDelegate = self.delegate;
-    self.activeUpdateAlert = [[SUUpdateAlert alloc] initWithAppcastItem:appcastItem state:state host:self.host versionDisplayer:versionDisplayer completionBlock:^(SPUUserUpdateChoice choice) {
+    self.activeUpdateAlert = [[SUUpdateAlert alloc] initWithAppcastItem:appcastItem state:state host:self.host versionDisplayer:versionDisplayer completionBlock:^(SPUUserUpdateChoice choice, NSRect windowFrame, BOOL wasKeyWindow) {
         reply(choice);
         
         SPUStandardUserDriver *strongSelf = weakSelf;
@@ -350,11 +351,12 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
             }
             
             // Record the window frame of the update alert right before we deallocate it
-            // So we can center future status window to where the update alert last was
-            NSWindow *updateAlertWindow = strongSelf.activeUpdateAlert.window;
-            if (updateAlertWindow != nil) {
-                strongSelf->_updateAlertWindowFrameValue = [NSValue valueWithRect:updateAlertWindow.frame];
-            }
+            // So we can center future status window to where the update alert last was.
+            // Also record if the window was inactive at the time a response was made
+            // (the window may not be key if the window e.g. holds command while clicking on a response button)
+            strongSelf->_updateAlertWindowFrameValue = [NSValue valueWithRect:windowFrame];
+            strongSelf->_updateAlertWindowWasInactive = !wasKeyWindow;
+            
             strongSelf.activeUpdateAlert = nil;
         }
     } didBecomeKeyBlock:^{
@@ -641,7 +643,12 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
         }
         
         self.statusController = [[SUStatusController alloc] initWithHost:self.host centerPointValue:centerPointValue minimizable:minimizable];
-        [self.statusController showWindow:self];
+        
+        if (_updateAlertWindowWasInactive) {
+            [self.statusController.window orderFront:nil];
+        } else {
+            [self.statusController showWindow:self];
+        }
     }
 }
 
