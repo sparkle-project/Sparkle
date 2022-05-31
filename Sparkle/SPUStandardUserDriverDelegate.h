@@ -81,6 +81,8 @@ SU_EXPORT @protocol SPUStandardUserDriverDelegate <NSObject>
  The delegate may implement scheduled update reminders that are presented in a gentle manner by implementing one or both of:
  `-standardUserDriverWillShowUpdate:state:` and `-standardUserDriverShouldHandleShowingUpdateAlertForScheduledUpdate:andInImmediateFocus:`
  
+ Visit https://sparkle-project.org/documentation/gentle-reminders for more information and examples.
+ 
  @return @c YES if gentle scheduled update reminders are implemented by standard user driver delegate, otherwise @c NO (default).
  */
 @property (nonatomic, readonly) BOOL supportsGentleScheduledUpdateReminders;
@@ -96,7 +98,7 @@ SU_EXPORT @protocol SPUStandardUserDriverDelegate <NSObject>
  Returning @c YES is the default behavior and allows the standard user driver to handle showing the update.
  
  If the standard user driver handles showing the update, `immediateFocus` reflects whether or not it will show the update in immediate and utmost focus.
- The standard user driver may choose show the update in immediate and utmost focus when the app was launched recently
+ The standard user driver may choose to show the update in immediate and utmost focus when the app was launched recently
  or the system has been idle for some time. If `immediateFocus` is @c NO the standard user driver may want to
  defer showing the update until the user comes back to the app.
  For background running applications, when `immediateFocus` is  @c NO the standard user driver will always want to show
@@ -151,7 +153,7 @@ SU_EXPORT @protocol SPUStandardUserDriverDelegate <NSObject>
  This occurs either when the user first brings the update alert in utmost focus or when the user makes a choice to install an update or dismiss/skip it.
  
  This may be useful to intercept for dismissing custom attention-based UI indicators (e.g, user notifications) introduced when implementing
- `-standardUserDriverShouldShowUpdateAlertForScheduledUpdate:inFocusNow:`
+ `-standardUserDriverShouldHandleShowingScheduledUpdate:andInImmediateFocus:`
  
  For custom UI indicators that need to still be on screen after the user has started to install an update, please see `standardUserDriverWillFinishUpdateSession`.
  
@@ -166,7 +168,7 @@ SU_EXPORT @protocol SPUStandardUserDriverDelegate <NSObject>
  For updaters updating external/other bundles, this may also be called after an update has been successfully installed.
  
  This may be useful to intercept for dismissing custom UI indicators introduced when implementing
- `-standardUserDriverShouldShowUpdateAlertForScheduledUpdate:inFocusNow:`
+ `-standardUserDriverShouldHandleShowingScheduledUpdate:andInImmediateFocus:`
  
  For UI indicators that need to be dismissed when the user has given attention to a new update alert,
  please see `standardUserDriverDidReceiveUserAttentionForUpdate:`
