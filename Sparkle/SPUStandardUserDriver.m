@@ -248,7 +248,8 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
             } else {
                 driverShowingUpdateNow = backgroundApp;
                 immediateFocus = NO;
-                showingUpdateInBack = backgroundApp;
+                // If there is a key window active in the app, show the update alert behind other windows
+                showingUpdateInBack = backgroundApp && ([NSApp keyWindow] != nil);
                 activatingApp = NO;
             }
         } else {
