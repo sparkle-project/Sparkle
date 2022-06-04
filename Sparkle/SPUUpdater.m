@@ -36,6 +36,12 @@
 
 #include "AppKitPrevention.h"
 
+@interface NSObject (SPUStandardUserDriverPrivate)
+
+- (void)_logGentleScheduledUpdateReminderWarningIfNeeded;
+
+@end
+
 NSString *const SUUpdaterDidFinishLoadingAppCastNotification = @"SUUpdaterDidFinishLoadingAppCastNotification";
 NSString *const SUUpdaterDidFindValidUpdateNotification = @"SUUpdaterDidFindValidUpdateNotification";
 NSString *const SUUpdaterDidNotFindUpdateNotification = @"SUUpdaterDidNotFindUpdateNotification";
@@ -510,6 +516,11 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
                 if ([self.delegate respondsToSelector:@selector(updater:willScheduleUpdateCheckAfterDelay:)]) {
                     [self.delegate updater:self willScheduleUpdateCheckAfterDelay:delayUntilCheck];
                 }
+                
+                if ([self.userDriver respondsToSelector:@selector(_logGentleScheduledUpdateReminderWarningIfNeeded)]) {
+                    [(NSObject *)self.userDriver _logGentleScheduledUpdateReminderWarningIfNeeded];
+                }
+                
                 [self.updaterTimer startAndFireAfterDelay:delayUntilCheck];
             } else {
                 // We're overdue! Run one now.

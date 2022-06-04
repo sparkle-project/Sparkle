@@ -37,7 +37,7 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 @property (strong) SUAppcastItem *updateItem;
 @property (strong) SUHost *host;
 @property (nonatomic) BOOL allowsAutomaticUpdates;
-@property (nonatomic, copy, nullable) void(^completionBlock)(SPUUserUpdateChoice);
+@property (nonatomic, copy, nullable) void(^completionBlock)(SPUUserUpdateChoice, NSRect, BOOL);
 @property (nonatomic) SPUUserUpdateState *state;
 
 @property (strong) NSProgressIndicator *releaseNotesSpinner;
@@ -58,6 +58,9 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 @end
 
 @implementation SUUpdateAlert
+{
+    void (^_didBecomeKeyBlock)(void);
+}
 
 @synthesize completionBlock = _completionBlock;
 @synthesize state = _state;
@@ -82,7 +85,7 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 
 @synthesize webView = _webView;
 
-- (instancetype)initWithAppcastItem:(SUAppcastItem *)item state:(SPUUserUpdateState *)state host:(SUHost *)aHost versionDisplayer:(id <SUVersionDisplay>)aVersionDisplayer completionBlock:(void (^)(SPUUserUpdateChoice))block
+- (instancetype)initWithAppcastItem:(SUAppcastItem *)item state:(SPUUserUpdateState *)state host:(SUHost *)aHost versionDisplayer:(id <SUVersionDisplay>)aVersionDisplayer completionBlock:(void (^)(SPUUserUpdateChoice, NSRect, BOOL))completionBlock didBecomeKeyBlock:(void (^)(void))didBecomeKeyBlock
 {
     self = [super initWithWindowNibName:@"SUUpdateAlert"];
     if (self != nil) {
@@ -91,11 +94,14 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
         versionDisplayer = aVersionDisplayer;
         
         _state = state;
-        _completionBlock = [block copy];
+        _completionBlock = [completionBlock copy];
+        _didBecomeKeyBlock = [didBecomeKeyBlock copy];
         
         SPUUpdaterSettings *updaterSettings = [[SPUUpdaterSettings alloc] initWithHostBundle:host.bundle];
         _allowsAutomaticUpdates = updaterSettings.allowsAutomaticUpdates && updaterSettings.automaticallyChecksForUpdates && !item.informationOnlyUpdate;
         [self setShouldCascadeWindows:NO];
+    } else {
+        assert(false);
     }
     return self;
 }
@@ -115,10 +121,14 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 {
     [self.webView stopLoading];
     [self.webView.view removeFromSuperview]; // Otherwise it gets sent Esc presses (why?!) and gets very confused.
+    
+    BOOL wasKeyWindow = self.window.keyWindow;
+    NSRect windowFrame = self.window.frame;
+    
     [self close];
     
     if (self.completionBlock != nil) {
-        self.completionBlock(choice);
+        self.completionBlock(choice, windowFrame, wasKeyWindow);
         self.completionBlock = nil;
     }
 }
@@ -312,10 +322,6 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 
     [self.window setFrameAutosaveName: showReleaseNotes ? @"SUUpdateAlert" : @"SUUpdateAlertSmall" ];
 
-    if ([SUApplicationInfo isBackgroundApplication:[NSApplication sharedApplication]]) {
-        [self.window setLevel:NSFloatingWindowLevel]; // This means the window will float over all other apps, if our app is switched out ?!
-    }
-
     if (self.updateItem.informationOnlyUpdate) {
         [self.installButton setTitle:SULocalizedString(@"Learn More…", @"Alternate title for 'Install Update' button when there's no download in RSS feed.")];
         [self.installButton setAction:@selector(openInfoURL:)];
@@ -369,6 +375,13 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
     }
 
     [self.window center];
+}
+
+- (void)windowDidBecomeKey:(NSNotification *)__unused note
+{
+    if (_didBecomeKeyBlock != NULL) {
+        _didBecomeKeyBlock();
+    }
 }
 
 - (BOOL)windowShouldClose:(NSNotification *) __unused note

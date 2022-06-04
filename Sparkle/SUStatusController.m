@@ -25,6 +25,10 @@ static NSString *const SUStatusControllerTouchBarIndentifier = @"" SPARKLE_BUNDL
 @end
 
 @implementation SUStatusController
+{
+    NSValue *_centerPointValue;
+}
+
 @synthesize progressValue;
 @synthesize maxProgressValue;
 @synthesize statusText;
@@ -37,12 +41,13 @@ static NSString *const SUStatusControllerTouchBarIndentifier = @"" SPARKLE_BUNDL
 @synthesize touchBarButton;
 @synthesize minimizable = _minimizable;
 
-- (instancetype)initWithHost:(SUHost *)aHost minimizable:(BOOL)minimizable
+- (instancetype)initWithHost:(SUHost *)aHost centerPointValue:(NSValue *)centerPointValue minimizable:(BOOL)minimizable
 {
     self = [super initWithWindowNibName:@"SUStatus" owner:self];
 	if (self)
 	{
         self.host = aHost;
+        _centerPointValue = centerPointValue;
         _minimizable = minimizable;
         [self setShouldCascadeWindows:NO];
     }
@@ -53,8 +58,15 @@ static NSString *const SUStatusControllerTouchBarIndentifier = @"" SPARKLE_BUNDL
 
 - (void)windowDidLoad
 {
-    [[self window] center];
-    [[self window] setFrameAutosaveName:@"SUStatusFrame"];
+    NSRect windowFrame = self.window.frame;
+    
+    if (_centerPointValue != nil) {
+        NSPoint centerPoint = _centerPointValue.pointValue;
+        [self.window setFrameOrigin:NSMakePoint(centerPoint.x - windowFrame.size.width / 2.0, centerPoint.y - windowFrame.size.height / 2.0)];
+    } else {
+        [self.window center];
+    }
+    
     if (self.minimizable) {
         self.window.styleMask |= NSWindowStyleMaskMiniaturizable;
     }
