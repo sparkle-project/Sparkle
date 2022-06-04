@@ -53,6 +53,11 @@
     self.updateDidShowHandler = handler;
 }
 
+- (void)setUpdateWillInstallHandler:(void (^)(void))updateWillInstallHandler
+{
+    [self.uiDriver setUpdateWillInstallHandler:updateWillInstallHandler];
+}
+
 - (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders
 {
     self.showingUserInitiatedProgress = YES;

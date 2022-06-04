@@ -766,6 +766,10 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         weakSelf.canCheckForUpdates = YES;
     }];
     
+    [self.driver setUpdateWillInstallHandler:^{
+        [weakSelf updateLastUpdateCheckDate];
+    }];
+    
     if (installerInProgress) {
         // Resume an update that has already begun installing in the background
         [self.driver resumeInstallingUpdate];

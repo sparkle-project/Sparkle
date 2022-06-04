@@ -132,6 +132,11 @@
     [self.coreDriver setCompletionHandler:completionBlock];
 }
 
+- (void)setUpdateWillInstallHandler:(void (^)(void))updateWillInstallHandler
+{
+    [self.coreDriver setUpdateWillInstallHandler:updateWillInstallHandler];
+}
+
 - (void)_clearSkippedUpdatesIfUserInitiated
 {
     if (self.userInitiated) {

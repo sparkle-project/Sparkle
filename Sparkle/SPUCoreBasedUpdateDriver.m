@@ -48,6 +48,9 @@
 @end
 
 @implementation SPUCoreBasedUpdateDriver
+{
+    void (^_updateWillInstallHandler)(void);
+}
 
 @synthesize basicDriver = _basicDriver;
 @synthesize downloadDriver = _downloadDriver;
@@ -87,6 +90,11 @@
 - (void)setCompletionHandler:(SPUUpdateDriverCompletion)completionBlock
 {
     [self.basicDriver setCompletionHandler:completionBlock];
+}
+
+- (void)setUpdateWillInstallHandler:(void (^)(void))updateWillInstallHandler
+{
+    _updateWillInstallHandler = [updateWillInstallHandler copy];
 }
 
 - (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background requiresSilentInstall:(BOOL)silentInstall
@@ -304,6 +312,10 @@
             [self.installerDriver cancelUpdate];
             break;
         case SPUUserUpdateChoiceInstall:
+            if (_updateWillInstallHandler != NULL) {
+                _updateWillInstallHandler();
+            }
+            
             [self.installerDriver installWithToolAndRelaunch:YES displayingUserInterface:displayingUserInterface];
             break;
     }

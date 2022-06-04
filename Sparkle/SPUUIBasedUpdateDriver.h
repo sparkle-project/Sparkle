@@ -33,6 +33,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)setCompletionHandler:(SPUUpdateDriverCompletion)completionBlock;
 
+- (void)setUpdateWillInstallHandler:(void (^)(void))updateWillInstallHandler;
+
 - (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background;
 
 - (void)resumeInstallingUpdate;
