@@ -23,6 +23,8 @@ typedef void (^SPUUpdateDriverCompletion)(BOOL shouldShowUpdateImmediately, id<S
 
 - (void)setUpdateShownHandler:(void (^)(void))updateShownHandler;
 
+- (void)setUpdateWillInstallHandler:(void (^)(void))updateWillInstallHandler;
+
 - (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders;
 
 - (void)resumeInstallingUpdate;

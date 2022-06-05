@@ -2,7 +2,7 @@
 
 Fixes # (issue)
 
-## Misc Checklist:
+## Misc Checklist
 
 - [ ] My change requires a documentation update on [Sparkle's website repository](https://github.com/sparkle-project/sparkle-project.github.io)
 - [ ] My change requires changes to generate_appcast, generate_keys, or sign_update

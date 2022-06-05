@@ -64,6 +64,9 @@
 @end
 
 @implementation SPUInstallerDriver
+{
+    void (^_updateWillInstallHandler)(void);
+}
 
 @synthesize host = _host;
 @synthesize applicationBundle = _applicationBundle;
@@ -93,6 +96,11 @@
         _delegate = delegate;
     }
     return self;
+}
+
+- (void)setUpdateWillInstallHandler:(void (^)(void))updateWillInstallHandler
+{
+    _updateWillInstallHandler = [updateWillInstallHandler copy];
 }
 
 - (void)_reportInstallerError:(nullable NSError *)currentInstallerError genericErrorCode:(NSInteger)genericErrorCode genericUserInfo:(NSDictionary *)genericUserInfo
@@ -474,6 +482,10 @@
                 return;
             }
         }
+    }
+    
+    if (_updateWillInstallHandler != NULL) {
+        _updateWillInstallHandler();
     }
     
     // Set up connection to the installer if one is not set up already

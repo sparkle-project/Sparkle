@@ -33,6 +33,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)resumeInstallingUpdateWithUpdateItem:(SUAppcastItem *)updateItem systemDomain:(BOOL)systemDomain;
 
+- (void)setUpdateWillInstallHandler:(void (^)(void))updateWillInstallHandler;
+
 - (void)extractDownloadedUpdate:(SPUDownloadedUpdate *)downloadedUpdate silently:(BOOL)silently completion:(void (^)(NSError * _Nullable))completionHandler;
 
 - (void)installWithToolAndRelaunch:(BOOL)relaunch displayingUserInterface:(BOOL)showUI;

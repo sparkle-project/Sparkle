@@ -89,6 +89,11 @@
     [self.basicDriver setCompletionHandler:completionBlock];
 }
 
+- (void)setUpdateWillInstallHandler:(void (^)(void))updateWillInstallHandler
+{
+    [self.installerDriver setUpdateWillInstallHandler:updateWillInstallHandler];
+}
+
 - (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background requiresSilentInstall:(BOOL)silentInstall
 {
     self.userAgent = userAgent;
