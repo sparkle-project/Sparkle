@@ -65,8 +65,10 @@ SU_EXPORT @interface SUAppcastItem : NSObject<NSSecureCoding>
  This corresponds to the application update's @c CFBundleShortVersionString
  
  This is extracted from the @c <sparkle:shortVersionString> element,  or the @c sparkle:shortVersionString attribute from the @c <enclosure> element.
+ 
+ If no short version string is available, this falls back to the update's `versionString`.
  */
-@property (copy, readonly, nullable) NSString *displayVersionString;
+@property (copy, readonly) NSString *displayVersionString;
 
 /**
  The file URL to the update item if provided.
