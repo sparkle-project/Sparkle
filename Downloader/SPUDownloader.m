@@ -9,7 +9,6 @@
 #import "SPUDownloader.h"
 #import "SPUDownloaderDelegate.h"
 #import "SPULocalCacheDirectory.h"
-#import "SPUURLRequest.h"
 #import "SPUDownloadData.h"
 #import "SPUDownloadDataPrivate.h"
 #import "SUErrors.h"
@@ -61,19 +60,19 @@ static NSString *SUDownloadingReason = @"Downloading update related file";
     return self;
 }
 
-- (void)startDownloadWithRequest:(SPUURLRequest *)request
+- (void)startDownloadWithRequest:(NSURLRequest *)request
 {
     self.downloadSession = [NSURLSession
         sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]
         delegate:self
         delegateQueue:[NSOperationQueue mainQueue]];
-    self.download = [self.downloadSession downloadTaskWithRequest:request.request];
+    self.download = [self.downloadSession downloadTaskWithRequest:request];
     [self.download resume];
 }
 
 // Don't implement dealloc - make the client call cleanup, which is the only way to remove the reference cycle from the delegate anyway
 
-- (void)startPersistentDownloadWithRequest:(SPUURLRequest *)request bundleIdentifier:(NSString *)bundleIdentifier desiredFilename:(NSString *)desiredFilename
+- (void)startPersistentDownloadWithRequest:(NSURLRequest *)request bundleIdentifier:(NSString *)bundleIdentifier desiredFilename:(NSString *)desiredFilename
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         if (self.download == nil && self.delegate != nil) {
@@ -90,7 +89,7 @@ static NSString *SUDownloadingReason = @"Downloading update related file";
     });
 }
 
-- (void)startTemporaryDownloadWithRequest:(SPUURLRequest *)request
+- (void)startTemporaryDownloadWithRequest:(NSURLRequest *)request
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         if (self.download == nil && self.delegate != nil) {
