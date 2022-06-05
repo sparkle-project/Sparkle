@@ -204,13 +204,13 @@
                     if (!latestAppcastItem.minimumOperatingSystemVersionIsOK) {
                         localizedDescription = SULocalizedString(@"Your macOS version is too old", nil);
                         
-                        recoverySuggestion = [NSString stringWithFormat:SULocalizedString(@"%1$@ %2$@ is available but your macOS version is too old to install it. At least macOS %3$@ is required.", nil), [self.host name], latestAppcastItem.versionString, latestAppcastItem.minimumSystemVersion];
+                        recoverySuggestion = [NSString stringWithFormat:SULocalizedString(@"%1$@ %2$@ is available but your macOS version is too old to install it. At least macOS %3$@ is required.", nil), [self.host name], latestAppcastItem.displayVersionString, latestAppcastItem.minimumSystemVersion];
                         
                         reason = SPUNoUpdateFoundReasonSystemIsTooOld;
                     } else if (!latestAppcastItem.maximumOperatingSystemVersionIsOK) {
                         localizedDescription = SULocalizedString(@"Your macOS version is too new", nil);
                         
-                        recoverySuggestion = [NSString stringWithFormat:SULocalizedString(@"%1$@ %2$@ is available but your macOS version is too new for this update. This update only supports up to macOS %3$@.", nil), [self.host name], latestAppcastItem.versionString, latestAppcastItem.maximumSystemVersion];
+                        recoverySuggestion = [NSString stringWithFormat:SULocalizedString(@"%1$@ %2$@ is available but your macOS version is too new for this update. This update only supports up to macOS %3$@.", nil), [self.host name], latestAppcastItem.displayVersionString, latestAppcastItem.maximumSystemVersion];
                         
                         reason = SPUNoUpdateFoundReasonSystemIsTooNew;
                     } else {
