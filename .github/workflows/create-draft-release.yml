@@ -2,7 +2,7 @@ name: "Create Draft Release"
 
 env:
   BUILDDIR: "build"
-  DEVELOPER_DIR: "/Applications/Xcode_13.2.1.app/Contents/Developer"
+  DEVELOPER_DIR: "/Applications/Xcode_13.3.1.app/Contents/Developer"
 
 on:
   workflow_dispatch:
@@ -29,7 +29,7 @@ concurrency:
 jobs:
   release:
     name: "Publish binaries for release"
-    runs-on: macos-11
+    runs-on: macos-12
 
     steps:
       - name: "Checkout sources"
@@ -90,7 +90,7 @@ jobs:
         with:
           draft: true
           prerelease: ${{ env.PRERELEASE_VERSION }}
-          name: "Sparkle ${{ github.event.inputs.marketingVersion }}${{ github.event.inputs.prereleaseSuffix }}"
+          name: "${{ github.event.inputs.marketingVersion }}${{ github.event.inputs.prereleaseSuffix }}"
           tag_name: "${{ github.event.inputs.marketingVersion }}${{ github.event.inputs.prereleaseSuffix }}"
           fail_on_unmatched_files: true
           token: ${{ secrets.BOT_PERSONAL_ACCESS_TOKEN }}
