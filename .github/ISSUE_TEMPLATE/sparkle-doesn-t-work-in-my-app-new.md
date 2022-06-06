@@ -1,8 +1,8 @@
 ---
-name: Sparkle 1.x doesn't work in my app
-about: Problems with integration, unexpected errors
+name: Sparkle 2.x doesn't work in my app
+about: Problems with integration, unexpected errors using Sparkle 2
 title: ''
-labels: '1.x'
+labels: '2.x'
 assignees: ''
 
 ---
