@@ -153,7 +153,7 @@
         }
 
         double itemsCopied = 0;
-        double totalItems = [contents count];
+        double totalItems = (double)[contents count];
 
 		for (NSString *item in contents)
 		{

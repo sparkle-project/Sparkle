@@ -88,7 +88,7 @@ static off_t search(off_t *I, u_char *old, off_t oldsize,
         return search(I, old, oldsize, new, newsize, x, en, pos);
     } else {
         return search(I, old, oldsize, new, newsize, st, x, pos);
-    };
+    }
 }
 
 /* offtout(x, buf)

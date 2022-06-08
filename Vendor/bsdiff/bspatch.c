@@ -271,7 +271,7 @@ int bspatch(int argc,const char * const argv[])
                 goto cleanup;
             }
             ctrl[i]=offtin(buf);
-        };
+        }
 
         /* Sanity-check */
         if(newpos+ctrl[0]>newsize) {
@@ -311,7 +311,7 @@ int bspatch(int argc,const char * const argv[])
         /* Adjust pointers */
         newpos+=ctrl[1];
         oldpos+=ctrl[2];
-    };
+    }
 
     /* Clean up the bzip2 reads */
     io->close(cstream);

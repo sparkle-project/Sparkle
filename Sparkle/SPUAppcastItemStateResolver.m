@@ -108,7 +108,7 @@
     
     BOOL minimumOperatingSystemVersionIsOK = [self isMinimumOperatingSystemVersionOK:minimumOperatingSystemVersion];
     
-    BOOL maximumOperatingSystemVersionIsOK = [self isMaximumOperatingSystemVersionOK:maximumOperatingSystemVersion];;
+    BOOL maximumOperatingSystemVersionIsOK = [self isMaximumOperatingSystemVersionOK:maximumOperatingSystemVersion];
     
     BOOL majorUpgrade = ![self isMinimumAutoupdateVersionOK:minimumAutoupdateVersion];
     

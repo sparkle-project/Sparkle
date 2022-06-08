@@ -88,15 +88,6 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 @synthesize loggedATSWarning = _loggedATSWarning;
 @synthesize loggedNoSecureKeyWarning = _loggedNoSecureKeyWarning;
 
-#if DEBUG
-+ (void)load
-{
-    // We're using NSLog instead of SULog here because we don't want to start Sparkle's logger here,
-    // and because this is not really an error, just a warning notice
-    // NSLog(@"WARNING: This is running a Debug build of Sparkle 2; don't use this in production!");
-}
-#endif
-
 - (instancetype)initWithHostBundle:(NSBundle *)hostBundle applicationBundle:(NSBundle *)applicationBundle userDriver:(id <SPUUserDriver>)userDriver delegate:(id<SPUUpdaterDelegate> _Nullable)delegate
 {
     self = [super init];
