@@ -42,8 +42,11 @@
             UTType *contentType = isMainBundle ? UTTypeApplication : UTTypeBundle;
             icon = [[NSWorkspace sharedWorkspace] iconForContentType:contentType];
         } else {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
             NSString *fileType = isMainBundle ? (__bridge NSString *)kUTTypeApplication : (__bridge NSString *)kUTTypeBundle;
             icon = [[NSWorkspace sharedWorkspace] iconForFileType:fileType];
+#pragma clang diagnostic pop
         }
     }
     return icon;

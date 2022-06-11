@@ -269,7 +269,6 @@
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
     __block SecGroupTransformRef group = SecTransformCreateGroupTransform();
-#pragma clang diagnostic pop
     __block SecTransformRef dataReadTransform = NULL;
     __block SecTransformRef dataDigestTransform = NULL;
     __block SecTransformRef dataVerifyTransform = NULL;
@@ -301,7 +300,7 @@
         
         return cleanup();
     }
-
+    
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdirect-ivar-access"
     dataVerifyTransform = SecVerifyTransformCreate(dsaPubKeySecKey, (__bridge CFDataRef)dsaSignature, &error);
@@ -321,6 +320,7 @@
         
         return cleanup();
     }
+#pragma clang diagnostic pop
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"

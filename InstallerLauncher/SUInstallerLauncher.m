@@ -211,7 +211,10 @@
                                 CFStringRef uti = (__bridge CFStringRef)[UTTypePNG identifier];
                                 imageDestination = CGImageDestinationCreateWithURL((CFURLRef)tempIconDestinationURL, uti, 1, NULL);
                             } else {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
                                 imageDestination = CGImageDestinationCreateWithURL((CFURLRef)tempIconDestinationURL, kUTTypePNG, 1, NULL);
+#pragma clang diagnostic pop
                             }
                             if (imageDestination != NULL) {
                                 CGImageDestinationAddImageFromSource(imageDestination, imageSource, imageIndex, (CFDictionaryRef)@{});
