@@ -436,12 +436,26 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
 
 - (void)showUpdateInFocus
 {
+    BOOL mayNeedToActivateApp;
     if (self.activeUpdateAlert != nil) {
         [self setUpActiveUpdateAlertForScheduledUpdate:nil state:nil];
+        mayNeedToActivateApp = NO;
     } else if (self.permissionPrompt != nil) {
         [self.permissionPrompt showWindow:nil];
+        mayNeedToActivateApp = YES;
     } else if (self.statusController != nil) {
         [self.statusController showWindow:nil];
+        mayNeedToActivateApp = YES;
+    } else if (self.checkingController != nil) {
+        [self.checkingController showWindow:nil];
+        mayNeedToActivateApp = YES;
+    } else {
+        mayNeedToActivateApp = NO;
+    }
+    
+    if (mayNeedToActivateApp && ![NSApp isActive]) {
+        // Make the app active if it's not already active
+        [NSApp activateIgnoringOtherApps:YES];
     }
 }
 
