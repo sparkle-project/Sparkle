@@ -28,10 +28,6 @@
 #import "SPUAppcastItemStateResolver+Private.h"
 #import "SPUAppcastItemState.h"
 
-// For statfs()
-#include <sys/param.h>
-#include <sys/mount.h>
-
 
 #include "AppKitPrevention.h"
 
@@ -47,7 +43,7 @@
 
 @implementation SUAppcastDriver
 {
-    NSNumber * _Nullable _systemSupportsDeltaUpdates; // BOOL
+    NSNumber * _Nullable _hostSupportsDeltaUpdates; // BOOL
 }
 
 @synthesize host = _host;
@@ -120,25 +116,63 @@
     
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdirect-ivar-access"
-    if (deltaItem != nil && _systemSupportsDeltaUpdates == nil) {
-        // Delta updates are not supported on fat32 and exfat systems
-        // This is because they do not preserve permissions at all, which we require
+    if (deltaItem != nil && _hostSupportsDeltaUpdates == nil) {
+        // Delta updates are not supported when bundles are transferred over to some file systems like fat32 and exfat systems
+        // This is because they do not preserve permissions completely, which we require for diff'ing.
         // We shouldn't download delta updates in cases where we can detect they aren't supported
-        struct statfs volumeInfo = {0};
-        NSURL *hostBundleURL = self.host.bundle.bundleURL;
-        if (statfs(hostBundleURL.fileSystemRepresentation, &volumeInfo) == 0) {
-            if (strncmp("msdos", volumeInfo.f_fstypename, sizeof(volumeInfo.f_fstypename)) == 0 ||
-                strncmp("exfat", volumeInfo.f_fstypename, sizeof(volumeInfo.f_fstypename)) == 0) {
-                _systemSupportsDeltaUpdates = @NO;
+        // More accurately we will detect if the host bundle's permission bits have been 'tainted'
+        // which is more reliable than checking the underlying file system.
+        // To do this, we will check the Sparkle executable's permission bits, which is produced from us
+        
+        NSFileManager *fileManager = NSFileManager.defaultManager;
+        
+        NSBundle *hostBundle = self.host.bundle;
+        NSString *sparkleExecutablePath;
+        if ([hostBundle isEqual:NSBundle.mainBundle]) {
+            NSBundle *sparkleBundle = [NSBundle bundleForClass:[self class]];
+            sparkleExecutablePath = sparkleBundle.executableURL.URLByResolvingSymlinksInPath.path;
+        } else {
+            // If we are not updating ourselves, make a good guess to the Sparkle executable location
+            NSURL *frameworksURL = hostBundle.privateFrameworksURL;
+            NSURL *sparkleSymlinkURL = [frameworksURL URLByAppendingPathComponent:@"Sparkle.framework/Sparkle"];
+            NSString *candidateExecutablePath = sparkleSymlinkURL.URLByResolvingSymlinksInPath.path;
+            
+            if ([fileManager fileExistsAtPath:candidateExecutablePath]) {
+                sparkleExecutablePath = candidateExecutablePath;
             } else {
-                _systemSupportsDeltaUpdates = @YES;
+                sparkleExecutablePath = nil;
+            }
+        }
+        
+        // Only skip delta updates if permissions are not 0755
+        BOOL hostSupportsDeltaUpdates;
+        if (sparkleExecutablePath != nil) {
+            NSError *attributesError = nil;
+            NSDictionary<NSFileAttributeKey, id> *attributes = [fileManager attributesOfItemAtPath:sparkleExecutablePath error:&attributesError];
+            if (attributes != nil) {
+                NSNumber *posixPermissions = attributes[NSFilePosixPermissions];
+                if (posixPermissions != nil && posixPermissions.shortValue != 0755) {
+                    hostSupportsDeltaUpdates = NO;
+                    
+                    SULog(SULogLevelDefault, @"Encountered irregular POSIX permissions 0%o for Sparkle executable, which is not 0755. Skipping delta updates..", posixPermissions.shortValue);
+                } else {
+                    hostSupportsDeltaUpdates = YES;
+                }
+            } else {
+                hostSupportsDeltaUpdates = YES;
+                
+                SULog(SULogLevelError, @"Error: Failed to retrieve attributes from Sparkle executable: %@", attributesError.localizedDescription);
             }
         } else {
-            _systemSupportsDeltaUpdates = @YES;
+            hostSupportsDeltaUpdates = YES;
+            
+            SULog(SULogLevelError, @"Error: Failed to unexpectably retrieve Sparkle executable URL from %@", hostBundle.bundlePath);
         }
+        
+        _hostSupportsDeltaUpdates = @(hostSupportsDeltaUpdates);
     }
     
-    if (deltaItem != nil && _systemSupportsDeltaUpdates.boolValue) {
+    if (deltaItem != nil && _hostSupportsDeltaUpdates.boolValue) {
         if (secondaryUpdate != NULL) {
             *secondaryUpdate = regularItem;
         }
