@@ -454,7 +454,7 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
     }
     
     if (mayNeedToActivateApp && ![NSApp isActive]) {
-        // Make the app active if it's not already active
+        // Make the app active if it's not already active, e.g, from a menu bar extra
         [NSApp activateIgnoringOtherApps:YES];
     }
 }
