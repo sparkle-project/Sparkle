@@ -15,6 +15,9 @@
 
 #define PERMISSION_FLAGS (S_IRWXU | S_IRWXG | S_IRWXO | S_ISUID | S_ISGID | S_ISVTX)
 #define VALID_SYMBOLIC_LINK_PERMISSIONS 0755
+// Enforcing Sparkle's executable permissions to be valid allows us to perform a preflight test before
+// downloading delta items
+#define VALID_SPARKLE_EXECUTABLE_PERMISSIONS 0755
 
 #define APPLE_CODE_SIGN_XATTR_CODE_DIRECTORY_KEY "com.apple.cs.CodeDirectory"
 #define APPLE_CODE_SIGN_XATTR_CODE_REQUIREMENTS_KEY "com.apple.cs.CodeRequirements"

@@ -1783,4 +1783,94 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
     XCTAssertTrue(success);
 }
 
+- (void)testRegularSparkleFrameworkPresence
+{
+    [self createAndApplyPatchWithHandler:^(NSFileManager *fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
+        NSString *sourceA = [sourceDirectory stringByAppendingPathComponent:@"Frameworks/Sparkle.framework/Versions/A/"];
+        NSString *destinationB = [destinationDirectory stringByAppendingPathComponent:@"Frameworks/Sparkle.framework/Versions/B/"];
+        
+        XCTAssertTrue([fileManager createDirectoryAtPath:sourceA withIntermediateDirectories:YES attributes:NULL error:NULL]);
+        XCTAssertTrue([fileManager createDirectoryAtPath:destinationB withIntermediateDirectories:YES attributes:NULL error:NULL]);
+        
+        NSString *sourceFile = [sourceA stringByAppendingPathComponent:@"Sparkle"];
+        NSString *destinationFile = [destinationB stringByAppendingPathComponent:@"Sparkle"];
+        
+        XCTAssertTrue([[self bigData1] writeToFile:sourceFile atomically:YES]);
+        XCTAssertTrue([[self bigData2] writeToFile:destinationFile atomically:YES]);
+        
+        NSError *error = nil;
+        if (![fileManager setAttributes:@{NSFilePosixPermissions : @0755} ofItemAtPath:sourceFile error:&error]) {
+            NSLog(@"Change Permission Error: %@", error);
+            XCTFail(@"Failed setting file permissions");
+        }
+        
+        if (![fileManager setAttributes:@{NSFilePosixPermissions : @0755} ofItemAtPath:destinationFile error:&error]) {
+            NSLog(@"Change Permission Error: %@", error);
+            XCTFail(@"Failed setting file permissions");
+        }
+    }];
+}
+
+- (void)testInvalidSparkleFrameworkInBeforeTree
+{
+    BOOL success = [self createAndApplyPatchWithBeforeDiffHandler:^(NSFileManager *fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
+        NSString *sourceA = [sourceDirectory stringByAppendingPathComponent:@"Frameworks/Sparkle.framework/Versions/A/"];
+        NSString *destinationB = [destinationDirectory stringByAppendingPathComponent:@"Frameworks/Sparkle.framework/Versions/B/"];
+        
+        XCTAssertTrue([fileManager createDirectoryAtPath:sourceA withIntermediateDirectories:YES attributes:NULL error:NULL]);
+        XCTAssertTrue([fileManager createDirectoryAtPath:destinationB withIntermediateDirectories:YES attributes:NULL error:NULL]);
+        
+        NSString *sourceFile = [sourceA stringByAppendingPathComponent:@"Sparkle"];
+        NSString *destinationFile = [destinationB stringByAppendingPathComponent:@"Sparkle"];
+        
+        XCTAssertTrue([[self bigData1] writeToFile:sourceFile atomically:YES]);
+        XCTAssertTrue([[self bigData2] writeToFile:destinationFile atomically:YES]);
+        
+        NSError *error = nil;
+        // Use invalid permission mode 0777
+        if (![fileManager setAttributes:@{NSFilePosixPermissions : @0777} ofItemAtPath:sourceFile error:&error]) {
+            NSLog(@"Change Permission Error: %@", error);
+            XCTFail(@"Failed setting file permissions");
+        }
+        
+        if (![fileManager setAttributes:@{NSFilePosixPermissions : @0755} ofItemAtPath:destinationFile error:&error]) {
+            NSLog(@"Change Permission Error: %@", error);
+            XCTFail(@"Failed setting file permissions");
+        }
+    } afterDiffHandler:nil afterPatchHandler:nil];
+    
+    XCTAssertFalse(success);
+}
+
+- (void)testInvalidSparkleFrameworkInAfterTree
+{
+    BOOL success = [self createAndApplyPatchWithBeforeDiffHandler:^(NSFileManager *fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
+        NSString *sourceA = [sourceDirectory stringByAppendingPathComponent:@"Frameworks/Sparkle.framework/Versions/A/"];
+        NSString *destinationB = [destinationDirectory stringByAppendingPathComponent:@"Frameworks/Sparkle.framework/Versions/B/"];
+        
+        XCTAssertTrue([fileManager createDirectoryAtPath:sourceA withIntermediateDirectories:YES attributes:NULL error:NULL]);
+        XCTAssertTrue([fileManager createDirectoryAtPath:destinationB withIntermediateDirectories:YES attributes:NULL error:NULL]);
+        
+        NSString *sourceFile = [sourceA stringByAppendingPathComponent:@"Sparkle"];
+        NSString *destinationFile = [destinationB stringByAppendingPathComponent:@"Sparkle"];
+        
+        XCTAssertTrue([[self bigData1] writeToFile:sourceFile atomically:YES]);
+        XCTAssertTrue([[self bigData2] writeToFile:destinationFile atomically:YES]);
+        
+        NSError *error = nil;
+        if (![fileManager setAttributes:@{NSFilePosixPermissions : @0755} ofItemAtPath:sourceFile error:&error]) {
+            NSLog(@"Change Permission Error: %@", error);
+            XCTFail(@"Failed setting file permissions");
+        }
+        
+        // Use invalid permission mode 0700
+        if (![fileManager setAttributes:@{NSFilePosixPermissions : @0700} ofItemAtPath:destinationFile error:&error]) {
+            NSLog(@"Change Permission Error: %@", error);
+            XCTFail(@"Failed setting file permissions");
+        }
+    } afterDiffHandler:nil afterPatchHandler:nil];
+    
+    XCTAssertFalse(success);
+}
+
 @end

@@ -463,6 +463,20 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
         }
         originalTreeState[key] = info;
 
+        // Ensure Sparkle executable permissions are valid
+        if (ent->fts_info == FTS_F && [key.lastPathComponent isEqualToString:@"Sparkle"] && [key.stringByDeletingLastPathComponent.stringByDeletingLastPathComponent.stringByDeletingLastPathComponent.lastPathComponent isEqualToString:@"Sparkle.framework"]) {
+            mode_t permissions = (mode_t)[(NSNumber *)info[INFO_PERMISSIONS_KEY] shortValue];
+            if (permissions != VALID_SPARKLE_EXECUTABLE_PERMISSIONS) {
+                if (verbose) {
+                    fprintf(stderr, "\n");
+                }
+                if (error != NULL) {
+                    *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Permissions for Sparkle executable must be 0%o (found 0%o) on file %@", VALID_SPARKLE_EXECUTABLE_PERMISSIONS, permissions, @(ent->fts_path)] }];
+                }
+                return NO;
+            }
+        }
+        
         if (aclExists(ent)) {
             if (verbose) {
                 fprintf(stderr, "\n");
@@ -563,6 +577,20 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
             return NO;
         }
 
+        // Ensure Sparkle executable permissions are valid
+        if (ent->fts_info == FTS_F && [key.lastPathComponent isEqualToString:@"Sparkle"] && [key.stringByDeletingLastPathComponent.stringByDeletingLastPathComponent.stringByDeletingLastPathComponent.lastPathComponent isEqualToString:@"Sparkle.framework"]) {
+            mode_t permissions = (mode_t)[(NSNumber *)info[INFO_PERMISSIONS_KEY] shortValue];
+            if (permissions != VALID_SPARKLE_EXECUTABLE_PERMISSIONS) {
+                if (verbose) {
+                    fprintf(stderr, "\n");
+                }
+                if (error != NULL) {
+                    *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Permissions for Sparkle executable must be 0%o (found 0%o) on file %@", VALID_SPARKLE_EXECUTABLE_PERMISSIONS, permissions, @(ent->fts_path)] }];
+                }
+                return NO;
+            }
+        }
+        
         // We should validate ACLs even if we don't store the info in the diff in the case of ACLs
         // We should also not allow files with code signed extended attributes since Apple doesn't recommend inserting these
         // inside an application, and since we don't preserve extended attribitutes anyway
