@@ -1,3 +1,33 @@
+# 2.2.0
+
+* Update Focus Improvements (#924)
+  * Present new scheduled updates in utmost focus only at opportune times (Zorg)
+    * For regular apps opportune times are: app launch, app re-activation, and system being idle (without a power assertion to keep the display on).
+    * For background (dockless) apps opportune time is just app launch. Otherwise, the update is now shown behind other applications and windows, instead of previously stealing focus from other active apps.
+  * Add APIs and documentation for adding gentle update reminders to compliment Sparkle's standard user interface (Zorg) (#2122)
+  * Allow status window to be minimizable for regular app installs (Zorg) (#2100)
+  * Center status window and inherit key focus from the previously shown update alert window (Zorg)
+  * Activate app when checking for updates if the app is not currently active (e.g, from a menu bar extra menu item) (Zorg)
+* Rename XPC Service filenames for Sandboxing to show more friendly human-readable name in authorization dialog (Zorg) (#2096)
+* Add support for running the framework and CLI as root (Zorg) (#2119)
+* Fix showing update in focus not bringing the "checking for updates" window in focus (Zorg) (#2150)
+* Fix issue where update cycle may not complete in unusual configuration if automatic checks are disabled + automatic downloading is enabled + install requires user interaction (Zorg) (#2133)
+* Update last update check time when choosing to install an update & relaunch (Zorg) (#2136)
+* Use displayVersionString instead of versionString for OS version mismatch error message (samschott) (#2138)
+* Make displayVersionString non-null and update fallback documentation (Zorg) (#2139)
+* Ignore custom icons set via resource forks when applying delta updates (Zorg) (#2114)
+* Fall back to regular update if delta update fails to download (Zorg) (#2118)
+* Skip downloading delta updates when application has been moved to a file system (like FAT) that doesn't support regular permission modes (Zorg) (#2148)
+* Add and improve translation strings and update pt-BR (BR Lingo) (#2094)
+* Update localisations (Eitot) (#2113)
+* Replace deprecated code with newer APIs (Eitot) (#2112)
+* Remove obsolete fallbacks for older OS versions (Eitot) (#2110)
+* Remove SPUURLRequest (Zorg) (#2124)
+* Silence ivar deprecation warnings (Zorg) (#2099)
+* Fix Xcode 14 project warnings (Zorg) (#2147)
+
+This update renames the bundled XPC Services, brings improvements to notifying users of new updates without disrupting their focus, and adds [gentle update reminder APIs](https://sparkle-project.org/documentation/gentle-reminders/) to further customize how Sparkle's standard user interface delivers new update alerts.
+
 # 2.1.0
 
 * New Binary Delta format (version 3)
