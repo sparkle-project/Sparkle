@@ -2,12 +2,13 @@
 
 * Update Focus Improvements (#924)
   * Present new scheduled updates in utmost focus only at opportune times (Zorg)
-    * For regular apps opportune times are: app launch, app re-activation, and system being idle (without a power assertion to keep the display on).
+    * For regular apps opportune times are: app launch, app re-activation, and system being idle (without a power assertion being held to prevent display sleep).
     * For background (dockless) apps opportune time is just app launch. Otherwise, the update is now shown behind other applications and windows, instead of previously stealing focus from other active apps.
   * Add APIs and documentation for adding gentle update reminders to compliment Sparkle's standard user interface (Zorg) (#2122)
   * Allow status window to be minimizable for regular app installs (Zorg) (#2100)
   * Center status window and inherit key focus from the previously shown update alert window (Zorg)
   * Activate app when checking for updates if the app is not currently active (e.g, from a menu bar extra menu item) (Zorg)
+  * Fix issue where bringing status window to front made other active windows exit in macOS Ventura's Stage Manager (#2153) (Zorg)
 * Rename XPC Service filenames for Sandboxing to show more friendly human-readable name in authorization dialog (Zorg) (#2096)
 * Add support for running the framework and CLI as root (Zorg) (#2119)
 * Fix showing update in focus not bringing the "checking for updates" window in focus (Zorg) (#2150)
