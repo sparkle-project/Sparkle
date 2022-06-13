@@ -14,7 +14,7 @@
 * Add support for running the framework and sparkle-cli as root (Zorg) (#2119)
 * Fix issue where update cycle may not complete in unusual configuration if automatic checks are disabled + automatic downloading is enabled + install requires user interaction (Zorg) (#2133)
 * Update last update check time when choosing to install an update & relaunch (Zorg) (#2136)
-* Improve error reporting in the framework and sparkle-cli when installation fails with no write permission (Zorg) (#2119)
+* Improve error reporting in the framework and sparkle-cli when installation fails with no write permission (Zorg) (#2157)
 * Use displayVersionString instead of versionString for OS version mismatch error message (samschott) (#2138)
 * Make displayVersionString non-null and update fallback documentation (Zorg) (#2139)
 * Ignore custom icons set via resource forks when applying delta updates (Zorg) (#2114)
