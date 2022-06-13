@@ -125,7 +125,7 @@
                     // macOS 13 and later introduce a policy where Gatekeeper can block app modifications if the apps have different Team IDs
                     BOOL warnAboutGatekeeper;
                     if (@available(macOS 13, *)) {
-                        warnAboutGatekeeper = ![mainBundle isEqual:_host.bundle];
+                        warnAboutGatekeeper = ![mainBundle isEqual:self.host.bundle];
                     } else {
                         warnAboutGatekeeper = NO;
                     }
