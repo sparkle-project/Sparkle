@@ -35,6 +35,7 @@ static void printUsage(char **argv)
     fprintf(stderr, "  If update permission is requested and --%s is not\n  specified, then checking for updates is aborted.\n\n", GRANT_AUTOMATIC_CHECKING_FLAG);
     fprintf(stderr, "  Unless --%s is specified, this tool will not request for escalated\n  authorization. Alternatively, this tool can be run as root under an active user login\n  session, which will not require (and disallow) interaction.\n\n", INTERACTIVE_FLAG);
     fprintf(stderr, "  If --%s is specified, this tool will exit leaving a spawned process\n  for finishing the installation after the target application terminates.\n\n", DEFER_FLAG);
+    fprintf(stderr, "  If update installation fails due to not having permission (e.g. from Gatekeeper) to replace the old bundle, an exit status of 8 is returned.\n");
     fprintf(stderr, "  Please specify --%s if you intend to use this tool in an automated way.\n", USER_AGENT_NAME);
     fprintf(stderr, "Options:\n");
     fprintf(stderr, " --%s\n    Path to the application to watch for termination and to relaunch.\n    If not provided, this is assumed to be the same as the bundle.\n", APPLICATION_FLAG);
