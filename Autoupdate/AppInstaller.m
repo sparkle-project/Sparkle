@@ -32,8 +32,8 @@
 
 #include "AppKitPrevention.h"
 
-#define FIRST_UPDATER_MESSAGE_TIMEOUT 7ull
-#define RETRIEVE_PROCESS_IDENTIFIER_TIMEOUT 5ull
+#define FIRST_UPDATER_MESSAGE_TIMEOUT 18ull
+#define RETRIEVE_PROCESS_IDENTIFIER_TIMEOUT 8ull
 
 /**
  * Show display progress UI after a delay from starting the final part of the installation.
