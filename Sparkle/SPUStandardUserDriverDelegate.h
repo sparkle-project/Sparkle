@@ -79,7 +79,7 @@ SU_EXPORT @protocol SPUStandardUserDriverDelegate <NSObject>
  Declares whether or not gentle scheduled update reminders are supported.
  
  The delegate may implement scheduled update reminders that are presented in a gentle manner by implementing one or both of:
- `-standardUserDriverWillShowUpdate:state:` and `-standardUserDriverShouldHandleShowingUpdateAlertForScheduledUpdate:andInImmediateFocus:`
+ `-standardUserDriverWillHandleShowingUpdate:forUpdate:state:` and `-standardUserDriverShouldHandleShowingScheduledUpdate:andInImmediateFocus:`
  
  Visit https://sparkle-project.org/documentation/gentle-reminders for more information and examples.
  
@@ -99,8 +99,9 @@ SU_EXPORT @protocol SPUStandardUserDriverDelegate <NSObject>
  
  If the standard user driver handles showing the update, `immediateFocus` reflects whether or not it will show the update in immediate and utmost focus.
  The standard user driver may choose to show the update in immediate and utmost focus when the app was launched recently
- or the system has been idle for some time. If `immediateFocus` is @c NO the standard user driver may want to
- defer showing the update until the user comes back to the app.
+ or the system has been idle for some time.
+ 
+ If `immediateFocus` is @c NO the standard user driver may want to defer showing the update until the user comes back to the app.
  For background running applications, when `immediateFocus` is  @c NO the standard user driver will always want to show
  the update alert immediately, but behind other running applications or behind the app's own windows if it's currently active.
  
@@ -121,16 +122,14 @@ SU_EXPORT @protocol SPUStandardUserDriverDelegate <NSObject>
 /**
  Called before an update will be shown to the user.
  
- If the standard user driver handles showing the update, `handleShowingUpdate` will be @c YES
- In this case, if the update is not user initiated (`state.userInitiated` is @c NO) then the standard user driver may defer showing the update,
- and it may be shown when the user comes back to the app.
- For a background (dockless) running app, the update alert will always show up immediately but behind other running applications or behind
- its own windows if the app is currently active.
+ If the standard user driver handles showing the update, `handleShowingUpdate` will be `YES`.
+ Please see `-standardUserDriverShouldHandleShowingScheduledUpdate:andInImmediateFocus:` for how the standard user driver
+ may handle showing scheduled updates when `handleShowingUpdate` is `YES` and `state.userInitiated` is `NO`.
  
  If the delegate declared it handles showing the update by returning @c NO in `-standardUserDriverShouldHandleShowingScheduledUpdate:andInImmediateFocus:`
  then the delegate should handle showing update reminders in this method, or at some later point.
  In this case, `handleShowingUpdate` will be @c NO.
- To bring the update alert in focus, you may call `-[SPUStandardUpdateController checkForUpdates:]` or `-[SPUUpdater checkForUpdates]`
+ To bring the update alert in focus, you may call `-[SPUStandardUpdaterController checkForUpdates:]` or `-[SPUUpdater checkForUpdates]`.
  You may want to show additional UI indicators in your application that will show this update in focus
  and want to dismiss additional UI indicators in `-standardUserDriverWillFinishUpdateSession` or `-standardUserDriverDidReceiveUserAttentionForUpdate:`
   
@@ -171,7 +170,7 @@ SU_EXPORT @protocol SPUStandardUserDriverDelegate <NSObject>
  `-standardUserDriverShouldHandleShowingScheduledUpdate:andInImmediateFocus:`
  
  For UI indicators that need to be dismissed when the user has given attention to a new update alert,
- please see `standardUserDriverDidReceiveUserAttentionForUpdate:`
+ please see `-standardUserDriverDidReceiveUserAttentionForUpdate:`
  */
 - (void)standardUserDriverWillFinishUpdateSession;
 
