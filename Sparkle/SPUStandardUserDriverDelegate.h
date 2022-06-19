@@ -152,9 +152,9 @@ SU_EXPORT @protocol SPUStandardUserDriverDelegate <NSObject>
  This occurs either when the user first brings the update alert in utmost focus or when the user makes a choice to install an update or dismiss/skip it.
  
  This may be useful to intercept for dismissing custom attention-based UI indicators (e.g, user notifications) introduced when implementing
- `-standardUserDriverShouldHandleShowingScheduledUpdate:andInImmediateFocus:`
+ `-standardUserDriverWillHandleShowingUpdate:forUpdate:state:`
  
- For custom UI indicators that need to still be on screen after the user has started to install an update, please see `standardUserDriverWillFinishUpdateSession`.
+ For custom UI indicators that need to still be on screen after the user has started to install an update, please see `-standardUserDriverWillFinishUpdateSession`.
  
  @param update The new update that the user gave attention to.
  */
@@ -167,7 +167,7 @@ SU_EXPORT @protocol SPUStandardUserDriverDelegate <NSObject>
  For updaters updating external/other bundles, this may also be called after an update has been successfully installed.
  
  This may be useful to intercept for dismissing custom UI indicators introduced when implementing
- `-standardUserDriverShouldHandleShowingScheduledUpdate:andInImmediateFocus:`
+ `-standardUserDriverWillHandleShowingUpdate:forUpdate:state:`
  
  For UI indicators that need to be dismissed when the user has given attention to a new update alert,
  please see `-standardUserDriverDidReceiveUserAttentionForUpdate:`
