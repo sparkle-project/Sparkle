@@ -59,14 +59,17 @@ struct GenerateAppcast: ParsableCommand {
     @Option(help: ArgumentHelp("The account name in your keychain associated with your private EdDSA (ed25519) key to use for signing new updates."))
     var account : String = "ed25519"
     
-    @Option(name: .customShort("s"), help: ArgumentHelp("The private EdDSA string (128 characters). If not specified, the private EdDSA key will be read from the Keychain instead.", valueName: "private-EdDSA-key"))
-    var privateEdString : String?
+    @Option(name: .customLong("ed-key-file"), help: ArgumentHelp("Path to the private EdDSA key file. If not specified, the private EdDSA key will be read from the Keychain instead. '-' can be used to echo the EdDSA key from a 'secret' environment variable to the standard input stream. For example: echo \"$PRIVATE_KEY_SECRET\" | ./\(programName) --ed-key-file -", valueName: "private-EdDSA-key-file"))
+    var privateEdKeyPath: String?
     
     @Option(name: .customShort("f"), help: ArgumentHelp("Path to the private DSA key file. Only use this option for transitioning to EdDSA from older updates.", valueName: "private-dsa-key-file"), transform: { URL(fileURLWithPath: $0) })
     var privateDSAKeyURL: URL?
     
     @Option(name: .customShort("n"), help: ArgumentHelp("The name of the private DSA key. This option must be used together with `-k`. Only use this option for transitioning to EdDSA from older updates.", valueName: "dsa-key-name"))
     var privateDSAKeyName: String?
+    
+    @Option(name: .customShort("s"), help: ArgumentHelp("(DEPRECATED): The private EdDSA string (128 characters). This option is deprecated. Please use the Keychain, or pass the key as standard input when using the --ed-key-file - option instead.", valueName: "private-EdDSA-key"))
+    var privateEdString : String?
     
     @Option(name: .customShort("k"), help: ArgumentHelp("The path to the keychain to look up the private DSA key. This option must be used together with `-n`. Only use this option for transitioning to EdDSA from older updates.", valueName: "keychain-for-dsa"), transform: { URL(fileURLWithPath: $0) })
     var keychainURL: URL?
@@ -178,6 +181,10 @@ struct GenerateAppcast: ParsableCommand {
             throw ValidationError("-f <private-dsa-key-file> cannot be provided if -n <dsa-key-name> and -k <keychain> is provided")
         }
         
+        guard (privateEdKeyPath == nil) || (privateEdString == nil) else {
+            throw ValidationError("--ed-key-file <private-EdDSA-key-file> cannot be provided if -s <private-EdDSA-key> is provided")
+        }
+        
         if let versions = versions {
             guard versions.count > 0 else {
                 throw ValidationError("--versions must specify at least one application version.")
@@ -220,7 +227,35 @@ struct GenerateAppcast: ParsableCommand {
             privateDSAKey = nil
         }
         
-        let keys = loadPrivateKeys(account, privateDSAKey, privateEdString)
+        let privateEdKeyString: String?
+        if let privateEdString = privateEdString {
+            privateEdKeyString = privateEdString
+            
+            print("Warning: The -s option for passing the private EdDSA key is insecure and deprecated. Please see its help usage for more information.")
+        } else if let privateEdKeyPath = privateEdKeyPath {
+            do {
+                let privateKeyString: String
+                if privateEdKeyPath == "-" && !FileManager.default.fileExists(atPath: privateEdKeyPath) {
+                    if let line = readLine(strippingNewline: true) {
+                        privateKeyString = line
+                    } else {
+                        print("Unable to read EdDSA private key from standard input")
+                        throw ExitCode(1)
+                    }
+                } else {
+                    privateKeyString = try String(contentsOf: URL(fileURLWithPath: privateEdKeyPath))
+                }
+                
+                privateEdKeyString = privateKeyString
+            } catch {
+                print("Unable to load EdDSA private key from", privateEdKeyPath, "\n", error)
+                throw ExitCode(1)
+            }
+        } else {
+            privateEdKeyString = nil
+        }
+        
+        let keys = loadPrivateKeys(account, privateDSAKey, privateEdKeyString)
         
         do {
             let allUpdates = try makeAppcast(archivesSourceDir: archivesSourceDir, cacheDirectory: GenerateAppcast.cacheDirectory, keys: keys, versions: versions, maximumDeltas: maximumDeltas, deltaCompressionModeDescription: deltaCompression, deltaCompressionLevel: deltaCompressionLevel, disableNestedCodeCheck: disableNestedCodeCheck, verbose: verbose)
