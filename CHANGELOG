@@ -20,6 +20,7 @@
 * Ignore custom icons set via resource forks when applying delta updates (Zorg) (#2114)
 * Fall back to regular update if delta update fails to download (Zorg) (#2118)
 * Skip downloading delta updates when application has been moved to a file system (like FAT) that doesn't support regular permission modes (Zorg) (#2148)
+* Bump initial installer message timeouts and declare daemon/agents processes as Interactive (Zorg) (#2162)
 * Add and improve translation strings and update pt-BR (BR Lingo) (#2094)
 * Update localisations (Eitot) (#2113)
 * Replace deprecated code with newer APIs (Eitot) (#2112)
@@ -27,6 +28,7 @@
 * Remove SPUURLRequest (Zorg) (#2124)
 * Silence ivar deprecation warnings (Zorg) (#2099)
 * Fix Xcode 14 project warnings (Zorg) (#2147)
+* Update text for external licenses (Zorg) (#2164)
 
 This update renames the bundled XPC Services, brings improvements to notifying users of new updates without disrupting their focus, and adds [gentle update reminder APIs](https://sparkle-project.org/documentation/gentle-reminders/) to further customize how Sparkle's standard user interface delivers new update alerts.
 
