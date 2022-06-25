@@ -30,7 +30,7 @@
     id<SUInstallerStatusProtocol> installerStatus = nil;
     BOOL usesXPC = SPUXPCServiceIsEnabled(SUEnableInstallerStatusServiceKey);
     if (!usesXPC) {
-        installerStatus = [[SUInstallerStatus alloc] init];
+        installerStatus = [[SUInstallerStatus alloc] initWithRemote:NO];
     } else {
         installerStatus = [[SUXPCInstallerStatus alloc] init];
     }

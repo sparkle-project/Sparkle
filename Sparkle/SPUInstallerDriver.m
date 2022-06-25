@@ -176,7 +176,7 @@
     assert(hostBundleIdentifier != nil);
     
     if (!SPUXPCServiceIsEnabled(SUEnableInstallerConnectionServiceKey)) {
-        self.installerConnection = [[SUInstallerConnection alloc] initWithDelegate:self];
+        self.installerConnection = [[SUInstallerConnection alloc] initWithDelegate:self remote:NO];
     } else {
         self.installerConnection = [[SUXPCInstallerConnection alloc] initWithDelegate:self];
     }
