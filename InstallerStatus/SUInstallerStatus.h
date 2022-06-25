@@ -14,4 +14,6 @@
 
 - (instancetype)initWithRemote:(BOOL)remote;
 
+- (instancetype)init NS_UNAVAILABLE;
+
 @end

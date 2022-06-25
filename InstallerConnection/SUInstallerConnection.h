@@ -17,6 +17,8 @@ NS_ASSUME_NONNULL_BEGIN
 // Due to XPC reasons, this delegate is strongly referenced, until it's invalidated
 - (instancetype)initWithDelegate:(id<SUInstallerCommunicationProtocol>)delegate remote:(BOOL)remote;
 
+- (instancetype)init NS_UNAVAILABLE;
+
 @end
 
 NS_ASSUME_NONNULL_END
