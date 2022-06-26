@@ -126,7 +126,9 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
         
         __weak InstallerProgressAppController *weakSelf = self;
         _connection.interruptionHandler = ^{
-            [weakSelf.connection invalidate];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [weakSelf.connection invalidate];
+            });
         };
         
         _connection.invalidationHandler = ^{

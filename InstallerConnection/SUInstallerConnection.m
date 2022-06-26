@@ -25,21 +25,27 @@ static NSString *SUInstallerConnectionKeepAliveReason = @"Installer Connection K
 @end
 
 @implementation SUInstallerConnection
+{
+    BOOL _remote;
+}
 
 @synthesize delegate = _delegate;
 @synthesize disabledAutomaticTermination = _disabledAutomaticTermination;
 @synthesize invalidationBlock = _invalidationBlock;
 @synthesize connection = _connection;
 
-- (instancetype)initWithDelegate:(id<SUInstallerCommunicationProtocol>)delegate
+- (instancetype)initWithDelegate:(id<SUInstallerCommunicationProtocol>)delegate remote:(BOOL)remote
 {
     self = [super init];
     if (self != nil) {
         _delegate = delegate;
+        _remote = remote;
         
-        // If we are a XPC service, protect it from being terminated until the invalidation handler is set
-        _disabledAutomaticTermination = YES;
-        [[NSProcessInfo processInfo] disableAutomaticTermination:SUInstallerConnectionKeepAliveReason];
+        if (remote) {
+            // If we are a XPC service, protect it from being terminated until the invalidation handler is set
+            _disabledAutomaticTermination = YES;
+            [[NSProcessInfo processInfo] disableAutomaticTermination:SUInstallerConnectionKeepAliveReason];
+        }
     }
     return self;
 }
@@ -52,7 +58,7 @@ static NSString *SUInstallerConnectionKeepAliveReason = @"Installer Connection K
     }
 }
 
-- (void)setInvalidationHandler:(void (^)(void))invalidationHandler
+- (void)_setInvalidationHandler:(void (^)(void))invalidationHandler
 {
     self.invalidationBlock = invalidationHandler;
     
@@ -60,7 +66,18 @@ static NSString *SUInstallerConnectionKeepAliveReason = @"Installer Connection K
     [self enableAutomaticTermination];
 }
 
-- (void)setServiceName:(NSString *)serviceName systemDomain:(BOOL)systemDomain
+- (void)setInvalidationHandler:(void (^)(void))invalidationHandler
+{
+    if (_remote) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self _setInvalidationHandler:invalidationHandler];
+        });
+    } else {
+        [self _setInvalidationHandler:invalidationHandler];
+    }
+}
+
+- (void)_setServiceName:(NSString *)serviceName systemDomain:(BOOL)systemDomain
 {
     NSXPCConnectionOptions options = systemDomain ? NSXPCConnectionPrivileged : 0;
     NSXPCConnection *connection = [[NSXPCConnection alloc] initWithMachServiceName:serviceName options:options];
@@ -74,41 +91,67 @@ static NSString *SUInstallerConnectionKeepAliveReason = @"Installer Connection K
     
     __weak SUInstallerConnection *weakSelf = self;
     self.connection.interruptionHandler = ^{
-        [weakSelf.connection invalidate];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [weakSelf.connection invalidate];
+        });
     };
     
     self.connection.invalidationHandler = ^{
-        SUInstallerConnection *strongSelf = weakSelf;
-        if (strongSelf != nil) {
-            strongSelf.connection = nil;
-            [strongSelf invalidate];
-        }
+        dispatch_async(dispatch_get_main_queue(), ^{
+            SUInstallerConnection *strongSelf = weakSelf;
+            if (strongSelf != nil) {
+                strongSelf.connection = nil;
+                [strongSelf _invalidate];
+            }
+        });
     };
     
     [self.connection resume];
 }
 
-- (void)handleMessageWithIdentifier:(int32_t)identifier data:(NSData *)data
+- (void)setServiceName:(NSString *)serviceName systemDomain:(BOOL)systemDomain
 {
-    [(id<SUInstallerCommunicationProtocol>)self.connection.remoteObjectProxy handleMessageWithIdentifier:identifier data:data];
+    if (_remote) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self _setServiceName:serviceName systemDomain:systemDomain];
+        });
+    } else {
+        [self _setServiceName:serviceName systemDomain:systemDomain];
+    }
 }
 
-// This method can be called by us or from a remote
+- (void)handleMessageWithIdentifier:(int32_t)identifier data:(NSData *)data
+{
+    if (_remote) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [(id<SUInstallerCommunicationProtocol>)self.connection.remoteObjectProxy handleMessageWithIdentifier:identifier data:data];
+        });
+    } else {
+        [(id<SUInstallerCommunicationProtocol>)self.connection.remoteObjectProxy handleMessageWithIdentifier:identifier data:data];
+    }
+}
+
+- (void)_invalidate
+{
+    if (self.invalidationBlock != nil) {
+        self.invalidationBlock();
+        self.invalidationBlock = nil;
+    }
+    
+    // Break the retain cycle
+    self.delegate = nil;
+    
+    [self enableAutomaticTermination];
+}
+
+// This method can be called from us or a remote
 - (void)invalidate
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.connection invalidate];
         self.connection = nil;
         
-        if (self.invalidationBlock != nil) {
-            self.invalidationBlock();
-            self.invalidationBlock = nil;
-        }
-        
-        // Break the retain cycle
-        self.delegate = nil;
-        
-        [self enableAutomaticTermination];
+        [self _invalidate];
     });
 }
 

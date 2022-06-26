@@ -19,16 +19,34 @@
 @end
 
 @implementation SUInstallerStatus
+{
+    BOOL _remote;
+}
 
 @synthesize invalidationBlock = _invalidationBlock;
 @synthesize connection = _connection;
 
-- (void)setInvalidationHandler:(void (^)(void))invalidationHandler
+- (instancetype)initWithRemote:(BOOL)remote
 {
-    self.invalidationBlock = invalidationHandler;
+    self = [super init];
+    if (self != nil) {
+        _remote = remote;
+    }
+    return self;
 }
 
-- (void)setServiceName:(NSString *)serviceName
+- (void)setInvalidationHandler:(void (^)(void))invalidationHandler
+{
+    if (_remote) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            self.invalidationBlock = invalidationHandler;
+        });
+    } else {
+        self.invalidationBlock = invalidationHandler;
+    }
+}
+
+- (void)_setServiceName:(NSString *)serviceName
 {
     NSXPCConnection *connection = [[NSXPCConnection alloc] initWithMachServiceName:serviceName options:(NSXPCConnectionOptions)0];
     
@@ -38,41 +56,73 @@
     
     __weak SUInstallerStatus *weakSelf = self;
     self.connection.interruptionHandler = ^{
-        [weakSelf.connection invalidate];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [weakSelf.connection invalidate];
+        });
     };
     
     self.connection.invalidationHandler = ^{
-        SUInstallerStatus *strongSelf = weakSelf;
-        if (strongSelf != nil) {
-            strongSelf.connection = nil;
-            [strongSelf invalidate];
-        }
+        dispatch_async(dispatch_get_main_queue(), ^{
+            SUInstallerStatus *strongSelf = weakSelf;
+            if (strongSelf != nil) {
+                strongSelf.connection = nil;
+                [strongSelf _invokeInvalidationBlock];
+            }
+        });
     };
     
     [self.connection resume];
 }
 
+- (void)setServiceName:(NSString *)serviceName
+{
+    if (_remote) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self _setServiceName:serviceName];
+        });
+    } else {
+        [self _setServiceName:serviceName];
+    }
+}
+
 - (void)probeStatusInfoWithReply:(void (^)(NSData * _Nullable installationInfoData))reply
 {
-    [(id<SUStatusInfoProtocol>)self.connection.remoteObjectProxy probeStatusInfoWithReply:reply];
+    if (_remote) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [(id<SUStatusInfoProtocol>)self.connection.remoteObjectProxy probeStatusInfoWithReply:reply];
+        });
+    } else {
+        [(id<SUStatusInfoProtocol>)self.connection.remoteObjectProxy probeStatusInfoWithReply:reply];
+    }
 }
 
 - (void)probeStatusConnectivityWithReply:(void (^)(void))reply
 {
-    [(id<SUStatusInfoProtocol>)self.connection.remoteObjectProxy probeStatusConnectivityWithReply:reply];
+    if (_remote) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [(id<SUStatusInfoProtocol>)self.connection.remoteObjectProxy probeStatusConnectivityWithReply:reply];
+        });
+    } else {
+        [(id<SUStatusInfoProtocol>)self.connection.remoteObjectProxy probeStatusConnectivityWithReply:reply];
+    }
 }
 
-// This method can be called by us or from a remote
+- (void)_invokeInvalidationBlock
+{
+    if (self.invalidationBlock != nil) {
+        self.invalidationBlock();
+        self.invalidationBlock = nil;
+    }
+}
+
+// This method can be called from us or a remote
 - (void)invalidate
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.connection invalidate];
         self.connection = nil;
         
-        if (self.invalidationBlock != nil) {
-            self.invalidationBlock();
-            self.invalidationBlock = nil;
-        }
+        [self _invokeInvalidationBlock];
     });
 }
 
