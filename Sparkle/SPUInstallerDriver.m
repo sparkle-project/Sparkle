@@ -131,9 +131,9 @@
                     // macOS 13 and later introduce a policy where Gatekeeper can block app modifications if the apps have different Team IDs
                     if (@available(macOS 13, *)) {
                         NSBundle *mainBundle = [NSBundle mainBundle];
-                        SUHost *mainBundleHost = [[SUHost alloc] initWithBundle:mainBundle];
-                        
                         if (![mainBundle isEqual:self.host.bundle]) {
+                            SUHost *mainBundleHost = [[SUHost alloc] initWithBundle:mainBundle];
+                            
                             userInfo[NSLocalizedRecoverySuggestionErrorKey] = [NSString stringWithFormat:SULocalizedString(@"You may need to allow modifications from %1$@ in System Settings under Privacy & Security and App Management to install future updates.", nil), mainBundleHost.name];
                         }
                     }
