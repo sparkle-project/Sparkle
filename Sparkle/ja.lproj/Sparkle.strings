@@ -32,6 +32,12 @@
 "%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@がダウンロードされました! 今すぐ %1$@ をインストールして再起動しますか?";
 
 /* No comment provided by engineer. */
+"%1$@ %2$@ is available but your macOS version is too new for this update. This update only supports up to macOS %3$@." = "%1$@ %2$@が入手可能ですが、インストールするにはmacOSのバージョンが新しすぎます。このアップデートはmacOS %3$@までしか対応していません。";
+
+/* No comment provided by engineer. */
+"%1$@ %2$@ is available but your macOS version is too old to install it. At least macOS %3$@ is required." = "%1$@ %2$@が入手可能ですが、インストールするにはmacOSのバージョンが古すぎます。macOS %3$@以降が必要です。";
+
+/* No comment provided by engineer. */
 "%1$@ can’t be updated if it’s running from the location it was downloaded to." = "この場所ではダウンロードされたアップデータを %1$@ に適用できません。";
 
 /* No comment provided by engineer. */
@@ -113,6 +119,15 @@
 "Should %1$@ automatically check for updates? You can always check for updates manually from the %1$@ menu." = " %1$@のアップデートを自動で確認しますか? アップデートは%1$@メニューから手動でいつでも確認することができます。";
 
 /* No comment provided by engineer. */
+"The update checker failed to start correctly. You should contact the app developer to report this issue and verify that you have the latest version." = "アップデートチェッカーが正しくスタートできませんでした。アプリケーション開発者に連絡をしてこの不具合を報告し、最新バージョンであることを確認してください。";
+
+/* No comment provided by engineer. */
+"The update is improperly signed and could not be validated. Please try again later or contact the app developer." = "アップデートの署名が不適切で認証できませんでした。あとでやり直すかアプリケーション開発者に連絡してください。";
+
+/* No comment provided by engineer. */
+"Unable to Check For Updates" = "アップデートを確認できませんでした";
+
+/* No comment provided by engineer. */
 "Update Error!" = "アップデートエラー!";
 
 /* No comment provided by engineer. */
@@ -123,6 +138,15 @@
 
 /* No comment provided by engineer. */
 "Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "%1$@をアプリケーションフォルダに移動し、そこから再起動したあとやり直してください。";
+
+/* No comment provided by engineer. */
+"Version History" = "バージョン履歴";
+
+/* No comment provided by engineer. */
+"Your macOS version is too new" = "このmacOSのバージョンは新しすぎます";
+
+/* No comment provided by engineer. */
+"Your macOS version is too old" = "このmacOSのバージョンは古すぎます";
 
 /* Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates. */
 "You’re up-to-date!" = "最新版を使用しています!";
