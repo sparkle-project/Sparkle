@@ -38,7 +38,7 @@
 "%1$@ %2$@ is available but your macOS version is too old to install it. At least macOS %3$@ is required." = "%1$@ %2$@が入手可能ですが、インストールするにはmacOSのバージョンが古すぎます。macOS %3$@以降が必要です。";
 
 /* No comment provided by engineer. */
-"%1$@ can’t be updated if it’s running from the location it was downloaded to." = "この場所ではダウンロードされたアップデータを %1$@ に適用できません。";
+"%1$@ can’t be updated if it’s running from the location it was downloaded to." = "この場所ではダウンロードされたアップデータを%1$@に適用できません。";
 
 /* No comment provided by engineer. */
 "%1$@ can’t be updated, because it was opened from a read-only or a temporary location." = "%1$@は読み出し専用またはテンポラリな場所で開かれているためアップデートできません。";
@@ -110,7 +110,7 @@
 "OK" = "OK";
 
 /* No comment provided by engineer. */
-"Quit %1$@, move it into your Applications folder, relaunch it from there and try again." = "%1$@ を終了させ、アプリケーションフォルダに移動の上再度お試しください。";
+"Quit %1$@, move it into your Applications folder, relaunch it from there and try again." = "%1$@を終了させ、アプリケーションフォルダに移動の上再度お試しください。";
 
 /* No comment provided by engineer. */
 "Ready to Install" = "インストールできます";
