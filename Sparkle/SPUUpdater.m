@@ -170,6 +170,10 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         return NO;
     }
     
+    if ([self.userDriver respondsToSelector:@selector(resetTimeSinceOpportuneUpdateNotice)]) {
+        [(id<SPUGentleUserDriverReminders>)self.userDriver resetTimeSinceOpportuneUpdateNotice];
+    }
+    
     self.startedUpdater = YES;
     self.canCheckForUpdates = YES;
     

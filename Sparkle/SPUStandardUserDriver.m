@@ -99,8 +99,6 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
             
             _timebaseInfo.numer = 0;
             _timebaseInfo.denom = 0;
-        } else {
-            [self resetTimeSinceOpportuneUpdateNotice];
         }
     }
     return self;
