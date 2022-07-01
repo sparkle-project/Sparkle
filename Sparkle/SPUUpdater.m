@@ -32,15 +32,10 @@
 #import "SPUResumableUpdate.h"
 #import "SUSignatures.h"
 #import "SPUUserAgent+Private.h"
+#import "SPUGentleUserDriverReminders.h"
 
 
 #include "AppKitPrevention.h"
-
-@interface NSObject (SPUStandardUserDriverPrivate)
-
-- (void)_logGentleScheduledUpdateReminderWarningIfNeeded;
-
-@end
 
 NSString *const SUUpdaterDidFinishLoadingAppCastNotification = @"SUUpdaterDidFinishLoadingAppCastNotification";
 NSString *const SUUpdaterDidFindValidUpdateNotification = @"SUUpdaterDidFindValidUpdateNotification";
@@ -520,8 +515,8 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
                     [self.delegate updater:self willScheduleUpdateCheckAfterDelay:delayUntilCheck];
                 }
                 
-                if ([self.userDriver respondsToSelector:@selector(_logGentleScheduledUpdateReminderWarningIfNeeded)]) {
-                    [(NSObject *)self.userDriver _logGentleScheduledUpdateReminderWarningIfNeeded];
+                if ([self.userDriver respondsToSelector:@selector(logGentleScheduledUpdateReminderWarningIfNeeded)]) {
+                    [(id<SPUGentleUserDriverReminders>)self.userDriver logGentleScheduledUpdateReminderWarningIfNeeded];
                 }
                 
                 [self.updaterTimer startAndFireAfterDelay:delayUntilCheck];
@@ -805,6 +800,12 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     if (!self.startedUpdater) {
         SULog(SULogLevelError, @"Error: resetUpdateCycle - updater hasn't been started yet. Please call -startUpdater: first");
         return; // not even ready yet
+    }
+    
+    // Note this resets the opportune time when user grants Sparkle permission to check for updates
+    // and when the user changes preferences on automatically checking for updates or the update time check interval
+    if ([self.userDriver respondsToSelector:@selector(resetTimeSinceOpportuneUpdateNotice)]) {
+        [(id<SPUGentleUserDriverReminders>)self.userDriver resetTimeSinceOpportuneUpdateNotice];
     }
     
     if (!self.sessionInProgress) {

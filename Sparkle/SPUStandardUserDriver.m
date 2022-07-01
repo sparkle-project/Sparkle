@@ -10,6 +10,7 @@
 
 #import "SPUStandardUserDriver.h"
 #import "SPUStandardUserDriverDelegate.h"
+#import "SPUGentleUserDriverReminders.h"
 #import "SUAppcastItem.h"
 #import "SUVersionDisplayProtocol.h"
 #import "SUHost.h"
@@ -33,7 +34,7 @@
 // The amount of time the app is allowed to be idle for us to consider showing an update prompt right away when the app is active
 static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 30.0 : 5 * 60.0;
 
-@interface SPUStandardUserDriver ()
+@interface SPUStandardUserDriver () <SPUGentleUserDriverReminders>
 
 @property (nonatomic, readonly) SUHost *host;
 // We must store the oldHostName before the host is potentially replaced
@@ -59,7 +60,7 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
 @implementation SPUStandardUserDriver
 {
     mach_timebase_info_data_t _timebaseInfo;
-    double _initializationTime;
+    double _timeSinceOpportuneUpdateNotice;
     id<NSObject> _applicationBecameActiveAfterUpdateAlertBecameKeyObserver;
     NSValue *_updateAlertWindowFrameValue;
     BOOL _updateAlertWindowWasInactive;
@@ -99,7 +100,7 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
             _timebaseInfo.numer = 0;
             _timebaseInfo.denom = 0;
         } else {
-            [self _resetInitializationTime];
+            [self resetTimeSinceOpportuneUpdateNotice];
         }
     }
     return self;
@@ -114,9 +115,10 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
     }
 }
 
-- (void)_resetInitializationTime
+// This private method is used by SPUUpdater for resetting the opportune time to show an update notice in utmost focus
+- (void)resetTimeSinceOpportuneUpdateNotice
 {
-    _initializationTime = [self currentTime];
+    _timeSinceOpportuneUpdateNotice = [self currentTime];
 }
 
 #pragma mark Update Permission
@@ -131,8 +133,6 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
     
     __weak __typeof__(self) weakSelf = self;
     self.permissionPrompt = [[SUUpdatePermissionPrompt alloc] initPromptWithHost:self.host request:request reply:^(SUUpdatePermissionResponse *response) {
-        [weakSelf _resetInitializationTime];
-        
         reply(response);
         weakSelf.permissionPrompt = nil;
     }];
@@ -143,7 +143,7 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
 #pragma mark Update Alert Focus
 
 // This private method is used by SPUUpdater when scheduling for update checks
-- (void)_logGentleScheduledUpdateReminderWarningIfNeeded
+- (void)logGentleScheduledUpdateReminderWarningIfNeeded
 {
     id<SPUStandardUserDriverDelegate> delegate = self.delegate;
     if (!_loggedGentleUpdateReminderWarning && (![delegate respondsToSelector:@selector(supportsGentleScheduledUpdateReminders)] || !delegate.supportsGentleScheduledUpdateReminders)) {
@@ -177,10 +177,10 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
         [self.activeUpdateAlert setInstallButtonFocus:YES];
     } else {
         // Handle scheduled update check
-        uint64_t timeElapsedSinceInitialization = (uint64_t)([self currentTime] - _initializationTime);
+        uint64_t timeElapsedSinceOpportuneUpdateNotice = (uint64_t)([self currentTime] - _timeSinceOpportuneUpdateNotice);
         
-        // Give scheduled update alerts priority if 3 or less seconds have passed since initialization
-        BOOL appNearUpdaterInitialization = (timeElapsedSinceInitialization <= 3000000000ULL);
+        // Give scheduled update alerts priority if 3 or less seconds have passed since our last opportune time
+        BOOL appNearUpdaterInitialization = (timeElapsedSinceOpportuneUpdateNotice <= 3000000000ULL);
         
         // We will always show an update alert at the right time
         [self.activeUpdateAlert setInstallButtonFocus:YES];
