@@ -5,7 +5,7 @@
 "45.title" = "Text Cell";
 
 /* Class = "NSTextFieldCell"; title = "Anonymous system profile information is used to help us plan future development work. Please contact us if you have any questions about this.\n\nThis is the information that would be sent:"; ObjectID = "183"; */
-"183.title" = "Οι ανώνυμες πληροφορίες του προφίλ του συστήματός σας, μας βοηθάει στο σχεδιασμό της μελλοντικής ανάπτυξης του προγράμματος. Παρακαλώ επικοινωνήστε μαζί μας άν έχετε ερωτήσεις.\n\nΑυτές είναι οι πληροφορίες που θα σταλούν σε εμάς:";
+"183.title" = "Οι ανώνυμες πληροφορίες του προφίλ του συστήματός σας, μας βοηθούν στο σχεδιασμό της μελλοντικής ανάπτυξης του προγράμματος. Παρακαλώ επικοινωνήστε μαζί μας άν έχετε ερωτήσεις.\n\nΑυτές είναι οι πληροφορίες που θα σταλούν σε εμάς:";
 
 /* Class = "NSButtonCell"; title = "Don’t Check"; ObjectID = "cCJ-V0-aTi"; */
 "cCJ-V0-aTi.title" = "Κανένας έλεγχος";
