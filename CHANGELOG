@@ -36,6 +36,8 @@
 
 This update renames the bundled XPC Services, brings improvements to notifying users of new updates without disrupting their focus, and adds [gentle update reminder APIs](https://sparkle-project.org/documentation/gentle-reminders/) to further customize how Sparkle's standard user interface delivers new update alerts.
 
+The `-s` flag for passing a raw private EdDSA key to sign_update and generate_appcast is now deprecated. If you were using this option previously, please see the help pages of these tools for more information.
+
 # 2.1.0
 
 * New Binary Delta format (version 3)
