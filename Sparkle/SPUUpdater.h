@@ -32,7 +32,7 @@ NS_ASSUME_NONNULL_BEGIN
  
  Prefer to set initial properties in your bundle's Info.plist as described in [Customizing Sparkle](https://sparkle-project.org/documentation/customization/).
  
- Otherwise only if you need dynamic behavior (eg. for user preferences) should you set properties on the updater such as:
+ Otherwise only if you need dynamic behavior for user preferences should you set properties on the updater such as:
  - `automaticallyChecksForUpdates`
  - `updateCheckInterval`
  - `automaticallyDownloadsUpdates`
@@ -102,18 +102,23 @@ SU_EXPORT @interface SPUUpdater : NSObject
 - (void)checkForUpdates;
 
 /**
- Checks for updates, but does not display any UI unless an update is found.
+ Checks for updates, but does not show any UI unless an update is found.
  
  You usually do not need to call this method directly. If `automaticallyChecksForUpdates` is @c YES,
  Sparkle calls this method automatically according to its update schedule using the `updateCheckInterval`
- and the `lastUpdateCheckDate`.
+ and the `lastUpdateCheckDate`. Therefore, you should typically only consider calling this method directly if you
+ opt out of automatic update checks.
  
- This is meant for programmatically initating a check for updates.
- That is, it will display no UI unless it finds an update, in which case it proceeds as usual.
+ This is meant for programmatically initating a check for updates in the background without the user initiating it.
+ This check will not show UI if no new updates are found.
+ 
+ If a new update is found, the updater's user driver may handle showing it at an appropriate (but not necessarily immediate) time.
+ If you want control over when and how a new update is shown, please see https://sparkle-project.org/documentation/gentle-reminders/
+ 
+ Note if automated updating is turned on, either a new update may be downloaded in the background to be installed silently,
+ or an already downloaded update may be shown.
+ 
  This will not find updates that the user has opted into skipping.
- 
- Note if there is no resumable update found, and automated updating is turned on,
- the update will be downloaded in the background without disrupting the user.
  
  This method does not do anything if there is a `sessionInProgress`.
  */
@@ -177,7 +182,9 @@ SU_EXPORT @interface SPUUpdater : NSObject
  this permission request is not performed however.
  
  Setting this property will persist in the host bundle's user defaults.
- Only set this property if you need dynamic behavior (e.g. user preferences).
+ Only set this property if the user wants to change the default via a user preferences option.
+ For testing environments, you can disable update checks by passing `-SUEnableAutomaticChecks NO`
+ to your app's command line arguments instead of setting this property.
  
  The update schedule cycle will be reset in a short delay after the property's new value is set.
  This is to allow reverting this property without kicking off a schedule change immediately
@@ -187,9 +194,10 @@ SU_EXPORT @interface SPUUpdater : NSObject
 /**
  A property indicating the current automatic update check interval in seconds.
  
+ Prefer to set SUScheduledCheckInterval directly in your Info.plist for setting the initial value.
+ 
  Setting this property will persist in the host bundle's user defaults.
- For this reason, only set this property if you need dynamic behavior (eg user preferences).
- Otherwise prefer to set SUScheduledCheckInterval directly in your Info.plist.
+ Only set this property if the user wants to change the default via a user preferences option.
  
  The update schedule cycle will be reset in a short delay after the property's new value is set.
  This is to allow reverting this property without kicking off a schedule change immediately
@@ -205,7 +213,7 @@ SU_EXPORT @interface SPUUpdater : NSObject
  In this case, this property will return NO regardless of how this property is set.
  
  Setting this property will persist in the host bundle's user defaults.
- For this reason, only set this property if you need dynamic behavior (eg user preferences).
+ For this reason, only set this property if the user wants to change the default via a user preferences option.
  Otherwise prefer to set SUAutomaticallyUpdate directly in your Info.plist.
  */
 @property (nonatomic) BOOL automaticallyDownloadsUpdates;
