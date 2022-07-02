@@ -5,7 +5,7 @@
 "%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "Το %1$@ %2$@ είναι η τελευταία διαθέσιμη έκδοση.\n(Η παρούσα εκδοσή σας είναι η %3$@.)";
 
 /* Description text for SUUpdateAlert when the update is downloadable. */
-"%@ %@ is now available—you have %@. Would you like to download it now?" = "Το %1$@ %2$@ είναι πλέον διαθέσιμο--έχετε το %3$@. Θέλετε να το κατεβάσετε τώρα;";
+"%@ %@ is now available—you have %@. Would you like to download it now?" = "Το %1$@ %2$@ είναι η νέα έκδοση--έχετε την %3$@. Θέλετε να την κατεβάσετε τώρα;";
 
 /* The download progress in a unit of bytes, e.g. 100 KB */
 "%@ downloaded" = "%@ λήφθησαν";
@@ -14,7 +14,7 @@
 "%@ of %@" = "%1$@ από %2$@";
 
 /* Description text for SUUpdateAlert when the update has already been downloaded and ready to install. */
-"%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "Το %1$@ %2$@ έχει ληφθεί και είναι έτοιμο προς χρήση! Θα θέλατε να το εγκαταστήσετε και να επανεκκινήσετε το %1$@ τώρα;";
+"%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "Το %1$@ %2$@ κατέβηκε. Είναι έτοιμο προς εγκατάσταση! Θέλετε να εγκαταστήσετε και να επανεκκινήσετε το %1$@ τώρα;";
 
 /* No comment provided by engineer. */
 "%1$@ can’t be updated, because it was opened from a read-only or a temporary location." = "Το %1$@ δεν μπορεί να ενημερωθεί όσο τρέχει από έναν δίσκο ανάγνωσης-μόνο ή έναν οπτικό δίσκο.";
@@ -65,7 +65,7 @@
 "Ready to Install" = "Έτοιμο προς Εγκατάσταση";
 
 /* No comment provided by engineer. */
-"Should %1$@ automatically check for updates? You can always check for updates manually from the %1$@ menu." = "Θέλετε το %1$@ να ελέγχει αυτόματα για ενημερώσεις; Μπορείτε πάντα να ελέγχετε για ενημερώσεις χειροκίνητα από το μενού %1$@.";
+"Should %1$@ automatically check for updates? You can always check for updates manually from the %1$@ menu." = "Θέλετε το %1$@ να ελέγχει αυτόματα για ενημερώσεις; Μπορείτε να ελέγχετε πάντα για επιθυμητές ενημερώσεις από το μενού %1$@.";
 
 /* No comment provided by engineer. */
 "Update Error!" = "Σφάλμα Ενημέρωσης!";
@@ -74,7 +74,7 @@
 "Updating %@" = "Ενημέρωση %@";
 
 /* No comment provided by engineer. */
-"Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "Μεταφέρετε το %1$@ στον φάκελο εφαρμογών σας, επανεκκινήστε το από εκεί, και ξαναδοκιμάστε.";
+"Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "Αντιγράψτε το %1$@ στον φάκελο εφαρμογών συστήματος, επανεκκινήστε το από εκεί και ξαναδοκιμάστε.";
 
 /* Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates. */
 "You’re up-to-date!" = "Είστε ενημερωμένοι!";
