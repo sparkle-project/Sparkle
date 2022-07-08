@@ -1,23 +1,47 @@
+/* Description text for SUUpdateAlert when the critical update has already been downloaded and ready to install. */
+"%1$@ %2$@ has been downloaded and is ready to use! This is an important update; would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ è stato scaricato ed è pronto per essere utilizzato! Questo è un aggiornamento importante; desideri installare e riavviare %1$@ ora?";
+
+/* Description text for SUUpdateAlert when the update has already been downloaded and ready to install. */
+"%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ è stato scaricato ed è pronto per essere utilizzato! Desideri installare e riavviare %1$@ ora?";
+
+/* No comment provided by engineer. */
+"%1$@ %2$@ is available but your macOS version is too new for this update. This update only supports up to macOS %3$@." = "%1$@ %2$@ è disponibile ma la tua versione di macOS è troppo recente per questo aggiornamento. Questo aggiornamento supporta solo fino a macOS %3$@.";
+
+/* No comment provided by engineer. */
+"%1$@ %2$@ is available but your macOS version is too old to install it. At least macOS %3$@ is required." = "%1$@ %2$@ è disponibile ma la tua versione di macOS è troppo vecchia per installarla. È richiesto almeno macOS %3$@.";
+
+/* No comment provided by engineer. */
+"%1$@ can’t be updated if it’s running from the location it was downloaded to." = "%1$@ non può essere aggiornata se è in esecuzione dalla posizione in cui è stato scaricata.";
+
+/* No comment provided by engineer. */
+"%1$@ can’t be updated, because it was opened from a read-only or a temporary location." = "%1$@ non può essere aggiornata perché è stata aperta da una posizione di sola lettura o temporanea.";
+
 /* No comment provided by engineer. */
 "%@ %@ is currently the newest version available." = "%1$@ %2$@ è la versione più recente attualmente disponibile.";
 
 /* No comment provided by engineer. */
-"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%1$@ %2$@ è la versione più recente attualmente disponibile.\n(You are currently running version %3$@.)";
+"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%1$@ %2$@ è la versione più recente attualmente disponibile.\n(Attualmente stai utilizzando la versione %3$@)";
+
+/* Description text for SUUpdateAlert when the critical update is downloadable. */
+"%@ %@ is now available—you have %@. This is an important update; would you like to download it now?" = "%1$@ %2$@ è disponibile; disponi della versione %3$@. Questo è un aggiornamento importante; desideri eseguire l’aggiornamento ora?";
 
 /* Description text for SUUpdateAlert when the update is downloadable. */
-"%@ %@ is now available—you have %@. Would you like to download it now?" = "%1$@ %2$@ è disponbile; disponi della versione %3$@. Desideri eseguire l’aggiornamento ora?";
+"%@ %@ is now available—you have %@. Would you like to download it now?" = "%1$@ %2$@ è disponibile; disponi della versione %3$@. Desideri eseguire l’aggiornamento ora?";
+
+/* Description text for SUUpdateAlert when the update informational with no download. */
+"%@ %@ is now available—you have %@. Would you like to learn more about this update on the web?" = "%1$@ %2$@ è disponibile; disponi della versione %3$@. Desideri ulteriori informazioni su questo aggiornamento sul web?";
 
 /* The download progress in a unit of bytes, e.g. 100 KB */
 "%@ downloaded" = "%@ scaricato";
 
-/* The download progress in units of bytes, e.g. 100 KB of 1,0 MB */
-"%@ of %@" = "%1$@ di %2$@";
-
-/* Description text for SUUpdateAlert when the update has already been downloaded and ready to install. */
-"%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ è stato scaricato ed è pronto per essere utilizzato! Desideri installare e riavviare  %1$@ ora?";
+/* No comment provided by engineer. */
+"%@ is now updated to version %@!" = "%1$@ ora è aggiornato alla versione %2$@!";
 
 /* No comment provided by engineer. */
-"%1$@ can’t be updated, because it was opened from a read-only or a temporary location." = "Impossibile aggiornare %1$@ quando viene eseguito da un volume di sola lettura come un’immagine disco o un’unità ottica.";
+"%@ is now updated!" = "%@ ora è aggiornato!";
+
+/* The download progress in units of bytes, e.g. 100 KB of 1,0 MB */
+"%@ of %@" = "%1$@ di %2$@";
 
 /* No comment provided by engineer. */
 "A new version of %@ is available!" = "E’ disponibile una nuova versione di %@!";
@@ -29,13 +53,28 @@
 "An error occurred in retrieving update information. Please try again later." = "Si è verificato un errore durante il recupero delle informazioni sull’aggiornamento. Riprova in seguito.";
 
 /* No comment provided by engineer. */
+"An error occurred while connecting to the installer. Please try again later." = "Si è verificato un errore durante la connessione al programma di installazione. Riprova in seguito.";
+
+/* No comment provided by engineer. */
 "An error occurred while downloading the update. Please try again later." = "Si è verificato un errore durante lo scaricamento dell’aggiornamento. Riprova in seguito.";
 
 /* No comment provided by engineer. */
 "An error occurred while extracting the archive. Please try again later." = "Si è verificato un errore durante l’estrazione dell’archivio. Riprova in seguito.";
 
 /* No comment provided by engineer. */
+"An error occurred while launching the installer. Please try again later." = "Si è verificato un errore durante l’avvio del programma di installazione. Riprova in seguito.";
+
+/* No comment provided by engineer. */
 "An error occurred while parsing the update feed." = "Si è verificato un errore durante la lettura del feed di aggiornamento.";
+
+/* No comment provided by engineer. */
+"An error occurred while running the updater. Please try again later." = "Si è verificato un errore durante l’esecuzione del programma di aggiornamento. Riprova in seguito.";
+
+/* No comment provided by engineer. */
+"An error occurred while starting the installer. Please try again later." = "Si è verificato un errore durante l’avvio del programma di installazione. Riprova in seguito.";
+
+/* No comment provided by engineer. */
+"An important update to %@ is ready to install" = "Un importante aggiornamento di %@ è pronto per l’installazione";
 
 /* No comment provided by engineer. */
 "Cancel" = "Annulla";
@@ -53,7 +92,13 @@
 "Extracting update…" = "Estrazione dell’aggiornamento…";
 
 /* No comment provided by engineer. */
+"Failed to resume installing update." = "Impossibile riprendere l’installazione dell’aggiornamento.";
+
+/* No comment provided by engineer. */
 "Install and Relaunch" = "Installa e Riavvia";
+
+/* Alternate title for 'Remind Me Later' button when downloaded updates can be resumed */
+"Install on Quit" = "Installa all’uscita";
 
 /* Take care not to overflow the status window. */
 "Installing update…" = "Installazione aggiornamento in corso…";
@@ -65,19 +110,43 @@
 "OK" = "OK";
 
 /* No comment provided by engineer. */
+"Quit %1$@, move it into your Applications folder, relaunch it from there and try again." = "Esci da %1$@, spostala nella Cartella Applicazioni, riavviala da lì e riprova.";
+
+/* No comment provided by engineer. */
 "Ready to Install" = "Pronto per l’installazione";
 
 /* No comment provided by engineer. */
 "Should %1$@ automatically check for updates? You can always check for updates manually from the %1$@ menu." = "Desideri che %1$@ verifichi gli aggiornamenti automaticamente? Puoi effettuare la verifica manualmente dal menu di %1$@.";
 
 /* No comment provided by engineer. */
+"The update checker failed to start correctly. You should contact the app developer to report this issue and verify that you have the latest version." = "Il controllo degli aggiornamenti non è stato avviato correttamente. È necessario contattare lo sviluppatore dell’app per segnalare questo problema e verificare di disporre della versione più recente.";
+
+/* No comment provided by engineer. */
+"The update is improperly signed and could not be validated. Please try again later or contact the app developer." = "L’aggiornamento è firmato in modo errato e non può essere convalidato. Riprova in seguito o contatta lo sviluppatore dell’app.";
+
+/* No comment provided by engineer. */
+"Unable to Check For Updates" = "Impossibile controllare gli aggiornamenti";
+
+/* No comment provided by engineer. */
 "Update Error!" = "Errore di Aggiornamento!";
+
+/* No comment provided by engineer. */
+"Update Installed" = "Aggiornamento installato";
 
 /* No comment provided by engineer. */
 "Updating %@" = "Aggiornamento di %@";
 
 /* No comment provided by engineer. */
-"Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "Spostare %1$@ nella Cartella Applicazioni, riavviarlo e riprovare.";
+"Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "Spostare %1$@ nella Cartella Applicazioni, riavviarla e riprovare.";
+
+/* No comment provided by engineer. */
+"Version History" = "Cronologia versioni";
+
+/* No comment provided by engineer. */
+"Your macOS version is too new" = "La tua versione di macOS è troppo recente";
+
+/* No comment provided by engineer. */
+"Your macOS version is too old" = "La tua versione di macOS è troppo vecchia";
 
 /* Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates. */
 "You’re up-to-date!" = "La tua applicazione è aggiornata!";
