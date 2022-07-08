@@ -35,16 +35,16 @@
 "%@ downloaded" = "%@ scaricato";
 
 /* No comment provided by engineer. */
-"%@ is now updated to version %@!" = "%1$@ ora è aggiornato alla versione %2$@!";
+"%@ is now updated to version %@!" = "%1$@ ora è aggiornata alla versione %2$@!";
 
 /* No comment provided by engineer. */
-"%@ is now updated!" = "%@ ora è aggiornato!";
+"%@ is now updated!" = "%@ ora è aggiornata!";
 
 /* The download progress in units of bytes, e.g. 100 KB of 1,0 MB */
 "%@ of %@" = "%1$@ di %2$@";
 
 /* No comment provided by engineer. */
-"A new version of %@ is available!" = "E’ disponibile una nuova versione di %@!";
+"A new version of %@ is available!" = "È disponibile una nuova versione di %@!";
 
 /* No comment provided by engineer. */
 "A new version of %@ is ready to install!" = "Una nuova versione di %@ è pronta per essere installata!";
