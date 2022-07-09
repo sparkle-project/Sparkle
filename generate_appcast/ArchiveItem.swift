@@ -138,18 +138,24 @@ class ArchiveItem: CustomStringConvertible {
             }
             
             var frameworkVersion: String? = nil
-            if let appBundle = Bundle(url: appPath), let frameworksURL = appBundle.privateFrameworksURL {
-                let sparkleBundleURL = frameworksURL.appendingPathComponent("Sparkle").appendingPathExtension("framework")
+            do {
+                let canonicalFrameworksURL = appPath.appendingPathComponent("Contents/Frameworks/Sparkle.framework")
                 
-                if let sparkleBundle = Bundle(url: sparkleBundleURL), let infoDictionary = sparkleBundle.infoDictionary {
-                    frameworkVersion = infoDictionary[kCFBundleVersionKey as String] as? String
-                } else {
+                let frameworksURL: URL?
+                if !FileManager.default.fileExists(atPath: canonicalFrameworksURL.path) {
                     // Try legacy SparkleCore framework that was shipping in early 2.0 betas
-                    let sparkleCoreBundleURL = frameworksURL.appendingPathComponent("SparkleCore").appendingPathExtension("framework")
-                    
-                    if let sparkleBundle = Bundle(url: sparkleCoreBundleURL), let infoDictionary = sparkleBundle.infoDictionary {
-                        frameworkVersion = infoDictionary[kCFBundleVersionKey as String] as? String
+                    let sparkleCoreFrameworksURL = appPath.appendingPathComponent("Contents/Frameworks/SparkleCore.framework")
+                    if FileManager.default.fileExists(atPath: sparkleCoreFrameworksURL.path) {
+                        frameworksURL = sparkleCoreFrameworksURL
+                    } else {
+                        frameworksURL = nil
                     }
+                } else {
+                    frameworksURL = canonicalFrameworksURL
+                }
+                
+                if let frameworksURL = frameworksURL, let frameworkInfoPlist = NSDictionary(contentsOf: frameworksURL.appendingPathComponent("Resources/Info.plist")) {
+                    frameworkVersion = frameworkInfoPlist[kCFBundleVersionKey as String] as? String
                 }
             }
 
