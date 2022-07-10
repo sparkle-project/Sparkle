@@ -171,6 +171,7 @@
 		7229E1BA1C97CC4D00CB50D0 /* SPUScheduledUpdateDriver.m in Sources */ = {isa = PBXBuildFile; fileRef = 7229E1B81C97CC4D00CB50D0 /* SPUScheduledUpdateDriver.m */; };
 		7229E1BD1C98EFF200CB50D0 /* SPUDownloadDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 7229E1BB1C98EFF200CB50D0 /* SPUDownloadDriver.h */; };
 		7229E1BE1C98EFF200CB50D0 /* SPUDownloadDriver.m in Sources */ = {isa = PBXBuildFile; fileRef = 7229E1BC1C98EFF200CB50D0 /* SPUDownloadDriver.m */; };
+		722C9539286EA68C0033908A /* SPUGentleUserDriverReminders.h in Headers */ = {isa = PBXBuildFile; fileRef = 722C9538286EA54A0033908A /* SPUGentleUserDriverReminders.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		722FB7E5260EE53F00EB571C /* SUNormalization.m in Sources */ = {isa = PBXBuildFile; fileRef = 722FB7E4260EE53F00EB571C /* SUNormalization.m */; };
 		722FB7E6260EE53F00EB571C /* SUNormalization.m in Sources */ = {isa = PBXBuildFile; fileRef = 722FB7E4260EE53F00EB571C /* SUNormalization.m */; };
 		72316BD31E0DA8430039EFD9 /* SUUnarchiverNotifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 72316BD21E0DA8430039EFD9 /* SUUnarchiverNotifier.m */; };
@@ -1010,6 +1011,7 @@
 		7229E1B81C97CC4D00CB50D0 /* SPUScheduledUpdateDriver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SPUScheduledUpdateDriver.m; sourceTree = "<group>"; };
 		7229E1BB1C98EFF200CB50D0 /* SPUDownloadDriver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPUDownloadDriver.h; sourceTree = "<group>"; };
 		7229E1BC1C98EFF200CB50D0 /* SPUDownloadDriver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SPUDownloadDriver.m; sourceTree = "<group>"; };
+		722C9538286EA54A0033908A /* SPUGentleUserDriverReminders.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SPUGentleUserDriverReminders.h; sourceTree = "<group>"; };
 		722FB7CA1DD69897001D40CE /* ConfigSwift.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigSwift.xcconfig; sourceTree = "<group>"; };
 		722FB7E3260EE53F00EB571C /* SUNormalization.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SUNormalization.h; sourceTree = "<group>"; };
 		722FB7E4260EE53F00EB571C /* SUNormalization.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SUNormalization.m; sourceTree = "<group>"; };
@@ -2159,6 +2161,7 @@
 				725CB9581C7121830064365A /* SPUStandardUserDriver.h */,
 				725CB9591C7121830064365A /* SPUStandardUserDriver.m */,
 				726E4A361C89116000C57C6A /* SPUStandardUserDriverDelegate.h */,
+				722C9538286EA54A0033908A /* SPUGentleUserDriverReminders.h */,
 				726DF88D1C84277500188804 /* SPUUserUpdateState.h */,
 				7269E49C2648FC6C0088C213 /* SPUUserUpdateState+Private.h */,
 				7269E4992648F7C00088C213 /* SPUUserUpdateState.m */,
@@ -2433,6 +2436,7 @@
 				7246E0A31C83B685003B4E75 /* SPUStandardUpdaterController.h in Headers */,
 				725CB95A1C7121830064365A /* SPUStandardUserDriver.h in Headers */,
 				726E4A371C89116000C57C6A /* SPUStandardUserDriverDelegate.h in Headers */,
+				722C9539286EA68C0033908A /* SPUGentleUserDriverReminders.h in Headers */,
 				729F7EAF273F1840004592DC /* SPUUserAgent+Private.h in Headers */,
 				72EE17FC26D1CC9D00C58B19 /* SPUInstallationType.h in Headers */,
 				72EF30BE2675CF38008CE987 /* SPUAppcastItemStateResolver.h in Headers */,

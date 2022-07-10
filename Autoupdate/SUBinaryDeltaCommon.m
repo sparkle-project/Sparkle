@@ -329,7 +329,7 @@ NSString *displayHashFromRawHash(const unsigned char *hash)
 {
     char hexHash[CC_SHA1_DIGEST_LENGTH * 2 + 1] = {0};
     for (size_t i = 0; i < CC_SHA1_DIGEST_LENGTH; i++) {
-        sprintf(hexHash + i * 2, "%02x", hash[i]);
+        snprintf(hexHash + i * 2, 3, "%02x", hash[i]);
     }
     return @(hexHash);
 }

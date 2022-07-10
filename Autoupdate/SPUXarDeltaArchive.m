@@ -348,7 +348,11 @@ static xar_file_t _xarAddFile(NSMutableDictionary<NSString *, NSValue *> *fileTa
             continue;
         }
         
-        NSString *relativePath = @(pathCString);
+        NSString *relativePath = [[NSString alloc] initWithBytesNoCopy:pathCString length:strlen(pathCString) encoding:NSUTF8StringEncoding freeWhenDone:YES];
+        if (relativePath == nil) {
+            free(pathCString);
+            continue;
+        }
         
         SPUDeltaItemCommands commands = 0;
         {

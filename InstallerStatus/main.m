@@ -25,7 +25,7 @@
     newConnection.exportedInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SUInstallerStatusProtocol)];
     
     // Next, set the object that the connection exports. All messages sent on the connection to this service will be sent to the exported object to handle. The connection retains the exported object.
-    SUInstallerStatus *exportedObject = [SUInstallerStatus new];
+    SUInstallerStatus *exportedObject = [[SUInstallerStatus alloc] initWithRemote:YES];
     newConnection.exportedObject = exportedObject;
     
     // Resuming the connection allows the system to deliver more incoming messages.

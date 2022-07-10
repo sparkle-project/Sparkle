@@ -147,7 +147,9 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     
     __weak AppInstaller *weakSelf = self;
     newConnection.interruptionHandler = ^{
-        [weakSelf.activeConnection invalidate];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [weakSelf.activeConnection invalidate];
+        });
     };
     
     newConnection.invalidationHandler = ^{

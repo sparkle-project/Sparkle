@@ -13,6 +13,7 @@
 * Rename XPC Service filenames for Sandboxing to show more friendly human-readable name in authorization dialog (Zorg) (#2096)
 * Add support for running the framework and sparkle-cli as root (Zorg) (#2119)
 * Fix issue where update cycle may not complete in unusual configuration if automatic checks are disabled + automatic downloading is enabled + install requires user interaction (Zorg) (#2133)
+* Synchronize usage of XPC connections to main queue to fix potential race conditions (Zorg) (#2178)
 * Update last update check time when choosing to install an update & relaunch (Zorg) (#2136)
 * Improve error reporting in the framework and sparkle-cli when installation fails with no write permission (Zorg) (#2157)
 * Use displayVersionString instead of versionString for OS version mismatch error message (samschott) (#2138)
@@ -23,14 +24,19 @@
 * Bump initial installer message timeouts and declare daemon/agents processes as Interactive (Zorg) (#2162)
 * Add and improve translation strings and update pt-BR (BR Lingo) (#2094)
 * Update localisations (Eitot) (#2113)
+* Update Greek localizations (seitsme) (#2184, #2185)
+* Update Japanese localization (1024jp) (#2182)
 * Replace deprecated code with newer APIs (Eitot) (#2112)
 * Remove obsolete fallbacks for older OS versions (Eitot) (#2110)
 * Remove SPUURLRequest (Zorg) (#2124)
 * Silence ivar deprecation warnings (Zorg) (#2099)
-* Fix Xcode 14 project warnings (Zorg) (#2147)
+* Fix Xcode 14 project warnings (Zorg) (#2147, #2179)
+* Deprecate -s flag and add --ed-key-file option to generate_appcast (Zorg) (#2170)
 * Update text for external licenses (Zorg) (#2164)
 
 This update renames the bundled XPC Services, brings improvements to notifying users of new updates without disrupting their focus, and adds [gentle update reminder APIs](https://sparkle-project.org/documentation/gentle-reminders/) to further customize how Sparkle's standard user interface delivers new update alerts.
+
+The `-s` flag for passing a raw private EdDSA key to sign_update and generate_appcast is now deprecated. If you were using this option previously, please see the help pages of these tools for more information.
 
 # 2.1.0
 

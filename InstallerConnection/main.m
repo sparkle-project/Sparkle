@@ -26,7 +26,7 @@
     newConnection.exportedInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SUInstallerConnectionProtocol)];
     newConnection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SUInstallerCommunicationProtocol)];
     
-    SUInstallerConnection *exportedObject = [[SUInstallerConnection alloc] initWithDelegate:newConnection.remoteObjectProxy];
+    SUInstallerConnection *exportedObject = [[SUInstallerConnection alloc] initWithDelegate:newConnection.remoteObjectProxy remote:YES];
     
     newConnection.exportedObject = exportedObject;
     

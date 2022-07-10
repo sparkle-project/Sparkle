@@ -121,28 +121,22 @@
             } else if (underlyingError.code == SUInstallationError) {
                 NSError *secondUnderlyingError = underlyingError.userInfo[NSUnderlyingErrorKey];
                 if (secondUnderlyingError != nil && [secondUnderlyingError.domain isEqualToString:NSCocoaErrorDomain] && secondUnderlyingError.code == NSFileWriteNoPermissionError) {
-                    NSBundle *mainBundle = [NSBundle mainBundle];
-                    // macOS 13 and later introduce a policy where Gatekeeper can block app modifications if the apps have different Team IDs
-                    BOOL warnAboutGatekeeper;
-                    if (@available(macOS 13, *)) {
-                        warnAboutGatekeeper = ![mainBundle isEqual:self.host.bundle];
-                    } else {
-                        warnAboutGatekeeper = NO;
-                    }
-                    
                     // Note: these error strings will only surface for external app updaters like sparkle-cli (i.e, updaters that update other app bundles)
-                    NSString *errorDescription;
-                    if (warnAboutGatekeeper) {
-                        SUHost *mainBundleHost = [[SUHost alloc] initWithBundle:mainBundle];
-                        errorDescription = [NSString stringWithFormat:SULocalizedString(@"The installation failed due to not having permission to write the new update. To install the update, you may need to allow modifications from %1$@ in System Settings under Privacy & Security and App Management", nil), mainBundleHost.name];
-                    } else {
-                        errorDescription = SULocalizedString(@"The installation failed due to not having permission to write the new update.", nil);
-                    }
                     
-                    NSDictionary *userInfo = @{
-                        NSLocalizedDescriptionKey: errorDescription,
+                    NSMutableDictionary *userInfo = [NSMutableDictionary dictionaryWithDictionary:@{
+                        NSLocalizedDescriptionKey: SULocalizedString(@"The installation failed due to not having permission to write the new update.", nil),
                         NSUnderlyingErrorKey: (NSError * _Nonnull)currentInstallerError
-                    };
+                    }];
+                    
+                    // macOS 13 and later introduce a policy where Gatekeeper can block app modifications if the apps have different Team IDs
+                    if (@available(macOS 13, *)) {
+                        NSBundle *mainBundle = [NSBundle mainBundle];
+                        if (![mainBundle isEqual:self.host.bundle]) {
+                            SUHost *mainBundleHost = [[SUHost alloc] initWithBundle:mainBundle];
+                            
+                            userInfo[NSLocalizedRecoverySuggestionErrorKey] = [NSString stringWithFormat:SULocalizedString(@"You may need to allow modifications from %1$@ in System Settings under Privacy & Security and App Management to install future updates.", nil), mainBundleHost.name];
+                        }
+                    }
                     
                     customError = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationWriteNoPermissionError userInfo:userInfo];
                 }
@@ -176,7 +170,7 @@
     assert(hostBundleIdentifier != nil);
     
     if (!SPUXPCServiceIsEnabled(SUEnableInstallerConnectionServiceKey)) {
-        self.installerConnection = [[SUInstallerConnection alloc] initWithDelegate:self];
+        self.installerConnection = [[SUInstallerConnection alloc] initWithDelegate:self remote:NO];
     } else {
         self.installerConnection = [[SUXPCInstallerConnection alloc] initWithDelegate:self];
     }
