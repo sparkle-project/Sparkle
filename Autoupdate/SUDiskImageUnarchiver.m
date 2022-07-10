@@ -128,16 +128,8 @@
                 dispatch_semaphore_signal(terminationSemaphore);
             };
             
-            if (@available(macOS 10.13, *)) {
-                if (![task launchAndReturnError:&error]) {
-                    goto reportError;
-                }
-            } else {
-                @try {
-                    [task launch];
-                } @catch (NSException *) {
-                    goto reportError;
-                }
+            if (![task launchAndReturnError:&error]) {
+                goto reportError;
             }
             
             [notifier notifyProgress:0.125];
@@ -221,20 +213,10 @@
             task.standardOutput = [NSPipe pipe];
             task.standardError = [NSPipe pipe];
             
-            
-            if (@available(macOS 10.13, *)) {
-                NSError *launchCleanupError = nil;
-                if (![task launchAndReturnError:&launchCleanupError]) {
-                    SULog(SULogLevelError, @"Failed to unmount %@", mountPoint);
-                    SULog(SULogLevelError, @"Error: %@", launchCleanupError);
-                }
-            } else {
-                @try {
-                    [task launch];
-                } @catch (NSException *exception) {
-                    SULog(SULogLevelError, @"Failed to unmount %@", mountPoint);
-                    SULog(SULogLevelError, @"Exception: %@", exception);
-                }
+            NSError *launchCleanupError = nil;
+            if (![task launchAndReturnError:&launchCleanupError]) {
+                SULog(SULogLevelError, @"Failed to unmount %@", mountPoint);
+                SULog(SULogLevelError, @"Error: %@", launchCleanupError);
             }
         } else {
             SULog(SULogLevelError, @"Can't mount DMG %@", self.archivePath);

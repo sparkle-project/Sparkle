@@ -150,7 +150,7 @@ struct GenerateAppcast: ParsableCommand {
         If the contents of these files are short (< \(DEFAULT_MAX_CDATA_THRESHOLD) characters) and do not include a DOCTYPE or body tags, they will be treated as embedded CDATA release notes.
         
         For new update entries, Sparkle infers the minimum system OS requirement based on your update's LSMinimumSystemVersion provided
-        by your application's Info.plist. If none is found, \(programName) defaults to Sparkle's own minimum system requirement (macOS 10.11).
+        by your application's Info.plist. If none is found, \(programName) defaults to Sparkle's own minimum system requirement (macOS 10.13).
         
         An example of an archives directory may look like:
             ./my-app-release-zipfiles/

@@ -1029,23 +1029,14 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
         }
         
         NSTask *dittoTask = [[NSTask alloc] init];
-        
-        if (@available(macOS 10.13, *)) {
-            dittoTask.executableURL = [NSURL fileURLWithPath:@"/usr/bin/ditto" isDirectory:NO];
-        } else {
-            dittoTask.launchPath = @"/usr/bin/ditto";
-        }
+        dittoTask.executableURL = [NSURL fileURLWithPath:@"/usr/bin/ditto" isDirectory:NO];
         
         dittoTask.arguments = @[@"--hfsCompression", destinationFile, destinationFile2];
         
         NSError *launchError = nil;
-        if (@available(macOS 10.13, *)) {
-            BOOL launched = [dittoTask launchAndReturnError:&launchError];
-            if (!launched) {
-                XCTFail(@"Failed to launch ditto: %@", launchError);
-            }
-        } else {
-            [dittoTask launch];
+        BOOL launched = [dittoTask launchAndReturnError:&launchError];
+        if (!launched) {
+            XCTFail(@"Failed to launch ditto: %@", launchError);
         }
         [dittoTask waitUntilExit];
         
