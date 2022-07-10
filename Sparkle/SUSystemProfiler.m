@@ -30,17 +30,8 @@ NSString *const SUSystemProfilerPreferredLanguageKey = @"lang";
 
 @implementation SUSystemProfiler
 
-+ (NSDictionary<NSString *, NSString *> *)modelTranslationTable
-{
-    // Use explicit class to use the correct bundle even when subclassed
-    NSString *path = [[NSBundle bundleForClass:[SUSystemProfiler class]] pathForResource:@"SUModelTranslation" ofType:@"plist"];
-    return [[NSDictionary alloc] initWithContentsOfFile:path];
-}
-
 + (NSArray<NSDictionary<NSString *, NSString *> *> *)systemProfileArrayForHost:(SUHost *)host
 {
-    NSDictionary<NSString *, NSString *> *modelTranslation = [self modelTranslationTable];
-
     // Gather profile information and append it to the URL.
     NSMutableArray<NSDictionary<NSString *, NSString *> *> *profileArray = [NSMutableArray array];
     NSArray *profileDictKeys = @[@"key", @"displayKey", @"value", @"displayValue"];
@@ -115,10 +106,7 @@ NSString *const SUSystemProfilerPreferredLanguageKey = @"lang";
             error = sysctlbyname("hw.model", cpuModel, &length, NULL, 0);
             if (error == 0) {
                 NSString *rawModelName = @(cpuModel);
-                NSString *visibleModelName = [modelTranslation objectForKey:rawModelName];
-                if (visibleModelName == nil) {
-                    visibleModelName = rawModelName;
-                }
+                NSString *visibleModelName = rawModelName;
                 [profileArray addObject:[NSDictionary dictionaryWithObjects:@[SUSystemProfilerHardwareModelKey, @"Mac Model", rawModelName, visibleModelName] forKeys:profileDictKeys]];
             }
             free(cpuModel);
