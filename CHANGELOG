@@ -1,3 +1,9 @@
+# 2.2.1
+
+* Make scroll bar dark in dark theme for Release Notes by default (#2187) (Pavel Moiseenko)
+* Fix memory leaks when using generate_appcast (#2193) (Zorg)
+* Update Italian localization (#2192) (VinBoiSoft)
+
 # 2.2.0
 
 * Update Focus Improvements (#924)
