@@ -398,32 +398,17 @@ BOOL applyBinaryDelta(NSString *source, NSString *finalDestination, NSString *pa
         
         NSTask *dittoTask = [[NSTask alloc] init];
         
-        if (@available(macOS 10.13, *)) {
-            dittoTask.executableURL = [NSURL fileURLWithPath:@"/usr/bin/ditto" isDirectory:NO];
-        } else {
-            dittoTask.launchPath = @"/usr/bin/ditto";
-        }
-        
+        dittoTask.executableURL = [NSURL fileURLWithPath:@"/usr/bin/ditto" isDirectory:NO];
         dittoTask.arguments = @[@"--hfsCompression", destination, finalDestination];
         
         // If we fail to apply file system compression, we will try falling back to not doing this
         BOOL failedToApplyFileSystemCompression = NO;
         
-        if (@available(macOS 10.13, *)) {
-            NSError *launchError = nil;
-            if (![dittoTask launchAndReturnError:&launchError]) {
-                failedToApplyFileSystemCompression = YES;
-                
-                fprintf(stderr, "\nWarning: failed to launch ditto task for file compression: %s", launchError.localizedDescription.UTF8String);
-            }
-        } else {
-            @try {
-                [dittoTask launch];
-            } @catch (NSException *exception) {
-                failedToApplyFileSystemCompression = YES;
-                
-                fprintf(stderr, "\nWarning: failed to launch ditto task for file compression: %s", exception.reason.UTF8String);
-            }
+        NSError *launchError = nil;
+        if (![dittoTask launchAndReturnError:&launchError]) {
+            failedToApplyFileSystemCompression = YES;
+            
+            fprintf(stderr, "\nWarning: failed to launch ditto task for file compression: %s", launchError.localizedDescription.UTF8String);
         }
         
         if (!failedToApplyFileSystemCompression) {

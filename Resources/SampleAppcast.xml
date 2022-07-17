@@ -16,7 +16,7 @@
             </sparkle:fullReleaseNotesLink>
             <pubDate>Wed, 09 Jan 2006 19:20:11 +0000</pubDate>
             <enclosure url="https://you.com/app/Your%20Great%20App%202.0.zip" length="1623481" type="application/octet-stream" sparkle:edSignature="WVyVJpOx+a5+vNWJVY79TRjFKveNk+VhGJf2iti4CZtJsJewIUGvh/1AKKEAFbH1qUwx+vro1ECuzOsMmumoBA==" />
-            <sparkle:minimumSystemVersion>10.11</sparkle:minimumSystemVersion>
+            <sparkle:minimumSystemVersion>10.13</sparkle:minimumSystemVersion>
         </item>
 
         <item>
@@ -31,7 +31,7 @@
             </sparkle:fullReleaseNotesLink>
             <pubDate>Wed, 01 Jan 2006 12:20:11 +0000</pubDate>
             <enclosure url="https://you.com/app/Your%20Great%20App%201.5.zip" length="1472893" type="application/octet-stream" sparkle:edSignature="pNFd7KbcQSu+Mq7UYrbQXTPq82luht2ACXm/r2utp1u/Uv/5hWqctdT2jwQgMejW7DRoeV/hVr6J4VdZYdwWDw==" />
-            <sparkle:minimumSystemVersion>10.11</sparkle:minimumSystemVersion>
+            <sparkle:minimumSystemVersion>10.13</sparkle:minimumSystemVersion>
         </item>
 
         <!-- Now here's an example of a version with a weird internal version number (like an SVN revision) but a human-readable external one. -->
@@ -48,7 +48,7 @@
             <sparkle:shortVersionString>1.4</sparkle:shortVersionString>
             <pubDate>Wed, 25 Dec 2005 12:20:11 +0000</pubDate>
             <enclosure url="https://you.com/app/Your%20Great%20App%201.4.zip" sparkle:edSignature="Ody3D/ybSMH4T+P/oNj3LN4F0SA8RJGLEr1TI4UemrBAiJ9aEcDnYV3u58P75AbcFjI13jPYmHDUHXMSTFQbDw==" length="1472349" type="application/octet-stream" />
-            <sparkle:minimumSystemVersion>10.11</sparkle:minimumSystemVersion>
+            <sparkle:minimumSystemVersion>10.13</sparkle:minimumSystemVersion>
         </item>
     </channel>
 </rss>

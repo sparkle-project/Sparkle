@@ -56,30 +56,18 @@
     task.standardError = nil;
     task.standardOutput = nil;
     
-    if (@available(macOS 10.13, *)) {
-        NSError *launchError = nil;
-        if (![task launchAndReturnError:&launchError]) {
-            if (error != NULL) {
-                NSMutableDictionary *userInfo = [NSMutableDictionary dictionaryWithDictionary:@{ NSLocalizedDescriptionKey: @"Guided package installer failed to launch" }];
-                
-                if (launchError != nil) {
-                    userInfo[NSUnderlyingErrorKey] = launchError;
-                }
-                
-                *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:userInfo];
-            }
-            return NO;
-        }
-    } else {
-        @try {
-            [task launch];
-        } @catch (NSException *) {
-            if (error != NULL) {
-                *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey: @"Guided package installer task threw an exception" }];
+    NSError *launchError = nil;
+    if (![task launchAndReturnError:&launchError]) {
+        if (error != NULL) {
+            NSMutableDictionary *userInfo = [NSMutableDictionary dictionaryWithDictionary:@{ NSLocalizedDescriptionKey: @"Guided package installer failed to launch" }];
+            
+            if (launchError != nil) {
+                userInfo[NSUnderlyingErrorKey] = launchError;
             }
             
-            return NO;
+            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:userInfo];
         }
+        return NO;
     }
     
     [task waitUntilExit];

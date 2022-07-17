@@ -119,19 +119,9 @@
         [task setArguments:[args arrayByAddingObject:destination]];
         
         NSError *launchError = nil;
-        if (@available(macOS 10.13, *)) {
-            if (![task launchAndReturnError:&launchError]) {
-                [notifier notifyFailureWithError:launchError];
-                return;
-            }
-        } else {
-            @try {
-                [task launch];
-            } @catch (NSException *e) {
-                NSError *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUUnarchivingError userInfo:@{ NSLocalizedDescriptionKey:[NSString stringWithFormat:@"Extraction failed, -[NSTask launch] threw exception '%@'", e.description]}];
-                [notifier notifyFailureWithError:error];
-                return;
-            }
+        if (![task launchAndReturnError:&launchError]) {
+            [notifier notifyFailureWithError:launchError];
+            return;
         }
         
         NSFileHandle *archiveOutput = [pipe fileHandleForWriting];

@@ -19,9 +19,7 @@ typedef NS_ENUM(uint8_t, SULogLevel) {
     SULogLevelError
 };
 
-// Logging utlity function that is thread-safe
-// On 10.12 or later this uses os_log
-// Otherwise on older systems this uses ASL
+// Logging utlity function that is thread-safe and uses os_log
 // For debugging command line tools, you may have to use Console.app or log(1) to view log messages
 // Try to keep log messages as compact/short as possible
 void SULog(SULogLevel level, NSString *format, ...) NS_FORMAT_FUNCTION(2, 3);
