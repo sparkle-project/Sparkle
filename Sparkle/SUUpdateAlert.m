@@ -347,13 +347,12 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
             NSLayoutConstraint *skipButtonToReleaseNotesContainerConstraint = [NSLayoutConstraint constraintWithItem:self.skipButton attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self.releaseNotesContainerView attribute:NSLayoutAttributeBottom multiplier:1.0 constant:12.0];
             
             [self.window.contentView addConstraint:skipButtonToReleaseNotesContainerConstraint];
-            
-            [self.automaticallyInstallUpdatesButton removeFromSuperview];
         } else {
-            // Disable automatic install updates option if the developer wishes for it in Info.plist
-            // If we are showing release notes, this button will be hidden instead
-            self.automaticallyInstallUpdatesButton.enabled = NO;
+            NSLayoutConstraint *skipButtonToDescriptionConstraint = [NSLayoutConstraint constraintWithItem:self.skipButton attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self.descriptionField attribute:NSLayoutAttributeBottom multiplier:1.0 constant:40.0];
+
+            [self.window.contentView addConstraint:skipButtonToDescriptionConstraint];
         }
+        [self.automaticallyInstallUpdatesButton removeFromSuperview];
     }
     
     if (self.state.stage == SPUUserUpdateStageInstalling) {
