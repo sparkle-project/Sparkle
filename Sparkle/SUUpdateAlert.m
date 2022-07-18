@@ -318,6 +318,9 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
         
         self.webView.view.frame = boxContentView.bounds;
         self.webView.view.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
+    } else {
+        // Update alert should not be resizable when no release notes are available
+        self.window.styleMask &= ~NSWindowStyleMaskResizable;
     }
 
     [self.window setFrameAutosaveName: showReleaseNotes ? @"SUUpdateAlert" : @"SUUpdateAlertSmall" ];
