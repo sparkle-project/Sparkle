@@ -292,6 +292,8 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
     BOOL showReleaseNotes = [self showsReleaseNotes];
     
     if (showReleaseNotes) {
+        self.window.frameAutosaveName = @"SUUpdateAlert";
+        
         NSURL *colorStyleURL = [[NSBundle bundleForClass:[self class]] URLForResource:@"ReleaseNotesColorStyle" withExtension:@"css"];
         
         // "-apple-system-font" is a reference to the system UI font. "-apple-system" is the new recommended token, but for backward compatibility we can't use it.
@@ -322,8 +324,6 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
         // Update alert should not be resizable when no release notes are available
         self.window.styleMask &= ~NSWindowStyleMaskResizable;
     }
-
-    [self.window setFrameAutosaveName: showReleaseNotes ? @"SUUpdateAlert" : @"SUUpdateAlertSmall" ];
 
     if (self.updateItem.informationOnlyUpdate) {
         [self.installButton setTitle:SULocalizedString(@"Learn More…", @"Alternate title for 'Install Update' button when there's no download in RSS feed.")];
