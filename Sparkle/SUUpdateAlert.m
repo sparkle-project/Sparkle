@@ -292,6 +292,8 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
     BOOL showReleaseNotes = [self showsReleaseNotes];
     
     if (showReleaseNotes) {
+        self.window.frameAutosaveName = @"SUUpdateAlert";
+        
         NSURL *colorStyleURL = [[NSBundle bundleForClass:[self class]] URLForResource:@"ReleaseNotesColorStyle" withExtension:@"css"];
         
         // "-apple-system-font" is a reference to the system UI font. "-apple-system" is the new recommended token, but for backward compatibility we can't use it.
@@ -318,21 +320,28 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
         
         self.webView.view.frame = boxContentView.bounds;
         self.webView.view.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
+    } else {
+        // Update alert should not be resizable when no release notes are available
+        self.window.styleMask &= ~NSWindowStyleMaskResizable;
     }
-
-    [self.window setFrameAutosaveName: showReleaseNotes ? @"SUUpdateAlert" : @"SUUpdateAlertSmall" ];
 
     if (self.updateItem.informationOnlyUpdate) {
         [self.installButton setTitle:SULocalizedString(@"Learn More…", @"Alternate title for 'Install Update' button when there's no download in RSS feed.")];
         [self.installButton setAction:@selector(openInfoURL:)];
     }
 
+    BOOL allowsAutomaticUpdates = self.allowsAutomaticUpdates;
+    
     if (showReleaseNotes) {
         [self displayReleaseNotes];
     } else {
-        NSLayoutConstraint *automaticallyInstallUpdatesButtonToDescriptionFieldConstraint = [NSLayoutConstraint constraintWithItem:self.automaticallyInstallUpdatesButton attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self.descriptionField attribute:NSLayoutAttributeBottom multiplier:1.0 constant:8.0];
-        
-        [self.window.contentView addConstraint:automaticallyInstallUpdatesButtonToDescriptionFieldConstraint];
+        // When automatic updates aren't allowed we won't show the automatic install updates button
+        // This button is removed later below
+        if (allowsAutomaticUpdates) {
+            NSLayoutConstraint *automaticallyInstallUpdatesButtonToDescriptionFieldConstraint = [NSLayoutConstraint constraintWithItem:self.automaticallyInstallUpdatesButton attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self.descriptionField attribute:NSLayoutAttributeBottom multiplier:1.0 constant:8.0];
+            
+            [self.window.contentView addConstraint:automaticallyInstallUpdatesButtonToDescriptionFieldConstraint];
+        }
         
         [self.releaseNotesContainerView removeFromSuperview];
     }
@@ -341,14 +350,14 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
     
     // When we show release notes, it looks ugly if the install buttons are not closer to the release notes view
     // However when we don't show release notes, it looks ugly if the install buttons are too close to the description field. Shrugs.
-    if (!self.allowsAutomaticUpdates) {
+    if (!allowsAutomaticUpdates) {
         if (showReleaseNotes) {
             // Fix constraints so that buttons aren't far away from web view when we hide the automatic updates check box
             NSLayoutConstraint *skipButtonToReleaseNotesContainerConstraint = [NSLayoutConstraint constraintWithItem:self.skipButton attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self.releaseNotesContainerView attribute:NSLayoutAttributeBottom multiplier:1.0 constant:12.0];
             
             [self.window.contentView addConstraint:skipButtonToReleaseNotesContainerConstraint];
         } else {
-            NSLayoutConstraint *skipButtonToDescriptionConstraint = [NSLayoutConstraint constraintWithItem:self.skipButton attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self.descriptionField attribute:NSLayoutAttributeBottom multiplier:1.0 constant:40.0];
+            NSLayoutConstraint *skipButtonToDescriptionConstraint = [NSLayoutConstraint constraintWithItem:self.skipButton attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self.descriptionField attribute:NSLayoutAttributeBottom multiplier:1.0 constant:20.0];
 
             [self.window.contentView addConstraint:skipButtonToDescriptionConstraint];
         }
