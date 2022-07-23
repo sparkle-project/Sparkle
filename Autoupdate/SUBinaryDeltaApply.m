@@ -282,6 +282,21 @@ BOOL applyBinaryDelta(NSString *source, NSString *finalDestination, NSString *pa
                 clonedRelativePath = nil;
             }
             
+            // Decide if we need to preserve original file permissions from the original file
+            // applyBinaryDeltaToFile() normally preserves file permissions on the file it's replacing.
+            // However this is not possible if the destination file we're patching is not writable.
+            // We also need to preserve permissions for clones except when we'll be changing permissions later anyway.
+            BOOL needsToCopyFilePermissions;
+            if (![fileManager isWritableFileAtPath:destinationFilePath]) {
+                // Remove the file non-writable we're patching that may cause issues
+                [fileManager removeItemAtPath:destinationFilePath error:NULL];
+                
+                // We will need to preserve permissons if there is no need to make permission changes later on
+                needsToCopyFilePermissions = (commands & SPUDeltaItemCommandModifyPermissions) == 0;
+            } else {
+                needsToCopyFilePermissions = ((commands & SPUDeltaItemCommandClone) != 0) && ((commands & SPUDeltaItemCommandModifyPermissions) == 0);
+            }
+            
             if (!applyBinaryDeltaToFile(tempDiffFile, sourceDiffFilePath, destinationFilePath)) {
                 if (verbose) {
                     fprintf(stderr, "\n");
@@ -293,12 +308,7 @@ BOOL applyBinaryDelta(NSString *source, NSString *finalDestination, NSString *pa
                 return;
             }
             
-            // Preserve original file permissions from the original file
-            // Only necessary for clones because applyBinaryDeltaToFile() otherwise preserves
-            // file permissions on the file it's replacing. Also not necessary if we're going to
-            // change permissions later
-            if ((commands & SPUDeltaItemCommandClone) != 0 && (commands & SPUDeltaItemCommandModifyPermissions) == 0) {
-                
+            if (needsToCopyFilePermissions) {
                 struct stat sourceFileInfo = {0};
                 if (lstat(sourceDiffFilePath.fileSystemRepresentation, &sourceFileInfo) != 0) {
                     if (verbose) {
