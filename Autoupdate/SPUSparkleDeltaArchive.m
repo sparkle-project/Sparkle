@@ -559,6 +559,8 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
         if ((commands & SPUDeltaItemCommandBinaryDiff) != 0 || S_ISREG(mode)) {
             // Regular files
             
+            [fileManager removeItemAtPath:itemFilePath error:NULL];
+            
             char itemFilePathString[PATH_MAX + 1] = {0};
             if (![itemFilePath getFileSystemRepresentation:itemFilePathString maxLength:sizeof(itemFilePathString) - 1]) {
                 self.error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Path to extract cannot be decoded and expressed as a file system representation: %@", itemFilePath] }];
