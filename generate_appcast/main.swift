@@ -52,8 +52,9 @@ struct GenerateAppcast: ParsableCommand {
     static let programName = "generate_appcast"
     static let programNamePath: String = CommandLine.arguments.first ?? "./\(programName)"
     static let cacheDirectory = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0].appendingPathComponent("Sparkle_generate_appcast")
+    static let prunedDirectoryName = ".pruned-updates"
     
-    static let DEFAULT_MAX_NEW_VERSIONS_IN_FEED = 5
+    static let DEFAULT_MAX_VERSIONS_PER_BRANCH_IN_FEED = 3
     static let DEFAULT_MAXIMUM_DELTAS = 5
     
     @Option(help: ArgumentHelp("The account name in your keychain associated with your private EdDSA (ed25519) key to use for signing new updates."))
@@ -86,7 +87,7 @@ struct GenerateAppcast: ParsableCommand {
     @Option(name: .long, help: ArgumentHelp("A URL to the application's website which Sparkle may use for directing users to if they cannot download a new update from within the application. This will be used for new generated update items. By default, no product link is used.", valueName: "link"))
     var link: String?
     
-    @Option(name: .long, help: ArgumentHelp("An optional comma delimited list of application versions (specified by CFBundleVersion) to generate new update items for. By default, new update items are inferred from the available archives and are only generated if they are in the latest \(DEFAULT_MAX_NEW_VERSIONS_IN_FEED) updates in the appcast.", valueName: "versions"), transform: { Set($0.components(separatedBy: ",")) })
+    @Option(name: .long, help: ArgumentHelp("An optional comma delimited list of application versions (specified by CFBundleVersion) to generate new update items for. By default, new update items are inferred from the available archives. Use this option if you need to insert old updates in the feed at a different branch point (for example with a different minimum OS requirement).", valueName: "versions"), transform: { Set($0.components(separatedBy: ",")) })
     var versions: Set<String>?
     
     @Option(name: .long, help: ArgumentHelp("The maximum number of delta items to create for the latest update for each minimum required operating system.", valueName: "maximum-deltas"))
@@ -122,11 +123,10 @@ struct GenerateAppcast: ParsableCommand {
     @Argument(help: "The path to the directory containing the update archives and delta files.", transform: { URL(fileURLWithPath: $0, isDirectory: true) })
     var archivesSourceDir: URL
     
-    // New update items are only generated if they are in the latest maxNewVersionsInFeed updates in the appcast
-    // If the `versions` to generate is specified however, this counter has no effect.
-    // Keep this option hidden from the user for now
+    // Rough indication of how many versions we should keep in the feed per branch point
+    // Keep this option hidden from the user
     @Option(name: .long, help: .hidden)
-    var maxNewVersionsInFeed: Int = DEFAULT_MAX_NEW_VERSIONS_IN_FEED
+    var maxVersionsPerBranchInFeed: Int = DEFAULT_MAX_VERSIONS_PER_BRANCH_IN_FEED
     
     @Flag(help: .hidden)
     var verbose: Bool = false
@@ -167,6 +167,8 @@ struct GenerateAppcast: ParsableCommand {
         For more advanced options that can be used for publishing updates, see https://sparkle-project.org/documentation/publishing/ for further documentation.
         
         Extracted archives are cached in \((cacheDirectory.path as NSString).abbreviatingWithTildeInPath) to avoid re-computation in subsequent runs.
+        
+        Old updates are automatically pruned from the generated appcast feed and their update files are moved to \(prunedDirectoryName). Old update files in this directory are deleted after a couple weeks.
         
         Note that \(programName) does not support package-based (.pkg) updates.
         """)
@@ -258,45 +260,32 @@ struct GenerateAppcast: ParsableCommand {
         let keys = loadPrivateKeys(account, privateDSAKey, privateEdKeyString)
         
         do {
-            let allUpdates = try makeAppcast(archivesSourceDir: archivesSourceDir, cacheDirectory: GenerateAppcast.cacheDirectory, keys: keys, versions: versions, maximumDeltas: maximumDeltas, deltaCompressionModeDescription: deltaCompression, deltaCompressionLevel: deltaCompressionLevel, disableNestedCodeCheck: disableNestedCodeCheck, verbose: verbose)
+            let appcastsByFeed = try makeAppcasts(archivesSourceDir: archivesSourceDir, outputPathURL: outputPathURL, cacheDirectory: GenerateAppcast.cacheDirectory, keys: keys, versions: versions, maxVersionsPerBranchInFeed: maxVersionsPerBranchInFeed, newChannel: channel, majorVersion: majorVersion, maximumDeltas: maximumDeltas, deltaCompressionModeDescription: deltaCompression, deltaCompressionLevel: deltaCompressionLevel, disableNestedCodeCheck: disableNestedCodeCheck, downloadURLPrefix: downloadURLPrefix, releaseNotesURLPrefix: releaseNotesURLPrefix, verbose: verbose)
             
-            // If a URL prefix was provided, set on the archive items
-            if downloadURLPrefix != nil || releaseNotesURLPrefix != nil {
-                for (_, archiveItems) in allUpdates {
-                    for archiveItem in archiveItems {
-                        if let downloadURLPrefix = downloadURLPrefix {
-                            archiveItem.downloadUrlPrefix = downloadURLPrefix
-                        }
-                        if let releaseNotesURLPrefix = releaseNotesURLPrefix {
-                            archiveItem.releaseNotesURLPrefix = releaseNotesURLPrefix
-                        }
-                    }
-                }
-            }
+            let prunedDirectory = archivesSourceDir.appendingPathComponent(GenerateAppcast.prunedDirectoryName)
             
-            // If a (single) output filename was specified on the command-line, but more than one
-            // appcast file was found in the archives, then it's an error.
-            if let outputPathURL = outputPathURL,
-                allUpdates.count > 1 {
-                print("Cannot write to \(outputPathURL.path): multiple appcasts found")
-                throw ExitCode(1)
-            }
-            
-            for (appcastFile, updates) in allUpdates {
+            for (appcastFile, appcast) in appcastsByFeed {
                 // If an output filename was specified, use it.
                 // Otherwise, use the name of the appcast file found in the archive.
                 let appcastDestPath = outputPathURL ?? URL(fileURLWithPath: appcastFile,
                                                                 relativeTo: archivesSourceDir)
 
                 // Write the appcast
-                let (numNewUpdates, numExistingUpdates) = try writeAppcast(appcastDestPath: appcastDestPath, updates: updates, newVersions: versions, maxNewVersionsInFeed: maxNewVersionsInFeed, fullReleaseNotesLink: fullReleaseNotesURL, maxCDATAThreshold: maxCDATAThreshold, link: link, newChannel: channel, majorVersion: majorVersion, ignoreSkippedUpgradesBelowVersion: ignoreSkippedUpgradesBelowVersion, phasedRolloutInterval: phasedRolloutInterval, criticalUpdateVersion: criticalUpdateVersion, informationalUpdateVersions: informationalUpdateVersions)
+                let (numNewUpdates, numExistingUpdates, numUpdatesRemoved) = try writeAppcast(appcastDestPath: appcastDestPath, appcast: appcast, fullReleaseNotesLink: fullReleaseNotesURL, maxCDATAThreshold: maxCDATAThreshold, link: link, newChannel: channel, majorVersion: majorVersion, ignoreSkippedUpgradesBelowVersion: ignoreSkippedUpgradesBelowVersion, phasedRolloutInterval: phasedRolloutInterval, criticalUpdateVersion: criticalUpdateVersion, informationalUpdateVersions: informationalUpdateVersions)
 
                 // Inform the user, pluralizing "update" if necessary
-                let pluralizeUpdates = { $0 == 1 ? "update" : "updates" }
+                let pluralizeWord = { $0 == 1 ? $1 : "\($1)s" }
+                let pluralizeUpdates = { pluralizeWord($0, "update") }
                 let newUpdatesString = pluralizeUpdates(numNewUpdates)
                 let existingUpdatesString = pluralizeUpdates(numExistingUpdates)
+                let removedUpdatesString = pluralizeUpdates(numUpdatesRemoved)
                 
-                print("Wrote \(numNewUpdates) new \(newUpdatesString) and updated \(numExistingUpdates) existing \(existingUpdatesString)")
+                print("Wrote \(numNewUpdates) new \(newUpdatesString), updated \(numExistingUpdates) existing \(existingUpdatesString), and removed \(numUpdatesRemoved) old \(removedUpdatesString)")
+                
+                let pruneCount = pruneUpdatesFromAppcast(archivesSourceDir: archivesSourceDir, prunedDirectory: prunedDirectory, cacheDirectory: GenerateAppcast.cacheDirectory, appcast: appcast)
+                if pruneCount > 0 {
+                    print("Pruned \(pruneCount) old update \(pluralizeWord(pruneCount, "file")) to \(prunedDirectory.lastPathComponent)")
+                }
             }
         } catch {
             print("Error generating appcast from directory", archivesSourceDir.path, "\n", error)

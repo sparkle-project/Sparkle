@@ -6,6 +6,13 @@
 import Foundation
 import UniformTypeIdentifiers
 
+struct UpdateBranch: Hashable {
+    let minimumSystemVersion: String?
+    let maximumSystemVersion: String?
+    let minimumAutoupdateVersion: String?
+    let channel: String?
+}
+
 class DeltaUpdate {
     let fromVersion: String
     let archivePath: URL
