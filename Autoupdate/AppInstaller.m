@@ -426,19 +426,22 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
             
             NSData *archivedData = SPUArchiveRootObjectSecurely(installationInfo);
             if (archivedData != nil) {
-                __block BOOL receivedCompletion = NO;
+                __block BOOL notifiedRegistrationCompleted = NO;
                 
                 [self.agentConnection.agent registerInstallationInfoData:archivedData completionHandler:^{
                     dispatch_async(dispatch_get_main_queue(), ^{
-                        receivedCompletion = YES;
-                        [self.communicator handleMessageWithIdentifier:SPUInstallerRegisteredAppcastItem data:[NSData data]];
+                        if (!notifiedRegistrationCompleted) {
+                            notifiedRegistrationCompleted = YES;
+                            [self.communicator handleMessageWithIdentifier:SPUInstallerRegisteredAppcastItem data:[NSData data]];
+                        }
                     });
                 }];
                 
                 // Not receiving that we've registered the appcast item in a timely manner is not a fatal issue
                 // If this operation takes too long, just let assume the item will be registered
                 dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(UPDATER_APPCAST_ITEM_REGISTRATION_TIMEOUT * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                    if (!receivedCompletion) {
+                    if (!notifiedRegistrationCompleted) {
+                        notifiedRegistrationCompleted = YES;
                         [self.communicator handleMessageWithIdentifier:SPUInstallerRegisteredAppcastItem data:[NSData data]];
                     }
                 });
