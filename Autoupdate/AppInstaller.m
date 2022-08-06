@@ -34,6 +34,7 @@
 
 #define FIRST_UPDATER_MESSAGE_TIMEOUT 18ull
 #define RETRIEVE_PROCESS_IDENTIFIER_TIMEOUT 8ull
+#define UPDATER_APPCAST_ITEM_REGISTRATION_TIMEOUT 8ull
 
 /**
  * Show display progress UI after a delay from starting the final part of the installation.
@@ -425,7 +426,25 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
             
             NSData *archivedData = SPUArchiveRootObjectSecurely(installationInfo);
             if (archivedData != nil) {
-                [self.agentConnection.agent registerInstallationInfoData:archivedData];
+                __block BOOL notifiedRegistrationCompleted = NO;
+                
+                [self.agentConnection.agent registerInstallationInfoData:archivedData completionHandler:^{
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        if (!notifiedRegistrationCompleted) {
+                            notifiedRegistrationCompleted = YES;
+                            [self.communicator handleMessageWithIdentifier:SPUInstallerRegisteredAppcastItem data:[NSData data]];
+                        }
+                    });
+                }];
+                
+                // Not receiving that we've registered the appcast item in a timely manner is not a fatal issue
+                // If this operation takes too long, just let assume the item will be registered
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(UPDATER_APPCAST_ITEM_REGISTRATION_TIMEOUT * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                    if (!notifiedRegistrationCompleted) {
+                        notifiedRegistrationCompleted = YES;
+                        [self.communicator handleMessageWithIdentifier:SPUInstallerRegisteredAppcastItem data:[NSData data]];
+                    }
+                });
             }
         }
     } else if (identifier == SPUResumeInstallationToStage2 && data.length == sizeof(uint8_t) * 2) {

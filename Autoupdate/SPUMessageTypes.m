@@ -23,7 +23,7 @@
 
 BOOL SPUInstallerMessageTypeIsLegal(SPUInstallerMessageType oldMessageType, SPUInstallerMessageType newMessageType)
 {
-    BOOL legal;
+    BOOL legal = NO;
     switch (newMessageType) {
         case SPUInstallerNotStarted:
             legal = (oldMessageType == SPUInstallerNotStarted);
@@ -45,7 +45,7 @@ BOOL SPUInstallerMessageTypeIsLegal(SPUInstallerMessageType oldMessageType, SPUI
             legal = (oldMessageType == SPUInstallationStartedStage1);
             break;
         case SPUInstallationFinishedStage2:
-            legal = (oldMessageType == SPUInstallationFinishedStage1);
+            legal = (oldMessageType == SPUInstallationFinishedStage1 || oldMessageType == SPUInstallerRegisteredAppcastItem);
             break;
         case SPUInstallationFinishedStage3:
             legal = (oldMessageType == SPUInstallationFinishedStage2);
@@ -55,6 +55,9 @@ BOOL SPUInstallerMessageTypeIsLegal(SPUInstallerMessageType oldMessageType, SPUI
             // Having this state being dependent on other installation states would make the complicate our logic
             // So just always allow these type of messages
             legal = YES;
+            break;
+        case SPUInstallerRegisteredAppcastItem:
+            legal = (oldMessageType == SPUInstallationFinishedStage1);
             break;
     }
     return legal;
