@@ -425,7 +425,11 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
             
             NSData *archivedData = SPUArchiveRootObjectSecurely(installationInfo);
             if (archivedData != nil) {
-                [self.agentConnection.agent registerInstallationInfoData:archivedData];
+                [self.agentConnection.agent registerInstallationInfoData:archivedData completionHandler:^{
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [self.communicator handleMessageWithIdentifier:SPUInstallerRegisteredAppcastItem data:[NSData data]];
+                    });
+                }];
             }
         }
     } else if (identifier == SPUResumeInstallationToStage2 && data.length == sizeof(uint8_t) * 2) {
@@ -488,8 +492,9 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
             self.installer = installer;
             
             uint8_t targetTerminated = (uint8_t)self.terminationListener.terminated;
+            uint8_t supportsAppcastItemRegisteredMessage = 1;
             
-            uint8_t sendInformation[] = {canPerformSilentInstall, targetTerminated};
+            uint8_t sendInformation[] = {canPerformSilentInstall, targetTerminated, supportsAppcastItemRegisteredMessage};
             
             NSData *sendData = [NSData dataWithBytes:sendInformation length:sizeof(sendInformation)];
             

@@ -284,7 +284,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
     });
 }
 
-- (void)registerInstallationInfoData:(NSData *)installationInfoData
+- (void)registerInstallationInfoData:(NSData *)installationInfoData completionHandler:(void (^)(void))completionHandler
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         if (self.statusInfo.installationInfoData == nil && installationInfoData != nil) {
@@ -297,6 +297,8 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
                 SULog(SULogLevelError, @"Error: Failed to decode initial installation info from installer: %@", installationInfoData);
             }
         }
+        
+        completionHandler();
     });
 }
 
