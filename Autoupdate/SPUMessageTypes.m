@@ -48,7 +48,7 @@ BOOL SPUInstallerMessageTypeIsLegal(SPUInstallerMessageType oldMessageType, SPUI
             legal = (oldMessageType == SPUInstallationFinishedStage1 || oldMessageType == SPUInstallerRegisteredAppcastItem);
             break;
         case SPUInstallationFinishedStage3:
-            legal = (oldMessageType == SPUInstallationFinishedStage2 || oldMessageType == SPUInstallerRegisteredAppcastItem);
+            legal = (oldMessageType == SPUInstallationFinishedStage2);
             break;
         case SPUInstallerError:
         case SPUUpdaterAlivePing:
