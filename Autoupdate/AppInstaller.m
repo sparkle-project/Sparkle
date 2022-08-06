@@ -492,9 +492,8 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
             self.installer = installer;
             
             uint8_t targetTerminated = (uint8_t)self.terminationListener.terminated;
-            uint8_t supportsAppcastItemRegisteredMessage = 1;
             
-            uint8_t sendInformation[] = {canPerformSilentInstall, targetTerminated, supportsAppcastItemRegisteredMessage};
+            uint8_t sendInformation[] = {canPerformSilentInstall, targetTerminated};
             
             NSData *sendData = [NSData dataWithBytes:sendInformation length:sizeof(sendInformation)];
             

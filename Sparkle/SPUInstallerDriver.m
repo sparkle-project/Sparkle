@@ -330,20 +330,11 @@
         }
         
         // The installer letting us know when the appcast item was registered (SPUInstallerRegisteredAppcastItem)
-        // was added later. Old installers may not send this message, but new ones will let us know if they will send it.
-        // In earlier versions of Sparkle, we could have notified the update too early
+        // was added later. In earlier versions of Sparkle, we could have notified the update too early
         // before the installer finished registering the appcast item.
-        BOOL supportsRegisteredAppcastItemDataMessage = NO;
-        if (data.length >= sizeof(uint8_t) * 3) {
-            supportsRegisteredAppcastItemDataMessage = (BOOL)*((const uint8_t *)data.bytes + 2);
-        }
-        
-        if (!supportsRegisteredAppcastItemDataMessage) {
-            [self.delegate installerDidFinishPreparationAndWillInstallImmediately:hasTargetTerminated silently:canInstallSilently];
-        } else {
-            _canInstallSilently = canInstallSilently;
-            _hasTargetTerminated = hasTargetTerminated;
-        }
+        // Note don't need to handle an "old" installer because Sparkle and the installer should still be aligned at this point.
+        _canInstallSilently = canInstallSilently;
+        _hasTargetTerminated = hasTargetTerminated;
     } else if (identifier == SPUInstallerRegisteredAppcastItem) {
         self.currentStage = identifier;
         
