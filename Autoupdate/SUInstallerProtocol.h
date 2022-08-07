@@ -28,11 +28,6 @@ NS_ASSUME_NONNULL_BEGIN
 // Should be able to be called from any thread
 - (void)performCleanup;
 
-// Indicates whether or not this installer can install the update silently in the background, without hindering the user
-// If this returns NO, then the installation can fail if the user did not directly request for the install to occur.
-// Should be thread safe
-- (BOOL)canInstallSilently;
-
 @end
 
 NS_ASSUME_NONNULL_END

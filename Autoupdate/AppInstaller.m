@@ -422,7 +422,8 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     } else if (identifier == SPUSentUpdateAppcastItemData) {
         SUAppcastItem *updateItem = (SUAppcastItem *)SPUUnarchiveRootObjectSecurely(data, [SUAppcastItem class]);
         if (updateItem != nil) {
-            SPUInstallationInfo *installationInfo = [[SPUInstallationInfo alloc] initWithAppcastItem:updateItem canSilentlyInstall:[self.installer canInstallSilently]];
+            // Note: older versions of Sparkle had interactive based pkg installers which could not be silently installed
+            SPUInstallationInfo *installationInfo = [[SPUInstallationInfo alloc] initWithAppcastItem:updateItem canSilentlyInstall:YES];
             
             NSData *archivedData = SPUArchiveRootObjectSecurely(installationInfo);
             if (archivedData != nil) {
@@ -432,7 +433,9 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
                     dispatch_async(dispatch_get_main_queue(), ^{
                         if (!notifiedRegistrationCompleted) {
                             notifiedRegistrationCompleted = YES;
-                            [self.communicator handleMessageWithIdentifier:SPUInstallerRegisteredAppcastItem data:[NSData data]];
+                            
+                            uint8_t targetTerminated = (uint8_t)self.terminationListener.terminated;
+                            [self.communicator handleMessageWithIdentifier:SPUInstallerRegisteredAppcastItem data:[NSData dataWithBytes:&targetTerminated length:sizeof(targetTerminated)]];
                         }
                     });
                 }];
@@ -442,7 +445,11 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
                 dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(UPDATER_APPCAST_ITEM_REGISTRATION_TIMEOUT * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                     if (!notifiedRegistrationCompleted) {
                         notifiedRegistrationCompleted = YES;
-                        [self.communicator handleMessageWithIdentifier:SPUInstallerRegisteredAppcastItem data:[NSData data]];
+                        
+                        SULog(SULogLevelError, @"Warning: did not receive appcast item registration from Updater in timely manner. Proceeding..");
+                        
+                        uint8_t targetTerminated = (uint8_t)self.terminationListener.terminated;
+                        [self.communicator handleMessageWithIdentifier:SPUInstallerRegisteredAppcastItem data:[NSData dataWithBytes:&targetTerminated length:sizeof(targetTerminated)]];
                     }
                 });
             }
@@ -453,7 +460,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
         uint8_t showsUI = *((const uint8_t *)data.bytes + 1);
         
         dispatch_async(dispatch_get_main_queue(), ^{
-            // This flag has an impact on interactive type installations and showing UI progress during non-interactive installations
+            // This flag has an impact on showing UI progress during non-interactive installations
             self.shouldShowUI = (BOOL)showsUI;
             // Don't test if the application was alive initially, leave that to the progress agent if we decide to relaunch
             self.shouldRelaunch = (BOOL)relaunch;
@@ -501,18 +508,10 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
             return;
         }
         
-        uint8_t canPerformSilentInstall = (uint8_t)[installer canInstallSilently];
-        
         dispatch_async(dispatch_get_main_queue(), ^{
             self.installer = installer;
             
-            uint8_t targetTerminated = (uint8_t)self.terminationListener.terminated;
-            
-            uint8_t sendInformation[] = {canPerformSilentInstall, targetTerminated};
-            
-            NSData *sendData = [NSData dataWithBytes:sendInformation length:sizeof(sendInformation)];
-            
-            [self.communicator handleMessageWithIdentifier:SPUInstallationFinishedStage1 data:sendData];
+            [self.communicator handleMessageWithIdentifier:SPUInstallationFinishedStage1 data:[NSData data]];
             
             self.performedStage1Installation = YES;
             
@@ -529,27 +528,18 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
         return;
     }
     
-    BOOL performedSecondStage = self.shouldShowUI || [self.installer canInstallSilently];
-    if (performedSecondStage) {
-        self.performedStage2Installation = YES;
+    self.performedStage2Installation = YES;
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        uint8_t targetTerminated = (uint8_t)self.terminationListener.terminated;
         
-        dispatch_async(dispatch_get_main_queue(), ^{
-            uint8_t targetTerminated = (uint8_t)self.terminationListener.terminated;
-            
-            NSData *sendData = [NSData dataWithBytes:&targetTerminated length:sizeof(targetTerminated)];
-            [self.communicator handleMessageWithIdentifier:SPUInstallationFinishedStage2 data:sendData];
-            
-            // Don't check if the target is already terminated, leave that to the progress agent
-            // We could be slightly off if there were multiple instances running
-            [self.agentConnection.agent sendTerminationSignal];
-        });
-    } else {
-        self.installer = nil;
+        NSData *sendData = [NSData dataWithBytes:&targetTerminated length:sizeof(targetTerminated)];
+        [self.communicator handleMessageWithIdentifier:SPUInstallationFinishedStage2 data:sendData];
         
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self cleanupAndExitWithStatus:EXIT_FAILURE error:[NSError errorWithDomain:SUSparkleErrorDomain code:SPUInstallerError userInfo:@{ NSLocalizedDescriptionKey: @"Error: Failed to resume installer on stage 2 because installation cannot be installed silently" }]];
-        });
-    }
+        // Don't check if the target is already terminated, leave that to the progress agent
+        // We could be slightly off if there were multiple instances running
+        [self.agentConnection.agent sendTerminationSignal];
+    });
 }
 
 - (void)finishInstallationAfterHostTermination
@@ -561,9 +551,8 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
         }
         
         // Show our installer progress UI tool if only after a certain amount of time passes,
-        // and if our installer is silent (i.e, doesn't show progress on its own)
         __block BOOL shouldShowUIProgress = YES;
-        if (self.shouldShowUI && [self.installer canInstallSilently]) {
+        if (self.shouldShowUI) {
             // Ask the updater if it is still alive
             // If they are, we will receive a pong response back
             // Reset if we received a pong just to be on the safe side

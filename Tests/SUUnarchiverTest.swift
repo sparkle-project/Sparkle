@@ -134,8 +134,6 @@ class SUUnarchiverTest: XCTestCase
     {
         self.unarchiveTestAppWithExtension("pkg", resourceName: "test", expectingInstallationType: SPUInstallationTypeGuidedPackage)
         
-        self.unarchiveTestAppWithExtension("pkg", resourceName: "test", expectingInstallationType: SPUInstallationTypeInteractivePackage, expectingSuccess: false)
-        
         self.unarchiveTestAppWithExtension("pkg", resourceName: "test", expectingInstallationType: SPUInstallationTypeApplication, expectingSuccess: false)
     }
 }

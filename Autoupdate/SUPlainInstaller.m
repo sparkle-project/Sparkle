@@ -330,9 +330,4 @@
     }
 }
 
-- (BOOL)canInstallSilently
-{
-    return YES;
-}
-
 @end

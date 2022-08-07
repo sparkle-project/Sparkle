@@ -375,14 +375,11 @@ static BOOL SPUUsesSystemDomainForBundlePath(NSString *path, NSString *installat
     if (!rootUser) {
         if ([installationType isEqualToString:SPUInstallationTypeGuidedPackage]) {
             return YES;
-        } else if ([installationType isEqualToString:SPUInstallationTypeInteractivePackage]) {
-            return NO;
         } else {
             return SPUSystemNeedsAuthorizationAccessForBundlePath(path);
         }
     } else {
         // If we are the root user we use the system domain even if we don't need escalated authorization.
-        // Note interactive package installations are not supported as root.
         return YES;
     }
 }

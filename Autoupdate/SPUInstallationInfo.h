@@ -17,6 +17,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithAppcastItem:(SUAppcastItem *)appcastItem canSilentlyInstall:(BOOL)canSilentyInstall;
 
 @property (nonatomic, readonly) SUAppcastItem *appcastItem;
+
+// Always YES in newer versions of Sparkle but kept around for compatibility
 @property (nonatomic, readonly) BOOL canSilentlyInstall;
 
 @property (nonatomic) BOOL systemDomain;

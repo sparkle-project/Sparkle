@@ -8,7 +8,6 @@
 
 #import "SUInstaller.h"
 #import "SUPlainInstaller.h"
-#import "SUPackageInstaller.h"
 #import "SUGuidedPackageInstaller.h"
 #import "SUHost.h"
 #import "SUConstants.h"
@@ -31,7 +30,7 @@
     return aliasFlag.boolValue && directoryFlag.boolValue;
 }
 
-+ (nullable NSString *)installSourcePathInUpdateFolder:(NSString *)inUpdateFolder forHost:(SUHost *)host isPackage:(BOOL *)isPackagePtr isGuided:(BOOL *)isGuidedPtr
++ (nullable NSString *)installSourcePathInUpdateFolder:(NSString *)inUpdateFolder forHost:(SUHost *)host isPackage:(BOOL *)isPackagePtr
 {
     NSParameterAssert(inUpdateFolder);
     NSParameterAssert(host);
@@ -42,7 +41,6 @@
         *bundleFileName = [[host bundlePath] lastPathComponent],
         *alternateBundleFileName = [[host name] stringByAppendingPathExtension:[[host bundlePath] pathExtension]];
     BOOL isPackage = NO;
-    BOOL isGuided = YES;
     NSString *fallbackPackagePath = nil;
     NSDirectoryEnumerator *dirEnum = [[NSFileManager defaultManager] enumeratorAtPath:inUpdateFolder];
     NSString *bundleFileNameNoExtension = [bundleFileName stringByDeletingPathExtension];
@@ -91,20 +89,8 @@
         newAppDownloadPath = fallbackPackagePath;
     }
 
-    if (isPackage) {
-        // Guided (or now "normal") installs used to be opt-in (i.e, Sparkle would detect foo.sparkle_guided.pkg or foo.sparkle_guided.mpkg),
-        // but to get an interactive (or "unguided") install, the developer now must opt-out of guided installations.
-        
-        // foo.app -> foo.sparkle_interactive.pkg or foo.sparkle_interactive.mpkg
-        if ([[[newAppDownloadPath stringByDeletingPathExtension] pathExtension] isEqualToString:@"sparkle_interactive"]) {
-            isGuided = NO;
-        }
-    }
-
     if (isPackagePtr)
         *isPackagePtr = isPackage;
-    if (isGuidedPtr)
-        *isGuidedPtr = isGuided;
 
     if (!newAppDownloadPath) {
         SULog(SULogLevelError, @"Searched %@ for %@.(app|pkg)", inUpdateFolder, bundleFileNameNoExtension);
@@ -115,8 +101,7 @@
 + (nullable id<SUInstallerProtocol>)installerForHost:(SUHost *)host expectedInstallationType:(NSString *)expectedInstallationType updateDirectory:(NSString *)updateDirectory homeDirectory:(NSString *)homeDirectory userName:(NSString *)userName error:(NSError * __autoreleasing *)error
 {
     BOOL isPackage = NO;
-    BOOL isGuided = NO;
-    NSString *newDownloadPath = [self installSourcePathInUpdateFolder:updateDirectory forHost:host isPackage:&isPackage isGuided:&isGuided];
+    NSString *newDownloadPath = [self installSourcePathInUpdateFolder:updateDirectory forHost:host isPackage:&isPackage];
     
     if (newDownloadPath == nil) {
         if (error != NULL) {
@@ -129,21 +114,13 @@
     // We shouldn't implicitly trust the installation type fed into here from the appcast because the installation type helps us determine
     // ahead of time whether or not this installer tool should be ran as root or not
     id <SUInstallerProtocol> installer = nil;
-    if (isPackage && isGuided) {
+    if (isPackage) {
         if (![expectedInstallationType isEqualToString:SPUInstallationTypeGuidedPackage]) {
             if (error != NULL) {
                 *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Found guided package installer but '%@=%@' was probably missing in the appcast item enclosure", SUAppcastAttributeInstallationType, SPUInstallationTypeGuidedPackage] }];
             }
         } else {
             installer = [[SUGuidedPackageInstaller alloc] initWithPackagePath:newDownloadPath homeDirectory:homeDirectory userName:userName];
-        }
-    } else if (isPackage) {
-        if (![expectedInstallationType isEqualToString:SPUInstallationTypeInteractivePackage]) {
-            if (error != NULL) {
-                *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Found package installer but '%@=%@' was probably missing in the appcast item enclosure", SUAppcastAttributeInstallationType, SPUInstallationTypeInteractivePackage] }];
-            }
-        } else {
-            installer = [[SUPackageInstaller alloc] initWithPackagePath:newDownloadPath];
         }
     } else {
         if (![expectedInstallationType isEqualToString:SPUInstallationTypeApplication]) {

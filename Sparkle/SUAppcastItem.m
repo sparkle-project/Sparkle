@@ -533,7 +533,6 @@ static NSString *SUAppcastItemStateKey = @"SUAppcastItemState";
         NSString *chosenInstallationType;
         if (attributeInstallationType == nil) {
             // If we have a flat package, assume installation type is guided
-            // (flat / non-archived interactive packages are not supported)
             // Otherwise assume we have a normal application inside an archive
             if ([_fileURL.pathExtension isEqualToString:@"pkg"] || [_fileURL.pathExtension isEqualToString:@"mpkg"]) {
                 chosenInstallationType = SPUInstallationTypeGuidedPackage;
@@ -545,10 +544,6 @@ static NSString *SUAppcastItemStateKey = @"SUAppcastItemState";
                 *error = [NSString stringWithFormat:@"Feed item's enclosure lacks valid %@ (found %@)", SUAppcastAttributeInstallationType, attributeInstallationType];
             }
             return nil;
-        } else if ([attributeInstallationType isEqualToString:SPUInstallationTypeInteractivePackage]) {
-            SULog(SULogLevelDefault, @"warning: '%@' for %@ is deprecated. Use '%@' instead.", SPUInstallationTypeInteractivePackage, SUAppcastAttributeInstallationType, SPUInstallationTypeGuidedPackage);
-            
-            chosenInstallationType = attributeInstallationType;
         } else {
             chosenInstallationType = attributeInstallationType;
         }

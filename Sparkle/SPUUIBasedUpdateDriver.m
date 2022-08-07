@@ -340,7 +340,7 @@
     [self.userDriver showExtractionReceivedProgress:progress];
 }
 
-- (void)installerDidFinishPreparationAndWillInstallImmediately:(BOOL)willInstallImmediately silently:(BOOL)__unused willInstallSilently
+- (void)installerDidFinishPreparationAndWillInstallImmediately:(BOOL)willInstallImmediately
 {
     if (!willInstallImmediately) {
         [self.userDriver showReadyToInstallAndRelaunch:^(SPUUserUpdateChoice choice) {

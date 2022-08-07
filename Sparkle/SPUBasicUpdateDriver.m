@@ -141,18 +141,11 @@
 {
     if (!self.aborted) {
         if (!resuming) {
-            // interactive pkg based updates are not supported under root user
-            if ([updateItem.installationType isEqualToString:SPUInstallationTypeInteractivePackage] && geteuid() == 0) {
-                [self.delegate basicDriverIsRequestingAbortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationRootInteractiveError userInfo:@{ NSLocalizedDescriptionKey: SULocalizedString(@"Interactive based packages cannot be installed as the root user.", nil) }]];
+            // Give the delegate a chance to bail
+            NSError *shouldNotProceedError = nil;
+            if ([self.updaterDelegate respondsToSelector:@selector(updater:shouldProceedWithUpdate:updateCheck:error:)] && ![self.updaterDelegate updater:self.updater shouldProceedWithUpdate:updateItem updateCheck:self.updateCheck error:&shouldNotProceedError]) {
+                [self.delegate basicDriverIsRequestingAbortUpdateWithError:shouldNotProceedError];
                 return;
-            } else {
-                // Give the delegate a chance to bail
-                
-                NSError *shouldNotProceedError = nil;
-                if ([self.updaterDelegate respondsToSelector:@selector(updater:shouldProceedWithUpdate:updateCheck:error:)] && ![self.updaterDelegate updater:self.updater shouldProceedWithUpdate:updateItem updateCheck:self.updateCheck error:&shouldNotProceedError]) {
-                    [self.delegate basicDriverIsRequestingAbortUpdateWithError:shouldNotProceedError];
-                    return;
-                }
             }
         }
         

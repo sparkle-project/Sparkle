@@ -262,7 +262,6 @@
 		7267E5B81D3D8AEE00D1BF90 /* SPUInstallationInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5B51D3D8AEE00D1BF90 /* SPUInstallationInfo.m */; };
 		7267E5C21D3D8B2700D1BF90 /* SUGuidedPackageInstaller.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5BB1D3D8B2700D1BF90 /* SUGuidedPackageInstaller.m */; };
 		7267E5C31D3D8B2700D1BF90 /* SUInstaller.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5BD1D3D8B2700D1BF90 /* SUInstaller.m */; };
-		7267E5C41D3D8B2700D1BF90 /* SUPackageInstaller.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5BF1D3D8B2700D1BF90 /* SUPackageInstaller.m */; };
 		7267E5C51D3D8B2700D1BF90 /* SUPlainInstaller.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5C11D3D8B2700D1BF90 /* SUPlainInstaller.m */; };
 		7267E5C91D3D8C4300D1BF90 /* CoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 721BC20A1D17A5AD002BC71E /* CoreServices.framework */; };
 		7267E5CA1D3D8C4800D1BF90 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D69BFE84028FC02AAC07 /* Foundation.framework */; };
@@ -291,7 +290,6 @@
 		7267E5F11D3D917A00D1BF90 /* SUBinaryDeltaUnarchiver.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E57E1D3D896700D1BF90 /* SUBinaryDeltaUnarchiver.m */; };
 		7267E5F21D3D918000D1BF90 /* SUSignatureVerifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E59B1D3D8A5A00D1BF90 /* SUSignatureVerifier.m */; };
 		7267E5F41D3D918B00D1BF90 /* SUGuidedPackageInstaller.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5BB1D3D8B2700D1BF90 /* SUGuidedPackageInstaller.m */; };
-		7267E5F51D3D918B00D1BF90 /* SUPackageInstaller.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5BF1D3D8B2700D1BF90 /* SUPackageInstaller.m */; };
 		7267E5F61D3D919000D1BF90 /* SUDiskImageUnarchiver.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5811D3D89B300D1BF90 /* SUDiskImageUnarchiver.m */; };
 		7267E5F71D3D919600D1BF90 /* SUPlainInstaller.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5C11D3D8B2700D1BF90 /* SUPlainInstaller.m */; };
 		7267E5F81D3D91A800D1BF90 /* SUPipedUnarchiver.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5831D3D89B300D1BF90 /* SUPipedUnarchiver.m */; };
@@ -1262,8 +1260,6 @@
 		7267E5BB1D3D8B2700D1BF90 /* SUGuidedPackageInstaller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SUGuidedPackageInstaller.m; path = Autoupdate/SUGuidedPackageInstaller.m; sourceTree = SOURCE_ROOT; };
 		7267E5BC1D3D8B2700D1BF90 /* SUInstaller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SUInstaller.h; path = Autoupdate/SUInstaller.h; sourceTree = SOURCE_ROOT; };
 		7267E5BD1D3D8B2700D1BF90 /* SUInstaller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SUInstaller.m; path = Autoupdate/SUInstaller.m; sourceTree = SOURCE_ROOT; };
-		7267E5BE1D3D8B2700D1BF90 /* SUPackageInstaller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SUPackageInstaller.h; path = Autoupdate/SUPackageInstaller.h; sourceTree = SOURCE_ROOT; };
-		7267E5BF1D3D8B2700D1BF90 /* SUPackageInstaller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SUPackageInstaller.m; path = Autoupdate/SUPackageInstaller.m; sourceTree = SOURCE_ROOT; };
 		7267E5C01D3D8B2700D1BF90 /* SUPlainInstaller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SUPlainInstaller.h; path = Autoupdate/SUPlainInstaller.h; sourceTree = SOURCE_ROOT; };
 		7267E5C11D3D8B2700D1BF90 /* SUPlainInstaller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SUPlainInstaller.m; path = Autoupdate/SUPlainInstaller.m; sourceTree = SOURCE_ROOT; };
 		7267E5CF1D3D8C8500D1BF90 /* SecurityFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SecurityFoundation.framework; path = System/Library/Frameworks/SecurityFoundation.framework; sourceTree = SDKROOT; };
@@ -1975,8 +1971,6 @@
 				722FB7E3260EE53F00EB571C /* SUNormalization.h */,
 				722FB7E4260EE53F00EB571C /* SUNormalization.m */,
 				7267E5B91D3D8B0B00D1BF90 /* SUInstallerProtocol.h */,
-				7267E5BE1D3D8B2700D1BF90 /* SUPackageInstaller.h */,
-				7267E5BF1D3D8B2700D1BF90 /* SUPackageInstaller.m */,
 				7267E5C01D3D8B2700D1BF90 /* SUPlainInstaller.h */,
 				7267E5C11D3D8B2700D1BF90 /* SUPlainInstaller.m */,
 			);
@@ -3312,7 +3306,6 @@
 				7267E5EC1D3D912900D1BF90 /* SUInstaller.m in Sources */,
 				5AF6C7541AEA49840014A3AB /* SUInstallerTest.m in Sources */,
 				14652F8219A9746000959E44 /* SULog.m in Sources */,
-				7267E5F51D3D918B00D1BF90 /* SUPackageInstaller.m in Sources */,
 				7267E5F81D3D91A800D1BF90 /* SUPipedUnarchiver.m in Sources */,
 				7267E5F71D3D919600D1BF90 /* SUPlainInstaller.m in Sources */,
 				72BEBFEF1D7287570019146B /* SUSpotlightImporterTest.swift in Sources */,
@@ -3510,7 +3503,6 @@
 				5A6DD17123FE1FFC000AEF33 /* SUSignatures.m in Sources */,
 				721D5A8525C65D3F00D23BEA /* SUFlatPackageUnarchiver.m in Sources */,
 				7267E5CE1D3D8C7500D1BF90 /* SULog.m in Sources */,
-				7267E5C41D3D8B2700D1BF90 /* SUPackageInstaller.m in Sources */,
 				7267E5871D3D89B300D1BF90 /* SUPipedUnarchiver.m in Sources */,
 				7267E5C51D3D8B2700D1BF90 /* SUPlainInstaller.m in Sources */,
 				7267E5D81D3D8D4400D1BF90 /* SUStandardVersionComparator.m in Sources */,

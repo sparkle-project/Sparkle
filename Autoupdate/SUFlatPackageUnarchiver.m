@@ -50,7 +50,6 @@
 {
     SUUnarchiverNotifier *notifier = [[SUUnarchiverNotifier alloc] initWithCompletionBlock:completionBlock progressBlock:progressBlock];
     
-    // Flat packages must use guided package installs, not interactive
     BOOL isDirectory = NO;
     if (![self.expectedInstallationType isEqualToString:SPUInstallationTypeGuidedPackage]) {
         [notifier notifyFailureWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUUnarchivingError userInfo:@{ NSLocalizedDescriptionKey:[NSString stringWithFormat:@"Flat package does not have guided installation type but %@ instead", self.expectedInstallationType]}]];

@@ -19,8 +19,7 @@ The launcher then looks for the installer and agent application. If we are insid
 
 The installer is first submitted. If it requires root privileges, it will ask for an admin user name and password. How it determines if root privileges are necessary is based on:
 
-* If the installation type from the appcast is an interactive package based installer, then no root privileges are necessary because the package installer will ask for them. Note this type of installation is deprecated however.
-* If the installation type from the appcast is a guided or regular package based installer, then root privileges are necessary because the system installer utility has to run as root.
+* If the installation type from the appcast is a guided package based installer, then root privileges are necessary because the system installer utility has to run as root.
 * Otherwise the installation type is a normal application update, and root privileges are only needed if write permission or changing the owner is currently insufficient.
 
 The installer makes sure, after extraction, that the expected installation type from the appcast matches the type of installation found within the archive. So this hint from the appcast is not just trusted implicitly.
@@ -69,28 +68,29 @@ When the installer gets the process identifier, it begins the installation. At t
 
 ### Starting the Installation
 
-The installer figures out what kind of installer to use (regular, guided pkg, interactive pkg) based on the type of file inside the archive. If the type of file doesn't match the expected installation type from the input installation data, then the installer aborts causing the updater to abort as well.
+The installer figures out what kind of installer to use (regular, guided pkg) based on the type of file inside the archive. If the type of file doesn't match the expected installation type from the input installation data, then the installer aborts causing the updater to abort as well.
 
 Once the type of installer is found, the first stage of installation is performed:
 
 * Regular application installer 1st stage: Makes sure this update is not a downgrade.
 * Guided Package installer 1st stage: Does nothing.
-* Interactive Package installer (deprecated) 1st stage: Makes sure /usr/bin/open utility is available.
 
 If the first stage fails, the installer aborts causing the updater to abort the update.
 
-Otherwise a `SPUInstallationFinishedStage1` message is sent back to the updater along with some data. This data includes whether the application bundle to relaunch is currently terminated, and whether the installation at later stages can be performed silently (that is, with no user interaction allowed). If we reach here, only the interactive package installer can't be performed silently.
+Otherwise a `SPUInstallationFinishedStage1` message is sent back to the updater.
 
 The installer then listens and waits for the target application to relaunch terminates. If it is already terminated, then it resumes to stage 2 and 3 of the installation immediately on the assumption that the installer does not have permission to show UI interaction to the user. Thus if the installer has to show user interaction here and hasn't received an OK from the updater (it won't if the target application is already terminated), the install will fail. If the target is already terminated, the installer will also assume that the target should not be relaunched after installation.
 
 ### Installation Waiting Period
-The updater receives `SPUInstallationFinishedStage1` message. The updater sends a message `SPUSentUpdateAppcastItemData` with the appcast data in case the updater may request for it later (due to installer resumability, discussed later). It also reads if the target has already been terminated (implying that the installer will continue installing the update immediately), and if the installation will be done silently.
+The updater receives `SPUInstallationFinishedStage1` message. The updater sends a message `SPUSentUpdateAppcastItemData` with the appcast data in case the updater may request for it later (due to installer resumability, discussed later).
+
+The updater waits to receive a `SPUInstallerRegisteredAppcastItem` message indicating the installer registered receiving the appcast item data (it waits for this registration to avoid a race of asking for it later and not being provided with info). The updater also reads if the target has already been terminated (implying that the installer will continue installing the update immediately).
 
 For UI based update drivers, the updater tells the user driver to show that the application is ready to be relaunched - the user can continue to install & relaunch the app. The user driver is only alerted however if the installation isn't happening immediately (that is, if the target application to relaunch is still alive). The user driver can decide whether to a) install b) install & relaunch or c) delay installation. If installation is delayed, it can be resumed later, or if the target application terminates, the installer will try to continue installation if it is capable to without user interaction.
 
-For automatic based drivers, if the update is not going to be installed immediately and if it can be installed silently, the updater's delegate has a choice to handle the immediate installation of the update. If the delegate handles the installation, it can invoke a block that will trigger the automatic update driver to tell the installer to resume to stage 2 as detailed in step the "Continue to Installation" section - except without displaying any user interface and by relaunching the application afterwards. If the delegate handles the immediate installation, the automatic update driver will not abort, it will just leave the driver running until the installer requests for the app to be terminated later. This means the update can't be resumed later and the user driver won't be involved.
+For automatic based drivers, if the update is not going to be installed immediately, the updater's delegate has a choice to handle the immediate installation of the update. If the delegate handles the installation, it can invoke a block that will trigger the automatic update driver to tell the installer to resume to stage 2 as detailed in step the "Continue to Installation" section - except without displaying any user interface and by relaunching the application afterwards. If the delegate handles the immediate installation, the automatic update driver will not abort, it will just leave the driver running until the installer requests for the app to be terminated later. This means the update can't be resumed later and the user driver won't be involved.
 
-Otherwise if the updater delegate doesn't handle immediate installation for automatic based drivers (assuming still the update is not going to be installed immediately), the update driver is aborted; the installer will still wait for the target to terminate however. If the update cannot be silently installed or if the update is marked as critical from the appcast, the update procedure is actually 'resumed' as a scheduled UI based update driver immediately. The update driver can also be 'resumed' later when the user initiates for an update manually or when a long duration (I think a week) has passed by without the user terminating the application. Note automatic based drivers are unable to do a resume, so only UI based ones can.
+Otherwise if the updater delegate doesn't handle immediate installation for automatic based drivers (assuming still the update is not going to be installed immediately), the update driver is aborted; the installer will still wait for the target to terminate however. If the update is marked as critical from the appcast, the update procedure is actually 'resumed' as a scheduled UI based update driver immediately. The update driver can also be 'resumed' later when the user initiates for an update manually or when a long duration (I think a week) has passed by without the user terminating the application. Note automatic based drivers are unable to do a resume, so only UI based ones can.
 
 If an update driver is resumed (which cannot happen if the target applicaton is already terminated by the way), then the updater first requests the installer for the appcast item data that the installer received before. The updater does this by creating a temporary distinct connection for the purpose of querying for the installation status. The connection will give up if a short timeout passes. If the updater fails to retrieve resume data, it assumes that there's no update to resume and will start back from the beginning. The updater can use this data for showing release notes, etc. Note the updater and target application don't have to live in the same process, and the updater could choose to terminate and resume later as a new process - so having the installer keep the appcast item data is nice.
 

@@ -26,7 +26,6 @@
 @property (nonatomic, readonly, weak, nullable) id updaterDelegate;
 @property (nonatomic, readonly) SPUCoreBasedUpdateDriver *coreDriver;
 @property (nonatomic) SUAppcastItem* updateItem;
-@property (nonatomic) BOOL willInstallSilently;
 
 @end
 
@@ -37,7 +36,6 @@
 @synthesize updaterDelegate = _updaterDelegate;
 @synthesize coreDriver = _coreDriver;
 @synthesize updateItem = _updateItem;
-@synthesize willInstallSilently = _willInstallSilently;
 
 - (instancetype)initWithHost:(SUHost *)host applicationBundle:(NSBundle *)applicationBundle updater:(id)updater userDriver:(id <SPUUserDriver>)userDriver updaterDelegate:(nullable id <SPUUpdaterDelegate>)updaterDelegate
 {
@@ -100,14 +98,12 @@
     return NO;
 }
 
-- (void)installerDidFinishPreparationAndWillInstallImmediately:(BOOL)willInstallImmediately silently:(BOOL)willInstallSilently
+- (void)installerDidFinishPreparationAndWillInstallImmediately:(BOOL)willInstallImmediately
 {
-    self.willInstallSilently = willInstallSilently;
-    
     if (!willInstallImmediately) {
         BOOL installationHandledByDelegate = NO;
         id<SPUUpdaterDelegate> updaterDelegate = self.updaterDelegate;
-        if (self.willInstallSilently && [updaterDelegate respondsToSelector:@selector(updater:willInstallUpdateOnQuit:immediateInstallationBlock:)]) {
+        if ([updaterDelegate respondsToSelector:@selector(updater:willInstallUpdateOnQuit:immediateInstallationBlock:)]) {
             __weak SPUAutomaticUpdateDriver *weakSelf = self;
             installationHandledByDelegate = [updaterDelegate updater:self.updater willInstallUpdateOnQuit:self.updateItem immediateInstallationBlock:^{
                 [weakSelf.coreDriver finishInstallationWithResponse:SPUUserUpdateChoiceInstall displayingUserInterface:NO];
@@ -139,7 +135,7 @@
 
 - (void)abortUpdateWithError:(NSError *)error
 {
-    BOOL showNextUpdateImmediately = (error == nil || error.code == SUInstallationAuthorizeLaterError) && (!self.willInstallSilently || self.updateItem.criticalUpdate || self.updateItem.isInformationOnlyUpdate);
+    BOOL showNextUpdateImmediately = (error == nil || error.code == SUInstallationAuthorizeLaterError) && (self.updateItem.criticalUpdate || self.updateItem.isInformationOnlyUpdate);
     
     [self.coreDriver abortUpdateAndShowNextUpdateImmediately:showNextUpdateImmediately error:error];
 }
