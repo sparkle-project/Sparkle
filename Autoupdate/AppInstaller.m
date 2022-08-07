@@ -435,7 +435,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
                             notifiedRegistrationCompleted = YES;
                             
                             uint8_t targetTerminated = (uint8_t)self.terminationListener.terminated;
-                            uint8_t sendInformation[] = {targetTerminated, canInstallSilently};
+                            uint8_t sendInformation[] = {targetTerminated, (uint8_t)canInstallSilently};
                             
                             [self.communicator handleMessageWithIdentifier:SPUInstallerRegisteredAppcastItem data:[NSData dataWithBytes:sendInformation length:sizeof(sendInformation)]];
                         }
@@ -451,7 +451,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
                         SULog(SULogLevelError, @"Warning: did not receive appcast item registration from Updater in timely manner. Proceeding..");
                         
                         uint8_t targetTerminated = (uint8_t)self.terminationListener.terminated;
-                        uint8_t sendInformation[] = {targetTerminated, canInstallSilently};
+                        uint8_t sendInformation[] = {targetTerminated, (uint8_t)canInstallSilently};
                         
                         [self.communicator handleMessageWithIdentifier:SPUInstallerRegisteredAppcastItem data:[NSData dataWithBytes:sendInformation length:sizeof(sendInformation)]];
                     }
