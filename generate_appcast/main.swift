@@ -90,7 +90,7 @@ struct GenerateAppcast: ParsableCommand {
     @Option(name: .long, help: ArgumentHelp("An optional comma delimited list of application versions (specified by CFBundleVersion) to generate new update items for. By default, new update items are inferred from the available archives. Use this option if you need to insert old updates in the feed at a different branch point (for example with a different minimum OS requirement).", valueName: "versions"), transform: { Set($0.components(separatedBy: ",")) })
     var versions: Set<String>?
     
-    @Option(name: .long, help: ArgumentHelp("The maximum number of delta items to create for the latest update for each minimum required operating system.", valueName: "maximum-deltas"))
+    @Option(name: .long, help: ArgumentHelp("The maximum number of delta items to create for the latest update for each branch point (for example with a different minimum OS requirement).", valueName: "maximum-deltas"))
     var maximumDeltas: Int = DEFAULT_MAXIMUM_DELTAS
     
     @Option(name: .long, help: ArgumentHelp(COMPRESSION_METHOD_ARGUMENT_DESCRIPTION, valueName: "delta-compression"))
@@ -144,7 +144,7 @@ struct GenerateAppcast: ParsableCommand {
         Appcast files and deltas will be written to the archives directory.
         
         If an appcast file is already present in the archives directory, that file will be re-used and updated with new entries.
-        Old entries in the appcast are kept intact. Otherwise, a new appcast file will be generated and written.
+        Old entries in the appcast that are still needed are kept intact. Otherwise, a new appcast file will be generated and written.
         
         .html files that have the same filename as an archive (except for the file extension) will be used for release notes for that item.
         If the contents of these files are short (< \(DEFAULT_MAX_CDATA_THRESHOLD) characters) and do not include a DOCTYPE or body tags, they will be treated as embedded CDATA release notes.
@@ -168,7 +168,7 @@ struct GenerateAppcast: ParsableCommand {
         
         Extracted archives are cached in \((cacheDirectory.path as NSString).abbreviatingWithTildeInPath) to avoid re-computation in subsequent runs.
         
-        Old updates are automatically pruned from the generated appcast feed and their update files are moved to \(prunedDirectoryName). Old update files in this directory are deleted after a couple weeks.
+        Old updates are automatically pruned from the generated appcast feed and their update files are moved to \(prunedDirectoryName). Old update files in this directory are deleted after 2 weeks.
         
         Note that \(programName) does not support package-based (.pkg) updates.
         """)
