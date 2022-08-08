@@ -49,8 +49,91 @@ func extractVersion(parent: XMLNode) -> String? {
     return nil
 }
 
-func writeAppcast(appcastDestPath: URL, updates: [ArchiveItem], newVersions: Set<String>?, maxNewVersionsInFeed: Int, fullReleaseNotesLink: String?, maxCDATAThreshold: Int, link: String?, newChannel: String?, majorVersion: String?, ignoreSkippedUpgradesBelowVersion: String?, phasedRolloutInterval: Int?, criticalUpdateVersion: String?, informationalUpdateVersions: [String]?) throws -> (numNewUpdates: Int, numExistingUpdates: Int) {
-    let appBaseName = updates[0].appPath.deletingPathExtension().lastPathComponent
+func readAppcast(archives: [String: ArchiveItem], appcastURL: URL) throws -> [String: UpdateBranch] {
+    let options: XMLNode.Options = [
+        XMLNode.Options.nodeLoadExternalEntitiesNever,
+        XMLNode.Options.nodePreserveCDATA,
+        XMLNode.Options.nodePreserveWhitespace,
+    ]
+    let doc = try XMLDocument(contentsOf: appcastURL, options: options)
+    
+    let rootNodes = try doc.nodes(forXPath: "/rss")
+    if rootNodes.count != 1 {
+        throw makeError(code: .appcastError, "Weird XML? \(appcastURL.path)")
+    }
+    
+    let root = rootNodes[0] as! XMLElement
+    
+    let channelNodes = try root.nodes(forXPath: "channel")
+    if channelNodes.count == 0 {
+        throw makeError(code: .appcastError, "Weird Feed? No channels: \(appcastURL.path)")
+    }
+    
+    let channel = channelNodes[0] as! XMLElement
+    
+    guard let itemNodes = try? channel.nodes(forXPath: "item") else {
+        return [:]
+    }
+    
+    var updateBranches: [String: UpdateBranch] = [:]
+    for item in itemNodes {
+        guard let item = item as? XMLElement else {
+            continue
+        }
+        
+        let version: String?
+        if let versionElement = findElement(name: SUAppcastElementVersion, parent: item) {
+            version = versionElement.stringValue
+        } else if let enclosure = findElement(name: "enclosure", parent: item), let versionAttribute = enclosure.attribute(forName: SUAppcastAttributeVersion) {
+            version = versionAttribute.stringValue
+        } else {
+            version = nil
+        }
+        
+        guard let version = version else {
+            continue
+        }
+        
+        let minimumSystemVersion: String?
+        if let minVer = findElement(name: SUAppcastElementMinimumSystemVersion, parent: item) {
+            minimumSystemVersion = minVer.stringValue
+        } else if let archive = archives[version] {
+            minimumSystemVersion = archive.minimumSystemVersion
+        } else {
+            minimumSystemVersion = nil
+        }
+        
+        let maximumSystemVersion: String?
+        if let maxVer = findElement(name: SUAppcastElementMaximumSystemVersion, parent: item) {
+            maximumSystemVersion = maxVer.stringValue
+        } else {
+            maximumSystemVersion = nil
+        }
+        
+        let minimumAutoupdateVersion: String?
+        if let minimumAutoupdateVersionElement = findElement(name: SUAppcastElementMinimumAutoupdateVersion, parent: item) {
+            minimumAutoupdateVersion = minimumAutoupdateVersionElement.stringValue
+        } else {
+            minimumAutoupdateVersion = nil
+        }
+        
+        let sparkleChannel: String?
+        if let sparkleChannelElement = findElement(name: SUAppcastElementChannel, parent: item) {
+            sparkleChannel = sparkleChannelElement.stringValue
+        } else {
+            sparkleChannel = nil
+        }
+        
+        let updateBranch = UpdateBranch(minimumSystemVersion: minimumSystemVersion, maximumSystemVersion: maximumSystemVersion, minimumAutoupdateVersion: minimumAutoupdateVersion, channel: sparkleChannel)
+        
+        updateBranches[version] = updateBranch
+    }
+    
+    return updateBranches
+}
+
+func writeAppcast(appcastDestPath: URL, appcast: Appcast, fullReleaseNotesLink: String?, maxCDATAThreshold: Int, link: String?, newChannel: String?, majorVersion: String?, ignoreSkippedUpgradesBelowVersion: String?, phasedRolloutInterval: Int?, criticalUpdateVersion: String?, informationalUpdateVersions: [String]?) throws -> (numNewUpdates: Int, numExistingUpdates: Int, numUpdatesRemoved: Int) {
+    let appBaseName = appcast.inferredAppName
 
     let sparkleNS = "http://www.andymatuschak.org/xml-namespaces/sparkle"
 
@@ -78,8 +161,45 @@ func writeAppcast(appcastDestPath: URL, updates: [ArchiveItem], newVersions: Set
     }
     let root = rootNodes[0] as! XMLElement
     let channelNodes = try root.nodes(forXPath: "channel")
+    var numUpdatesRemoved: Int = 0
+    
     if channelNodes.count > 0 {
         channel = channelNodes[0] as! XMLElement
+        
+        // Enumerate through all existing update items and remove any that we aren't going to keep
+        let versionsInFeedSet = Set(appcast.versionsInFeed)
+        var nodesToRemove: [XMLElement] = []
+        if let itemNodes = try? channel.nodes(forXPath: "item") {
+            for item in itemNodes {
+                guard let item = item as? XMLElement else {
+                    continue
+                }
+                
+                let version: String?
+                if let versionElement = findElement(name: SUAppcastElementVersion, parent: item) {
+                    version = versionElement.stringValue
+                } else if let enclosure = findElement(name: "enclosure", parent: item), let versionAttribute = enclosure.attribute(forName: SUAppcastAttributeVersion) {
+                    version = versionAttribute.stringValue
+                } else {
+                    version = nil
+                }
+                
+                guard let version = version else {
+                    continue
+                }
+                
+                if !versionsInFeedSet.contains(version) {
+                    nodesToRemove.append(item)
+                }
+            }
+            
+            // Remove old nodes from highest-to-lowest index order
+            for node in nodesToRemove.reversed() {
+                channel.removeChild(at: node.index)
+            }
+            
+            numUpdatesRemoved = nodesToRemove.count
+        }
     } else {
         channel = XMLElement(name: "channel")
         channel.addChild(XMLElement.element(withName: "title", stringValue: appBaseName) as! XMLElement)
@@ -92,7 +212,11 @@ func writeAppcast(appcastDestPath: URL, updates: [ArchiveItem], newVersions: Set
     let versionComparator = SUStandardVersionComparator()
 
     var numItems = 0
-    for update in updates {
+    for version in appcast.versionsInFeed {
+        guard let update = appcast.archives[version] else {
+            continue
+        }
+        
         var item: XMLElement
         
         var existingItems = try channel.nodes(forXPath: "item[enclosure[@\(SUAppcastAttributeVersion)=\"\(update.version)\"]]")
@@ -102,20 +226,8 @@ func writeAppcast(appcastDestPath: URL, updates: [ArchiveItem], newVersions: Set
         }
         
         let createNewItem = (existingItems.count == 0)
-
-        // Update all old items, but aim for less than maxNewVersionsInFeed in new feeds,
-        // unless the user specifies which versions they want to generate
+        
         if createNewItem {
-            if let newVersions = newVersions {
-                if !newVersions.contains(update.version) {
-                    continue
-                }
-            } else {
-                if numItems >= maxNewVersionsInFeed {
-                    continue
-                }
-            }
-            
             numNewUpdates += 1
         } else {
             numExistingUpdates += 1
@@ -359,5 +471,5 @@ func writeAppcast(appcastDestPath: URL, updates: [ArchiveItem], newVersions: Set
     _ = try XMLDocument(data: docData, options: XMLNode.Options()); // Verify that it was generated correctly, which does not always happen!
     try docData.write(to: appcastDestPath)
     
-    return (numNewUpdates, numExistingUpdates)
+    return (numNewUpdates, numExistingUpdates, numUpdatesRemoved)
 }

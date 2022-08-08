@@ -11,4 +11,5 @@
 #import "SUSignatures.h"
 #import "SUCodeSigningVerifier.h"
 #import "SPUInstallationType.h"
+#import "SUFileManager.h"
 #import "ed25519.h" // Run `git submodule update --init` if you get an error here
