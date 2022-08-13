@@ -87,7 +87,7 @@ struct GenerateAppcast: ParsableCommand {
     @Option(name: .long, help: ArgumentHelp("A URL to the application's website which Sparkle may use for directing users to if they cannot download a new update from within the application. This will be used for new generated update items. By default, no product link is used.", valueName: "link"))
     var link: String?
     
-    @Option(name: .long, help: ArgumentHelp("An optional comma delimited list of application versions (specified by CFBundleVersion) to generate new update items for. By default, new update items are inferred from the available archives. Use this option if you need to insert old updates in the feed at a different branch point (for example with a different minimum OS requirement).", valueName: "versions"), transform: { Set($0.components(separatedBy: ",")) })
+    @Option(name: .long, help: ArgumentHelp("An optional comma delimited list of application versions (specified by CFBundleVersion) to generate new update items for. By default, new update items are inferred from the available archives and current feed. Use this option if you need to insert only a specific new version or insert an old update in the feed at a different branch point (e.g. with a different minimum OS version or channel).", valueName: "versions"), transform: { Set($0.components(separatedBy: ",")) })
     var versions: Set<String>?
     
     @Option(name: .long, help: ArgumentHelp("The maximum number of delta items to create for the latest update for each branch point (for example with a different minimum OS requirement).", valueName: "maximum-deltas"))
@@ -145,6 +145,9 @@ struct GenerateAppcast: ParsableCommand {
         
         If an appcast file is already present in the archives directory, that file will be re-used and updated with new entries.
         Old entries in the appcast that are still needed are kept intact. Otherwise, a new appcast file will be generated and written.
+        
+        Use the --versions option if you need to insert an update that is older than the latest update in your feed, or
+        if you need to insert only a specific new version with certain parameters.
         
         .html files that have the same filename as an archive (except for the file extension) will be used for release notes for that item.
         If the contents of these files are short (< \(DEFAULT_MAX_CDATA_THRESHOLD) characters) and do not include a DOCTYPE or body tags, they will be treated as embedded CDATA release notes.

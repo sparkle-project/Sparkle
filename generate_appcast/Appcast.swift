@@ -88,6 +88,9 @@ func makeAppcasts(archivesSourceDir: URL, outputPathURL: URL?, cacheDirectory ca
         } else {
             // If the user doesn't specify which versions to generate updates for,
             // then by default we ignore generating updates that are less than the latest update in the existing feed
+            // The reason why we need to do this is because new branch-specific flags the user can specify like the channel
+            // or the major version will be applied to new unknown updates. We can only absolutely be sure to apply this to
+            // updates that are greater in version than the top of the current feed, or if the user uses --versions.
             for latestUpdateCandidate in updates {
                 if feedUpdateBranches[latestUpdateCandidate.version] != nil {
                     // Found the latest update in the feed
@@ -209,6 +212,7 @@ func makeAppcasts(archivesSourceDir: URL, outputPathURL: URL?, cacheDirectory ca
             
             // We only generate deltas for the latest version per branch,
             // but we still wanted to record the used delta updates for a batch of recent updates
+            // This is to support rollback in case the top newly generated update isn't exactly what the user wants
             let generatingDeltas = latestVersionPerBranch.contains(version)
             var numDeltas = 0
             let appBaseName = latestItem.appPath.deletingPathExtension().lastPathComponent
