@@ -10,18 +10,18 @@ jobs:
   build:
     strategy:
       matrix:
-        xcode: ['xcode12.5.1', 'xcode13.3.1']
+        xcode: ['xcode14.0', 'xcode13.4.1']
         include:
-            - xcode: 'xcode13.3.1'
-              xcode-path: '/Applications/Xcode_13.3.1.app/Contents/Developer'
+            - xcode: 'xcode13.4.1'
+              xcode-path: '/Applications/Xcode_13.4.1.app/Contents/Developer'
               upload-dist: true
               run-analyzer: true
               macos: 'macos-12'
-            - xcode: 'xcode12.5.1'
-              xcode-path: '/Applications/Xcode_12.5.1.app/Contents/Developer'
+            - xcode: 'xcode14.0'
+              xcode-path: '/Applications/Xcode_14.0.app/Contents/Developer'
               upload-dist: false
               run-analyzer: false
-              macos: 'macos-11'
+              macos: 'macos-12'
             
     name: Build and Test Sparkle
     runs-on: ${{ matrix.macos }}
