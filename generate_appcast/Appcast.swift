@@ -416,15 +416,32 @@ func moveOldUpdatesFromAppcast(archivesSourceDir: URL, oldFilesDirectory: URL, c
         
         do {
             try fileManager.moveItem(at: archivePath, to: oldFilesDirectory.appendingPathComponent(archivePath.lastPathComponent))
+            
+            movedItemsCount += 1
+            
+            // Remove cache for the update
+            let appCachePath = update.appPath.deletingLastPathComponent()
+            let _ = try? fileManager.removeItem(at: appCachePath)
         } catch {
             print("Warning: failed to move \(archivePath.lastPathComponent) to \(oldFilesDirectory.lastPathComponent): \(error)")
         }
         
-        movedItemsCount += 1
-        
-        // Remove cache for the update
-        let appCachePath = update.appPath.deletingLastPathComponent()
-        let _ = try? fileManager.removeItem(at: appCachePath)
+        let releaseNotesFile = archivePath.deletingLastPathComponent().appendingPathExtension("html")
+        if fileManager.fileExists(atPath: releaseNotesFile.path) {
+            do {
+                try suFileManager.updateModificationAndAccessTimeOfItem(at: releaseNotesFile)
+            } catch {
+                print("Warning: failed to update modification time for \(releaseNotesFile.path): \(error)")
+            }
+            
+            do {
+                try fileManager.moveItem(at: releaseNotesFile, to: oldFilesDirectory.appendingPathComponent(releaseNotesFile.lastPathComponent))
+                
+                movedItemsCount += 1
+            } catch {
+                print("Warning: failed to move \(releaseNotesFile.lastPathComponent) to \(oldFilesDirectory.lastPathComponent): \(error)")
+            }
+        }
     }
     
     // Move aside all unused delta items in the archives directory
