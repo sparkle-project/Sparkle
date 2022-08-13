@@ -365,37 +365,37 @@ func makeAppcasts(archivesSourceDir: URL, outputPathURL: URL?, cacheDirectory ca
     return appcastByFeed
 }
 
-func pruneUpdatesFromAppcast(archivesSourceDir: URL, prunedDirectory: URL, cacheDirectory: URL, appcast: Appcast) -> Int {
+func moveOldUpdatesFromAppcast(archivesSourceDir: URL, oldFilesDirectory: URL, cacheDirectory: URL, appcast: Appcast, autoPruneUpdates: Bool) -> (movedCount: Int, prunedCount: Int) {
     let fileManager = FileManager.default
     let suFileManager = SUFileManager()
     
-    // Create pruned updates directory if needed
-    var createdPrunedDirectory = false
-    let makePrunedFilesDirectory: () -> Bool = {
-        guard !createdPrunedDirectory else {
+    // Create old files updates directory if needed
+    var createdOldFilesDirectory = false
+    let makeOldFilesDirectory: () -> Bool = {
+        guard !createdOldFilesDirectory else {
             return true
         }
         
-        if fileManager.fileExists(atPath: prunedDirectory.path) {
-            createdPrunedDirectory = true
+        if fileManager.fileExists(atPath: oldFilesDirectory.path) {
+            createdOldFilesDirectory = true
             return true
         }
         
         do {
-            try fileManager.createDirectory(at: prunedDirectory, withIntermediateDirectories: false)
+            try fileManager.createDirectory(at: oldFilesDirectory, withIntermediateDirectories: false)
             
-            createdPrunedDirectory = true
+            createdOldFilesDirectory = true
             
             return true
         } catch {
-            print("Warning: failed to create \(prunedDirectory.lastPathComponent) in \(archivesSourceDir.lastPathComponent): \(error)")
+            print("Warning: failed to create \(oldFilesDirectory.lastPathComponent) in \(archivesSourceDir.lastPathComponent): \(error)")
             return false
         }
     }
     
-    var prunedItemsCount = 0
+    var movedItemsCount = 0
     
-    // Prune all unused update items
+    // Move aside all old unused update items
     let versionsInFeedSet = Set(appcast.versionsInFeed)
     for (version, update) in appcast.archives {
         guard !versionsInFeedSet.contains(version) && !appcast.deltaFromVersionsUsed.contains(version) && !appcast.ignoredVersionsToInsert.contains(version) else {
@@ -404,8 +404,8 @@ func pruneUpdatesFromAppcast(archivesSourceDir: URL, prunedDirectory: URL, cache
         
         let archivePath = update.archivePath
         
-        guard makePrunedFilesDirectory() else {
-            return prunedItemsCount
+        guard makeOldFilesDirectory() else {
+            return (movedItemsCount, 0)
         }
         
         do {
@@ -415,19 +415,19 @@ func pruneUpdatesFromAppcast(archivesSourceDir: URL, prunedDirectory: URL, cache
         }
         
         do {
-            try fileManager.moveItem(at: archivePath, to: prunedDirectory.appendingPathComponent(archivePath.lastPathComponent))
+            try fileManager.moveItem(at: archivePath, to: oldFilesDirectory.appendingPathComponent(archivePath.lastPathComponent))
         } catch {
-            print("Warning: failed to move \(archivePath.lastPathComponent) to \(prunedDirectory.lastPathComponent): \(error)")
+            print("Warning: failed to move \(archivePath.lastPathComponent) to \(oldFilesDirectory.lastPathComponent): \(error)")
         }
         
-        prunedItemsCount += 1
+        movedItemsCount += 1
         
-        // Prune cache for the update
+        // Remove cache for the update
         let appCachePath = update.appPath.deletingLastPathComponent()
         let _ = try? fileManager.removeItem(at: appCachePath)
     }
     
-    // Prune all unused delta items in the archives directory
+    // Move aside all unused delta items in the archives directory
     // We will be missing out on ignore markers in the cache for delta items because they're difficult to fetch
     // However they are zero-sized so they don't take much space anyway
     do {
@@ -442,11 +442,11 @@ func pruneUpdatesFromAppcast(archivesSourceDir: URL, prunedDirectory: URL, cache
                 continue
             }
             
-            guard makePrunedFilesDirectory() else {
-                return prunedItemsCount
+            guard makeOldFilesDirectory() else {
+                return (movedItemsCount, 0)
             }
             
-            prunedItemsCount += 1
+            movedItemsCount += 1
             
             do {
                 try suFileManager.updateModificationAndAccessTimeOfItem(at: deltaURL)
@@ -455,46 +455,50 @@ func pruneUpdatesFromAppcast(archivesSourceDir: URL, prunedDirectory: URL, cache
             }
             
             do {
-                try fileManager.moveItem(at: deltaURL, to: prunedDirectory.appendingPathComponent(filename))
+                try fileManager.moveItem(at: deltaURL, to: oldFilesDirectory.appendingPathComponent(filename))
             } catch {
-                print("Warning: failed to move \(deltaURL.lastPathComponent) to \(prunedDirectory.lastPathComponent): \(error)")
+                print("Warning: failed to move \(deltaURL.lastPathComponent) to \(oldFilesDirectory.lastPathComponent): \(error)")
             }
         }
     } catch {
         print("Warning: failed to list contents of \(archivesSourceDir.lastPathComponent) during pruning: \(error)")
     }
     
-    // Garbage collect the pruned updates directory
-    do {
-        let directoryContents = try fileManager.contentsOfDirectory(atPath: prunedDirectory.path)
-        
-        // Delete files that have roughly not been touched for 14 days
-        let prunedFileDeletionInterval: TimeInterval = 86400 * 14
-        
-        let currentDate = Date()
-        for filename in directoryContents {
-            guard !filename.hasPrefix(".") else {
-                continue
-            }
+    var pruneCount = 0
+    if autoPruneUpdates {
+        // Garbage collect the old updates directory
+        do {
+            let directoryContents = try fileManager.contentsOfDirectory(atPath: oldFilesDirectory.path)
             
-            let fileURL = prunedDirectory.appendingPathComponent(filename)
+            // Delete files that have roughly not been touched for 14 days
+            let prunedFileDeletionInterval: TimeInterval = 86400 * 14
             
-            if let resourceValues = try? fileURL.resourceValues(forKeys: [.contentModificationDateKey]),
-               let lastModificationDate = resourceValues.contentModificationDate {
-                if currentDate.timeIntervalSince(lastModificationDate) >= prunedFileDeletionInterval {
-                    do {
-                        try fileManager.removeItem(at: fileURL)
-                    } catch {
-                        print("Warning: failed to delete old pruned file \(prunedDirectory.lastPathComponent)/\(fileURL.lastPathComponent): \(error)")
+            let currentDate = Date()
+            for filename in directoryContents {
+                guard !filename.hasPrefix(".") else {
+                    continue
+                }
+                
+                let fileURL = oldFilesDirectory.appendingPathComponent(filename)
+                
+                if let resourceValues = try? fileURL.resourceValues(forKeys: [.contentModificationDateKey]),
+                   let lastModificationDate = resourceValues.contentModificationDate {
+                    if currentDate.timeIntervalSince(lastModificationDate) >= prunedFileDeletionInterval {
+                        do {
+                            try fileManager.removeItem(at: fileURL)
+                            pruneCount += 1
+                        } catch {
+                            print("Warning: failed to delete old update file \(oldFilesDirectory.lastPathComponent)/\(fileURL.lastPathComponent): \(error)")
+                        }
                     }
                 }
             }
+        } catch {
+            // Nothing to log for failing to fetch prunedDirectory
         }
-    } catch {
-        // Nothing to log for failing to fetch prunedDirectory
     }
     
-    return prunedItemsCount
+    return (movedItemsCount, pruneCount)
 }
 
 func markDeltaAsIgnored(delta: DeltaUpdate, markerPath: URL) {
