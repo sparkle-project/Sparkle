@@ -147,7 +147,11 @@ struct GenerateAppcast: ParsableCommand {
         Appcast files and deltas will be written to the archives directory.
         
         If an appcast file is already present in the archives directory, that file will be re-used and updated with new entries.
-        Old entries in the appcast that are still needed are kept intact. Otherwise, a new appcast file will be generated and written.
+        Otherwise, a new appcast file will be generated and written.
+        
+        Old updates are automatically removed from the generated appcast feed and their update files are moved to \(oldFilesDirectoryName)/
+        If --auto-prune-update-files is passed, old update files in this directory are deleted after 2 weeks.
+        You may want to exclude files from this directory from being uploaded.
         
         Use the --versions option if you need to insert an update that is older than the latest update in your feed, or
         if you need to insert only a specific new version with certain parameters.
@@ -173,10 +177,8 @@ struct GenerateAppcast: ParsableCommand {
         
         For more advanced options that can be used for publishing updates, see https://sparkle-project.org/documentation/publishing/ for further documentation.
         
-        Extracted archives are cached in \((cacheDirectory.path as NSString).abbreviatingWithTildeInPath) to avoid re-computation in subsequent runs.
-        
-        Old updates are automatically removed from the generated appcast feed and their update files are moved to \(oldFilesDirectoryName). If --auto-prune-update-files is passed, old update files in this directory are deleted after 2 weeks.
-        
+        Extracted archives that are needed are cached in \((cacheDirectory.path as NSString).abbreviatingWithTildeInPath) to avoid re-computation in subsequent runs.
+                
         Note that \(programName) does not support package-based (.pkg) updates.
         """)
     
