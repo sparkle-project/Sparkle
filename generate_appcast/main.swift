@@ -52,7 +52,7 @@ struct GenerateAppcast: ParsableCommand {
     static let programName = "generate_appcast"
     static let programNamePath: String = CommandLine.arguments.first ?? "./\(programName)"
     static let cacheDirectory = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0].appendingPathComponent("Sparkle_generate_appcast")
-    static let oldFilesDirectoryName = "old-updates"
+    static let oldFilesDirectoryName = "old_updates"
     
     static let DEFAULT_MAX_VERSIONS_PER_BRANCH_IN_FEED = 3
     static let DEFAULT_MAXIMUM_DELTAS = 5
@@ -165,6 +165,7 @@ struct GenerateAppcast: ParsableCommand {
                 MyApp 1.1.zip
                 MyApp 1.1.html
                 appcast.xml
+                \(oldFilesDirectoryName)/
                 
         EXAMPLES:
             \(programNamePath) ./my-app-release-zipfiles/
