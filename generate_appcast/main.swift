@@ -296,7 +296,7 @@ struct GenerateAppcast: ParsableCommand {
                     print("Moved \(moveCount) old update \(pluralizeWord(moveCount, "file")) to \(oldFilesDirectory.lastPathComponent)")
                 }
                 if prunedCount > 0 {
-                    print("Pruned \(moveCount) old update \(pluralizeWord(moveCount, "file"))")
+                    print("Pruned \(prunedCount) old update \(pluralizeWord(prunedCount, "file"))")
                 }
             }
         } catch {
