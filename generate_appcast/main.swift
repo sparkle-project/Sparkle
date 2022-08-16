@@ -52,7 +52,7 @@ struct GenerateAppcast: ParsableCommand {
     static let programName = "generate_appcast"
     static let programNamePath: String = CommandLine.arguments.first ?? "./\(programName)"
     static let cacheDirectory = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0].appendingPathComponent("Sparkle_generate_appcast")
-    static let prunedDirectoryName = ".pruned-updates"
+    static let oldFilesDirectoryName = "old_updates"
     
     static let DEFAULT_MAX_VERSIONS_PER_BRANCH_IN_FEED = 3
     static let DEFAULT_MAXIMUM_DELTAS = 5
@@ -87,7 +87,7 @@ struct GenerateAppcast: ParsableCommand {
     @Option(name: .long, help: ArgumentHelp("A URL to the application's website which Sparkle may use for directing users to if they cannot download a new update from within the application. This will be used for new generated update items. By default, no product link is used.", valueName: "link"))
     var link: String?
     
-    @Option(name: .long, help: ArgumentHelp("An optional comma delimited list of application versions (specified by CFBundleVersion) to generate new update items for. By default, new update items are inferred from the available archives. Use this option if you need to insert old updates in the feed at a different branch point (for example with a different minimum OS requirement).", valueName: "versions"), transform: { Set($0.components(separatedBy: ",")) })
+    @Option(name: .long, help: ArgumentHelp("An optional comma delimited list of application versions (specified by CFBundleVersion) to generate new update items for. By default, new update items are inferred from the available archives and current feed. Use this option if you need to insert only a specific new version or insert an old update in the feed at a different branch point (e.g. with a different minimum OS version or channel).", valueName: "versions"), transform: { Set($0.components(separatedBy: ",")) })
     var versions: Set<String>?
     
     @Option(name: .long, help: ArgumentHelp("The maximum number of delta items to create for the latest update for each branch point (for example with a different minimum OS requirement).", valueName: "maximum-deltas"))
@@ -117,6 +117,9 @@ struct GenerateAppcast: ParsableCommand {
     @Option(name: .long, help: ArgumentHelp("A comma delimited list of application sparkle:version's that will see newly generated updates as being informational only. An empty string argument will treat this update as informational coming from any application version. Prefix a version string with '<' to indicate (eg \"<2.5\") to indicate older versions than the one specified should treat the update as informational only. By default, updates are not informational only. --link must also be provided. Old applications need to be using Sparkle 2 to use this feature, and 2.1 or later to use the '<' upper bound feature.", valueName: "informational-update-versions"), transform: { $0.components(separatedBy: ",").filter({$0.count > 0}) })
     var informationalUpdateVersions: [String]?
     
+    @Flag(name: .customLong("auto-prune-update-files"), help: ArgumentHelp("Automatically remove old update files in \(oldFilesDirectoryName) that haven't been touched in 2 weeks"))
+    var autoPruneUpdates: Bool = false
+    
     @Option(name: .customShort("o"), help: ArgumentHelp("Path to filename for the generated appcast (allowed when only one will be created).", valueName: "output-path"), transform: { URL(fileURLWithPath: $0) })
     var outputPathURL: URL?
     
@@ -144,7 +147,14 @@ struct GenerateAppcast: ParsableCommand {
         Appcast files and deltas will be written to the archives directory.
         
         If an appcast file is already present in the archives directory, that file will be re-used and updated with new entries.
-        Old entries in the appcast that are still needed are kept intact. Otherwise, a new appcast file will be generated and written.
+        Otherwise, a new appcast file will be generated and written.
+        
+        Old updates are automatically removed from the generated appcast feed and their update files are moved to \(oldFilesDirectoryName)/
+        If --auto-prune-update-files is passed, old update files in this directory are deleted after 2 weeks.
+        You may want to exclude files from this directory from being uploaded.
+        
+        Use the --versions option if you need to insert an update that is older than the latest update in your feed, or
+        if you need to insert only a specific new version with certain parameters.
         
         .html files that have the same filename as an archive (except for the file extension) will be used for release notes for that item.
         If the contents of these files are short (< \(DEFAULT_MAX_CDATA_THRESHOLD) characters) and do not include a DOCTYPE or body tags, they will be treated as embedded CDATA release notes.
@@ -159,6 +169,7 @@ struct GenerateAppcast: ParsableCommand {
                 MyApp 1.1.zip
                 MyApp 1.1.html
                 appcast.xml
+                \(oldFilesDirectoryName)/
                 
         EXAMPLES:
             \(programNamePath) ./my-app-release-zipfiles/
@@ -166,10 +177,8 @@ struct GenerateAppcast: ParsableCommand {
         
         For more advanced options that can be used for publishing updates, see https://sparkle-project.org/documentation/publishing/ for further documentation.
         
-        Extracted archives are cached in \((cacheDirectory.path as NSString).abbreviatingWithTildeInPath) to avoid re-computation in subsequent runs.
-        
-        Old updates are automatically pruned from the generated appcast feed and their update files are moved to \(prunedDirectoryName). Old update files in this directory are deleted after 2 weeks.
-        
+        Extracted archives that are needed are cached in \((cacheDirectory.path as NSString).abbreviatingWithTildeInPath) to avoid re-computation in subsequent runs.
+                
         Note that \(programName) does not support package-based (.pkg) updates.
         """)
     
@@ -262,7 +271,7 @@ struct GenerateAppcast: ParsableCommand {
         do {
             let appcastsByFeed = try makeAppcasts(archivesSourceDir: archivesSourceDir, outputPathURL: outputPathURL, cacheDirectory: GenerateAppcast.cacheDirectory, keys: keys, versions: versions, maxVersionsPerBranchInFeed: maxVersionsPerBranchInFeed, newChannel: channel, majorVersion: majorVersion, maximumDeltas: maximumDeltas, deltaCompressionModeDescription: deltaCompression, deltaCompressionLevel: deltaCompressionLevel, disableNestedCodeCheck: disableNestedCodeCheck, downloadURLPrefix: downloadURLPrefix, releaseNotesURLPrefix: releaseNotesURLPrefix, verbose: verbose)
             
-            let prunedDirectory = archivesSourceDir.appendingPathComponent(GenerateAppcast.prunedDirectoryName)
+            let oldFilesDirectory = archivesSourceDir.appendingPathComponent(GenerateAppcast.oldFilesDirectoryName)
             
             for (appcastFile, appcast) in appcastsByFeed {
                 // If an output filename was specified, use it.
@@ -282,9 +291,12 @@ struct GenerateAppcast: ParsableCommand {
                 
                 print("Wrote \(numNewUpdates) new \(newUpdatesString), updated \(numExistingUpdates) existing \(existingUpdatesString), and removed \(numUpdatesRemoved) old \(removedUpdatesString)")
                 
-                let pruneCount = pruneUpdatesFromAppcast(archivesSourceDir: archivesSourceDir, prunedDirectory: prunedDirectory, cacheDirectory: GenerateAppcast.cacheDirectory, appcast: appcast)
-                if pruneCount > 0 {
-                    print("Pruned \(pruneCount) old update \(pluralizeWord(pruneCount, "file")) to \(prunedDirectory.lastPathComponent)")
+                let (moveCount, prunedCount) = moveOldUpdatesFromAppcast(archivesSourceDir: archivesSourceDir, oldFilesDirectory: oldFilesDirectory, cacheDirectory: GenerateAppcast.cacheDirectory, appcast: appcast, autoPruneUpdates: autoPruneUpdates)
+                if moveCount > 0 {
+                    print("Moved \(moveCount) old update \(pluralizeWord(moveCount, "file")) to \(oldFilesDirectory.lastPathComponent)")
+                }
+                if prunedCount > 0 {
+                    print("Pruned \(prunedCount) old update \(pluralizeWord(prunedCount, "file"))")
                 }
             }
         } catch {
