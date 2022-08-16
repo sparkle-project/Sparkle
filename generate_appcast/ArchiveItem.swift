@@ -18,10 +18,12 @@ class DeltaUpdate {
     let archivePath: URL
     var dsaSignature: String?
     var edSignature: String?
+    let sparkleExecutableFileSize: Int?
 
-    init(fromVersion: String, archivePath: URL) {
+    init(fromVersion: String, archivePath: URL, sparkleExecutableFileSize: Int?) {
         self.archivePath = archivePath
         self.fromVersion = fromVersion
+        self.sparkleExecutableFileSize = sparkleExecutableFileSize
     }
 
     var fileSize: Int64 {
@@ -51,7 +53,7 @@ class DeltaUpdate {
         
         let _ = try? fileManager.removeItem(at: tempApplyToPath)
 
-        return DeltaUpdate(fromVersion: from.version, archivePath: archivePath)
+        return DeltaUpdate(fromVersion: from.version, archivePath: archivePath, sparkleExecutableFileSize: from.sparkleExecutableFileSize)
     }
 }
 
@@ -61,6 +63,7 @@ class ArchiveItem: CustomStringConvertible {
     let _shortVersion: String?
     let minimumSystemVersion: String
     let frameworkVersion: String?
+    let sparkleExecutableFileSize: Int?
     let archivePath: URL
     let appPath: URL
     let feedURL: URL?
@@ -74,12 +77,13 @@ class ArchiveItem: CustomStringConvertible {
     var downloadUrlPrefix: URL?
     var releaseNotesURLPrefix: URL?
 
-    init(version: String, shortVersion: String?, feedURL: URL?, minimumSystemVersion: String?, frameworkVersion: String?, publicEdKey: String?, supportsDSA: Bool, appPath: URL, archivePath: URL) throws {
+    init(version: String, shortVersion: String?, feedURL: URL?, minimumSystemVersion: String?, frameworkVersion: String?, sparkleExecutableFileSize: Int?, publicEdKey: String?, supportsDSA: Bool, appPath: URL, archivePath: URL) throws {
         self.version = version
         self._shortVersion = shortVersion
         self.feedURL = feedURL
         self.minimumSystemVersion = minimumSystemVersion ?? "10.13"
         self.frameworkVersion = frameworkVersion
+        self.sparkleExecutableFileSize = sparkleExecutableFileSize
         self.archivePath = archivePath
         self.appPath = appPath
         self.supportsDSA = supportsDSA
@@ -145,24 +149,42 @@ class ArchiveItem: CustomStringConvertible {
             }
             
             var frameworkVersion: String? = nil
+            let sparkleExecutableFileSize: Int?
             do {
                 let canonicalFrameworksURL = appPath.appendingPathComponent("Contents/Frameworks/Sparkle.framework")
                 
                 let frameworksURL: URL?
+                let usingLegacySparkleCore: Bool
                 if !FileManager.default.fileExists(atPath: canonicalFrameworksURL.path) {
                     // Try legacy SparkleCore framework that was shipping in early 2.0 betas
                     let sparkleCoreFrameworksURL = appPath.appendingPathComponent("Contents/Frameworks/SparkleCore.framework")
                     if FileManager.default.fileExists(atPath: sparkleCoreFrameworksURL.path) {
                         frameworksURL = sparkleCoreFrameworksURL
+                        usingLegacySparkleCore = true
                     } else {
                         frameworksURL = nil
+                        usingLegacySparkleCore = false
                     }
                 } else {
                     frameworksURL = canonicalFrameworksURL
+                    usingLegacySparkleCore = false
                 }
                 
-                if let frameworksURL = frameworksURL, let frameworkInfoPlist = NSDictionary(contentsOf: frameworksURL.appendingPathComponent("Resources/Info.plist")) {
-                    frameworkVersion = frameworkInfoPlist[kCFBundleVersionKey as String] as? String
+                if let frameworksURL = frameworksURL {
+                    if let frameworkInfoPlist = NSDictionary(contentsOf: frameworksURL.appendingPathComponent("Resources/Info.plist")) {
+                        frameworkVersion = frameworkInfoPlist[kCFBundleVersionKey as String] as? String
+                    }
+                    
+                    let frameworkExecutableURL = frameworksURL.appendingPathComponent(!usingLegacySparkleCore ? "Sparkle" : "SparkleCore").resolvingSymlinksInPath()
+                    do {
+                        let resourceValues = try frameworkExecutableURL.resourceValues(forKeys: [.fileSizeKey])
+                        
+                        sparkleExecutableFileSize = resourceValues.fileSize
+                    } catch {
+                        sparkleExecutableFileSize = nil
+                    }
+                } else {
+                    sparkleExecutableFileSize = nil
                 }
             }
 
@@ -171,6 +193,7 @@ class ArchiveItem: CustomStringConvertible {
                           feedURL: feedURL,
                           minimumSystemVersion: infoPlist["LSMinimumSystemVersion"] as? String,
                           frameworkVersion: frameworkVersion,
+                          sparkleExecutableFileSize: sparkleExecutableFileSize,
                           publicEdKey: publicEdKey,
                           supportsDSA: supportsDSA,
                           appPath: appPath,

@@ -554,6 +554,14 @@ static NSString *SUAppcastItemStateKey = @"SUAppcastItemState";
         }
         
         _installationType = [chosenInstallationType copy];
+        
+        NSString *enclosureDeltaSparkleExecutableSize = [enclosure objectForKey:SUAppcastAttributeDeltaSparkleExecutableSize];
+        if (enclosureDeltaSparkleExecutableSize != nil) {
+            long long sparkleExecutableSize = [enclosureDeltaSparkleExecutableSize longLongValue];
+            if (sparkleExecutableSize > 0) {
+                _deltaSparkleExecutableSize = @(sparkleExecutableSize);
+            }
+        }
 
         // Find the appropriate release notes URL.
         NSString *releaseNotesString = [dict objectForKey:SUAppcastElementReleaseNotesLink];

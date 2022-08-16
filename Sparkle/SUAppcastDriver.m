@@ -42,9 +42,6 @@
 @end
 
 @implementation SUAppcastDriver
-{
-    NSNumber * _Nullable _hostSupportsDeltaUpdates; // BOOL
-}
 
 @synthesize host = _host;
 @synthesize updater = _updater;
@@ -114,9 +111,10 @@
 {
     SUAppcastItem *deltaItem = (regularItem != nil) ? [[self class] deltaUpdateFromAppcastItem:regularItem hostVersion:self.host.version] : nil;
     
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdirect-ivar-access"
-    if (deltaItem != nil && _hostSupportsDeltaUpdates == nil) {
+    BOOL supportsDeltaItem;
+    if (deltaItem == nil) {
+        supportsDeltaItem = NO;
+    } else {
         // Delta updates are not supported when bundles are transferred over to some file systems like fat32 and exfat systems
         // This is because they do not preserve permissions completely, which we require for diff'ing.
         // We shouldn't download delta updates in cases where we can detect they aren't supported
@@ -144,35 +142,44 @@
             }
         }
         
-        // Only skip delta updates if permissions are not 0755
-        BOOL hostSupportsDeltaUpdates;
+        // Skip delta updates if permissions are not 0755
         if (sparkleExecutablePath != nil) {
             NSError *attributesError = nil;
             NSDictionary<NSFileAttributeKey, id> *attributes = [fileManager attributesOfItemAtPath:sparkleExecutablePath error:&attributesError];
             if (attributes != nil) {
                 NSNumber *posixPermissions = attributes[NSFilePosixPermissions];
                 if (posixPermissions != nil && posixPermissions.shortValue != 0755) {
-                    hostSupportsDeltaUpdates = NO;
+                    supportsDeltaItem = NO;
                     
                     SULog(SULogLevelDefault, @"Encountered irregular POSIX permissions 0%o for Sparkle executable, which is not 0755. Skipping delta updates..", posixPermissions.shortValue);
                 } else {
-                    hostSupportsDeltaUpdates = YES;
+                    // Test if Sparkle's executable file on disk has expected file size for applying this delta update
+                    if (deltaItem.deltaSparkleExecutableSize != nil) {
+                        NSNumber *fileSize = attributes[NSFileSize];
+                        if (fileSize != nil && ![deltaItem.deltaSparkleExecutableSize isEqualToNumber:fileSize]) {
+                            supportsDeltaItem = NO;
+                            
+                            SULog(SULogLevelDefault, @"Expected file size (%lld) of Sparkle's executable does not match actual file size (%lld). Skipping delta update.", deltaItem.deltaSparkleExecutableSize.unsignedLongLongValue, fileSize.unsignedLongLongValue);
+                        } else {
+                            supportsDeltaItem = YES;
+                        }
+                    } else {
+                        supportsDeltaItem = YES;
+                    }
                 }
             } else {
-                hostSupportsDeltaUpdates = YES;
+                supportsDeltaItem = YES;
                 
                 SULog(SULogLevelError, @"Error: Failed to retrieve attributes from Sparkle executable: %@", attributesError.localizedDescription);
             }
         } else {
-            hostSupportsDeltaUpdates = YES;
+            supportsDeltaItem = YES;
             
             SULog(SULogLevelError, @"Error: Failed to unexpectably retrieve Sparkle executable URL from %@", hostBundle.bundlePath);
         }
-        
-        _hostSupportsDeltaUpdates = @(hostSupportsDeltaUpdates);
     }
     
-    if (deltaItem != nil && _hostSupportsDeltaUpdates.boolValue) {
+    if (supportsDeltaItem) {
         if (secondaryUpdate != NULL) {
             *secondaryUpdate = regularItem;
         }
@@ -183,7 +190,6 @@
         }
         return regularItem;
     }
-#pragma clang diagnostic pop
 }
 
 - (SUAppcastItem *)retrieveBestAppcastItemFromAppcast:(SUAppcast *)appcast versionComparator:(id<SUVersionComparison>)versionComparator secondaryUpdate:(SUAppcastItem * __autoreleasing _Nullable *)secondaryAppcastItem

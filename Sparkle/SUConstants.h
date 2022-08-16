@@ -75,6 +75,7 @@ extern NSString *const SURelaunchToolNameKey __attribute__((deprecated("This key
 // -----------------------------------------------------------------------------
 
 extern NSString *const SUAppcastAttributeDeltaFrom;
+extern NSString *const SUAppcastAttributeDeltaSparkleExecutableSize;
 extern NSString *const SUAppcastAttributeDSASignature;
 extern NSString *const SUAppcastAttributeEDSignature;
 extern NSString *const SUAppcastAttributeShortVersionString;

@@ -337,6 +337,16 @@ SU_EXPORT @interface SUAppcastItem : NSObject<NSSecureCoding>
 @property (copy, readonly, nullable) NSDictionary<NSString *, SUAppcastItem *> *deltaUpdates;
 
 /**
+ The expected size of the Sparkle executable file before applying this delta update.
+ 
+ This attribute is used to test if the delta item can still be applied. If Sparkle's executable file has changed (e.g. from having an architecture stripped),
+ then the delta item cannot be applied.
+ 
+ This is extracted from the @c sparkle:deltaSparkleExecutableSize attribute from the @c <enclosure> element of a @c sparkle:deltas item.
+ */
+@property (nonatomic, readonly, nullable) NSNumber *deltaSparkleExecutableSize;
+
+/**
  Indicates whether or not the update item is a delta update.
  
  An update item is a delta update if it is in the `deltaUpdates` of another update item.

@@ -315,7 +315,7 @@ func makeAppcasts(archivesSourceDir: URL, outputPathURL: URL?, cacheDirectory ca
                         continue
                     }
                 } else {
-                    delta = DeltaUpdate(fromVersion: item.version, archivePath: deltaPath)
+                    delta = DeltaUpdate(fromVersion: item.version, archivePath: deltaPath, sparkleExecutableFileSize: item.sparkleExecutableFileSize)
                 }
 
                 // Require delta to be a bit smaller
