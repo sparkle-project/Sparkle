@@ -66,8 +66,6 @@
 @implementation SPUInstallerDriver
 {
     void (^_updateWillInstallHandler)(void);
-    BOOL _canInstallSilently;
-    BOOL _hasTargetTerminated;
 }
 
 @synthesize host = _host;
@@ -329,16 +327,7 @@
             hasTargetTerminated = (BOOL)*((const uint8_t *)data.bytes + 1);
         }
         
-        // The installer letting us know when the appcast item was registered (SPUInstallerRegisteredAppcastItem)
-        // was added later. In earlier versions of Sparkle, we could have notified the update too early
-        // before the installer finished registering the appcast item.
-        // Note we don't need to handle an "old" installer because Sparkle and the installer should still be aligned at this point.
-        _canInstallSilently = canInstallSilently;
-        _hasTargetTerminated = hasTargetTerminated;
-    } else if (identifier == SPUInstallerRegisteredAppcastItem) {
-        self.currentStage = identifier;
-        
-        [self.delegate installerDidFinishPreparationAndWillInstallImmediately:_hasTargetTerminated silently:_canInstallSilently];
+        [self.delegate installerDidFinishPreparationAndWillInstallImmediately:hasTargetTerminated silently:canInstallSilently];
     } else if (identifier == SPUInstallationFinishedStage2) {
         self.currentStage = identifier;
         
