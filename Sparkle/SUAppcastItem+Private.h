@@ -15,6 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 // Available in SPUAppcastItemStateResolver.h (a private exposed header)
 @class SPUAppcastItemStateResolver;
+@class SUSignatures;
 
 @interface SUAppcastItem (Private) <NSSecureCoding>
 

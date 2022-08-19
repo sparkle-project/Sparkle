@@ -35,6 +35,7 @@ static NSString *SUAppcastItemVersionStringKey = @"versionString";
 static NSString *SUAppcastItemPropertiesKey = @"propertiesDictionary";
 static NSString *SUAppcastItemInstallationTypeKey = @"SUAppcastItemInstallationType";
 static NSString *SUAppcastItemStateKey = @"SUAppcastItemState";
+static NSString *SUAppcastItemDeltaFromSparkleExecutableSizeKey = @"SUAppcastItemDeltaFromSparkleExecutableSize";
 
 @interface SUAppcastItem ()
 
@@ -79,6 +80,7 @@ static NSString *SUAppcastItemStateKey = @"SUAppcastItemState";
 @synthesize hasCriticalInformation = _hasCriticalInformation;
 @synthesize informationalUpdateVersions = _informationalUpdateVersions;
 @synthesize channel = _channel;
+@synthesize deltaFromSparkleExecutableSize = _deltaFromSparkleExecutableSize;
 
 + (BOOL)supportsSecureCoding
 {
@@ -91,6 +93,8 @@ static NSString *SUAppcastItemStateKey = @"SUAppcastItemState";
     
     if (self != nil) {
         _deltaUpdates = [decoder decodeObjectOfClasses:[NSSet setWithArray:@[[NSDictionary class], [SUAppcastItem class]]] forKey:SUAppcastItemDeltaUpdatesKey];
+        _deltaFromSparkleExecutableSize = [decoder decodeObjectOfClass:[NSNumber class] forKey:SUAppcastItemDeltaFromSparkleExecutableSizeKey];
+        
         _displayVersionString = [(NSString *)[decoder decodeObjectOfClass:[NSString class] forKey:SUAppcastItemDisplayVersionStringKey] copy];
         _signatures = (SUSignatures *)[decoder decodeObjectOfClass:[SUSignatures class] forKey:SUAppcastItemSignaturesKey];
         _fileURL = [decoder decodeObjectOfClass:[NSURL class] forKey:SUAppcastItemFileURLKey];
@@ -149,6 +153,10 @@ static NSString *SUAppcastItemStateKey = @"SUAppcastItemState";
 {
     if (self.deltaUpdates != nil) {
         [encoder encodeObject:self.deltaUpdates forKey:SUAppcastItemDeltaUpdatesKey];
+    }
+    
+    if (self.deltaFromSparkleExecutableSize != nil) {
+        [encoder encodeObject:self.deltaFromSparkleExecutableSize forKey:SUAppcastItemDeltaFromSparkleExecutableSizeKey];
     }
     
     if (self.displayVersionString != nil) {
@@ -559,7 +567,7 @@ static NSString *SUAppcastItemStateKey = @"SUAppcastItemState";
         if (enclosureDeltaSparkleExecutableSize != nil) {
             long long sparkleExecutableSize = [enclosureDeltaSparkleExecutableSize longLongValue];
             if (sparkleExecutableSize > 0) {
-                _deltaSparkleExecutableSize = @(sparkleExecutableSize);
+                _deltaFromSparkleExecutableSize = @(sparkleExecutableSize);
             }
         }
 

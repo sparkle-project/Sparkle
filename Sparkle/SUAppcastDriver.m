@@ -154,12 +154,12 @@
                     SULog(SULogLevelDefault, @"Encountered irregular POSIX permissions 0%o for Sparkle executable, which is not 0755. Skipping delta updates..", posixPermissions.shortValue);
                 } else {
                     // Test if Sparkle's executable file on disk has expected file size for applying this delta update
-                    if (deltaItem.deltaSparkleExecutableSize != nil) {
+                    if (deltaItem.deltaFromSparkleExecutableSize != nil) {
                         NSNumber *fileSize = attributes[NSFileSize];
-                        if (fileSize != nil && ![deltaItem.deltaSparkleExecutableSize isEqualToNumber:fileSize]) {
+                        if (fileSize != nil && ![deltaItem.deltaFromSparkleExecutableSize isEqualToNumber:fileSize]) {
                             supportsDeltaItem = NO;
                             
-                            SULog(SULogLevelDefault, @"Expected file size (%lld) of Sparkle's executable does not match actual file size (%lld). Skipping delta update.", deltaItem.deltaSparkleExecutableSize.unsignedLongLongValue, fileSize.unsignedLongLongValue);
+                            SULog(SULogLevelDefault, @"Expected file size (%lld) of Sparkle's executable does not match actual file size (%lld). Skipping delta update.", deltaItem.deltaFromSparkleExecutableSize.unsignedLongLongValue, fileSize.unsignedLongLongValue);
                         } else {
                             supportsDeltaItem = YES;
                         }

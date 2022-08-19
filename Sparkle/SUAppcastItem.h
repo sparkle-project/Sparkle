@@ -21,9 +21,6 @@
 #import <Sparkle/SUExport.h>
 #endif
 
-@class SUSignatures;
-@class SPUAppcastItemState;
-
 NS_ASSUME_NONNULL_BEGIN
 
 /**
@@ -342,9 +339,9 @@ SU_EXPORT @interface SUAppcastItem : NSObject<NSSecureCoding>
  This attribute is used to test if the delta item can still be applied. If Sparkle's executable file has changed (e.g. from having an architecture stripped),
  then the delta item cannot be applied.
  
- This is extracted from the @c sparkle:deltaSparkleExecutableSize attribute from the @c <enclosure> element of a @c sparkle:deltas item.
+ This is extracted from the @c sparkle:deltaFromSparkleExecutableSize attribute from the @c <enclosure> element of a @c sparkle:deltas item.
  */
-@property (nonatomic, readonly, nullable) NSNumber *deltaSparkleExecutableSize;
+@property (nonatomic, readonly, nullable) NSNumber *deltaFromSparkleExecutableSize;
 
 /**
  Indicates whether or not the update item is a delta update.
