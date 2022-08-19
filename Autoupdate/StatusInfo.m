@@ -24,6 +24,8 @@
     NSUInteger _pendingReplyCounter;
 }
 
+@synthesize installationInfoData = _installationInfoData;
+
 - (instancetype)initWithHostBundleIdentifier:(NSString *)bundleIdentifier
 {
     self = [super init];
