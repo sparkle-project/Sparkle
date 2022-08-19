@@ -126,9 +126,11 @@
         
         NSBundle *hostBundle = self.host.bundle;
         NSString *sparkleExecutablePath;
+        NSString *sparkleResourcesPath;
         if ([hostBundle isEqual:NSBundle.mainBundle]) {
             NSBundle *sparkleBundle = [NSBundle bundleForClass:[self class]];
             sparkleExecutablePath = sparkleBundle.executableURL.URLByResolvingSymlinksInPath.path;
+            sparkleResourcesPath = sparkleBundle.resourcePath;
         } else {
             // If we are not updating ourselves, make a good guess to the Sparkle executable location
             NSURL *frameworksURL = hostBundle.privateFrameworksURL;
@@ -137,8 +139,10 @@
             
             if ([fileManager fileExistsAtPath:candidateExecutablePath]) {
                 sparkleExecutablePath = candidateExecutablePath;
+                sparkleResourcesPath = [candidateExecutablePath.stringByDeletingLastPathComponent stringByAppendingPathComponent:@"Resources"];
             } else {
                 sparkleExecutablePath = nil;
+                sparkleResourcesPath = nil;
             }
         }
         
@@ -161,7 +165,23 @@
                             
                             SULog(SULogLevelDefault, @"Expected file size (%lld) of Sparkle's executable does not match actual file size (%lld). Skipping delta update.", deltaItem.deltaFromSparkleExecutableSize.unsignedLongLongValue, fileSize.unsignedLongLongValue);
                         } else {
-                            supportsDeltaItem = YES;
+                            // Test if Sparkle's expected localization files on disk are still present for applying this delta update
+                            if (sparkleResourcesPath != nil && deltaItem.deltaFromSparkleLocales != nil) {
+                                BOOL foundAllExpectedLocales = YES;
+                                for (NSString *locale in deltaItem.deltaFromSparkleLocales) {
+                                    NSString *localeProjectPath = [[sparkleResourcesPath stringByAppendingPathComponent:locale] stringByAppendingPathExtension:@"lproj"];
+                                    if (![fileManager fileExistsAtPath:localeProjectPath]) {
+                                        foundAllExpectedLocales = NO;
+                                        
+                                        SULog(SULogLevelDefault, @"Expected project locale (%@) is missing in Sparkle.framework. Skipping delta update.", locale);
+                                        break;
+                                    }
+                                }
+                                
+                                supportsDeltaItem = foundAllExpectedLocales;
+                            } else {
+                                supportsDeltaItem = YES;
+                            }
                         }
                     } else {
                         supportsDeltaItem = YES;
