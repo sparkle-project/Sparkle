@@ -23,8 +23,7 @@ typedef NS_ENUM(int32_t, SPUInstallerMessageType)
     SPUInstallationFinishedStage2 = 7,
     SPUInstallationFinishedStage3 = 8,
     SPUUpdaterAlivePing = 9,
-    SPUInstallerError = 10,
-    SPUInstallerRegisteredAppcastItem = 11,
+    SPUInstallerError = 10
 };
 
 typedef NS_ENUM(int32_t, SPUUpdaterMessageType)

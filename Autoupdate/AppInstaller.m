@@ -34,7 +34,6 @@
 
 #define FIRST_UPDATER_MESSAGE_TIMEOUT 18ull
 #define RETRIEVE_PROCESS_IDENTIFIER_TIMEOUT 8ull
-#define UPDATER_APPCAST_ITEM_REGISTRATION_TIMEOUT 8ull
 
 /**
  * Show display progress UI after a delay from starting the final part of the installation.
@@ -422,40 +421,11 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     } else if (identifier == SPUSentUpdateAppcastItemData) {
         SUAppcastItem *updateItem = (SUAppcastItem *)SPUUnarchiveRootObjectSecurely(data, [SUAppcastItem class]);
         if (updateItem != nil) {
-            BOOL canInstallSilently = [self.installer canInstallSilently];
-            SPUInstallationInfo *installationInfo = [[SPUInstallationInfo alloc] initWithAppcastItem:updateItem canSilentlyInstall:canInstallSilently];
+            SPUInstallationInfo *installationInfo = [[SPUInstallationInfo alloc] initWithAppcastItem:updateItem canSilentlyInstall:[self.installer canInstallSilently]];
             
             NSData *archivedData = SPUArchiveRootObjectSecurely(installationInfo);
             if (archivedData != nil) {
-                __block BOOL notifiedRegistrationCompleted = NO;
-                
-                [self.agentConnection.agent registerInstallationInfoData:archivedData completionHandler:^{
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        if (!notifiedRegistrationCompleted) {
-                            notifiedRegistrationCompleted = YES;
-                            
-                            uint8_t targetTerminated = (uint8_t)self.terminationListener.terminated;
-                            uint8_t sendInformation[] = {targetTerminated, (uint8_t)canInstallSilently};
-                            
-                            [self.communicator handleMessageWithIdentifier:SPUInstallerRegisteredAppcastItem data:[NSData dataWithBytes:sendInformation length:sizeof(sendInformation)]];
-                        }
-                    });
-                }];
-                
-                // Not receiving that we've registered the appcast item in a timely manner is not a fatal issue
-                // If this operation takes too long, just let assume the item will be registered
-                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(UPDATER_APPCAST_ITEM_REGISTRATION_TIMEOUT * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                    if (!notifiedRegistrationCompleted) {
-                        notifiedRegistrationCompleted = YES;
-                        
-                        SULog(SULogLevelError, @"Warning: did not receive appcast item registration from Updater in timely manner. Proceeding..");
-                        
-                        uint8_t targetTerminated = (uint8_t)self.terminationListener.terminated;
-                        uint8_t sendInformation[] = {targetTerminated, (uint8_t)canInstallSilently};
-                        
-                        [self.communicator handleMessageWithIdentifier:SPUInstallerRegisteredAppcastItem data:[NSData dataWithBytes:sendInformation length:sizeof(sendInformation)]];
-                    }
-                });
+                [self.agentConnection.agent registerInstallationInfoData:archivedData];
             }
         }
     } else if (identifier == SPUResumeInstallationToStage2 && data.length == sizeof(uint8_t) * 2) {
@@ -512,10 +482,18 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
             return;
         }
         
+        uint8_t canPerformSilentInstall = (uint8_t)[installer canInstallSilently];
+        
         dispatch_async(dispatch_get_main_queue(), ^{
             self.installer = installer;
             
-            [self.communicator handleMessageWithIdentifier:SPUInstallationFinishedStage1 data:[NSData data]];
+            uint8_t targetTerminated = (uint8_t)self.terminationListener.terminated;
+            
+            uint8_t sendInformation[] = {canPerformSilentInstall, targetTerminated};
+            
+            NSData *sendData = [NSData dataWithBytes:sendInformation length:sizeof(sendInformation)];
+            
+            [self.communicator handleMessageWithIdentifier:SPUInstallationFinishedStage1 data:sendData];
             
             self.performedStage1Installation = YES;
             

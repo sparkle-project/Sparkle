@@ -14,7 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)registerApplicationBundlePath:(NSString *)applicationBundlePath reply:(void (^)(NSNumber * _Nullable processIdentifier))reply;
 
-- (void)registerInstallationInfoData:(NSData *)installationInfoData completionHandler:(void (^)(void))completionHandler;
+- (void)registerInstallationInfoData:(NSData *)installationInfoData;
 
 - (void)sendTerminationSignal;
 
