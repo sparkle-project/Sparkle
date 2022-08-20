@@ -273,6 +273,8 @@ struct GenerateAppcast: ParsableCommand {
             
             let oldFilesDirectory = archivesSourceDir.appendingPathComponent(GenerateAppcast.oldFilesDirectoryName)
             
+            let pluralizeWord = { $0 == 1 ? $1 : "\($1)s" }
+            
             for (appcastFile, appcast) in appcastsByFeed {
                 // If an output filename was specified, use it.
                 // Otherwise, use the name of the appcast file found in the archive.
@@ -283,21 +285,20 @@ struct GenerateAppcast: ParsableCommand {
                 let (numNewUpdates, numExistingUpdates, numUpdatesRemoved) = try writeAppcast(appcastDestPath: appcastDestPath, appcast: appcast, fullReleaseNotesLink: fullReleaseNotesURL, maxCDATAThreshold: maxCDATAThreshold, link: link, newChannel: channel, majorVersion: majorVersion, ignoreSkippedUpgradesBelowVersion: ignoreSkippedUpgradesBelowVersion, phasedRolloutInterval: phasedRolloutInterval, criticalUpdateVersion: criticalUpdateVersion, informationalUpdateVersions: informationalUpdateVersions)
 
                 // Inform the user, pluralizing "update" if necessary
-                let pluralizeWord = { $0 == 1 ? $1 : "\($1)s" }
                 let pluralizeUpdates = { pluralizeWord($0, "update") }
                 let newUpdatesString = pluralizeUpdates(numNewUpdates)
                 let existingUpdatesString = pluralizeUpdates(numExistingUpdates)
                 let removedUpdatesString = pluralizeUpdates(numUpdatesRemoved)
                 
-                print("Wrote \(numNewUpdates) new \(newUpdatesString), updated \(numExistingUpdates) existing \(existingUpdatesString), and removed \(numUpdatesRemoved) old \(removedUpdatesString)")
-                
-                let (moveCount, prunedCount) = moveOldUpdatesFromAppcast(archivesSourceDir: archivesSourceDir, oldFilesDirectory: oldFilesDirectory, cacheDirectory: GenerateAppcast.cacheDirectory, appcast: appcast, autoPruneUpdates: autoPruneUpdates)
-                if moveCount > 0 {
-                    print("Moved \(moveCount) old update \(pluralizeWord(moveCount, "file")) to \(oldFilesDirectory.lastPathComponent)")
-                }
-                if prunedCount > 0 {
-                    print("Pruned \(prunedCount) old update \(pluralizeWord(prunedCount, "file"))")
-                }
+                print("Wrote \(numNewUpdates) new \(newUpdatesString), updated \(numExistingUpdates) existing \(existingUpdatesString), and removed \(numUpdatesRemoved) old \(removedUpdatesString) in \(appcastFile)")
+            }
+            
+            let (moveCount, prunedCount) = moveOldUpdatesFromAppcasts(archivesSourceDir: archivesSourceDir, oldFilesDirectory: oldFilesDirectory, cacheDirectory: GenerateAppcast.cacheDirectory, appcasts: Array(appcastsByFeed.values), autoPruneUpdates: autoPruneUpdates)
+            if moveCount > 0 {
+                print("Moved \(moveCount) old update \(pluralizeWord(moveCount, "file")) to \(oldFilesDirectory.lastPathComponent)")
+            }
+            if prunedCount > 0 {
+                print("Pruned \(prunedCount) old update \(pluralizeWord(prunedCount, "file"))")
             }
         } catch {
             print("Error generating appcast from directory", archivesSourceDir.path, "\n", error)
