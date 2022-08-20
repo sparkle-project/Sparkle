@@ -41,18 +41,18 @@ func makeAppcasts(archivesSourceDir: URL, outputPathURL: URL?, cacheDirectory ca
         update.downloadUrlPrefix = downloadURLPrefix
         update.releaseNotesURLPrefix = releaseNotesURLPrefix
     }
-    
-    // If a (single) output filename was specified on the command-line, but more than one
-    // appcast file was found in the archives, then it's an error.
-    if let outputPathURL = outputPathURL, allUpdates.count > 1 {
-        throw makeError(code: .appcastError, "Cannot write to \(outputPathURL.path): multiple appcasts found")
-    }
 
     // Group updates by appcast feed
     var updatesByAppcast: [FeedName: [ArchiveItem]] = [:]
     for update in allUpdates {
         let appcastFile = update.feedURL?.lastPathComponent ?? "appcast.xml"
         updatesByAppcast[appcastFile, default: []].append(update)
+    }
+    
+    // If a (single) output filename was specified on the command-line, but more than one
+    // appcast file was found in the archives, then it's an error.
+    if let outputPathURL = outputPathURL, updatesByAppcast.count > 1 {
+        throw makeError(code: .appcastError, "Cannot write to \(outputPathURL.path): multiple appcasts found")
     }
     
     let group = DispatchGroup()
@@ -66,12 +66,13 @@ func makeAppcasts(archivesSourceDir: URL, outputPathURL: URL?, cacheDirectory ca
         
         let feedURL = outputPathURL ?? archivesSourceDir.appendingPathComponent(feed)
         
-        guard let reachable = try? feedURL.checkResourceIsReachable(), reachable else {
-            continue
+        // Find all the update versions & branches from our existing feed (if available)
+        let feedUpdateBranches: [UpdateVersion: UpdateBranch]
+        if let reachable = try? feedURL.checkResourceIsReachable(), reachable {
+            feedUpdateBranches = try readAppcast(archives: archivesTable, appcastURL: feedURL)
+        } else {
+            feedUpdateBranches = [:]
         }
-        
-        // Find all the update versions & branches from our existing feed
-        let feedUpdateBranches: [UpdateVersion: UpdateBranch] = try readAppcast(archives: archivesTable, appcastURL: feedURL)
         
         // Find which versions are new and old but aren't in the feed and that we should ignore/skip
         var ignoredVersionsToInsert: Set<UpdateVersion> = Set()
@@ -365,7 +366,7 @@ func makeAppcasts(archivesSourceDir: URL, outputPathURL: URL?, cacheDirectory ca
     return appcastByFeed
 }
 
-func moveOldUpdatesFromAppcast(archivesSourceDir: URL, oldFilesDirectory: URL, cacheDirectory: URL, appcast: Appcast, autoPruneUpdates: Bool) -> (movedCount: Int, prunedCount: Int) {
+func moveOldUpdatesFromAppcasts(archivesSourceDir: URL, oldFilesDirectory: URL, cacheDirectory: URL, appcasts: [Appcast], autoPruneUpdates: Bool) -> (movedCount: Int, prunedCount: Int) {
     let fileManager = FileManager.default
     let suFileManager = SUFileManager()
     
@@ -396,50 +397,52 @@ func moveOldUpdatesFromAppcast(archivesSourceDir: URL, oldFilesDirectory: URL, c
     var movedItemsCount = 0
     
     // Move aside all old unused update items
-    let versionsInFeedSet = Set(appcast.versionsInFeed)
-    for (version, update) in appcast.archives {
-        guard !versionsInFeedSet.contains(version) && !appcast.deltaFromVersionsUsed.contains(version) && !appcast.ignoredVersionsToInsert.contains(version) else {
-            continue
-        }
-        
-        let archivePath = update.archivePath
-        
-        guard makeOldFilesDirectory() else {
-            return (movedItemsCount, 0)
-        }
-        
-        do {
-            try suFileManager.updateModificationAndAccessTimeOfItem(at: archivePath)
-        } catch {
-            print("Warning: failed to update modification time for \(archivePath.path): \(error)")
-        }
-        
-        do {
-            try fileManager.moveItem(at: archivePath, to: oldFilesDirectory.appendingPathComponent(archivePath.lastPathComponent))
+    for appcast in appcasts {
+        let versionsInFeedSet = Set(appcast.versionsInFeed)
+        for (version, update) in appcast.archives {
+            guard !versionsInFeedSet.contains(version) && !appcast.deltaFromVersionsUsed.contains(version) && !appcast.ignoredVersionsToInsert.contains(version) else {
+                continue
+            }
             
-            movedItemsCount += 1
+            let archivePath = update.archivePath
             
-            // Remove cache for the update
-            let appCachePath = update.appPath.deletingLastPathComponent()
-            let _ = try? fileManager.removeItem(at: appCachePath)
-        } catch {
-            print("Warning: failed to move \(archivePath.lastPathComponent) to \(oldFilesDirectory.lastPathComponent): \(error)")
-        }
-        
-        let releaseNotesFile = archivePath.deletingPathExtension().appendingPathExtension("html")
-        if fileManager.fileExists(atPath: releaseNotesFile.path) {
-            do {
-                try suFileManager.updateModificationAndAccessTimeOfItem(at: releaseNotesFile)
-            } catch {
-                print("Warning: failed to update modification time for \(releaseNotesFile.path): \(error)")
+            guard makeOldFilesDirectory() else {
+                return (movedItemsCount, 0)
             }
             
             do {
-                try fileManager.moveItem(at: releaseNotesFile, to: oldFilesDirectory.appendingPathComponent(releaseNotesFile.lastPathComponent))
+                try suFileManager.updateModificationAndAccessTimeOfItem(at: archivePath)
+            } catch {
+                print("Warning: failed to update modification time for \(archivePath.path): \(error)")
+            }
+            
+            do {
+                try fileManager.moveItem(at: archivePath, to: oldFilesDirectory.appendingPathComponent(archivePath.lastPathComponent))
                 
                 movedItemsCount += 1
+                
+                // Remove cache for the update
+                let appCachePath = update.appPath.deletingLastPathComponent()
+                let _ = try? fileManager.removeItem(at: appCachePath)
             } catch {
-                print("Warning: failed to move \(releaseNotesFile.lastPathComponent) to \(oldFilesDirectory.lastPathComponent): \(error)")
+                print("Warning: failed to move \(archivePath.lastPathComponent) to \(oldFilesDirectory.lastPathComponent): \(error)")
+            }
+            
+            let releaseNotesFile = archivePath.deletingPathExtension().appendingPathExtension("html")
+            if fileManager.fileExists(atPath: releaseNotesFile.path) {
+                do {
+                    try suFileManager.updateModificationAndAccessTimeOfItem(at: releaseNotesFile)
+                } catch {
+                    print("Warning: failed to update modification time for \(releaseNotesFile.path): \(error)")
+                }
+                
+                do {
+                    try fileManager.moveItem(at: releaseNotesFile, to: oldFilesDirectory.appendingPathComponent(releaseNotesFile.lastPathComponent))
+                    
+                    movedItemsCount += 1
+                } catch {
+                    print("Warning: failed to move \(releaseNotesFile.lastPathComponent) to \(oldFilesDirectory.lastPathComponent): \(error)")
+                }
             }
         }
     }
@@ -455,8 +458,18 @@ func moveOldUpdatesFromAppcast(archivesSourceDir: URL, oldFilesDirectory: URL, c
             }
             
             let deltaURL = archivesSourceDir.appendingPathComponent(filename)
-            guard !appcast.deltaPathsUsed.contains(deltaURL.path) else {
-                continue
+            do {
+                var foundDeltaItemUsage = false
+                for appcast in appcasts {
+                    if appcast.deltaPathsUsed.contains(deltaURL.path) {
+                        foundDeltaItemUsage = true
+                        break
+                    }
+                }
+                
+                guard !foundDeltaItemUsage else {
+                    continue
+                }
             }
             
             guard makeOldFilesDirectory() else {
