@@ -19,6 +19,8 @@
 
 #include "AppKitPrevention.h"
 
+#define DELTA_EXPECTED_LOCALES_LIMIT 15
+
 static NSString *SUAppcastItemDeltaUpdatesKey = @"deltaUpdates";
 static NSString *SUAppcastItemDisplayVersionStringKey = @"displayVersionString";
 static NSString *SUAppcastItemSignaturesKey = @"signatures";
@@ -35,6 +37,8 @@ static NSString *SUAppcastItemVersionStringKey = @"versionString";
 static NSString *SUAppcastItemPropertiesKey = @"propertiesDictionary";
 static NSString *SUAppcastItemInstallationTypeKey = @"SUAppcastItemInstallationType";
 static NSString *SUAppcastItemStateKey = @"SUAppcastItemState";
+static NSString *SUAppcastItemDeltaFromSparkleExecutableSizeKey = @"SUAppcastItemDeltaFromSparkleExecutableSize";
+static NSString *SUAppcastItemDeltaFromSparkleLocalesKey = @"SUAppcastItemDeltaFromSparkleLocales";
 
 @interface SUAppcastItem ()
 
@@ -79,6 +83,8 @@ static NSString *SUAppcastItemStateKey = @"SUAppcastItemState";
 @synthesize hasCriticalInformation = _hasCriticalInformation;
 @synthesize informationalUpdateVersions = _informationalUpdateVersions;
 @synthesize channel = _channel;
+@synthesize deltaFromSparkleExecutableSize = _deltaFromSparkleExecutableSize;
+@synthesize deltaFromSparkleLocales = _deltaFromSparkleLocales;
 
 + (BOOL)supportsSecureCoding
 {
@@ -91,6 +97,9 @@ static NSString *SUAppcastItemStateKey = @"SUAppcastItemState";
     
     if (self != nil) {
         _deltaUpdates = [decoder decodeObjectOfClasses:[NSSet setWithArray:@[[NSDictionary class], [SUAppcastItem class]]] forKey:SUAppcastItemDeltaUpdatesKey];
+        _deltaFromSparkleExecutableSize = [decoder decodeObjectOfClass:[NSNumber class] forKey:SUAppcastItemDeltaFromSparkleExecutableSizeKey];
+        _deltaFromSparkleLocales = [decoder decodeObjectOfClasses:[NSSet setWithArray:@[[NSSet class], [NSString class]]] forKey:SUAppcastItemDeltaFromSparkleLocalesKey];
+        
         _displayVersionString = [(NSString *)[decoder decodeObjectOfClass:[NSString class] forKey:SUAppcastItemDisplayVersionStringKey] copy];
         _signatures = (SUSignatures *)[decoder decodeObjectOfClass:[SUSignatures class] forKey:SUAppcastItemSignaturesKey];
         _fileURL = [decoder decodeObjectOfClass:[NSURL class] forKey:SUAppcastItemFileURLKey];
@@ -149,6 +158,14 @@ static NSString *SUAppcastItemStateKey = @"SUAppcastItemState";
 {
     if (self.deltaUpdates != nil) {
         [encoder encodeObject:self.deltaUpdates forKey:SUAppcastItemDeltaUpdatesKey];
+    }
+    
+    if (self.deltaFromSparkleExecutableSize != nil) {
+        [encoder encodeObject:self.deltaFromSparkleExecutableSize forKey:SUAppcastItemDeltaFromSparkleExecutableSizeKey];
+    }
+    
+    if (self.deltaFromSparkleLocales != nil) {
+        [encoder encodeObject:self.deltaFromSparkleLocales forKey:SUAppcastItemDeltaFromSparkleLocalesKey];
     }
     
     if (self.displayVersionString != nil) {
@@ -554,6 +571,37 @@ static NSString *SUAppcastItemStateKey = @"SUAppcastItemState";
         }
         
         _installationType = [chosenInstallationType copy];
+        
+        NSString *enclosureDeltaSparkleExecutableSize = [enclosure objectForKey:SUAppcastAttributeDeltaFromSparkleExecutableSize];
+        if (enclosureDeltaSparkleExecutableSize != nil) {
+            long long sparkleExecutableSize = [enclosureDeltaSparkleExecutableSize longLongValue];
+            if (sparkleExecutableSize > 0) {
+                _deltaFromSparkleExecutableSize = @(sparkleExecutableSize);
+            }
+        }
+        
+        NSString *enclosureDeltaSparkleLocales = [enclosure objectForKey:SUAppcastAttributeDeltaFromSparkleLocales];
+        if (enclosureDeltaSparkleLocales != nil) {
+            NSMutableSet<NSString *> *expectedLocales = [NSMutableSet set];
+            
+            NSArray<NSString *> *locales = [enclosureDeltaSparkleLocales componentsSeparatedByString:@","];
+            NSUInteger localeIndex = 0;
+            for (NSString *locale in locales) {
+                if (locale.length != 0 && ![locale containsString:@"."] && ![locale containsString:@"/"]) {
+                    [expectedLocales addObject:locale];
+                    localeIndex++;
+                    
+                    // Place an upper limit on the number of locales we process
+                    if (localeIndex >= DELTA_EXPECTED_LOCALES_LIMIT) {
+                        break;
+                    }
+                } else {
+                    SULog(SULogLevelError, @"Ignoring expected delta locale '%@' because it contains a period or slash or is empty", locale);
+                }
+            }
+            
+            _deltaFromSparkleLocales = [expectedLocales copy];
+        }
 
         // Find the appropriate release notes URL.
         NSString *releaseNotesString = [dict objectForKey:SUAppcastElementReleaseNotesLink];

@@ -72,6 +72,8 @@ NSString *const SUNormalizeInstalledApplicationNameKey = @"SUNormalizeInstalledA
 NSString *const SURelaunchToolNameKey = @"SURelaunchToolName";
 
 NSString *const SUAppcastAttributeDeltaFrom = @"sparkle:deltaFrom";
+NSString *const SUAppcastAttributeDeltaFromSparkleExecutableSize = @"sparkle:deltaFromSparkleExecutableSize";
+NSString *const SUAppcastAttributeDeltaFromSparkleLocales = @"sparkle:deltaFromSparkleLocales";
 NSString *const SUAppcastAttributeDSASignature = @"sparkle:dsaSignature";
 NSString *const SUAppcastAttributeEDSignature = @"sparkle:edSignature";
 NSString *const SUAppcastAttributeShortVersionString = @"sparkle:shortVersionString";

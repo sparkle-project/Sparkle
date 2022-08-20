@@ -18,10 +18,14 @@ class DeltaUpdate {
     let archivePath: URL
     var dsaSignature: String?
     var edSignature: String?
+    let sparkleExecutableFileSize: Int?
+    let sparkleLocales: String?
 
-    init(fromVersion: String, archivePath: URL) {
+    init(fromVersion: String, archivePath: URL, sparkleExecutableFileSize: Int?, sparkleLocales: String?) {
         self.archivePath = archivePath
         self.fromVersion = fromVersion
+        self.sparkleExecutableFileSize = sparkleExecutableFileSize
+        self.sparkleLocales = sparkleLocales
     }
 
     var fileSize: Int64 {
@@ -51,7 +55,7 @@ class DeltaUpdate {
         
         let _ = try? fileManager.removeItem(at: tempApplyToPath)
 
-        return DeltaUpdate(fromVersion: from.version, archivePath: archivePath)
+        return DeltaUpdate(fromVersion: from.version, archivePath: archivePath, sparkleExecutableFileSize: from.sparkleExecutableFileSize, sparkleLocales: from.sparkleLocales)
     }
 }
 
@@ -61,6 +65,8 @@ class ArchiveItem: CustomStringConvertible {
     let _shortVersion: String?
     let minimumSystemVersion: String
     let frameworkVersion: String?
+    let sparkleExecutableFileSize: Int?
+    let sparkleLocales: String?
     let archivePath: URL
     let appPath: URL
     let feedURL: URL?
@@ -74,12 +80,14 @@ class ArchiveItem: CustomStringConvertible {
     var downloadUrlPrefix: URL?
     var releaseNotesURLPrefix: URL?
 
-    init(version: String, shortVersion: String?, feedURL: URL?, minimumSystemVersion: String?, frameworkVersion: String?, publicEdKey: String?, supportsDSA: Bool, appPath: URL, archivePath: URL) throws {
+    init(version: String, shortVersion: String?, feedURL: URL?, minimumSystemVersion: String?, frameworkVersion: String?, sparkleExecutableFileSize: Int?, sparkleLocales: String?, publicEdKey: String?, supportsDSA: Bool, appPath: URL, archivePath: URL) throws {
         self.version = version
         self._shortVersion = shortVersion
         self.feedURL = feedURL
         self.minimumSystemVersion = minimumSystemVersion ?? "10.13"
         self.frameworkVersion = frameworkVersion
+        self.sparkleExecutableFileSize = sparkleExecutableFileSize
+        self.sparkleLocales = sparkleLocales
         self.archivePath = archivePath
         self.appPath = appPath
         self.supportsDSA = supportsDSA
@@ -145,24 +153,83 @@ class ArchiveItem: CustomStringConvertible {
             }
             
             var frameworkVersion: String? = nil
+            let sparkleExecutableFileSize: Int?
+            let sparkleLocales: String?
             do {
                 let canonicalFrameworksURL = appPath.appendingPathComponent("Contents/Frameworks/Sparkle.framework")
                 
                 let frameworksURL: URL?
+                let usingLegacySparkleCore: Bool
                 if !FileManager.default.fileExists(atPath: canonicalFrameworksURL.path) {
                     // Try legacy SparkleCore framework that was shipping in early 2.0 betas
                     let sparkleCoreFrameworksURL = appPath.appendingPathComponent("Contents/Frameworks/SparkleCore.framework")
                     if FileManager.default.fileExists(atPath: sparkleCoreFrameworksURL.path) {
                         frameworksURL = sparkleCoreFrameworksURL
+                        usingLegacySparkleCore = true
                     } else {
                         frameworksURL = nil
+                        usingLegacySparkleCore = false
                     }
                 } else {
                     frameworksURL = canonicalFrameworksURL
+                    usingLegacySparkleCore = false
                 }
                 
-                if let frameworksURL = frameworksURL, let frameworkInfoPlist = NSDictionary(contentsOf: frameworksURL.appendingPathComponent("Resources/Info.plist")) {
-                    frameworkVersion = frameworkInfoPlist[kCFBundleVersionKey as String] as? String
+                if let frameworksURL = frameworksURL {
+                    let resourcesURL = frameworksURL.appendingPathComponent("Resources").resolvingSymlinksInPath()
+                    
+                    if let frameworkInfoPlist = NSDictionary(contentsOf: resourcesURL.appendingPathComponent("Info.plist")) {
+                        frameworkVersion = frameworkInfoPlist[kCFBundleVersionKey as String] as? String
+                    }
+                    
+                    let frameworkExecutableURL = frameworksURL.appendingPathComponent(!usingLegacySparkleCore ? "Sparkle" : "SparkleCore").resolvingSymlinksInPath()
+                    do {
+                        let resourceValues = try frameworkExecutableURL.resourceValues(forKeys: [.fileSizeKey])
+                        
+                        sparkleExecutableFileSize = resourceValues.fileSize
+                    } catch {
+                        sparkleExecutableFileSize = nil
+                    }
+                    
+                    do {
+                        let fileManager = FileManager.default
+                        let resourcesDirectoryContents = try fileManager.contentsOfDirectory(atPath: resourcesURL.path)
+                        let localeExtension = ".lproj"
+                        let localeExtensionCount = localeExtension.count
+                        let maxLocalesToProcess = 7
+                        var localesPresent: [String] = []
+                        var localeIndex = 0
+                        for filename in resourcesDirectoryContents {
+                            guard filename.hasSuffix(localeExtension) else {
+                                continue
+                            }
+                            
+                            // English and Base directories are the least likely to be stripped,
+                            // so let's not bother recording them.
+                            guard filename != "en" && filename != "Base" else {
+                                continue
+                            }
+                            
+                            let locale = String(filename.dropLast(localeExtensionCount))
+                            localesPresent.append(locale)
+                            localeIndex += 1
+                            
+                            if localeIndex >= maxLocalesToProcess {
+                                break
+                            }
+                        }
+                        
+                        if localesPresent.count > 0 {
+                            sparkleLocales = localesPresent.joined(separator: ",")
+                        } else {
+                            sparkleLocales = nil
+                        }
+                    } catch {
+                        sparkleLocales = nil
+                    }
+                } else {
+                    sparkleExecutableFileSize = nil
+                    sparkleLocales = nil
                 }
             }
 
@@ -171,6 +238,8 @@ class ArchiveItem: CustomStringConvertible {
                           feedURL: feedURL,
                           minimumSystemVersion: infoPlist["LSMinimumSystemVersion"] as? String,
                           frameworkVersion: frameworkVersion,
+                          sparkleExecutableFileSize: sparkleExecutableFileSize,
+                          sparkleLocales: sparkleLocales,
                           publicEdKey: publicEdKey,
                           supportsDSA: supportsDSA,
                           appPath: appPath,

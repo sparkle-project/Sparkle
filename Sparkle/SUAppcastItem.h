@@ -21,9 +21,6 @@
 #import <Sparkle/SUExport.h>
 #endif
 
-@class SUSignatures;
-@class SPUAppcastItemState;
-
 NS_ASSUME_NONNULL_BEGIN
 
 /**
@@ -335,6 +332,29 @@ SU_EXPORT @interface SUAppcastItem : NSObject<NSSecureCoding>
  This is extracted from the @c <sparkle:deltas> element.
  */
 @property (copy, readonly, nullable) NSDictionary<NSString *, SUAppcastItem *> *deltaUpdates;
+
+/**
+ The expected size of the Sparkle executable file before applying this delta update.
+ 
+ This attribute is used to test if the delta item can still be applied. If Sparkle's executable file has changed (e.g. from having an architecture stripped),
+ then the delta item cannot be applied.
+ 
+ This is extracted from the @c sparkle:deltaFromSparkleExecutableSize attribute from the @c <enclosure> element of a @c sparkle:deltas item.
+ This attribute is optional for delta update items.
+ */
+@property (nonatomic, readonly, nullable) NSNumber *deltaFromSparkleExecutableSize;
+
+/**
+ An expected set of Sparkle's locales present on disk before applying this delta update.
+ 
+ This attribute is used to test if the delta item can still be applied. If Sparkle's list of locales present on disk  (.lproj directories) do not contain any items from this set,
+ (e.g. from having localization files stripped) then the delta item cannot be applied. This set does not need to be a complete list of locales. Sparkle may even decide
+ to not process all them. 1-10 should be a decent amount.
+ 
+ This is extracted from the @c sparkle:deltaFromSparkleLocales attribute from the @c <enclosure> element of a @c sparkle:deltas item.
+ The locales extracted from this attribute are delimited by a comma (e.g. "en,ca,fr,hr,hu"). This attribute is optional for delta update items.
+ */
+@property (nonatomic, readonly, nullable) NSSet<NSString *> *deltaFromSparkleLocales;
 
 /**
  Indicates whether or not the update item is a delta update.

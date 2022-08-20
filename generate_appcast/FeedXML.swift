@@ -455,6 +455,15 @@ func writeAppcast(appcastDestPath: URL, appcast: Appcast, fullReleaseNotesLink: 
                     XMLNode.attribute(withName: "length", stringValue: String(delta.fileSize)) as! XMLNode,
                     XMLNode.attribute(withName: "type", stringValue: "application/octet-stream") as! XMLNode,
                     ]
+                
+                if let sparkleExecutableFileSize = delta.sparkleExecutableFileSize {
+                    attributes.append(XMLNode.attribute(withName: SUAppcastAttributeDeltaFromSparkleExecutableSize, stringValue: String(sparkleExecutableFileSize)) as! XMLNode)
+                }
+                
+                if let sparkleLocales = delta.sparkleLocales {
+                    attributes.append(XMLNode.attribute(withName: SUAppcastAttributeDeltaFromSparkleLocales, stringValue: sparkleLocales) as! XMLNode)
+                }
+                
                 if let sig = delta.edSignature {
                     attributes.append(XMLNode.attribute(withName: SUAppcastAttributeEDSignature, uri: sparkleNS, stringValue: sig) as! XMLNode)
                 }
