@@ -224,17 +224,33 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
     NSMutableArray<NSRunningApplication *> *matchedRunningApplications = [[NSMutableArray alloc] init];
     
     if (bundleIdentifier != nil && bundlePathComponents != nil) {
-        NSArray *runningApplications =
-        (bundleIdentifier != nil) ?
-        [NSRunningApplication runningApplicationsWithBundleIdentifier:bundleIdentifier] :
-        [[NSWorkspace sharedWorkspace] runningApplications];
+        NSArray *runningApplications = [NSRunningApplication runningApplicationsWithBundleIdentifier:bundleIdentifier];
+        
+        // If we find any running application that is translocated and looks like the bundle, we should record those too
+        // We will want to terminate those apps and observe their pids, but we will only do this if we don't find any regular matches
+        NSMutableArray<NSRunningApplication *> *potentialMatchingTranslocatedRunningApplications = [[NSMutableArray alloc] init];
         
         for (NSRunningApplication *runningApplication in runningApplications) {
             // Comparing the URLs hasn't worked well for me in practice, so I'm comparing the file paths instead
             NSString *candidatePath = runningApplication.bundleURL.URLByResolvingSymlinksInPath.path;
-            if (candidatePath != nil && [candidatePath.pathComponents isEqualToArray:bundlePathComponents]) {
-                [matchedRunningApplications addObject:runningApplication];
+            if (candidatePath != nil) {
+                NSArray<NSString *> *candidatePathComponents = candidatePath.pathComponents;
+                if ([candidatePathComponents isEqualToArray:bundlePathComponents]) {
+                    [matchedRunningApplications addObject:runningApplication];
+                } else if (matchedRunningApplications.count == 0 && candidatePathComponents.count > 0 && bundlePathComponents.count > 0) {
+                    NSString *lastBundlePathComponent = bundlePathComponents.lastObject;
+                    NSString *lastCandidatePathComponent = candidatePathComponents.lastObject;
+                    if (lastBundlePathComponent != nil && lastCandidatePathComponent != nil && [lastBundlePathComponent isEqualToString:lastCandidatePathComponent] && [candidatePathComponents containsObject:@"AppTranslocation"]) {
+                        [potentialMatchingTranslocatedRunningApplications addObject:runningApplication];
+                    }
+                }
             }
+        }
+        
+        // Non-translocated apps take priority first
+        // And we only use translocated version of apps if there are no regular apps matched
+        if (matchedRunningApplications.count == 0) {
+            [matchedRunningApplications addObjectsFromArray:potentialMatchingTranslocatedRunningApplications];
         }
     }
     
