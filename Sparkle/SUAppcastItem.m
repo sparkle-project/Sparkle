@@ -587,7 +587,7 @@ static NSString *SUAppcastItemDeltaFromSparkleLocalesKey = @"SUAppcastItemDeltaF
             NSArray<NSString *> *locales = [enclosureDeltaSparkleLocales componentsSeparatedByString:@","];
             NSUInteger localeIndex = 0;
             for (NSString *locale in locales) {
-                if (![locale containsString:@"."] && ![locale containsString:@"/"]) {
+                if (locale.length != 0 && ![locale containsString:@"."] && ![locale containsString:@"/"]) {
                     [expectedLocales addObject:locale];
                     localeIndex++;
                     
@@ -596,7 +596,7 @@ static NSString *SUAppcastItemDeltaFromSparkleLocalesKey = @"SUAppcastItemDeltaF
                         break;
                     }
                 } else {
-                    SULog(SULogLevelError, @"Ignoring expected delta locale '%@' because it contains a period or slash", locale);
+                    SULog(SULogLevelError, @"Ignoring expected delta locale '%@' because it contains a period or slash or is empty", locale);
                 }
             }
             
