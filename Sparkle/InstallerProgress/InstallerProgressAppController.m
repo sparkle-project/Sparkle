@@ -241,10 +241,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
                     NSString *lastBundlePathComponent = bundlePathComponents.lastObject;
                     NSString *lastCandidatePathComponent = candidatePathComponents.lastObject;
                     if (lastBundlePathComponent != nil && lastCandidatePathComponent != nil && [lastBundlePathComponent isEqualToString:lastCandidatePathComponent] && [candidatePathComponents containsObject:@"AppTranslocation"]) {
-                        NSString *runningApplicationBundleIdentifier = runningApplication.bundleIdentifier;
-                        if (runningApplicationBundleIdentifier != nil && [runningApplicationBundleIdentifier isEqualToString:bundleIdentifier]) {
-                            [potentialMatchingTranslocatedRunningApplications addObject:runningApplication];
-                        }
+                        [potentialMatchingTranslocatedRunningApplications addObject:runningApplication];
                     }
                 }
             }
