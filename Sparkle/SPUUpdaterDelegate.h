@@ -402,7 +402,7 @@ SU_EXPORT extern NSString *const SUSystemProfilerPreferredLanguageKey;
  
  @param updater The updater instance.
  @param item The appcast item corresponding to the update that is proposed to be installed.
- @param immediateInstallHandler The install handler for the delegate to immediately install the update. No UI interaction will be shown and the application will be relaunched after installation. This handler can only be used if @c YES is returned and the delegate handles installing the update. This handler can be invoked multiple times in case the application cancels the termination request.
+ @param immediateInstallHandler The install handler for the delegate to immediately install the update. No UI interaction will be shown and the application will be relaunched after installation. This handler can only be used if @c YES is returned and the delegate handles installing the update. For Sparkle 2.3 onwards, this handler can be invoked multiple times in case the application cancels the termination request.
  @return @c YES if the delegate will handle installing the update or @c NO if the updater should be given responsibility.
  */
 - (BOOL)updater:(SPUUpdater *)updater willInstallUpdateOnQuit:(SUAppcastItem *)item immediateInstallationBlock:(void (^)(void))immediateInstallHandler;
