@@ -444,7 +444,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
                 dispatch_async(self.installerQueue, ^{
                     if (!self.performedStage2Installation) {
                         [self performStage2Installation];
-                    } else {
+                    } else if (!self.performedStage3Installation) {
                         // If we already performed the 2nd stage, re-purpose this request to re-try sending another termination signal
                         dispatch_async(dispatch_get_main_queue(), ^{
                             // Don't check if the target is already terminated, leave that to the progress agent
