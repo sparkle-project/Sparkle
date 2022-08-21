@@ -221,7 +221,7 @@
     }
 }
 
-- (void)showInstallingUpdateWithApplicationTerminated:(BOOL)__unused applicationTerminated
+- (void)showInstallingUpdateWithApplicationTerminated:(BOOL)__unused applicationTerminated retryTerminatingApplication:(void (^)(void))__unused retryTerminatingApplication
 {
     if (self.verbose) {
         fprintf(stderr, "Installing Update...\n");

@@ -317,8 +317,19 @@
 
 - (void)installerDidStartInstallingWithApplicationTerminated:(BOOL)applicationTerminated
 {
-    if ([self.userDriver respondsToSelector:@selector(showInstallingUpdateWithApplicationTerminated:)]) {
+    if ([self.userDriver respondsToSelector:@selector(showInstallingUpdateWithApplicationTerminated:retryTerminatingApplication:)]) {
+        __weak __typeof__(self) weakSelf = self;
+        [self.userDriver showInstallingUpdateWithApplicationTerminated:applicationTerminated retryTerminatingApplication:^{
+            if (!applicationTerminated) {
+                __typeof__(self) strongSelf = weakSelf;
+                [strongSelf.coreDriver finishInstallationWithResponse:SPUUserUpdateChoiceInstall displayingUserInterface:YES];
+            }
+        }];
+    } else if ([self.userDriver respondsToSelector:@selector(showInstallingUpdateWithApplicationTerminated:)]) {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
         [self.userDriver showInstallingUpdateWithApplicationTerminated:applicationTerminated];
+#pragma clang diagnostic pop
     } else {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
