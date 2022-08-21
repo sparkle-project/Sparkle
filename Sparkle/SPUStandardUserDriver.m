@@ -59,6 +59,7 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
 
 @implementation SPUStandardUserDriver
 {
+    void (^_retryTerminatingApplication)(void);
     mach_timebase_info_data_t _timebaseInfo;
     double _timeSinceOpportuneUpdateNotice;
     id<NSObject> _applicationBecameActiveAfterUpdateAlertBecameKeyObserver;
@@ -447,6 +448,9 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
     } else if (self.checkingController != nil) {
         [self.checkingController showWindow:nil];
         mayNeedToActivateApp = YES;
+    } else if (_retryTerminatingApplication != nil) {
+        [self _showAndConfigureStatusControllerForReadyToInstallWithAction:@selector(retryTermination:) closable:YES];
+        mayNeedToActivateApp = YES;
     } else {
         mayNeedToActivateApp = NO;
     }
@@ -459,16 +463,21 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
 
 #pragma mark Install & Relaunch Update
 
-- (void)showReadyToInstallAndRelaunch:(void (^)(SPUUserUpdateChoice))installUpdateHandler
+- (void)_showAndConfigureStatusControllerForReadyToInstallWithAction:(SEL)selector closable:(BOOL)closable
 {
-    assert(NSThread.isMainThread);
-    
-    [self createAndShowStatusController];
+    [self createAndShowStatusControllerWithClosable:closable];
     
     [self.statusController beginActionWithTitle:SULocalizedString(@"Ready to Install", nil) maxProgressValue:1.0 statusText:nil];
     [self.statusController setProgressValue:1.0]; // Fill the bar.
     [self.statusController setButtonEnabled:YES];
-    [self.statusController setButtonTitle:SULocalizedString(@"Install and Relaunch", nil) target:self action:@selector(installAndRestart:) isDefault:YES];
+    [self.statusController setButtonTitle:SULocalizedString(@"Install and Relaunch", nil) target:self action:selector isDefault:YES];
+}
+
+- (void)showReadyToInstallAndRelaunch:(void (^)(SPUUserUpdateChoice))installUpdateHandler
+{
+    assert(NSThread.isMainThread);
+    
+    [self _showAndConfigureStatusControllerForReadyToInstallWithAction:@selector(installAndRestart:) closable:NO];
     
     [NSApp requestUserAttention:NSInformationalRequest];
     
@@ -483,6 +492,13 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
     }
 }
 
+- (void)retryTermination:(id)__unused sender
+{
+    if (_retryTerminatingApplication != nil) {
+        _retryTerminatingApplication();
+    }
+}
+
 #pragma mark Check for Updates
 
 - (void)showUserInitiatedUpdateCheckWithCancellation:(void (^)(void))cancellation
@@ -491,7 +507,7 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
     
     self.cancellation = cancellation;
     
-    self.checkingController = [[SUStatusController alloc] initWithHost:self.host centerPointValue:nil minimizable:NO];
+    self.checkingController = [[SUStatusController alloc] initWithHost:self.host centerPointValue:nil minimizable:NO closable:NO];
     [[self.checkingController window] center]; // Force the checking controller to load its window.
     [self.checkingController beginActionWithTitle:SULocalizedString(@"Checking for updates…", nil) maxProgressValue:0.0 statusText:nil];
     [self.checkingController setButtonTitle:SULocalizedString(@"Cancel", nil) target:self action:@selector(cancelCheckForUpdates:) isDefault:NO];
@@ -635,7 +651,7 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
 
 #pragma mark Download & Install Updates
 
-- (void)createAndShowStatusController
+- (void)createAndShowStatusControllerWithClosable:(BOOL)closable
 {
     if (self.statusController == nil) {
         // We will make the status window minimizable for regular app updates which are often
@@ -659,7 +675,7 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
             centerPointValue = nil;
         }
         
-        self.statusController = [[SUStatusController alloc] initWithHost:self.host centerPointValue:centerPointValue minimizable:minimizable];
+        self.statusController = [[SUStatusController alloc] initWithHost:self.host centerPointValue:centerPointValue minimizable:minimizable closable:closable];
         
         if (_updateAlertWindowWasInactive) {
             [self.statusController.window orderFront:nil];
@@ -675,7 +691,7 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
     
     self.cancellation = cancellation;
     
-    [self createAndShowStatusController];
+    [self createAndShowStatusControllerWithClosable:NO];
     
     [self.statusController beginActionWithTitle:SULocalizedString(@"Downloading update…", @"Take care not to overflow the status window.") maxProgressValue:1.0 statusText:nil];
     [self.statusController setProgressValue:0.0];
@@ -728,7 +744,7 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
     
     self.cancellation = nil;
     
-    [self createAndShowStatusController];
+    [self createAndShowStatusControllerWithClosable:NO];
     [self.statusController beginActionWithTitle:SULocalizedString(@"Extracting update…", @"Take care not to overflow the status window.") maxProgressValue:1.0 statusText:nil];
     [self.statusController setProgressValue:0.0];
     [self.statusController setButtonTitle:SULocalizedString(@"Cancel", nil) target:nil action:nil isDefault:NO];
@@ -742,11 +758,12 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
     [self.statusController setProgressValue:progress];
 }
 
-- (void)showInstallingUpdateWithApplicationTerminated:(BOOL)applicationTerminated
+- (void)showInstallingUpdateWithApplicationTerminated:(BOOL)applicationTerminated retryTerminatingApplication:(void (^)(void))retryTerminatingApplication
 {
     assert(NSThread.isMainThread);
     
     if (applicationTerminated) {
+        // Note this will only show up if -showReadyToInstallAndRelaunch: was called beforehand
         [self.statusController beginActionWithTitle:SULocalizedString(@"Installing update…", @"Take care not to overflow the status window.") maxProgressValue:0.0 statusText:nil];
         [self.statusController setButtonEnabled:NO];
     } else {
@@ -755,6 +772,9 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
         // We close our status window because we don't want it persisting for too long and have it obscure other windows
         [self.statusController close];
         self.statusController = nil;
+        
+        // Keep retry handler in case user tries to show update in focus again
+        _retryTerminatingApplication = [retryTerminatingApplication copy];
     }
 }
 
@@ -816,6 +836,7 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
     _updateReceivedUserAttention = NO;
     self.installUpdateHandler = nil;
     self.cancellation = nil;
+    _retryTerminatingApplication = nil;
     
     [self closeCheckingWindow];
     

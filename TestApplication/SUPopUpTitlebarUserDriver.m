@@ -251,7 +251,7 @@
     [self addUpdateButtonWithTitle:[NSString stringWithFormat:@"Extracting (%d%%)…", (int)(progress * 100)]];
 }
 
-- (void)showInstallingUpdateWithApplicationTerminated:(BOOL)applicationTerminated
+- (void)showInstallingUpdateWithApplicationTerminated:(BOOL)applicationTerminated retryTerminatingApplication:(void (^)(void))__unused retryTerminatingApplication
 {
     if (applicationTerminated) {
         [self addUpdateButtonWithTitle:@"Installing…"];

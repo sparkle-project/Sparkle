@@ -105,6 +105,8 @@ If the 2nd stage succeeds, the installer sends a `SPUInstallationFinishedStage2`
 
 The updater receives a `SPUInstallationFinishedStage2` message, and reads if the target application had already been terminated. If the target application has not already terminated, the updater tells the user driver to show that the application is being sent a termination request.
 
+In the case termination of the application is delayed or canceled, the user driver may re-try sending a `SPUResumeInstallationToStage2` message to the installer. This time the installer will recognize it already completed stage 2. If it hasn't proceeded onto stage 3 it will send another quit event to the application. This re-try can be done multiple times.
+
 ### Showing Progress
 
 When the target application is terminated, if the updater allowed the installer to show UI progress and the installation type doesn't show progress on its own (only interactive package installer shows progress on its own), then the installer sends a `SPUUpdaterAlivePing` message to the updater. If the updater is still alive by now and receives the message, the updater will then send back a `SPUUpdaterAlivePong` message. This lets the installer know that the updater is still active after the target application is terminated, and whether the installer should later be responsible for displaying updater progress or not if a short time passes by, and the installation is still not finished. If the updater is still not alive, then the installer should be responsible for showing progress if otherwise allowed.

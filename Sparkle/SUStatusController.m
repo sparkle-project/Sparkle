@@ -27,6 +27,7 @@ static NSString *const SUStatusControllerTouchBarIndentifier = @"" SPARKLE_BUNDL
 @implementation SUStatusController
 {
     NSValue *_centerPointValue;
+    BOOL _closable;
 }
 
 @synthesize progressValue;
@@ -41,7 +42,7 @@ static NSString *const SUStatusControllerTouchBarIndentifier = @"" SPARKLE_BUNDL
 @synthesize touchBarButton;
 @synthesize minimizable = _minimizable;
 
-- (instancetype)initWithHost:(SUHost *)aHost centerPointValue:(NSValue *)centerPointValue minimizable:(BOOL)minimizable
+- (instancetype)initWithHost:(SUHost *)aHost centerPointValue:(NSValue *)centerPointValue minimizable:(BOOL)minimizable closable:(BOOL)closable
 {
     self = [super initWithWindowNibName:@"SUStatus" owner:self];
 	if (self)
@@ -49,6 +50,7 @@ static NSString *const SUStatusControllerTouchBarIndentifier = @"" SPARKLE_BUNDL
         self.host = aHost;
         _centerPointValue = centerPointValue;
         _minimizable = minimizable;
+        _closable = closable;
         [self setShouldCascadeWindows:NO];
     }
     return self;
@@ -69,6 +71,9 @@ static NSString *const SUStatusControllerTouchBarIndentifier = @"" SPARKLE_BUNDL
     
     if (self.minimizable) {
         self.window.styleMask |= NSWindowStyleMaskMiniaturizable;
+    }
+    if (_closable) {
+        self.window.styleMask |= NSWindowStyleMaskClosable;
     }
     [self.progressBar setUsesThreadedAnimation:YES];
     [self.statusTextField setFont:[NSFont monospacedDigitSystemFontOfSize:0 weight:NSFontWeightRegular]];
