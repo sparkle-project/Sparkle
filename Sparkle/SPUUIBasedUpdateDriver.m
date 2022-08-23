@@ -321,8 +321,9 @@
         __weak __typeof__(self) weakSelf = self;
         [self.userDriver showInstallingUpdateWithApplicationTerminated:applicationTerminated retryTerminatingApplication:^{
             if (!applicationTerminated) {
-                __typeof__(self) strongSelf = weakSelf;
-                [strongSelf.coreDriver finishInstallationWithResponse:SPUUserUpdateChoiceInstall displayingUserInterface:YES];
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [weakSelf.coreDriver finishInstallationWithResponse:SPUUserUpdateChoiceInstall displayingUserInterface:YES];
+                });
             }
         }];
     } else if ([self.userDriver respondsToSelector:@selector(showInstallingUpdateWithApplicationTerminated:)]) {
