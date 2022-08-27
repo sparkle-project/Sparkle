@@ -11,7 +11,7 @@
 #import "SUFileManager.h"
 #import "SUTestWebServer.h"
 #import "TestAppHelperProtocol.h"
-#import "ed25519.h" // Run `git submodule update --init` if you get an error here
+#import "ed25519.h"
 #import <Sparkle/Sparkle.h>
 #import "SUPopUpTitlebarUserDriver.h"
 #import "SUBinaryDeltaCreate.h"
