@@ -107,40 +107,46 @@ if [ "$ACTION" = "" ] ; then
     rm -rf "/tmp/sparkle-extract"
     rm -rf "$CONFIGURATION_BUILD_DIR/staging"
 
-    # Generate zip containing the xcframework for SPM
-    rm -rf "/tmp/sparkle-spm-extract"
-    mkdir -p "/tmp/sparkle-spm-extract"
-    cd "$CONFIGURATION_BUILD_DIR/staging-spm"
-    # rm -rf "$CONFIGURATION_BUILD_DIR/Sparkle.xcarchive"
-    ditto -c -k --zlibCompressionLevel 9 --rsrc . "../Sparkle-for-Swift-Package-Manager.zip"
-
-    # Test code signing validity of the extracted Swift package
-    # This guards against our archives being corrupt / created incorrectly
-    ditto -x -k "../Sparkle-for-Swift-Package-Manager.zip" "/tmp/sparkle-spm-extract"
-    verify_code_signatures "/tmp/sparkle-spm-extract"
-
-    rm -rf "/tmp/sparkle-spm-extract"
-    rm -rf "$CONFIGURATION_BUILD_DIR/staging-spm"
-
     # Get latest git tag
     cd "$SRCROOT"
-    latest_git_tag=$(git describe --tags --abbrev=0)
+    latest_git_tag=$( git describe --tags --abbrev=0 || true )
 
-    # Check semantic versioning
-    if [[ $latest_git_tag =~ ^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-((0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*)(\.(0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*))*))?(\\+([0-9a-zA-Z-]+(\.[0-9a-zA-Z-]+)*))?$ ]]; then
-        echo "Tag $latest_git_tag follows semantic versioning"
-    else
-        echo "ERROR: Tag $latest_git_tag does not follow semantic versioning! SPM will not be able to resolve the repository" >&2
-        exit 1
-    fi
+    if [ -n "$latest_git_tag" ] ; then
+        # Generate zip containing the xcframework for SPM
+        rm -rf "/tmp/sparkle-spm-extract"
+        mkdir -p "/tmp/sparkle-spm-extract"
+        cd "$CONFIGURATION_BUILD_DIR/staging-spm"
+        # rm -rf "$CONFIGURATION_BUILD_DIR/Sparkle.xcarchive"
+        ditto -c -k --zlibCompressionLevel 9 --rsrc . "../Sparkle-for-Swift-Package-Manager.zip"
 
-    # Generate new Package manifest, podspec, and carthage files
-    cd "$CONFIGURATION_BUILD_DIR"
-    cp "$SRCROOT/Package.swift" "$CONFIGURATION_BUILD_DIR"
-    cp "$SRCROOT/Sparkle.podspec" "$CONFIGURATION_BUILD_DIR"
-    cp "$SRCROOT/Carthage-dev.json" "$CONFIGURATION_BUILD_DIR"
+        # Test code signing validity of the extracted Swift package
+        # This guards against our archives being corrupt / created incorrectly
+        ditto -x -k "../Sparkle-for-Swift-Package-Manager.zip" "/tmp/sparkle-spm-extract"
+        verify_code_signatures "/tmp/sparkle-spm-extract"
+
+        rm -rf "/tmp/sparkle-spm-extract"
+        rm -rf "$CONFIGURATION_BUILD_DIR/staging-spm"
+        
+        cd "$SRCROOT"
     
-    if [ "$XCODE_VERSION_MAJOR" -ge "1200" ]; then
+        # Check semantic versioning
+        if [[ $latest_git_tag =~ ^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-((0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*)(\.(0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*))*))?(\\+([0-9a-zA-Z-]+(\.[0-9a-zA-Z-]+)*))?$ ]]; then
+            echo "Tag $latest_git_tag follows semantic versioning"
+        else
+            echo "ERROR: Tag $latest_git_tag does not follow semantic versioning! SPM will not be able to resolve the repository" >&2
+            exit 1
+        fi
+        
+            # Generate new Package manifest, podspec, and carthage files
+        cd "$CONFIGURATION_BUILD_DIR"
+        cp "$SRCROOT/Package.swift" "$CONFIGURATION_BUILD_DIR"
+        cp "$SRCROOT/Sparkle.podspec" "$CONFIGURATION_BUILD_DIR"
+        cp "$SRCROOT/Carthage-dev.json" "$CONFIGURATION_BUILD_DIR"
+    fi
+    
+    if [ -z "$latest_git_tag" ] ; then
+        echo "warning: No git repository found so skipping updating package management files"
+    elif [ "$XCODE_VERSION_MAJOR" -ge "1200" ]; then
         # is equivalent to shasum -a 256 FILE
         spm_checksum=$(swift package compute-checksum "Sparkle-for-Swift-Package-Manager.zip")
         rm -rf ".build"

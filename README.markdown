@@ -37,13 +37,6 @@ Please visit [Sparkle's website](http://sparkle-project.org) for up to date docu
 
 See [getting started guide](https://sparkle-project.org/documentation/). No code is necessary, but a bit of Xcode configuration is required.
 
-## Development
-
-This repository uses git submodules, and will not build unless you clone recursively. Also, GitHub-provided ZIP/tar archives are broken due to GitHub not supporting git submodules properly.
-
-    git clone https://github.com/sparkle-project/Sparkle
-    git submodule update --init --recursive
-
 ### Troubleshooting
 
   * Please check **Console.app** for logs under your application. Sparkle prints detailed information there about all problems it encounters. It often also suggests solutions to the problems, so please read Sparkle's log messages carefully.
