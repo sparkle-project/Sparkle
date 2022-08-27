@@ -214,7 +214,7 @@ static char SUAppleQuarantineIdentifier[] = "com.apple.quarantine";
     return [_fileManager moveItemAtURL:sourceURL toURL:destinationURL error:error];
 }
 
-- (BOOL)swapItemAtURL:(NSURL *)originalItemURL withItemAtURL:(NSURL *)newItemURL error:(NSError * __autoreleasing *)error API_AVAILABLE(macos(10.13))
+- (BOOL)swapItemAtURL:(NSURL *)originalItemURL withItemAtURL:(NSURL *)newItemURL error:(NSError * __autoreleasing *)error
 {
     char originalPath[PATH_MAX] = {0};
     if (![originalItemURL.path getFileSystemRepresentation:originalPath maxLength:sizeof(originalPath)]) {
