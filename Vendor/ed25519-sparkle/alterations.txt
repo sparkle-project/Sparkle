@@ -1,0 +1,8 @@
+Files removed:
+ed25519_32.dll
+ed25519_64.dll
+test.c
+
+Retrieved source: git@github.com:sparkle-project/ed25519.git
+Branch: master
+Commit: 7fa6712ef5d581a6981ec2b08ee623314cd1d1c4
