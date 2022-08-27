@@ -2,7 +2,11 @@
 set -e
 
 # Convenience script to automatically commit Package.swift after updating the checksum and move the latest tag
-latest_git_tag=$(git describe --tags --abbrev=0) # gets the latest tag name
+latest_git_tag=$( git describe --tags --abbrev=0 || true ) # gets the latest tag name
+if [ -z "$latest_git_tag" ] ; then
+    exit 0
+fi
+
 commits_since_tag=$(git rev-list ${latest_git_tag}.. --count)
 
 function move_tag() {
