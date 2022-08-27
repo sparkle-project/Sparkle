@@ -17,7 +17,7 @@
 #import "SUSignatures.h"
 #import "SUErrors.h"
 #include <CommonCrypto/CommonDigest.h>
-#import "ed25519.h" // Run `git submodule update --init` if you get an error here
+#import "ed25519.h"
 
 
 #include "AppKitPrevention.h"
