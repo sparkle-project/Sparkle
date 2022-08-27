@@ -2357,7 +2357,7 @@
 				EA1E284422B660ED004AA304 /* ge.h */,
 			);
 			name = ed25519;
-			path = ed25519/src;
+			path = "ed25519-sparkle/src";
 			sourceTree = "<group>";
 		};
 		EA1E285F22B66487004AA304 /* generate_keys */ = {
