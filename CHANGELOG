@@ -1,3 +1,10 @@
+# 2.2.2
+
+* Critical update alerts may not show up as promptly as they should when they are being automatically installed (#2230) (Zorg)
+* Remove module imports from framework headers (#2217) (Zorg)
+* Update Portuguese localization (#2224) (Kent Sutherland)
+* Update zh_TW localization (#2246) (Chiahong)
+
 # 2.2.1
 
 * Make scroll bar dark in dark theme for Release Notes by default (#2187) (Pavel Moiseenko)
