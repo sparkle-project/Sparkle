@@ -33,7 +33,7 @@ jobs:
 
     steps:
       - name: "Checkout sources"
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           token: ${{ secrets.BOT_PERSONAL_ACCESS_TOKEN }}
           submodules: true
@@ -90,6 +90,7 @@ jobs:
         with:
           draft: true
           prerelease: ${{ env.PRERELEASE_VERSION }}
+          target_commitish: ${{ github.ref_name }}
           name: "${{ github.event.inputs.marketingVersion }}${{ github.event.inputs.prereleaseSuffix }}"
           tag_name: "${{ github.event.inputs.marketingVersion }}${{ github.event.inputs.prereleaseSuffix }}"
           fail_on_unmatched_files: true
