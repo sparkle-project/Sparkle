@@ -38,11 +38,6 @@ jobs:
           token: ${{ secrets.BOT_PERSONAL_ACCESS_TOKEN }}
           submodules: true
           fetch-depth: 0
-
-      - name: "Test ref"
-        run: |
-          echo "Ref: ${{ github.ref_name }}"
-          exit 1
           
       - name: "Extract latest changes from CHANGELOG"
         run: |
