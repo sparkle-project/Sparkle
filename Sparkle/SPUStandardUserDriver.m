@@ -48,6 +48,7 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
 @property (nonatomic, copy) void (^cancellation)(void);
 
 @property (nonatomic) SUStatusController *checkingController;
+// Note: we expose a private interface for activeUpdateAlert in SPUStandardUserDriver+Private.h as NSWindowController
 @property (nonatomic) SUUpdateAlert *activeUpdateAlert;
 @property (nonatomic) SUStatusController *statusController;
 @property (nonatomic) SUUpdatePermissionPrompt *permissionPrompt;
