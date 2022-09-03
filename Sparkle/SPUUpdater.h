@@ -25,7 +25,7 @@ NS_ASSUME_NONNULL_BEGIN
  
  Prefer to set initial properties in your bundle's Info.plist as described in [Customizing Sparkle](https://sparkle-project.org/documentation/customization/).
  
- Otherwise only if you need dynamic behavior for user preferences should you set properties on the updater such as:
+ Otherwise only if you need dynamic behavior for user settings should you set properties on the updater such as:
  - `automaticallyChecksForUpdates`
  - `updateCheckInterval`
  - `automaticallyDownloadsUpdates`
@@ -175,7 +175,9 @@ SU_EXPORT @interface SPUUpdater : NSObject
  this permission request is not performed however.
  
  Setting this property will persist in the host bundle's user defaults.
- Only set this property if the user wants to change the default via a user preferences option.
+ Hence developers shouldn't maintain an additional user default for this property.
+ Only set this property if the user wants to change the default via a user settings option.
+ Do not always set it on launch unless you want to ignore the user's preference.
  For testing environments, you can disable update checks by passing `-SUEnableAutomaticChecks NO`
  to your app's command line arguments instead of setting this property.
  
@@ -190,7 +192,9 @@ SU_EXPORT @interface SPUUpdater : NSObject
  Prefer to set SUScheduledCheckInterval directly in your Info.plist for setting the initial value.
  
  Setting this property will persist in the host bundle's user defaults.
- Only set this property if the user wants to change the default via a user preferences option.
+ Hence developers shouldn't maintain an additional user default for this property.
+ Only set this property if the user wants to change the default via a user settings option.
+ Do not always set it on launch unless you want to ignore the user's preference.
  
  The update schedule cycle will be reset in a short delay after the property's new value is set.
  This is to allow reverting this property without kicking off a schedule change immediately
@@ -202,12 +206,15 @@ SU_EXPORT @interface SPUUpdater : NSObject
  
  By default, updates are not automatically downloaded.
  
- Note that the developer can disallow automatic downloading of updates from being enabled.
+ Note that the developer can disallow automatic downloading of updates from being enabled (via `SUAllowsAutomaticUpdates` Info.plist key).
  In this case, this property will return NO regardless of how this property is set.
  
+ Prefer to set SUAutomaticallyUpdate directly in your Info.plist for setting the initial value.
+ 
  Setting this property will persist in the host bundle's user defaults.
- For this reason, only set this property if the user wants to change the default via a user preferences option.
- Otherwise prefer to set SUAutomaticallyUpdate directly in your Info.plist.
+ Hence developers shouldn't maintain an additional user default for this property.
+ Only set this property if the user wants to change the default via a user settings option.
+ Do not always set it on launch unless you want to ignore the user's preference.
  */
 @property (nonatomic) BOOL automaticallyDownloadsUpdates;
 
@@ -218,6 +225,9 @@ SU_EXPORT @interface SPUUpdater : NSObject
  Otherwise if the feed URL has been set before, the feed URL returned will be retrieved from the host bundle's user defaults.
  Otherwise the feed URL in the host bundle's Info.plist will be returned.
  If no feed URL can be retrieved, returns nil.
+ 
+ For setting a primary feed URL, please set the `SUFeedURL` property in your Info.plist.
+ For setting an alternative feed URL, please prefer `-[SPUUpdaterDelegate feedURLStringForUpdater:]` over `-setFeedURL:`
  
  This property must be called on the main thread; calls from background threads will return nil.
  */
@@ -282,7 +292,7 @@ SU_EXPORT @interface SPUUpdater : NSObject
 @property (nonatomic, readonly, copy, nullable) NSDate *lastUpdateCheckDate;
 
 /**
- Appropriately schedules or cancels the update checking timer according to the preferences for time interval and automatic checks.
+ Appropriately schedules or cancels the update checking timer according to the settings for the time interval and automatic checks.
 
  If you change the `updateCheckInterval` or `automaticallyChecksForUpdates` properties, the update cycle will be reset automatically after a short delay.
  The update cycle is also started automatically after the updater is started. In all these cases, this method should not be called directly.
