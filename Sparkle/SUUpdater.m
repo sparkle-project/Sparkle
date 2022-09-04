@@ -325,10 +325,10 @@ static NSMutableDictionary *sharedUpdaters = nil;
     }
 }
 
-- (void)updater:(SPUUpdater *)__unused updater userDidSkipThisVersion:(nonnull SUAppcastItem *)item
+- (void)updater:(SPUUpdater *)__unused updater userDidMakeChoice:(SPUUserUpdateChoice)choice forUpdate:(SUAppcastItem *)updateItem state:(SPUUserUpdateState *)__unused state
 {
-    if ([self.delegate respondsToSelector:@selector(updater:userDidSkipThisVersion:)]) {
-        [self.delegate updater:self userDidSkipThisVersion:item];
+    if (choice == SPUUserUpdateChoiceSkip && [self.delegate respondsToSelector:@selector(updater:userDidSkipThisVersion:)]) {
+        [self.delegate updater:self userDidSkipThisVersion:updateItem];
     }
 }
 
