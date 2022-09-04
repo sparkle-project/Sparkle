@@ -204,6 +204,15 @@
                 validatedChoice = userChoice;
             }
             
+            if ([self.updaterDelegate respondsToSelector:@selector(updater:userDidMakeChoice:forUpdate:state:)]) {
+                [self.updaterDelegate updater:self.updater userDidMakeChoice:validatedChoice forUpdate:updateItem state:state];
+            } else if (validatedChoice == SPUUserUpdateChoiceSkip && [self.updaterDelegate respondsToSelector:@selector(updater:userDidSkipThisVersion:)]) {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+                [self.updaterDelegate updater:self.updater userDidSkipThisVersion:updateItem];
+#pragma clang diagnostic pop
+            }
+            
             switch (validatedChoice) {
                 case SPUUserUpdateChoiceInstall: {
                     switch (stage) {
@@ -221,10 +230,6 @@
                 }
                 case SPUUserUpdateChoiceSkip: {
                     [SPUSkippedUpdate skipUpdate:updateItem host:self.host];
-                    
-                    if ([self.updaterDelegate respondsToSelector:@selector(updater:userDidSkipThisVersion:)]) {
-                        [self.updaterDelegate updater:self.updater userDidSkipThisVersion:updateItem];
-                    }
                     
                     switch (stage) {
                         case SPUUserUpdateStageDownloaded:

@@ -32,6 +32,9 @@
 #pragma clang diagnostic ignored "-Wdeprecated-implementations"
 @implementation SUUpdater
 #pragma clang diagnostic pop
+{
+    BOOL _delayShowingUserUpdate;
+}
 
 @synthesize updater = _updater;
 @synthesize delegate = _delegate;
@@ -198,7 +201,14 @@ static NSMutableDictionary *sharedUpdaters = nil;
 
 - (void)checkForUpdatesInBackground
 {
-    [self.updater checkForUpdatesInBackground];
+    if (_delayShowingUserUpdate) {
+        // We don't know if SUUpdater delegate will call checkForUpdates: or checkForUpdatesInBackground
+        // to bring a deffered update alert back in 1.x.
+        // So if checkForUpdatesInBackground is called we will bring the update back in focus
+        [self checkForUpdates:nil];
+    } else {
+        [self.updater checkForUpdatesInBackground];
+    }
 }
 
 - (NSDate *)lastUpdateCheckDate
@@ -228,7 +238,7 @@ static NSMutableDictionary *sharedUpdaters = nil;
         SULog(SULogLevelError, @"-[%@ installUpdatesIfAvailable] does not function anymore.. Instead a background scheduled update check will be done.", NSStringFromClass([self class]));
         
         self.loggedInstallUpdatesIfAvailableWarning = YES;
-        }
+    }
 
     [self checkForUpdatesInBackground];
 }
@@ -325,11 +335,40 @@ static NSMutableDictionary *sharedUpdaters = nil;
     }
 }
 
-- (void)updater:(SPUUpdater *)__unused updater userDidSkipThisVersion:(nonnull SUAppcastItem *)item
+- (void)updater:(SPUUpdater *)__unused updater userDidMakeChoice:(SPUUserUpdateChoice)choice forUpdate:(SUAppcastItem *)updateItem state:(SPUUserUpdateState *)__unused state
 {
-    if ([self.delegate respondsToSelector:@selector(updater:userDidSkipThisVersion:)]) {
-        [self.delegate updater:self userDidSkipThisVersion:item];
+    // This delegate callback matches 1.x behavior (even though -standardUserDriverWillFinishUpdateSession might be a better place for it)
+    if ([self.delegate respondsToSelector:@selector(updater:didDismissUpdateAlertPermanently:forItem:)]) {
+        [self.delegate updater:self didDismissUpdateAlertPermanently:(choice == SPUUserUpdateChoiceSkip) forItem:updateItem];
     }
+    
+    if (choice == SPUUserUpdateChoiceSkip && [self.delegate respondsToSelector:@selector(updater:userDidSkipThisVersion:)]) {
+        [self.delegate updater:self userDidSkipThisVersion:updateItem];
+    }
+}
+
+- (BOOL)standardUserDriverShouldHandleShowingScheduledUpdate:(SUAppcastItem *)update andInImmediateFocus:(BOOL)immediateFocus
+{
+    if ([self.delegate respondsToSelector:@selector(updaterShouldShowUpdateAlertForScheduledUpdate:forItem:)]) {
+        // If the delegate returns NO and tries to show the update before
+        // -standardUserDriverWillHandleShowingUpdate:forUpdate:state: is called, this is technically
+        // a violation. However it is also unlikely to happen.
+        return [self.delegate updaterShouldShowUpdateAlertForScheduledUpdate:self forItem:update];
+    } else {
+        return YES;
+    }
+}
+
+- (void)standardUserDriverWillHandleShowingUpdate:(BOOL)handleShowingUpdate forUpdate:(SUAppcastItem *)update state:(SPUUserUpdateState *)state
+{
+    if (!handleShowingUpdate) {
+        _delayShowingUserUpdate = YES;
+    }
+}
+
+- (void)standardUserDriverWillFinishUpdateSession
+{
+    _delayShowingUserUpdate = NO;
 }
 
 - (void)updater:(SPUUpdater *)__unused updater willDownloadUpdate:(SUAppcastItem *)item withRequest:(NSMutableURLRequest *)request
