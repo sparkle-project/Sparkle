@@ -90,7 +90,16 @@ struct GenerateAppcast: ParsableCommand {
     @Option(name: .long, help: ArgumentHelp("An optional comma delimited list of application versions (specified by CFBundleVersion) to generate new update items for. By default, new update items are inferred from the available archives and current feed. Use this option if you need to insert only a specific new version or insert an old update in the feed at a different branch point (e.g. with a different minimum OS version or channel).", valueName: "versions"), transform: { Set($0.components(separatedBy: ",")) })
     var versions: Set<String>?
     
-    @Option(name: .long, help: ArgumentHelp("The maximum number of delta items to create for the latest update for each branch point (for example with a different minimum OS requirement).", valueName: "maximum-deltas"))
+    @Option(name: .customLong("maximum-versions"), help: ArgumentHelp("The maximum number of versions to preserve in the generated appcast for each branch point (e.g. with a different minimum OS requirement). If this value is 0, then all items in the appcast are preserved.", valueName: "maximum-versions"), transform: { value -> Int in
+        if let intValue = Int(value) {
+            return (intValue <= 0) ? Int.max : intValue
+        } else {
+            return DEFAULT_MAX_VERSIONS_PER_BRANCH_IN_FEED
+        }
+    })
+    var maxVersionsPerBranchInFeed: Int = DEFAULT_MAX_VERSIONS_PER_BRANCH_IN_FEED
+    
+    @Option(name: .long, help: ArgumentHelp("The maximum number of delta items to create for the latest update for each branch point (e.g. with a different minimum OS requirement).", valueName: "maximum-deltas"))
     var maximumDeltas: Int = DEFAULT_MAXIMUM_DELTAS
     
     @Option(name: .long, help: ArgumentHelp(COMPRESSION_METHOD_ARGUMENT_DESCRIPTION, valueName: "delta-compression"))
@@ -125,11 +134,6 @@ struct GenerateAppcast: ParsableCommand {
     
     @Argument(help: "The path to the directory containing the update archives and delta files.", transform: { URL(fileURLWithPath: $0, isDirectory: true) })
     var archivesSourceDir: URL
-    
-    // Rough indication of how many versions we should keep in the feed per branch point
-    // Keep this option hidden from the user
-    @Option(name: .long, help: .hidden)
-    var maxVersionsPerBranchInFeed: Int = DEFAULT_MAX_VERSIONS_PER_BRANCH_IN_FEED
     
     @Flag(help: .hidden)
     var verbose: Bool = false
