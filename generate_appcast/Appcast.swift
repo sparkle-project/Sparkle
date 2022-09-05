@@ -138,20 +138,23 @@ func makeAppcasts(archivesSourceDir: URL, outputPathURL: URL?, cacheDirectory ca
                 updatesGroupedByBranch[branch] = Array(versions.sorted(by: descendingVersionComparator).prefix(maxVersionsPerBranchInFeed))
             }
             
-            // Remove extraneous versions for branches that have converged
-            for (branch, versions) in updatesGroupedByBranch {
-                guard branch.channel != nil else {
-                    continue
-                }
-                
-                let defaultChannelBranch = UpdateBranch(minimumSystemVersion: branch.minimumSystemVersion, maximumSystemVersion: branch.maximumSystemVersion, minimumAutoupdateVersion: branch.minimumAutoupdateVersion, channel: nil)
-                
-                guard let defaultChannelVersions = updatesGroupedByBranch[defaultChannelBranch] else {
-                    continue
-                }
-                
-                if descendingVersionComparator(defaultChannelVersions[0], versions[0]) {
-                    updatesGroupedByBranch[branch] = [versions[0]]
+            // Remove extraneous versions for branches that have converged,
+            // as long as the user doesn't opt into keeping all versions in the feed
+            if maxVersionsPerBranchInFeed < Int.max {
+                for (branch, versions) in updatesGroupedByBranch {
+                    guard branch.channel != nil else {
+                        continue
+                    }
+                    
+                    let defaultChannelBranch = UpdateBranch(minimumSystemVersion: branch.minimumSystemVersion, maximumSystemVersion: branch.maximumSystemVersion, minimumAutoupdateVersion: branch.minimumAutoupdateVersion, channel: nil)
+                    
+                    guard let defaultChannelVersions = updatesGroupedByBranch[defaultChannelBranch] else {
+                        continue
+                    }
+                    
+                    if descendingVersionComparator(defaultChannelVersions[0], versions[0]) {
+                        updatesGroupedByBranch[branch] = [versions[0]]
+                    }
                 }
             }
             
