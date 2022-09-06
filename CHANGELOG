@@ -1,3 +1,31 @@
+# 2.3.0
+
+* Bump minimum deployment target to macOS 10.13 (#2196) (Zorg)
+* Remove and preserve necessary updates in generate_appcast (#2218) (Zorg)
+* Move old update files no longer needed to old_updates/ in archive directory in generate_appcast (#2228) (Zorg)
+* Expose maximum-versions option (per branch) in generate_appcast to preserve in the feed (#2259) (Zorg)
+* Hide automatic install check box when allowsAutomaticUpdates is disabled (#2202) (Jie)
+* Fix update window going haywire during resize when release notes are hidden by disabling resizing (#2200) (Zorg)
+* Allow user to re-try installing/relaunching application when quit is delayed/cancelled (#2234) (Zorg)
+* Add delta update attributes for validating an app hasn't been stripped from removed localizations or architectures (#2219) (Zorg)
+* Fix delta patches not applying edge case if files from source that need to be diffed are not writeable (#2211) (Zorg)
+* Add delegate callback when user makes choice to install, dismiss, or skip an update (#2250) (Zorg)
+* Reject serving updates with DSA only and no EdDSA (#2167) (Zorg)
+* Find potential matching running apps that are translocated in the updater agent (#2233) (Zorg)
+* Expose -[SPUStandardUserDriver activeUpdateAlert] as private API (#2255) (Zorg)
+* Add zh_CN l10n for "Version History" (#2247) (kakaiikaka)
+* Remove ed25519 git submodule in favor of including the dependency directly (#2244) (Zorg)
+* Clean up left-over code (#2243) (Eitot)
+* Update Package.resolved (#2245) (Zorg)
+* Remove model translation table for system profiling (#2188) (Zorg)
+* Improve documentation usage for SPUUpdater properties (#2256) (Zorg)
+
+This release improves generate_appcast by automatically removing updates that are no longer needed in the generated appcast, and moving old update files to old_updates/ in the archives directory. New delta update attributes are also added to let Sparkle know when to skip downloading delta updates if the application has been stripped.
+
+macOS 10.13 or later is now required (due to Xcode 14 dropping support for deploying to older OS versions).
+
+If you're not generating appcasts automatically, remember to add `<sparkle:minimumSystemVersion>10.13</sparkle:minimumSystemVersion>` element to `<item>`s in your appcast.
+
 # 2.2.2
 
 * Critical update alerts may not show up as promptly as they should when they are being automatically installed (#2230) (Zorg)
