@@ -98,7 +98,18 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
         _didBecomeKeyBlock = [didBecomeKeyBlock copy];
         
         SPUUpdaterSettings *updaterSettings = [[SPUUpdaterSettings alloc] initWithHostBundle:host.bundle];
-        _allowsAutomaticUpdates = updaterSettings.allowsAutomaticUpdates && updaterSettings.automaticallyChecksForUpdates && !item.informationOnlyUpdate;
+        
+        BOOL allowsAutomaticUpdates;
+        NSNumber *allowsAutomaticUpdatesOption = updaterSettings.allowsAutomaticUpdatesOption;
+        if (item.informationOnlyUpdate) {
+            allowsAutomaticUpdates = NO;
+        } else if (allowsAutomaticUpdatesOption == nil) {
+            allowsAutomaticUpdates = updaterSettings.automaticallyChecksForUpdates;
+        } else {
+            allowsAutomaticUpdates = allowsAutomaticUpdatesOption.boolValue;
+        }
+        _allowsAutomaticUpdates = allowsAutomaticUpdates;
+        
         [self setShouldCascadeWindows:NO];
     } else {
         assert(false);
