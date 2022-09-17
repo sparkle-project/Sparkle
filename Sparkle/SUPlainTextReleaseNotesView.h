@@ -1,5 +1,5 @@
 //
-//  SUNoWebView.h
+//  SUPlainTextReleaseNotesView.h
 //  Sparkle
 //
 //  Created on 9/11/22.
@@ -10,11 +10,11 @@
 
 #import <Foundation/Foundation.h>
 
-#import "SUWebView.h"
+#import "SUReleaseNotesView.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface SUNoWebView : NSObject <SUWebView>
+@interface SUPlainTextReleaseNotesView : NSObject <SUReleaseNotesView>
 
 - (instancetype)initWithFontFamily:(NSString *)fontFamily fontPointSize:(int)fontPointSize;
 

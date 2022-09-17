@@ -1,5 +1,5 @@
 //
-//  SUWebView.h
+//  SUReleaseNotesView.h
 //  Sparkle
 //
 //  Created by Mayur Pawashe on 12/30/20.
@@ -14,7 +14,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@protocol SUWebView <NSObject>
+@protocol SUReleaseNotesView <NSObject>
 
 @property (nonatomic, readonly) NSView *view;
 

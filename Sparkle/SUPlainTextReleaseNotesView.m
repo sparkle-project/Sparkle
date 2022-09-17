@@ -1,5 +1,5 @@
 //
-//  SUNoWebView.m
+//  SUPlainReleaseNotesView.m
 //  Sparkle
 //
 //  Created on 9/11/22.
@@ -8,17 +8,17 @@
 
 #if SPARKLE_BUILD_UI_BITS
 
-#import "SUNoWebView.h"
-#import "SUWebViewCommon.h"
+#import "SUPlainTextReleaseNotesView.h"
+#import "SUReleaseNotesCommon.h"
 #import "SULog.h"
 #import "SUErrors.h"
 
 #import <AppKit/AppKit.h>
 
-@interface SUNoWebView () <NSTextViewDelegate>
+@interface SUPlainTextReleaseNotesView () <NSTextViewDelegate>
 @end
 
-@implementation SUNoWebView
+@implementation SUPlainTextReleaseNotesView
 {
     NSScrollView *_scrollView;
     NSTextView *_textView;
@@ -155,7 +155,7 @@
     }
     
     BOOL isAboutBlankURL;
-    if (!SUWebViewIsSafeURL(linkURL, &isAboutBlankURL)) {
+    if (!SUReleaseNotesIsSafeURL(linkURL, &isAboutBlankURL)) {
         SULog(SULogLevelDefault, @"Blocked display of %@ URL which may be dangerous", linkURL.scheme);
         return YES;
     }

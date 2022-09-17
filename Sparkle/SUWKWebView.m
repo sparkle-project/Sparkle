@@ -9,7 +9,7 @@
 #if SPARKLE_BUILD_UI_BITS
 
 #import "SUWKWebView.h"
-#import "SUWebViewCommon.h"
+#import "SUReleaseNotesCommon.h"
 #import "SULog.h"
 #import "SUErrors.h"
 #import <WebKit/WebKit.h>
@@ -182,7 +182,7 @@ static WKUserScript *_userScriptWithInjectedStyleSource(NSString *styleSource)
     NSURLRequest *request = navigationAction.request;
     NSURL *requestURL = request.URL;
     BOOL isAboutBlank = NO;
-    BOOL safeURL = SUWebViewIsSafeURL(requestURL, &isAboutBlank);
+    BOOL safeURL = SUReleaseNotesIsSafeURL(requestURL, &isAboutBlank);
     
     // Do not allow redirects to dangerous protocols such as file://
     if (!safeURL) {

@@ -9,11 +9,11 @@
 #if SPARKLE_BUILD_UI_BITS
 
 #import <Foundation/Foundation.h>
-#import "SUWebView.h"
+#import "SUReleaseNotesView.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface SULegacyWebView : NSObject <SUWebView>
+@interface SULegacyWebView : NSObject <SUReleaseNotesView>
 
 - (instancetype)initWithColorStyleSheetLocation:(NSURL *)colorStyleSheetLocation fontFamily:(NSString *)fontFamily fontPointSize:(int)fontPointSize javaScriptEnabled:(BOOL)javaScriptEnabled;
 

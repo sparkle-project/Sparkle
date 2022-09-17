@@ -15,10 +15,10 @@
 #import "SUUpdateAlert.h"
 
 #import "SUHost.h"
-#import "SUWebView.h"
+#import "SUReleaseNotesView.h"
 #import "SUWKWebView.h"
 #import "SULegacyWebView.h"
-#import "SUNoWebView.h"
+#import "SUPlainTextReleaseNotesView.h"
 
 #import "SUConstants.h"
 #import "SULog.h"
@@ -54,7 +54,7 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 @property (strong) NSBox *darkBackgroundView;
 @property (assign) BOOL observingAppearance;
 
-@property (nonatomic) id<SUWebView> webView;
+@property (nonatomic) id<SUReleaseNotesView> releaseNotesView;
 
 @end
 
@@ -84,7 +84,7 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 @synthesize darkBackgroundView = _darkBackgroundView;
 @synthesize observingAppearance;
 
-@synthesize webView = _webView;
+@synthesize releaseNotesView = _releaseNotesView;
 
 - (instancetype)initWithAppcastItem:(SUAppcastItem *)item state:(SPUUserUpdateState *)state host:(SUHost *)aHost versionDisplayer:(id <SUVersionDisplay>)aVersionDisplayer completionBlock:(void (^)(SPUUserUpdateChoice, NSRect, BOOL))completionBlock didBecomeKeyBlock:(void (^)(void))didBecomeKeyBlock
 {
@@ -131,8 +131,8 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 
 - (void)endWithSelection:(SPUUserUpdateChoice)choice
 {
-    [self.webView stopLoading];
-    [self.webView.view removeFromSuperview]; // Otherwise it gets sent Esc presses (why?!) and gets very confused.
+    [self.releaseNotesView stopLoading];
+    [self.releaseNotesView.view removeFromSuperview]; // Otherwise it gets sent Esc presses (why?!) and gets very confused.
     
     BOOL wasKeyWindow = self.window.keyWindow;
     NSRect windowFrame = self.window.frame;
@@ -176,17 +176,17 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 
     if (@available(macOS 10.14, *)) {
         if (!self.observingAppearance) {
-            [self.webView.view addObserver:self forKeyPath:@"effectiveAppearance" options:0 context:nil];
+            [self.releaseNotesView.view addObserver:self forKeyPath:@"effectiveAppearance" options:0 context:nil];
             self.observingAppearance = YES;
         }
     }
     
     // Stick a nice big spinner in the middle of the web view until the page is loaded.
-    NSRect frame = [[self.webView.view superview] frame];
+    NSRect frame = [[self.releaseNotesView.view superview] frame];
     self.releaseNotesSpinner = [[NSProgressIndicator alloc] initWithFrame:NSMakeRect(NSMidX(frame) - 16, NSMidY(frame) - 16, 32, 32)];
     [self.releaseNotesSpinner setStyle:NSProgressIndicatorStyleSpinning];
     [self.releaseNotesSpinner startAnimation:self];
-    [[self.webView.view superview] addSubview:self.releaseNotesSpinner];
+    [[self.releaseNotesView.view superview] addSubview:self.releaseNotesSpinner];
     
     // If there's no release notes URL, just stick the contents of the description into the web view
     // Otherwise we'll wait until the client wants us to show release notes
@@ -195,7 +195,7 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
         NSString *itemDescription = self.updateItem.itemDescription;
         if (itemDescription != nil) {
             __weak __typeof__(self) weakSelf = self;
-            [self.webView loadHTMLString:itemDescription baseURL:nil completionHandler:^(NSError * _Nullable error) {
+            [self.releaseNotesView loadHTMLString:itemDescription baseURL:nil completionHandler:^(NSError * _Nullable error) {
                 if (error != nil) {
                     SULog(SULogLevelError, @"Failed to load HTML string from web view: %@", error);
                 }
@@ -207,7 +207,7 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(__attribute__((unused)) NSDictionary<NSKeyValueChangeKey,id> *)change context:(__attribute__((unused)) void *)context {
     if (@available(macOS 10.14, *)) {
-        if (object == self.webView.view && [keyPath isEqualToString:@"effectiveAppearance"]) {
+        if (object == self.releaseNotesView.view && [keyPath isEqualToString:@"effectiveAppearance"]) {
             [self adaptReleaseNotesAppearance];
         }
     }
@@ -216,7 +216,7 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 - (void)dealloc {
     if (@available(macOS 10.14, *)) {
         if (self.observingAppearance) {
-            [self.webView.view removeObserver:self forKeyPath:@"effectiveAppearance"];
+            [self.releaseNotesView.view removeObserver:self forKeyPath:@"effectiveAppearance"];
             self.observingAppearance = NO;
         }
     }
@@ -226,21 +226,21 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 {
     if (@available(macOS 10.14, *))
     {
-        NSAppearanceName bestAppearance = [self.webView.view.effectiveAppearance bestMatchFromAppearancesWithNames:@[NSAppearanceNameAqua, NSAppearanceNameDarkAqua]];
+        NSAppearanceName bestAppearance = [self.releaseNotesView.view.effectiveAppearance bestMatchFromAppearancesWithNames:@[NSAppearanceNameAqua, NSAppearanceNameDarkAqua]];
         if ([bestAppearance isEqualToString:NSAppearanceNameDarkAqua])
         {
             // Remove web view background...
-            [self.webView setDrawsBackground:NO];
+            [self.releaseNotesView setDrawsBackground:NO];
             // ... and use NSBox to get the dynamically colored background
             if (self.darkBackgroundView == nil)
             {
-                self.darkBackgroundView = [[NSBox alloc] initWithFrame:self.webView.view.frame];
+                self.darkBackgroundView = [[NSBox alloc] initWithFrame:self.releaseNotesView.view.frame];
                 self.darkBackgroundView.boxType = NSBoxCustom;
                 self.darkBackgroundView.fillColor = [NSColor textBackgroundColor];
                 self.darkBackgroundView.borderColor = [NSColor clearColor];
                 // Using auto-resizing mask instead of contraints works well enough
                 self.darkBackgroundView.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
-                [self.webView.view.superview addSubview:self.darkBackgroundView positioned:NSWindowBelow relativeTo:self.webView.view];
+                [self.releaseNotesView.view.superview addSubview:self.darkBackgroundView positioned:NSWindowBelow relativeTo:self.releaseNotesView.view];
                 
                 // The release note user stylesheet will not adjust to the user changing the theme until adaptReleaseNoteAppearance is called again.
                 // So lock the appearance of the background to keep the text readable if the system theme changes.
@@ -252,7 +252,7 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
             // Restore standard dark on light appearance
             [self.darkBackgroundView removeFromSuperview];
             self.darkBackgroundView = nil;
-            [self.webView setDrawsBackground:YES];
+            [self.releaseNotesView setDrawsBackground:YES];
         }
     }
 }
@@ -266,7 +266,7 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
     NSString *chosenTextEncodingName = (downloadData.textEncodingName != nil) ? downloadData.textEncodingName : @"utf-8";
     
     __weak __typeof__(self) weakSelf = self;
-    [self.webView loadData:downloadData.data MIMEType:chosenMIMEType textEncodingName:chosenTextEncodingName baseURL:baseURL completionHandler:^(NSError * _Nullable error) {
+    [self.releaseNotesView loadData:downloadData.data MIMEType:chosenMIMEType textEncodingName:chosenTextEncodingName baseURL:baseURL completionHandler:^(NSError * _Nullable error) {
         if (error != nil) {
             SULog(SULogLevelError, @"Failed to load data from web view: %@", error);
         }
@@ -319,7 +319,7 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
         }
         
         if (isCatalystApp) {
-            self.webView = [[SUNoWebView alloc] initWithFontFamily:defaultFontFamily fontPointSize:defaultFontSize];
+            self.releaseNotesView = [[SUPlainTextReleaseNotesView alloc] initWithFontFamily:defaultFontFamily fontPointSize:defaultFontSize];
         } else {
             NSURL *colorStyleURL = [[NSBundle bundleForClass:[self class]] URLForResource:@"ReleaseNotesColorStyle" withExtension:@"css"];
             
@@ -333,17 +333,17 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
             BOOL useWKWebView = !SPUXPCServiceIsEnabled(SUEnableDownloaderServiceKey);
             
             if (useWKWebView) {
-                self.webView = [[SUWKWebView alloc] initWithColorStyleSheetLocation:colorStyleURL fontFamily:defaultFontFamily fontPointSize:defaultFontSize javaScriptEnabled:javaScriptEnabled];
+                self.releaseNotesView = [[SUWKWebView alloc] initWithColorStyleSheetLocation:colorStyleURL fontFamily:defaultFontFamily fontPointSize:defaultFontSize javaScriptEnabled:javaScriptEnabled];
             } else {
-                self.webView = [[SULegacyWebView alloc] initWithColorStyleSheetLocation:colorStyleURL fontFamily:defaultFontFamily fontPointSize:defaultFontSize javaScriptEnabled:javaScriptEnabled];
+                self.releaseNotesView = [[SULegacyWebView alloc] initWithColorStyleSheetLocation:colorStyleURL fontFamily:defaultFontFamily fontPointSize:defaultFontSize javaScriptEnabled:javaScriptEnabled];
             }
         }
         
         NSView *boxContentView = self.releaseNotesBoxView.contentView;
-        [boxContentView addSubview:self.webView.view];
+        [boxContentView addSubview:self.releaseNotesView.view];
         
-        self.webView.view.frame = boxContentView.bounds;
-        self.webView.view.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
+        self.releaseNotesView.view.frame = boxContentView.bounds;
+        self.releaseNotesView.view.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
     } else {
         // Update alert should not be resizable when no release notes are available
         self.window.styleMask &= ~NSWindowStyleMaskResizable;
