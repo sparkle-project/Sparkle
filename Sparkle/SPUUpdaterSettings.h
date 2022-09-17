@@ -33,6 +33,12 @@ SU_EXPORT @interface SPUUpdaterSettings : NSObject
 
 /**
  * Indicates whether or not automatically downloading updates is allowed to be turned on by the user.
+ * If this value is nil, the developer has not explicitly specified this option.
+ */
+@property (readonly, nonatomic, nullable) NSNumber *allowsAutomaticUpdatesOption;
+
+/**
+ * Indicates whether or not automatically downloading updates is allowed to be turned on by the user.
  */
 @property (readonly, nonatomic) BOOL allowsAutomaticUpdates;
 

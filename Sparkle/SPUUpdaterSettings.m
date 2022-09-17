@@ -52,9 +52,15 @@
 }
 
 // For allowing automatic downloaded updates to be turned on or off
-- (BOOL)allowsAutomaticUpdates
+- (NSNumber * _Nullable)allowsAutomaticUpdatesOption
 {
     NSNumber *developerAllowsAutomaticUpdates = [self.host objectForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey];
+    return [developerAllowsAutomaticUpdates isKindOfClass:[NSNumber class]] ? developerAllowsAutomaticUpdates : nil;
+}
+
+- (BOOL)allowsAutomaticUpdates
+{
+    NSNumber *developerAllowsAutomaticUpdates = [self allowsAutomaticUpdatesOption];
     return (developerAllowsAutomaticUpdates == nil || developerAllowsAutomaticUpdates.boolValue);
 }
 
