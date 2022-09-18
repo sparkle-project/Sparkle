@@ -91,6 +91,9 @@ struct SignUpdate: ParsableCommand {
     @Option(name: [.customShort("f"), .customLong("ed-key-file")], help: ArgumentHelp("Path to the file containing the private EdDSA (ed25519) key. '-' can be used to echo the EdDSA key from a 'secret' environment variable to the standard input stream. For example: echo \"$PRIVATE_KEY_SECRET\" | ./\(programName) --ed-key-file -", valueName: "private-key-file"))
     var privateKeyFile: String?
     
+    @Flag(name: .customShort("p"), help: ArgumentHelp("Only prints the signature when signing an update."))
+    var printOnlySignature: Bool = false
+    
     @Argument(help: "The update archive, delta update, or package (pkg) to sign or verify.")
     var updatePath: String
     
@@ -102,7 +105,7 @@ struct SignUpdate: ParsableCommand {
     
     static var configuration: CommandConfiguration = CommandConfiguration(
         abstract: "Sign or verify an update using your EdDSA (ed25519) keys.",
-        discussion: "The EdDSA keys are automatically read from the Keychain if no <private-key-file> is specified.\n\nWhen signing, this tool will output an EdDSA signature and length attributes to use for your update's appcast item enclosure.")
+        discussion: "The EdDSA keys are automatically read from the Keychain if no <private-key-file> is specified.\n\nWhen signing, this tool will output an EdDSA signature and length attributes to use for your update's appcast item enclosure. You can use -p to only print the EdDSA signature for automation.")
     
     func validate() throws {
         guard privateKey == nil || privateKeyFile == nil else {
@@ -156,7 +159,12 @@ struct SignUpdate: ParsableCommand {
         } else {
             // Sign the update
             let sig = edSignature(data: data, publicEdKey: pub, privateEdKey: priv)
-            print("sparkle:edSignature=\"\(sig)\" length=\"\(data.count)\"")
+            
+            if printOnlySignature {
+                print(sig)
+            } else {
+                print("sparkle:edSignature=\"\(sig)\" length=\"\(data.count)\"")
+            }
         }
     }
 }
