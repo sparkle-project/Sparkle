@@ -115,6 +115,10 @@ struct SignUpdate: ParsableCommand {
         guard !verify || verifySignature != nil else {
             throw ValidationError("<verify-signature> must be passed as a second argument after <update-path> if --verify is passed.")
         }
+        
+        guard !verify || !printOnlySignature else {
+            throw ValidationError("Both --verify and -p options cannot be provided.")
+        }
     }
     
     func run() throws {
