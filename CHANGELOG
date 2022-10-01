@@ -16,6 +16,7 @@
 * Find potential matching running apps that are translocated in the updater agent (#2233) (Zorg)
 * Expose -[SPUStandardUserDriver activeUpdateAlert] as private API (#2255) (Zorg)
 * Add zh_CN l10n for "Version History" (#2247) (kakaiikaka)
+* Update zh_TW localization (#2271) (Chiahong)
 * Remove ed25519 git submodule in favor of including the dependency directly (#2244) (Zorg)
 * Clean up left-over code (#2243) (Eitot)
 * Update Package.resolved (#2245) (Zorg)
