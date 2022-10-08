@@ -923,6 +923,10 @@
 		149B78641B7D3A4800D7D62C /* ConfigUnitTestCoverage.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigUnitTestCoverage.xcconfig; sourceTree = "<group>"; };
 		1EAA4C8A2132C7BF00604473 /* ReleaseNotesColorStyle.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = ReleaseNotesColorStyle.css; sourceTree = "<group>"; };
 		3772FEA813DE0B6B00F79537 /* SUVersionDisplayProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUVersionDisplayProtocol.h; sourceTree = "<group>"; };
+		37A5F28528E9219000891504 /* zh_HK */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = zh_HK; path = zh_HK.lproj/Sparkle.strings; sourceTree = "<group>"; };
+		37A5F28628E9219000891504 /* zh_HK */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = zh_HK; path = zh_HK.lproj/SUUpdatePermissionPrompt.strings; sourceTree = "<group>"; };
+		37A5F28728E9219000891504 /* zh_HK */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = zh_HK; path = zh_HK.lproj/SUUpdateAlert.strings; sourceTree = "<group>"; };
+		37A5F28828E9219000891504 /* zh_HK */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = zh_HK; path = zh_HK.lproj/MainMenu.strings; sourceTree = "<group>"; };
 		4607BEA21948443800EF8DA4 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/Sparkle.strings; sourceTree = "<group>"; };
 		525A278F133D6AE900FD8D70 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		555CF29A196C52330000B31E /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/Sparkle.strings; sourceTree = "<group>"; };
@@ -3051,6 +3055,7 @@
 				Base,
 				hr,
 				fa,
+				zh_HK,
 			);
 			mainGroup = 0867D691FE84028FC02AAC07 /* Sparkle */;
 			packageReferences = (
@@ -3891,6 +3896,7 @@
 				726FD2CC25F4BE5F00123BC6 /* fa */,
 				F67C9B7B281410B600740813 /* hu */,
 				F6E11510281410D10003736C /* ar */,
+				37A5F28528E9219000891504 /* zh_HK */,
 			);
 			name = Sparkle.strings;
 			sourceTree = "<group>";
@@ -3931,6 +3937,7 @@
 				723ABD69259A9C6600BDB4FA /* uk */,
 				72E1DAB625B3E8AE0001BA6D /* hr */,
 				F67C9B7C281410B600740813 /* hu */,
+				37A5F28728E9219000891504 /* zh_HK */,
 			);
 			name = SUUpdateAlert.xib;
 			sourceTree = "<group>";
@@ -3969,6 +3976,7 @@
 				723ABD9F259A9D6000BDB4FA /* tr */,
 				723ABDA0259A9D6300BDB4FA /* uk */,
 				72E1DAB525B3E8AE0001BA6D /* hr */,
+				37A5F28628E9219000891504 /* zh_HK */,
 			);
 			name = SUUpdatePermissionPrompt.xib;
 			sourceTree = "<group>";
@@ -4018,6 +4026,7 @@
 				723ABE39259A9F2E00BDB4FA /* uk */,
 				72E1DAB725B3E8AE0001BA6D /* hr */,
 				726FD2CB25F4BE5F00123BC6 /* fa */,
+				37A5F28828E9219000891504 /* zh_HK */,
 			);
 			name = MainMenu.xib;
 			sourceTree = "<group>";
