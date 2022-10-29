@@ -4,6 +4,9 @@
 /* No comment provided by engineer. */
 "%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%1$@ %2$@ je nejnovější dostupná verze.\n(Aktuálně používáte verzi %3$@.)";
 
+/* Description text for SUUpdateAlert when the critical update is downloadable. */
+"%@ %@ is now available—you have %@. This is an important update; would you like to download it now?" = "Verze %1$@ %2$@ je nyní k dispozici – nainstalována je %3$@. Tato aktualizace je důležitá; přejete si ji nyní stáhnout?";
+
 /* Description text for SUUpdateAlert when the update is downloadable. */
 "%@ %@ is now available—you have %@. Would you like to download it now?" = "Je k dispozici %1$@ %2$@ - nainstalována je %3$@. Přejete si nyní stáhnout aktualizaci?";
 
@@ -13,6 +16,12 @@
 /* The download progress in a unit of bytes, e.g. 100 KB */
 "%@ downloaded" = "staženo %@";
 
+/* No comment provided by engineer. */
+"%@ is now updated to version %@!" = "Aplikace %1$@ je nyní aktualizována na verzi %2$@! ";
+
+/* No comment provided by engineer. */
+"%@ is now updated!" = "%@ je nyní aktuální!";
+
 /* The download progress in units of bytes, e.g. 100 KB of 1,0 MB */
 "%@ of %@" = "%1$@ z %2$@";
 
@@ -21,6 +30,12 @@
 
 /* Description text for SUUpdateAlert when the update has already been downloaded and ready to install. */
 "%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "Aplikace %1$@ %2$@ byla stažena a je připravena k použití po příštím spuštění! Přejete si aplikaci %1$@ nyní nainstalovat a znovu spustit?";
+
+/* No comment provided by engineer. */
+"%1$@ %2$@ is available but your macOS version is too new for this update. This update only supports up to macOS %3$@." = "%1$@ %2$@ je k dispozici, ale vaše verze macOS je pro tuto aktualizaci příliš nová. Aktualizace podporuje nejvýše macOS %3$@.";
+
+/* No comment provided by engineer. */
+"%1$@ %2$@ is available but your macOS version is too old to install it. At least macOS %3$@ is required." = "%1$@ %2$@ je k dispozici, ale vaše verze macOS je pro tuto aktualizaci příliš stará. Je potřeba alespoň macOS %3$@.";
 
 /* No comment provided by engineer. */
 "%1$@ can’t be updated if it’s running from the location it was downloaded to." = "Aplikace %1$@ nemůže být aktualizována pokud je spuštěna z umístění, ve kterém je stažena.";
@@ -38,13 +53,25 @@
 "An error occurred in retrieving update information. Please try again later." = "Při získávání údajů o aktualizaci se vyskytla chyba. Zkuste to prosím později.";
 
 /* No comment provided by engineer. */
+"An error occurred while connecting to the installer. Please try again later." = "Při připojování k instalátoru se vyskytla chyba. Zkuste to prosím později.";
+
+/* No comment provided by engineer. */
 "An error occurred while downloading the update. Please try again later." = "Při stahování souboru se vyskytla chyba. Zkuste to prosím později.";
 
 /* No comment provided by engineer. */
 "An error occurred while extracting the archive. Please try again later." = "Při rozbalování archivu se vyskytla chyba. Zkuste to prosím později.";
 
 /* No comment provided by engineer. */
+"An error occurred while launching the installer. Please try again later." = "Při spouštění instalátoru se vyskytla chyba. Zkuste to prosím později.";
+
+/* No comment provided by engineer. */
 "An error occurred while parsing the update feed." = "Při zpracování údajů o aktualizaci se vyskytla chyba. Zkuste to prosím později.";
+
+/* No comment provided by engineer. */
+"An error occurred while running the updater. Please try again later." = "Při provádění aktualizace se vyskytla chyba. Zkuste to prosím později.";
+
+/* No comment provided by engineer. */
+"An error occurred while starting the installer. Please try again later." = "Při spouštění instalátoru se vyskytla chyba. Zkuste to prosím později.";
 
 /* No comment provided by engineer. */
 "An important update to %@ is ready to install" = "Důležitá aktualizace %@ je připravena k instalaci";
@@ -55,14 +82,17 @@
 /* No comment provided by engineer. */
 "Cancel Update" = "Zrušit aktualizaci";
 
-/* No comment provided by engineer. */
-"Checking for updates…" = "Hledání aktualizací…";
-
 /* Take care not to overflow the status window. */
 "Downloading update…" = "Stahuje se aktualizace…";
 
 /* Take care not to overflow the status window. */
 "Extracting update…" = "Rozbaluje se aktualizace…";
+
+/* No comment provided by engineer. */
+"Failed to resume installing update." = "Nepodařilo se pokračovat v aktualizaci.";
+
+/* No comment provided by engineer. */
+"Checking for updates…" = "Hledání aktualizací…";
 
 /* No comment provided by engineer. */
 "Install and Relaunch" = "Instalovat a znovu spustit";
@@ -89,7 +119,19 @@
 "Should %1$@ automatically check for updates? You can always check for updates manually from the %1$@ menu." = "Přejete si, aby aplikace %1$@ automaticky vyhledávala aktualizace? Tuto volbu můžete kdykoliv změnit v nabídce %1$@.";
 
 /* No comment provided by engineer. */
+"The update checker failed to start correctly. You should contact the app developer to report this issue and verify that you have the latest version." = "Nepodařilo se správně spustit update checker. Kontaktujte prosím vývojáře, nahlašte tento problém a ujistěte se, že používáte nejnovější verzi.";
+
+/* No comment provided by engineer. */
+"The update is improperly signed and could not be validated. Please try again later or contact the app developer." = "Tato aktualizace není správně podepsaná a nelze ji ověřit. Zkuste to prosím později nebo kontaktujte vývojáře aplikace.";
+
+/* No comment provided by engineer. */
+"Unable to Check For Updates" = "Hledání aktualizací se nezdařilo";
+
+/* No comment provided by engineer. */
 "Update Error!" = "Chyba při aktualizaci!";
+
+/* No comment provided by engineer. */
+"Update Installed" = "Aktualizace dokončena";
 
 /* No comment provided by engineer. */
 "Updating %@" = "Aktualizuje se %@";
@@ -97,5 +139,15 @@
 /* No comment provided by engineer. */
 "Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "Přesuňte %1$@ do složky Aplikace a spusťte ji z tohoto umístění znovu.";
 
+/* No comment provided by engineer. */
+"Version History" = "Historie verzí";
+
 /* Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates. */
 "You’re up-to-date!" = "Vaše verze je aktuální!";
+
+/* No comment provided by engineer. */
+"Your macOS version is too new" = "Vaše verze macOS je příliš nová";
+
+/* No comment provided by engineer. */
+"Your macOS version is too old" = "Vaše verze macOS je příliš stará";
+
