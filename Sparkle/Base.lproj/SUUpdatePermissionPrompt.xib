@@ -276,11 +276,11 @@ Gw
             <point key="canvasLocation" x="-291" y="554"/>
         </customView>
         <customView id="ov1-yV-Uol" userLabel="Anonymous Info View">
-            <rect key="frame" x="0.0" y="0.0" width="437" height="27"/>
+            <rect key="frame" x="0.0" y="0.0" width="437" height="25"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
                 <customView translatesAutoresizingMaskIntoConstraints="NO" id="a0k-dW-Jhx" userLabel="View">
-                    <rect key="frame" x="0.0" y="-26" width="437" height="66"/>
+                    <rect key="frame" x="0.0" y="-26" width="437" height="64"/>
                     <subviews>
                         <button focusRingType="none" translatesAutoresizingMaskIntoConstraints="NO" id="a90-Iq-FgS" userLabel="IncludeInfoButton">
                             <rect key="frame" x="104" y="25" width="200" height="16"/>
@@ -324,7 +324,7 @@ Gw
                         <constraint firstItem="JW6-0z-Ud3" firstAttribute="leading" secondItem="a0k-dW-Jhx" secondAttribute="leading" constant="85" id="6Y1-s7-g6r"/>
                         <constraint firstItem="a90-Iq-FgS" firstAttribute="centerY" secondItem="JW6-0z-Ud3" secondAttribute="centerY" id="BNJ-xV-faQ"/>
                         <constraint firstItem="a90-Iq-FgS" firstAttribute="leading" secondItem="a0k-dW-Jhx" secondAttribute="leading" constant="105" id="ILg-Qu-R6M"/>
-                        <constraint firstItem="a90-Iq-FgS" firstAttribute="top" secondItem="a0k-dW-Jhx" secondAttribute="top" constant="26" id="Mh6-5L-xqM"/>
+                        <constraint firstItem="a90-Iq-FgS" firstAttribute="top" secondItem="a0k-dW-Jhx" secondAttribute="top" constant="24" id="Mh6-5L-xqM"/>
                         <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="a90-Iq-FgS" secondAttribute="trailing" constant="20" id="U4G-Eh-HPu"/>
                         <constraint firstItem="a90-Iq-FgS" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="JW6-0z-Ud3" secondAttribute="trailing" constant="4" id="axA-s0-uGg"/>
                         <constraint firstAttribute="width" constant="437" id="iUc-Zs-h9S"/>
@@ -341,11 +341,11 @@ Gw
             <point key="canvasLocation" x="-135.5" y="242.5"/>
         </customView>
         <customView id="37T-Ef-DtX" userLabel="Automatic Download View">
-            <rect key="frame" x="0.0" y="0.0" width="437" height="27"/>
+            <rect key="frame" x="0.0" y="0.0" width="437" height="25"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
                 <customView translatesAutoresizingMaskIntoConstraints="NO" id="MEW-2n-kJE" userLabel="View">
-                    <rect key="frame" x="0.0" y="-26" width="437" height="66"/>
+                    <rect key="frame" x="0.0" y="-26" width="437" height="64"/>
                     <subviews>
                         <button focusRingType="none" translatesAutoresizingMaskIntoConstraints="NO" id="BId-kb-eYW" userLabel="automaticallyDownloadUpdatesButton">
                             <rect key="frame" x="104" y="25" width="248" height="16"/>
@@ -365,7 +365,7 @@ Gw
                         <constraint firstItem="BId-kb-eYW" firstAttribute="leading" secondItem="MEW-2n-kJE" secondAttribute="leading" constant="105" id="MnW-AM-QzP"/>
                         <constraint firstAttribute="bottom" secondItem="BId-kb-eYW" secondAttribute="bottom" constant="26" id="QXK-90-kUJ"/>
                         <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="BId-kb-eYW" secondAttribute="trailing" constant="20" id="Vk3-CH-cXd"/>
-                        <constraint firstItem="BId-kb-eYW" firstAttribute="top" secondItem="MEW-2n-kJE" secondAttribute="top" constant="26" id="YrX-aL-LAq"/>
+                        <constraint firstItem="BId-kb-eYW" firstAttribute="top" secondItem="MEW-2n-kJE" secondAttribute="top" constant="24" id="YrX-aL-LAq"/>
                         <constraint firstAttribute="width" constant="437" id="n4W-Z4-w9i"/>
                     </constraints>
                 </customView>
