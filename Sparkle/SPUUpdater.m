@@ -427,9 +427,9 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     [self setSendsSystemProfile:response.sendSystemProfile];
     [self setAutomaticallyChecksForUpdates:response.automaticUpdateChecks];
     
-    NSNumber *automaticallyDownloadUpdates = response.automaticallyDownloadUpdates;
-    if (automaticallyDownloadUpdates != nil) {
-        [self setAutomaticallyDownloadsUpdates:automaticallyDownloadUpdates.boolValue];
+    NSNumber *automaticUpdateDownloading = response.automaticUpdateDownloading;
+    if (automaticUpdateDownloading != nil) {
+        [self setAutomaticallyDownloadsUpdates:automaticUpdateDownloading.boolValue];
     }
 }
 

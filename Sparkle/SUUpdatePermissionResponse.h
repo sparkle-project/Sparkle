@@ -28,10 +28,10 @@ SU_EXPORT @interface SUUpdatePermissionResponse : NSObject<NSSecureCoding>
  Initializes a new update permission response instance.
  
  @param automaticUpdateChecks Flag to enable automatic update checks.
- @param automaticallyDownloadUpdates Flag to enable automatic downloading and installing of updates. If this is nil, then no response was made for this option.
+ @param automaticUpdateDownloading Flag to enable automatic downloading and installing of updates. If this is nil, this option will be ignored.
  @param sendSystemProfile Flag for if system profile information should be sent to the server hosting the appcast.
  */
-- (instancetype)initWithAutomaticUpdateChecks:(BOOL)automaticUpdateChecks automaticallyDownloadUpdates:(NSNumber * _Nullable)automaticallyDownloadUpdates sendSystemProfile:(BOOL)sendSystemProfile;
+- (instancetype)initWithAutomaticUpdateChecks:(BOOL)automaticUpdateChecks automaticUpdateDownloading:(NSNumber * _Nullable)automaticUpdateDownloading sendSystemProfile:(BOOL)sendSystemProfile;
 
 /*
  Use -initWithAutomaticUpdateChecks:sendSystemProfile: instead.
@@ -39,14 +39,16 @@ SU_EXPORT @interface SUUpdatePermissionResponse : NSObject<NSSecureCoding>
 - (instancetype)init NS_UNAVAILABLE;
 
 /**
- A read-only property indicating whether automatic update checks are allowed or not.
+ A read-only property indicating if update checks should be done automatically.
  */
 @property (nonatomic, readonly) BOOL automaticUpdateChecks;
 
 /**
- A read-only property indicating whether automatic downloading and installing of updates is on.
+ A read-only property indicating if updates should be automatically downloaded and installed.
+ 
+ If this property is nil, then no user choice was made for this option.
  */
-@property (nonatomic, readonly, nullable) NSNumber *automaticallyDownloadUpdates;
+@property (nonatomic, readonly, nullable) NSNumber *automaticUpdateDownloading;
 
 /**
  A read-only property indicating if system profile should be sent or not.

@@ -87,10 +87,10 @@ static NSString *const SUUpdatePermissionPromptTouchBarIndentifier = @"" SPARKLE
     return [(NSNumber *)[self.host objectForInfoDictionaryKey:SUEnableSystemProfilingKey] boolValue];
 }
 
-- (BOOL)allowsAutomaticDownloadingOfUpdates
+- (BOOL)allowsAutomaticUpdates
 {
-    NSNumber *allowsAutomaticDownloadingOfUpdates = [self.host objectForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey];
-    return (allowsAutomaticDownloadingOfUpdates == nil || allowsAutomaticDownloadingOfUpdates.boolValue);
+    NSNumber *allowsAutomaticUpdates = [self.host objectForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey];
+    return (allowsAutomaticUpdates == nil || allowsAutomaticUpdates.boolValue);
 }
 
 - (NSString *)description { return [NSString stringWithFormat:@"%@ <%@>", [self class], [self.host bundlePath]]; }
@@ -100,7 +100,7 @@ static NSString *const SUUpdatePermissionPromptTouchBarIndentifier = @"" SPARKLE
     [self.window center];
     
     self.infoChoiceView.hidden = ![self shouldAskAboutProfile];
-    self.automaticallyDownloadUpdatesView.hidden = ![self allowsAutomaticDownloadingOfUpdates];
+    self.automaticallyDownloadUpdatesView.hidden = ![self allowsAutomaticUpdates];
     
     [self.stackView addArrangedSubview:self.promptView];
     [self.stackView addArrangedSubview:self.automaticallyDownloadUpdatesView];
@@ -161,14 +161,14 @@ static NSString *const SUUpdatePermissionPromptTouchBarIndentifier = @"" SPARKLE
 
 - (IBAction)finishPrompt:(NSButton *)sender
 {
-    NSNumber *automaticallyDownloadUpdatesResponse;
-    if ([self allowsAutomaticDownloadingOfUpdates]) {
-        automaticallyDownloadUpdatesResponse = @(self.automaticallyDownloadUpdates);
+    NSNumber *automaticUpdateDownloading;
+    if ([self allowsAutomaticUpdates]) {
+        automaticUpdateDownloading = @(self.automaticallyDownloadUpdates);
     } else {
-        automaticallyDownloadUpdatesResponse = nil;
+        automaticUpdateDownloading = nil;
     }
     
-    SUUpdatePermissionResponse *response = [[SUUpdatePermissionResponse alloc] initWithAutomaticUpdateChecks:([sender tag] == 1) automaticallyDownloadUpdates:automaticallyDownloadUpdatesResponse sendSystemProfile:self.shouldSendProfile];
+    SUUpdatePermissionResponse *response = [[SUUpdatePermissionResponse alloc] initWithAutomaticUpdateChecks:([sender tag] == 1) automaticUpdateDownloading:automaticUpdateDownloading sendSystemProfile:self.shouldSendProfile];
     self.reply(response);
     
     [self close];
