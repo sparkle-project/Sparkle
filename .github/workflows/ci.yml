@@ -14,12 +14,12 @@ jobs:
         include:
             - xcode: 'xcode13.4.1'
               xcode-path: '/Applications/Xcode_13.4.1.app/Contents/Developer'
-              upload-dist: true
+              upload-dist: false
               run-analyzer: true
               macos: 'macos-12'
             - xcode: 'xcode14.1'
               xcode-path: '/Applications/Xcode_14.1.app/Contents/Developer'
-              upload-dist: false
+              upload-dist: true
               run-analyzer: false
               macos: 'macos-12'
             
