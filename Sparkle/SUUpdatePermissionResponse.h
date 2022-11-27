@@ -46,7 +46,11 @@ SU_EXPORT @interface SUUpdatePermissionResponse : NSObject<NSSecureCoding>
 /**
  A read-only property indicating if updates should be automatically downloaded and installed.
  
- If this property is nil, then no user choice was made for this option.
+ If this property is `nil`, then no user choice was made for this option.
+ 
+ If  `automaticUpdateChecks` is `NO` then this property should not be `@YES`.
+ Set it to `NO` if the user was given the choice of automatically downloading and installing updates,
+ otherwise set it to `nil`.
  */
 @property (nonatomic, readonly, nullable) NSNumber *automaticUpdateDownloading;
 

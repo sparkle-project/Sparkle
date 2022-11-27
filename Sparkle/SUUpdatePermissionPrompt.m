@@ -161,14 +161,16 @@ static NSString *const SUUpdatePermissionPromptTouchBarIndentifier = @"" SPARKLE
 
 - (IBAction)finishPrompt:(NSButton *)sender
 {
+    BOOL automaticUpdateChecksEnabled = ([sender tag] == 1);
+    
     NSNumber *automaticUpdateDownloading;
     if ([self allowsAutomaticUpdates]) {
-        automaticUpdateDownloading = @(self.automaticallyDownloadUpdates);
+        automaticUpdateDownloading = @(automaticUpdateChecksEnabled && self.automaticallyDownloadUpdates);
     } else {
         automaticUpdateDownloading = nil;
     }
     
-    SUUpdatePermissionResponse *response = [[SUUpdatePermissionResponse alloc] initWithAutomaticUpdateChecks:([sender tag] == 1) automaticUpdateDownloading:automaticUpdateDownloading sendSystemProfile:self.shouldSendProfile];
+    SUUpdatePermissionResponse *response = [[SUUpdatePermissionResponse alloc] initWithAutomaticUpdateChecks:automaticUpdateChecksEnabled automaticUpdateDownloading:automaticUpdateDownloading sendSystemProfile:self.shouldSendProfile];
     self.reply(response);
     
     [self close];
