@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="18122" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21507" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="18122"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21507"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -67,13 +67,13 @@
             </declaredKeys>
         </userDefaultsController>
         <view id="Yrl-Dt-Qvb" userLabel="Prompt View">
-            <rect key="frame" x="0.0" y="0.0" width="437" height="87"/>
+            <rect key="frame" x="0.0" y="0.0" width="437" height="86"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="IgD-Pj-pc8">
-                    <rect key="frame" x="104" y="33" width="315" height="34"/>
+                    <rect key="frame" x="104" y="50" width="315" height="16"/>
                     <constraints>
-                        <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="34" id="J49-m7-iIa"/>
+                        <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="16" id="J49-m7-iIa"/>
                     </constraints>
                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Check for updates automatically?" id="gmh-T4-BO0">
                         <font key="font" metaFont="systemBold"/>
@@ -97,7 +97,7 @@
                     </connections>
                 </textField>
                 <imageView translatesAutoresizingMaskIntoConstraints="NO" id="NBn-FN-XAx">
-                    <rect key="frame" x="23" y="3" width="64" height="64"/>
+                    <rect key="frame" x="23" y="2" width="64" height="64"/>
                     <constraints>
                         <constraint firstAttribute="width" constant="64" id="KbC-i0-ZyN"/>
                         <constraint firstAttribute="height" constant="64" id="Osy-kb-JTR"/>
@@ -115,7 +115,7 @@
                 <constraint firstItem="NBn-FN-XAx" firstAttribute="leading" secondItem="Yrl-Dt-Qvb" secondAttribute="leading" constant="23" id="Xku-5M-xMC"/>
                 <constraint firstItem="tgW-Jp-Aia" firstAttribute="leading" secondItem="NBn-FN-XAx" secondAttribute="trailing" constant="19" id="fPB-MW-Oc2"/>
                 <constraint firstItem="NBn-FN-XAx" firstAttribute="top" secondItem="Yrl-Dt-Qvb" secondAttribute="top" constant="20" symbolic="YES" id="fad-TA-xIj"/>
-                <constraint firstItem="tgW-Jp-Aia" firstAttribute="top" secondItem="IgD-Pj-pc8" secondAttribute="bottom" constant="-9" id="nN4-jN-Fdn"/>
+                <constraint firstItem="tgW-Jp-Aia" firstAttribute="top" secondItem="IgD-Pj-pc8" secondAttribute="bottom" constant="8" id="nN4-jN-Fdn"/>
                 <constraint firstItem="IgD-Pj-pc8" firstAttribute="leading" secondItem="NBn-FN-XAx" secondAttribute="trailing" constant="19" id="s7w-Aw-JQY"/>
                 <constraint firstAttribute="bottom" secondItem="tgW-Jp-Aia" secondAttribute="bottom" id="uS1-FX-kSX"/>
             </constraints>
