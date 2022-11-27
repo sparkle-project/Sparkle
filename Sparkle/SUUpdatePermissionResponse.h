@@ -48,7 +48,7 @@ SU_EXPORT @interface SUUpdatePermissionResponse : NSObject<NSSecureCoding>
  
  If this property is `nil`, then no user choice was made for this option.
  
- If  `automaticUpdateChecks` is `NO` then this property should not be `@YES`.
+ If  `automaticUpdateChecks` is `NO` then this property should not be `@(YES)`.
  Set it to `NO` if the user was given the choice of automatically downloading and installing updates,
  otherwise set it to `nil`.
  */
