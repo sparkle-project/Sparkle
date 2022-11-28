@@ -25,6 +25,10 @@
 - (void)installerProgressShouldDisplayWithHost:(SUHost *)host
 {
     // Try to retrieve localization strings from the old bundle if possible
+    // Note in Sparkle 2 in the common case it should be unlikely that this progress window will show up
+    // Uncommon cases where the install process may be slower are if the app to be installed is on a network mount
+    // or e.g. USB mount or a different mount in general.
+    // In case we fail to load the localizations we will show English strings, which is not a big deal here.
     
     NSBundle *hostSparkleBundle;
     {
