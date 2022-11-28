@@ -13,17 +13,11 @@
 
 #include "AppKitPrevention.h"
 
-@interface SUDiskImageUnarchiver ()
-
-@property (nonatomic, copy, readonly) NSString *archivePath;
-@property (nullable, nonatomic, copy, readonly) NSString *decryptionPassword;
-
-@end
-
 @implementation SUDiskImageUnarchiver
-
-@synthesize archivePath = _archivePath;
-@synthesize decryptionPassword = _decryptionPassword;
+{
+    NSString *_archivePath;
+    NSString *_decryptionPassword;
+}
 
 + (BOOL)canUnarchivePath:(NSString *)path
 {
@@ -84,10 +78,10 @@
         
         NSData *promptData = [NSData dataWithBytes:"yes\n" length:4];
         
-        NSMutableArray *arguments = [@[@"attach", self.archivePath, @"-mountpoint", mountPoint, /*@"-noverify",*/ @"-nobrowse", @"-noautoopen"] mutableCopy];
+        NSMutableArray *arguments = [@[@"attach", _archivePath, @"-mountpoint", mountPoint, /*@"-noverify",*/ @"-nobrowse", @"-noautoopen"] mutableCopy];
         
-        if (self.decryptionPassword) {
-            NSMutableData *passwordData = [[self.decryptionPassword dataUsingEncoding:NSUTF8StringEncoding] mutableCopy];
+        if (_decryptionPassword) {
+            NSMutableData *passwordData = [[_decryptionPassword dataUsingEncoding:NSUTF8StringEncoding] mutableCopy];
             // From the hdiutil docs:
             // read a null-terminated passphrase from standard input
             //
@@ -181,7 +175,7 @@
 		for (NSString *item in contents)
 		{
             NSString *fromPath = [mountPoint stringByAppendingPathComponent:item];
-            NSString *toPath = [[self.archivePath stringByDeletingLastPathComponent] stringByAppendingPathComponent:item];
+            NSString *toPath = [[_archivePath stringByDeletingLastPathComponent] stringByAppendingPathComponent:item];
             
             itemsCopied += 1.0;
             [notifier notifyProgress:0.5 + itemsCopied/(totalItems*2.0)];
@@ -219,11 +213,11 @@
                 SULog(SULogLevelError, @"Error: %@", launchCleanupError);
             }
         } else {
-            SULog(SULogLevelError, @"Can't mount DMG %@", self.archivePath);
+            SULog(SULogLevelError, @"Can't mount DMG %@", _archivePath);
         }
     }
 }
 
-- (NSString *)description { return [NSString stringWithFormat:@"%@ <%@>", [self class], self.archivePath]; }
+- (NSString *)description { return [NSString stringWithFormat:@"%@ <%@>", [self class], _archivePath]; }
 
 @end

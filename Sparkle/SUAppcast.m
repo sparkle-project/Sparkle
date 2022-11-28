@@ -21,12 +21,6 @@
 
 #include "AppKitPrevention.h"
 
-@interface SUAppcast ()
-
-@property (nonatomic, copy) NSArray<SUAppcastItem *> *items;
-
-@end
-
 @implementation SUAppcast
 
 @synthesize items = _items;
@@ -235,7 +229,7 @@
         }
     }
     
-    other.items = newItems;
+    other->_items = newItems;
     return other;
 }
 

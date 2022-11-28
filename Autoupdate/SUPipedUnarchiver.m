@@ -14,15 +14,10 @@
 
 #include "AppKitPrevention.h"
 
-@interface SUPipedUnarchiver ()
-
-@property (nonatomic, copy, readonly) NSString *archivePath;
-
-@end
-
 @implementation SUPipedUnarchiver
-
-@synthesize archivePath = _archivePath;
+{
+    NSString *_archivePath;
+}
 
 + (nullable NSArray <NSString *> *)commandAndArgumentsConformingToTypeOfPath:(NSString *)path
 {
@@ -74,7 +69,7 @@
 
 - (void)unarchiveWithCompletionBlock:(void (^)(NSError * _Nullable))completionBlock progressBlock:(void (^ _Nullable)(double))progressBlock
 {
-    NSArray <NSString *> *commandAndArguments = [[self class] commandAndArgumentsConformingToTypeOfPath:self.archivePath];
+    NSArray <NSString *> *commandAndArguments = [[self class] commandAndArgumentsConformingToTypeOfPath:_archivePath];
     assert(commandAndArguments != nil);
     
     NSString *command = commandAndArguments.firstObject;
@@ -93,22 +88,22 @@
 {
     // *** GETS CALLED ON NON-MAIN THREAD!!!
 	@autoreleasepool {
-        NSString *destination = [self.archivePath stringByDeletingLastPathComponent];
+        NSString *destination = [_archivePath stringByDeletingLastPathComponent];
         
-        SULog(SULogLevelDefault, @"Extracting using '%@' '%@' < '%@' '%@'", command, [args componentsJoinedByString:@"' '"], self.archivePath, destination);
+        SULog(SULogLevelDefault, @"Extracting using '%@' '%@' < '%@' '%@'", command, [args componentsJoinedByString:@"' '"], _archivePath, destination);
         
         // Get the file size.
-        NSDictionary *attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:self.archivePath error:nil];
+        NSDictionary *attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:_archivePath error:nil];
         NSUInteger expectedLength = [(NSNumber *)[attributes objectForKey:NSFileSize] unsignedIntegerValue];
         
         if (expectedLength == 0) {
-            NSError *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUUnarchivingError userInfo:@{ NSLocalizedDescriptionKey:[NSString stringWithFormat:@"Extraction failed, archive '%@' is empty", self.archivePath]}];
+            NSError *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUUnarchivingError userInfo:@{ NSLocalizedDescriptionKey:[NSString stringWithFormat:@"Extraction failed, archive '%@' is empty", _archivePath]}];
             
             [notifier notifyFailureWithError:error];
             return;
         }
         
-        NSFileHandle *archiveInput = [NSFileHandle fileHandleForReadingAtPath:self.archivePath];
+        NSFileHandle *archiveInput = [NSFileHandle fileHandleForReadingAtPath:_archivePath];
         
         NSPipe *pipe = [NSPipe pipe];
         NSTask *task = [[NSTask alloc] init];
@@ -221,6 +216,6 @@
     }
 }
 
-- (NSString *)description { return [NSString stringWithFormat:@"%@ <%@>", [self class], self.archivePath]; }
+- (NSString *)description { return [NSString stringWithFormat:@"%@ <%@>", [self class], _archivePath]; }
 
 @end

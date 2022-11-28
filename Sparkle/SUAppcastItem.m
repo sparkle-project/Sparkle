@@ -44,20 +44,21 @@ static NSString *SUAppcastItemDeltaFromSparkleLocalesKey = @"SUAppcastItemDeltaF
 
 @property (readonly, nullable) SUSignatures *signatures;
 
-// Auxillary appcast item state that needs to be evaluated based on the host state
-// This may be nil if the client creates an SUAppcastItem with a deprecated initializer
-// In that case we will need to fallback to safe behavior
-@property (nonatomic, readonly, nullable) SPUAppcastItemState *state;
-
-// Indicates if we have any critical information. Used as a fallback if state is nil
-@property (nonatomic, readonly) BOOL hasCriticalInformation;
-
-// Indicates the versions we update from that are informational-only
-@property (nonatomic, readonly, nullable) NSSet<NSString *> *informationalUpdateVersions;
-
 @end
 
 @implementation SUAppcastItem
+{
+    // Auxillary appcast item state that needs to be evaluated based on the host state
+    // This may be nil if the client creates an SUAppcastItem with a deprecated initializer
+    // In that case we will need to fallback to safe behavior
+    SPUAppcastItemState *_state;
+    
+    // Indicates if we have any critical information. Used as a fallback if state is nil
+    BOOL _hasCriticalInformation;
+    
+    // Indicates the versions we update from that are informational-only
+    NSSet<NSString *> *_informationalUpdateVersions;
+}
 
 @synthesize dateString = _dateString;
 @synthesize deltaUpdates = _deltaUpdates;
@@ -79,9 +80,6 @@ static NSString *SUAppcastItemDeltaFromSparkleLocalesKey = @"SUAppcastItemDeltaF
 @synthesize minimumAutoupdateVersion = _minimumAutoupdateVersion;
 @synthesize ignoreSkippedUpgradesBelowVersion = _ignoreSkippedUpgradesBelowVersion;
 @synthesize phasedRolloutInterval = _phasedRolloutInterval;
-@synthesize state = _state;
-@synthesize hasCriticalInformation = _hasCriticalInformation;
-@synthesize informationalUpdateVersions = _informationalUpdateVersions;
 @synthesize channel = _channel;
 @synthesize deltaFromSparkleExecutableSize = _deltaFromSparkleExecutableSize;
 @synthesize deltaFromSparkleLocales = _deltaFromSparkleLocales;
@@ -206,8 +204,8 @@ static NSString *SUAppcastItemDeltaFromSparkleLocalesKey = @"SUAppcastItemDeltaF
         [encoder encodeObject:self.ignoreSkippedUpgradesBelowVersion forKey:SUAppcastElementIgnoreSkippedUpgradesBelowVersion];
     }
     
-    if (self.state != nil) {
-        [encoder encodeObject:self.state forKey:SUAppcastItemStateKey];
+    if (_state != nil) {
+        [encoder encodeObject:_state forKey:SUAppcastItemStateKey];
     }
     
     if (self.releaseNotesURL != nil) {
@@ -255,17 +253,17 @@ static NSString *SUAppcastItemDeltaFromSparkleLocalesKey = @"SUAppcastItemDeltaF
 
 - (BOOL)isCriticalUpdate
 {
-    if (self.state != nil) {
-        return self.state.criticalUpdate;
+    if (_state != nil) {
+        return _state.criticalUpdate;
     } else {
-        return self.hasCriticalInformation;
+        return _hasCriticalInformation;
     }
 }
 
 - (BOOL)isMajorUpgrade
 {
-    if (self.state != nil) {
-        return self.state.majorUpgrade;
+    if (_state != nil) {
+        return _state.majorUpgrade;
     } else {
         return NO;
     }
@@ -273,8 +271,8 @@ static NSString *SUAppcastItemDeltaFromSparkleLocalesKey = @"SUAppcastItemDeltaF
 
 - (BOOL)minimumOperatingSystemVersionIsOK
 {
-    if (self.state != nil) {
-        return self.state.minimumOperatingSystemVersionIsOK;
+    if (_state != nil) {
+        return _state.minimumOperatingSystemVersionIsOK;
     } else {
         return YES;
     }
@@ -282,8 +280,8 @@ static NSString *SUAppcastItemDeltaFromSparkleLocalesKey = @"SUAppcastItemDeltaF
 
 - (BOOL)maximumOperatingSystemVersionIsOK
 {
-    if (self.state != nil) {
-        return self.state.maximumOperatingSystemVersionIsOK;
+    if (_state != nil) {
+        return _state.maximumOperatingSystemVersionIsOK;
     } else {
         return YES;
     }
@@ -310,10 +308,10 @@ static NSString *SUAppcastItemDeltaFromSparkleLocalesKey = @"SUAppcastItemDeltaF
 
 - (BOOL)isInformationOnlyUpdate
 {
-    if (self.state != nil) {
-        return self.state.informationalUpdate;
+    if (_state != nil) {
+        return _state.informationalUpdate;
     } else {
-        return (self.informationalUpdateVersions != nil && self.informationalUpdateVersions.count == 0);
+        return (_informationalUpdateVersions != nil && _informationalUpdateVersions.count == 0);
     }
 }
 

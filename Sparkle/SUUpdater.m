@@ -17,15 +17,6 @@
 #import <AppKit/AppKit.h>
 
 @interface SUUpdater () <SPUUpdaterDelegate, SPUStandardUserDriverDelegate>
-
-@property (nonatomic, readonly) SPUUpdater *updater;
-@property (nonatomic, readonly) SPUStandardUserDriver *userDriver;
-
-@property (nonatomic, copy) void(^postponedInstallHandler)(void);
-@property (nonatomic, copy) void(^silentInstallHandler)(void);
-
-@property (nonatomic) BOOL loggedInstallUpdatesIfAvailableWarning;
-
 @end
 
 #pragma clang diagnostic push
@@ -33,16 +24,16 @@
 @implementation SUUpdater
 #pragma clang diagnostic pop
 {
+    SPUUpdater *_updater;
+    SPUStandardUserDriver *_userDriver;
+    void(^_postponedInstallHandler)(void);
+    void(^_silentInstallHandler)(void);
     BOOL _delayShowingUserUpdate;
+    BOOL _loggedInstallUpdatesIfAvailableWarning;
 }
 
-@synthesize updater = _updater;
 @synthesize delegate = _delegate;
-@synthesize userDriver = _userDriver;
-@synthesize postponedInstallHandler = _postponedInstallHandler;
-@synthesize silentInstallHandler = _silentInstallHandler;
 @synthesize decryptionPassword = _decryptionPassword;
-@synthesize loggedInstallUpdatesIfAvailableWarning = _loggedInstallUpdatesIfAvailableWarning;
 
 static NSMutableDictionary *sharedUpdaters = nil;
 
@@ -87,7 +78,7 @@ static NSMutableDictionary *sharedUpdaters = nil;
         _updater = [[SPUUpdater alloc] initWithHostBundle:bundle applicationBundle:bundle userDriver:_userDriver delegate:self];
         
         NSError *updaterError = nil;
-        if (![self.updater startUpdater:&updaterError]) {
+        if (![_updater startUpdater:&updaterError]) {
             SULog(SULogLevelError, @"Error: Failed to start updater with error: %@", updaterError);
         }
     }
@@ -102,12 +93,12 @@ static NSMutableDictionary *sharedUpdaters = nil;
 
 - (void)resetUpdateCycle
 {
-    [self.updater resetUpdateCycle];
+    [_updater resetUpdateCycle];
 }
 
 - (NSBundle *)hostBundle
 {
-    return self.updater.hostBundle;
+    return _updater.hostBundle;
 }
 
 - (NSBundle *)sparkleBundle
@@ -118,83 +109,83 @@ static NSMutableDictionary *sharedUpdaters = nil;
 
 - (BOOL)automaticallyChecksForUpdates
 {
-    return self.updater.automaticallyChecksForUpdates;
+    return _updater.automaticallyChecksForUpdates;
 }
 
 - (void)setAutomaticallyChecksForUpdates:(BOOL)automaticallyChecksForUpdates
 {
-    [self.updater setAutomaticallyChecksForUpdates:automaticallyChecksForUpdates];
+    [_updater setAutomaticallyChecksForUpdates:automaticallyChecksForUpdates];
 }
 
 - (NSTimeInterval)updateCheckInterval
 {
-    return self.updater.updateCheckInterval;
+    return _updater.updateCheckInterval;
 }
 
 - (void)setUpdateCheckInterval:(NSTimeInterval)updateCheckInterval
 {
-    [self.updater setUpdateCheckInterval:updateCheckInterval];
+    [_updater setUpdateCheckInterval:updateCheckInterval];
 }
 
 - (NSURL *)feedURL
 {
-    return self.updater.feedURL;
+    return _updater.feedURL;
 }
 
 - (void)setFeedURL:(NSURL *)feedURL
 {
-    [self.updater setFeedURL:feedURL];
+    [_updater setFeedURL:feedURL];
 }
 
 - (NSString *)userAgentString
 {
-    return self.updater.userAgentString;
+    return _updater.userAgentString;
 }
 
 - (void)setUserAgentString:(NSString *)userAgentString
 {
-    [self.updater setUserAgentString:userAgentString];
+    [_updater setUserAgentString:userAgentString];
 }
 
 - (NSDictionary *)httpHeaders
 {
-    return self.updater.httpHeaders;
+    return _updater.httpHeaders;
 }
 
 - (void)setHttpHeaders:(NSDictionary *)httpHeaders
 {
-    [self.updater setHttpHeaders:httpHeaders];
+    [_updater setHttpHeaders:httpHeaders];
 }
 
 - (BOOL)sendsSystemProfile
 {
-    return self.updater.sendsSystemProfile;
+    return _updater.sendsSystemProfile;
 }
 
 - (void)setSendsSystemProfile:(BOOL)sendsSystemProfile
 {
-    [self.updater setSendsSystemProfile:sendsSystemProfile];
+    [_updater setSendsSystemProfile:sendsSystemProfile];
 }
 
 - (BOOL)automaticallyDownloadsUpdates
 {
-    return self.updater.automaticallyDownloadsUpdates;
+    return _updater.automaticallyDownloadsUpdates;
 }
 
 - (void)setAutomaticallyDownloadsUpdates:(BOOL)automaticallyDownloadsUpdates
 {
-    [self.updater setAutomaticallyDownloadsUpdates:automaticallyDownloadsUpdates];
+    [_updater setAutomaticallyDownloadsUpdates:automaticallyDownloadsUpdates];
 }
 
 - (IBAction)checkForUpdates:(id)__unused sender
 {
-    [self.updater checkForUpdates];
+    [_updater checkForUpdates];
 }
     
 - (BOOL)validateMenuItem:(NSMenuItem *)item
 {
     if ([item action] == @selector(checkForUpdates:)) {
-        return self.updater.canCheckForUpdates;
+        return _updater.canCheckForUpdates;
     }
     return YES;
 }
@@ -207,25 +198,25 @@ static NSMutableDictionary *sharedUpdaters = nil;
         // So if checkForUpdatesInBackground is called we will bring the update back in focus
         [self checkForUpdates:nil];
     } else {
-        [self.updater checkForUpdatesInBackground];
+        [_updater checkForUpdatesInBackground];
     }
 }
 
 - (NSDate *)lastUpdateCheckDate
 {
-    return self.updater.lastUpdateCheckDate;
+    return _updater.lastUpdateCheckDate;
 }
 
 - (void)checkForUpdateInformation
 {
-    [self.updater checkForUpdateInformation];
+    [_updater checkForUpdateInformation];
 }
 
 - (BOOL)updateInProgress
 {
     // This is not quite true -- we may be able to check / resume an update if one is in progress
     // But this is a close enough approximation for 1.x updater API
-    return self.updater.sessionInProgress;
+    return _updater.sessionInProgress;
 }
 
 // Not implemented properly at the moment - leaning towards it not be in the future
@@ -234,10 +225,10 @@ static NSMutableDictionary *sharedUpdaters = nil;
 // For now, just invoke the regular background update process if this is invoked. Could change our minds on this later.
 - (void)installUpdatesIfAvailable
 {
-    if (!self.loggedInstallUpdatesIfAvailableWarning) {
+    if (!_loggedInstallUpdatesIfAvailableWarning) {
         SULog(SULogLevelError, @"-[%@ installUpdatesIfAvailable] does not function anymore.. Instead a background scheduled update check will be done.", NSStringFromClass([self class]));
         
-        self.loggedInstallUpdatesIfAvailableWarning = YES;
+        _loggedInstallUpdatesIfAvailableWarning = YES;
     }
 
     [self checkForUpdatesInBackground];
@@ -422,9 +413,9 @@ static NSMutableDictionary *sharedUpdaters = nil;
 
 - (void)installPostponedUpdate
 {
-    if (self.postponedInstallHandler != nil) {
-        self.postponedInstallHandler();
-        self.postponedInstallHandler = nil;
+    if (_postponedInstallHandler != nil) {
+        _postponedInstallHandler();
+        _postponedInstallHandler = nil;
     }
 }
 
@@ -440,7 +431,7 @@ static NSMutableDictionary *sharedUpdaters = nil;
         // This invocation will retain self, but this instance is kept alive forever by our singleton pattern anyway
         [invocation setTarget:self];
 
-        self.postponedInstallHandler = installHandler;
+        _postponedInstallHandler = installHandler;
 
         shouldPostponeRelaunch = [self.delegate updater:self shouldPostponeRelaunchForUpdate:item untilInvoking:invocation];
     } else if ([self.delegate respondsToSelector:@selector(updater:shouldPostponeRelaunchForUpdate:)]) {
@@ -493,9 +484,9 @@ static NSMutableDictionary *sharedUpdaters = nil;
 
 - (void)finishSilentInstallation
 {
-    if (self.silentInstallHandler != nil) {
-        self.silentInstallHandler();
-        self.silentInstallHandler = nil;
+    if (_silentInstallHandler != nil) {
+        _silentInstallHandler();
+        _silentInstallHandler = nil;
     }
 }
 
@@ -515,7 +506,7 @@ static NSMutableDictionary *sharedUpdaters = nil;
         // This invocation will retain self, but this instance is kept alive forever by our singleton pattern anyway
         [invocation setTarget:self];
         
-        self.silentInstallHandler = immediateInstallHandler;
+        _silentInstallHandler = immediateInstallHandler;
         
         [self.delegate updater:self willInstallUpdateOnQuit:item immediateInstallationInvocation:invocation];
         

@@ -45,22 +45,14 @@ extern char *xar_get_safe_path(xar_file_t f) __attribute__((weak_import));
 #define SPARKLE_DELTA_XAR_ARCHIVE_ERROR_CODE_EXTRACT_FAILURE 3
 #define SPARKLE_DELTA_XAR_ARCHIVE_ERROR_CODE_UNSUPPORTED_COMPRESSION_FAILURE 4
 
-@interface SPUXarDeltaArchive ()
-
-@property (nonatomic) xar_t x;
-@property (nonatomic, readonly) int32_t xarMode;
-@property (nonatomic, readonly) NSMutableDictionary<NSString *, NSValue *> *fileTable;
-@property (nonatomic, readonly) NSString *patchFile;
-@property (nonatomic) NSError *error;
-
-@end
-
 @implementation SPUXarDeltaArchive
+{
+    xar_t _x;
+    int32_t _xarMode;
+    NSMutableDictionary<NSString *, NSValue *> *_fileTable;
+    NSString *_patchFile;
+}
 
-@synthesize x = _x;
-@synthesize xarMode = _xarMode;
-@synthesize patchFile = _patchFile;
-@synthesize fileTable = _fileTable;
 @synthesize error = _error;
 
 - (instancetype)initWithPatchFileForWriting:(NSString *)patchFile
@@ -91,9 +83,9 @@ extern char *xar_get_safe_path(xar_file_t f) __attribute__((weak_import));
 
 - (void)close
 {
-    if (self.x != NULL) {
-        xar_close(self.x);
-        self.x = NULL;
+    if (_x != NULL) {
+        xar_close(_x);
+        _x = NULL;
     }
 }
 
@@ -105,18 +97,18 @@ extern char *xar_get_safe_path(xar_file_t f) __attribute__((weak_import));
 
 - (nullable SPUDeltaArchiveHeader *)readHeader
 {
-    NSString *patchFile = self.patchFile;
+    NSString *patchFile = _patchFile;
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
     // Sparkle's XAR delta archives have been superceded by Sparkle's own format
     xar_t x = xar_open(patchFile.fileSystemRepresentation, READ);
 #pragma clang diagnostic pop
     if (x == NULL) {
-        self.error = [NSError errorWithDomain:SPARKLE_DELTA_XAR_ARCHIVE_ERROR_DOMAIN code:SPARKLE_DELTA_XAR_ARCHIVE_ERROR_CODE_OPEN_FAILURE userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to xar_open() file for reading: %@", patchFile] }];
+        _error = [NSError errorWithDomain:SPARKLE_DELTA_XAR_ARCHIVE_ERROR_DOMAIN code:SPARKLE_DELTA_XAR_ARCHIVE_ERROR_CODE_OPEN_FAILURE userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to xar_open() file for reading: %@", patchFile] }];
         return nil;
     }
     
-    self.x = x;
+    _x = x;
     
     uint16_t majorDiffVersion = SUBinaryDeltaMajorVersionFirst;
     uint16_t minorDiffVersion = 0;
@@ -124,7 +116,7 @@ extern char *xar_get_safe_path(xar_file_t f) __attribute__((weak_import));
     NSString *expectedAfterHash = nil;
 
     xar_subdoc_t subdoc;
-    for (subdoc = xar_subdoc_first(self.x); subdoc; subdoc = xar_subdoc_next(subdoc)) {
+    for (subdoc = xar_subdoc_first(_x); subdoc; subdoc = xar_subdoc_next(subdoc)) {
         if (strcmp(xar_subdoc_name(subdoc), BINARY_DELTA_ATTRIBUTES_KEY) == 0) {
             {
                 // available in version 2.0 or later
@@ -177,7 +169,7 @@ extern char *xar_get_safe_path(xar_file_t f) __attribute__((weak_import));
 
 - (void)writeHeader:(SPUDeltaArchiveHeader *)header
 {
-    NSString *patchFile = self.patchFile;
+    NSString *patchFile = _patchFile;
     
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
@@ -185,11 +177,11 @@ extern char *xar_get_safe_path(xar_file_t f) __attribute__((weak_import));
     xar_t x = xar_open(patchFile.fileSystemRepresentation, WRITE);
 #pragma clang diagnostic pop
     if (x == NULL) {
-        self.error = [NSError errorWithDomain:SPARKLE_DELTA_XAR_ARCHIVE_ERROR_DOMAIN code:SPARKLE_DELTA_XAR_ARCHIVE_ERROR_CODE_OPEN_FAILURE userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to xar_open() file for writing: %@", patchFile] }];
+        _error = [NSError errorWithDomain:SPARKLE_DELTA_XAR_ARCHIVE_ERROR_DOMAIN code:SPARKLE_DELTA_XAR_ARCHIVE_ERROR_CODE_OPEN_FAILURE userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to xar_open() file for writing: %@", patchFile] }];
         return;
     }
     
-    self.x = x;
+    _x = x;
     
     SPUDeltaCompressionMode compression = (header.compression == SPUDeltaCompressionModeDefault ? SPUDeltaCompressionModeBzip2 : header.compression);
     
@@ -218,7 +210,7 @@ extern char *xar_get_safe_path(xar_file_t f) __attribute__((weak_import));
         case SPUDeltaCompressionModeLZFSE:
         case SPUDeltaCompressionModeLZ4:
         case SPUDeltaCompressionModeZLIB: {
-            self.error = [NSError errorWithDomain:SPARKLE_DELTA_XAR_ARCHIVE_ERROR_DOMAIN code:SPARKLE_DELTA_XAR_ARCHIVE_ERROR_CODE_UNSUPPORTED_COMPRESSION_FAILURE userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Version 2 patches only support bzip2 compression."] }];
+            _error = [NSError errorWithDomain:SPARKLE_DELTA_XAR_ARCHIVE_ERROR_DOMAIN code:SPARKLE_DELTA_XAR_ARCHIVE_ERROR_CODE_UNSUPPORTED_COMPRESSION_FAILURE userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Version 2 patches only support bzip2 compression."] }];
             
             return;
         }
@@ -290,9 +282,9 @@ static xar_file_t _xarAddFile(NSMutableDictionary<NSString *, NSValue *> *fileTa
     SPUDeltaItemCommands commands = item.commands;
     uint16_t mode = item.mode;
     
-    xar_file_t newFile = _xarAddFile(self.fileTable, self.x, relativeFilePath, filePath);
+    xar_file_t newFile = _xarAddFile(_fileTable, _x, relativeFilePath, filePath);
     if (newFile == NULL) {
-        self.error = [NSError errorWithDomain:SPARKLE_DELTA_XAR_ARCHIVE_ERROR_DOMAIN code:SPARKLE_DELTA_XAR_ARCHIVE_ERROR_CODE_ADD_FAILURE userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to add xar file entry: %@", relativeFilePath] }];
+        _error = [NSError errorWithDomain:SPARKLE_DELTA_XAR_ARCHIVE_ERROR_DOMAIN code:SPARKLE_DELTA_XAR_ARCHIVE_ERROR_CODE_ADD_FAILURE userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to add xar file entry: %@", relativeFilePath] }];
         return;
     }
     
@@ -326,7 +318,7 @@ static xar_file_t _xarAddFile(NSMutableDictionary<NSString *, NSValue *> *fileTa
     
     BOOL exitedEarly = NO;
     xar_iter_t iter = xar_iter_new();
-    for (xar_file_t file = xar_file_first(self.x, iter); file; file = xar_file_next(iter)) {
+    for (xar_file_t file = xar_file_first(_x, iter); file; file = xar_file_next(iter)) {
         char *pathCString;
 #if HAS_XAR_GET_SAFE_PATH
 #pragma clang diagnostic push
@@ -405,8 +397,8 @@ static xar_file_t _xarAddFile(NSMutableDictionary<NSString *, NSValue *> *fileTa
     assert(item.xarContext != NULL);
     
     xar_file_t file = item.xarContext;
-    if (xar_extract_tofile(self.x, file, item.itemFilePath.fileSystemRepresentation) != 0) {
-        self.error = [NSError errorWithDomain:SPARKLE_DELTA_XAR_ARCHIVE_ERROR_DOMAIN code:SPARKLE_DELTA_XAR_ARCHIVE_ERROR_CODE_EXTRACT_FAILURE userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to extract xar file entry to %@", item.itemFilePath] }];
+    if (xar_extract_tofile(_x, file, item.itemFilePath.fileSystemRepresentation) != 0) {
+        _error = [NSError errorWithDomain:SPARKLE_DELTA_XAR_ARCHIVE_ERROR_DOMAIN code:SPARKLE_DELTA_XAR_ARCHIVE_ERROR_CODE_EXTRACT_FAILURE userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to extract xar file entry to %@", item.itemFilePath] }];
         return NO;
     }
     

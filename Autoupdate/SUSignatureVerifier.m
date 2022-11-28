@@ -22,14 +22,10 @@
 
 #include "AppKitPrevention.h"
 
-@interface SUSignatureVerifier ()
-@property (readonly) SUPublicKeys *pubKeys;
-@end
-
-@implementation SUSignatureVerifier {
+@implementation SUSignatureVerifier
+{
+    SUPublicKeys *_pubKeys;
 }
-
-@synthesize pubKeys = _pubKeys;
 
 + (BOOL)validatePath:(NSString *)path withSignatures:(SUSignatures *)signatures withPublicKeys:(SUPublicKeys *)pkeys error:(NSError * __autoreleasing *)error
 {
@@ -56,7 +52,7 @@
 
 - (SecKeyRef)dsaSecKeyRef {
 
-    NSData *data = [self.pubKeys.dsaPubKey dataUsingEncoding:NSASCIIStringEncoding];
+    NSData *data = [_pubKeys.dsaPubKey dataUsingEncoding:NSASCIIStringEncoding];
     if (!self || !data.length) {
         SULog(SULogLevelError, @"Could not read public DSA key");
         return nil;
@@ -106,7 +102,7 @@
         return NO;
     }
 
-    switch (self.pubKeys.ed25519PubKeyStatus) {
+    switch (_pubKeys.ed25519PubKeyStatus) {
     case SUSigningInputStatusAbsent:
         if (signatures.ed25519SignatureStatus != SUSigningInputStatusAbsent) {
             SULog(SULogLevelDefault, @"The update has an EdDSA signature, but it won't be used, because the old app doesn't have an EdDSA public key");
@@ -165,7 +161,7 @@
                 
                 return NO;
             }
-            if (ed25519_verify(signatures.ed25519Signature, data.bytes, data.length, self.pubKeys.ed25519PubKey)) {
+            if (ed25519_verify(signatures.ed25519Signature, data.bytes, data.length, _pubKeys.ed25519PubKey)) {
                 SULog(SULogLevelDefault, @"OK: EdDSA signature is correct");
                 // No need to check DSA when EdDSA verification succeeded, unless a DSA signature is provided and it's
                 // erroneously invalid
@@ -192,7 +188,7 @@
         break;
     }
 
-    switch (self.pubKeys.dsaPubKeyStatus) {
+    switch (_pubKeys.dsaPubKeyStatus) {
     case SUSigningInputStatusAbsent:
         if (signatures.dsaSignatureStatus != SUSigningInputStatusAbsent) {
             SULog(SULogLevelDefault, @"The update has a DSA signature, but it can't be used, because the old app doesn't have a DSA public key");

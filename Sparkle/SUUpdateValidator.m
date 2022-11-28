@@ -18,21 +18,13 @@
 
 #include "AppKitPrevention.h"
 
-@interface SUUpdateValidator ()
-
-@property (nonatomic, readonly) SUHost *host;
-@property (nonatomic) BOOL prevalidatedSignature;
-@property (strong, nonatomic, readonly) SUSignatures *signatures;
-@property (nonatomic, readonly) NSString *downloadPath;
-
-@end
-
 @implementation SUUpdateValidator
-
-@synthesize host = _host;
-@synthesize prevalidatedSignature = _prevalidatedSignature;
-@synthesize signatures = _signatures;
-@synthesize downloadPath = _downloadPath;
+{
+    SUHost *_host;
+    BOOL _prevalidatedSignature;
+    SUSignatures *_signatures;
+    NSString *_downloadPath;
+}
 
 - (instancetype)initWithDownloadPath:(NSString *)downloadPath signatures:(SUSignatures *)signatures host:(SUHost *)host
 {
@@ -47,8 +39,8 @@
 
 - (BOOL)validateDownloadPathWithError:(NSError * __autoreleasing *)error
 {
-    SUPublicKeys *publicKeys = self.host.publicKeys;
-    SUSignatures *signatures = self.signatures;
+    SUPublicKeys *publicKeys = _host.publicKeys;
+    SUSignatures *signatures = _signatures;
 
     if (!publicKeys.hasAnyKeys) {
         if (error != NULL) {
@@ -56,12 +48,12 @@
         }
     } else {
         NSError *innerError = nil;
-        if ([SUSignatureVerifier validatePath:self.downloadPath withSignatures:signatures withPublicKeys:publicKeys error:&innerError]) {
-            self.prevalidatedSignature = YES;
+        if ([SUSignatureVerifier validatePath:_downloadPath withSignatures:signatures withPublicKeys:publicKeys error:&innerError]) {
+            _prevalidatedSignature = YES;
             return YES;
         }
         if (error != NULL) {
-            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"(Ed)DSA signature validation before unarchiving failed for update %@", self.downloadPath], NSUnderlyingErrorKey: innerError }];
+            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"(Ed)DSA signature validation before unarchiving failed for update %@", _downloadPath], NSUnderlyingErrorKey: innerError }];
         }
     }
     return NO;
@@ -69,10 +61,10 @@
 
 - (BOOL)validateWithUpdateDirectory:(NSString *)updateDirectory error:(NSError * __autoreleasing *)error
 {
-    SUSignatures *signatures = self.signatures;
-    SUPublicKeys *publicKeys = self.host.publicKeys;
-    NSString *downloadPath = self.downloadPath;
-    SUHost *host = self.host;
+    SUSignatures *signatures = _signatures;
+    SUPublicKeys *publicKeys = _host.publicKeys;
+    NSString *downloadPath = _downloadPath;
+    SUHost *host = _host;
 
     BOOL isPackage = NO;
 
@@ -87,7 +79,7 @@
 
     NSURL *installSourceURL = [NSURL fileURLWithPath:installSource];
 
-    if (!self.prevalidatedSignature) {
+    if (!_prevalidatedSignature) {
         // Check to see if we have a package or bundle to validate
         if (isPackage) {
             // If we get here, then the appcast installation type was lying to us.. This error will be caught later when starting the installer.

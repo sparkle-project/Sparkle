@@ -12,15 +12,10 @@
 #import "SUHost.h"
 #import "SULocalizations.h"
 
-@interface ShowInstallerProgress ()
-
-@property (nonatomic) SUStatusController *statusController;
-
-@end
-
 @implementation ShowInstallerProgress
-
-@synthesize statusController = _statusController;
+{
+    SUStatusController *_statusController;
+}
 
 - (void)installerProgressShouldDisplayWithHost:(SUHost *)host
 {
@@ -55,7 +50,7 @@
         }
     }
     
-    self.statusController = [[SUStatusController alloc] initWithHost:host windowTitle:updatingString centerPointValue:nil minimizable:NO closable:NO];
+    _statusController = [[SUStatusController alloc] initWithHost:host windowTitle:updatingString centerPointValue:nil minimizable:NO closable:NO];
     
     NSString *cancelUpdateTitle;
     {
@@ -63,7 +58,7 @@
         cancelUpdateTitle = (cancelUpdateTitleFromBundle != nil) ? cancelUpdateTitleFromBundle : @"Cancel Update";
     }
     
-    [self.statusController setButtonTitle:cancelUpdateTitle target:nil action:nil isDefault:NO];
+    [_statusController setButtonTitle:cancelUpdateTitle target:nil action:nil isDefault:NO];
     
     NSString *installingUpdateTitle;
     {
@@ -71,15 +66,15 @@
         installingUpdateTitle = (installingUpdateTitleFromBundle != nil) ? installingUpdateTitleFromBundle : @"Installing update…";
     }
     
-    [self.statusController beginActionWithTitle:installingUpdateTitle maxProgressValue:0 statusText:@""];
+    [_statusController beginActionWithTitle:installingUpdateTitle maxProgressValue:0 statusText:@""];
     
-    [self.statusController showWindow:self];
+    [_statusController showWindow:self];
 }
 
 - (void)installerProgressShouldStop
 {
-    [self.statusController close];
-    self.statusController = nil;
+    [_statusController close];
+    _statusController = nil;
 }
 
 @end

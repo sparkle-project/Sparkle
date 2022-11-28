@@ -13,17 +13,11 @@
 
 #include "AppKitPrevention.h"
 
-@interface SUUnarchiverNotifier ()
-
-@property (nonatomic, readonly, copy) void (^completionBlock)(NSError * _Nullable);
-@property (nonatomic, readonly, copy) void (^ _Nullable progressBlock)(double);
-
-@end
-
 @implementation SUUnarchiverNotifier
-
-@synthesize completionBlock = _completionBlock;
-@synthesize progressBlock = _progressBlock;
+{
+    void (^_completionBlock)(NSError * _Nullable);
+    void (^ _Nullable _progressBlock)(double);
+}
 
 - (instancetype)initWithCompletionBlock:(void (^)(NSError * _Nullable))completionBlock progressBlock:(void (^ _Nullable)(double))progressBlock
 {
@@ -40,7 +34,7 @@
 - (void)notifySuccess
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        self.completionBlock(nil);
+        self->_completionBlock(nil);
     });
 }
 
@@ -54,15 +48,15 @@
     NSError *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUUnarchivingError userInfo:userInfo];
     
     dispatch_async(dispatch_get_main_queue(), ^{
-        self.completionBlock(error);
+        self->_completionBlock(error);
     });
 }
 
 - (void)notifyProgress:(double)progress
 {
-    if (self.progressBlock != nil) {
+    if (_progressBlock != nil) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            self.progressBlock(progress);
+            self->_progressBlock(progress);
         });
     }
 }

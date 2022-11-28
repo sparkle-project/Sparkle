@@ -16,17 +16,11 @@
 
 #include "AppKitPrevention.h"
 
-@interface SUBinaryDeltaUnarchiver ()
-
-@property (nonatomic, copy, readonly) NSString *archivePath;
-@property (nonatomic, copy, readonly) NSString *updateHostBundlePath;
-
-@end
-
 @implementation SUBinaryDeltaUnarchiver
-
-@synthesize archivePath = _archivePath;
-@synthesize updateHostBundlePath = _updateHostBundlePath;
+{
+    NSString *_archivePath;
+    NSString *_updateHostBundlePath;
+}
 
 + (BOOL)canUnarchivePath:(NSString *)path
 {
@@ -95,11 +89,11 @@
 
 - (void)extractDeltaWithNotifier:(SUUnarchiverNotifier *)notifier
 {
-    NSString *sourcePath = self.updateHostBundlePath;
-    NSString *targetPath = [[self.archivePath stringByDeletingLastPathComponent] stringByAppendingPathComponent:[sourcePath lastPathComponent]];
+    NSString *sourcePath = _updateHostBundlePath;
+    NSString *targetPath = [[_archivePath stringByDeletingLastPathComponent] stringByAppendingPathComponent:[sourcePath lastPathComponent]];
     
     NSError *applyDiffError = nil;
-    BOOL success = applyBinaryDelta(sourcePath, targetPath, self.archivePath, NO, ^(double progress){
+    BOOL success = applyBinaryDelta(sourcePath, targetPath, _archivePath, NO, ^(double progress){
         [notifier notifyProgress:progress];
 
     }, &applyDiffError);
@@ -113,6 +107,6 @@
     }
 }
 
-- (NSString *)description { return [NSString stringWithFormat:@"%@ <%@>", [self class], self.archivePath]; }
+- (NSString *)description { return [NSString stringWithFormat:@"%@ <%@>", [self class], _archivePath]; }
 
 @end

@@ -13,19 +13,12 @@
 
 #include "AppKitPrevention.h"
 
-@interface SUGuidedPackageInstaller ()
-
-@property (nonatomic, readonly, copy) NSString *packagePath;
-@property (nonatomic, readonly, copy) NSString *homeDirectory;
-@property (nonatomic, readonly, copy) NSString *userName;
-
-@end
-
 @implementation SUGuidedPackageInstaller
-
-@synthesize packagePath = _packagePath;
-@synthesize homeDirectory = _homeDirectory;
-@synthesize userName = _userName;
+{
+    NSString *_packagePath;
+    NSString *_homeDirectory;
+    NSString *_userName;
+}
 
 - (instancetype)initWithPackagePath:(NSString *)packagePath homeDirectory:(NSString *)homeDirectory userName:(NSString *)userName
 {
@@ -50,9 +43,9 @@
     
     NSTask *task = [[NSTask alloc] init];
     task.launchPath = installerPath;
-    task.arguments = @[@"-pkg", self.packagePath, @"-target", @"/"];
+    task.arguments = @[@"-pkg", _packagePath, @"-target", @"/"];
     // Set the $HOME and $USER variables so pre/post install scripts reference the correct user environment
-    task.environment = @{@"HOME": self.homeDirectory, @"USER": self.userName};
+    task.environment = @{@"HOME": _homeDirectory, @"USER": _userName};
     task.standardError = nil;
     task.standardOutput = nil;
     
