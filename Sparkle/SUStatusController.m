@@ -79,12 +79,8 @@ static NSString *const SUStatusControllerTouchBarIndentifier = @"" SPARKLE_BUNDL
     }
     [self.progressBar setUsesThreadedAnimation:YES];
     [self.statusTextField setFont:[NSFont monospacedDigitSystemFontOfSize:0 weight:NSFontWeightRegular]];
-}
-
-// Accessed via bindings
-- (NSString *)windowTitle
-{
-    return (_windowTitle != nil) ? _windowTitle : @"";
+    
+    self.window.title = _windowTitle;
 }
 
 - (NSImage *)applicationIcon

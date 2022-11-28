@@ -103,9 +103,6 @@
                     <constraint firstItem="8" firstAttribute="top" secondItem="6" secondAttribute="top" constant="15" id="tAo-wJ-XR0"/>
                 </constraints>
             </view>
-            <connections>
-                <binding destination="-2" name="title" keyPath="windowTitle" id="24"/>
-            </connections>
             <point key="canvasLocation" x="-158" y="132"/>
         </window>
     </objects>
