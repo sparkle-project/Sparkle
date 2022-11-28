@@ -24,7 +24,7 @@
 @property (nonatomic) double maxProgressValue;
 @property (getter=isButtonEnabled) BOOL buttonEnabled;
 
-- (instancetype)initWithHost:(SUHost *)aHost centerPointValue:(NSValue *)centerPointValue minimizable:(BOOL)minimizable closable:(BOOL)closable;
+- (instancetype)initWithHost:(SUHost *)aHost windowTitle:(NSString *)windowTitle centerPointValue:(NSValue *)centerPointValue minimizable:(BOOL)minimizable closable:(BOOL)closable;
 
 // Pass 0 for the max progress value to get an indeterminate progress bar.
 // Pass nil for the status text to not show it.

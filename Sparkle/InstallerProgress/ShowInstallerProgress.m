@@ -24,10 +24,51 @@
 
 - (void)installerProgressShouldDisplayWithHost:(SUHost *)host
 {
-    self.statusController = [[SUStatusController alloc] initWithHost:host centerPointValue:nil minimizable:NO closable:NO];
+    // Try to retrieve localization strings from the old bundle if possible
     
-    [self.statusController setButtonTitle:SULocalizedString(@"Cancel Update", @"") target:nil action:nil isDefault:NO];
-    [self.statusController beginActionWithTitle:SULocalizedString(@"Installing update…", @"") maxProgressValue:0 statusText:@""];
+    NSBundle *hostSparkleBundle;
+    {
+        NSURL *hostSparkleURL = [host.bundle.privateFrameworksURL URLByAppendingPathComponent:@"Sparkle.framework" isDirectory:YES];
+        if (hostSparkleURL == nil) {
+            hostSparkleBundle = nil;
+        } else {
+            hostSparkleBundle = [NSBundle bundleWithURL:hostSparkleURL];
+        }
+    }
+    
+    NSString *updatingString;
+    {
+        NSString *updatingFormatStringFromBundle = (hostSparkleBundle != nil) ? SULocalizedStringFromTableInBundle(@"Updating %@", @"Sparkle", hostSparkleBundle, nil) : nil;
+
+        NSString *hostNameFromBundle = host.name;
+        NSString *hostName = (hostNameFromBundle != nil) ? hostNameFromBundle : @"";
+        
+        if (updatingFormatStringFromBundle != nil) {
+            // Replacing the %@ will be a bit safer than using +[NSString stringWithFormat:]
+            updatingString = [updatingFormatStringFromBundle stringByReplacingOccurrencesOfString:@"%@" withString:hostName];
+        } else {
+            updatingString = [@"Updating " stringByAppendingString:hostName];
+        }
+    }
+    
+    self.statusController = [[SUStatusController alloc] initWithHost:host windowTitle:updatingString centerPointValue:nil minimizable:NO closable:NO];
+    
+    NSString *cancelUpdateTitle;
+    {
+        NSString *cancelUpdateTitleFromBundle = (hostSparkleBundle != nil) ?  SULocalizedStringFromTableInBundle(@"Cancel Update", @"Sparkle", hostSparkleBundle, @"") : nil;
+        cancelUpdateTitle = (cancelUpdateTitleFromBundle != nil) ? cancelUpdateTitleFromBundle : @"Cancel Update";
+    }
+    
+    [self.statusController setButtonTitle:cancelUpdateTitle target:nil action:nil isDefault:NO];
+    
+    NSString *installingUpdateTitle;
+    {
+        NSString *installingUpdateTitleFromBundle = (hostSparkleBundle != nil) ?  SULocalizedStringFromTableInBundle(@"Installing update…", @"Sparkle", hostSparkleBundle, @"") : nil;
+        installingUpdateTitle = (installingUpdateTitleFromBundle != nil) ? installingUpdateTitleFromBundle : @"Installing update…";
+    }
+    
+    [self.statusController beginActionWithTitle:installingUpdateTitle maxProgressValue:0 statusText:@""];
+    
     [self.statusController showWindow:self];
 }
 

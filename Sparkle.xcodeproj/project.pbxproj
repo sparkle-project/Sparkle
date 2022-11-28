@@ -212,7 +212,6 @@
 		724BB3AA1D3347C2005D534A /* SUInstallerStatus.m in Sources */ = {isa = PBXBuildFile; fileRef = 724BB3971D333832005D534A /* SUInstallerStatus.m */; };
 		724BB3B71D35ABA8005D534A /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 61B5F8F609C4CEB300B25A18 /* Security.framework */; };
 		724F76F91D6EAD0D00ECD062 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 525A278F133D6AE900FD8D70 /* Cocoa.framework */; };
-		725264A91D5FBD9100CD6400 /* Sparkle.strings in Resources */ = {isa = PBXBuildFile; fileRef = 61AAE8220A321A7F00D8810D /* Sparkle.strings */; };
 		725602D51C83551C00DAA70E /* SUApplicationInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 725602D31C83551C00DAA70E /* SUApplicationInfo.h */; };
 		725602D61C83551C00DAA70E /* SUApplicationInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 725602D41C83551C00DAA70E /* SUApplicationInfo.m */; };
 		725B3A82263FBF0C0041AB8E /* testappcast_minimumAutoupdateVersion.xml in Resources */ = {isa = PBXBuildFile; fileRef = 725B3A81263FBF0C0041AB8E /* testappcast_minimumAutoupdateVersion.xml */; };
@@ -3141,7 +3140,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				725264A91D5FBD9100CD6400 /* Sparkle.strings in Resources */,
 				72EB87EC1CB8887E00C37F42 /* SUStatus.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
