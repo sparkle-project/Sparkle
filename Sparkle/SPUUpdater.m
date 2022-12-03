@@ -426,6 +426,11 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 {
     [self setSendsSystemProfile:response.sendSystemProfile];
     [self setAutomaticallyChecksForUpdates:response.automaticUpdateChecks];
+    
+    NSNumber *automaticUpdateDownloading = response.automaticUpdateDownloading;
+    if (automaticUpdateDownloading != nil) {
+        [self setAutomaticallyDownloadsUpdates:automaticUpdateDownloading.boolValue];
+    }
 }
 
 - (NSDate *)lastUpdateCheckDate

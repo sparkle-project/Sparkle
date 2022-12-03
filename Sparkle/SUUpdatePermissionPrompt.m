@@ -23,6 +23,7 @@ static NSString *const SUUpdatePermissionPromptTouchBarIndentifier = @"" SPARKLE
 @interface SUUpdatePermissionPrompt () <NSTouchBarDelegate>
 
 @property (nonatomic) BOOL shouldSendProfile;
+@property (nonatomic) BOOL automaticallyDownloadUpdates;
 
 @property (nonatomic) SUHost *host;
 @property (nonatomic) NSArray *systemProfileInformationArray;
@@ -33,6 +34,7 @@ static NSString *const SUUpdatePermissionPromptTouchBarIndentifier = @"" SPARKLE
 @property (nonatomic) IBOutlet NSView *placeholderView;
 @property (nonatomic) IBOutlet NSView *responseView;
 @property (nonatomic) IBOutlet NSView *infoChoiceView;
+@property (nonatomic) IBOutlet NSView *automaticallyDownloadUpdatesView;
 
 @property (nonatomic) IBOutlet NSButton *cancelButton;
 @property (nonatomic) IBOutlet NSButton *checkButton;
@@ -48,6 +50,7 @@ static NSString *const SUUpdatePermissionPromptTouchBarIndentifier = @"" SPARKLE
 
 @synthesize reply = _reply;
 @synthesize shouldSendProfile = _shouldSendProfile;
+@synthesize automaticallyDownloadUpdates = _automaticallyDownloadUpdates;
 @synthesize host = _host;
 @synthesize systemProfileInformationArray = _systemProfileInformationArray;
 @synthesize stackView = _stackView;
@@ -56,6 +59,7 @@ static NSString *const SUUpdatePermissionPromptTouchBarIndentifier = @"" SPARKLE
 @synthesize placeholderView = _placeholderView;
 @synthesize responseView = _responseView;
 @synthesize infoChoiceView = _infoChoiceView;
+@synthesize automaticallyDownloadUpdatesView = _automaticallyDownloadUpdatesView;
 @synthesize cancelButton = _cancelButton;
 @synthesize checkButton = _checkButton;
 @synthesize anonymousInfoDisclosureButton = _anonymousInfoDisclosureButton;
@@ -70,6 +74,7 @@ static NSString *const SUUpdatePermissionPromptTouchBarIndentifier = @"" SPARKLE
         _host = theHost;
         _shouldSendProfile = [self shouldAskAboutProfile];
         _systemProfileInformationArray = request.systemProfile;
+        _automaticallyDownloadUpdates = [theHost boolForKey:SUAutomaticallyUpdateKey];
         [self setShouldCascadeWindows:NO];
     } else {
         assert(false);
@@ -82,6 +87,12 @@ static NSString *const SUUpdatePermissionPromptTouchBarIndentifier = @"" SPARKLE
     return [(NSNumber *)[self.host objectForInfoDictionaryKey:SUEnableSystemProfilingKey] boolValue];
 }
 
+- (BOOL)allowsAutomaticUpdates
+{
+    NSNumber *allowsAutomaticUpdates = [self.host objectForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey];
+    return (allowsAutomaticUpdates == nil || allowsAutomaticUpdates.boolValue);
+}
+
 - (NSString *)description { return [NSString stringWithFormat:@"%@ <%@>", [self class], [self.host bundlePath]]; }
 
 - (void)windowDidLoad
@@ -89,8 +100,10 @@ static NSString *const SUUpdatePermissionPromptTouchBarIndentifier = @"" SPARKLE
     [self.window center];
     
     self.infoChoiceView.hidden = ![self shouldAskAboutProfile];
+    self.automaticallyDownloadUpdatesView.hidden = ![self allowsAutomaticUpdates];
     
     [self.stackView addArrangedSubview:self.promptView];
+    [self.stackView addArrangedSubview:self.automaticallyDownloadUpdatesView];
     [self.stackView addArrangedSubview:self.infoChoiceView];
     [self.stackView addArrangedSubview:self.placeholderView];
     [self.stackView addArrangedSubview:self.moreInfoView];
@@ -148,7 +161,16 @@ static NSString *const SUUpdatePermissionPromptTouchBarIndentifier = @"" SPARKLE
 
 - (IBAction)finishPrompt:(NSButton *)sender
 {
-    SUUpdatePermissionResponse *response = [[SUUpdatePermissionResponse alloc] initWithAutomaticUpdateChecks:([sender tag] == 1) sendSystemProfile:self.shouldSendProfile];
+    BOOL automaticUpdateChecksEnabled = ([sender tag] == 1);
+    
+    NSNumber *automaticUpdateDownloading;
+    if ([self allowsAutomaticUpdates]) {
+        automaticUpdateDownloading = @(automaticUpdateChecksEnabled && self.automaticallyDownloadUpdates);
+    } else {
+        automaticUpdateDownloading = nil;
+    }
+    
+    SUUpdatePermissionResponse *response = [[SUUpdatePermissionResponse alloc] initWithAutomaticUpdateChecks:automaticUpdateChecksEnabled automaticUpdateDownloading:automaticUpdateDownloading sendSystemProfile:self.shouldSendProfile];
     self.reply(response);
     
     [self close];
