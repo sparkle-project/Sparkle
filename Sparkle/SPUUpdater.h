@@ -265,7 +265,7 @@ SU_EXPORT @interface SPUUpdater : NSObject
  
  You should call this method if you have used `-setFeedURL:` in the past and want to stop using that API.
  Otherwise for compatibility Sparkle will prefer to use the feed URL that was set in the user defaults over the one that was specified in the host bundle's Info.plist,
- which is undesirable.
+ which is often undesirable (except for testing purposes).
  
  If a feed URL is found stored in the host bundle's user defaults (from calling `-setFeedURL:`) before it gets cleared,
  then that previously set URL is returned from this method.
