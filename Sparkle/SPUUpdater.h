@@ -243,7 +243,7 @@ SU_EXPORT @interface SPUUpdater : NSObject
  Set the URL of the appcast used to download update information. This method is deprecated.
  
  Setting this property will persist in the host bundle's user defaults.
- To avoid this, please consider implementing
+ To avoid this undesirable behavior, please consider implementing
  `-[SPUUpdaterDelegate feedURLStringForUpdater:]` instead of using this method.
  
  Calling `-clearFeedURLFromUserDefaults` will remove any feed URL that has been set in the host bundle's user defaults.
@@ -253,6 +253,8 @@ SU_EXPORT @interface SPUUpdater : NSObject
  If you do not need to alternate between multiple feeds, set the SUFeedURL in your Info.plist instead of invoking this method.
  
  For beta updates, you may consider migrating to `-[SPUUpdaterDelegate allowedChannelsForUpdater:]` in the future.
+ 
+ Updaters that update other developer's bundles should not call this method.
  
  This method must be called on the main thread; calls from background threads will have no effect.
  */
@@ -270,6 +272,8 @@ SU_EXPORT @interface SPUUpdater : NSObject
  
  This method should be called as soon as possible, after your application finished launching or right after the updater has been started
  if you manually manage starting the updater.
+ 
+ Updaters that update other developer's bundles should not call this method.
  
  This method must be called on the main thread.
  
