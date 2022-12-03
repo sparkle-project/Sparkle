@@ -508,7 +508,7 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
     
     self.cancellation = cancellation;
     
-    self.checkingController = [[SUStatusController alloc] initWithHost:self.host centerPointValue:nil minimizable:NO closable:NO];
+    self.checkingController = [[SUStatusController alloc] initWithHost:self.host windowTitle:[NSString stringWithFormat:SULocalizedString(@"Updating %@", nil), [self.host name]] centerPointValue:nil minimizable:NO closable:NO];
     [[self.checkingController window] center]; // Force the checking controller to load its window.
     [self.checkingController beginActionWithTitle:SULocalizedString(@"Checking for updates…", nil) maxProgressValue:0.0 statusText:nil];
     [self.checkingController setButtonTitle:SULocalizedString(@"Cancel", nil) target:self action:@selector(cancelCheckForUpdates:) isDefault:NO];
@@ -676,7 +676,7 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
             centerPointValue = nil;
         }
         
-        self.statusController = [[SUStatusController alloc] initWithHost:self.host centerPointValue:centerPointValue minimizable:minimizable closable:closable];
+        self.statusController = [[SUStatusController alloc] initWithHost:self.host windowTitle:[NSString stringWithFormat:SULocalizedString(@"Updating %@", nil), [self.host name]] centerPointValue:centerPointValue minimizable:minimizable closable:closable];
         
         if (_updateAlertWindowWasInactive) {
             [self.statusController.window orderFront:nil];

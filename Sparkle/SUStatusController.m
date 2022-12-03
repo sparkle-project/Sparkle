@@ -26,6 +26,7 @@ static NSString *const SUStatusControllerTouchBarIndentifier = @"" SPARKLE_BUNDL
 
 @implementation SUStatusController
 {
+    NSString *_windowTitle;
     NSValue *_centerPointValue;
     BOOL _closable;
 }
@@ -42,7 +43,7 @@ static NSString *const SUStatusControllerTouchBarIndentifier = @"" SPARKLE_BUNDL
 @synthesize touchBarButton;
 @synthesize minimizable = _minimizable;
 
-- (instancetype)initWithHost:(SUHost *)aHost centerPointValue:(NSValue *)centerPointValue minimizable:(BOOL)minimizable closable:(BOOL)closable
+- (instancetype)initWithHost:(SUHost *)aHost windowTitle:(NSString *)windowTitle centerPointValue:(NSValue *)centerPointValue minimizable:(BOOL)minimizable closable:(BOOL)closable
 {
     self = [super initWithWindowNibName:@"SUStatus" owner:self];
 	if (self)
@@ -51,6 +52,7 @@ static NSString *const SUStatusControllerTouchBarIndentifier = @"" SPARKLE_BUNDL
         _centerPointValue = centerPointValue;
         _minimizable = minimizable;
         _closable = closable;
+        _windowTitle = [windowTitle copy];
         [self setShouldCascadeWindows:NO];
     }
     return self;
@@ -77,11 +79,8 @@ static NSString *const SUStatusControllerTouchBarIndentifier = @"" SPARKLE_BUNDL
     }
     [self.progressBar setUsesThreadedAnimation:YES];
     [self.statusTextField setFont:[NSFont monospacedDigitSystemFontOfSize:0 weight:NSFontWeightRegular]];
-}
-
-- (NSString *)windowTitle
-{
-    return [NSString stringWithFormat:SULocalizedString(@"Updating %@", nil), [self.host name]];
+    
+    self.window.title = _windowTitle;
 }
 
 - (NSImage *)applicationIcon

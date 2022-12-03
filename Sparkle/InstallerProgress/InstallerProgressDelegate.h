@@ -14,6 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol InstallerProgressDelegate <NSObject>
 
+- (void)loadLocalizationStringsFromHost:(SUHost *)host;
 - (void)installerProgressShouldDisplayWithHost:(SUHost *)host;
 - (void)installerProgressShouldStop;
 
