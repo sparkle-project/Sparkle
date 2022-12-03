@@ -192,7 +192,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         if (self->_updatingMainBundle) {
             NSString *appcastUserDefaultsString = [self.host objectForUserDefaultsKey:SUFeedURLKey];
             if (appcastUserDefaultsString != nil) {
-                SULog(SULogLevelError, @"Warning: A feed URL was found stored in user defaults for %@. This was likely set using -[SPUUpdater setFeedURL:] which is deprecated. Please migrate away from using this API and use -[SPUUpdater clearFeedURLFromUserDefaults] to remove any stored defaults, otherwise Sparkle may continue to use the feed stored from the defaults. Read the documentation for -[SPUUpdater setFeedURL:] regarding migrating away from using the API", self.host.name);
+                SULog(SULogLevelError, @"Warning: A feed URL was found stored in user defaults for %@. This was likely set using -[SPUUpdater setFeedURL:] which is deprecated. Please migrate away from using this API and use -[SPUUpdater clearFeedURLFromUserDefaults] to remove any stored defaults, otherwise Sparkle may continue to use the feed stored from the defaults. If the feed url was set via a defaults write command for testing purposes, then please ignore this warning.", self.host.name);
             }
         }
         
