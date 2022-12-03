@@ -100,7 +100,8 @@ SU_EXPORT @interface SPUUpdater : NSObject
  You usually do not need to call this method directly. If `automaticallyChecksForUpdates` is @c YES,
  Sparkle calls this method automatically according to its update schedule using the `updateCheckInterval`
  and the `lastUpdateCheckDate`. Therefore, you should typically only consider calling this method directly if you
- opt out of automatic update checks.
+ opt out of automatic update checks. Calling this method when updating your own bundle is invalid if Sparkle is configured
+ to ask the user's permission to check for updates automatically and `automaticallyChecksForUpdates` is `NO`.
  
  This is meant for programmatically initating a check for updates in the background without the user initiating it.
  This check will not show UI if no new updates are found.
@@ -108,7 +109,7 @@ SU_EXPORT @interface SPUUpdater : NSObject
  If a new update is found, the updater's user driver may handle showing it at an appropriate (but not necessarily immediate) time.
  If you want control over when and how a new update is shown, please see https://sparkle-project.org/documentation/gentle-reminders/
  
- Note if automated updating is turned on, either a new update may be downloaded in the background to be installed silently,
+ Note if automated downloading/installing is turned on, either a new update may be downloaded in the background to be installed silently,
  or an already downloaded update may be shown.
  
  This will not find updates that the user has opted into skipping.
