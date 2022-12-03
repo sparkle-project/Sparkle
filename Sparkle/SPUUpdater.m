@@ -619,7 +619,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
             // Check if automatic update checking is disabled or if the user hasn't given permission for Sparkle to check
             BOOL automaticChecksInDefaults = [self automaticallyChecksForUpdates];
             if (!automaticChecksInDefaults) {
-                SULog(SULogLevelError, @"Error: Calling -[SPUUpdater checkForUpdatesInBackground] when Sparkle is set to ask the user permission to check for updates in the background automatically and automaticallyChecksForUpdates is NO leads to incorrect behavior");
+                SULog(SULogLevelError, @"Error: Calling -[SPUUpdater checkForUpdatesInBackground] for your own bundle when Sparkle is set to ask the user permission to check for updates in the background automatically and automaticallyChecksForUpdates is NO leads to incorrect behavior");
             }
         }
     }
