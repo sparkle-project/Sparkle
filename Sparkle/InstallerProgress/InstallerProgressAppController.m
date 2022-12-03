@@ -119,6 +119,8 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
         _application = application;
         _delegate = delegate;
         
+        [delegate loadLocalizationStringsFromHost:host];
+        
         _connection.exportedInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SPUInstallerAgentProtocol)];
         _connection.exportedObject = self;
         

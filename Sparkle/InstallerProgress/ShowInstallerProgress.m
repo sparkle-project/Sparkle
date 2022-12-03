@@ -19,16 +19,20 @@
 @end
 
 @implementation ShowInstallerProgress
+{
+    NSString *_updatingString;
+    NSString *_cancelUpdateTitle;
+    NSString *_installingUpdateTitle;
+}
 
 @synthesize statusController = _statusController;
 
-- (void)installerProgressShouldDisplayWithHost:(SUHost *)host
+- (void)loadLocalizationStringsFromHost:(SUHost *)host
 {
     // Try to retrieve localization strings from the old bundle if possible
-    // Note in Sparkle 2 in the common case it should be unlikely that this progress window will show up
-    // Uncommon cases where the install process may be slower are if the app to be installed is on a network mount
-    // or e.g. USB mount or a different mount in general.
-    // In case we fail to load the localizations we will show English strings, which is not a big deal here.
+    // We won't display these strings until installerProgressShouldDisplayWithHost:
+    // (which will be after the update is trusted)
+    // If we fail to load localizations in any way, we default to English
     
     NSBundle *hostSparkleBundle;
     {
@@ -55,7 +59,7 @@
         }
     }
     
-    self.statusController = [[SUStatusController alloc] initWithHost:host windowTitle:updatingString centerPointValue:nil minimizable:NO closable:NO];
+    _updatingString = updatingString;
     
     NSString *cancelUpdateTitle;
     {
@@ -63,7 +67,7 @@
         cancelUpdateTitle = (cancelUpdateTitleFromBundle != nil) ? cancelUpdateTitleFromBundle : @"Cancel Update";
     }
     
-    [self.statusController setButtonTitle:cancelUpdateTitle target:nil action:nil isDefault:NO];
+    _cancelUpdateTitle = cancelUpdateTitle;
     
     NSString *installingUpdateTitle;
     {
@@ -71,7 +75,15 @@
         installingUpdateTitle = (installingUpdateTitleFromBundle != nil) ? installingUpdateTitleFromBundle : @"Installing update…";
     }
     
-    [self.statusController beginActionWithTitle:installingUpdateTitle maxProgressValue:0 statusText:@""];
+    _installingUpdateTitle = installingUpdateTitle;
+}
+
+- (void)installerProgressShouldDisplayWithHost:(SUHost *)host
+{
+    self.statusController = [[SUStatusController alloc] initWithHost:host windowTitle:_updatingString centerPointValue:nil minimizable:NO closable:NO];
+    
+    [self.statusController setButtonTitle:_cancelUpdateTitle target:nil action:nil isDefault:NO];
+    [self.statusController beginActionWithTitle:_installingUpdateTitle maxProgressValue:0 statusText:@""];
     
     [self.statusController showWindow:self];
 }
