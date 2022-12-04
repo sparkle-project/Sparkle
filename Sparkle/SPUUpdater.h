@@ -206,6 +206,10 @@ SU_EXPORT @interface SPUUpdater : NSObject
  
  By default, updates are not automatically downloaded.
  
+ By default starting from Sparkle 2.4, users are provided an option to opt in to automatically downloading and installing updates when they are asked if they want automatic update checks enabled.
+ The default value for this option is based on what the developer sets `SUAutomaticallyUpdate` in their Info.plist.
+ This is not done if `SUEnableAutomaticChecks` is set in the Info.plist however. Please check `automaticallyChecksForUpdates` property for more details.
+ 
  Note that the developer can disallow automatic downloading of updates from being enabled (via `SUAllowsAutomaticUpdates` Info.plist key).
  In this case, this property will return NO regardless of how this property is set.
  
