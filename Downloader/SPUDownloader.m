@@ -158,12 +158,12 @@ static NSString *SUDownloadingReason = @"Downloading update related file";
     });
 }
 
-- (void)URLSession:(NSURLSession *)__unused session downloadTask:(NSURLSessionDownloadTask *) downloadTask didFinishDownloadingToURL:(NSURL *)location
+- (void)URLSession:(NSURLSession *)__unused session downloadTask:(NSURLSessionDownloadTask *)downloadTask didFinishDownloadingToURL:(NSURL *)location
 {
     NSInteger statusCode = [downloadTask.response isKindOfClass:[NSHTTPURLResponse class]] ? ((NSHTTPURLResponse *)downloadTask.response).statusCode : 200;
     if ((statusCode < 200) || (statusCode >= 400))
     {
-        NSString *message = [NSString stringWithFormat:@"A network error occurred while downloading the update. %@ (%ld)", [NSHTTPURLResponse localizedStringForStatusCode:statusCode], (long)statusCode];
+        NSString *message = [NSString stringWithFormat:@"A network error occurred while downloading %@. %@ (%ld)", downloadTask.originalRequest.URL.absoluteString, [NSHTTPURLResponse localizedStringForStatusCode:statusCode], (long)statusCode];
         NSError *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUDownloadError userInfo:@{ NSLocalizedDescriptionKey: message }];
         [self.delegate downloaderDidFailWithError:error];
     }
