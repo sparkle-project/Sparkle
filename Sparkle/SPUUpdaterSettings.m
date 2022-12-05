@@ -13,15 +13,10 @@
 
 #include "AppKitPrevention.h"
 
-@interface SPUUpdaterSettings ()
-
-@property (nonatomic, readonly) SUHost *host;
-
-@end
-
 @implementation SPUUpdaterSettings
-
-@synthesize host = _host;
+{
+    SUHost *_host;
+}
 
 - (instancetype)initWithHostBundle:(NSBundle *)hostBundle
 {
@@ -38,13 +33,13 @@
     if ((NSInteger)[self updateCheckInterval] == 0) {
         return NO;
     }
-    return [self.host boolForKey:SUEnableAutomaticChecksKey];
+    return [_host boolForKey:SUEnableAutomaticChecksKey];
 }
 
 - (NSTimeInterval)updateCheckInterval
 {
     // Find the stored check interval. User defaults override Info.plist.
-    NSNumber *intervalValue = [self.host objectForKey:SUScheduledCheckIntervalKey];
+    NSNumber *intervalValue = [_host objectForKey:SUScheduledCheckIntervalKey];
     if (intervalValue)
         return [intervalValue doubleValue];
     else
@@ -54,7 +49,7 @@
 // For allowing automatic downloaded updates to be turned on or off
 - (NSNumber * _Nullable)allowsAutomaticUpdatesOption
 {
-    NSNumber *developerAllowsAutomaticUpdates = [self.host objectForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey];
+    NSNumber *developerAllowsAutomaticUpdates = [_host objectForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey];
     return [developerAllowsAutomaticUpdates isKindOfClass:[NSNumber class]] ? developerAllowsAutomaticUpdates : nil;
 }
 
@@ -66,12 +61,12 @@
 
 - (BOOL)automaticallyDownloadsUpdates
 {
-    return [self.host boolForKey:SUAutomaticallyUpdateKey];
+    return [_host boolForKey:SUAutomaticallyUpdateKey];
 }
 
 - (BOOL)sendsSystemProfile
 {
-    return [self.host boolForKey:SUSendProfileInfoKey];
+    return [_host boolForKey:SUSendProfileInfoKey];
 }
 
 @end

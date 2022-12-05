@@ -36,13 +36,13 @@ static NSString *SUUpdatePermissionSendSystemProfileKey = @"SUUpdatePermissionSe
 
 - (void)encodeWithCoder:(NSCoder *)encoder
 {
-    [encoder encodeBool:self.automaticUpdateChecks forKey:SUUpdatePermissionAutomaticUpdateChecksKey];
+    [encoder encodeBool:_automaticUpdateChecks forKey:SUUpdatePermissionAutomaticUpdateChecksKey];
     
     if (self.automaticUpdateDownloading != nil) {
-        [encoder encodeObject:self.automaticUpdateDownloading forKey:SUUpdatePermissionAutomaticUpdateDownloadingKey];
+        [encoder encodeObject:_automaticUpdateDownloading forKey:SUUpdatePermissionAutomaticUpdateDownloadingKey];
     }
     
-    [encoder encodeBool:self.sendSystemProfile forKey:SUUpdatePermissionSendSystemProfileKey];
+    [encoder encodeBool:_sendSystemProfile forKey:SUUpdatePermissionSendSystemProfileKey];
 }
 
 - (instancetype)initWithAutomaticUpdateChecks:(BOOL)automaticUpdateChecks automaticUpdateDownloading:(NSNumber * _Nullable)automaticUpdateDownloading sendSystemProfile:(BOOL)sendSystemProfile

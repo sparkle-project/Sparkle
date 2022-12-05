@@ -22,13 +22,13 @@
 // programmatically.
 
 @interface SPUStandardUpdaterController () <NSMenuItemValidation>
-
-@property (nonatomic) SPUUpdater *updater;
-@property (nonatomic) id<SPUUserDriver> userDriver;
-
 @end
 
 @implementation SPUStandardUpdaterController
+{
+    SPUUpdater *_updater;
+    id<SPUUserDriver> _userDriver;
+}
 
 @synthesize updater = _updater;
 @synthesize userDriver = _userDriver;
@@ -38,7 +38,7 @@
     // Note: awakeFromNib might be called more than once
     // We have to use awakeFromNib otherwise the delegate outlets may not be connected yet,
     // and we aren't a proper window or view controller, so we don't have a proper "did load" point
-    if (self.updater == nil) {
+    if (_updater == nil) {
         [self _initUpdater];
         [self startUpdater];
     }
@@ -51,8 +51,8 @@
 #pragma clang diagnostic ignored "-Wdirect-ivar-access"
     SPUStandardUserDriver *userDriver = [[SPUStandardUserDriver alloc] initWithHostBundle:hostBundle delegate:self->userDriverDelegate];
     
-    self.updater = [[SPUUpdater alloc] initWithHostBundle:hostBundle applicationBundle:hostBundle userDriver:userDriver delegate:self->updaterDelegate];
-    self.userDriver = userDriver;
+    _updater = [[SPUUpdater alloc] initWithHostBundle:hostBundle applicationBundle:hostBundle userDriver:userDriver delegate:self->updaterDelegate];
+    _userDriver = userDriver;
 #pragma clang diagnostic pop
 }
 
@@ -94,13 +94,13 @@
 
 - (IBAction)checkForUpdates:(nullable id)__unused sender
 {
-    [self.updater checkForUpdates];
+    [_updater checkForUpdates];
 }
 
 - (BOOL)validateMenuItem:(NSMenuItem *)item
 {
     if ([item action] == @selector(checkForUpdates:)) {
-        return self.updater.canCheckForUpdates;
+        return _updater.canCheckForUpdates;
     }
     return YES;
 }

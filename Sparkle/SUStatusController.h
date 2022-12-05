@@ -15,14 +15,11 @@
 
 @class SUHost;
 @interface SUStatusController : NSWindowController
-@property (weak) IBOutlet NSButton *actionButton;
-@property (weak) IBOutlet NSProgressIndicator *progressBar;
-@property (weak) IBOutlet NSTextField *statusTextField;
 
-@property (copy) NSString *statusText;
-@property double progressValue;
+@property (nonatomic, copy) NSString *statusText;
+@property (nonatomic) double progressValue;
 @property (nonatomic) double maxProgressValue;
-@property (getter=isButtonEnabled) BOOL buttonEnabled;
+@property (nonatomic, getter=isButtonEnabled) BOOL buttonEnabled;
 
 - (instancetype)initWithHost:(SUHost *)aHost windowTitle:(NSString *)windowTitle centerPointValue:(NSValue *)centerPointValue minimizable:(BOOL)minimizable closable:(BOOL)closable;
 

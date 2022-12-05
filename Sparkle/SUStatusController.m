@@ -18,10 +18,16 @@
 static NSString *const SUStatusControllerTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDENTIFIER ".SUStatusController";
 
 @interface SUStatusController () <NSTouchBarDelegate>
-@property (copy) NSString *title, *buttonTitle;
-@property (strong) SUHost *host;
-@property NSButton *touchBarButton;
+
+@property (nonatomic) IBOutlet NSButton *actionButton;
+@property (nonatomic) IBOutlet NSProgressIndicator *progressBar;
+@property (nonatomic) IBOutlet NSTextField *statusTextField;
+
+@property (nonatomic, copy) NSString *title, *buttonTitle;
+@property (nonatomic) SUHost *host;
+@property (nonatomic) NSButton *touchBarButton;
 @property (nonatomic, readonly) BOOL minimizable;
+
 @end
 
 @implementation SUStatusController
@@ -31,16 +37,16 @@ static NSString *const SUStatusControllerTouchBarIndentifier = @"" SPARKLE_BUNDL
     BOOL _closable;
 }
 
-@synthesize progressValue;
-@synthesize maxProgressValue;
-@synthesize statusText;
-@synthesize title;
-@synthesize buttonTitle;
-@synthesize host;
-@synthesize actionButton;
-@synthesize progressBar;
-@synthesize statusTextField;
-@synthesize touchBarButton;
+@synthesize progressValue = _progressValue;
+@synthesize maxProgressValue = _maxProgressValue;
+@synthesize statusText = _statusText;
+@synthesize title = _title;
+@synthesize buttonTitle = _buttonTitle;
+@synthesize host = _host;
+@synthesize actionButton = _actionButton;
+@synthesize progressBar = _progressBar;
+@synthesize statusTextField = _statusTextField;
+@synthesize touchBarButton = _touchBarButton;
 @synthesize minimizable = _minimizable;
 
 - (instancetype)initWithHost:(SUHost *)aHost windowTitle:(NSString *)windowTitle centerPointValue:(NSValue *)centerPointValue minimizable:(BOOL)minimizable closable:(BOOL)closable
@@ -48,7 +54,7 @@ static NSString *const SUStatusControllerTouchBarIndentifier = @"" SPARKLE_BUNDL
     self = [super initWithWindowNibName:@"SUStatus" owner:self];
 	if (self)
 	{
-        self.host = aHost;
+        _host = aHost;
         _centerPointValue = centerPointValue;
         _minimizable = minimizable;
         _closable = closable;
@@ -139,7 +145,7 @@ static NSString *const SUStatusControllerTouchBarIndentifier = @"" SPARKLE_BUNDL
 - (void)setMaxProgressValue:(double)value
 {
 	if (value < 0.0) value = 0.0;
-    maxProgressValue = value;
+    _maxProgressValue = value;
     [self setProgressValue:0.0];
     [self.progressBar setIndeterminate:(value == 0.0)];
     [self.progressBar startAnimation:self];
