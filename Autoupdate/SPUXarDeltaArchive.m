@@ -47,10 +47,11 @@ extern char *xar_get_safe_path(xar_file_t f) __attribute__((weak_import));
 
 @implementation SPUXarDeltaArchive
 {
-    xar_t _x;
-    int32_t _xarMode;
     NSMutableDictionary<NSString *, NSValue *> *_fileTable;
     NSString *_patchFile;
+    
+    xar_t _x;
+    int32_t _xarMode;
 }
 
 @synthesize error = _error;

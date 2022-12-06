@@ -8,9 +8,9 @@
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="SUStatusController">
             <connections>
-                <outlet property="actionButton" destination="12" id="34"/>
-                <outlet property="progressBar" destination="11" id="49"/>
-                <outlet property="statusTextField" destination="16" id="MiZ-Tn-yVg"/>
+                <outlet property="_actionButton" destination="12" id="0jE-Zn-L18"/>
+                <outlet property="_progressBar" destination="11" id="Cwm-99-fCT"/>
+                <outlet property="_statusTextField" destination="16" id="oOr-uc-6cX"/>
                 <outlet property="window" destination="5" id="25"/>
             </connections>
         </customObject>

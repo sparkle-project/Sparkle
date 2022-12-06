@@ -35,15 +35,17 @@ typedef struct
 {
     FILE *_file;
     BZFILE *_bzipFile;
-    compression_stream _compressionStream;
-    BOOL _initializedCompressionStream;
     NSString *_patchFile;
-    SPUDeltaCompressionMode _compression;
-    BOOL _writeMode;
     NSError *_error;
     void *_partialChunkBuffer;
     void *_compressionBuffer;
     NSMutableArray<SPUDeltaArchiveItem *> *_writableItems;
+    
+    compression_stream _compressionStream;
+    SPUDeltaCompressionMode _compression;
+    
+    BOOL _initializedCompressionStream;
+    BOOL _writeMode;
 }
 
 @synthesize error = _error;

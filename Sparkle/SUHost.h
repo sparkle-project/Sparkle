@@ -13,7 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface SUHost : NSObject
 
-@property (strong, readonly) NSBundle *bundle;
+@property (nonatomic, readonly) NSBundle *bundle;
 
 - (instancetype)initWithBundle:(NSBundle *)aBundle;
 

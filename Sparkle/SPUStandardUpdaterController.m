@@ -25,10 +25,6 @@
 @end
 
 @implementation SPUStandardUpdaterController
-{
-    SPUUpdater *_updater;
-    id<SPUUserDriver> _userDriver;
-}
 
 @synthesize updater = _updater;
 @synthesize userDriver = _userDriver;

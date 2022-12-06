@@ -18,36 +18,28 @@
 static NSString *const SUStatusControllerTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDENTIFIER ".SUStatusController";
 
 @interface SUStatusController () <NSTouchBarDelegate>
-
-@property (nonatomic) IBOutlet NSButton *actionButton;
-@property (nonatomic) IBOutlet NSProgressIndicator *progressBar;
-@property (nonatomic) IBOutlet NSTextField *statusTextField;
-
-@property (nonatomic, copy) NSString *title, *buttonTitle;
-@property (nonatomic) SUHost *host;
-@property (nonatomic) NSButton *touchBarButton;
-@property (nonatomic, readonly) BOOL minimizable;
-
 @end
 
 @implementation SUStatusController
 {
     NSString *_windowTitle;
     NSValue *_centerPointValue;
+    NSString *_title;
+    NSString *_buttonTitle;
+    SUHost *_host;
+    NSButton *_touchBarButton;
+    BOOL _minimizable;
+    
+    IBOutlet NSButton *_actionButton;
+    IBOutlet NSTextField *_statusTextField;
+    IBOutlet NSProgressIndicator *_progressBar;
+    
     BOOL _closable;
 }
 
 @synthesize progressValue = _progressValue;
 @synthesize maxProgressValue = _maxProgressValue;
 @synthesize statusText = _statusText;
-@synthesize title = _title;
-@synthesize buttonTitle = _buttonTitle;
-@synthesize host = _host;
-@synthesize actionButton = _actionButton;
-@synthesize progressBar = _progressBar;
-@synthesize statusTextField = _statusTextField;
-@synthesize touchBarButton = _touchBarButton;
-@synthesize minimizable = _minimizable;
 
 - (instancetype)initWithHost:(SUHost *)aHost windowTitle:(NSString *)windowTitle centerPointValue:(NSValue *)centerPointValue minimizable:(BOOL)minimizable closable:(BOOL)closable
 {
@@ -64,7 +56,10 @@ static NSString *const SUStatusControllerTouchBarIndentifier = @"" SPARKLE_BUNDL
     return self;
 }
 
-- (NSString *)description { return [NSString stringWithFormat:@"%@ <%@>", [self class], [self.host bundlePath]]; }
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"%@ <%@>", [self class], _host.bundlePath];
+}
 
 - (void)windowDidLoad
 {
@@ -77,26 +72,26 @@ static NSString *const SUStatusControllerTouchBarIndentifier = @"" SPARKLE_BUNDL
         [self.window center];
     }
     
-    if (self.minimizable) {
+    if (_minimizable) {
         self.window.styleMask |= NSWindowStyleMaskMiniaturizable;
     }
     if (_closable) {
         self.window.styleMask |= NSWindowStyleMaskClosable;
     }
-    [self.progressBar setUsesThreadedAnimation:YES];
-    [self.statusTextField setFont:[NSFont monospacedDigitSystemFontOfSize:0 weight:NSFontWeightRegular]];
+    [_progressBar setUsesThreadedAnimation:YES];
+    [_statusTextField setFont:[NSFont monospacedDigitSystemFontOfSize:0 weight:NSFontWeightRegular]];
     
     self.window.title = _windowTitle;
 }
 
 - (NSImage *)applicationIcon
 {
-    return [SUApplicationInfo bestIconForHost:self.host];
+    return [SUApplicationInfo bestIconForHost:_host];
 }
 
 - (void)beginActionWithTitle:(NSString *)aTitle maxProgressValue:(double)aMaxProgressValue statusText:(NSString *)aStatusText
 {
-    self.title = aTitle;
+    _title = [aTitle copy];
 
     self.maxProgressValue = aMaxProgressValue;
     self.statusText = aStatusText;
@@ -104,24 +99,24 @@ static NSString *const SUStatusControllerTouchBarIndentifier = @"" SPARKLE_BUNDL
 
 - (void)setButtonTitle:(NSString *)aButtonTitle target:(id)target action:(SEL)action isDefault:(BOOL)isDefault
 {
-    self.buttonTitle = aButtonTitle;
+    _buttonTitle = [aButtonTitle copy];
 
     [self window];
-    [self.actionButton sizeToFit];
+    [_actionButton sizeToFit];
     // Except we're going to add 15 px for padding.
-    [self.actionButton setFrameSize:NSMakeSize([self.actionButton frame].size.width + 15, [self.actionButton frame].size.height)];
+    [_actionButton setFrameSize:NSMakeSize(_actionButton.frame.size.width + 15, _actionButton.frame.size.height)];
     // Now we have to move it over so that it's always 15px from the side of the window.
-    [self.actionButton setFrameOrigin:NSMakePoint([[self window] frame].size.width - 15 - [self.actionButton frame].size.width, [self.actionButton frame].origin.y)];
+    [_actionButton setFrameOrigin:NSMakePoint([[self window] frame].size.width - 15 - _actionButton.frame.size.width, _actionButton.frame.origin.y)];
     // Redisplay superview to clean up artifacts
-    [[self.actionButton superview] display];
+    [[_actionButton superview] display];
 
-    [self.actionButton setTarget:target];
-    [self.actionButton setAction:action];
-    [self.actionButton setKeyEquivalent:isDefault ? @"\r" : @""];
+    [_actionButton setTarget:target];
+    [_actionButton setAction:action];
+    [_actionButton setKeyEquivalent:isDefault ? @"\r" : @""];
     
-    self.touchBarButton.target = self.actionButton.target;
-    self.touchBarButton.action = self.actionButton.action;
-    self.touchBarButton.keyEquivalent = self.actionButton.keyEquivalent;
+    _touchBarButton.target = _actionButton.target;
+    _touchBarButton.action = _actionButton.action;
+    _touchBarButton.keyEquivalent = _actionButton.keyEquivalent;
 
     // 06/05/2008 Alex: Avoid a crash when cancelling during the extraction
     [self setButtonEnabled:(target != nil)];
@@ -134,12 +129,12 @@ static NSString *const SUStatusControllerTouchBarIndentifier = @"" SPARKLE_BUNDL
 
 - (void)setButtonEnabled:(BOOL)enabled
 {
-    [self.actionButton setEnabled:enabled];
+    [_actionButton setEnabled:enabled];
 }
 
 - (BOOL)isButtonEnabled
 {
-    return [self.actionButton isEnabled];
+    return [_actionButton isEnabled];
 }
 
 - (void)setMaxProgressValue:(double)value
@@ -147,9 +142,9 @@ static NSString *const SUStatusControllerTouchBarIndentifier = @"" SPARKLE_BUNDL
 	if (value < 0.0) value = 0.0;
     _maxProgressValue = value;
     [self setProgressValue:0.0];
-    [self.progressBar setIndeterminate:(value == 0.0)];
-    [self.progressBar startAnimation:self];
-    [self.progressBar setUsesThreadedAnimation:YES];
+    [_progressBar setIndeterminate:(value == 0.0)];
+    [_progressBar startAnimation:self];
+    [_progressBar setUsesThreadedAnimation:YES];
 }
 
 
@@ -166,11 +161,11 @@ static NSString *const SUStatusControllerTouchBarIndentifier = @"" SPARKLE_BUNDL
 {
     if ([identifier isEqualToString:SUStatusControllerTouchBarIndentifier]) {
         NSCustomTouchBarItem *item = [[NSCustomTouchBarItem alloc] initWithIdentifier:identifier];
-        SUTouchBarButtonGroup *group = [[SUTouchBarButtonGroup alloc] initByReferencingButtons:@[self.actionButton,]];
+        SUTouchBarButtonGroup *group = [[SUTouchBarButtonGroup alloc] initByReferencingButtons:@[_actionButton,]];
         item.viewController = group;
-        self.touchBarButton = group.buttons.firstObject;
-        [self.touchBarButton bind:@"title" toObject:self.actionButton withKeyPath:@"title" options:nil];
-        [self.touchBarButton bind:@"enabled" toObject:self.actionButton withKeyPath:@"enabled" options:nil];
+        _touchBarButton = group.buttons.firstObject;
+        [_touchBarButton bind:@"title" toObject:_actionButton withKeyPath:@"title" options:nil];
+        [_touchBarButton bind:@"enabled" toObject:_actionButton withKeyPath:@"enabled" options:nil];
         return item;
     }
     return nil;
