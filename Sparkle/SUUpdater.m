@@ -6,7 +6,7 @@
 //  Copyright 2006 Andy Matuschak. All rights reserved.
 //
 
-#if SPARKLE_BUILD_UI_BITS
+#if SPARKLE_BUILD_UI_BITS && SPARKLE_BUILD_LEGACY_SUUPDATER
 
 #import "SUUpdater.h"
 #import "SPUUpdater.h"
