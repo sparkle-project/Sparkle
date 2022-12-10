@@ -42,7 +42,7 @@ static NSString *SUAppcastItemDeltaFromSparkleLocalesKey = @"SUAppcastItemDeltaF
 
 @interface SUAppcastItem ()
 
-@property (readonly, nullable) SUSignatures *signatures;
+@property (readonly, nonatomic, nullable) SUSignatures *signatures;
 
 @end
 

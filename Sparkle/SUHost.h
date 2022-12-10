@@ -19,15 +19,15 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)init NS_UNAVAILABLE;
 
-@property (readonly, copy) NSString *bundlePath;
-@property (readonly, copy) NSString *name;
-@property (readonly, copy) NSString *version;
+@property (readonly, nonatomic, copy) NSString *bundlePath;
+@property (readonly, nonatomic, copy) NSString *name;
+@property (readonly, nonatomic, copy) NSString *version;
 @property (readonly, nonatomic) BOOL validVersion;
-@property (readonly, copy) NSString *displayVersion;
-@property (readonly) SUPublicKeys *publicKeys;
+@property (readonly, nonatomic, copy) NSString *displayVersion;
+@property (readonly, nonatomic) SUPublicKeys *publicKeys;
 
-@property (getter=isRunningOnReadOnlyVolume, readonly) BOOL runningOnReadOnlyVolume;
-@property (getter=isRunningTranslocated, readonly) BOOL runningTranslocated;
+@property (getter=isRunningOnReadOnlyVolume, nonatomic, readonly) BOOL runningOnReadOnlyVolume;
+@property (getter=isRunningTranslocated, nonatomic, readonly) BOOL runningTranslocated;
 @property (readonly, nonatomic, copy, nullable) NSString *publicDSAKeyFileKey;
 
 - (nullable id)objectForInfoDictionaryKey:(NSString *)key;

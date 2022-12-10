@@ -28,7 +28,7 @@ SU_EXPORT @interface SUAppcast : NSObject
  
  These `SUAppcastItem` items are in the same order as specified in the appcast XML feed and are thus not sorted by version.
  */
-@property (readonly, copy) NSArray<SUAppcastItem *> *items;
+@property (readonly, nonatomic, copy) NSArray<SUAppcastItem *> *items;
 
 @end
 

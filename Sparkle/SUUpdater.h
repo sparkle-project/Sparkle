@@ -157,7 +157,7 @@ SU_EXPORT @interface SUUpdater : NSObject
 
  The keys of this dictionary are HTTP header fields (NSString) and values are corresponding values (NSString)
  */
-@property (copy) NSDictionary<NSString *, NSString *> *httpHeaders;
+@property (copy, nonatomic) NSDictionary<NSString *, NSString *> *httpHeaders;
 
 /*!
  A property indicating whether or not the user's system profile information is sent when checking for updates.

@@ -30,7 +30,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  The DSA and EdDSA signatures along with their statuses.
  */
-@property (readonly, nullable) SUSignatures *signatures;
+@property (readonly, nonatomic, nullable) SUSignatures *signatures;
 
 @end
 
