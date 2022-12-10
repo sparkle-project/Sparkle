@@ -62,11 +62,11 @@
             
             _downloader = _connection.remoteObjectProxy;
             
-            __weak SPUDownloadDriver *weakSelf = self;
+            __weak __typeof__(self) weakSelf = self;
             
             _connection.interruptionHandler = ^{
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    SPUDownloadDriver *strongSelf = weakSelf;
+                    __typeof__(self) strongSelf = weakSelf;
                     if (strongSelf != nil && !strongSelf->_retrievedDownloadResult) {
                         [strongSelf->_connection invalidate];
                     }
@@ -75,7 +75,7 @@
             
             _connection.invalidationHandler = ^{
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    SPUDownloadDriver *strongSelf = weakSelf;
+                    __typeof__(self) strongSelf = weakSelf;
                     if (strongSelf != nil && !strongSelf->_retrievedDownloadResult && !strongSelf->_cleaningUp) {
                         strongSelf->_downloader = nil;
                         

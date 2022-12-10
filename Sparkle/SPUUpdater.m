@@ -388,10 +388,10 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         [self setSessionInProgress:YES];
         [self setCanCheckForUpdates:YES];
         
-        __weak SPUUpdater *weakSelf = self;
+        __weak __typeof__(self) weakSelf = self;
         [_userDriver showUpdatePermissionRequest:updatePermissionRequest reply:^(SUUpdatePermissionResponse *response) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                SPUUpdater *strongSelf = weakSelf;
+                __typeof__(self) strongSelf = weakSelf;
                 if (strongSelf != nil) {
                     [strongSelf setSessionInProgress:NO];
                     strongSelf->_showingPermissionRequest = NO;
@@ -547,13 +547,13 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     [self setCanCheckForUpdates:NO];
     
     // We don't want the probe check to act on the driver if the updater is going near death
-    __weak SPUUpdater *weakSelf = self;
+    __weak __typeof__(self) weakSelf = self;
     
     NSString *hostBundleIdentifier = _host.bundle.bundleIdentifier;
     assert(hostBundleIdentifier != nil);
     [SPUProbeInstallStatus probeInstallerInProgressForHostBundleIdentifier:hostBundleIdentifier completion:^(BOOL installerIsRunning) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            SPUUpdater *strongSelf = weakSelf;
+            __typeof__(self) strongSelf = weakSelf;
             if (strongSelf == nil) {
                 return;
             }
@@ -613,10 +613,10 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     NSString *bundleIdentifier = _host.bundle.bundleIdentifier;
     assert(bundleIdentifier != nil);
     
-    __weak SPUUpdater *weakSelf = self;
+    __weak __typeof__(self) weakSelf = self;
     [SPUProbeInstallStatus probeInstallerInProgressForHostBundleIdentifier:bundleIdentifier completion:^(BOOL installerInProgress) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            SPUUpdater *strongSelf = weakSelf;
+            __typeof__(self) strongSelf = weakSelf;
             if (strongSelf != nil) {
                 [strongSelf checkForUpdatesWithDriver:theUpdateDriver updateCheck:SPUUpdateCheckUpdates installerInProgress:installerInProgress];
             }
@@ -626,7 +626,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 
 - (void)checkForUpdateInformation
 {
-    __weak SPUUpdater *weakSelf = self;
+    __weak __typeof__(self) weakSelf = self;
     if (!_startedUpdater) {
         SULog(SULogLevelError, @"Error: checkForUpdateInformation - updater hasn't been started yet. Please call -startUpdater: first");
         return;
@@ -644,7 +644,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     assert(bundleIdentifier != nil);
     [SPUProbeInstallStatus probeInstallerInProgressForHostBundleIdentifier:bundleIdentifier completion:^(BOOL installerInProgress) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            SPUUpdater *strongSelf = weakSelf;
+            __typeof__(self) strongSelf = weakSelf;
             if (strongSelf != nil) {
                 [strongSelf checkForUpdatesWithDriver:[[SPUProbingUpdateDriver alloc] initWithHost:strongSelf->_host updater:strongSelf updaterDelegate:strongSelf->_delegate] updateCheck:SPUUpdateCheckUpdateInformation installerInProgress:installerInProgress];
             }
@@ -686,9 +686,9 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     };
     
     void (^abortUpdateDriver)(NSError  * _Nullable , BOOL) = ^(NSError * _Nullable abortError, BOOL shouldScheduleNextUpdateCheck) {
-        __weak SPUUpdater *weakSelf = self;
+        __weak __typeof__(self) weakSelf = self;
         [self->_driver setCompletionHandler:^(BOOL __unused shouldShowUpdateImmediately, id<SPUResumableUpdate>  _Nullable __unused resumableUpdate, NSError * _Nullable error) {
-            SPUUpdater *strongSelf = weakSelf;
+            __typeof__(self) strongSelf = weakSelf;
             if (strongSelf != nil) {
                 strongSelf->_driver = nil;
                 
@@ -737,9 +737,9 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     }
     
     // Run our update driver and schedule next update check on its completion
-    __weak SPUUpdater *weakSelf = self;
+    __weak __typeof__(self) weakSelf = self;
     [_driver setCompletionHandler:^(BOOL shouldShowUpdateImmediately, id<SPUResumableUpdate>  _Nullable resumableUpdate, NSError * _Nullable error) {
-        SPUUpdater *strongSelf = weakSelf;
+        __typeof__(self) strongSelf = weakSelf;
         if (strongSelf != nil) {
             strongSelf->_resumableUpdate = resumableUpdate;
             strongSelf->_driver = nil;

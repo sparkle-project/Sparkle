@@ -72,10 +72,10 @@
     
     _activeConnection = newConnection;
     
-    __weak AgentConnection *weakSelf = self;
+    __weak __typeof__(self) weakSelf = self;
     newConnection.interruptionHandler = ^{
         dispatch_async(dispatch_get_main_queue(), ^{
-            AgentConnection *strongSelf = weakSelf;
+            __typeof__(self) strongSelf = weakSelf;
             if (strongSelf != nil) {
                 [strongSelf->_activeConnection invalidate];
             }
@@ -84,7 +84,7 @@
     
     newConnection.invalidationHandler = ^{
         dispatch_async(dispatch_get_main_queue(), ^{
-            AgentConnection *strongSelf = weakSelf;
+            __typeof__(self) strongSelf = weakSelf;
             if (strongSelf != nil) {
                 [strongSelf->_delegate agentConnectionDidInvalidate];
             }

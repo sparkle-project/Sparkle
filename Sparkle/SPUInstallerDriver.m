@@ -155,10 +155,10 @@
         _installerConnection = [[SUXPCInstallerConnection alloc] initWithDelegate:self];
     }
     
-    __weak SPUInstallerDriver *weakSelf = self;
+    __weak __typeof__(self) weakSelf = self;
     [_installerConnection setInvalidationHandler:^{
         dispatch_async(dispatch_get_main_queue(), ^{
-            SPUInstallerDriver *strongSelf = weakSelf;
+            __typeof__(self) strongSelf = weakSelf;
             if (strongSelf != nil && strongSelf->_installerConnection != nil && !strongSelf->_aborted) {
                 NSDictionary *genericUserInfo = @{
                     NSLocalizedDescriptionKey: SULocalizedString(@"An error occurred while running the updater. Please try again later.", nil),
@@ -234,9 +234,9 @@
     // This also handles the case when a delta extraction fails and tries to re-try another extraction attempt later
     // We will also want to make sure current stage is still SUInstallerNotStarted because it may not be due to resumability
     NSUInteger currentExtractionAttempts = _extractionAttempts;
-    __weak SPUInstallerDriver *weakSelf = self;
+    __weak __typeof__(self) weakSelf = self;
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(FIRST_INSTALLER_MESSAGE_TIMEOUT * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        SPUInstallerDriver *strongSelf = weakSelf;
+        __typeof__(self) strongSelf = weakSelf;
         if (strongSelf != nil && strongSelf->_currentStage == SPUInstallerNotStarted && currentExtractionAttempts == strongSelf->_extractionAttempts) {
             SULog(SULogLevelError, @"Timeout: Installer never started archive extraction");
             [strongSelf->_delegate installerIsRequestingAbortInstallWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey:SULocalizedString(@"An error occurred while starting the installer. Please try again later.", nil) }]];
@@ -476,7 +476,7 @@
     {
         if ([_updaterDelegate respondsToSelector:@selector(updater:shouldPostponeRelaunchForUpdate:untilInvokingBlock:)]) {
             _postponedOnce = YES;
-            __weak SPUInstallerDriver *weakSelf = self;
+            __weak __typeof__(self) weakSelf = self;
             if ([_updaterDelegate updater:_updater shouldPostponeRelaunchForUpdate:_updateItem untilInvokingBlock:^{
                 [weakSelf installWithToolAndRelaunch:relaunch displayingUserInterface:showUI];
             }]) {

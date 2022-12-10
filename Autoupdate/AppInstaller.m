@@ -120,10 +120,10 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     
     newConnection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SUInstallerCommunicationProtocol)];
     
-    __weak AppInstaller *weakSelf = self;
+    __weak __typeof__(self) weakSelf = self;
     newConnection.interruptionHandler = ^{
         dispatch_async(dispatch_get_main_queue(), ^{
-            AppInstaller *strongSelf = weakSelf;
+            __typeof__(self) strongSelf = weakSelf;
             if (strongSelf != nil) {
                 [strongSelf->_activeConnection invalidate];
             }
@@ -132,7 +132,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     
     newConnection.invalidationHandler = ^{
         dispatch_async(dispatch_get_main_queue(), ^{
-            AppInstaller *strongSelf = weakSelf;
+            __typeof__(self) strongSelf = weakSelf;
             if (strongSelf != nil) {
                 if (strongSelf->_activeConnection != nil && !strongSelf->_willCompleteInstallation) {
                     [strongSelf cleanupAndExitWithStatus:EXIT_FAILURE error:[NSError errorWithDomain:SUSparkleErrorDomain code:SPUInstallerError userInfo:@{ NSLocalizedDescriptionKey: @"Invalidation on remote port being called, and installation is not close enough to completion!" }]];

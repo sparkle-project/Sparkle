@@ -103,10 +103,10 @@
         BOOL installationHandledByDelegate = NO;
         id<SPUUpdaterDelegate> updaterDelegate = _updaterDelegate;
         if (_willInstallSilently && [updaterDelegate respondsToSelector:@selector(updater:willInstallUpdateOnQuit:immediateInstallationBlock:)]) {
-            __weak SPUAutomaticUpdateDriver *weakSelf = self;
+            __weak __typeof__(self) weakSelf = self;
             installationHandledByDelegate = [updaterDelegate updater:_updater willInstallUpdateOnQuit:_updateItem immediateInstallationBlock:^{
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    SPUAutomaticUpdateDriver *strongSelf = weakSelf;
+                    __typeof__(self) strongSelf = weakSelf;
                     if (strongSelf != nil) {
                         [strongSelf->_coreDriver finishInstallationWithResponse:SPUUserUpdateChoiceInstall displayingUserInterface:NO];
                     }

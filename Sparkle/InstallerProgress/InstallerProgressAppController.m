@@ -112,10 +112,10 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
         
         _connection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SUInstallerAgentInitiationProtocol)];
         
-        __weak InstallerProgressAppController *weakSelf = self;
+        __weak __typeof__(self) weakSelf = self;
         _connection.interruptionHandler = ^{
             dispatch_async(dispatch_get_main_queue(), ^{
-                InstallerProgressAppController *strongSelf = weakSelf;
+                __typeof__(self) strongSelf = weakSelf;
                 if (strongSelf != nil) {
                     [strongSelf->_connection invalidate];
                 }
@@ -124,7 +124,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
         
         _connection.invalidationHandler = ^{
             dispatch_async(dispatch_get_main_queue(), ^{
-                InstallerProgressAppController *strongSelf = weakSelf;
+                __typeof__(self) strongSelf = weakSelf;
                 if (strongSelf != nil) {
                     int exitStatus = (strongSelf->_repliedToRegistration ? EXIT_SUCCESS : EXIT_FAILURE);
                     NSError *registrationError;

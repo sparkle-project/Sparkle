@@ -339,12 +339,12 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
     
     BOOL needsToObserveUserAttention = [_delegate respondsToSelector:@selector(standardUserDriverDidReceiveUserAttentionForUpdate:)];
     
-    __weak SPUStandardUserDriver *weakSelf = self;
+    __weak __typeof__(self) weakSelf = self;
     __weak id<SPUStandardUserDriverDelegate> weakDelegate = _delegate;
     _activeUpdateAlert = [[SUUpdateAlert alloc] initWithAppcastItem:appcastItem state:state host:_host versionDisplayer:versionDisplayer completionBlock:^(SPUUserUpdateChoice choice, NSRect windowFrame, BOOL wasKeyWindow) {
         reply(choice);
         
-        SPUStandardUserDriver *strongSelf = weakSelf;
+        __typeof__(self) strongSelf = weakSelf;
         
         if (strongSelf != nil) {
             if (needsToObserveUserAttention && !strongSelf->_updateReceivedUserAttention) {
@@ -370,7 +370,7 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
         }
         
         if ([NSApp isActive]) {
-            SPUStandardUserDriver *strongSelf = weakSelf;
+            __typeof__(self) strongSelf = weakSelf;
             if (strongSelf != nil && !strongSelf->_updateReceivedUserAttention) {
                 strongSelf->_updateReceivedUserAttention = YES;
                 
@@ -382,10 +382,10 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
             // We need to listen for when the app becomes active again, and then test if the window alert
             // is still key. if it is, let the delegate know. Remove the observation after that.
             
-            SPUStandardUserDriver *strongSelfOuter = weakSelf;
+            __typeof__(self) strongSelfOuter = weakSelf;
             if (strongSelfOuter != nil && strongSelfOuter->_applicationBecameActiveAfterUpdateAlertBecameKeyObserver == nil) {
                 strongSelfOuter->_applicationBecameActiveAfterUpdateAlertBecameKeyObserver = [[NSNotificationCenter defaultCenter] addObserverForName:NSApplicationDidBecomeActiveNotification object:NSApp queue:NSOperationQueue.mainQueue usingBlock:^(NSNotification * _Nonnull __unused note) {
-                    SPUStandardUserDriver *strongSelf = weakSelf;
+                    __typeof__(self) strongSelf = weakSelf;
                     if (strongSelf != nil) {
                         if (!strongSelf->_updateReceivedUserAttention && [strongSelf->_activeUpdateAlert.window isKeyWindow]) {
                             strongSelf->_updateReceivedUserAttention = YES;
