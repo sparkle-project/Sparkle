@@ -63,14 +63,20 @@
 - (BOOL)validateWithUpdateDirectory:(NSString *)updateDirectory error:(NSError * __autoreleasing *)error
 {
     SUSignatures *signatures = _signatures;
-    SUPublicKeys *publicKeys = _host.publicKeys;
     NSString *downloadPath = _downloadPath;
     SUHost *host = _host;
 
+#if SPARKLE_BUILD_PACKAGE_SUPPORT
     BOOL isPackage = NO;
+#endif
 
     // install source could point to a new bundle or a package
-    NSString *installSource = [SUInstaller installSourcePathInUpdateFolder:updateDirectory forHost:host isPackage:&isPackage isGuided:NULL];
+    NSString *installSource = [SUInstaller installSourcePathInUpdateFolder:updateDirectory forHost:host
+#if SPARKLE_BUILD_PACKAGE_SUPPORT
+                                                                 isPackage:&isPackage isGuided:NULL
+#endif
+    ];
+    
     if (installSource == nil) {
         if (error != NULL) {
             *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUValidationError userInfo:@{ NSLocalizedDescriptionKey: @"No suitable install is found in the update. The update will be rejected." }];
@@ -81,11 +87,13 @@
     NSURL *installSourceURL = [NSURL fileURLWithPath:installSource];
 
     if (!_prevalidatedSignature) {
+#if SPARKLE_BUILD_PACKAGE_SUPPORT
         // Check to see if we have a package or bundle to validate
         if (isPackage) {
             // If we get here, then the appcast installation type was lying to us.. This error will be caught later when starting the installer.
             // For package type updates, all we do is check if the EdDSA signature is valid
             NSError *innerError = nil;
+            SUPublicKeys *publicKeys = host.publicKeys;
             BOOL validationCheckSuccess = [SUSignatureVerifier validatePath:downloadPath withSignatures:signatures withPublicKeys:publicKeys error:&innerError];
             if (!validationCheckSuccess) {
                 if (error != NULL) {
@@ -93,14 +101,21 @@
                 }
             }
             return validationCheckSuccess;
-        } else {
+        } else
+#endif
+        {
             // For application bundle updates, we check both the EdDSA and Apple code signing signatures
             return [self validateUpdateForHost:host downloadedToPath:downloadPath newBundleURL:installSourceURL signatures:signatures error:error];
         }
-    } else if (isPackage) {
+    }
+#if SPARKLE_BUILD_PACKAGE_SUPPORT
+    else if (isPackage) {
         // We already prevalidated the package and nothing else needs to be done
         return YES;
-    } else {
+    }
+#endif
+    else
+    {
         // Because we already validated the EdDSA signature, this is just a consistency check to see
         // if the developer signed their application properly with their Apple ID
         // Currently, this case only gets hit for binary delta updates

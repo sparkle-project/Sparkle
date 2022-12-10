@@ -6,6 +6,8 @@
 //  Copyright 2008 Andy Matuschak. All rights reserved.
 //
 
+#if SPARKLE_BUILD_PACKAGE_SUPPORT
+
 #import "SUPackageInstaller.h"
 #import "SUConstants.h"
 #import "SUErrors.h"
@@ -75,3 +77,5 @@ static NSString *SUOpenUtilityPath = @"/usr/bin/open";
 }
 
 @end
+
+#endif

@@ -6,6 +6,8 @@
 //  Copyright 2010 Dragon Systems Software Limited. All rights reserved.
 //
 
+#if SPARKLE_BUILD_PACKAGE_SUPPORT
+
 #import <sys/stat.h>
 #import "SUGuidedPackageInstaller.h"
 #import "SUErrors.h"
@@ -86,3 +88,5 @@
 }
 
 @end
+
+#endif

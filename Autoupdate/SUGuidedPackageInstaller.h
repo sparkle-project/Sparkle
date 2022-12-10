@@ -16,6 +16,8 @@ The installer package is installed using macOS's built-in command line installer
 A guided installation can be started by applications other than the application being replaced. This is particularly useful where helper applications or agents are used.
 */
 
+#if SPARKLE_BUILD_PACKAGE_SUPPORT
+
 #import <Foundation/Foundation.h>
 #import "SUInstallerProtocol.h"
 
@@ -24,3 +26,5 @@ A guided installation can be started by applications other than the application 
 - (instancetype)initWithPackagePath:(NSString *)packagePath homeDirectory:(NSString *)homeDirectory userName:(NSString *)userName;
 
 @end
+
+#endif

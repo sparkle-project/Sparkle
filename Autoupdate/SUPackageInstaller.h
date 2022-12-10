@@ -6,6 +6,8 @@
 //  Copyright 2008 Andy Matuschak. All rights reserved.
 //
 
+#if SPARKLE_BUILD_PACKAGE_SUPPORT
+
 #import <Foundation/Foundation.h>
 #import "SUInstallerProtocol.h"
 
@@ -17,3 +19,5 @@
 - (instancetype)initWithPackagePath:(NSString *)packagePath;
 
 @end
+
+#endif

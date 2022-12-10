@@ -373,11 +373,14 @@ BOOL SPUSystemNeedsAuthorizationAccessForBundlePath(NSString *bundlePath)
 static BOOL SPUUsesSystemDomainForBundlePath(NSString *path, NSString *installationType, BOOL rootUser)
 {
     if (!rootUser) {
+#if SPARKLE_BUILD_PACKAGE_SUPPORT
         if ([installationType isEqualToString:SPUInstallationTypeGuidedPackage]) {
             return YES;
         } else if ([installationType isEqualToString:SPUInstallationTypeInteractivePackage]) {
             return NO;
-        } else {
+        } else
+#endif
+        {
             return SPUSystemNeedsAuthorizationAccessForBundlePath(path);
         }
     } else {

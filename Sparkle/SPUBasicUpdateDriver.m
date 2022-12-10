@@ -142,11 +142,14 @@
         id updater = _updater;
         
         if (!resuming) {
+#if SPARKLE_BUILD_PACKAGE_SUPPORT
             // interactive pkg based updates are not supported under root user
             if ([updateItem.installationType isEqualToString:SPUInstallationTypeInteractivePackage] && geteuid() == 0) {
                 [delegate basicDriverIsRequestingAbortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationRootInteractiveError userInfo:@{ NSLocalizedDescriptionKey: SULocalizedString(@"Interactive based packages cannot be installed as the root user.", nil) }]];
                 return;
-            } else {
+            } else
+#endif
+            {
                 // Give the delegate a chance to bail
                 
                 NSError *shouldNotProceedError = nil;
