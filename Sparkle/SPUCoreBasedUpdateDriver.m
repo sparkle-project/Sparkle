@@ -319,14 +319,16 @@
     id updater = _updater;
     id<SPUUpdaterDelegate> updaterDelegate = _updaterDelegate;
     
-    if (updater != nil && [updaterDelegate respondsToSelector:@selector((updater:willInstallUpdate:))]) {
-        [updaterDelegate updater:updater willInstallUpdate:_updateItem];
-    }
-    
-    if (relaunch) {
-        [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterWillRestartNotification object:self];
-        if (updater != nil && [updaterDelegate respondsToSelector:@selector((updaterWillRelaunchApplication:))]) {
-            [updaterDelegate updaterWillRelaunchApplication:updater];
+    if (updater != nil) {
+        if ([updaterDelegate respondsToSelector:@selector((updater:willInstallUpdate:))]) {
+            [updaterDelegate updater:updater willInstallUpdate:_updateItem];
+        }
+        
+        if (relaunch) {
+            [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterWillRestartNotification object:updater];
+            if ([updaterDelegate respondsToSelector:@selector((updaterWillRelaunchApplication:))]) {
+                [updaterDelegate updaterWillRelaunchApplication:updater];
+            }
         }
     }
 }
