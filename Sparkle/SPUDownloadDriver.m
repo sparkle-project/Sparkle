@@ -28,7 +28,9 @@
 @implementation SPUDownloadDriver
 {
     id<SPUDownloaderProtocol> _downloader;
+#if DOWNLOADER_XPC_SERVICE_EMBEDDED
     NSXPCConnection *_connection;
+#endif
     SUAppcastItem *_updateItem;
     SUAppcastItem * _Nullable _secondaryUpdateItem;
     SUHost *_host;
@@ -52,9 +54,8 @@
     if (self != nil) {
         _host = host;
         
-        if (!SPUXPCServiceIsEnabled(SUEnableDownloaderServiceKey)) {
-            _downloader = [[SPUDownloader alloc] initWithDelegate:self];
-        } else {
+#if DOWNLOADER_XPC_SERVICE_EMBEDDED
+        if (SPUXPCServiceIsEnabled(SUEnableDownloaderServiceKey)) {
             _connection = [[NSXPCConnection alloc] initWithServiceName:@DOWNLOADER_BUNDLE_ID];
             _connection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SPUDownloaderProtocol)];
             _connection.exportedInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SPUDownloaderDelegate)];
@@ -94,6 +95,10 @@
             };
             
             [_connection resume];
+        } else
+#endif
+        {
+            _downloader = [[SPUDownloader alloc] initWithDelegate:self];
         }
     }
     return self;
@@ -176,10 +181,12 @@
     void (^cleanupBlock)(void) = ^{
         self->_cleaningUp = YES;
         
+#if DOWNLOADER_XPC_SERVICE_EMBEDDED
         if (self->_connection != nil) {
             [self->_connection invalidate];
             self->_connection = nil;
         }
+#endif
         self->_downloadName = nil;
         self->_downloader = nil;
         

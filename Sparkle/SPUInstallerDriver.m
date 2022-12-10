@@ -149,10 +149,13 @@
     NSString *hostBundleIdentifier = _host.bundle.bundleIdentifier;
     assert(hostBundleIdentifier != nil);
     
-    if (!SPUXPCServiceIsEnabled(SUEnableInstallerConnectionServiceKey)) {
-        _installerConnection = [[SUInstallerConnection alloc] initWithDelegate:self remote:NO];
-    } else {
+#if INSTALLER_CONNECTION_XPC_SERVICE_EMBEDDED
+    if (SPUXPCServiceIsEnabled(SUEnableInstallerConnectionServiceKey)) {
         _installerConnection = [[SUXPCInstallerConnection alloc] initWithDelegate:self];
+    } else
+#endif
+    {
+        _installerConnection = [[SUInstallerConnection alloc] initWithDelegate:self remote:NO];
     }
     
     __weak __typeof__(self) weakSelf = self;
@@ -345,13 +348,13 @@
 
 - (void)launchAutoUpdateSilently:(BOOL)silently completion:(void (^)(NSError *_Nullable))completionHandler
 {
-    id<SUInstallerLauncherProtocol> installerLauncher = nil;
+    id<SUInstallerLauncherProtocol> installerLauncher;
+    
+#if INSTALLER_LAUNCHER_XPC_SERVICE_EMBEDDED
     __block BOOL retrievedLaunchStatus = NO;
     NSXPCConnection *launcherConnection = nil;
     
-    if (!SPUXPCServiceIsEnabled(SUEnableInstallerLauncherServiceKey)) {
-        installerLauncher = [[SUInstallerLauncher alloc] init];
-    } else {
+    if (SPUXPCServiceIsEnabled(SUEnableInstallerLauncherServiceKey)) {
         launcherConnection = [[NSXPCConnection alloc] initWithServiceName:@INSTALLER_LAUNCHER_BUNDLE_ID];
         launcherConnection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SUInstallerLauncherProtocol)];
         
@@ -393,6 +396,10 @@
         [launcherConnection resume];
         
         installerLauncher = launcherConnection.remoteObjectProxy;
+    } else
+#endif
+    {
+        installerLauncher = [[SUInstallerLauncher alloc] init];
     }
     
     // Our driver (automatic or UI based) has a say if interaction is allowed as well
@@ -434,8 +441,10 @@
     
     [installerLauncher launchInstallerWithHostBundlePath:hostBundlePath updaterIdentifier:mainBundleIdentifier authorizationPrompt:authorizationPrompt installationType:installationType allowingDriverInteraction:driverAllowsInteraction completion:^(SUInstallerLauncherStatus result, BOOL systemDomain) {
         dispatch_async(dispatch_get_main_queue(), ^{
+#if INSTALLER_LAUNCHER_XPC_SERVICE_EMBEDDED
             retrievedLaunchStatus = YES;
             [launcherConnection invalidate];
+#endif
             
             switch (result) {
                 case SUInstallerLauncherFailure:

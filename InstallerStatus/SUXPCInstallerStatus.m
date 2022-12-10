@@ -6,6 +6,8 @@
 //  Copyright © 2016 Sparkle Project. All rights reserved.
 //
 
+#if INSTALLER_STATUS_XPC_SERVICE_EMBEDDED
+
 #import "SUXPCInstallerStatus.h"
 
 
@@ -84,3 +86,5 @@
 }
 
 @end
+
+#endif
