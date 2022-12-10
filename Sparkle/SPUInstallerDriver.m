@@ -205,16 +205,18 @@
 {
     NSString *pathToRelaunch = _applicationBundle.bundlePath;
     // Give the delegate one more chance for determining the path to relaunch via a private API used by SUUpdater
-    if ([_updaterDelegate respondsToSelector:@selector(_pathToRelaunchForUpdater:)]) {
-        NSString *relaunchPath = [(NSObject *)_updaterDelegate _pathToRelaunchForUpdater:_updater];
+    id<SPUUpdaterDelegate> updaterDelegate = _updaterDelegate;
+    id updater = _updater;
+    if (updater != nil && [updaterDelegate respondsToSelector:@selector(_pathToRelaunchForUpdater:)]) {
+        NSString *relaunchPath = [(NSObject *)updaterDelegate _pathToRelaunchForUpdater:updater];
         if (relaunchPath != nil) {
             pathToRelaunch = relaunchPath;
         }
     }
 
     NSString *decryptionPassword = nil;
-    if ([_updaterDelegate respondsToSelector:@selector(decryptionPasswordForUpdater:)]) {
-        decryptionPassword = [_updaterDelegate decryptionPasswordForUpdater:_updater];
+    if (updater != nil && [updaterDelegate respondsToSelector:@selector(decryptionPasswordForUpdater:)]) {
+        decryptionPassword = [updaterDelegate decryptionPasswordForUpdater:updater];
     }
     
     SPUInstallationInputData *installationData = [[SPUInstallationInputData alloc] initWithRelaunchPath:pathToRelaunch hostBundlePath:_host.bundlePath updateDirectoryPath:_temporaryDirectory downloadName:_downloadName installationType:_updateItem.installationType signatures:_updateItem.signatures decryptionPassword:decryptionPassword];
@@ -258,21 +260,23 @@
         return;
     }
     
+    id<SPUInstallerDriverDelegate> delegate = _delegate;
+    
     if (identifier == SPUExtractionStarted) {
         _extractionAttempts++;
         _currentStage = identifier;
-        [_delegate installerDidStartExtracting];
+        [delegate installerDidStartExtracting];
     } else if (identifier == SPUExtractedArchiveWithProgress) {
         if (data.length == sizeof(double) && sizeof(double) == sizeof(uint64_t)) {
             uint64_t progressValue = CFSwapInt64LittleToHost(*(const uint64_t *)data.bytes);
             double progress = *(double *)&progressValue;
-            [_delegate installerDidExtractUpdateWithProgress:progress];
+            [delegate installerDidExtractUpdateWithProgress:progress];
             _currentStage = identifier;
         }
     } else if (identifier == SPUArchiveExtractionFailed) {
         // If this is a delta update, there must be a regular update we can fall back to
         if ([_updateItem isDeltaUpdate]) {
-            [_delegate installerDidFailToApplyDeltaUpdate];
+            [delegate installerDidFailToApplyDeltaUpdate];
         } else {
             // Don't have to store current stage because we're going to abort
             NSDictionary *genericUserInfo = @{ NSLocalizedDescriptionKey:SULocalizedString(@"An error occurred while extracting the archive. Please try again later.", nil) };
@@ -307,7 +311,7 @@
             hasTargetTerminated = (BOOL)*((const uint8_t *)data.bytes + 1);
         }
         
-        [_delegate installerDidFinishPreparationAndWillInstallImmediately:hasTargetTerminated silently:canInstallSilently];
+        [delegate installerDidFinishPreparationAndWillInstallImmediately:hasTargetTerminated silently:canInstallSilently];
     } else if (identifier == SPUInstallationFinishedStage2) {
         _currentStage = identifier;
         
@@ -316,18 +320,18 @@
             hasTargetTerminated = (BOOL)*((const uint8_t *)data.bytes);
         }
         
-        [_delegate installerWillFinishInstallationAndRelaunch:_relaunch];
+        [delegate installerWillFinishInstallationAndRelaunch:_relaunch];
         
-        [_delegate installerDidStartInstallingWithApplicationTerminated:hasTargetTerminated];
+        [delegate installerDidStartInstallingWithApplicationTerminated:hasTargetTerminated];
     } else if (identifier == SPUInstallationFinishedStage3) {
         _currentStage = identifier;
         
         [_installerConnection invalidate];
         _installerConnection = nil;
         
-        [_delegate installerDidFinishInstallationAndRelaunched:_relaunch acknowledgement:^{
+        [delegate installerDidFinishInstallationAndRelaunched:_relaunch acknowledgement:^{
             dispatch_async(dispatch_get_main_queue(), ^{
-                [self->_delegate installerIsRequestingAbortInstallWithError:nil];
+                [delegate installerIsRequestingAbortInstallWithError:nil];
             });
         }];
     } else if (identifier == SPUUpdaterAlivePing) {
@@ -474,10 +478,12 @@
     // Give the host app an opportunity to postpone the install and relaunch.
     if (!_postponedOnce)
     {
-        if ([_updaterDelegate respondsToSelector:@selector(updater:shouldPostponeRelaunchForUpdate:untilInvokingBlock:)]) {
+        id updater = _updater;
+        id<SPUUpdaterDelegate> updaterDelegate = _updaterDelegate;
+        if (updater != nil && [updaterDelegate respondsToSelector:@selector(updater:shouldPostponeRelaunchForUpdate:untilInvokingBlock:)]) {
             _postponedOnce = YES;
             __weak __typeof__(self) weakSelf = self;
-            if ([_updaterDelegate updater:_updater shouldPostponeRelaunchForUpdate:_updateItem untilInvokingBlock:^{
+            if ([updaterDelegate updater:updater shouldPostponeRelaunchForUpdate:_updateItem untilInvokingBlock:^{
                 [weakSelf installWithToolAndRelaunch:relaunch displayingUserInterface:showUI];
             }]) {
                 return;

@@ -159,14 +159,16 @@
 
 - (void)basicDriverDidFinishLoadingAppcast
 {
-    if ([_delegate respondsToSelector:@selector(basicDriverDidFinishLoadingAppcast)]) {
-        [_delegate basicDriverDidFinishLoadingAppcast];
+    id<SPUUIBasedUpdateDriverDelegate> delegate = _delegate;
+    if ([delegate respondsToSelector:@selector(basicDriverDidFinishLoadingAppcast)]) {
+        [delegate basicDriverDidFinishLoadingAppcast];
     }
 }
 
 - (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)updateItem secondaryAppcastItem:(SUAppcastItem * _Nullable)secondaryUpdateItem
 {
     id <SPUUpdaterDelegate> updaterDelegate = _updaterDelegate;
+    id<SPUUIBasedUpdateDriverDelegate> delegate = _delegate;
     
     SPUUserUpdateStage stage;
     // Major upgrades and information only updates are not downloaded automatically
@@ -191,13 +193,16 @@
                 validatedChoice = userChoice;
             }
             
-            if ([updaterDelegate respondsToSelector:@selector(updater:userDidMakeChoice:forUpdate:state:)]) {
-                [updaterDelegate updater:self->_updater userDidMakeChoice:validatedChoice forUpdate:updateItem state:state];
-            } else if (validatedChoice == SPUUserUpdateChoiceSkip && [updaterDelegate respondsToSelector:@selector(updater:userDidSkipThisVersion:)]) {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-                [updaterDelegate updater:self->_updater userDidSkipThisVersion:updateItem];
-#pragma clang diagnostic pop
+            id updater = self->_updater;
+            if (updater != nil) {
+                if ([updaterDelegate respondsToSelector:@selector(updater:userDidMakeChoice:forUpdate:state:)]) {
+                    [updaterDelegate updater:updater userDidMakeChoice:validatedChoice forUpdate:updateItem state:state];
+                } else if (validatedChoice == SPUUserUpdateChoiceSkip && [updaterDelegate respondsToSelector:@selector(updater:userDidSkipThisVersion:)]) {
+    #pragma clang diagnostic push
+    #pragma clang diagnostic ignored "-Wdeprecated-declarations"
+                    [updaterDelegate updater:updater userDidSkipThisVersion:updateItem];
+    #pragma clang diagnostic pop
+                }
             }
             
             switch (validatedChoice) {
@@ -227,7 +232,7 @@
                                 [self->_coreDriver clearDownloadedUpdate];
                             }
                             
-                            [self->_delegate uiDriverIsRequestingAbortUpdateWithError:nil];
+                            [delegate uiDriverIsRequestingAbortUpdateWithError:nil];
                             
                             break;
                         case SPUUserUpdateStageInstalling:
@@ -256,8 +261,8 @@
         });
     }];
     
-    if ([_delegate respondsToSelector:@selector(uiDriverDidShowUpdate)]) {
-        [_delegate uiDriverDidShowUpdate];
+    if ([delegate respondsToSelector:@selector(uiDriverDidShowUpdate)]) {
+        [delegate uiDriverDidShowUpdate];
     }
     
     if (updateItem.releaseNotesURL != nil && (![updaterDelegate respondsToSelector:@selector(updater:shouldDownloadReleaseNotesForUpdate:)] || [updaterDelegate updater:_updater shouldDownloadReleaseNotesForUpdate:updateItem])) {

@@ -116,16 +116,18 @@
 
 - (void)notifyFinishLoadingAppcast
 {
-    if ([_delegate respondsToSelector:@selector(basicDriverDidFinishLoadingAppcast)]) {
-        [_delegate basicDriverDidFinishLoadingAppcast];
+    id<SPUBasicUpdateDriverDelegate> delegate = _delegate;
+    if ([delegate respondsToSelector:@selector(basicDriverDidFinishLoadingAppcast)]) {
+        [delegate basicDriverDidFinishLoadingAppcast];
     }
 }
 
 - (void)didFinishLoadingAppcast:(SUAppcast *)appcast
 {
     if (!_aborted) {
-        if ([_updaterDelegate respondsToSelector:@selector((updater:didFinishLoadingAppcast:))]) {
-            [_updaterDelegate updater:_updater didFinishLoadingAppcast:appcast];
+        id <SPUUpdaterDelegate> updaterDelegate = _updaterDelegate;
+        if ([updaterDelegate respondsToSelector:@selector((updater:didFinishLoadingAppcast:))]) {
+            [updaterDelegate updater:_updater didFinishLoadingAppcast:appcast];
         }
         
         [self notifyFinishLoadingAppcast];
@@ -135,31 +137,35 @@
 - (void)notifyFoundValidUpdateWithAppcastItem:(SUAppcastItem *)updateItem secondaryAppcastItem:(SUAppcastItem * _Nullable)secondaryUpdateItem systemDomain:(NSNumber * _Nullable)systemDomain resuming:(BOOL)resuming
 {
     if (!_aborted) {
+        id<SPUBasicUpdateDriverDelegate> delegate = _delegate;
+        id <SPUUpdaterDelegate> updaterDelegate = _updaterDelegate;
+        id updater = _updater;
+        
         if (!resuming) {
             // interactive pkg based updates are not supported under root user
             if ([updateItem.installationType isEqualToString:SPUInstallationTypeInteractivePackage] && geteuid() == 0) {
-                [_delegate basicDriverIsRequestingAbortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationRootInteractiveError userInfo:@{ NSLocalizedDescriptionKey: SULocalizedString(@"Interactive based packages cannot be installed as the root user.", nil) }]];
+                [delegate basicDriverIsRequestingAbortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationRootInteractiveError userInfo:@{ NSLocalizedDescriptionKey: SULocalizedString(@"Interactive based packages cannot be installed as the root user.", nil) }]];
                 return;
             } else {
                 // Give the delegate a chance to bail
                 
                 NSError *shouldNotProceedError = nil;
-                if ([_updaterDelegate respondsToSelector:@selector(updater:shouldProceedWithUpdate:updateCheck:error:)] && ![_updaterDelegate updater:_updater shouldProceedWithUpdate:updateItem updateCheck:_updateCheck error:&shouldNotProceedError]) {
-                    [_delegate basicDriverIsRequestingAbortUpdateWithError:shouldNotProceedError];
+                if ([updaterDelegate respondsToSelector:@selector(updater:shouldProceedWithUpdate:updateCheck:error:)] && ![updaterDelegate updater:updater shouldProceedWithUpdate:updateItem updateCheck:_updateCheck error:&shouldNotProceedError]) {
+                    [delegate basicDriverIsRequestingAbortUpdateWithError:shouldNotProceedError];
                     return;
                 }
             }
         }
         
         [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidFindValidUpdateNotification
-                                                            object:_updater
+                                                            object:updater
                                                           userInfo:@{ SUUpdaterAppcastItemNotificationKey: updateItem }];
         
-        if ([_updaterDelegate respondsToSelector:@selector((updater:didFindValidUpdate:))]) {
-            [_updaterDelegate updater:_updater didFindValidUpdate:updateItem];
+        if ([updaterDelegate respondsToSelector:@selector((updater:didFindValidUpdate:))]) {
+            [updaterDelegate updater:updater didFindValidUpdate:updateItem];
         }
         
-        [_delegate basicDriverDidFindUpdateWithAppcastItem:updateItem secondaryAppcastItem:secondaryUpdateItem systemDomain:systemDomain];
+        [delegate basicDriverDidFindUpdateWithAppcastItem:updateItem secondaryAppcastItem:secondaryUpdateItem systemDomain:systemDomain];
     }
 }
 
@@ -250,13 +256,18 @@
          code:SUNoUpdateError
          userInfo:[userInfo copy]];
         
-        if ([_updaterDelegate respondsToSelector:@selector((updaterDidNotFindUpdate:error:))]) {
-            [_updaterDelegate updaterDidNotFindUpdate:_updater error:notFoundError];
-        } else if ([_updaterDelegate respondsToSelector:@selector((updaterDidNotFindUpdate:))]) {
-            [_updaterDelegate updaterDidNotFindUpdate:_updater];
-        }
+        id <SPUUpdaterDelegate> updaterDelegate = _updaterDelegate;
+        id updater = _updater;
         
-        [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidNotFindUpdateNotification object:_updater userInfo:userInfo];
+        if (updater != nil) {
+            if ([updaterDelegate respondsToSelector:@selector((updaterDidNotFindUpdate:error:))]) {
+                [updaterDelegate updaterDidNotFindUpdate:updater error:notFoundError];
+            } else if ([updaterDelegate respondsToSelector:@selector((updaterDidNotFindUpdate:))]) {
+                [updaterDelegate updaterDidNotFindUpdate:updater];
+            }
+            
+            [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidNotFindUpdateNotification object:updater userInfo:userInfo];
+        }
         
         [_delegate basicDriverIsRequestingAbortUpdateWithError:notFoundError];
     }

@@ -115,4 +115,4 @@ GCC_WARN_UNUSED_PARAMETER = YES
 GCC_WARN_UNUSED_VARIABLE = YES
 
 // Turn on all warnings, then disable a few which are almost impossible to avoid
-WARNING_CFLAGS = -Wall -Weverything -Wno-unused-macros -Wno-gnu-statement-expression -Wno-arc-repeated-use-of-weak -Wno-auto-import -Wno-gnu-zero-variadic-macro-arguments -Wno-format-non-iso -Wno-direct-ivar-access
+WARNING_CFLAGS = -Wall -Weverything -Wno-unused-macros -Wno-gnu-statement-expression -Wno-auto-import -Wno-gnu-zero-variadic-macro-arguments -Wno-format-non-iso -Wno-direct-ivar-access

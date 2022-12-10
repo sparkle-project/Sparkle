@@ -417,11 +417,12 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
     NSString *updateItemVersion = [_updateItem displayVersionString];
     NSString *hostVersion = [_host displayVersion];
     // Display more info if the version strings are the same; useful for betas.
-    if (_versionDisplayer == nil && [updateItemVersion isEqualToString:hostVersion] ) {
+    id<SUVersionDisplay> versionDisplayer = _versionDisplayer;
+    if (versionDisplayer == nil && [updateItemVersion isEqualToString:hostVersion] ) {
         updateItemVersion = [updateItemVersion stringByAppendingFormat:@" (%@)", [_updateItem versionString]];
         hostVersion = [hostVersion stringByAppendingFormat:@" (%@)", _host.version];
     } else {
-        [_versionDisplayer formatVersion:&updateItemVersion andVersion:&hostVersion];
+        [versionDisplayer formatVersion:&updateItemVersion andVersion:&hostVersion];
     }
 
     // We display a different summary depending on if it's an "info-only" item, or a "critical update" item, or if we've already downloaded the update and just need to relaunch

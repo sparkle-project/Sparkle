@@ -266,9 +266,10 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
             }
         }
         
+        id <SPUStandardUserDriverDelegate> delegate = _delegate;
         BOOL handleShowingUpdates;
-        if ([_delegate respondsToSelector:@selector(standardUserDriverShouldHandleShowingScheduledUpdate:andInImmediateFocus:)]) {
-            handleShowingUpdates = [_delegate standardUserDriverShouldHandleShowingScheduledUpdate:(SUAppcastItem * _Nonnull)updateItem andInImmediateFocus:immediateFocus];
+        if ([delegate respondsToSelector:@selector(standardUserDriverShouldHandleShowingScheduledUpdate:andInImmediateFocus:)]) {
+            handleShowingUpdates = [delegate standardUserDriverShouldHandleShowingScheduledUpdate:(SUAppcastItem * _Nonnull)updateItem andInImmediateFocus:immediateFocus];
         } else {
             handleShowingUpdates = YES;
         }
@@ -279,19 +280,19 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
             dispatch_async(dispatch_get_main_queue(), ^{
                 __typeof__(self) strongSelf = weakSelf;
                 if (strongSelf != nil) {
-                    id<SPUStandardUserDriverDelegate> delegate = strongSelf->_delegate;
-                    if ([delegate respondsToSelector:@selector(standardUserDriverWillHandleShowingUpdate:forUpdate:state:)]) {
-                        [delegate standardUserDriverWillHandleShowingUpdate:handleShowingUpdates forUpdate:(SUAppcastItem * _Nonnull)updateItem state:(SPUUserUpdateState * _Nonnull)state];
+                    id<SPUStandardUserDriverDelegate> innerDelegate = strongSelf->_delegate;
+                    if ([innerDelegate respondsToSelector:@selector(standardUserDriverWillHandleShowingUpdate:forUpdate:state:)]) {
+                        [innerDelegate standardUserDriverWillHandleShowingUpdate:handleShowingUpdates forUpdate:(SUAppcastItem * _Nonnull)updateItem state:(SPUUserUpdateState * _Nonnull)state];
                     } else {
-                        SULog(SULogLevelError, @"Error: Delegate <%@> is handling showing scheduled update but does not implement %@", delegate, NSStringFromSelector(@selector(standardUserDriverWillHandleShowingUpdate:forUpdate:state:)));
+                        SULog(SULogLevelError, @"Error: Delegate <%@> is handling showing scheduled update but does not implement %@", innerDelegate, NSStringFromSelector(@selector(standardUserDriverWillHandleShowingUpdate:forUpdate:state:)));
                     }
                 }
             });
         } else {
             // The update will be shown, but not necessarily immediately if !driverShowingUpdateNow
             // It is useful to post this early in case the delegate wants to post a notification
-            if ([_delegate respondsToSelector:@selector(standardUserDriverWillHandleShowingUpdate:forUpdate:state:)]) {
-                [_delegate standardUserDriverWillHandleShowingUpdate:handleShowingUpdates forUpdate:(SUAppcastItem * _Nonnull)updateItem state:(SPUUserUpdateState * _Nonnull)state];
+            if ([delegate respondsToSelector:@selector(standardUserDriverWillHandleShowingUpdate:forUpdate:state:)]) {
+                [delegate standardUserDriverWillHandleShowingUpdate:handleShowingUpdates forUpdate:(SUAppcastItem * _Nonnull)updateItem state:(SPUUserUpdateState * _Nonnull)state];
             }
             
             if (!driverShowingUpdateNow) {
@@ -332,15 +333,17 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
     
     [self closeCheckingWindow];
     
+    id<SPUStandardUserDriverDelegate> delegate = _delegate;
     id <SUVersionDisplay> versionDisplayer = nil;
-    if ([_delegate respondsToSelector:@selector(standardUserDriverRequestsVersionDisplayer)]) {
-        versionDisplayer = [_delegate standardUserDriverRequestsVersionDisplayer];
+    
+    if ([delegate respondsToSelector:@selector(standardUserDriverRequestsVersionDisplayer)]) {
+        versionDisplayer = [delegate standardUserDriverRequestsVersionDisplayer];
     }
     
-    BOOL needsToObserveUserAttention = [_delegate respondsToSelector:@selector(standardUserDriverDidReceiveUserAttentionForUpdate:)];
+    BOOL needsToObserveUserAttention = [delegate respondsToSelector:@selector(standardUserDriverDidReceiveUserAttentionForUpdate:)];
     
     __weak __typeof__(self) weakSelf = self;
-    __weak id<SPUStandardUserDriverDelegate> weakDelegate = _delegate;
+    __weak id<SPUStandardUserDriverDelegate> weakDelegate = delegate;
     _activeUpdateAlert = [[SUUpdateAlert alloc] initWithAppcastItem:appcastItem state:state host:_host versionDisplayer:versionDisplayer completionBlock:^(SPUUserUpdateChoice choice, NSRect windowFrame, BOOL wasKeyWindow) {
         reply(choice);
         
@@ -410,8 +413,8 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
     
     // For user initiated checks, let the delegate know we'll be showing an update
     // For scheduled checks, -setUpActiveUpdateAlertForUpdate:state: below will handle this
-    if (state.userInitiated && [_delegate respondsToSelector:@selector(standardUserDriverWillHandleShowingUpdate:forUpdate:state:)]) {
-        [_delegate standardUserDriverWillHandleShowingUpdate:YES forUpdate:appcastItem state:state];
+    if (state.userInitiated && [delegate respondsToSelector:@selector(standardUserDriverWillHandleShowingUpdate:forUpdate:state:)]) {
+        [delegate standardUserDriverWillHandleShowingUpdate:YES forUpdate:appcastItem state:state];
     }
     
     [self setUpActiveUpdateAlertForScheduledUpdate:(state.userInitiated ? nil : appcastItem) state:state];
@@ -657,11 +660,12 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
     if (_statusController == nil) {
         // We will make the status window minimizable for regular app updates which are often
         // quick and atomic to install on quit. But we won't do this for package based updates.
+        id <SPUStandardUserDriverDelegate> delegate = _delegate;
         BOOL minimizable;
         if (!_regularApplicationUpdate) {
             minimizable = NO;
-        } else if ([_delegate respondsToSelector:@selector(standardUserDriverAllowsMinimizableStatusWindow)]) {
-            minimizable = [_delegate standardUserDriverAllowsMinimizableStatusWindow];
+        } else if ([delegate respondsToSelector:@selector(standardUserDriverAllowsMinimizableStatusWindow)]) {
+            minimizable = [delegate standardUserDriverAllowsMinimizableStatusWindow];
         } else {
             minimizable = YES;
         }

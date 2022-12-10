@@ -141,8 +141,9 @@
 
 - (void)downloadFile
 {
-    if ([_delegate respondsToSelector:@selector(downloadDriverWillBeginDownload)]) {
-        [_delegate downloadDriverWillBeginDownload];
+    id<SPUDownloadDriverDelegate> delegate = _delegate;
+    if ([delegate respondsToSelector:@selector(downloadDriverWillBeginDownload)]) {
+        [delegate downloadDriverWillBeginDownload];
     }
     
     if (_updateItem != nil) {
@@ -201,6 +202,7 @@
     dispatch_async(dispatch_get_main_queue(), ^{
         self->_retrievedDownloadResult = YES;
         
+        id<SPUDownloadDriverDelegate> delegate = self->_delegate;
         if (self->_updateItem != nil) {
             if (self->_expectedContentLength > 0 && self->_updateItem.contentLength > 0 && self->_expectedContentLength != self->_updateItem.contentLength) {
                 SULog(SULogLevelError, @"Warning: Downloader's expected content length (%llu) != Appcast item's length (%llu)", self->_expectedContentLength, self->_updateItem.contentLength);
@@ -208,14 +210,14 @@
             
             SPUDownloadedUpdate *downloadedUpdate = [[SPUDownloadedUpdate alloc] initWithAppcastItem:self->_updateItem secondaryAppcastItem:self->_secondaryUpdateItem downloadName:self->_downloadName temporaryDirectory:self->_temporaryDirectory];
             
-            if ([self->_delegate respondsToSelector:@selector(downloadDriverDidDownloadUpdate:)]) {
-                [self->_delegate downloadDriverDidDownloadUpdate:downloadedUpdate];
+            if ([delegate respondsToSelector:@selector(downloadDriverDidDownloadUpdate:)]) {
+                [delegate downloadDriverDidDownloadUpdate:downloadedUpdate];
             }
         } else {
             assert(downloadData != nil);
             SPUDownloadData *nonNullDownloadData = downloadData;
-            if ([self->_delegate respondsToSelector:@selector(downloadDriverDidDownloadData:)]) {
-                [self->_delegate downloadDriverDidDownloadData:nonNullDownloadData];
+            if ([delegate respondsToSelector:@selector(downloadDriverDidDownloadData:)]) {
+                [delegate downloadDriverDidDownloadData:nonNullDownloadData];
             }
         }
     });
@@ -256,8 +258,9 @@
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         // Fallback to appcast item's content length if we don't get the length from HTTP header
-        if ([self->_delegate respondsToSelector:@selector(downloadDriverDidReceiveExpectedContentLength:)]) {
-            [self->_delegate downloadDriverDidReceiveExpectedContentLength:expectedContentLength > 0 ? (uint64_t)expectedContentLength : self->_updateItem.contentLength];
+        id<SPUDownloadDriverDelegate> delegate = self->_delegate;
+        if ([delegate respondsToSelector:@selector(downloadDriverDidReceiveExpectedContentLength:)]) {
+            [delegate downloadDriverDidReceiveExpectedContentLength:expectedContentLength > 0 ? (uint64_t)expectedContentLength : self->_updateItem.contentLength];
         }
         
         // Reset expected content length from downloader
@@ -271,8 +274,9 @@
 - (void)downloaderDidReceiveDataOfLength:(uint64_t)length
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        if ([self->_delegate respondsToSelector:@selector(downloadDriverDidReceiveDataOfLength:)]) {
-            [self->_delegate downloadDriverDidReceiveDataOfLength:length];
+        id<SPUDownloadDriverDelegate> delegate = self->_delegate;
+        if ([delegate respondsToSelector:@selector(downloadDriverDidReceiveDataOfLength:)]) {
+            [delegate downloadDriverDidReceiveDataOfLength:length];
         }
     });
 }

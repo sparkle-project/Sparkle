@@ -353,14 +353,16 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     BOOL shouldPrompt = NO;
     BOOL hasLaunchedBefore = [_host boolForUserDefaultsKey:SUHasLaunchedBeforeKey];
 
+    id<SPUUpdaterDelegate> delegate = _delegate;
+    
     // If the user has been asked about automatic checks, don't bother prompting
     // When the user answers to the permission prompt, this will be set to either @YES or @NO instead of nil
     if ([_host objectForUserDefaultsKey:SUEnableAutomaticChecksKey] != nil) {
         shouldPrompt = NO;
     }
     // Does the delegate want to take care of the logic for when we should ask permission to update?
-    else if ([_delegate respondsToSelector:@selector((updaterShouldPromptForPermissionToCheckForUpdates:))]) {
-        shouldPrompt = [_delegate updaterShouldPromptForPermissionToCheckForUpdates:self];
+    else if ([delegate respondsToSelector:@selector((updaterShouldPromptForPermissionToCheckForUpdates:))]) {
+        shouldPrompt = [delegate updaterShouldPromptForPermissionToCheckForUpdates:self];
     }
     // Has the user been asked already? And don't ask if the host has a default value set in its Info.plist.
     else if ([_host objectForKey:SUEnableAutomaticChecksKey] == nil) {
@@ -375,8 +377,8 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     if (shouldPrompt) {
         NSArray<NSDictionary<NSString *, NSString *> *> *profileInfo = self.systemProfileArray;
         // Always say we're sending the system profile here so that the delegate displays the parameters it would send.
-        if ([_delegate respondsToSelector:@selector((feedParametersForUpdater:sendingSystemProfile:))]) {
-            NSArray *feedParameters = [_delegate feedParametersForUpdater:self sendingSystemProfile:YES];
+        if ([delegate respondsToSelector:@selector((feedParametersForUpdater:sendingSystemProfile:))]) {
+            NSArray *feedParameters = [delegate feedParametersForUpdater:self sendingSystemProfile:YES];
             if (feedParameters != nil) {
                 profileInfo = [profileInfo arrayByAddingObjectsFromArray:feedParameters];
             }
@@ -445,9 +447,10 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 {
     [_updaterTimer invalidate];
     
+    id<SPUUpdaterDelegate> delegate = _delegate;
     if (!firingImmediately && ![self automaticallyChecksForUpdates]) {
-        if ([_delegate respondsToSelector:@selector(updaterWillNotScheduleUpdateCheck:)]) {
-            [_delegate updaterWillNotScheduleUpdateCheck:self];
+        if ([delegate respondsToSelector:@selector(updaterWillNotScheduleUpdateCheck:)]) {
+            [delegate updaterWillNotScheduleUpdateCheck:self];
         }
         return;
     }
@@ -509,8 +512,8 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
                 updateCheckInterval = SUMinimumUpdateCheckInterval;
             if (intervalSinceCheck < updateCheckInterval) {
                 NSTimeInterval delayUntilCheck = (updateCheckInterval - intervalSinceCheck); // It hasn't been long enough.
-                if ([self->_delegate respondsToSelector:@selector(updater:willScheduleUpdateCheckAfterDelay:)]) {
-                    [self->_delegate updater:self willScheduleUpdateCheckAfterDelay:delayUntilCheck];
+                if ([delegate respondsToSelector:@selector(updater:willScheduleUpdateCheckAfterDelay:)]) {
+                    [delegate updater:self willScheduleUpdateCheckAfterDelay:delayUntilCheck];
                 }
                 
                 if ([self->_userDriver respondsToSelector:@selector(logGentleScheduledUpdateReminderWarningIfNeeded)]) {
@@ -558,6 +561,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
                 return;
             }
             
+            id<SPUUpdaterDelegate> delegate = strongSelf->_delegate;
             id <SPUUpdateDriver> updateDriver;
             if (!installerIsRunning && [strongSelf automaticallyDownloadsUpdates] && strongSelf->_resumableUpdate == nil) {
                 updateDriver =
@@ -566,7 +570,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
                  applicationBundle:strongSelf->_applicationBundle
                  updater:strongSelf
                  userDriver:strongSelf->_userDriver
-                 updaterDelegate:strongSelf->_delegate];
+                 updaterDelegate:delegate];
             } else {
                 updateDriver =
                 [[SPUScheduledUpdateDriver alloc]
@@ -574,7 +578,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
                  applicationBundle:strongSelf->_applicationBundle
                  updater:strongSelf
                  userDriver:strongSelf->_userDriver
-                 updaterDelegate:strongSelf->_delegate];
+                 updaterDelegate:delegate];
             }
             
             [strongSelf checkForUpdatesWithDriver:updateDriver updateCheck:SPUUpdateCheckUpdatesInBackground installerInProgress:installerIsRunning];
@@ -667,21 +671,23 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     assert(_driver != nil);
     
     void (^notifyDelegateOfDriverCompletion)(NSError * _Nullable, BOOL) = ^(NSError * _Nullable error, BOOL shouldShowUpdateImmediately) {
+        id<SPUUpdaterDelegate> delegate = self->_delegate;
+        
         if (error != nil) {
             if (error.code != SUNoUpdateError && error.code != SUInstallationCanceledError && error.code != SUInstallationAuthorizeLaterError) { // Let's not bother logging this.
                 SULogError(error);
             }
             
             // Notify host app that update driver has aborted if a non-recoverable error occurs
-            if (error.code != SUInstallationAuthorizeLaterError && [self->_delegate respondsToSelector:@selector((updater:didAbortWithError:))]) {
-                [self->_delegate updater:self didAbortWithError:(NSError * _Nonnull)error];
+            if (error.code != SUInstallationAuthorizeLaterError && [delegate respondsToSelector:@selector((updater:didAbortWithError:))]) {
+                [delegate updater:self didAbortWithError:(NSError * _Nonnull)error];
             }
         }
         
         // Notify host app that update driver has finished
         // As long as we're not going to immmediately kick off a new check
-        if (!shouldShowUpdateImmediately && [self->_delegate respondsToSelector:@selector((updater:didFinishUpdateCycleForUpdateCheck:error:))]) {
-            [self->_delegate updater:self didFinishUpdateCycleForUpdateCheck:updateCheck error:error];
+        if (!shouldShowUpdateImmediately && [delegate respondsToSelector:@selector((updater:didFinishUpdateCycleForUpdateCheck:error:))]) {
+            [delegate updater:self didFinishUpdateCycleForUpdateCheck:updateCheck error:error];
         }
     };
     
@@ -714,12 +720,13 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     };
     
     // Check if the delegate wants to defer checking for updates
+    id<SPUUpdaterDelegate> delegate = _delegate;
     NSError *mayCheckForUpdatesError = nil;
     if (
-        ([_delegate respondsToSelector:@selector(updater:mayPerformUpdateCheck:error:)] && ![_delegate updater:self mayPerformUpdateCheck:updateCheck error:&mayCheckForUpdatesError]) ||
+        ([delegate respondsToSelector:@selector(updater:mayPerformUpdateCheck:error:)] && ![delegate updater:self mayPerformUpdateCheck:updateCheck error:&mayCheckForUpdatesError]) ||
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
-        ([_delegate respondsToSelector:@selector((updaterMayCheckForUpdates:))] && ![_delegate updaterMayCheckForUpdates:self]))
+        ([delegate respondsToSelector:@selector((updaterMayCheckForUpdates:))] && ![delegate updaterMayCheckForUpdates:self]))
 #pragma clang diagnostic pop
     {
         abortUpdateDriver(mayCheckForUpdatesError, YES);
@@ -873,8 +880,9 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     
     // A value in the user defaults overrides one in the Info.plist (so preferences panels can be created wherein users choose between beta / release feeds).
     NSString *appcastString = [_host objectForKey:SUFeedURLKey];
-    if ([_delegate respondsToSelector:@selector((feedURLStringForUpdater:))]) {
-        NSString *delegateAppcastString = [_delegate feedURLStringForUpdater:self];
+    id<SPUUpdaterDelegate> delegate = _delegate;
+    if ([delegate respondsToSelector:@selector((feedURLStringForUpdater:))]) {
+        NSString *delegateAppcastString = [delegate feedURLStringForUpdater:self];
         if (delegateAppcastString != nil) {
             appcastString = delegateAppcastString;
         }
@@ -955,9 +963,10 @@ static NSString *escapeURLComponent(NSString *str) {
     const NSTimeInterval oneWeek = 60 * 60 * 24 * 7;
     sendingSystemProfile &= (-[lastSubmitDate timeIntervalSinceNow] >= oneWeek);
 
+    id<SPUUpdaterDelegate> delegate = _delegate;
     NSArray<NSDictionary<NSString *, NSString *> *> *parameters = @[];
-    if ([_delegate respondsToSelector:@selector((feedParametersForUpdater:sendingSystemProfile:))]) {
-        NSArray *feedParameters = [_delegate feedParametersForUpdater:self sendingSystemProfile:sendingSystemProfile];
+    if ([delegate respondsToSelector:@selector((feedParametersForUpdater:sendingSystemProfile:))]) {
+        NSArray *feedParameters = [delegate feedParametersForUpdater:self sendingSystemProfile:sendingSystemProfile];
         if (feedParameters != nil) {
             parameters = [parameters arrayByAddingObjectsFromArray:feedParameters];
         }
@@ -990,9 +999,10 @@ static NSString *escapeURLComponent(NSString *str) {
 }
 
 - (NSArray<NSDictionary<NSString *, NSString *> *> *)systemProfileArray {
+    id<SPUUpdaterDelegate> delegate = _delegate;
     NSArray *systemProfile = [SUSystemProfiler systemProfileArrayForHost:_host];
-    if ([_delegate respondsToSelector:@selector(allowedSystemProfileKeysForUpdater:)]) {
-        NSArray * allowedKeys = [_delegate allowedSystemProfileKeysForUpdater:self];
+    if ([delegate respondsToSelector:@selector(allowedSystemProfileKeysForUpdater:)]) {
+        NSArray * allowedKeys = [delegate allowedSystemProfileKeysForUpdater:self];
         if (allowedKeys != nil) {
             NSMutableArray *filteredProfile = [NSMutableArray array];
             for (NSDictionary *profileElement in systemProfile) {

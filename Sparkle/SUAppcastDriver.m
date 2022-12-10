@@ -223,10 +223,12 @@
 {
     // Find the best valid update in the appcast by asking the delegate
     // Don't ask the delegate if the appcast has no items though
+    id <SPUUpdaterDelegate> updaterDelegate = _updaterDelegate;
+    id updater = _updater;
     SUAppcastItem *regularItemFromDelegate;
     BOOL delegateOptedOutOfSelection;
-    if (appcast.items.count > 0 && [_updaterDelegate respondsToSelector:@selector((bestValidUpdateInAppcast:forUpdater:))]) {
-        SUAppcastItem *candidateItem = [_updaterDelegate bestValidUpdateInAppcast:appcast forUpdater:(id _Nonnull)_updater];
+    if (appcast.items.count > 0 && updater != nil && [updaterDelegate respondsToSelector:@selector((bestValidUpdateInAppcast:forUpdater:))]) {
+        SUAppcastItem *candidateItem = [updaterDelegate bestValidUpdateInAppcast:appcast forUpdater:updater];
         
         if (candidateItem == SUAppcastItem.emptyAppcastItem) {
             regularItemFromDelegate = nil;
@@ -267,15 +269,19 @@
 
 - (void)appcastDidFinishLoading:(SUAppcast *)loadedAppcast inBackground:(BOOL)background
 {
-    [_delegate didFinishLoadingAppcast:loadedAppcast];
+    id<SUAppcastDriverDelegate> delegate = _delegate;
+    [delegate didFinishLoadingAppcast:loadedAppcast];
     
-    NSDictionary *userInfo = @{ SUUpdaterAppcastNotificationKey: loadedAppcast };
-    [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidFinishLoadingAppCastNotification object:_updater userInfo:userInfo];
+    id updater = _updater;
+    if (updater != nil) {
+        NSDictionary *userInfo = @{ SUUpdaterAppcastNotificationKey: loadedAppcast };
+        [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidFinishLoadingAppCastNotification object:updater userInfo:userInfo];
+    }
     
     NSSet<NSString *> *allowedChannels;
     id<SPUUpdaterDelegate> updaterDelegate = _updaterDelegate;
-    if ([updaterDelegate respondsToSelector:@selector(allowedChannelsForUpdater:)]) {
-        allowedChannels = [updaterDelegate allowedChannelsForUpdater:_updater];
+    if (updater != nil && [updaterDelegate respondsToSelector:@selector(allowedChannelsForUpdater:)]) {
+        allowedChannels = [updaterDelegate allowedChannelsForUpdater:updater];
         if (allowedChannels == nil) {
             SULog(SULogLevelError, @"Error: -allowedChannelsForUpdater: cannot return nil. Treating this as an empty set.");
             allowedChannels = [NSSet set];
@@ -318,7 +324,7 @@
     
     if ([self isItemNewer:finalPrimaryItem]) {
         // We found a suitable update
-        [_delegate didFindValidUpdateWithAppcastItem:finalPrimaryItem secondaryAppcastItem:finalSecondaryItem];
+        [delegate didFindValidUpdateWithAppcastItem:finalPrimaryItem secondaryAppcastItem:finalSecondaryItem];
     } else {
         // Find the latest appcast item that we can report to the user and updater delegates
         // This may include updates that fail due to OS version requirements.
@@ -334,7 +340,7 @@
             hostToLatestAppcastItemComparisonResult = 0;
         }
         
-        [_delegate didNotFindUpdateWithLatestAppcastItem:notFoundPrimaryItem hostToLatestAppcastItemComparisonResult:hostToLatestAppcastItemComparisonResult background:background];
+        [delegate didNotFindUpdateWithLatestAppcastItem:notFoundPrimaryItem hostToLatestAppcastItemComparisonResult:hostToLatestAppcastItemComparisonResult background:background];
     }
 }
 

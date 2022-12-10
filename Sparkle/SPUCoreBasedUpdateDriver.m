@@ -106,8 +106,9 @@
 
 - (void)basicDriverDidFinishLoadingAppcast
 {
-    if ([_delegate respondsToSelector:@selector(basicDriverDidFinishLoadingAppcast)]) {
-        [_delegate basicDriverDidFinishLoadingAppcast];
+    id<SPUCoreBasedUpdateDriverDelegate> delegate = _delegate;
+    if ([delegate respondsToSelector:@selector(basicDriverDidFinishLoadingAppcast)]) {
+        [delegate basicDriverDidFinishLoadingAppcast];
     }
 }
 
@@ -128,10 +129,11 @@
 {
     _downloadDriver = [[SPUDownloadDriver alloc] initWithUpdateItem:updateItem secondaryUpdateItem:secondaryUpdateItem host:_host userAgent:_userAgent httpHeaders:_httpHeaders inBackground:background delegate:self];
     
-    if ([_updaterDelegate respondsToSelector:@selector((updater:willDownloadUpdate:withRequest:))]) {
-        [_updaterDelegate updater:_updater
-                               willDownloadUpdate:updateItem
-                                      withRequest:_downloadDriver.request];
+    id updater = _updater;
+    id<SPUUpdaterDelegate> updaterDelegate = _updaterDelegate;
+    
+    if (updater != nil && [updaterDelegate respondsToSelector:@selector((updater:willDownloadUpdate:withRequest:))]) {
+        [updaterDelegate updater:updater willDownloadUpdate:updateItem withRequest:_downloadDriver.request];
     }
     
     [_downloadDriver downloadFile];
@@ -139,22 +141,25 @@
 
 - (void)downloadDriverWillBeginDownload
 {
-    if ([_delegate respondsToSelector:@selector(downloadDriverWillBeginDownload)]) {
-        [_delegate downloadDriverWillBeginDownload];
+    id<SPUCoreBasedUpdateDriverDelegate> delegate = _delegate;
+    if ([delegate respondsToSelector:@selector(downloadDriverWillBeginDownload)]) {
+        [delegate downloadDriverWillBeginDownload];
     }
 }
 
 - (void)downloadDriverDidReceiveExpectedContentLength:(uint64_t)expectedContentLength
 {
-    if ([_delegate respondsToSelector:@selector(downloadDriverDidReceiveExpectedContentLength:)]) {
-        [_delegate downloadDriverDidReceiveExpectedContentLength:expectedContentLength];
+    id<SPUCoreBasedUpdateDriverDelegate> delegate = _delegate;
+    if ([delegate respondsToSelector:@selector(downloadDriverDidReceiveExpectedContentLength:)]) {
+        [delegate downloadDriverDidReceiveExpectedContentLength:expectedContentLength];
     }
 }
 
 - (void)downloadDriverDidReceiveDataOfLength:(uint64_t)length
 {
-    if ([_delegate respondsToSelector:@selector(downloadDriverDidReceiveDataOfLength:)]) {
-        [_delegate downloadDriverDidReceiveDataOfLength:length];
+    id<SPUCoreBasedUpdateDriverDelegate> delegate = _delegate;
+    if ([delegate respondsToSelector:@selector(downloadDriverDidReceiveDataOfLength:)]) {
+        [delegate downloadDriverDidReceiveDataOfLength:length];
     }
 }
 
@@ -167,8 +172,11 @@
         [SUPhasedUpdateGroupInfo setNewUpdateGroupIdentifierForHost:_host];
     }
     
-    if ([_updaterDelegate respondsToSelector:@selector(updater:didDownloadUpdate:)]) {
-        [_updaterDelegate updater:_updater didDownloadUpdate:_updateItem];
+    id updater = _updater;
+    id<SPUUpdaterDelegate> updaterDelegate = _updaterDelegate;
+    
+    if (updater != nil && [updaterDelegate respondsToSelector:@selector(updater:didDownloadUpdate:)]) {
+        [updaterDelegate updater:updater didDownloadUpdate:_updateItem];
     }
     
     _resumableUpdate = downloadedUpdate;
@@ -206,13 +214,17 @@
 
 - (void)extractUpdate:(SPUDownloadedUpdate *)downloadedUpdate
 {
-    if ([_updaterDelegate respondsToSelector:@selector(updater:willExtractUpdate:)]) {
-        [_updaterDelegate updater:_updater willExtractUpdate:_updateItem];
+    id updater = _updater;
+    id<SPUUpdaterDelegate> updaterDelegate = _updaterDelegate;
+    
+    if (updater != nil && [updaterDelegate respondsToSelector:@selector(updater:willExtractUpdate:)]) {
+        [updaterDelegate updater:updater willExtractUpdate:_updateItem];
     }
     
     // Now we have to extract the downloaded archive.
-    if ([_delegate respondsToSelector:@selector(coreDriverDidStartExtractingUpdate)]) {
-        [_delegate coreDriverDidStartExtractingUpdate];
+    id<SPUCoreBasedUpdateDriverDelegate> delegate = _delegate;
+    if ([delegate respondsToSelector:@selector(coreDriverDidStartExtractingUpdate)]) {
+        [delegate coreDriverDidStartExtractingUpdate];
     }
     
     [_installerDriver extractDownloadedUpdate:downloadedUpdate silently:_silentInstall completion:^(NSError * _Nullable error) {
@@ -229,8 +241,8 @@
             self->_downloadedUpdateForRemoval = downloadedUpdate;
             self->_resumableUpdate = nil;
             
-            if ([self->_updaterDelegate respondsToSelector:@selector(updater:didExtractUpdate:)]) {
-                [self->_updaterDelegate updater:self->_updater didExtractUpdate:self->_updateItem];
+            if (updater != nil && [updaterDelegate respondsToSelector:@selector(updater:didExtractUpdate:)]) {
+                [updaterDelegate updater:updater didExtractUpdate:self->_updateItem];
             }
         }
     }];
@@ -244,13 +256,16 @@
         
         [self fallBackAndDownloadRegularUpdate];
     } else {
-        if ([_updaterDelegate respondsToSelector:@selector((updater:failedToDownloadUpdate:error:))]) {
+        id updater = _updater;
+        id<SPUUpdaterDelegate> updaterDelegate = _updaterDelegate;
+        
+        if (updater != nil && [updaterDelegate respondsToSelector:@selector((updater:failedToDownloadUpdate:error:))]) {
             NSError *errorToReport = [error.userInfo objectForKey:NSUnderlyingErrorKey];
             if (errorToReport == nil) {
                 errorToReport = error;
             }
             
-            [_updaterDelegate updater:_updater failedToDownloadUpdate:_updateItem error:errorToReport];
+            [updaterDelegate updater:updater failedToDownloadUpdate:_updateItem error:errorToReport];
         }
         
         [_delegate coreDriverIsRequestingAbortUpdateWithError:error];
@@ -259,8 +274,9 @@
 
 - (void)installerDidStartInstallingWithApplicationTerminated:(BOOL)applicationTerminated
 {
-    if ([_delegate respondsToSelector:@selector(installerDidStartInstallingWithApplicationTerminated:)]) {
-        [_delegate installerDidStartInstallingWithApplicationTerminated:applicationTerminated];
+    id<SPUCoreBasedUpdateDriverDelegate> delegate = _delegate;
+    if ([delegate respondsToSelector:@selector(installerDidStartInstallingWithApplicationTerminated:)]) {
+        [delegate installerDidStartInstallingWithApplicationTerminated:applicationTerminated];
     }
 }
 
@@ -272,8 +288,9 @@
 
 - (void)installerDidExtractUpdateWithProgress:(double)progress
 {
-    if ([_delegate respondsToSelector:@selector(installerDidExtractUpdateWithProgress:)]) {
-        [_delegate installerDidExtractUpdateWithProgress:progress];
+    id<SPUCoreBasedUpdateDriverDelegate> delegate = _delegate;
+    if ([delegate respondsToSelector:@selector(installerDidExtractUpdateWithProgress:)]) {
+        [delegate installerDidExtractUpdateWithProgress:progress];
     }
 }
 
@@ -299,22 +316,26 @@
 
 - (void)installerWillFinishInstallationAndRelaunch:(BOOL)relaunch
 {
-    if ([_updaterDelegate respondsToSelector:@selector((updater:willInstallUpdate:))]) {
-        [_updaterDelegate updater:_updater willInstallUpdate:_updateItem];
+    id updater = _updater;
+    id<SPUUpdaterDelegate> updaterDelegate = _updaterDelegate;
+    
+    if (updater != nil && [updaterDelegate respondsToSelector:@selector((updater:willInstallUpdate:))]) {
+        [updaterDelegate updater:updater willInstallUpdate:_updateItem];
     }
     
     if (relaunch) {
         [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterWillRestartNotification object:self];
-        if ([_updaterDelegate respondsToSelector:@selector((updaterWillRelaunchApplication:))]) {
-            [_updaterDelegate updaterWillRelaunchApplication:_updater];
+        if (updater != nil && [updaterDelegate respondsToSelector:@selector((updaterWillRelaunchApplication:))]) {
+            [updaterDelegate updaterWillRelaunchApplication:updater];
         }
     }
 }
 
 - (void)installerDidFinishInstallationAndRelaunched:(BOOL)relaunched acknowledgement:(void(^)(void))acknowledgement
 {
-    if ([_delegate respondsToSelector:@selector(installerDidFinishInstallationAndRelaunched:acknowledgement:)]) {
-        [_delegate installerDidFinishInstallationAndRelaunched:relaunched acknowledgement:acknowledgement];
+    id<SPUCoreBasedUpdateDriverDelegate> delegate = _delegate;
+    if ([delegate respondsToSelector:@selector(installerDidFinishInstallationAndRelaunched:acknowledgement:)]) {
+        [delegate installerDidFinishInstallationAndRelaunched:relaunched acknowledgement:acknowledgement];
     } else {
         acknowledgement();
     }

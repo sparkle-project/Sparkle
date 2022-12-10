@@ -121,7 +121,11 @@ static NSString *const SUStatusControllerTouchBarIndentifier = @"" SPARKLE_BUNDL
     [_actionButton setAction:action];
     [_actionButton setKeyEquivalent:isDefault ? @"\r" : @""];
     
+    // False warning
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Warc-repeated-use-of-weak"
     _touchBarButton.target = _actionButton.target;
+#pragma clang diagnostic pop
     _touchBarButton.action = _actionButton.action;
     _touchBarButton.keyEquivalent = _actionButton.keyEquivalent;
 
