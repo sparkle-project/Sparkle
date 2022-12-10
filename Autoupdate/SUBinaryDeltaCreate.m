@@ -29,42 +29,47 @@
 extern int bsdiff(int argc, const char **argv);
 
 @interface CreateBinaryDeltaOperation : NSOperation
-@property (copy) NSString *relativePath;
-@property (copy) NSString *clonedRelativePath;
-@property (strong) NSString *resultPath;
-@property (strong) NSNumber *oldPermissions;
-@property (strong) NSNumber *permissions;
-@property (nonatomic) BOOL changingPermissions;
-@property (strong) NSString *_fromPath;
-@property (strong) NSString *_toPath;
+
+@property (nonatomic, copy, readonly) NSString *relativePath;
+@property (nonatomic, copy, readonly) NSString *clonedRelativePath;
+@property (nonatomic, readonly) NSString *resultPath;
+@property (nonatomic, readonly) NSNumber *oldPermissions;
+@property (nonatomic, readonly) NSNumber *permissions;
+@property (nonatomic, readonly) NSString *fromPath;
+@property (nonatomic, readonly) BOOL changingPermissions;
+
 - (id)initWithRelativePath:(NSString *)relativePath clonedRelativePath:(NSString *)clonedRelativePath oldTree:(NSString *)oldTree newTree:(NSString *)newTree oldPermissions:(NSNumber *)oldPermissions newPermissions:(NSNumber *)permissions changingPermissions:(BOOL)changingPermissions;
+
 @end
 
 @implementation CreateBinaryDeltaOperation
+{
+    NSString *_toPath;
+}
+
 @synthesize relativePath = _relativePath;
 @synthesize clonedRelativePath = _clonedRelativePath;
 @synthesize resultPath = _resultPath;
 @synthesize oldPermissions = _oldPermissions;
 @synthesize permissions = _permissions;
+@synthesize fromPath = _fromPath;
 @synthesize changingPermissions = _changingPermissions;
-@synthesize _fromPath = _fromPath;
-@synthesize _toPath = _toPath;
 
 - (id)initWithRelativePath:(NSString *)relativePath clonedRelativePath:(NSString *)clonedRelativePath oldTree:(NSString *)oldTree newTree:(NSString *)newTree oldPermissions:(NSNumber *)oldPermissions newPermissions:(NSNumber *)permissions changingPermissions:(BOOL)changingPermissions
 {
     if ((self = [super init])) {
-        self.relativePath = relativePath;
-        self.clonedRelativePath = clonedRelativePath;
-        self.oldPermissions = oldPermissions;
-        self.permissions = permissions;
-        self.changingPermissions = changingPermissions;
+        _relativePath = [relativePath copy];
+        _clonedRelativePath = [clonedRelativePath copy];
+        _oldPermissions = oldPermissions;
+        _permissions = permissions;
+        _changingPermissions = changingPermissions;
         
         if (clonedRelativePath == nil) {
-            self._fromPath = [oldTree stringByAppendingPathComponent:relativePath];
+            _fromPath = [oldTree stringByAppendingPathComponent:relativePath];
         } else {
-            self._fromPath = [oldTree stringByAppendingPathComponent:clonedRelativePath];
+            _fromPath = [oldTree stringByAppendingPathComponent:clonedRelativePath];
         }
-        self._toPath = [newTree stringByAppendingPathComponent:relativePath];
+        _toPath = [newTree stringByAppendingPathComponent:relativePath];
     }
     return self;
 }
@@ -72,10 +77,11 @@ extern int bsdiff(int argc, const char **argv);
 - (void)main
 {
     NSString *temporaryFile = temporaryFilename(@"BinaryDelta");
-    const char *argv[] = { "/usr/bin/bsdiff", [self._fromPath fileSystemRepresentation], [self._toPath fileSystemRepresentation], [temporaryFile fileSystemRepresentation] };
+    const char *argv[] = { "/usr/bin/bsdiff", [_fromPath fileSystemRepresentation], [_toPath fileSystemRepresentation], [temporaryFile fileSystemRepresentation] };
     int result = bsdiff(4, argv);
-    if (!result)
-        self.resultPath = temporaryFile;
+    if (result == 0) {
+        _resultPath = temporaryFile;
+    }
 }
 
 @end
@@ -918,7 +924,7 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
 
     BOOL deltaOperationsFailed = NO;
     for (CreateBinaryDeltaOperation *operation in deltaOperations) {
-        NSString *resultPath = [operation resultPath];
+        NSString *resultPath = operation.resultPath;
         if (resultPath == nil) {
             if (verbose) {
                 fprintf(stderr, "\n");
@@ -952,7 +958,7 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
         
         SPUDeltaArchiveItem *item = [[SPUDeltaArchiveItem alloc] initWithRelativeFilePath:relativePath commands:commands mode:mode.unsignedShortValue];
         item.itemFilePath = resultPath;
-        item.sourcePath = operation._fromPath;
+        item.sourcePath = operation.fromPath;
         item.clonedRelativePath = clonedRelativePath;
         
         [archive addItem:item];
@@ -972,7 +978,7 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
     
     // Clean up operations after the archive has finished encoding
     for (CreateBinaryDeltaOperation *operation in deltaOperations) {
-        NSString *resultPath = [operation resultPath];
+        NSString *resultPath = operation.resultPath;
         if (resultPath != nil) {
             unlink(resultPath.fileSystemRepresentation);
         }
