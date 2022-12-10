@@ -370,7 +370,11 @@ BOOL SPUSystemNeedsAuthorizationAccessForBundlePath(NSString *bundlePath)
     return needsAuthorization;
 }
 
-static BOOL SPUUsesSystemDomainForBundlePath(NSString *path, NSString *installationType, BOOL rootUser)
+static BOOL SPUUsesSystemDomainForBundlePath(NSString *path, BOOL rootUser
+#if SPARKLE_BUILD_PACKAGE_SUPPORT
+                                             , NSString *installationType
+#endif
+)
 {
     if (!rootUser) {
 #if SPARKLE_BUILD_PACKAGE_SUPPORT
@@ -399,7 +403,11 @@ static BOOL SPUUsesSystemDomainForBundlePath(NSString *path, NSString *installat
         // and that is not necessarily related to a preflight test. It's more related to being ran under a root / different user from the active GUI session
         BOOL rootUser = (geteuid() == 0);
         
-        BOOL inSystemDomain = SPUUsesSystemDomainForBundlePath(hostBundlePath, installationType, rootUser);
+        BOOL inSystemDomain = SPUUsesSystemDomainForBundlePath(hostBundlePath, rootUser
+#if SPARKLE_BUILD_PACKAGE_SUPPORT
+                                                               , installationType
+#endif
+                                                               );
         
         NSBundle *hostBundle = [NSBundle bundleWithPath:hostBundlePath];
         if (hostBundle == nil) {

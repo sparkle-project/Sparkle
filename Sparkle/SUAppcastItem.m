@@ -544,9 +544,9 @@ static NSString *SUAppcastItemDeltaFromSparkleLocalesKey = @"SUAppcastItemDeltaF
             _displayVersionString = [_versionString copy];
         }
         
-        NSString *attributeInstallationType = [enclosure objectForKey:SUAppcastAttributeInstallationType];
         NSString *chosenInstallationType;
 #if SPARKLE_BUILD_PACKAGE_SUPPORT
+        NSString *attributeInstallationType = [enclosure objectForKey:SUAppcastAttributeInstallationType];
         if (attributeInstallationType == nil) {
             // If we have a flat package, assume installation type is guided
             // (flat / non-archived interactive packages are not supported)
