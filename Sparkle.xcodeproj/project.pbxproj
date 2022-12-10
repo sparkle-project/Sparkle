@@ -194,8 +194,6 @@
 		723C8A561E2D60DB00C14942 /* SUTouchBarButtonGroup.m in Sources */ = {isa = PBXBuildFile; fileRef = 723C8A531E2D60DB00C14942 /* SUTouchBarButtonGroup.m */; };
 		723EDC3F26885A8E000BCBA4 /* testappcast_channels.xml in Resources */ = {isa = PBXBuildFile; fileRef = 723EDC3E26885A8E000BCBA4 /* testappcast_channels.xml */; };
 		72464F701E1F31E000FB341C /* SUOperatingSystem.m in Sources */ = {isa = PBXBuildFile; fileRef = 726F2CE41BC9C33D001971A4 /* SUOperatingSystem.m */; };
-		72464F711E1F326A00FB341C /* SUOperatingSystem.m in Sources */ = {isa = PBXBuildFile; fileRef = 726F2CE41BC9C33D001971A4 /* SUOperatingSystem.m */; };
-		72464F721E1F327C00FB341C /* SUOperatingSystem.m in Sources */ = {isa = PBXBuildFile; fileRef = 726F2CE41BC9C33D001971A4 /* SUOperatingSystem.m */; };
 		72464F7C1E2097F600FB341C /* SUOperatingSystem.m in Sources */ = {isa = PBXBuildFile; fileRef = 726F2CE41BC9C33D001971A4 /* SUOperatingSystem.m */; };
 		72464F7E1E21ED8C00FB341C /* SUHost.m in Sources */ = {isa = PBXBuildFile; fileRef = 61EF67550E25B58D00F754E0 /* SUHost.m */; };
 		7246E0A31C83B685003B4E75 /* SPUStandardUpdaterController.h in Headers */ = {isa = PBXBuildFile; fileRef = 7246E0A11C83B685003B4E75 /* SPUStandardUpdaterController.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -420,8 +418,6 @@
 		72F94F5A1CC450DE002DEE68 /* SUInstallerLauncher.m in Sources */ = {isa = PBXBuildFile; fileRef = 726E07B11CAF08D6001A286B /* SUInstallerLauncher.m */; };
 		72F9EBE21D517E2F004AC8B6 /* SUUpdater.h in Headers */ = {isa = PBXBuildFile; fileRef = 72F9EBE01D517E2F004AC8B6 /* SUUpdater.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		72F9EBE31D517E2F004AC8B6 /* SUUpdater.m in Sources */ = {isa = PBXBuildFile; fileRef = 72F9EBE11D517E2F004AC8B6 /* SUUpdater.m */; };
-		72F9EC341D5BF542004AC8B6 /* SUFileManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5E41D3D90AA00D1BF90 /* SUFileManager.m */; };
-		72F9EC351D5BF54E004AC8B6 /* SUFileManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5E41D3D90AA00D1BF90 /* SUFileManager.m */; };
 		72F9EC3F1D5E823F004AC8B6 /* SPUUpdaterTimer.h in Headers */ = {isa = PBXBuildFile; fileRef = 72F9EC3D1D5E823F004AC8B6 /* SPUUpdaterTimer.h */; };
 		72F9EC401D5E823F004AC8B6 /* SPUUpdaterTimer.m in Sources */ = {isa = PBXBuildFile; fileRef = 72F9EC3E1D5E823F004AC8B6 /* SPUUpdaterTimer.m */; };
 		72F9EC441D5E9ED8004AC8B6 /* SPUDownloadData.h in Headers */ = {isa = PBXBuildFile; fileRef = 72F9EC421D5E9ED8004AC8B6 /* SPUDownloadData.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -3417,7 +3413,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				724BB3731D31D0B7005D534A /* main.m in Sources */,
-				72F9EC341D5BF542004AC8B6 /* SUFileManager.m in Sources */,
 				724BB3711D31D0B7005D534A /* SUInstallerConnection.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -3427,7 +3422,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				724BB39A1D333832005D534A /* main.m in Sources */,
-				72F9EC351D5BF54E004AC8B6 /* SUFileManager.m in Sources */,
 				724BB3981D333832005D534A /* SUInstallerStatus.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -3445,7 +3439,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				72464F7E1E21ED8C00FB341C /* SUHost.m in Sources */,
-				72464F711E1F326A00FB341C /* SUOperatingSystem.m in Sources */,
 				726E07B41CAF08D6001A286B /* main.m in Sources */,
 				721D8A7B1D4963190032E472 /* SPULocalCacheDirectory.m in Sources */,
 				7267E5E11D3D901600D1BF90 /* SPUMessageTypes.m in Sources */,
@@ -3462,7 +3455,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				72464F721E1F327C00FB341C /* SUOperatingSystem.m in Sources */,
 				723B5DA71CF7AB0100365F95 /* main.m in Sources */,
 				72E539121D68C3FA0092CE5E /* SPUDownloadData.m in Sources */,
 				723B5DA91CF7AB0100365F95 /* SPUDownloader.m in Sources */,

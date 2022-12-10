@@ -25,9 +25,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation SUHost
 {
-    BOOL _isMainBundle;
     NSString *_defaultsDomain;
+    
     BOOL _usesStandardUserDefaults;
+    BOOL _isMainBundle;
 }
 
 @synthesize bundle = _bundle;
@@ -38,15 +39,15 @@ NS_ASSUME_NONNULL_BEGIN
 	{
         NSParameterAssert(aBundle);
         _bundle = aBundle;
-        if (![self.bundle bundleIdentifier]) {
-            SULog(SULogLevelError, @"Error: the bundle being updated at %@ has no %@! This will cause preference read/write to not work properly.", self.bundle, kCFBundleIdentifierKey);
+        if (_bundle.bundleIdentifier == nil) {
+            SULog(SULogLevelError, @"Error: the bundle being updated at %@ has no %@! This will cause preference read/write to not work properly.", _bundle, kCFBundleIdentifierKey);
         }
         
         _isMainBundle = [aBundle isEqualTo:[NSBundle mainBundle]];
 
         _defaultsDomain = [self objectForInfoDictionaryKey:SUDefaultsDomainKey];
         if (_defaultsDomain == nil) {
-            _defaultsDomain = [self.bundle bundleIdentifier];
+            _defaultsDomain = [_bundle bundleIdentifier];
         }
 
         // If we're using the main bundle's defaults we'll use the standard user defaults mechanism, otherwise we have to get CF-y.
@@ -60,7 +61,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)bundlePath
 {
-    return [self.bundle bundlePath];
+    return _bundle.bundlePath;
 }
 
 - (NSString * _Nonnull)name
@@ -119,13 +120,13 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)isRunningOnReadOnlyVolume
 {
     struct statfs statfs_info;
-    statfs([[self.bundle bundlePath] fileSystemRepresentation], &statfs_info);
+    statfs(_bundle.bundlePath.fileSystemRepresentation, &statfs_info);
     return (statfs_info.f_flags & MNT_RDONLY) != 0;
 }
 
 - (BOOL)isRunningTranslocated
 {
-    NSString *path = [self.bundle bundlePath];
+    NSString *path = _bundle.bundlePath;
     return [path rangeOfString:@"/AppTranslocation/"].location != NSNotFound;
 }
 
@@ -148,7 +149,7 @@ NS_ASSUME_NONNULL_BEGIN
         return nil;
     }
 
-    NSString *keyPath = [self.bundle pathForResource:keyFilename ofType:nil];
+    NSString *keyPath = [_bundle pathForResource:keyFilename ofType:nil];
     if (!keyPath) {
         return nil;
     }
@@ -182,7 +183,7 @@ NS_ASSUME_NONNULL_BEGIN
         // the bundle can be replaced externally or even by us.
         // This is the easiest way to read the Info dictionary values *correctly* despite some performance loss.
         // A mutable method to reload the Info dictionary at certain points and have it cached at other points is challenging to do correctly.
-        CFDictionaryRef cfInfoDictionary = CFBundleCopyInfoDictionaryInDirectory((CFURLRef)self.bundle.bundleURL);
+        CFDictionaryRef cfInfoDictionary = CFBundleCopyInfoDictionaryInDirectory((CFURLRef)_bundle.bundleURL);
         NSDictionary *infoDictionary = CFBridgingRelease(cfInfoDictionary);
         
         return [infoDictionary objectForKey:key];

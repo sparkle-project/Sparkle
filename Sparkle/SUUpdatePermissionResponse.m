@@ -38,7 +38,7 @@ static NSString *SUUpdatePermissionSendSystemProfileKey = @"SUUpdatePermissionSe
 {
     [encoder encodeBool:_automaticUpdateChecks forKey:SUUpdatePermissionAutomaticUpdateChecksKey];
     
-    if (self.automaticUpdateDownloading != nil) {
+    if (_automaticUpdateDownloading != nil) {
         [encoder encodeObject:_automaticUpdateDownloading forKey:SUUpdatePermissionAutomaticUpdateDownloadingKey];
     }
     

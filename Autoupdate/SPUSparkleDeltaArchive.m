@@ -28,9 +28,6 @@ typedef struct
     bool fileSystemCompression : 1;
 } SparkleDeltaArchiveMetadata;
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdirect-ivar-access"
-
 @implementation SPUSparkleDeltaArchive
 {
     FILE *_file;
@@ -338,7 +335,7 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
 
 - (NSArray<NSString *> *)_readRelativeFilePaths
 {
-    if (self.error != nil) {
+    if (_error != nil) {
         return nil;
     }
     
@@ -513,7 +510,7 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
         }
     }
     
-    if (self.error != nil) {
+    if (_error != nil) {
         return;
     }
     
@@ -585,7 +582,7 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
             
             fclose(outputFile);
             
-            if (self.error != nil) {
+            if (_error != nil) {
                 return NO;
             }
             
@@ -836,7 +833,7 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
 
 - (void)finishEncodingItems
 {
-    if (self.error != nil) {
+    if (_error != nil) {
         return;
     }
     
@@ -899,7 +896,7 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
         totalPathLength += strlen(relativePathString) + 1;
     }
     
-    if (self.error != nil) {
+    if (_error != nil) {
         return;
     }
     
@@ -934,7 +931,7 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
         }
     }
     
-    if (self.error != nil) {
+    if (_error != nil) {
         return;
     }
     
@@ -1113,7 +1110,7 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
         }
     }
     
-    if (self.error != nil) {
+    if (_error != nil) {
         return;
     }
     
@@ -1234,5 +1231,3 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
 }
 
 @end
-
-#pragma clang diagnostic pop

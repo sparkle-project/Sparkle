@@ -34,8 +34,11 @@
     SUHost *_host;
     NSString *_temporaryDirectory;
     NSString *_downloadName;
+    
     __weak id<SPUDownloadDriverDelegate> _delegate;
+    
     uint64_t _expectedContentLength;
+    
     BOOL _retrievedDownloadResult;
     BOOL _cleaningUp;
 }

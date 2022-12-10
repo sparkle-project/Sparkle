@@ -29,13 +29,17 @@
 
 @implementation SPUBasicUpdateDriver
 {
-    __weak id<SPUBasicUpdateDriverDelegate> _delegate;
     SUAppcastDriver *_appcastDriver;
-    SPUUpdateDriverCompletion _completionBlock;
     SUHost *_host;
+    
+    SPUUpdateDriverCompletion _completionBlock;
+    
     SPUUpdateCheck _updateCheck;
+    
     __weak id _updater;
     __weak id <SPUUpdaterDelegate> _updaterDelegate;
+    __weak id<SPUBasicUpdateDriverDelegate> _delegate;
+    
     BOOL _aborted;
 }
 

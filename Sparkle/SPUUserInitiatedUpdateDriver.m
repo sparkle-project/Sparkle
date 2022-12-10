@@ -21,10 +21,12 @@
 {
     SPUUIBasedUpdateDriver *_uiDriver;
     id<SPUUserDriver> _userDriver;
+    
+    void (^_updateDidShowHandler)(void);
+    
     BOOL _showingUserInitiatedProgress;
     BOOL _showingUpdate;
     BOOL _aborted;
-    void (^_updateDidShowHandler)(void);
 }
 
 @synthesize showingUpdate = _showingUpdate;

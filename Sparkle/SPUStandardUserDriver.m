@@ -19,7 +19,6 @@
 #import "SUUpdateAlert.h"
 #import "SULocalizations.h"
 #import "SUApplicationInfo.h"
-#import "SUOperatingSystem.h"
 #import "SPUUserUpdateState.h"
 #import "SUErrors.h"
 #import "SPUInstallationType.h"
@@ -43,6 +42,10 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
 
 @implementation SPUStandardUserDriver
 {
+    void (^_retryTerminatingApplication)(void);
+    void (^_installUpdateHandler)(SPUUserUpdateChoice);
+    void (^_cancellation)(void);
+    
     SUHost *_host;
     // We must store the oldHostName before the host is potentially replaced
     // because we may use this property after update has been installed
@@ -59,10 +62,6 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
     SUUpdatePermissionPrompt *_permissionPrompt;
     
     __weak id <SPUStandardUserDriverDelegate> _delegate;
-    
-    void (^_retryTerminatingApplication)(void);
-    void (^_installUpdateHandler)(SPUUserUpdateChoice);
-    void (^_cancellation)(void);
     
     mach_timebase_info_data_t _timebaseInfo;
     
@@ -159,7 +158,7 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
 - (void)setUpActiveUpdateAlertForScheduledUpdate:(SUAppcastItem * _Nullable)updateItem state:(SPUUserUpdateState * _Nullable)state
 {
     // Make sure the window is loaded in any case
-    [self.activeUpdateAlert window];
+    [_activeUpdateAlert window];
     
     [self _removeApplicationBecomeActiveObserver];
     
@@ -303,9 +302,9 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
                 }
                 
                 if (showingUpdateInBack) {
-                    [self.activeUpdateAlert.window orderBack:nil];
+                    [_activeUpdateAlert.window orderBack:nil];
                 } else {
-                    [self.activeUpdateAlert showWindow:nil];
+                    [_activeUpdateAlert showWindow:nil];
                 }
             }
         }
@@ -388,7 +387,7 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
                 strongSelfOuter->_applicationBecameActiveAfterUpdateAlertBecameKeyObserver = [[NSNotificationCenter defaultCenter] addObserverForName:NSApplicationDidBecomeActiveNotification object:NSApp queue:NSOperationQueue.mainQueue usingBlock:^(NSNotification * _Nonnull __unused note) {
                     SPUStandardUserDriver *strongSelf = weakSelf;
                     if (strongSelf != nil) {
-                        if (!strongSelf->_updateReceivedUserAttention && [strongSelf.activeUpdateAlert.window isKeyWindow]) {
+                        if (!strongSelf->_updateReceivedUserAttention && [strongSelf->_activeUpdateAlert.window isKeyWindow]) {
                             strongSelf->_updateReceivedUserAttention = YES;
                             
                             id<SPUStandardUserDriverDelegate> strongDelegate = weakDelegate;
@@ -438,7 +437,7 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
 - (void)showUpdateInFocus
 {
     BOOL mayNeedToActivateApp;
-    if (self.activeUpdateAlert != nil) {
+    if (_activeUpdateAlert != nil) {
         [self setUpActiveUpdateAlertForScheduledUpdate:nil state:nil];
         mayNeedToActivateApp = NO;
     } else if (_permissionPrompt != nil) {

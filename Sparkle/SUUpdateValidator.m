@@ -21,9 +21,10 @@
 @implementation SUUpdateValidator
 {
     SUHost *_host;
-    BOOL _prevalidatedSignature;
     SUSignatures *_signatures;
     NSString *_downloadPath;
+    
+    BOOL _prevalidatedSignature;
 }
 
 - (instancetype)initWithDownloadPath:(NSString *)downloadPath signatures:(SUSignatures *)signatures host:(SUHost *)host

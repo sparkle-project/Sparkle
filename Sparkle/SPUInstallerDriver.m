@@ -44,19 +44,21 @@
 {
     SUHost *_host;
     NSBundle *_applicationBundle;
-    __weak id<SPUInstallerDriverDelegate> _delegate;
     id<SUInstallerConnectionProtocol> _installerConnection;
-    __weak id _updater;
-    __weak id<SPUUpdaterDelegate> _updaterDelegate;
     SUAppcastItem *_updateItem;
     NSString *_downloadName;
     NSString *_temporaryDirectory;
     NSError *_installerError;
     
+    __weak id _updater;
+    __weak id<SPUUpdaterDelegate> _updaterDelegate;
+    __weak id<SPUInstallerDriverDelegate> _delegate;
+    
     void (^_updateWillInstallHandler)(void);
     
     SPUInstallerMessageType _currentStage;
     NSUInteger _extractionAttempts;
+    
     BOOL _postponedOnce;
     BOOL _relaunch;
     BOOL _systemDomain;

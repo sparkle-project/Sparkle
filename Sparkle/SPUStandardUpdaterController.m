@@ -43,13 +43,10 @@
 - (void)_initUpdater
 {
     NSBundle *hostBundle = [NSBundle mainBundle];
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdirect-ivar-access"
     SPUStandardUserDriver *userDriver = [[SPUStandardUserDriver alloc] initWithHostBundle:hostBundle delegate:self->userDriverDelegate];
     
     _updater = [[SPUUpdater alloc] initWithHostBundle:hostBundle applicationBundle:hostBundle userDriver:userDriver delegate:self->updaterDelegate];
     _userDriver = userDriver;
-#pragma clang diagnostic pop
 }
 
 - (instancetype)initWithUpdaterDelegate:(nullable id<SPUUpdaterDelegate>)theUpdaterDelegate userDriverDelegate:(nullable id<SPUStandardUserDriverDelegate>)theUserDriverDelegate
@@ -75,7 +72,7 @@
 - (void)startUpdater
 {
     NSError *updaterError = nil;
-    if (![self.updater startUpdater:&updaterError]) {
+    if (![_updater startUpdater:&updaterError]) {
         SULog(SULogLevelError, @"Fatal updater error (%ld): %@", updaterError.code, updaterError.localizedDescription);
         
         // Delay the alert four seconds so it doesn't show RIGHT as the app launches, but also doesn't interrupt the user once they really get to work.

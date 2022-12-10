@@ -223,7 +223,7 @@
     SUAppcast *other = [SUAppcast new];
     NSMutableArray *newItems = [NSMutableArray new];
     
-    for (SUAppcastItem *item in self.items) {
+    for (SUAppcastItem *item in _items) {
         if (filterBlock(item)) {
             [newItems addObject:item];
         }

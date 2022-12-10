@@ -154,100 +154,100 @@ static NSString *SUAppcastItemDeltaFromSparkleLocalesKey = @"SUAppcastItemDeltaF
 
 - (void)encodeWithCoder:(NSCoder *)encoder
 {
-    if (self.deltaUpdates != nil) {
-        [encoder encodeObject:self.deltaUpdates forKey:SUAppcastItemDeltaUpdatesKey];
+    if (_deltaUpdates != nil) {
+        [encoder encodeObject:_deltaUpdates forKey:SUAppcastItemDeltaUpdatesKey];
     }
     
-    if (self.deltaFromSparkleExecutableSize != nil) {
-        [encoder encodeObject:self.deltaFromSparkleExecutableSize forKey:SUAppcastItemDeltaFromSparkleExecutableSizeKey];
+    if (_deltaFromSparkleExecutableSize != nil) {
+        [encoder encodeObject:_deltaFromSparkleExecutableSize forKey:SUAppcastItemDeltaFromSparkleExecutableSizeKey];
     }
     
-    if (self.deltaFromSparkleLocales != nil) {
-        [encoder encodeObject:self.deltaFromSparkleLocales forKey:SUAppcastItemDeltaFromSparkleLocalesKey];
+    if (_deltaFromSparkleLocales != nil) {
+        [encoder encodeObject:_deltaFromSparkleLocales forKey:SUAppcastItemDeltaFromSparkleLocalesKey];
     }
     
-    if (self.displayVersionString != nil) {
-        [encoder encodeObject:self.displayVersionString forKey:SUAppcastItemDisplayVersionStringKey];
+    if (_displayVersionString != nil) {
+        [encoder encodeObject:_displayVersionString forKey:SUAppcastItemDisplayVersionStringKey];
     }
     
-    if (self.signatures != nil) {
-        [encoder encodeObject:self.signatures forKey:SUAppcastItemSignaturesKey];
+    if (_signatures != nil) {
+        [encoder encodeObject:_signatures forKey:SUAppcastItemSignaturesKey];
     }
     
-    if (self.fileURL != nil) {
-        [encoder encodeObject:self.fileURL forKey:SUAppcastItemFileURLKey];
+    if (_fileURL != nil) {
+        [encoder encodeObject:_fileURL forKey:SUAppcastItemFileURLKey];
     }
     
-    if (self.infoURL != nil) {
-        [encoder encodeObject:self.infoURL forKey:SUAppcastItemInfoURLKey];
+    if (_infoURL != nil) {
+        [encoder encodeObject:_infoURL forKey:SUAppcastItemInfoURLKey];
     }
     
-    [encoder encodeInt64:(int64_t)self.contentLength forKey:SUAppcastItemContentLengthKey];
+    [encoder encodeInt64:(int64_t)_contentLength forKey:SUAppcastItemContentLengthKey];
     
-    if (self.itemDescription != nil) {
-        [encoder encodeObject:self.itemDescription forKey:SUAppcastItemDescriptionKey];
+    if (_itemDescription != nil) {
+        [encoder encodeObject:_itemDescription forKey:SUAppcastItemDescriptionKey];
     }
     
-    if (self.maximumSystemVersion != nil) {
-        [encoder encodeObject:self.maximumSystemVersion forKey:SUAppcastItemMaximumSystemVersionKey];
+    if (_maximumSystemVersion != nil) {
+        [encoder encodeObject:_maximumSystemVersion forKey:SUAppcastItemMaximumSystemVersionKey];
     }
     
-    if (self.minimumSystemVersion != nil) {
-        [encoder encodeObject:self.minimumSystemVersion forKey:SUAppcastItemMinimumSystemVersionKey];
+    if (_minimumSystemVersion != nil) {
+        [encoder encodeObject:_minimumSystemVersion forKey:SUAppcastItemMinimumSystemVersionKey];
     }
     
-    if (self.minimumAutoupdateVersion != nil) {
-        [encoder encodeObject:self.minimumAutoupdateVersion forKey:SUAppcastElementMinimumAutoupdateVersion];
+    if (_minimumAutoupdateVersion != nil) {
+        [encoder encodeObject:_minimumAutoupdateVersion forKey:SUAppcastElementMinimumAutoupdateVersion];
     }
     
-    if (self.ignoreSkippedUpgradesBelowVersion != nil) {
-        [encoder encodeObject:self.ignoreSkippedUpgradesBelowVersion forKey:SUAppcastElementIgnoreSkippedUpgradesBelowVersion];
+    if (_ignoreSkippedUpgradesBelowVersion != nil) {
+        [encoder encodeObject:_ignoreSkippedUpgradesBelowVersion forKey:SUAppcastElementIgnoreSkippedUpgradesBelowVersion];
     }
     
     if (_state != nil) {
         [encoder encodeObject:_state forKey:SUAppcastItemStateKey];
     }
     
-    if (self.releaseNotesURL != nil) {
-        [encoder encodeObject:self.releaseNotesURL forKey:SUAppcastItemReleaseNotesURLKey];
+    if (_releaseNotesURL != nil) {
+        [encoder encodeObject:_releaseNotesURL forKey:SUAppcastItemReleaseNotesURLKey];
     }
     
-    if (self.fullReleaseNotesURL != nil) {
-        [encoder encodeObject:self.fullReleaseNotesURL forKey:SUAppcastItemFullReleaseNotesURLKey];
+    if (_fullReleaseNotesURL != nil) {
+        [encoder encodeObject:_fullReleaseNotesURL forKey:SUAppcastItemFullReleaseNotesURLKey];
     }
     
-    if (self.title != nil) {
-        [encoder encodeObject:self.title forKey:SUAppcastItemTitleKey];
+    if (_title != nil) {
+        [encoder encodeObject:_title forKey:SUAppcastItemTitleKey];
     }
     
-    if (self.versionString != nil) {
-        [encoder encodeObject:self.versionString forKey:SUAppcastItemVersionStringKey];
+    if (_versionString != nil) {
+        [encoder encodeObject:_versionString forKey:SUAppcastItemVersionStringKey];
     }
     
-    if (self.osString != nil) {
-        [encoder encodeObject:self.osString forKey:SUAppcastAttributeOsType];
+    if (_osString != nil) {
+        [encoder encodeObject:_osString forKey:SUAppcastAttributeOsType];
     }
     
-    if (self.propertiesDictionary != nil) {
-        [encoder encodeObject:self.propertiesDictionary forKey:SUAppcastItemPropertiesKey];
+    if (_propertiesDictionary != nil) {
+        [encoder encodeObject:_propertiesDictionary forKey:SUAppcastItemPropertiesKey];
     }
     
-    if (self.installationType != nil) {
-        [encoder encodeObject:self.installationType forKey:SUAppcastItemInstallationTypeKey];
+    if (_installationType != nil) {
+        [encoder encodeObject:_installationType forKey:SUAppcastItemInstallationTypeKey];
     }
     
-    if (self.phasedRolloutInterval != nil) {
-        [encoder encodeObject:self.phasedRolloutInterval forKey:SUAppcastElementPhasedRolloutInterval];
+    if (_phasedRolloutInterval != nil) {
+        [encoder encodeObject:_phasedRolloutInterval forKey:SUAppcastElementPhasedRolloutInterval];
     }
     
-    if (self.channel != nil) {
-        [encoder encodeObject:self.channel forKey:SUAppcastElementChannel];
+    if (_channel != nil) {
+        [encoder encodeObject:_channel forKey:SUAppcastElementChannel];
     }
 }
 
 - (BOOL)isDeltaUpdate
 {
-    NSDictionary *rssElementEnclosure = [self.propertiesDictionary objectForKey:SURSSElementEnclosure];
+    NSDictionary *rssElementEnclosure = [_propertiesDictionary objectForKey:SURSSElementEnclosure];
     return [rssElementEnclosure objectForKey:SUAppcastAttributeDeltaFrom] != nil;
 }
 
@@ -289,12 +289,12 @@ static NSString *SUAppcastItemDeltaFromSparkleLocalesKey = @"SUAppcastItemDeltaF
 
 - (BOOL)isMacOsUpdate
 {
-    return self.osString == nil || [self.osString isEqualToString:SUAppcastAttributeValueMacOS];
+    return _osString == nil || [_osString isEqualToString:SUAppcastAttributeValueMacOS];
 }
 
 - (NSDate *)date
 {
-    NSString *dateString = self.dateString;
+    NSString *dateString = _dateString;
     if (dateString == nil) {
         return nil;
     }
@@ -616,8 +616,8 @@ static NSString *SUAppcastItemDeltaFromSparkleLocalesKey = @"SUAppcastItemDeltaF
                 SULog(SULogLevelError, @"Release notes must have a http or https URL scheme.");
                 _releaseNotesURL = nil;
             }
-        } else if ([self.itemDescription hasPrefix:@"http://"] || [self.itemDescription hasPrefix:@"https://"]) { // if the description starts with http:// or https:// use that.
-            _releaseNotesURL = [NSURL URLWithString:(NSString * _Nonnull)self.itemDescription];
+        } else if ([_itemDescription hasPrefix:@"http://"] || [_itemDescription hasPrefix:@"https://"]) { // if the description starts with http:// or https:// use that.
+            _releaseNotesURL = [NSURL URLWithString:(NSString * _Nonnull)_itemDescription];
         } else {
             _releaseNotesURL = nil;
         }

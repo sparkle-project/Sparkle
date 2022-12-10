@@ -103,9 +103,6 @@ id<SPUDeltaArchiveProtocol> SPUDeltaArchiveReadPatchAndHeader(NSString *patchFil
     return self;
 }
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdirect-ivar-access"
-
 - (unsigned char *)beforeTreeHash
 {
     return _beforeTreeHash;
@@ -115,7 +112,5 @@ id<SPUDeltaArchiveProtocol> SPUDeltaArchiveReadPatchAndHeader(NSString *patchFil
 {
     return _afterTreeHash;
 }
-
-#pragma clang diagnostic pop
 
 @end

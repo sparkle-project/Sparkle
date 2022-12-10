@@ -51,7 +51,6 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     NSXPCConnection *_activeConnection;
     id<SUInstallerCommunicationProtocol> _communicator;
     AgentConnection *_agentConnection;
-    BOOL _receivedUpdaterPong;
 
     TerminationListener *_terminationListener;
 
@@ -67,16 +66,21 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     SUSignatures *_signatures;
     NSString *_relaunchPath;
     NSString *_installationType;
-    BOOL _shouldRelaunch;
-    BOOL _shouldShowUI;
 
     id<SUInstallerProtocol> _installer;
+
+    dispatch_queue_t _installerQueue;
+    
+    BOOL _shouldRelaunch;
+    BOOL _shouldShowUI;
+    
+    BOOL _receivedUpdaterPong;
+    
     BOOL _willCompleteInstallation;
     BOOL _receivedInstallationData;
     BOOL _finishedValidation;
     BOOL _agentInitiatedConnection;
-
-    dispatch_queue_t _installerQueue;
+    
     BOOL _performedStage1Installation;
     BOOL _performedStage2Installation;
     BOOL _performedStage3Installation;
@@ -306,7 +310,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     if (identifier == SPUInstallationData && _updateDirectoryPath == nil) {
         dispatch_async(dispatch_get_main_queue(), ^{
             // Mark that we have received the installation data
-            // Do not rely on eg: self.updateDirectoryPath != nil because we may set it to nil again if an early stage fails (i.e, archive extraction)
+            // Do not rely on eg: self->_updateDirectoryPath != nil because we may set it to nil again if an early stage fails (i.e, archive extraction)
             self->_receivedInstallationData = YES;
             
             SPUInstallationInputData *installationData = (SPUInstallationInputData *)SPUUnarchiveRootObjectSecurely(data, [SPUInstallationInputData class]);

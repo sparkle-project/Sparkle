@@ -37,20 +37,22 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
 @implementation InstallerProgressAppController
 {
     NSApplication *_application;
-    __weak id<InstallerProgressDelegate> _delegate;
     NSXPCConnection *_connection;
+    SUHost *_oldHost;
+    NSString *_oldHostBundlePath;
+    StatusInfo *_statusInfo;
+    NSBundle *_applicationBundle;
+    NSString *_normalizedPath;
+    
+    __weak id<InstallerProgressDelegate> _delegate;
+    
     BOOL _connected;
     BOOL _repliedToRegistration;
-    SUHost *_oldHost;
     BOOL _shouldRelaunchHostBundle;
-    NSString *_oldHostBundlePath;
     BOOL _systemDomain;
-    StatusInfo *_statusInfo;
     BOOL _submittedLauncherJob;
     BOOL _willTerminate;
     BOOL _applicationInitiallyAlive;
-    NSBundle *_applicationBundle;
-    NSString *_normalizedPath;
 }
 
 - (instancetype)initWithApplication:(NSApplication *)application arguments:(NSArray<NSString *> *)arguments delegate:(id<InstallerProgressDelegate>)delegate
@@ -325,7 +327,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
             if (self->_normalizedPath != nil) {
                 pathToRelaunch = self->_normalizedPath;
             } else if (self->_shouldRelaunchHostBundle) {
-                // Use self.oldHostBundlePath because it was computed before self.oldHost could have been removed
+                // Use self->_oldHostBundlePath because it was computed before self->_oldHost could have been removed
                 pathToRelaunch = self->_oldHostBundlePath;
             } else {
                 pathToRelaunch = self->_applicationBundle.bundlePath;

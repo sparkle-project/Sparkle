@@ -24,11 +24,13 @@
 
 @implementation SPUAutomaticUpdateDriver
 {
+    SPUCoreBasedUpdateDriver *_coreDriver;
+    SUAppcastItem* _updateItem;
+    
     __weak id _updater;
     __weak id<SPUUserDriver> _userDriver;
     __weak id _updaterDelegate;
-    SPUCoreBasedUpdateDriver *_coreDriver;
-    SUAppcastItem* _updateItem;
+    
     BOOL _willInstallSilently;
 }
 

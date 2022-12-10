@@ -13,7 +13,6 @@
 #import "SUAppcastItem+Private.h"
 #import "SUVersionComparisonProtocol.h"
 #import "SUStandardVersionComparator.h"
-#import "SUOperatingSystem.h"
 #import "SPUUpdaterDelegate.h"
 #import "SUHost.h"
 #import "SPUSkippedUpdate.h"

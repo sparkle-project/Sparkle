@@ -21,10 +21,6 @@ extern int renamex_np(const char *, const char *, unsigned int) __attribute__((w
 
 static char SUAppleQuarantineIdentifier[] = "com.apple.quarantine";
 
-#pragma clang diagnostic push
-// Use direct access because it's easier, clearer, and faster
-#pragma clang diagnostic ignored "-Wdirect-ivar-access"
-
 @implementation SUFileManager
 {
     NSFileManager *_fileManager;
@@ -570,5 +566,3 @@ static char SUAppleQuarantineIdentifier[] = "com.apple.quarantine";
 }
 
 @end
-
-#pragma clang diagnostic pop

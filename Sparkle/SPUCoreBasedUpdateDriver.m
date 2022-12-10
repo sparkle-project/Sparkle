@@ -34,19 +34,20 @@
     SPUBasicUpdateDriver *_basicDriver;
     SPUDownloadDriver *_downloadDriver;
     SPUInstallerDriver *_installerDriver;
-    __weak id<SPUCoreBasedUpdateDriverDelegate> _delegate;
     SUAppcastItem *_updateItem;
     SUAppcastItem * _Nullable _secondaryUpdateItem;
     id<SPUResumableUpdate> _resumableUpdate;
     SPUDownloadedUpdate *_downloadedUpdateForRemoval;
-    
     SUHost *_host;
-    BOOL _resumingInstallingUpdate;
-    BOOL _silentInstall;
-    __weak id _updater; // if we didn't have legacy support, I'd remove this..
-    __weak id <SPUUpdaterDelegate> _updaterDelegate;
     NSString *_userAgent;
     NSDictionary * _Nullable _httpHeaders;
+    
+    __weak id _updater; // if we didn't have legacy support, I'd remove this..
+    __weak id <SPUUpdaterDelegate> _updaterDelegate;
+    __weak id<SPUCoreBasedUpdateDriverDelegate> _delegate;
+    
+    BOOL _resumingInstallingUpdate;
+    BOOL _silentInstall;
 }
 
 - (instancetype)initWithHost:(SUHost *)host applicationBundle:(NSBundle *)applicationBundle updateCheck:(SPUUpdateCheck)updateCheck updater:(id)updater updaterDelegate:(nullable id <SPUUpdaterDelegate>)updaterDelegate delegate:(id<SPUCoreBasedUpdateDriverDelegate>)delegate

@@ -19,8 +19,10 @@
 @implementation TerminationListener
 {
     NSNumber *_processIdentifier;
-    BOOL _watchedTermination;
+    
     void (^_completionBlock)(BOOL);
+    
+    BOOL _watchedTermination;
 }
 
 - (instancetype)initWithProcessIdentifier:(NSNumber * _Nullable)processIdentifier

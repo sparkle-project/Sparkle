@@ -112,8 +112,9 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
     [_webView stopLoading];
     [_webView.view removeFromSuperview]; // Otherwise it gets sent Esc presses (why?!) and gets very confused.
     
-    BOOL wasKeyWindow = self.window.keyWindow;
-    NSRect windowFrame = self.window.frame;
+    NSWindow *window = self.window;
+    BOOL wasKeyWindow = window.keyWindow;
+    NSRect windowFrame = window.frame;
     
     [self close];
     
@@ -279,10 +280,12 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 
 - (void)windowDidLoad
 {
+    NSWindow *window = self.window;
+    
     BOOL showReleaseNotes = [self showsReleaseNotes];
     
     if (showReleaseNotes) {
-        self.window.frameAutosaveName = @"SUUpdateAlert";
+        window.frameAutosaveName = @"SUUpdateAlert";
         
         NSURL *colorStyleURL = [[NSBundle bundleForClass:[self class]] URLForResource:@"ReleaseNotesColorStyle" withExtension:@"css"];
         
@@ -312,7 +315,7 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
         _webView.view.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
     } else {
         // Update alert should not be resizable when no release notes are available
-        self.window.styleMask &= ~NSWindowStyleMaskResizable;
+        window.styleMask &= ~NSWindowStyleMaskResizable;
     }
 
     if (_updateItem.informationOnlyUpdate) {
@@ -330,7 +333,7 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
         if (allowsAutomaticUpdates) {
             NSLayoutConstraint *automaticallyInstallUpdatesButtonToDescriptionFieldConstraint = [NSLayoutConstraint constraintWithItem:_automaticallyInstallUpdatesButton attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:_descriptionField attribute:NSLayoutAttributeBottom multiplier:1.0 constant:8.0];
             
-            [self.window.contentView addConstraint:automaticallyInstallUpdatesButtonToDescriptionFieldConstraint];
+            [window.contentView addConstraint:automaticallyInstallUpdatesButtonToDescriptionFieldConstraint];
         }
         
         [_releaseNotesContainerView removeFromSuperview];
@@ -345,11 +348,11 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
             // Fix constraints so that buttons aren't far away from web view when we hide the automatic updates check box
             NSLayoutConstraint *skipButtonToReleaseNotesContainerConstraint = [NSLayoutConstraint constraintWithItem:_skipButton attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:_releaseNotesContainerView attribute:NSLayoutAttributeBottom multiplier:1.0 constant:12.0];
             
-            [self.window.contentView addConstraint:skipButtonToReleaseNotesContainerConstraint];
+            [window.contentView addConstraint:skipButtonToReleaseNotesContainerConstraint];
         } else {
             NSLayoutConstraint *skipButtonToDescriptionConstraint = [NSLayoutConstraint constraintWithItem:_skipButton attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:_descriptionField attribute:NSLayoutAttributeBottom multiplier:1.0 constant:20.0];
 
-            [self.window.contentView addConstraint:skipButtonToDescriptionConstraint];
+            [window.contentView addConstraint:skipButtonToDescriptionConstraint];
         }
         [_automaticallyInstallUpdatesButton removeFromSuperview];
     }
@@ -372,7 +375,7 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
         _laterButton.hidden = YES;
     }
 
-    [self.window center];
+    [window center];
 }
 
 - (void)windowDidBecomeKey:(NSNotification *)__unused note

@@ -23,7 +23,7 @@ typedef NS_ENUM(uint8_t, SUSigningInputStatus) {
 };
 
 @interface SUSignatures : NSObject <NSSecureCoding> {
-    unsigned char ed25519_signature[64];
+    unsigned char _ed25519_signature[64];
 }
 @property (nonatomic, readonly, nullable) NSData *dsaSignature;
 @property (nonatomic, readonly) SUSigningInputStatus dsaSignatureStatus;
@@ -36,7 +36,7 @@ typedef NS_ENUM(uint8_t, SUSigningInputStatus) {
 
 
 @interface SUPublicKeys : NSObject {
-    unsigned char ed25519_public_key[32];
+    unsigned char _ed25519_public_key[32];
 }
 @property (nonatomic, readonly, nullable) NSString *dsaPubKey;
 @property (nonatomic, readonly) SUSigningInputStatus dsaPubKeyStatus;

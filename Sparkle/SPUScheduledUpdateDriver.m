@@ -22,8 +22,10 @@
 @implementation SPUScheduledUpdateDriver
 {
     SPUUIBasedUpdateDriver *_uiDriver;
-    BOOL _showedUpdate;
+    
     void (^_updateDidShowHandler)(void);
+    
+    BOOL _showedUpdate;
 }
 
 - (instancetype)initWithHost:(SUHost *)host applicationBundle:(NSBundle *)applicationBundle updater:(id)updater userDriver:(id <SPUUserDriver>)userDriver updaterDelegate:(nullable id <SPUUpdaterDelegate>)updaterDelegate

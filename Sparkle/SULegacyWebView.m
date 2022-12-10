@@ -22,6 +22,7 @@
 @implementation SULegacyWebView
 {
     WebView *_webView;
+    
     void (^_completionHandler)(NSError * _Nullable);
 }
 

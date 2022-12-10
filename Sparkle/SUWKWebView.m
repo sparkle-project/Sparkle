@@ -28,7 +28,9 @@
 {
     WKWebView *_webView;
     WKNavigation *_currentNavigation;
+    
     void (^_completionHandler)(NSError * _Nullable);
+    
     BOOL _drawsWebViewBackground;
 }
 

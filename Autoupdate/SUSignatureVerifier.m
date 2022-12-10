@@ -297,10 +297,7 @@
         return cleanup();
     }
     
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdirect-ivar-access"
     dataVerifyTransform = SecVerifyTransformCreate(dsaPubKeySecKey, (__bridge CFDataRef)dsaSignature, &error);
-#pragma clang diagnostic pop
     if (!dataVerifyTransform) {
         SULog(SULogLevelError, @"Could not understand format of the signature: %@; Signature data: %@", error, dsaSignature);
         if (outError != NULL) {

@@ -30,6 +30,7 @@
 @implementation SPUReleaseNotesDriver
 {
     SPUDownloadDriver *_downloadDriver;
+    
     void (^_completionHandler)(SPUDownloadData * _Nullable, NSError  * _Nullable);
 }
 
@@ -221,7 +222,7 @@
                         case SPUUserUpdateStageDownloaded:
                         case SPUUserUpdateStageNotDownloaded:
                             // Informational and major updates can be resumed too, so make sure we check
-                            // self.resumingDownloadedInfoOrUpdate instead of the stage we pass to user driver
+                            // self->_resumingDownloadedInfoOrUpdate instead of the stage we pass to user driver
                             if (self->_resumingDownloadedInfoOrUpdate) {
                                 [self->_coreDriver clearDownloadedUpdate];
                             }

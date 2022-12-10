@@ -274,7 +274,7 @@ static xar_file_t _xarAddFile(NSMutableDictionary<NSString *, NSValue *> *fileTa
 
 - (void)addItem:(SPUDeltaArchiveItem *)item
 {
-    if (self.error != nil) {
+    if (_error != nil) {
         return;
     }
     
@@ -313,7 +313,7 @@ static xar_file_t _xarAddFile(NSMutableDictionary<NSString *, NSValue *> *fileTa
 
 - (void)enumerateItems:(void (^)(SPUDeltaArchiveItem *, BOOL *))itemHandler
 {
-    if (self.error != nil) {
+    if (_error != nil) {
         return;
     }
     
@@ -390,7 +390,7 @@ static xar_file_t _xarAddFile(NSMutableDictionary<NSString *, NSValue *> *fileTa
 
 - (BOOL)extractItem:(SPUDeltaArchiveItem *)item
 {
-    if (self.error != nil) {
+    if (_error != nil) {
         return NO;
     }
     

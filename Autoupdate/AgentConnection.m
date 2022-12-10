@@ -113,7 +113,7 @@
 - (void)connectionWillInvalidateWithError:(NSError *)error
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        self.invalidationError = error;
+        self->_invalidationError = error;
     });
 }
 

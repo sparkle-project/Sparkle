@@ -168,7 +168,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     // Start updater on next update cycle so we make sure the application invoking the updater is ready
     // This also gives the developer a cycle to check for updates before Sparkle's update cycle scheduler kicks in
     dispatch_async(dispatch_get_main_queue(), ^{
-        if (!self.sessionInProgress) {
+        if (!self->_sessionInProgress) {
             [self startUpdateCycle];
         }
     });
@@ -700,7 +700,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
                 notifyDelegateOfDriverCompletion(error, NO);
                 
                 // Ensure the delegate doesn't start a new session when being notified of the previous one ending
-                if (!strongSelf.sessionInProgress) {
+                if (!strongSelf->_sessionInProgress) {
                     if (shouldScheduleNextUpdateCheck) {
                         [strongSelf scheduleNextUpdateCheckFiringImmediately:NO usingCurrentDate:NO];
                     } else {
@@ -752,7 +752,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
             notifyDelegateOfDriverCompletion(error, shouldShowUpdateImmediately);
             
             // Ensure the delegate doesn't start a new session when being notified of the previous one ending
-            if (!strongSelf.sessionInProgress) {
+            if (!strongSelf->_sessionInProgress) {
                 [strongSelf scheduleNextUpdateCheckFiringImmediately:shouldShowUpdateImmediately usingCurrentDate:NO];
             }
         }
@@ -964,7 +964,7 @@ static NSString *escapeURLComponent(NSString *str) {
     }
 	if (sendingSystemProfile)
 	{
-        parameters = [parameters arrayByAddingObjectsFromArray:self.systemProfileArray];
+        parameters = [parameters arrayByAddingObjectsFromArray:[self systemProfileArray]];
         [_host setObject:[NSDate date] forUserDefaultsKey:SULastProfileSubmitDateKey];
     }
 	if ([parameters count] == 0) { return baseFeedURL; }

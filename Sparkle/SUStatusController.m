@@ -12,12 +12,16 @@
 #import "SUHost.h"
 #import "SUApplicationInfo.h"
 #import "SULocalizations.h"
-#import "SUOperatingSystem.h"
 #import "SUTouchBarButtonGroup.h"
 
 static NSString *const SUStatusControllerTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDENTIFIER ".SUStatusController";
 
 @interface SUStatusController () <NSTouchBarDelegate>
+
+// These properties are used for bindings
+@property (nonatomic, copy) NSString *title;
+@property (nonatomic, copy) NSString *buttonTitle;
+
 @end
 
 @implementation SUStatusController
@@ -28,15 +32,17 @@ static NSString *const SUStatusControllerTouchBarIndentifier = @"" SPARKLE_BUNDL
     NSString *_buttonTitle;
     SUHost *_host;
     NSButton *_touchBarButton;
-    BOOL _minimizable;
     
     IBOutlet NSButton *_actionButton;
     IBOutlet NSTextField *_statusTextField;
     IBOutlet NSProgressIndicator *_progressBar;
     
+    BOOL _minimizable;
     BOOL _closable;
 }
 
+@synthesize title = _title;
+@synthesize buttonTitle = _buttonTitle;
 @synthesize progressValue = _progressValue;
 @synthesize maxProgressValue = _maxProgressValue;
 @synthesize statusText = _statusText;
@@ -63,25 +69,26 @@ static NSString *const SUStatusControllerTouchBarIndentifier = @"" SPARKLE_BUNDL
 
 - (void)windowDidLoad
 {
-    NSRect windowFrame = self.window.frame;
+    NSWindow *window = self.window;
+    NSRect windowFrame = window.frame;
     
     if (_centerPointValue != nil) {
         NSPoint centerPoint = _centerPointValue.pointValue;
-        [self.window setFrameOrigin:NSMakePoint(centerPoint.x - windowFrame.size.width / 2.0, centerPoint.y - windowFrame.size.height / 2.0)];
+        [window setFrameOrigin:NSMakePoint(centerPoint.x - windowFrame.size.width / 2.0, centerPoint.y - windowFrame.size.height / 2.0)];
     } else {
-        [self.window center];
+        [window center];
     }
     
     if (_minimizable) {
-        self.window.styleMask |= NSWindowStyleMaskMiniaturizable;
+        window.styleMask |= NSWindowStyleMaskMiniaturizable;
     }
     if (_closable) {
-        self.window.styleMask |= NSWindowStyleMaskClosable;
+        window.styleMask |= NSWindowStyleMaskClosable;
     }
     [_progressBar setUsesThreadedAnimation:YES];
     [_statusTextField setFont:[NSFont monospacedDigitSystemFontOfSize:0 weight:NSFontWeightRegular]];
     
-    self.window.title = _windowTitle;
+    window.title = _windowTitle;
 }
 
 - (NSImage *)applicationIcon
@@ -91,7 +98,7 @@ static NSString *const SUStatusControllerTouchBarIndentifier = @"" SPARKLE_BUNDL
 
 - (void)beginActionWithTitle:(NSString *)aTitle maxProgressValue:(double)aMaxProgressValue statusText:(NSString *)aStatusText
 {
-    _title = [aTitle copy];
+    self.title = aTitle;
 
     self.maxProgressValue = aMaxProgressValue;
     self.statusText = aStatusText;
@@ -99,7 +106,7 @@ static NSString *const SUStatusControllerTouchBarIndentifier = @"" SPARKLE_BUNDL
 
 - (void)setButtonTitle:(NSString *)aButtonTitle target:(id)target action:(SEL)action isDefault:(BOOL)isDefault
 {
-    _buttonTitle = [aButtonTitle copy];
+    self.buttonTitle = aButtonTitle;
 
     [self window];
     [_actionButton sizeToFit];
