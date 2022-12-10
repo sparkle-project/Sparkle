@@ -6,6 +6,8 @@
 //  Copyright © 2021 Sparkle Project. All rights reserved.
 //
 
+#if SPARKLE_BUILD_PACKAGE_SUPPORT
+
 #import <Foundation/Foundation.h>
 #import "SUUnarchiverProtocol.h"
 
@@ -19,3 +21,5 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 NS_ASSUME_NONNULL_END
+
+#endif

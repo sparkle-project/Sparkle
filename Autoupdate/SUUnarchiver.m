@@ -30,10 +30,13 @@
         assert(hostPath != nil);
         NSString *nonNullHostPath = hostPath;
         return [[SUBinaryDeltaUnarchiver alloc] initWithArchivePath:path updateHostBundlePath:nonNullHostPath];
-    } else if ([SUFlatPackageUnarchiver canUnarchivePath:path]) {
+    }
+#if SPARKLE_BUILD_PACKAGE_SUPPORT
+    else if ([SUFlatPackageUnarchiver canUnarchivePath:path]) {
         // Flat packages are only supported for guided packaage installs
         return [[SUFlatPackageUnarchiver alloc] initWithFlatPackagePath:path expectingInstallationType:installationType];
     }
+#endif
     return nil;
 }
 

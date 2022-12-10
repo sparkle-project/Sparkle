@@ -6,6 +6,8 @@
 //  Copyright © 2021 Sparkle Project. All rights reserved.
 //
 
+#if SPARKLE_BUILD_PACKAGE_SUPPORT
+
 #import "SUFlatPackageUnarchiver.h"
 #import "SUUnarchiverNotifier.h"
 #import "SPUInstallationType.h"
@@ -59,3 +61,5 @@
 - (NSString *)description { return [NSString stringWithFormat:@"%@ <%@>", [self class], _flatPackagePath]; }
 
 @end
+
+#endif
