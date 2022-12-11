@@ -8,7 +8,7 @@
 #ifndef SPUStandardUserDriver_Private_h
 #define SPUStandardUserDriver_Private_h
 
-#if defined(BUILDING_SPARKLE_TESTS)
+#if defined(BUILDING_SPARKLE_SOURCES_EXTERNALLY)
 // Ignore incorrect warning
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wquoted-include-in-framework-header"
