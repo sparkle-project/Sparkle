@@ -11,17 +11,17 @@
 NS_ASSUME_NONNULL_BEGIN
 
 // Appcast Item state that contains properties that depends on a host
-@interface SPUAppcastItemState : NSObject
+SPU_OBJC_DIRECT_MEMBERS @interface SPUAppcastItemState : NSObject
 
 - (instancetype)init NS_UNAVAILABLE;
 
-- (instancetype)initWithMajorUpgrade:(BOOL)majorUpgrade criticalUpdate:(BOOL)criticalUpdate informationalUpdate:(BOOL)informationalUpdate minimumOperatingSystemVersionIsOK:(BOOL)minimumOperatingSystemVersionIsOK maximumOperatingSystemVersionIsOK:(BOOL)maximumOperatingSystemVersionIsOK SPU_OBJC_DIRECT;
+- (instancetype)initWithMajorUpgrade:(BOOL)majorUpgrade criticalUpdate:(BOOL)criticalUpdate informationalUpdate:(BOOL)informationalUpdate minimumOperatingSystemVersionIsOK:(BOOL)minimumOperatingSystemVersionIsOK maximumOperatingSystemVersionIsOK:(BOOL)maximumOperatingSystemVersionIsOK;
 
-@property (nonatomic, readonly, direct) BOOL majorUpgrade;
-@property (nonatomic, readonly, direct) BOOL criticalUpdate;
-@property (nonatomic, readonly, direct) BOOL informationalUpdate;
-@property (nonatomic, readonly, direct) BOOL minimumOperatingSystemVersionIsOK;
-@property (nonatomic, readonly, direct) BOOL maximumOperatingSystemVersionIsOK;
+@property (nonatomic, readonly) BOOL majorUpgrade;
+@property (nonatomic, readonly) BOOL criticalUpdate;
+@property (nonatomic, readonly) BOOL informationalUpdate;
+@property (nonatomic, readonly) BOOL minimumOperatingSystemVersionIsOK;
+@property (nonatomic, readonly) BOOL maximumOperatingSystemVersionIsOK;
 
 @end
 

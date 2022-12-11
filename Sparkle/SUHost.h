@@ -13,7 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 SPU_OBJC_DIRECT_MEMBERS @interface SUHost : NSObject
 
-@property (nonatomic, readonly, direct) NSBundle *bundle;
+@property (nonatomic, readonly) NSBundle *bundle;
 
 - (instancetype)initWithBundle:(NSBundle *)aBundle;
 
@@ -22,7 +22,7 @@ SPU_OBJC_DIRECT_MEMBERS @interface SUHost : NSObject
 @property (readonly, nonatomic, copy) NSString *bundlePath;
 @property (readonly, nonatomic, copy) NSString *name;
 @property (readonly, nonatomic, copy) NSString *version;
-@property (readonly, nonatomic, direct) BOOL validVersion;
+@property (readonly, nonatomic) BOOL validVersion;
 @property (readonly, nonatomic, copy) NSString *displayVersion;
 @property (readonly, nonatomic) SUPublicKeys *publicKeys;
 
