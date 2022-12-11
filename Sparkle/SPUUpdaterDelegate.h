@@ -9,9 +9,13 @@
 #import <Foundation/Foundation.h>
 
 #if defined(BUILDING_SPARKLE_TESTS)
+// Ignore incorrect warning
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wquoted-include-in-framework-header"
 #import "SUExport.h"
 #import "SPUUpdateCheck.h"
 #import "SPUUserUpdateState.h"
+#pragma clang diagnostic pop
 #else
 #import <Sparkle/SUExport.h>
 #import <Sparkle/SPUUpdateCheck.h>

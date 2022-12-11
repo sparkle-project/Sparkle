@@ -10,8 +10,12 @@
 #define SUInstallerLauncher_Private_h
 
 #if defined(BUILDING_SPARKLE_TESTS)
+// Ignore incorrect warning
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wquoted-include-in-framework-header"
 #import "SUExport.h"
 #import "SPUInstallationType.h"
+#pragma clang diagnostic pop
 #else
 #import <Sparkle/SUExport.h>
 // Chances are clients will need this too
