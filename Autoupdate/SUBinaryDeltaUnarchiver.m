@@ -37,7 +37,7 @@
 // We used to invoke mdimport on the bundle but this is not a very good approach.
 // There's no need to do that for non-delta updates and for updates that contain no mdimporters.
 // Moreover, updating the timestamp on the mdimporter bundles is what developers have to do anyway when shipping their new update outside of Sparkle
-+ (void)updateSpotlightImportersAtBundlePath:(NSString *)targetPath
+- (void)updateSpotlightImportersAtBundlePath:(NSString *)targetPath __attribute__((objc_direct))
 {
     NSURL *targetURL = [NSURL fileURLWithPath:targetPath];
     // Only recurse if it's actually a directory.  Don't recurse into a
@@ -99,7 +99,7 @@
     }, &applyDiffError);
     
     if (success) {
-        [[self class] updateSpotlightImportersAtBundlePath:targetPath];
+        [self updateSpotlightImportersAtBundlePath:targetPath];
         [notifier notifySuccess];
     }
     else {

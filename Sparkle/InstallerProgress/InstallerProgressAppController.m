@@ -148,7 +148,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
     [_application run];
 }
 
-- (void)startConnection
+- (void)startConnection __attribute__((objc_direct))
 {
     [_statusInfo startListener];
     
@@ -206,7 +206,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
     exit(status);
 }
 
-- (NSArray<NSRunningApplication *> *)runningApplicationsWithBundle:(NSBundle *)bundle
+- (NSArray<NSRunningApplication *> *)runningApplicationsWithBundle:(NSBundle *)bundle __attribute__((objc_direct))
 {
     // Resolve symlinks otherwise when we compare file paths, we may not realize two paths that are represented differently are the same
     NSArray<NSString *> *bundlePathComponents = bundle.bundlePath.stringByResolvingSymlinksInPath.pathComponents;

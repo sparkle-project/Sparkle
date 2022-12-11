@@ -16,7 +16,7 @@
 
 @interface SUPackageInstaller : NSObject <SUInstallerProtocol>
 
-- (instancetype)initWithPackagePath:(NSString *)packagePath;
+- (instancetype)initWithPackagePath:(NSString *)packagePath __attribute__((objc_direct));
 
 @end
 

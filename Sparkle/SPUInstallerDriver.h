@@ -29,19 +29,19 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface SPUInstallerDriver : NSObject
 
-- (instancetype)initWithHost:(SUHost *)host applicationBundle:(NSBundle *)applicationBundle updater:(id)updater updaterDelegate:(nullable id<SPUUpdaterDelegate>)updaterDelegate delegate:(nullable id<SPUInstallerDriverDelegate>)delegate;
+- (instancetype)initWithHost:(SUHost *)host applicationBundle:(NSBundle *)applicationBundle updater:(id)updater updaterDelegate:(nullable id<SPUUpdaterDelegate>)updaterDelegate delegate:(nullable id<SPUInstallerDriverDelegate>)delegate __attribute__((objc_direct));
 
-- (void)resumeInstallingUpdateWithUpdateItem:(SUAppcastItem *)updateItem systemDomain:(BOOL)systemDomain;
+- (void)resumeInstallingUpdateWithUpdateItem:(SUAppcastItem *)updateItem systemDomain:(BOOL)systemDomain __attribute__((objc_direct));
 
-- (void)setUpdateWillInstallHandler:(void (^)(void))updateWillInstallHandler;
+- (void)setUpdateWillInstallHandler:(void (^)(void))updateWillInstallHandler __attribute__((objc_direct));
 
-- (void)extractDownloadedUpdate:(SPUDownloadedUpdate *)downloadedUpdate silently:(BOOL)silently completion:(void (^)(NSError * _Nullable))completionHandler;
+- (void)extractDownloadedUpdate:(SPUDownloadedUpdate *)downloadedUpdate silently:(BOOL)silently completion:(void (^)(NSError * _Nullable))completionHandler __attribute__((objc_direct));
 
-- (void)installWithToolAndRelaunch:(BOOL)relaunch displayingUserInterface:(BOOL)showUI;
+- (void)installWithToolAndRelaunch:(BOOL)relaunch displayingUserInterface:(BOOL)showUI __attribute__((objc_direct));
 
-- (void)cancelUpdate;
+- (void)cancelUpdate __attribute__((objc_direct));
 
-- (void)abortInstall;
+- (void)abortInstall __attribute__((objc_direct));
 
 @end
 

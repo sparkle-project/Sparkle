@@ -39,23 +39,7 @@
     return self;
 }
 
-// Returns the bundle version from the specified host that is appropriate to use as a filename, or nil if we're unable to retrieve one
-- (NSString *)bundleVersionAppropriateForFilenameFromHost:(SUHost *)host
-{
-    NSString *bundleVersion = [host objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey];
-    NSString *trimmedVersion = @"";
-    
-    if (bundleVersion != nil) {
-        NSMutableCharacterSet *validCharacters = [NSMutableCharacterSet alphanumericCharacterSet];
-        [validCharacters formUnionWithCharacterSet:[NSCharacterSet characterSetWithCharactersInString:@".-()"]];
-        
-        trimmedVersion = [bundleVersion stringByTrimmingCharactersInSet:[validCharacters invertedSet]];
-    }
-    
-    return trimmedVersion.length > 0 ? trimmedVersion : nil;
-}
-
-- (BOOL)startInstallationToURL:(NSURL *)installationURL fromUpdateAtURL:(NSURL *)newURL withHost:(SUHost *)host progressBlock:(nullable void(^)(double))progress  error:(NSError * __autoreleasing *)error
+- (BOOL)startInstallationToURL:(NSURL *)installationURL fromUpdateAtURL:(NSURL *)newURL withHost:(SUHost *)host progressBlock:(nullable void(^)(double))progress  error:(NSError * __autoreleasing *)error __attribute__((objc_direct))
 {
     if (installationURL == nil || newURL == nil) {
         // this really shouldn't happen but just in case

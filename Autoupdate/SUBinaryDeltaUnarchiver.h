@@ -18,6 +18,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithArchivePath:(NSString *)archivePath updateHostBundlePath:(NSString *)updateHostBundlePath;
 
++ (BOOL)canUnarchivePath:(NSString *)path __attribute__((objc_direct));
+
 @end
 
 NS_ASSUME_NONNULL_END

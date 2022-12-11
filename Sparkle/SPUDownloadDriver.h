@@ -36,20 +36,20 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface SPUDownloadDriver : NSObject
 
-- (instancetype)initWithRequestURL:(NSURL *)requestURL host:(SUHost *)host userAgent:(NSString * _Nullable)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background delegate:(id<SPUDownloadDriverDelegate>)delegate;
+- (instancetype)initWithRequestURL:(NSURL *)requestURL host:(SUHost *)host userAgent:(NSString * _Nullable)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background delegate:(id<SPUDownloadDriverDelegate>)delegate __attribute__((objc_direct));
 
-- (instancetype)initWithUpdateItem:(SUAppcastItem *)updateItem secondaryUpdateItem:(SUAppcastItem * _Nullable)secondaryUpdateItem host:(SUHost *)host userAgent:(NSString * _Nullable)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background delegate:(id<SPUDownloadDriverDelegate>)delegate;
+- (instancetype)initWithUpdateItem:(SUAppcastItem *)updateItem secondaryUpdateItem:(SUAppcastItem * _Nullable)secondaryUpdateItem host:(SUHost *)host userAgent:(NSString * _Nullable)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background delegate:(id<SPUDownloadDriverDelegate>)delegate __attribute__((objc_direct));
 
-- (instancetype)initWithHost:(SUHost *)host;
+- (instancetype)initWithHost:(SUHost *)host __attribute__((objc_direct));
 
-- (void)downloadFile;
+- (void)downloadFile __attribute__((objc_direct));
 
-- (void)removeDownloadedUpdate:(SPUDownloadedUpdate *)downloadedUpdate;
+- (void)removeDownloadedUpdate:(SPUDownloadedUpdate *)downloadedUpdate __attribute__((objc_direct));
 
-@property (nonatomic, readonly) NSMutableURLRequest *request;
-@property (nonatomic, readonly) BOOL inBackground;
+@property (nonatomic, readonly, direct) NSMutableURLRequest *request;
+@property (nonatomic, readonly, direct) BOOL inBackground;
 
-- (void)cleanup:(void (^)(void))completionHandler;
+- (void)cleanup:(void (^)(void))completionHandler __attribute__((objc_direct));
 
 @end
 

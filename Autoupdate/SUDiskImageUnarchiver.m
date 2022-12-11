@@ -48,7 +48,7 @@
 }
 
 // Called on a non-main thread.
-- (void)extractDMGWithNotifier:(SUUnarchiverNotifier *)notifier
+- (void)extractDMGWithNotifier:(SUUnarchiverNotifier *)notifier __attribute__((objc_direct))
 {
 	@autoreleasepool {
         BOOL mountedSuccessfully = NO;

@@ -37,7 +37,7 @@
     return self;
 }
 
-- (NSDictionary *)attributesOfNode:(NSXMLElement *)node
+- (NSDictionary *)attributesOfNode:(NSXMLElement *)node __attribute__((objc_direct))
 {
     NSEnumerator *attributeEnum = [[node attributes] objectEnumerator];
     NSMutableDictionary *dictionary = [NSMutableDictionary dictionary];
@@ -55,7 +55,8 @@
     return dictionary;
 }
 
--(NSString *)sparkleNamespacedNameOfNode:(NSXMLNode *)node {
+-(NSString *)sparkleNamespacedNameOfNode:(NSXMLNode *)node __attribute__((objc_direct))
+{
     // XML namespace prefix is semantically meaningless, so compare namespace URI
     // NS URI isn't used to fetch anything, and must match exactly, so we look for http:// not https://
     if ([[node URI] isEqualToString:@"http://www.andymatuschak.org/xml-namespaces/sparkle"]) {
@@ -67,7 +68,8 @@
     }
 }
 
--(NSArray *)parseAppcastItemsFromXMLData:(NSData *)appcastData relativeToURL:(NSURL * _Nullable)appcastURL stateResolver:(SPUAppcastItemStateResolver *)stateResolver error:(NSError *__autoreleasing*)errorp {
+-(NSArray *)parseAppcastItemsFromXMLData:(NSData *)appcastData relativeToURL:(NSURL * _Nullable)appcastURL stateResolver:(SPUAppcastItemStateResolver *)stateResolver error:(NSError *__autoreleasing*)errorp __attribute__((objc_direct))
+{
     if (errorp) {
         *errorp = nil;
     }
@@ -195,7 +197,7 @@
     return appcastItems;
 }
 
-- (NSXMLNode *)bestNodeInNodes:(NSArray *)nodes
+- (NSXMLNode *)bestNodeInNodes:(NSArray *)nodes __attribute__((objc_direct))
 {
     // We use this method to pick out the localized version of a node when one's available.
     if ([nodes count] == 1)

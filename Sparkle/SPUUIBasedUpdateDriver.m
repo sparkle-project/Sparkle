@@ -34,7 +34,7 @@
     void (^_completionHandler)(SPUDownloadData * _Nullable, NSError  * _Nullable);
 }
 
-- (instancetype)initWithReleaseNotesURL:(NSURL *)releaseNotesURL httpHeaders:(NSDictionary * _Nullable)httpHeaders userAgent:(NSString * _Nullable)userAgent host:(SUHost *)host completionHandler:(void (^)(SPUDownloadData * _Nullable, NSError * _Nullable))completionHandler
+- (instancetype)initWithReleaseNotesURL:(NSURL *)releaseNotesURL httpHeaders:(NSDictionary * _Nullable)httpHeaders userAgent:(NSString * _Nullable)userAgent host:(SUHost *)host completionHandler:(void (^)(SPUDownloadData * _Nullable, NSError * _Nullable))completionHandler __attribute__((objc_direct))
 {
     self = [super init];
     if (self != nil) {
@@ -46,7 +46,7 @@
     return self;
 }
 
-- (void)startDownload
+- (void)startDownload __attribute__((objc_direct))
 {
     [_downloadDriver downloadFile];
 }
@@ -67,7 +67,7 @@
     }
 }
 
-- (void)cleanup:(void (^)(void))cleanupHandler
+- (void)cleanup:(void (^)(void))cleanupHandler __attribute__((objc_direct))
 {
     _completionHandler = nil;
     [_downloadDriver cleanup:cleanupHandler];
@@ -124,7 +124,7 @@
     [_coreDriver setUpdateWillInstallHandler:updateWillInstallHandler];
 }
 
-- (void)_clearSkippedUpdatesIfUserInitiated
+- (void)_clearSkippedUpdatesIfUserInitiated __attribute__((objc_direct))
 {
     if (_userInitiated) {
         [SPUSkippedUpdate clearSkippedUpdateForHost:_host];
@@ -390,7 +390,7 @@
     [_delegate coreDriverIsRequestingAbortUpdateWithError:error];
 }
 
-- (void)_abortUpdateWithError:(nullable NSError *)error showErrorToUser:(BOOL)showErrorToUser
+- (void)_abortUpdateWithError:(nullable NSError *)error showErrorToUser:(BOOL)showErrorToUser __attribute__((objc_direct))
 {
     void (^abortUpdate)(void) = ^{
         if (showErrorToUser) {

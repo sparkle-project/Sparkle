@@ -47,7 +47,7 @@
     }
 }
 
-- (void)displayReleaseNotes:(const char * _Nullable)releaseNotes
+- (void)displayReleaseNotes:(const char * _Nullable)releaseNotes __attribute__((objc_direct))
 {
     if (releaseNotes != NULL) {
         fprintf(stderr, "Release notes:\n");
@@ -55,7 +55,7 @@
     }
 }
 
-- (void)displayHTMLReleaseNotes:(NSData *)releaseNotes
+- (void)displayHTMLReleaseNotes:(NSData *)releaseNotes __attribute__((objc_direct))
 {
     // Note: this is the only API we rely on here that references AppKit
     // We shouldn't invoke it when the calling process is ran under root.
@@ -66,7 +66,7 @@
     }
 }
 
-- (void)displayPlainTextReleaseNotes:(NSData *)releaseNotes encoding:(NSStringEncoding)encoding
+- (void)displayPlainTextReleaseNotes:(NSData *)releaseNotes encoding:(NSStringEncoding)encoding __attribute__((objc_direct))
 {
     NSString *string = [[NSString alloc] initWithData:releaseNotes encoding:encoding];
     [self displayReleaseNotes:string.UTF8String];

@@ -67,7 +67,7 @@ static NSString *const SUStatusControllerTouchBarIndentifier = @"" SPARKLE_BUNDL
     return [NSString stringWithFormat:@"%@ <%@>", [self class], _host.bundlePath];
 }
 
-- (void)windowDidLoad
+- (void)windowDidLoad 
 {
     NSWindow *window = self.window;
     NSRect windowFrame = window.frame;

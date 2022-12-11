@@ -21,14 +21,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface AgentConnection : NSObject
 
-- (instancetype)initWithHostBundleIdentifier:(NSString *)bundleIdentifier delegate:(id<AgentConnectionDelegate>)delegate;
+- (instancetype)initWithHostBundleIdentifier:(NSString *)bundleIdentifier delegate:(id<AgentConnectionDelegate>)delegate __attribute__((objc_direct));
 
-- (void)startListener;
-- (void)invalidate;
+- (void)startListener __attribute__((objc_direct));
+- (void)invalidate __attribute__((objc_direct));
 
-@property (nonatomic, readonly, nullable) id<SPUInstallerAgentProtocol> agent;
-@property (nonatomic, readonly) BOOL connected;
-@property (nonatomic, nullable) NSError *invalidationError;
+@property (nonatomic, readonly, nullable, direct) id<SPUInstallerAgentProtocol> agent;
+@property (nonatomic, readonly, direct) BOOL connected;
+@property (nonatomic, nullable, direct) NSError *invalidationError;
 
 @end
 

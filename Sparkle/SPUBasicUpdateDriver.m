@@ -78,7 +78,7 @@
     }
 }
 
-- (void)notifyResumableUpdateItem:(SUAppcastItem *)updateItem secondaryUpdateItem:(SUAppcastItem * _Nullable)secondaryUpdateItem systemDomain:(NSNumber * _Nullable)systemDomain
+- (void)notifyResumableUpdateItem:(SUAppcastItem *)updateItem secondaryUpdateItem:(SUAppcastItem * _Nullable)secondaryUpdateItem systemDomain:(NSNumber * _Nullable)systemDomain __attribute__((objc_direct))
 {
     if (updateItem == nil) {
         [_delegate basicDriverIsRequestingAbortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUResumeAppcastError userInfo:@{ NSLocalizedDescriptionKey: SULocalizedString(@"Failed to resume installing update.", nil) }]];
@@ -114,7 +114,7 @@
     }
 }
 
-- (void)notifyFinishLoadingAppcast
+- (void)notifyFinishLoadingAppcast __attribute__((objc_direct))
 {
     id<SPUBasicUpdateDriverDelegate> delegate = _delegate;
     if ([delegate respondsToSelector:@selector(basicDriverDidFinishLoadingAppcast)]) {
@@ -134,7 +134,7 @@
     }
 }
 
-- (void)notifyFoundValidUpdateWithAppcastItem:(SUAppcastItem *)updateItem secondaryAppcastItem:(SUAppcastItem * _Nullable)secondaryUpdateItem systemDomain:(NSNumber * _Nullable)systemDomain resuming:(BOOL)resuming
+- (void)notifyFoundValidUpdateWithAppcastItem:(SUAppcastItem *)updateItem secondaryAppcastItem:(SUAppcastItem * _Nullable)secondaryUpdateItem systemDomain:(NSNumber * _Nullable)systemDomain resuming:(BOOL)resuming __attribute__((objc_direct))
 {
     if (!_aborted) {
         id<SPUBasicUpdateDriverDelegate> delegate = _delegate;

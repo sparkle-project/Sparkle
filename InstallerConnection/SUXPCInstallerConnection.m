@@ -79,7 +79,7 @@
     _connection = nil;
 }
 
-- (void)invokeInvalidation
+- (void)invokeInvalidation __attribute__((objc_direct))
 {
     if (_invalidationBlock != nil) {
         _invalidationBlock();

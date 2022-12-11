@@ -17,7 +17,7 @@
 
 @interface SUUpdatePermissionPrompt : NSWindowController
 
-- (instancetype)initPromptWithHost:(SUHost *)theHost request:(SPUUpdatePermissionRequest *)request reply:(void (^)(SUUpdatePermissionResponse *))reply;
+- (instancetype)initPromptWithHost:(SUHost *)theHost request:(SPUUpdatePermissionRequest *)request reply:(void (^)(SUUpdatePermissionResponse *))reply __attribute__((objc_direct));
 
 @end
 

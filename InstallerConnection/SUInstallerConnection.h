@@ -15,7 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface SUInstallerConnection : NSObject <SUInstallerConnectionProtocol>
 
 // Due to XPC reasons, this delegate is strongly referenced, until it's invalidated
-- (instancetype)initWithDelegate:(id<SUInstallerCommunicationProtocol>)delegate remote:(BOOL)remote;
+- (instancetype)initWithDelegate:(id<SUInstallerCommunicationProtocol>)delegate remote:(BOOL)remote __attribute__((objc_direct));
 
 - (instancetype)init NS_UNAVAILABLE;
 

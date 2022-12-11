@@ -19,7 +19,7 @@
     NSString *_archivePath;
 }
 
-+ (nullable NSArray <NSString *> *)commandAndArgumentsConformingToTypeOfPath:(NSString *)path
+static NSArray <NSString *> * _Nullable _commandAndArgumentsConformingToTypeOfPath(NSString *path)
 {
     NSArray <NSString *> *extractTGZ = @[@"/usr/bin/tar", @"-zxC"];
     NSArray <NSString *> *extractTBZ = @[@"/usr/bin/tar", @"-jxC"];
@@ -50,7 +50,7 @@
 
 + (BOOL)canUnarchivePath:(NSString *)path
 {
-    return ([self commandAndArgumentsConformingToTypeOfPath:path] != nil);
+    return _commandAndArgumentsConformingToTypeOfPath(path) != nil;
 }
 
 + (BOOL)mustValidateBeforeExtraction
@@ -69,7 +69,7 @@
 
 - (void)unarchiveWithCompletionBlock:(void (^)(NSError * _Nullable))completionBlock progressBlock:(void (^ _Nullable)(double))progressBlock
 {
-    NSArray <NSString *> *commandAndArguments = [[self class] commandAndArgumentsConformingToTypeOfPath:_archivePath];
+    NSArray <NSString *> *commandAndArguments = _commandAndArgumentsConformingToTypeOfPath(_archivePath);
     assert(commandAndArguments != nil);
     
     NSString *command = commandAndArguments.firstObject;
@@ -84,7 +84,7 @@
 }
 
 // This method abstracts the types that use a command line tool piping data from stdin.
-- (void)extractArchivePipingDataToCommand:(NSString *)command arguments:(NSArray*)args notifier:(SUUnarchiverNotifier *)notifier
+- (void)extractArchivePipingDataToCommand:(NSString *)command arguments:(NSArray*)args notifier:(SUUnarchiverNotifier *)notifier __attribute__((objc_direct))
 {
     // *** GETS CALLED ON NON-MAIN THREAD!!!
 	@autoreleasepool {

@@ -16,7 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, readonly, copy) NSArray<NSButton *> *buttons;
 
-- (instancetype)initByReferencingButtons:(NSArray<NSButton *> *)buttons;
+- (instancetype)initByReferencingButtons:(NSArray<NSButton *> *)buttons __attribute__((objc_direct));
 
 @end
 

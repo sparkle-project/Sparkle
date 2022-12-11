@@ -20,20 +20,20 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface SPUSkippedUpdate : NSObject
 
-+ (nullable SPUSkippedUpdate *)skippedUpdateForHost:(SUHost *)host;
++ (nullable SPUSkippedUpdate *)skippedUpdateForHost:(SUHost *)host __attribute__((objc_direct));
 
-+ (void)clearSkippedUpdateForHost:(SUHost *)host;
++ (void)clearSkippedUpdateForHost:(SUHost *)host __attribute__((objc_direct));
 
-+ (void)skipUpdate:(SUAppcastItem *)updateItem host:(SUHost *)host;
++ (void)skipUpdate:(SUAppcastItem *)updateItem host:(SUHost *)host __attribute__((objc_direct));
 
 // At least one of minorVersion or majorVersion should be non-nil
-- (instancetype)initWithMinorVersion:(nullable NSString *)minorVersion majorVersion:(nullable NSString *)majorVersion majorSubreleaseVersion:(nullable NSString *)majorSubreleaseVersion;
+- (instancetype)initWithMinorVersion:(nullable NSString *)minorVersion majorVersion:(nullable NSString *)majorVersion majorSubreleaseVersion:(nullable NSString *)majorSubreleaseVersion __attribute__((objc_direct));
 
 // At least one of these two version properties will be non-nil
-@property (nonatomic, readonly, nullable) NSString *minorVersion;
-@property (nonatomic, readonly, nullable) NSString *majorVersion;
+@property (nonatomic, readonly, nullable, direct) NSString *minorVersion;
+@property (nonatomic, readonly, nullable, direct) NSString *majorVersion;
 
-@property (nonatomic, readonly, nullable) NSString *majorSubreleaseVersion;
+@property (nonatomic, readonly, nullable, direct) NSString *majorSubreleaseVersion;
 
 @end
 

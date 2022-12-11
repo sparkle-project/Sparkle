@@ -16,6 +16,6 @@
 
 // Due to XPC remote object reasons, this delegate is strongly referenced
 // Invoke cleanup when done with this instance
-- (instancetype)initWithDelegate:(id <SPUDownloaderDelegate>)delegate;
+- (instancetype)initWithDelegate:(id <SPUDownloaderDelegate>)delegate __attribute__((objc_direct));
 
 @end

@@ -13,6 +13,6 @@
 
 @interface SUPopUpTitlebarUserDriver : NSObject <SPUUserDriver>
 
-- (instancetype)initWithWindow:(NSWindow *)window;
+- (instancetype)initWithWindow:(NSWindow *)window __attribute__((objc_direct));
 
 @end

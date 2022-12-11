@@ -166,7 +166,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     });
 }
 
-- (void)extractAndInstallUpdate
+- (void)extractAndInstallUpdate __attribute__((objc_direct))
 {
     [_communicator handleMessageWithIdentifier:SPUExtractionStarted data:[NSData data]];
     
@@ -229,7 +229,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     }
 }
 
-- (void)clearUpdateDirectory
+- (void)clearUpdateDirectory __attribute__((objc_direct))
 {
     if (_updateDirectoryPath != nil) {
         NSError *theError = nil;
@@ -240,7 +240,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     }
 }
 
-- (void)unarchiverDidFailWithError:(NSError *)error
+- (void)unarchiverDidFailWithError:(NSError *)error __attribute__((objc_direct))
 {
     SULog(SULogLevelError, @"Failed to unarchive file");
     SULogError(error);
@@ -285,7 +285,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     }
 }
 
-- (void)retrieveProcessIdentifierAndStartInstallation
+- (void)retrieveProcessIdentifierAndStartInstallation __attribute__((objc_direct))
 {
     // We use the relaunch path for the bundle to listen for termination instead of the host path
     // For a plug-in this makes a big difference; we want to wait until the app hosting the plug-in terminates
@@ -442,7 +442,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     }
 }
 
-- (void)startInstallation
+- (void)startInstallation __attribute__((objc_direct))
 {
     _willCompleteInstallation = YES;
     
@@ -491,7 +491,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     });
 }
 
-- (void)performStage2Installation
+- (void)performStage2Installation __attribute__((objc_direct))
 {
     BOOL canPerformSecondStage = _shouldShowUI || [_installer canInstallSilently];
     if (canPerformSecondStage) {
@@ -516,7 +516,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     }
 }
 
-- (void)finishInstallationAfterHostTermination
+- (void)finishInstallationAfterHostTermination __attribute__((objc_direct))
 {
     [_terminationListener startListeningWithCompletion:^(BOOL success) {
         if (!success) {

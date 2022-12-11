@@ -50,8 +50,8 @@
     return self;
 }
 
-- (SecKeyRef)dsaSecKeyRef {
-
+- (SecKeyRef)dsaSecKeyRef __attribute__((objc_direct))
+{
     NSData *data = [_pubKeys.dsaPubKey dataUsingEncoding:NSASCIIStringEncoding];
     if (!self || !data.length) {
         SULog(SULogLevelError, @"Could not read public DSA key");
@@ -240,7 +240,7 @@
     return NO;
 }
 
-- (BOOL)verifyDSASignatureOfStream:(NSInputStream *)stream dsaSignature:(NSData *)dsaSignature error:(NSError * __autoreleasing *)outError
+- (BOOL)verifyDSASignatureOfStream:(NSInputStream *)stream dsaSignature:(NSData *)dsaSignature error:(NSError * __autoreleasing *)outError __attribute__((objc_direct))
 {
     if (!stream || !dsaSignature) {
         SULog(SULogLevelError, @"Invalid arguments to verifyStream");

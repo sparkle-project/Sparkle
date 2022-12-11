@@ -24,11 +24,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface SUAppcastDriver : NSObject
 
-- (instancetype)initWithHost:(SUHost *)host updater:(id)updater updaterDelegate:(nullable id <SPUUpdaterDelegate>)updaterDelegate delegate:(nullable id <SUAppcastDriverDelegate>)delegate;
+- (instancetype)initWithHost:(SUHost *)host updater:(id)updater updaterDelegate:(nullable id <SPUUpdaterDelegate>)updaterDelegate delegate:(nullable id <SUAppcastDriverDelegate>)delegate __attribute__((objc_direct));
 
-- (void)loadAppcastFromURL:(NSURL *)appcastURL userAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background;
+- (void)loadAppcastFromURL:(NSURL *)appcastURL userAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background __attribute__((objc_direct));
 
-- (void)cleanup:(void (^)(void))completionHandler;
+- (void)cleanup:(void (^)(void))completionHandler __attribute__((objc_direct));
 
 @end
 

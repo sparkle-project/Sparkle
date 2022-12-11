@@ -22,7 +22,7 @@
 
 @implementation SUInstaller
 
-+ (BOOL)isAliasFolderAtPath:(NSString *)path
++ (BOOL)isAliasFolderAtPath:(NSString *)path __attribute__((objc_direct))
 {
     NSNumber *aliasFlag = nil;
     [[NSURL fileURLWithPath:path] getResourceValue:&aliasFlag forKey:NSURLIsAliasFileKey error:nil];

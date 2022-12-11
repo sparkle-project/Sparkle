@@ -26,42 +26,42 @@ typedef NS_ENUM(uint8_t, SPUDeltaItemCommands) {
 // Represents header for our archive
 @interface SPUDeltaArchiveHeader : NSObject
 
-- (instancetype)initWithCompression:(SPUDeltaCompressionMode)compression compressionLevel:(uint8_t)compressionLevel fileSystemCompression:(bool)fileSystemCompression majorVersion:(uint16_t)majorVersion minorVersion:(uint16_t)minorVersion beforeTreeHash:(const unsigned char *)beforeTreeHash afterTreeHash:(const unsigned char *)afterTreeHash;
+- (instancetype)initWithCompression:(SPUDeltaCompressionMode)compression compressionLevel:(uint8_t)compressionLevel fileSystemCompression:(bool)fileSystemCompression majorVersion:(uint16_t)majorVersion minorVersion:(uint16_t)minorVersion beforeTreeHash:(const unsigned char *)beforeTreeHash afterTreeHash:(const unsigned char *)afterTreeHash __attribute__((objc_direct));
 
-@property (nonatomic, readonly) SPUDeltaCompressionMode compression;
-@property (nonatomic, readonly) uint8_t compressionLevel;
-@property (nonatomic, readonly) bool fileSystemCompression;
-@property (nonatomic, readonly) uint16_t majorVersion;
-@property (nonatomic, readonly) uint16_t minorVersion;
-@property (nonatomic, readonly) unsigned char *beforeTreeHash;
-@property (nonatomic, readonly) unsigned char *afterTreeHash;
+@property (nonatomic, readonly, direct) SPUDeltaCompressionMode compression;
+@property (nonatomic, readonly, direct) uint8_t compressionLevel;
+@property (nonatomic, readonly, direct) bool fileSystemCompression;
+@property (nonatomic, readonly, direct) uint16_t majorVersion;
+@property (nonatomic, readonly, direct) uint16_t minorVersion;
+@property (nonatomic, readonly, direct) unsigned char *beforeTreeHash;
+@property (nonatomic, readonly, direct) unsigned char *afterTreeHash;
 
 @end
 
 // Represents an item we read or write to in our delta archive
 @interface SPUDeltaArchiveItem : NSObject
 
-- (instancetype)initWithRelativeFilePath:(NSString *)relativeFilePath commands:(SPUDeltaItemCommands)commands mode:(uint16_t)mode;
+- (instancetype)initWithRelativeFilePath:(NSString *)relativeFilePath commands:(SPUDeltaItemCommands)commands mode:(uint16_t)mode __attribute__((objc_direct));
 
 // The relative file path of the item, eg /Contents/MacOS/Foo
-@property (nonatomic, readonly) NSString *relativeFilePath;
+@property (nonatomic, readonly, direct) NSString *relativeFilePath;
 // For extraction, the path where the item will be extracted. For creation, the path to the item to add to the archive.
-@property (nonatomic, nullable) NSString *itemFilePath;
+@property (nonatomic, nullable, direct) NSString *itemFilePath;
 // The relative file path of the originating item for clones. This may be null.
 // For example, if /Contents/Resources/hello/foo.txt moves to /Contents/Resources/hello2/foo.txt, the former is the relative path
-@property (nonatomic, nullable) NSString *clonedRelativePath;
+@property (nonatomic, nullable, direct) NSString *clonedRelativePath;
 // The source path of the item to extract file metadata from such as file size.
-@property (nonatomic, nullable) NSString *sourcePath;
+@property (nonatomic, nullable, direct) NSString *sourcePath;
 // The commands that describe the actions to take for this item.
-@property (nonatomic, readonly) SPUDeltaItemCommands commands;
+@property (nonatomic, readonly, direct) SPUDeltaItemCommands commands;
 // Provided change in permissions for item or tracking file mode for the item
-@property (nonatomic) uint16_t mode;
+@property (nonatomic, direct) uint16_t mode;
 
 // Private properties
 // xar_file context for Xar delta archiver
-@property (nonatomic, nullable) const void *xarContext;
+@property (nonatomic, nullable, direct) const void *xarContext;
 // Tracking length of item's data in data section, when encoding items and when extracting items
-@property (nonatomic) uint64_t codedDataLength;
+@property (nonatomic, direct) uint64_t codedDataLength;
 
 @end
 

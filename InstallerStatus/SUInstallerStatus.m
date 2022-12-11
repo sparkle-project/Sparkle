@@ -40,7 +40,7 @@
     }
 }
 
-- (void)_setServiceName:(NSString *)serviceName
+- (void)_setServiceName:(NSString *)serviceName __attribute__((objc_direct))
 {
     NSXPCConnection *connection = [[NSXPCConnection alloc] initWithMachServiceName:serviceName options:(NSXPCConnectionOptions)0];
     
@@ -104,7 +104,7 @@
     }
 }
 
-- (void)_invokeInvalidationBlock
+- (void)_invokeInvalidationBlock __attribute__((objc_direct))
 {
     if (_invalidationBlock != nil) {
         _invalidationBlock();

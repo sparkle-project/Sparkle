@@ -14,7 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface SUBundleIcon : NSObject
 
-+ (NSURL * _Nullable)iconURLForHost:(SUHost *)host;
++ (NSURL * _Nullable)iconURLForHost:(SUHost *)host __attribute__((objc_direct));
 
 @end
 

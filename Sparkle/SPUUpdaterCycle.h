@@ -21,11 +21,11 @@ NS_ASSUME_NONNULL_BEGIN
 @interface SPUUpdaterCycle : NSObject
 
 // This delegate is weakly referenced
-- (instancetype)initWithDelegate:(id<SPUUpdaterCycleDelegate>)delegate;
+- (instancetype)initWithDelegate:(id<SPUUpdaterCycleDelegate>)delegate __attribute__((objc_direct));
 
-- (void)resetUpdateCycleAfterDelay;
+- (void)resetUpdateCycleAfterDelay __attribute__((objc_direct));
 
-- (void)cancelNextUpdateCycle;
+- (void)cancelNextUpdateCycle __attribute__((objc_direct));
 
 @end
 

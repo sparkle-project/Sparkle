@@ -9,6 +9,6 @@
 
 @interface SUOperatingSystem : NSObject
 
-+ (NSString *)systemVersionString;
++ (NSString *)systemVersionString __attribute__((objc_direct));
 
 @end

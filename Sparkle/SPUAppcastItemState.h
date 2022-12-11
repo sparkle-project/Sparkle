@@ -15,13 +15,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)init NS_UNAVAILABLE;
 
-- (instancetype)initWithMajorUpgrade:(BOOL)majorUpgrade criticalUpdate:(BOOL)criticalUpdate informationalUpdate:(BOOL)informationalUpdate minimumOperatingSystemVersionIsOK:(BOOL)minimumOperatingSystemVersionIsOK maximumOperatingSystemVersionIsOK:(BOOL)maximumOperatingSystemVersionIsOK;
+- (instancetype)initWithMajorUpgrade:(BOOL)majorUpgrade criticalUpdate:(BOOL)criticalUpdate informationalUpdate:(BOOL)informationalUpdate minimumOperatingSystemVersionIsOK:(BOOL)minimumOperatingSystemVersionIsOK maximumOperatingSystemVersionIsOK:(BOOL)maximumOperatingSystemVersionIsOK __attribute__((objc_direct));
 
-@property (nonatomic, readonly) BOOL majorUpgrade;
-@property (nonatomic, readonly) BOOL criticalUpdate;
-@property (nonatomic, readonly) BOOL informationalUpdate;
-@property (nonatomic, readonly) BOOL minimumOperatingSystemVersionIsOK;
-@property (nonatomic, readonly) BOOL maximumOperatingSystemVersionIsOK;
+@property (nonatomic, readonly, direct) BOOL majorUpgrade;
+@property (nonatomic, readonly, direct) BOOL criticalUpdate;
+@property (nonatomic, readonly, direct) BOOL informationalUpdate;
+@property (nonatomic, readonly, direct) BOOL minimumOperatingSystemVersionIsOK;
+@property (nonatomic, readonly, direct) BOOL maximumOperatingSystemVersionIsOK;
 
 @end
 

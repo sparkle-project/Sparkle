@@ -23,7 +23,7 @@ A guided installation can be started by applications other than the application 
 
 @interface SUGuidedPackageInstaller : NSObject <SUInstallerProtocol>
 
-- (instancetype)initWithPackagePath:(NSString *)packagePath homeDirectory:(NSString *)homeDirectory userName:(NSString *)userName;
+- (instancetype)initWithPackagePath:(NSString *)packagePath homeDirectory:(NSString *)homeDirectory userName:(NSString *)userName __attribute__((objc_direct));
 
 @end
 

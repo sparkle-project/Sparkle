@@ -257,7 +257,7 @@ typedef NS_ENUM(int, CLIErrorExitStatus) {
     return _verbose;
 }
 
-- (void)startUpdater
+- (void)startUpdater __attribute__((objc_direct))
 {
     NSError *updaterError = nil;
     if (![_updater startUpdater:&updaterError]) {

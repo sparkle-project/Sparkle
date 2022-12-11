@@ -38,7 +38,7 @@ typedef NS_ENUM(NSInteger, SUCharacterType) {
     kDashType,
 };
 
-- (SUCharacterType)typeOfCharacter:(NSString *)character
+- (SUCharacterType)typeOfCharacter:(NSString *)character __attribute__((objc_direct))
 {
     if ([character isEqualToString:@"."]) {
         return kPeriodSeparatorType;
@@ -55,7 +55,7 @@ typedef NS_ENUM(NSInteger, SUCharacterType) {
     }
 }
 
-- (BOOL)isSeparatorType:(SUCharacterType)characterType
+- (BOOL)isSeparatorType:(SUCharacterType)characterType __attribute__((objc_direct))
 {
     switch (characterType) {
         case kNumberType:
@@ -70,7 +70,7 @@ typedef NS_ENUM(NSInteger, SUCharacterType) {
 }
 
 // If type A and type B are some sort of separator, consider them to be equal
-- (BOOL)isEqualCharacterTypeClassForTypeA:(SUCharacterType)typeA typeB:(SUCharacterType)typeB
+- (BOOL)isEqualCharacterTypeClassForTypeA:(SUCharacterType)typeA typeB:(SUCharacterType)typeB __attribute__((objc_direct))
 {
     switch (typeA) {
         case kNumberType:
@@ -94,7 +94,7 @@ typedef NS_ENUM(NSInteger, SUCharacterType) {
     }
 }
 
-- (NSMutableArray<NSString *> *)splitVersionString:(NSString *)version
+- (NSMutableArray<NSString *> *)splitVersionString:(NSString *)version __attribute__((objc_direct))
 {
     NSString *character;
     NSMutableString *s;
@@ -133,7 +133,7 @@ typedef NS_ENUM(NSInteger, SUCharacterType) {
 
 // This returns the count of number and period parts at the beginning of the version
 // See -balanceVersionPartsA:partsB below
-- (NSUInteger)countOfNumberAndPeriodStartingParts:(NSArray<NSString *> *)parts
+- (NSUInteger)countOfNumberAndPeriodStartingParts:(NSArray<NSString *> *)parts __attribute__((objc_direct))
 {
     NSUInteger count = 0;
     for (NSString *part in parts) {
@@ -149,7 +149,7 @@ typedef NS_ENUM(NSInteger, SUCharacterType) {
 }
 
 // See -balanceVersionPartsA:partsB below
-- (void)addNumberAndPeriodPartsToParts:(NSMutableArray<NSString *> *)toParts toNumberAndPeriodPartsCount:(NSUInteger)toNumberAndPeriodPartsCount fromParts:(NSArray<NSString *> *)fromParts fromNumberAndPeriodPartsCount:(NSUInteger)fromNumberAndPeriodPartsCount
+- (void)addNumberAndPeriodPartsToParts:(NSMutableArray<NSString *> *)toParts toNumberAndPeriodPartsCount:(NSUInteger)toNumberAndPeriodPartsCount fromParts:(NSArray<NSString *> *)fromParts fromNumberAndPeriodPartsCount:(NSUInteger)fromNumberAndPeriodPartsCount __attribute__((objc_direct))
 {
     NSUInteger partsCountDifference = (fromNumberAndPeriodPartsCount - toNumberAndPeriodPartsCount);
     
@@ -168,7 +168,7 @@ typedef NS_ENUM(NSInteger, SUCharacterType) {
 
 // If one version starts with "1.0.0" and the other starts with "1.1" we make sure they're balanced
 // such that the latter version now becomes "1.1.0". This helps ensure that versions like "1.0" and "1.0.0" are equal.
-- (void)balanceVersionPartsA:(NSMutableArray<NSString *> *)partsA partsB:(NSMutableArray<NSString *> *)partsB
+- (void)balanceVersionPartsA:(NSMutableArray<NSString *> *)partsA partsB:(NSMutableArray<NSString *> *)partsB __attribute__((objc_direct))
 {
     NSUInteger partANumberAndPeriodPartsCount = [self countOfNumberAndPeriodStartingParts:partsA];
     NSUInteger partBNumberAndPeriodPartsCount = [self countOfNumberAndPeriodStartingParts:partsB];;

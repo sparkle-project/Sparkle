@@ -40,7 +40,7 @@
     }
 }
 
-- (void)_initUpdater
+- (void)_initUpdater __attribute__((objc_direct))
 {
     NSBundle *hostBundle = [NSBundle mainBundle];
     SPUStandardUserDriver *userDriver = [[SPUStandardUserDriver alloc] initWithHostBundle:hostBundle delegate:self->userDriverDelegate];

@@ -16,14 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
  * All operations on this class may be used on thread other than the main thread.
  * This class provides just basic file operations and stays away from including much application-level logic.
  */
-@interface SUFileManager : NSObject
-
-/**
- * Initializes a new file manager
- *
- * @return A new file manager instance
- */
-- (instancetype)init;
+__attribute__((objc_direct_members)) @interface SUFileManager : NSObject
 
 /**
  * Creates a temporary directory on the same volume as a provided URL

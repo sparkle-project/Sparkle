@@ -11,8 +11,8 @@
 
 @interface SUInstallUpdateViewController : NSViewController
 
-- (instancetype)initWithAppcastItem:(SUAppcastItem *)appcastItem reply:(void (^)(SPUUserUpdateChoice))reply;
+- (instancetype)initWithAppcastItem:(SUAppcastItem *)appcastItem reply:(void (^)(SPUUserUpdateChoice))reply __attribute__((objc_direct));
 
-- (void)showReleaseNotesWithDownloadData:(SPUDownloadData *)downloadData;
+- (void)showReleaseNotesWithDownloadData:(SPUDownloadData *)downloadData __attribute__((objc_direct));
 
 @end

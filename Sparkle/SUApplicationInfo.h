@@ -16,9 +16,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface SUApplicationInfo : NSObject
 
-+ (BOOL)isBackgroundApplication:(NSApplication *)application;
++ (BOOL)isBackgroundApplication:(NSApplication *)application __attribute__((objc_direct));
 
-+ (NSImage *)bestIconForHost:(SUHost *)host;
++ (NSImage *)bestIconForHost:(SUHost *)host __attribute__((objc_direct));
 
 @end
 

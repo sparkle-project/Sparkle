@@ -10,8 +10,8 @@
 
 @interface SUTestWebServer : NSObject
 
-- (instancetype)initWithPort:(int)port workingDirectory:(NSString*)workingDirectory;
+- (instancetype)initWithPort:(int)port workingDirectory:(NSString*)workingDirectory __attribute__((objc_direct));
 
-- (void)close;
+- (void)close __attribute__((objc_direct));
 
 @end

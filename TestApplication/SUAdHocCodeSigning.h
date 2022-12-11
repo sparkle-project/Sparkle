@@ -10,6 +10,6 @@
 
 @interface SUAdHocCodeSigning : NSObject
 
-+ (BOOL)codeSignApplicationAtPath:(NSString *)applicationPath;
++ (BOOL)codeSignApplicationAtPath:(NSString *)applicationPath __attribute__((objc_direct));
 
 @end

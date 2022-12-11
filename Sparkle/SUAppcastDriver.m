@@ -101,7 +101,7 @@
     [_delegate didFailToFetchAppcastWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUDownloadError userInfo:userInfo]];
 }
 
-- (SUAppcastItem * _Nullable)preferredUpdateForRegularAppcastItem:(SUAppcastItem * _Nullable)regularItem secondaryUpdate:(SUAppcastItem * __autoreleasing _Nullable *)secondaryUpdate
+- (SUAppcastItem * _Nullable)preferredUpdateForRegularAppcastItem:(SUAppcastItem * _Nullable)regularItem secondaryUpdate:(SUAppcastItem * __autoreleasing _Nullable *)secondaryUpdate __attribute__((objc_direct))
 {
     SUAppcastItem *deltaItem = (regularItem != nil) ? [[self class] deltaUpdateFromAppcastItem:regularItem hostVersion:_host.version] : nil;
     
@@ -219,7 +219,7 @@
     }
 }
 
-- (SUAppcastItem *)retrieveBestAppcastItemFromAppcast:(SUAppcast *)appcast versionComparator:(id<SUVersionComparison>)versionComparator secondaryUpdate:(SUAppcastItem * __autoreleasing _Nullable *)secondaryAppcastItem
+- (SUAppcastItem *)retrieveBestAppcastItemFromAppcast:(SUAppcast *)appcast versionComparator:(id<SUVersionComparison>)versionComparator secondaryUpdate:(SUAppcastItem * __autoreleasing _Nullable *)secondaryAppcastItem __attribute__((objc_direct))
 {
     // Find the best valid update in the appcast by asking the delegate
     // Don't ask the delegate if the appcast has no items though
@@ -256,7 +256,7 @@
     // Take care of finding best appcast item ourselves if delegate does not
     SUAppcastItem *regularItem;
     if (regularItemFromDelegate == nil && !delegateOptedOutOfSelection) {
-        regularItem = [[self class] bestItemFromAppcastItems:appcast.items comparator:versionComparator];
+        regularItem = [SUAppcastDriver bestItemFromAppcastItems:appcast.items comparator:versionComparator];
     } else {
         regularItem = regularItemFromDelegate;
     }
@@ -267,7 +267,7 @@
     return [self preferredUpdateForRegularAppcastItem:regularItem secondaryUpdate:secondaryAppcastItem];
 }
 
-- (void)appcastDidFinishLoading:(SUAppcast *)loadedAppcast inBackground:(BOOL)background
+- (void)appcastDidFinishLoading:(SUAppcast *)loadedAppcast inBackground:(BOOL)background __attribute__((objc_direct))
 {
     id<SUAppcastDriverDelegate> delegate = _delegate;
     [delegate didFinishLoadingAppcast:loadedAppcast];
@@ -290,7 +290,7 @@
         allowedChannels = [NSSet set];
     }
     
-    SUAppcast *macOSAppcast = [[self class] filterAppcast:loadedAppcast forMacOSAndAllowedChannels:allowedChannels];
+    SUAppcast *macOSAppcast = [SUAppcastDriver filterAppcast:loadedAppcast forMacOSAndAllowedChannels:allowedChannels];
     
     id<SUVersionComparison> applicationVersionComparator = [self versionComparator];
     
@@ -304,7 +304,7 @@
     // the minimum autoupdate version. We filter out updates that fail the minimum
     // autoupdate version test because we have a preference over minor updates that can be
     // downloaded and installed with less disturbance
-    SUAppcast *passesMinimumAutoupdateAppcast = [[self class] filterSupportedAppcast:macOSAppcast phasedUpdateGroup:phasedUpdateGroup skippedUpdate:skippedUpdate currentDate:currentDate hostVersion:_host.version versionComparator:applicationVersionComparator testOSVersion:YES testMinimumAutoupdateVersion:YES];
+    SUAppcast *passesMinimumAutoupdateAppcast = [SUAppcastDriver filterSupportedAppcast:macOSAppcast phasedUpdateGroup:phasedUpdateGroup skippedUpdate:skippedUpdate currentDate:currentDate hostVersion:_host.version versionComparator:applicationVersionComparator testOSVersion:YES testMinimumAutoupdateVersion:YES];
     
     SUAppcastItem *secondaryItemPassesMinimumAutoupdate = nil;
     SUAppcastItem *primaryItemPassesMinimumAutoupdate = [self retrieveBestAppcastItemFromAppcast:passesMinimumAutoupdateAppcast versionComparator:applicationVersionComparator secondaryUpdate:&secondaryItemPassesMinimumAutoupdate];
@@ -314,7 +314,7 @@
     SUAppcastItem *finalPrimaryItem;
     SUAppcastItem *finalSecondaryItem = nil;
     if (![self isItemNewer:primaryItemPassesMinimumAutoupdate]) {
-        SUAppcast *failsMinimumAutoupdateAppcast = [[self class] filterSupportedAppcast:macOSAppcast phasedUpdateGroup:phasedUpdateGroup skippedUpdate:skippedUpdate currentDate:currentDate hostVersion:_host.version versionComparator:applicationVersionComparator testOSVersion:YES testMinimumAutoupdateVersion:NO];
+        SUAppcast *failsMinimumAutoupdateAppcast = [SUAppcastDriver filterSupportedAppcast:macOSAppcast phasedUpdateGroup:phasedUpdateGroup skippedUpdate:skippedUpdate currentDate:currentDate hostVersion:_host.version versionComparator:applicationVersionComparator testOSVersion:YES testMinimumAutoupdateVersion:NO];
         
         finalPrimaryItem = [self retrieveBestAppcastItemFromAppcast:failsMinimumAutoupdateAppcast versionComparator:applicationVersionComparator secondaryUpdate:&finalSecondaryItem];
     } else {
@@ -329,7 +329,7 @@
         // Find the latest appcast item that we can report to the user and updater delegates
         // This may include updates that fail due to OS version requirements.
         // This excludes newer backgrounded updates that fail because they are skipped or not in current phased rollout group
-        SUAppcast *notFoundAppcast = [[self class] filterSupportedAppcast:macOSAppcast phasedUpdateGroup:phasedUpdateGroup skippedUpdate:skippedUpdate currentDate:currentDate hostVersion:_host.version versionComparator:applicationVersionComparator testOSVersion:NO testMinimumAutoupdateVersion:NO];
+        SUAppcast *notFoundAppcast = [SUAppcastDriver filterSupportedAppcast:macOSAppcast phasedUpdateGroup:phasedUpdateGroup skippedUpdate:skippedUpdate currentDate:currentDate hostVersion:_host.version versionComparator:applicationVersionComparator testOSVersion:NO testMinimumAutoupdateVersion:NO];
         
         SUAppcastItem *notFoundPrimaryItem = [self retrieveBestAppcastItemFromAppcast:notFoundAppcast versionComparator:applicationVersionComparator secondaryUpdate:nil];
         
@@ -345,7 +345,7 @@
 }
 
 // This method is used by unit tests
-+ (SUAppcast *)filterAppcast:(SUAppcast *)appcast forMacOSAndAllowedChannels:(NSSet<NSString *> *)allowedChannels
++ (SUAppcast *)filterAppcast:(SUAppcast *)appcast forMacOSAndAllowedChannels:(NSSet<NSString *> *)allowedChannels __attribute__((objc_direct))
 {
     return [appcast copyByFilteringItems:^(SUAppcastItem *item) {
         // We will never care about other OS's
@@ -371,7 +371,7 @@
 }
 
 // This method is used by unit tests
-+ (SUAppcast *)filterSupportedAppcast:(SUAppcast *)appcast phasedUpdateGroup:(NSNumber * _Nullable)phasedUpdateGroup skippedUpdate:(SPUSkippedUpdate * _Nullable)skippedUpdate currentDate:(NSDate *)currentDate hostVersion:(NSString *)hostVersion versionComparator:(id<SUVersionComparison>)versionComparator testOSVersion:(BOOL)testOSVersion testMinimumAutoupdateVersion:(BOOL)testMinimumAutoupdateVersion
++ (SUAppcast *)filterSupportedAppcast:(SUAppcast *)appcast phasedUpdateGroup:(NSNumber * _Nullable)phasedUpdateGroup skippedUpdate:(SPUSkippedUpdate * _Nullable)skippedUpdate currentDate:(NSDate *)currentDate hostVersion:(NSString *)hostVersion versionComparator:(id<SUVersionComparison>)versionComparator testOSVersion:(BOOL)testOSVersion testMinimumAutoupdateVersion:(BOOL)testMinimumAutoupdateVersion __attribute__((objc_direct))
 {
     BOOL hostPassesSkippedMajorVersion = [SPUAppcastItemStateResolver isMinimumAutoupdateVersionOK:skippedUpdate.majorVersion hostVersion:hostVersion versionComparator:versionComparator];
     
@@ -407,7 +407,7 @@
 
 // This method is used by unit tests
 // This method should not do *any* filtering, only version comparing
-+ (SUAppcastItem *)bestItemFromAppcastItems:(NSArray *)appcastItems getDeltaItem:(SUAppcastItem * __autoreleasing *)deltaItem withHostVersion:(NSString *)hostVersion comparator:(id<SUVersionComparison>)comparator
++ (SUAppcastItem *)bestItemFromAppcastItems:(NSArray *)appcastItems getDeltaItem:(SUAppcastItem * __autoreleasing *)deltaItem withHostVersion:(NSString *)hostVersion comparator:(id<SUVersionComparison>)comparator __attribute__((objc_direct))
 {
     SUAppcastItem *item = [self bestItemFromAppcastItems:appcastItems comparator:comparator];
     if (item != nil && deltaItem != NULL) {
@@ -416,7 +416,7 @@
     return item;
 }
 
-- (id<SUVersionComparison>)versionComparator
+- (id<SUVersionComparison>)versionComparator __attribute__((objc_direct))
 {
     id<SUVersionComparison> comparator = nil;
     
@@ -434,12 +434,12 @@
     return comparator;
 }
 
-- (BOOL)isItemNewer:(SUAppcastItem *)ui
+- (BOOL)isItemNewer:(SUAppcastItem *)ui __attribute__((objc_direct))
 {
     return ui != nil && [[self versionComparator] compareVersion:_host.version toVersion:ui.versionString] == NSOrderedAscending;
 }
 
-+ (BOOL)item:(SUAppcastItem *)ui containsSkippedUpdate:(SPUSkippedUpdate * _Nullable)skippedUpdate hostPassesSkippedMajorVersion:(BOOL)hostPassesSkippedMajorVersion versionComparator:(id<SUVersionComparison>)versionComparator
++ (BOOL)item:(SUAppcastItem *)ui containsSkippedUpdate:(SPUSkippedUpdate * _Nullable)skippedUpdate hostPassesSkippedMajorVersion:(BOOL)hostPassesSkippedMajorVersion versionComparator:(id<SUVersionComparison>)versionComparator __attribute__((objc_direct))
 {
     NSString *skippedMajorVersion = skippedUpdate.majorVersion;
     NSString *skippedMajorSubreleaseVersion = skippedUpdate.majorSubreleaseVersion;
@@ -462,7 +462,7 @@
     return NO;
 }
 
-+ (BOOL)itemIsReadyForPhasedRollout:(SUAppcastItem *)ui phasedUpdateGroup:(NSNumber * _Nullable)phasedUpdateGroup currentDate:(NSDate *)currentDate hostVersion:(NSString *)hostVersion versionComparator:(id<SUVersionComparison>)versionComparator
++ (BOOL)itemIsReadyForPhasedRollout:(SUAppcastItem *)ui phasedUpdateGroup:(NSNumber * _Nullable)phasedUpdateGroup currentDate:(NSDate *)currentDate hostVersion:(NSString *)hostVersion versionComparator:(id<SUVersionComparison>)versionComparator __attribute__((objc_direct))
 {
     if (phasedUpdateGroup == nil || ui.criticalUpdate) {
         return YES;

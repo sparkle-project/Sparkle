@@ -13,13 +13,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface StatusInfo : NSObject <SUStatusInfoProtocol>
 
-- (instancetype)initWithHostBundleIdentifier:(NSString *)bundleIdentifier;
+- (instancetype)initWithHostBundleIdentifier:(NSString *)bundleIdentifier __attribute__((objc_direct));
 
-@property (nonatomic, nullable) NSData *installationInfoData;
+@property (nonatomic, nullable, direct) NSData *installationInfoData;
 
-- (void)startListener;
+- (void)startListener __attribute__((objc_direct));
 
-- (void)invalidate;
+- (void)invalidate __attribute__((objc_direct));
 
 @end
 

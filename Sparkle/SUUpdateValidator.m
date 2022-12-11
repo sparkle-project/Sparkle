@@ -140,7 +140,7 @@
  *  * old and new Code Signing identity are the same and valid
  *
  */
-- (BOOL)validateUpdateForHost:(SUHost *)host downloadedToPath:(NSString *)downloadedPath newBundleURL:(NSURL *)newBundleURL signatures:(SUSignatures *)signatures error:(NSError * __autoreleasing *)error
+- (BOOL)validateUpdateForHost:(SUHost *)host downloadedToPath:(NSString *)downloadedPath newBundleURL:(NSURL *)newBundleURL signatures:(SUSignatures *)signatures error:(NSError * __autoreleasing *)error __attribute__((objc_direct))
 {
     NSBundle *newBundle = [NSBundle bundleWithURL:newBundleURL];
     if (newBundle == nil) {

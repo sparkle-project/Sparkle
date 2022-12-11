@@ -83,7 +83,7 @@
     _updateWillInstallHandler = [updateWillInstallHandler copy];
 }
 
-- (void)_reportInstallerError:(nullable NSError *)currentInstallerError genericErrorCode:(NSInteger)genericErrorCode genericUserInfo:(NSDictionary *)genericUserInfo
+- (void)_reportInstallerError:(nullable NSError *)currentInstallerError genericErrorCode:(NSInteger)genericErrorCode genericUserInfo:(NSDictionary *)genericUserInfo __attribute__((objc_direct))
 {
     // First see if there is a good custom error we can show
     // We only check for signing validation errors and installation errors due to not having write permission currently
@@ -140,7 +140,7 @@
     [_delegate installerIsRequestingAbortInstallWithError:installerError];
 }
 
-- (void)setUpConnection
+- (void)setUpConnection __attribute__((objc_direct))
 {
     if (_installerConnection != nil) {
         return;
@@ -204,7 +204,7 @@
     _systemDomain = systemDomain;
 }
 
-- (void)sendInstallationData
+- (void)sendInstallationData __attribute__((objc_direct))
 {
     NSString *pathToRelaunch = _applicationBundle.bundlePath;
     // Give the delegate one more chance for determining the path to relaunch via a private API used by SUUpdater
@@ -256,7 +256,7 @@
     });
 }
 
-- (void)_handleMessageWithIdentifier:(int32_t)identifier data:(NSData *)data
+- (void)_handleMessageWithIdentifier:(int32_t)identifier data:(NSData *)data __attribute__((objc_direct))
 {
     if (!SPUInstallerMessageTypeIsLegal(_currentStage, identifier)) {
         SULog(SULogLevelError, @"Error: received out of order message with current stage: %d, requested stage: %d", _currentStage, identifier);
@@ -346,7 +346,7 @@
     }
 }
 
-- (void)launchAutoUpdateSilently:(BOOL)silently completion:(void (^)(NSError *_Nullable))completionHandler
+- (void)launchAutoUpdateSilently:(BOOL)silently completion:(void (^)(NSError *_Nullable))completionHandler __attribute__((objc_direct))
 {
     id<SUInstallerLauncherProtocol> installerLauncher;
     
@@ -468,7 +468,7 @@
     }];
 }
 
-- (BOOL)mayUpdateAndRestart
+- (BOOL)mayUpdateAndRestart __attribute__((objc_direct))
 {
     id<SPUUpdaterDelegate> updaterDelegate = _updaterDelegate;
     return (!updaterDelegate || ![updaterDelegate respondsToSelector:@selector((updaterShouldRelaunchApplication:))] || [updaterDelegate updaterShouldRelaunchApplication:_updater]);

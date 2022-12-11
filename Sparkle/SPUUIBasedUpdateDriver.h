@@ -29,19 +29,19 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface SPUUIBasedUpdateDriver : NSObject
 
-- (instancetype)initWithHost:(SUHost *)host applicationBundle:(NSBundle *)applicationBundle updater:(id)updater userDriver:(id <SPUUserDriver>)userDriver userInitiated:(BOOL)userInitiated updaterDelegate:(nullable id <SPUUpdaterDelegate>)updaterDelegate delegate:(id<SPUUIBasedUpdateDriverDelegate>)delegate;
+- (instancetype)initWithHost:(SUHost *)host applicationBundle:(NSBundle *)applicationBundle updater:(id)updater userDriver:(id <SPUUserDriver>)userDriver userInitiated:(BOOL)userInitiated updaterDelegate:(nullable id <SPUUpdaterDelegate>)updaterDelegate delegate:(id<SPUUIBasedUpdateDriverDelegate>)delegate __attribute__((objc_direct));
 
-- (void)setCompletionHandler:(SPUUpdateDriverCompletion)completionBlock;
+- (void)setCompletionHandler:(SPUUpdateDriverCompletion)completionBlock __attribute__((objc_direct));
 
-- (void)setUpdateWillInstallHandler:(void (^)(void))updateWillInstallHandler;
+- (void)setUpdateWillInstallHandler:(void (^)(void))updateWillInstallHandler __attribute__((objc_direct));
 
-- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background;
+- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background __attribute__((objc_direct));
 
-- (void)resumeInstallingUpdate;
+- (void)resumeInstallingUpdate __attribute__((objc_direct));
 
-- (void)resumeUpdate:(id<SPUResumableUpdate>)resumableUpdate;
+- (void)resumeUpdate:(id<SPUResumableUpdate>)resumableUpdate __attribute__((objc_direct));
 
-- (void)abortUpdateWithError:(nullable NSError *)error showErrorToUser:(BOOL)showedUserProgress;
+- (void)abortUpdateWithError:(nullable NSError *)error showErrorToUser:(BOOL)showedUserProgress __attribute__((objc_direct));
 
 @end
 

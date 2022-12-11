@@ -14,11 +14,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface SPUCommandLineDriver : NSObject
 
-- (nullable instancetype)initWithUpdateBundlePath:(NSString *)updateBundlePath applicationBundlePath:(nullable NSString *)applicationBundlePath allowedChannels:(NSSet<NSString *> *)allowedChannels customFeedURL:(nullable NSString *)customFeedURL userAgentName:(nullable NSString *)userAgentName updatePermissionResponse:(nullable SUUpdatePermissionResponse *)updatePermissionResponse deferInstallation:(BOOL)deferInstallation interactiveInstallation:(BOOL)interactiveInstallation allowMajorUpgrades:(BOOL)allowMajorUpgrades verbose:(BOOL)verbose;
+- (nullable instancetype)initWithUpdateBundlePath:(NSString *)updateBundlePath applicationBundlePath:(nullable NSString *)applicationBundlePath allowedChannels:(NSSet<NSString *> *)allowedChannels customFeedURL:(nullable NSString *)customFeedURL userAgentName:(nullable NSString *)userAgentName updatePermissionResponse:(nullable SUUpdatePermissionResponse *)updatePermissionResponse deferInstallation:(BOOL)deferInstallation interactiveInstallation:(BOOL)interactiveInstallation allowMajorUpgrades:(BOOL)allowMajorUpgrades verbose:(BOOL)verbose __attribute__((objc_direct));
 
-- (void)runAndCheckForUpdatesNow:(BOOL)checkForUpdatesNow;
+- (void)runAndCheckForUpdatesNow:(BOOL)checkForUpdatesNow __attribute__((objc_direct));
 
-- (void)probeForUpdates;
+- (void)probeForUpdates __attribute__((objc_direct));
 
 @end
 

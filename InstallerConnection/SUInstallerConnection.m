@@ -44,7 +44,7 @@ static NSString *SUInstallerConnectionKeepAliveReason = @"Installer Connection K
     return self;
 }
 
-- (void)enableAutomaticTermination
+- (void)enableAutomaticTermination __attribute__((objc_direct))
 {
     if (_disabledAutomaticTermination) {
         [[NSProcessInfo processInfo] enableAutomaticTermination:SUInstallerConnectionKeepAliveReason];
@@ -52,7 +52,7 @@ static NSString *SUInstallerConnectionKeepAliveReason = @"Installer Connection K
     }
 }
 
-- (void)_setInvalidationHandler:(void (^)(void))invalidationHandler
+- (void)_setInvalidationHandler:(void (^)(void))invalidationHandler __attribute__((objc_direct))
 {
     _invalidationBlock = [invalidationHandler copy];
     
@@ -71,7 +71,7 @@ static NSString *SUInstallerConnectionKeepAliveReason = @"Installer Connection K
     }
 }
 
-- (void)_setServiceName:(NSString *)serviceName systemDomain:(BOOL)systemDomain
+- (void)_setServiceName:(NSString *)serviceName systemDomain:(BOOL)systemDomain __attribute__((objc_direct))
 {
     NSXPCConnectionOptions options = systemDomain ? NSXPCConnectionPrivileged : 0;
     NSXPCConnection *connection = [[NSXPCConnection alloc] initWithMachServiceName:serviceName options:options];
@@ -128,7 +128,7 @@ static NSString *SUInstallerConnectionKeepAliveReason = @"Installer Connection K
     }
 }
 
-- (void)_invalidate
+- (void)_invalidate __attribute__((objc_direct))
 {
     if (_invalidationBlock != nil) {
         _invalidationBlock();

@@ -326,7 +326,7 @@ static NSString *SUAppcastItemDeltaFromSparkleLocalesKey = @"SUAppcastItemDeltaF
 }
 
 // Initializer used for making delta items
-- (nullable instancetype)initWithDictionary:(NSDictionary *)dict relativeToURL:(NSURL * _Nullable)appcastURL state:(SPUAppcastItemState * _Nullable)state
+- (nullable instancetype)initWithDictionary:(NSDictionary *)dict relativeToURL:(NSURL * _Nullable)appcastURL state:(SPUAppcastItemState * _Nullable)state __attribute__((objc_direct))
 {
     return [self initWithDictionary:dict relativeToURL:nil stateResolver:nil resolvedState:state failureReason:nil];
 }

@@ -15,13 +15,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface SUInstaller : NSObject
 
-+ (nullable id<SUInstallerProtocol>)installerForHost:(SUHost *)host expectedInstallationType:(NSString *)expectedInstallationType updateDirectory:(NSString *)updateDirectory homeDirectory:(NSString *)homeDirectory userName:(NSString *)userName error:(NSError **)error;
++ (nullable id<SUInstallerProtocol>)installerForHost:(SUHost *)host expectedInstallationType:(NSString *)expectedInstallationType updateDirectory:(NSString *)updateDirectory homeDirectory:(NSString *)homeDirectory userName:(NSString *)userName error:(NSError **)error __attribute__((objc_direct));
 
 + (nullable NSString *)installSourcePathInUpdateFolder:(NSString *)inUpdateFolder forHost:(SUHost *)host
 #if SPARKLE_BUILD_PACKAGE_SUPPORT
                                              isPackage:(BOOL *)isPackagePtr isGuided:(nullable BOOL *)isGuidedPtr
 #endif
-;
+__attribute__((objc_direct));
 
 @end
 
