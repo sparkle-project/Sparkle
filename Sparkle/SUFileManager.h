@@ -16,7 +16,10 @@ NS_ASSUME_NONNULL_BEGIN
  * All operations on this class may be used on thread other than the main thread.
  * This class provides just basic file operations and stays away from including much application-level logic.
  */
-SPU_OBJC_DIRECT_MEMBERS @interface SUFileManager : NSObject
+#ifndef BUILDING_SPARKLE_TESTS
+SPU_OBJC_DIRECT_MEMBERS
+#endif
+@interface SUFileManager : NSObject
 
 /**
  * Creates a temporary directory on the same volume as a provided URL

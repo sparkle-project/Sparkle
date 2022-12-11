@@ -11,7 +11,11 @@
 
 #import <Foundation/Foundation.h>
 
+#if defined(BUILDING_SPARKLE_TESTS)
+#import "SUExport.h"
+#else
 #import <Sparkle/SUExport.h>
+#endif
 
 NS_ASSUME_NONNULL_BEGIN
 

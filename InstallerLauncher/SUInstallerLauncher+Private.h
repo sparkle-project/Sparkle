@@ -9,10 +9,14 @@
 #ifndef SUInstallerLauncher_Private_h
 #define SUInstallerLauncher_Private_h
 
+#if defined(BUILDING_SPARKLE_TESTS)
+#import "SUExport.h"
+#import "SPUInstallationType.h"
+#else
 #import <Sparkle/SUExport.h>
-
 // Chances are clients will need this too
 #import <Sparkle/SPUInstallationType.h>
+#endif
 
 @class NSString;
 

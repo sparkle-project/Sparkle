@@ -32,7 +32,7 @@
     [super tearDown];
 }
 
-#if __clang_major__ >= 6
+#if SPARKLE_BUILD_PACKAGE_SUPPORT
 - (void)testInstallIfRoot
 {
     uid_t uid = getuid();

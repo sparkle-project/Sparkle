@@ -7,8 +7,14 @@
 //
 
 #import <Foundation/Foundation.h>
+
+#if defined(BUILDING_SPARKLE_TESTS)
+#import "SUExport.h"
+#import "SPUUserDriver.h"
+#else
 #import <Sparkle/SUExport.h>
 #import <Sparkle/SPUUserDriver.h>
+#endif
 
 NS_ASSUME_NONNULL_BEGIN
 

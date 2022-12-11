@@ -7,7 +7,12 @@
 //
 
 #import <Foundation/Foundation.h>
+
+#if defined(BUILDING_SPARKLE_TESTS)
+#import "SUExport.h"
+#else
 #import <Sparkle/SUExport.h>
+#endif
 
 @protocol SUVersionComparison, SUVersionDisplay;
 @class SUUpdater, SUAppcast, SUAppcastItem;

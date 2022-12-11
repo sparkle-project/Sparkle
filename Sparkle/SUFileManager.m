@@ -37,7 +37,10 @@ static char SUAppleQuarantineIdentifier[] = "com.apple.quarantine";
 
 // -[NSFileManager attributesOfItemAtPath:error:] won't follow symbolic links
 
-- (BOOL)_itemExistsAtURL:(NSURL *)fileURL SPU_OBJC_DIRECT
+- (BOOL)_itemExistsAtURL:(NSURL *)fileURL
+#ifndef BUILDING_SPARKLE_TESTS
+SPU_OBJC_DIRECT
+#endif
 {
     NSString *path = fileURL.path;
     if (path == nil) {
@@ -46,7 +49,10 @@ static char SUAppleQuarantineIdentifier[] = "com.apple.quarantine";
     return [_fileManager attributesOfItemAtPath:path error:NULL] != nil;
 }
 
-- (BOOL)_itemExistsAtURL:(NSURL *)fileURL isDirectory:(BOOL *)isDirectory SPU_OBJC_DIRECT
+- (BOOL)_itemExistsAtURL:(NSURL *)fileURL isDirectory:(BOOL *)isDirectory
+#ifndef BUILDING_SPARKLE_TESTS
+SPU_OBJC_DIRECT
+#endif
 {
     NSString *path = fileURL.path;
     if (path == nil) {

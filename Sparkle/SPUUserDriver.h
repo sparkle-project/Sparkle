@@ -8,8 +8,13 @@
 
 #import <Foundation/Foundation.h>
 
+#if defined(BUILDING_SPARKLE_TESTS)
+#import "SPUUserUpdateState.h"
+#import "SUExport.h"
+#else
 #import <Sparkle/SPUUserUpdateState.h>
 #import <Sparkle/SUExport.h>
+#endif
 
 NS_ASSUME_NONNULL_BEGIN
 

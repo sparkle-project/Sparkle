@@ -475,7 +475,11 @@ static NSString *SUAppcastItemDeltaFromSparkleLocalesKey = @"SUAppcastItemDeltaF
             }
         }
         if (enclosure) {
-            _signatures = [[SUSignatures alloc] initWithDsa:[enclosure objectForKey:SUAppcastAttributeDSASignature] ed:[enclosure objectForKey:SUAppcastAttributeEDSignature]];
+            _signatures = [[SUSignatures alloc] initWithEd:[enclosure objectForKey:SUAppcastAttributeEDSignature]
+#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
+                                                       dsa:[enclosure objectForKey:SUAppcastAttributeDSASignature]
+#endif
+            ];
             _osString = [enclosure objectForKey:SUAppcastAttributeOsType];
         }
 

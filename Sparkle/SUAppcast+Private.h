@@ -8,6 +8,12 @@
 
 #import <Foundation/Foundation.h>
 
+#ifdef BUILDING_SPARKLE_TESTS
+#import "SUAppcast.h"
+#else
+#import <Sparkle/SUAppcast.h>
+#endif
+
 NS_ASSUME_NONNULL_BEGIN
 
 @class SPUAppcastItemStateResolver;

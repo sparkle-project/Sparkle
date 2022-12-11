@@ -154,13 +154,29 @@
 
     SUHost *newHost = [[SUHost alloc] initWithBundle:newBundle];
     SUPublicKeys *newPublicKeys = newHost.publicKeys;
+#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
     BOOL oldHasLegacyDSAKey = publicKeys.dsaPubKeyStatus != SUSigningInputStatusAbsent;
+#endif
     BOOL oldHasEdDSAKey = publicKeys.ed25519PubKeyStatus != SUSigningInputStatusAbsent;
+#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
     BOOL oldHasAnyDSAKey = oldHasLegacyDSAKey || oldHasEdDSAKey;
+#else
+    BOOL oldHasAnyDSAKey = oldHasEdDSAKey;
+#endif
+#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
     BOOL newHasLegacyDSAKey = newPublicKeys.dsaPubKeyStatus != SUSigningInputStatusAbsent;
+#endif
     BOOL newHasEdDSAKey = newPublicKeys.ed25519PubKeyStatus != SUSigningInputStatusAbsent;
+#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
     BOOL newHasAnyDSAKey = newHasLegacyDSAKey || newHasEdDSAKey;
+#else
+    BOOL newHasAnyDSAKey = newHasEdDSAKey;
+#endif
+#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
     BOOL migratesDSAKeys = oldHasLegacyDSAKey && !oldHasEdDSAKey && newHasEdDSAKey && !newHasLegacyDSAKey;
+#else
+    BOOL migratesDSAKeys = NO;
+#endif
     BOOL updateIsCodeSigned = [SUCodeSigningVerifier bundleAtURLIsCodeSigned:newHost.bundle.bundleURL];
     BOOL hostIsCodeSigned = [SUCodeSigningVerifier bundleAtURLIsCodeSigned:host.bundle.bundleURL];
 

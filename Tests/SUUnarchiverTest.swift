@@ -130,6 +130,7 @@ class SUUnarchiverTest: XCTestCase
         self.unarchiveTestAppWithExtension("dmg", resourceName: "SparkleTestCodeSign_apfs")
     }
     
+#if SPARKLE_BUILD_PACKAGE_SUPPORT
     func testUnarchivingFlatPackage()
     {
         self.unarchiveTestAppWithExtension("pkg", resourceName: "test", expectingInstallationType: SPUInstallationTypeGuidedPackage)
@@ -138,4 +139,5 @@ class SUUnarchiverTest: XCTestCase
         
         self.unarchiveTestAppWithExtension("pkg", resourceName: "test", expectingInstallationType: SPUInstallationTypeApplication, expectingSuccess: false)
     }
+#endif
 }

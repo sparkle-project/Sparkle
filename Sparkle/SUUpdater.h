@@ -10,10 +10,18 @@
 #define SUUPDATER_H
 
 #import <Foundation/Foundation.h>
+
+#if defined(BUILDING_SPARKLE_TESTS)
+#import "SUExport.h"
+#import "SUVersionComparisonProtocol.h"
+#import "SUVersionDisplayProtocol.h"
+#import "SUUpdaterDelegate.h"
+#else
 #import <Sparkle/SUExport.h>
 #import <Sparkle/SUVersionComparisonProtocol.h>
 #import <Sparkle/SUVersionDisplayProtocol.h>
 #import <Sparkle/SUUpdaterDelegate.h>
+#endif
 
 @class SUAppcastItem, SUAppcast, NSMenuItem;
 

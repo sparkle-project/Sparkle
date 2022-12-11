@@ -8,8 +8,13 @@
 #ifndef SPUStandardUserDriver_Private_h
 #define SPUStandardUserDriver_Private_h
 
+#if defined(BUILDING_SPARKLE_TESTS)
+#import "SPUStandardUserDriver.h"
+#import "SUExport.h"
+#else
 #import <Sparkle/SPUStandardUserDriver.h>
 #import <Sparkle/SUExport.h>
+#endif
 
 @class NSWindowController;
 

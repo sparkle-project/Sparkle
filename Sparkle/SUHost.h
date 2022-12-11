@@ -11,7 +11,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class SUPublicKeys;
 
-SPU_OBJC_DIRECT_MEMBERS @interface SUHost : NSObject
+#ifndef BUILDING_SPARKLE_TESTS
+SPU_OBJC_DIRECT_MEMBERS
+#endif
+@interface SUHost : NSObject
 
 @property (nonatomic, readonly) NSBundle *bundle;
 
@@ -28,7 +31,9 @@ SPU_OBJC_DIRECT_MEMBERS @interface SUHost : NSObject
 
 @property (getter=isRunningOnReadOnlyVolume, nonatomic, readonly) BOOL runningOnReadOnlyVolume;
 @property (getter=isRunningTranslocated, nonatomic, readonly) BOOL runningTranslocated;
+#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
 @property (readonly, nonatomic, copy, nullable) NSString *publicDSAKeyFileKey;
+#endif
 
 - (nullable id)objectForInfoDictionaryKey:(NSString *)key;
 - (BOOL)boolForInfoDictionaryKey:(NSString *)key;

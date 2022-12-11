@@ -344,8 +344,11 @@
     }
 }
 
-// This method is used by unit tests
-+ (SUAppcast *)filterAppcast:(SUAppcast *)appcast forMacOSAndAllowedChannels:(NSSet<NSString *> *)allowedChannels SPU_OBJC_DIRECT
+// Note: This method is used by unit tests
++ (SUAppcast *)filterAppcast:(SUAppcast *)appcast forMacOSAndAllowedChannels:(NSSet<NSString *> *)allowedChannels
+#ifndef BUILDING_SPARKLE_TESTS
+SPU_OBJC_DIRECT
+#endif
 {
     return [appcast copyByFilteringItems:^(SUAppcastItem *item) {
         // We will never care about other OS's
@@ -370,8 +373,11 @@
     }];
 }
 
-// This method is used by unit tests
-+ (SUAppcast *)filterSupportedAppcast:(SUAppcast *)appcast phasedUpdateGroup:(NSNumber * _Nullable)phasedUpdateGroup skippedUpdate:(SPUSkippedUpdate * _Nullable)skippedUpdate currentDate:(NSDate *)currentDate hostVersion:(NSString *)hostVersion versionComparator:(id<SUVersionComparison>)versionComparator testOSVersion:(BOOL)testOSVersion testMinimumAutoupdateVersion:(BOOL)testMinimumAutoupdateVersion SPU_OBJC_DIRECT
+// Note: This method is used by unit tests
++ (SUAppcast *)filterSupportedAppcast:(SUAppcast *)appcast phasedUpdateGroup:(NSNumber * _Nullable)phasedUpdateGroup skippedUpdate:(SPUSkippedUpdate * _Nullable)skippedUpdate currentDate:(NSDate *)currentDate hostVersion:(NSString *)hostVersion versionComparator:(id<SUVersionComparison>)versionComparator testOSVersion:(BOOL)testOSVersion testMinimumAutoupdateVersion:(BOOL)testMinimumAutoupdateVersion
+#ifndef BUILDING_SPARKLE_TESTS
+SPU_OBJC_DIRECT
+#endif
 {
     BOOL hostPassesSkippedMajorVersion = [SPUAppcastItemStateResolver isMinimumAutoupdateVersionOK:skippedUpdate.majorVersion hostVersion:hostVersion versionComparator:versionComparator];
     
@@ -405,9 +411,12 @@
     return item;
 }
 
-// This method is used by unit tests
+// Note: this method is used by unit tests
 // This method should not do *any* filtering, only version comparing
-+ (SUAppcastItem *)bestItemFromAppcastItems:(NSArray *)appcastItems getDeltaItem:(SUAppcastItem * __autoreleasing *)deltaItem withHostVersion:(NSString *)hostVersion comparator:(id<SUVersionComparison>)comparator SPU_OBJC_DIRECT
++ (SUAppcastItem *)bestItemFromAppcastItems:(NSArray *)appcastItems getDeltaItem:(SUAppcastItem * __autoreleasing *)deltaItem withHostVersion:(NSString *)hostVersion comparator:(id<SUVersionComparison>)comparator
+#ifndef BUILDING_SPARKLE_TESTS
+SPU_OBJC_DIRECT
+#endif
 {
     SUAppcastItem *item = [self bestItemFromAppcastItems:appcastItems comparator:comparator];
     if (item != nil && deltaItem != NULL) {

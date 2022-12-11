@@ -301,6 +301,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     
     SUPublicKeys *publicKeys = _host.publicKeys;
     BOOL hasAnyPublicKey = publicKeys.hasAnyKeys;
+#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
     if (!hasAnyPublicKey) {
         // If we failed to retrieve a DSA key but the bundle specifies a path to one, we should consider this a configuration failure
         NSString *publicDSAKeyFileKey = [_host publicDSAKeyFileKey];
@@ -311,6 +312,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
             return NO;
         }
     }
+#endif
     
     // Don't allow invalid EdDSA public keys
     if (publicKeys.ed25519PubKeyStatus == SUSigningInputStatusInvalid) {

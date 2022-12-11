@@ -11,7 +11,10 @@
 
 #import <Foundation/Foundation.h>
 
-SPU_OBJC_DIRECT_MEMBERS @interface SUCodeSigningVerifier : NSObject
+#ifndef BUILDING_SPARKLE_TESTS
+SPU_OBJC_DIRECT_MEMBERS
+#endif
+@interface SUCodeSigningVerifier : NSObject
 
 + (BOOL)codeSignatureAtBundleURL:(NSURL *)oldBundleURL matchesSignatureAtBundleURL:(NSURL *)newBundleURL error:(NSError  **)error;
 
