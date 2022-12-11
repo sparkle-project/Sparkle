@@ -14,11 +14,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class SUHost, NSImage, NSApplication;
 
-@interface SUApplicationInfo : NSObject
+__attribute__((objc_direct_members)) @interface SUApplicationInfo : NSObject
 
-+ (BOOL)isBackgroundApplication:(NSApplication *)application __attribute__((objc_direct));
++ (BOOL)isBackgroundApplication:(NSApplication *)application;
 
-+ (NSImage *)bestIconForHost:(SUHost *)host __attribute__((objc_direct));
++ (NSImage *)bestIconForHost:(SUHost *)host;
 
 @end
 

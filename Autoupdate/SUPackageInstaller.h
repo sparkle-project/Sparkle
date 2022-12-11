@@ -14,9 +14,9 @@
 // This is the deprecated package installation type, aka the "interactive" package installer
 // For a more supported package installation, see SUGuidedPackageInstaller
 
-@interface SUPackageInstaller : NSObject <SUInstallerProtocol>
+__attribute__((objc_direct_members)) @interface SUPackageInstaller : NSObject <SUInstallerProtocol>
 
-- (instancetype)initWithPackagePath:(NSString *)packagePath __attribute__((objc_direct));
+- (instancetype)initWithPackagePath:(NSString *)packagePath;
 
 @end
 

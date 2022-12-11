@@ -11,9 +11,9 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface SPUCommandLineUserDriver : NSObject <SPUUserDriver>
+__attribute__((objc_direct_members)) @interface SPUCommandLineUserDriver : NSObject <SPUUserDriver>
 
-- (instancetype)initWithUpdatePermissionResponse:(nullable SUUpdatePermissionResponse *)updatePermissionResponse deferInstallation:(BOOL)deferInstallation verbose:(BOOL)verbose __attribute__((objc_direct));
+- (instancetype)initWithUpdatePermissionResponse:(nullable SUUpdatePermissionResponse *)updatePermissionResponse deferInstallation:(BOOL)deferInstallation verbose:(BOOL)verbose;
 
 @end
 

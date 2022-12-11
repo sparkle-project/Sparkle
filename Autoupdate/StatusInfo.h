@@ -11,15 +11,15 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface StatusInfo : NSObject <SUStatusInfoProtocol>
+__attribute__((objc_direct_members)) @interface StatusInfo : NSObject <SUStatusInfoProtocol>
 
-- (instancetype)initWithHostBundleIdentifier:(NSString *)bundleIdentifier __attribute__((objc_direct));
+- (instancetype)initWithHostBundleIdentifier:(NSString *)bundleIdentifier;
 
-@property (nonatomic, nullable, direct) NSData *installationInfoData;
+@property (nonatomic, nullable) NSData *installationInfoData;
 
-- (void)startListener __attribute__((objc_direct));
+- (void)startListener;
 
-- (void)invalidate __attribute__((objc_direct));
+- (void)invalidate;
 
 @end
 

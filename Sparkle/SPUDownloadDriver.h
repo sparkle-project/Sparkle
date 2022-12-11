@@ -34,22 +34,22 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface SPUDownloadDriver : NSObject
+__attribute__((objc_direct_members)) @interface SPUDownloadDriver : NSObject
 
-- (instancetype)initWithRequestURL:(NSURL *)requestURL host:(SUHost *)host userAgent:(NSString * _Nullable)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background delegate:(id<SPUDownloadDriverDelegate>)delegate __attribute__((objc_direct));
+- (instancetype)initWithRequestURL:(NSURL *)requestURL host:(SUHost *)host userAgent:(NSString * _Nullable)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background delegate:(id<SPUDownloadDriverDelegate>)delegate;
 
-- (instancetype)initWithUpdateItem:(SUAppcastItem *)updateItem secondaryUpdateItem:(SUAppcastItem * _Nullable)secondaryUpdateItem host:(SUHost *)host userAgent:(NSString * _Nullable)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background delegate:(id<SPUDownloadDriverDelegate>)delegate __attribute__((objc_direct));
+- (instancetype)initWithUpdateItem:(SUAppcastItem *)updateItem secondaryUpdateItem:(SUAppcastItem * _Nullable)secondaryUpdateItem host:(SUHost *)host userAgent:(NSString * _Nullable)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background delegate:(id<SPUDownloadDriverDelegate>)delegate;
 
-- (instancetype)initWithHost:(SUHost *)host __attribute__((objc_direct));
+- (instancetype)initWithHost:(SUHost *)host;
 
-- (void)downloadFile __attribute__((objc_direct));
+- (void)downloadFile;
 
-- (void)removeDownloadedUpdate:(SPUDownloadedUpdate *)downloadedUpdate __attribute__((objc_direct));
+- (void)removeDownloadedUpdate:(SPUDownloadedUpdate *)downloadedUpdate;
 
-@property (nonatomic, readonly, direct) NSMutableURLRequest *request;
-@property (nonatomic, readonly, direct) BOOL inBackground;
+@property (nonatomic, readonly) NSMutableURLRequest *request;
+@property (nonatomic, readonly) BOOL inBackground;
 
-- (void)cleanup:(void (^)(void))completionHandler __attribute__((objc_direct));
+- (void)cleanup:(void (^)(void))completionHandler;
 
 @end
 

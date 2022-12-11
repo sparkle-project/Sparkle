@@ -19,13 +19,13 @@
 @class SUSignatures;
 @class SUPublicKeys;
 
-@interface SUSignatureVerifier : NSObject
+__attribute__((objc_direct_members)) @interface SUSignatureVerifier : NSObject
 
-+ (BOOL)validatePath:(NSString *)path withSignatures:(SUSignatures *)signatures withPublicKeys:(SUPublicKeys *)pkeys error:(NSError * __autoreleasing *)error __attribute__((objc_direct));
++ (BOOL)validatePath:(NSString *)path withSignatures:(SUSignatures *)signatures withPublicKeys:(SUPublicKeys *)pkeys error:(NSError * __autoreleasing *)error;
 
-- (instancetype)initWithPublicKeys:(SUPublicKeys *)pkeys __attribute__((objc_direct));
+- (instancetype)initWithPublicKeys:(SUPublicKeys *)pkeys;
 
-- (BOOL)verifyFileAtPath:(NSString *)path signatures:(SUSignatures *)signatures error:(NSError * __autoreleasing *)error __attribute__((objc_direct));
+- (BOOL)verifyFileAtPath:(NSString *)path signatures:(SUSignatures *)signatures error:(NSError * __autoreleasing *)error;
 
 @end
 

@@ -13,15 +13,15 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface SUUpdateValidator : NSObject
+__attribute__((objc_direct_members)) @interface SUUpdateValidator : NSObject
 
-- (instancetype)initWithDownloadPath:(NSString *)downloadPath signatures:(SUSignatures *)signatures host:(SUHost *)host __attribute__((objc_direct));
+- (instancetype)initWithDownloadPath:(NSString *)downloadPath signatures:(SUSignatures *)signatures host:(SUHost *)host;
 
 // This is "pre" validation, before the archive has been extracted
-- (BOOL)validateDownloadPathWithError:(NSError **)error __attribute__((objc_direct));
+- (BOOL)validateDownloadPathWithError:(NSError **)error;
 
 // This is "post" validation, after an archive has been extracted
-- (BOOL)validateWithUpdateDirectory:(NSString *)updateDirectory error:(NSError **)error __attribute__((objc_direct));
+- (BOOL)validateWithUpdateDirectory:(NSString *)updateDirectory error:(NSError **)error;
 
 @end
 

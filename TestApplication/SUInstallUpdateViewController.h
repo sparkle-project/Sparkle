@@ -9,10 +9,10 @@
 #import <Cocoa/Cocoa.h>
 #import <Sparkle/Sparkle.h>
 
-@interface SUInstallUpdateViewController : NSViewController
+__attribute__((objc_direct_members)) @interface SUInstallUpdateViewController : NSViewController
 
-- (instancetype)initWithAppcastItem:(SUAppcastItem *)appcastItem reply:(void (^)(SPUUserUpdateChoice))reply __attribute__((objc_direct));
+- (instancetype)initWithAppcastItem:(SUAppcastItem *)appcastItem reply:(void (^)(SPUUserUpdateChoice))reply;
 
-- (void)showReleaseNotesWithDownloadData:(SPUDownloadData *)downloadData __attribute__((objc_direct));
+- (void)showReleaseNotesWithDownloadData:(SPUDownloadData *)downloadData;
 
 @end

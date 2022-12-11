@@ -14,11 +14,11 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface SUBinaryDeltaUnarchiver : NSObject <SUUnarchiverProtocol>
+__attribute__((objc_direct_members)) @interface SUBinaryDeltaUnarchiver : NSObject <SUUnarchiverProtocol>
 
 - (instancetype)initWithArchivePath:(NSString *)archivePath updateHostBundlePath:(NSString *)updateHostBundlePath;
 
-+ (BOOL)canUnarchivePath:(NSString *)path __attribute__((objc_direct));
++ (BOOL)canUnarchivePath:(NSString *)path;
 
 @end
 

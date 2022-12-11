@@ -13,10 +13,10 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface SUXPCInstallerConnection : NSObject <SUInstallerConnectionProtocol>
+__attribute__((objc_direct_members)) @interface SUXPCInstallerConnection : NSObject <SUInstallerConnectionProtocol>
 
 // Due to XPC reasons, this delegate is strongly referenced, until it's invalidated
-- (instancetype)initWithDelegate:(id<SUInstallerCommunicationProtocol>)delegate __attribute__((objc_direct));
+- (instancetype)initWithDelegate:(id<SUInstallerCommunicationProtocol>)delegate;
 
 @end
 

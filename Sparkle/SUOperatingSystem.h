@@ -7,8 +7,8 @@
 
 #import <Foundation/Foundation.h>
 
-@interface SUOperatingSystem : NSObject
+__attribute__((objc_direct_members)) @interface SUOperatingSystem : NSObject
 
-+ (NSString *)systemVersionString __attribute__((objc_direct));
++ (NSString *)systemVersionString;
 
 @end

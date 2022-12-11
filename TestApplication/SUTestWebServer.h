@@ -8,10 +8,10 @@
 
 #import <Foundation/Foundation.h>
 
-@interface SUTestWebServer : NSObject
+__attribute__((objc_direct_members)) @interface SUTestWebServer : NSObject
 
-- (instancetype)initWithPort:(int)port workingDirectory:(NSString*)workingDirectory __attribute__((objc_direct));
+- (instancetype)initWithPort:(int)port workingDirectory:(NSString*)workingDirectory;
 
-- (void)close __attribute__((objc_direct));
+- (void)close;
 
 @end

@@ -18,18 +18,14 @@
 @protocol SUUpdateAlertDelegate;
 
 @class SUAppcastItem, SPUDownloadData, SUHost;
-@interface SUUpdateAlert : NSWindowController
+__attribute__((objc_direct_members)) @interface SUUpdateAlert : NSWindowController
 
-- (instancetype)initWithAppcastItem:(SUAppcastItem *)item state:(SPUUserUpdateState *)state host:(SUHost *)aHost versionDisplayer:(id <SUVersionDisplay>)aVersionDisplayer completionBlock:(void (^)(SPUUserUpdateChoice, NSRect, BOOL))completionBlock didBecomeKeyBlock:(void (^)(void))didBecomeKeyBlock __attribute__((objc_direct));
+- (instancetype)initWithAppcastItem:(SUAppcastItem *)item state:(SPUUserUpdateState *)state host:(SUHost *)aHost versionDisplayer:(id <SUVersionDisplay>)aVersionDisplayer completionBlock:(void (^)(SPUUserUpdateChoice, NSRect, BOOL))completionBlock didBecomeKeyBlock:(void (^)(void))didBecomeKeyBlock;
 
-- (void)showUpdateReleaseNotesWithDownloadData:(SPUDownloadData *)downloadData __attribute__((objc_direct));
-- (void)showReleaseNotesFailedToDownload __attribute__((objc_direct));
+- (void)showUpdateReleaseNotesWithDownloadData:(SPUDownloadData *)downloadData;
+- (void)showReleaseNotesFailedToDownload;
 
-- (IBAction)installUpdate:sender;
-- (IBAction)skipThisVersion:sender;
-- (IBAction)remindMeLater:sender;
-
-- (void)setInstallButtonFocus:(BOOL)focus __attribute__((objc_direct));
+- (void)setInstallButtonFocus:(BOOL)focus;
 
 @end
 

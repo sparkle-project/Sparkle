@@ -12,13 +12,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class SPUInstallationInfo;
 
-@interface SPUProbeInstallStatus : NSObject
+__attribute__((objc_direct_members)) @interface SPUProbeInstallStatus : NSObject
 
-+ (void)probeInstallerInProgressForHostBundleIdentifier:(NSString *)hostBundleIdentifier completion:(void (^)(BOOL))completionHandler __attribute__((objc_direct));
++ (void)probeInstallerInProgressForHostBundleIdentifier:(NSString *)hostBundleIdentifier completion:(void (^)(BOOL))completionHandler;
 
 // completionHandler may not be sent on main queue
 // additionally, it may be possible that the installer is in progress but we get a nil installation info back
-+ (void)probeInstallerUpdateItemForHostBundleIdentifier:(NSString *)hostBundleIdentifier completion:(void (^)(SPUInstallationInfo  * _Nullable))completionHandler __attribute__((objc_direct));
++ (void)probeInstallerUpdateItemForHostBundleIdentifier:(NSString *)hostBundleIdentifier completion:(void (^)(SPUInstallationInfo  * _Nullable))completionHandler;
 
 @end
 

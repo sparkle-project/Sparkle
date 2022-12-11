@@ -14,11 +14,11 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface SUPipedUnarchiver : NSObject <SUUnarchiverProtocol>
+__attribute__((objc_direct_members)) @interface SUPipedUnarchiver : NSObject <SUUnarchiverProtocol>
 
-- (instancetype)initWithArchivePath:(NSString *)archivePath __attribute__((objc_direct));
+- (instancetype)initWithArchivePath:(NSString *)archivePath;
 
-+ (BOOL)canUnarchivePath:(NSString *)path __attribute__((objc_direct));
++ (BOOL)canUnarchivePath:(NSString *)path;
 
 @end
 

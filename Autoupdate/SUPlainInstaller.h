@@ -12,13 +12,13 @@
 @class SUHost;
 @protocol SUVersionComparison;
 
-@interface SUPlainInstaller : NSObject <SUInstallerProtocol>
+__attribute__((objc_direct_members)) @interface SUPlainInstaller : NSObject <SUInstallerProtocol>
 
 /**
  @param host The current (old) bundle host
  @param bundlePath The path to the new bundle that will be installed.
  @param installationPath The path the new bundlePath will be installed to.
  */
-- (instancetype)initWithHost:(SUHost *)host bundlePath:(NSString *)bundlePath installationPath:(NSString *)installationPath __attribute__((objc_direct));
+- (instancetype)initWithHost:(SUHost *)host bundlePath:(NSString *)bundlePath installationPath:(NSString *)installationPath;
 
 @end

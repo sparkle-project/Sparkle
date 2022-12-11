@@ -14,9 +14,9 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @class SUHost;
-@interface SUSystemProfiler : NSObject
+__attribute__((objc_direct_members)) @interface SUSystemProfiler : NSObject
 
-+ (NSArray<NSDictionary<NSString *, NSString *> *> *)systemProfileArrayForHost:(SUHost *)host __attribute__((objc_direct));
++ (NSArray<NSDictionary<NSString *, NSString *> *> *)systemProfileArrayForHost:(SUHost *)host;
 
 @end
 

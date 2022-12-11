@@ -11,9 +11,9 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface SPUInformationalUpdate : NSObject <SPUResumableUpdate>
+__attribute__((objc_direct_members)) @interface SPUInformationalUpdate : NSObject <SPUResumableUpdate>
 
-- (instancetype)initWithAppcastItem:(SUAppcastItem *)updateItem secondaryAppcastItem:(SUAppcastItem * _Nullable)secondaryUpdateItem __attribute__((objc_direct));
+- (instancetype)initWithAppcastItem:(SUAppcastItem *)updateItem secondaryAppcastItem:(SUAppcastItem * _Nullable)secondaryUpdateItem;
 
 @end
 

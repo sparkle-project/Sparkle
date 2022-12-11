@@ -103,7 +103,7 @@ typedef struct
     _compressionBuffer = NULL;
 }
 
-- (BOOL)createBuffers
+- (BOOL)createBuffers __attribute__((objc_direct))
 {
     _partialChunkBuffer = calloc(1, PARTIAL_IO_CHUNK_SIZE);
     if (_partialChunkBuffer == NULL) {
@@ -122,7 +122,7 @@ typedef struct
     return YES;
 }
 
-- (BOOL)_readBuffer:(void *)buffer length:(int32_t)length
+- (BOOL)_readBuffer:(void *)buffer length:(int32_t)length __attribute__((objc_direct))
 {
     if (_error != nil) {
         return NO;
@@ -333,7 +333,7 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
     return [[SPUDeltaArchiveHeader alloc] initWithCompression:compression compressionLevel:metadata.compressionLevel fileSystemCompression:metadata.fileSystemCompression majorVersion:majorVersion minorVersion:minorVersion beforeTreeHash:beforeTreeHash afterTreeHash:afterTreeHash];
 }
 
-- (NSArray<NSString *> *)_readRelativeFilePaths
+- (NSArray<NSString *> *)_readRelativeFilePaths __attribute__((objc_direct))
 {
     if (_error != nil) {
         return nil;
@@ -647,7 +647,7 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
     return YES;
 }
 
-- (BOOL)_writeBuffer:(void *)buffer length:(int32_t)length
+- (BOOL)_writeBuffer:(void *)buffer length:(int32_t)length __attribute__((objc_direct))
 {
     if (_error != nil) {
         return NO;

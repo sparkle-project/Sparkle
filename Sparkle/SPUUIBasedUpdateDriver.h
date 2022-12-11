@@ -27,21 +27,21 @@ NS_ASSUME_NONNULL_BEGIN
 @class SUHost;
 @protocol SPUUserDriver, SPUUpdaterDelegate;
 
-@interface SPUUIBasedUpdateDriver : NSObject
+__attribute__((objc_direct_members)) @interface SPUUIBasedUpdateDriver : NSObject
 
-- (instancetype)initWithHost:(SUHost *)host applicationBundle:(NSBundle *)applicationBundle updater:(id)updater userDriver:(id <SPUUserDriver>)userDriver userInitiated:(BOOL)userInitiated updaterDelegate:(nullable id <SPUUpdaterDelegate>)updaterDelegate delegate:(id<SPUUIBasedUpdateDriverDelegate>)delegate __attribute__((objc_direct));
+- (instancetype)initWithHost:(SUHost *)host applicationBundle:(NSBundle *)applicationBundle updater:(id)updater userDriver:(id <SPUUserDriver>)userDriver userInitiated:(BOOL)userInitiated updaterDelegate:(nullable id <SPUUpdaterDelegate>)updaterDelegate delegate:(id<SPUUIBasedUpdateDriverDelegate>)delegate;
 
-- (void)setCompletionHandler:(SPUUpdateDriverCompletion)completionBlock __attribute__((objc_direct));
+- (void)setCompletionHandler:(SPUUpdateDriverCompletion)completionBlock;
 
-- (void)setUpdateWillInstallHandler:(void (^)(void))updateWillInstallHandler __attribute__((objc_direct));
+- (void)setUpdateWillInstallHandler:(void (^)(void))updateWillInstallHandler;
 
-- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background __attribute__((objc_direct));
+- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background;
 
-- (void)resumeInstallingUpdate __attribute__((objc_direct));
+- (void)resumeInstallingUpdate;
 
-- (void)resumeUpdate:(id<SPUResumableUpdate>)resumableUpdate __attribute__((objc_direct));
+- (void)resumeUpdate:(id<SPUResumableUpdate>)resumableUpdate;
 
-- (void)abortUpdateWithError:(nullable NSError *)error showErrorToUser:(BOOL)showedUserProgress __attribute__((objc_direct));
+- (void)abortUpdateWithError:(nullable NSError *)error showErrorToUser:(BOOL)showedUserProgress;
 
 @end
 

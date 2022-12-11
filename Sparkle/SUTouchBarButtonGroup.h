@@ -12,11 +12,11 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface SUTouchBarButtonGroup : NSViewController
+__attribute__((objc_direct_members)) @interface SUTouchBarButtonGroup : NSViewController
 
 @property (nonatomic, readonly, copy) NSArray<NSButton *> *buttons;
 
-- (instancetype)initByReferencingButtons:(NSArray<NSButton *> *)buttons __attribute__((objc_direct));
+- (instancetype)initByReferencingButtons:(NSArray<NSButton *> *)buttons;
 
 @end
 

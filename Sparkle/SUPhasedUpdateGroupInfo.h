@@ -12,10 +12,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class SUHost;
 
-@interface SUPhasedUpdateGroupInfo : NSObject
+__attribute__((objc_direct_members)) @interface SUPhasedUpdateGroupInfo : NSObject
 
-+ (NSUInteger)updateGroupForHost:(SUHost*)host __attribute__((objc_direct));
-+ (NSNumber*)setNewUpdateGroupIdentifierForHost:(SUHost*)host __attribute__((objc_direct));
++ (NSUInteger)updateGroupForHost:(SUHost*)host;
++ (NSNumber*)setNewUpdateGroupIdentifierForHost:(SUHost*)host;
 
 @end
 

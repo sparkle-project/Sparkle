@@ -11,13 +11,13 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface AppInstaller : NSObject
+__attribute__((objc_direct_members)) @interface AppInstaller : NSObject
 
-- (instancetype)initWithHostBundleIdentifier:(NSString *)hostBundleIdentifier homeDirectory:(NSString *)homeDirectory userName:(NSString *)userName __attribute__((objc_direct));
+- (instancetype)initWithHostBundleIdentifier:(NSString *)hostBundleIdentifier homeDirectory:(NSString *)homeDirectory userName:(NSString *)userName;
 
-- (void)start __attribute__((objc_direct));
+- (void)start;
 
-- (void)cleanupAndExitWithStatus:(int)status error:(NSError * _Nullable)error __attribute__((noreturn)) __attribute__((objc_direct));
+- (void)cleanupAndExitWithStatus:(int)status error:(NSError * _Nullable)error __attribute__((noreturn));
 
 @end
 

@@ -11,12 +11,12 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface SPUDownloadedUpdate : NSObject <SPUResumableUpdate>
+__attribute__((objc_direct_members)) @interface SPUDownloadedUpdate : NSObject <SPUResumableUpdate>
 
-- (instancetype)initWithAppcastItem:(SUAppcastItem *)updateItem secondaryAppcastItem:(SUAppcastItem * _Nullable)secondaryItem downloadName:(NSString *)downloadName temporaryDirectory:(NSString *)temporaryDirectory __attribute__((objc_direct));
+- (instancetype)initWithAppcastItem:(SUAppcastItem *)updateItem secondaryAppcastItem:(SUAppcastItem * _Nullable)secondaryItem downloadName:(NSString *)downloadName temporaryDirectory:(NSString *)temporaryDirectory;
 
-@property (nonatomic, copy, readonly, direct) NSString *downloadName;
-@property (nonatomic, copy, readonly, direct) NSString *temporaryDirectory;
+@property (nonatomic, copy, readonly) NSString *downloadName;
+@property (nonatomic, copy, readonly) NSString *temporaryDirectory;
 
 @end
 

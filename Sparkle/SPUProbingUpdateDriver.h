@@ -14,9 +14,9 @@ NS_ASSUME_NONNULL_BEGIN
 @class SUHost;
 @protocol SPUUpdaterDelegate;
 
-@interface SPUProbingUpdateDriver : NSObject <SPUUpdateDriver>
+__attribute__((objc_direct_members)) @interface SPUProbingUpdateDriver : NSObject <SPUUpdateDriver>
 
-- (instancetype)initWithHost:(SUHost *)host updater:(id)updater updaterDelegate:(nullable id <SPUUpdaterDelegate>)updaterDelegate __attribute__((objc_direct));
+- (instancetype)initWithHost:(SUHost *)host updater:(id)updater updaterDelegate:(nullable id <SPUUpdaterDelegate>)updaterDelegate;
 
 @end
 

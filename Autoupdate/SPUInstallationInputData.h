@@ -12,7 +12,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface SPUInstallationInputData : NSObject <NSSecureCoding>
+__attribute__((objc_direct_members)) @interface SPUInstallationInputData : NSObject <NSSecureCoding>
 
 /*
  * relaunchPath - path to application bundle to relaunch and listen for termination
@@ -22,15 +22,15 @@ NS_ASSUME_NONNULL_BEGIN
  * signatures - signatures for the update that came from the appcast item
  * decryptionPassword - optional decryption password for dmg archives
  */
-- (instancetype)initWithRelaunchPath:(NSString *)relaunchPath hostBundlePath:(NSString *)hostBundlePath updateDirectoryPath:(NSString *)updateDirectoryPath downloadName:(NSString *)downloadName installationType:(NSString *)installationType signatures:(SUSignatures * _Nullable)signatures decryptionPassword:(nullable NSString *)decryptionPassword __attribute__((objc_direct));
+- (instancetype)initWithRelaunchPath:(NSString *)relaunchPath hostBundlePath:(NSString *)hostBundlePath updateDirectoryPath:(NSString *)updateDirectoryPath downloadName:(NSString *)downloadName installationType:(NSString *)installationType signatures:(SUSignatures * _Nullable)signatures decryptionPassword:(nullable NSString *)decryptionPassword;
 
-@property (nonatomic, copy, readonly, direct) NSString *relaunchPath;
-@property (nonatomic, copy, readonly, direct) NSString *hostBundlePath;
-@property (nonatomic, copy, readonly, direct) NSString *updateDirectoryPath;
-@property (nonatomic, copy, readonly, direct) NSString *downloadName;
-@property (nonatomic, copy, readonly, direct) NSString *installationType;
-@property (nonatomic, readonly, nullable, direct) SUSignatures *signatures; // nullable because although not using signatures is deprecated, it's still supported
-@property (nonatomic, copy, readonly, nullable, direct) NSString *decryptionPassword;
+@property (nonatomic, copy, readonly) NSString *relaunchPath;
+@property (nonatomic, copy, readonly) NSString *hostBundlePath;
+@property (nonatomic, copy, readonly) NSString *updateDirectoryPath;
+@property (nonatomic, copy, readonly) NSString *downloadName;
+@property (nonatomic, copy, readonly) NSString *installationType;
+@property (nonatomic, readonly, nullable) SUSignatures *signatures; // nullable because although not using signatures is deprecated, it's still supported
+@property (nonatomic, copy, readonly, nullable) NSString *decryptionPassword;
 
 @end
 

@@ -18,22 +18,22 @@ NS_ASSUME_NONNULL_BEGIN
  The intent is when the user is faced with a major upgrade, they can skip a major version.
  Otherwise they can choose to skip a minor version.
  */
-@interface SPUSkippedUpdate : NSObject
+__attribute__((objc_direct_members)) @interface SPUSkippedUpdate : NSObject
 
-+ (nullable SPUSkippedUpdate *)skippedUpdateForHost:(SUHost *)host __attribute__((objc_direct));
++ (nullable SPUSkippedUpdate *)skippedUpdateForHost:(SUHost *)host;
 
-+ (void)clearSkippedUpdateForHost:(SUHost *)host __attribute__((objc_direct));
++ (void)clearSkippedUpdateForHost:(SUHost *)host;
 
-+ (void)skipUpdate:(SUAppcastItem *)updateItem host:(SUHost *)host __attribute__((objc_direct));
++ (void)skipUpdate:(SUAppcastItem *)updateItem host:(SUHost *)host;
 
 // At least one of minorVersion or majorVersion should be non-nil
-- (instancetype)initWithMinorVersion:(nullable NSString *)minorVersion majorVersion:(nullable NSString *)majorVersion majorSubreleaseVersion:(nullable NSString *)majorSubreleaseVersion __attribute__((objc_direct));
+- (instancetype)initWithMinorVersion:(nullable NSString *)minorVersion majorVersion:(nullable NSString *)majorVersion majorSubreleaseVersion:(nullable NSString *)majorSubreleaseVersion;
 
 // At least one of these two version properties will be non-nil
-@property (nonatomic, readonly, nullable, direct) NSString *minorVersion;
-@property (nonatomic, readonly, nullable, direct) NSString *majorVersion;
+@property (nonatomic, readonly, nullable) NSString *minorVersion;
+@property (nonatomic, readonly, nullable) NSString *majorVersion;
 
-@property (nonatomic, readonly, nullable, direct) NSString *majorSubreleaseVersion;
+@property (nonatomic, readonly, nullable) NSString *majorSubreleaseVersion;
 
 @end
 

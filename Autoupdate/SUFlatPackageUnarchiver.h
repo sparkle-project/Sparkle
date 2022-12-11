@@ -14,11 +14,11 @@
 NS_ASSUME_NONNULL_BEGIN
 
 // An unarchiver for flat packages that doesn't really do any unarchiving
-@interface SUFlatPackageUnarchiver : NSObject <SUUnarchiverProtocol>
+__attribute__((objc_direct_members)) @interface SUFlatPackageUnarchiver : NSObject <SUUnarchiverProtocol>
 
-- (instancetype)initWithFlatPackagePath:(NSString *)flatPackagePath expectingInstallationType:(NSString *)installationType __attribute__((objc_direct));
+- (instancetype)initWithFlatPackagePath:(NSString *)flatPackagePath expectingInstallationType:(NSString *)installationType;
 
-+ (BOOL)canUnarchivePath:(NSString *)path __attribute__((objc_direct));
++ (BOOL)canUnarchivePath:(NSString *)path;
 
 @end
 

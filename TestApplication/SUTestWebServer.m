@@ -31,7 +31,8 @@
     __weak id<SUTestWebServerConnectionDelegate> _delegate;
 }
 
-- (instancetype)initWithNativeHandle:(CFSocketNativeHandle)handle workingDirectory:(NSString*)workingDirectory delegate:(id<SUTestWebServerConnectionDelegate>)delegate {
+- (instancetype)initWithNativeHandle:(CFSocketNativeHandle)handle workingDirectory:(NSString*)workingDirectory delegate:(id<SUTestWebServerConnectionDelegate>)delegate __attribute__((objc_direct))
+{
     self = [super init];
     assert(self != nil);
     
@@ -60,7 +61,8 @@
     return self;
 }
 
-- (void)close {
+- (void)close __attribute__((objc_direct))
+{
     NSInputStream *inputStream = _inputStream;
     NSOutputStream *outputStream = _outputStream;
     if (inputStream == nil) {
@@ -76,7 +78,8 @@
     [_delegate connectionDidClose:self];
 }
 
-- (void)stream:(NSStream *)aStream handleEvent:(NSStreamEvent)eventCode {
+- (void)stream:(NSStream *)aStream handleEvent:(NSStreamEvent)eventCode
+{
     if (eventCode == NSStreamEventEndEncountered) {
         [self close];
         return;
@@ -112,12 +115,14 @@
     }
 }
 
-- (void)write404 {
+- (void)write404 __attribute__((objc_direct))
+{
     NSString *body = @"<html><head><title>404 Not Found</title></head><body><h1>Not Found</h1></body></html>";
     [self write:[body dataUsingEncoding:NSUTF8StringEncoding] status:NO];
 }
 
-- (void)write:(NSData*)body status:(BOOL)status {
+- (void)write:(NSData*)body status:(BOOL)status __attribute__((objc_direct))
+{
     NSString *state = status ? @"200 OK" : @"404 Not Found";
     NSString *header = [NSString stringWithFormat:@"HTTP/1.0 %@\r\nContent-Length: %lu\r\n\r\n", state, body.length];
     NSMutableData *response = [[header dataUsingEncoding:NSUTF8StringEncoding] mutableCopy];
@@ -125,7 +130,8 @@
     [self queueWrite:response];
 }
 
-- (void)queueWrite:(NSData*)data {
+- (void)queueWrite:(NSData*)data __attribute__((objc_direct))
+{
     assert(_dataToWrite == nil);
     assert(data != nil);
     assert(data.length > 0);
@@ -134,7 +140,8 @@
     [self checkIfCanWriteNow];
 }
 
-- (void)checkIfCanWriteNow {
+- (void)checkIfCanWriteNow __attribute__((objc_direct))
+{
     assert(_dataToWrite != nil);
     if (_numBytesToWrite == 0) {
         // nothing more to write, we're done.
@@ -146,7 +153,8 @@
     // otherwise wait for space available event
 }
 
-- (void)writeNow {
+- (void)writeNow __attribute__((objc_direct))
+{
     assert(_outputStream != nil);
     assert(_outputStream.hasSpaceAvailable);
     assert(_dataToWrite != nil);
@@ -164,7 +172,7 @@
 
 @end
 
-@interface SUTestWebServer () <SUTestWebServerConnectionDelegate> {
+__attribute__((objc_direct_members)) @interface SUTestWebServer () <SUTestWebServerConnectionDelegate> {
     CFSocketRef _socket;
 }
 
@@ -175,7 +183,8 @@
 
 @end
 
-static void connectCallback(CFSocketRef __unused s, CFSocketCallBackType type, CFDataRef __unused address, const void *data, void *info) {
+static void connectCallback(CFSocketRef __unused s, CFSocketCallBackType type, CFDataRef __unused address, const void *data, void *info)
+{
     if (type == kCFSocketAcceptCallBack) {
         assert(data != NULL);
         assert(info != NULL);
@@ -190,7 +199,8 @@ static void connectCallback(CFSocketRef __unused s, CFSocketCallBackType type, C
 @synthesize connections = _connections;
 @synthesize workingDirectory = _workingDirectory;
 
-- (instancetype)initWithPort:(int)port workingDirectory:(NSString*)workingDirectory {
+- (instancetype)initWithPort:(int)port workingDirectory:(NSString*)workingDirectory
+{
     self = [super init];
     assert(self != nil);
     
@@ -225,13 +235,15 @@ static void connectCallback(CFSocketRef __unused s, CFSocketCallBackType type, C
     return self;
 }
 
-- (void)connectionDidClose:(SUTestWebServerConnection *)sender {
+- (void)connectionDidClose:(SUTestWebServerConnection *)sender
+{
     assert(_connections != nil);
     assert([_connections containsObject:sender]);
     [_connections removeObject:sender];
 }
 
-- (void)accept:(CFSocketNativeHandle)address {
+- (void)accept:(CFSocketNativeHandle)address
+{
     SUTestWebServerConnection *conn = [[SUTestWebServerConnection alloc] initWithNativeHandle:address workingDirectory:_workingDirectory delegate:self];
     assert(conn != nil);
     if (conn) {
@@ -240,7 +252,8 @@ static void connectCallback(CFSocketRef __unused s, CFSocketCallBackType type, C
     }
 }
 
-- (void)close {
+- (void)close
+{
     for (SUTestWebServerConnection *conn in _connections) {
         [conn close];
     }

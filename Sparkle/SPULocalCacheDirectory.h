@@ -10,7 +10,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface SPULocalCacheDirectory : NSObject
+__attribute__((objc_direct_members)) @interface SPULocalCacheDirectory : NSObject
 
 // Returns a path to a suitable cache directory to create specifically for Sparkle
 // Intermediate directories to this path may not exist yet
@@ -19,16 +19,16 @@ NS_ASSUME_NONNULL_BEGIN
 // The caller should create a subdirectory from the path that is returned here so they don't have files that
 // conflict with other callers. Once that subdirectory name is decided, the caller can remove old items inside it (using +removeOldItemsInDirectory:)
 // and then create a unique temporary directory inside it (using +createUniqueDirectoryInDirectory:)
-+ (NSString *)cachePathForBundleIdentifier:(NSString *)bundleIdentifier __attribute__((objc_direct));
++ (NSString *)cachePathForBundleIdentifier:(NSString *)bundleIdentifier;
 
 // Remove old files inside a directory
 // A caller may want to invoke this on a directory they own rather than remove and re-create an entire directory
 // This does nothing if the supplied directory does not exist yet
-+ (void)removeOldItemsInDirectory:(NSString *)directory __attribute__((objc_direct));
++ (void)removeOldItemsInDirectory:(NSString *)directory;
 
 // Create a unique directory inside a parent directory
 // The parent directory doesn't have to exist yet. If it doesn't exist, intermediate directories will be created.
-+ (NSString * _Nullable)createUniqueDirectoryInDirectory:(NSString *)directory __attribute__((objc_direct));
++ (NSString * _Nullable)createUniqueDirectoryInDirectory:(NSString *)directory;
 
 @end
 

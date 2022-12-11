@@ -12,13 +12,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class SUUpdatePermissionResponse;
 
-@interface SPUCommandLineDriver : NSObject
+__attribute__((objc_direct_members)) @interface SPUCommandLineDriver : NSObject
 
-- (nullable instancetype)initWithUpdateBundlePath:(NSString *)updateBundlePath applicationBundlePath:(nullable NSString *)applicationBundlePath allowedChannels:(NSSet<NSString *> *)allowedChannels customFeedURL:(nullable NSString *)customFeedURL userAgentName:(nullable NSString *)userAgentName updatePermissionResponse:(nullable SUUpdatePermissionResponse *)updatePermissionResponse deferInstallation:(BOOL)deferInstallation interactiveInstallation:(BOOL)interactiveInstallation allowMajorUpgrades:(BOOL)allowMajorUpgrades verbose:(BOOL)verbose __attribute__((objc_direct));
+- (nullable instancetype)initWithUpdateBundlePath:(NSString *)updateBundlePath applicationBundlePath:(nullable NSString *)applicationBundlePath allowedChannels:(NSSet<NSString *> *)allowedChannels customFeedURL:(nullable NSString *)customFeedURL userAgentName:(nullable NSString *)userAgentName updatePermissionResponse:(nullable SUUpdatePermissionResponse *)updatePermissionResponse deferInstallation:(BOOL)deferInstallation interactiveInstallation:(BOOL)interactiveInstallation allowMajorUpgrades:(BOOL)allowMajorUpgrades verbose:(BOOL)verbose;
 
-- (void)runAndCheckForUpdatesNow:(BOOL)checkForUpdatesNow __attribute__((objc_direct));
+- (void)runAndCheckForUpdatesNow:(BOOL)checkForUpdatesNow;
 
-- (void)probeForUpdates __attribute__((objc_direct));
+- (void)probeForUpdates;
 
 @end
 

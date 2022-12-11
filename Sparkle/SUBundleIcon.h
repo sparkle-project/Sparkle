@@ -12,9 +12,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class SUHost;
 
-@interface SUBundleIcon : NSObject
+__attribute__((objc_direct_members)) @interface SUBundleIcon : NSObject
 
-+ (NSURL * _Nullable)iconURLForHost:(SUHost *)host __attribute__((objc_direct));
++ (NSURL * _Nullable)iconURLForHost:(SUHost *)host;
 
 @end
 

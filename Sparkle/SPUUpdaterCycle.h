@@ -18,14 +18,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 // This notifies the updater for (re-)starting and canceling update cycles
 // This class is used so that an updater instance isn't kept alive by a pending update cycle
-@interface SPUUpdaterCycle : NSObject
+__attribute__((objc_direct_members)) @interface SPUUpdaterCycle : NSObject
 
 // This delegate is weakly referenced
-- (instancetype)initWithDelegate:(id<SPUUpdaterCycleDelegate>)delegate __attribute__((objc_direct));
+- (instancetype)initWithDelegate:(id<SPUUpdaterCycleDelegate>)delegate;
 
-- (void)resetUpdateCycleAfterDelay __attribute__((objc_direct));
+- (void)resetUpdateCycleAfterDelay;
 
-- (void)cancelNextUpdateCycle __attribute__((objc_direct));
+- (void)cancelNextUpdateCycle;
 
 @end
 

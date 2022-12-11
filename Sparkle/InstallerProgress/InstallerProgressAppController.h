@@ -12,13 +12,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol InstallerProgressDelegate;
 
-@interface InstallerProgressAppController : NSObject <NSApplicationDelegate>
+__attribute__((objc_direct_members)) @interface InstallerProgressAppController : NSObject <NSApplicationDelegate>
 
-- (instancetype)initWithApplication:(NSApplication *)application arguments:(NSArray<NSString *> *)arguments delegate:(id<InstallerProgressDelegate>)delegate __attribute__((objc_direct));
+- (instancetype)initWithApplication:(NSApplication *)application arguments:(NSArray<NSString *> *)arguments delegate:(id<InstallerProgressDelegate>)delegate;
 
-- (void)run __attribute__((objc_direct));
+- (void)run;
 
-- (void)cleanupAndExitWithStatus:(int)status error:(NSError * _Nullable)error __attribute__((noreturn)) __attribute__((objc_direct));
+- (void)cleanupAndExitWithStatus:(int)status error:(NSError * _Nullable)error __attribute__((noreturn));
 
 @end
 
