@@ -710,7 +710,17 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
     if (majorVersion >= SUBinaryDeltaMajorVersion3) {
         archive = [[SPUSparkleDeltaArchive alloc] initWithPatchFileForWriting:temporaryFile];
     } else {
+#if SPARKLE_BUILD_LEGACY_DELTA_SUPPORT
         archive = [[SPUXarDeltaArchive alloc] initWithPatchFileForWriting:temporaryFile];
+#else
+        if (verbose) {
+            fprintf(stderr, "\n");
+        }
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadUnknownError userInfo:@{ NSLocalizedDescriptionKey: @"Support for creating legacy delta updates is disabled" }];
+        }
+        return NO;
+#endif
     }
     
     SPUDeltaArchiveHeader *header = [[SPUDeltaArchiveHeader alloc] initWithCompression:compression compressionLevel:compressionLevel fileSystemCompression:foundFilesystemCompression majorVersion:majorVersion minorVersion:minorVersion beforeTreeHash:beforeHash afterTreeHash:afterHash];

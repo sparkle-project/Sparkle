@@ -58,8 +58,10 @@ SPU_OBJC_DIRECT_MEMBERS @interface SPUDeltaArchiveItem : NSObject
 @property (nonatomic) uint16_t mode;
 
 // Private properties
+#if SPARKLE_BUILD_LEGACY_DELTA_SUPPORT
 // xar_file context for Xar delta archiver
 @property (nonatomic, nullable) const void *xarContext;
+#endif
 // Tracking length of item's data in data section, when encoding items and when extracting items
 @property (nonatomic) uint64_t codedDataLength;
 

@@ -6,6 +6,8 @@
 //  Copyright © 2021 Sparkle Project. All rights reserved.
 //
 
+#if SPARKLE_BUILD_LEGACY_DELTA_SUPPORT
+
 #import <Foundation/Foundation.h>
 
 #import "SPUDeltaArchiveProtocol.h"
@@ -22,3 +24,5 @@ SPU_OBJC_DIRECT_MEMBERS @interface SPUXarDeltaArchive : NSObject <SPUDeltaArchiv
 @end
 
 NS_ASSUME_NONNULL_END
+
+#endif

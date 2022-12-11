@@ -6,6 +6,8 @@
 //  Copyright © 2021 Sparkle Project. All rights reserved.
 //
 
+#if SPARKLE_BUILD_LEGACY_DELTA_SUPPORT
+
 #import "SPUXarDeltaArchive.h"
 #include <xar/xar.h>
 #include "SUBinaryDeltaCommon.h"
@@ -407,3 +409,5 @@ static xar_file_t _xarAddFile(NSMutableDictionary<NSString *, NSValue *> *fileTa
 }
 
 @end
+
+#endif
