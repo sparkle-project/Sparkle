@@ -31,7 +31,7 @@
     __weak id<SUTestWebServerConnectionDelegate> _delegate;
 }
 
-- (instancetype)initWithNativeHandle:(CFSocketNativeHandle)handle workingDirectory:(NSString*)workingDirectory delegate:(id<SUTestWebServerConnectionDelegate>)delegate __attribute__((objc_direct))
+- (instancetype)initWithNativeHandle:(CFSocketNativeHandle)handle workingDirectory:(NSString*)workingDirectory delegate:(id<SUTestWebServerConnectionDelegate>)delegate SPU_OBJC_DIRECT
 {
     self = [super init];
     assert(self != nil);
@@ -61,7 +61,7 @@
     return self;
 }
 
-- (void)close __attribute__((objc_direct))
+- (void)close SPU_OBJC_DIRECT
 {
     NSInputStream *inputStream = _inputStream;
     NSOutputStream *outputStream = _outputStream;
@@ -115,13 +115,13 @@
     }
 }
 
-- (void)write404 __attribute__((objc_direct))
+- (void)write404 SPU_OBJC_DIRECT
 {
     NSString *body = @"<html><head><title>404 Not Found</title></head><body><h1>Not Found</h1></body></html>";
     [self write:[body dataUsingEncoding:NSUTF8StringEncoding] status:NO];
 }
 
-- (void)write:(NSData*)body status:(BOOL)status __attribute__((objc_direct))
+- (void)write:(NSData*)body status:(BOOL)status SPU_OBJC_DIRECT
 {
     NSString *state = status ? @"200 OK" : @"404 Not Found";
     NSString *header = [NSString stringWithFormat:@"HTTP/1.0 %@\r\nContent-Length: %lu\r\n\r\n", state, body.length];
@@ -130,7 +130,7 @@
     [self queueWrite:response];
 }
 
-- (void)queueWrite:(NSData*)data __attribute__((objc_direct))
+- (void)queueWrite:(NSData*)data SPU_OBJC_DIRECT
 {
     assert(_dataToWrite == nil);
     assert(data != nil);
@@ -140,7 +140,7 @@
     [self checkIfCanWriteNow];
 }
 
-- (void)checkIfCanWriteNow __attribute__((objc_direct))
+- (void)checkIfCanWriteNow SPU_OBJC_DIRECT
 {
     assert(_dataToWrite != nil);
     if (_numBytesToWrite == 0) {
@@ -153,7 +153,7 @@
     // otherwise wait for space available event
 }
 
-- (void)writeNow __attribute__((objc_direct))
+- (void)writeNow SPU_OBJC_DIRECT
 {
     assert(_outputStream != nil);
     assert(_outputStream.hasSpaceAvailable);
@@ -172,7 +172,7 @@
 
 @end
 
-__attribute__((objc_direct_members)) @interface SUTestWebServer () <SUTestWebServerConnectionDelegate> {
+SPU_OBJC_DIRECT_MEMBERS @interface SUTestWebServer () <SUTestWebServerConnectionDelegate> {
     CFSocketRef _socket;
 }
 

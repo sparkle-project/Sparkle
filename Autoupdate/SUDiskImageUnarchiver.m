@@ -48,7 +48,7 @@
 }
 
 // Called on a non-main thread.
-- (void)extractDMGWithNotifier:(SUUnarchiverNotifier *)notifier __attribute__((objc_direct))
+- (void)extractDMGWithNotifier:(SUUnarchiverNotifier *)notifier SPU_OBJC_DIRECT
 {
 	@autoreleasepool {
         BOOL mountedSuccessfully = NO;

@@ -13,7 +13,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-__attribute__((objc_direct_members)) @interface SULegacyWebView : NSObject <SUWebView>
+SPU_OBJC_DIRECT_MEMBERS @interface SULegacyWebView : NSObject <SUWebView>
 
 - (instancetype)initWithColorStyleSheetLocation:(NSURL *)colorStyleSheetLocation fontFamily:(NSString *)fontFamily fontPointSize:(int)fontPointSize javaScriptEnabled:(BOOL)javaScriptEnabled;
 

@@ -22,7 +22,7 @@
     return ([updateGroupIdentifier unsignedIntValue] % NUM_UPDATE_GROUPS);
 }
 
-+ (NSNumber*)updateGroupIdentifierForHost:(SUHost*)host __attribute__((objc_direct))
++ (NSNumber*)updateGroupIdentifierForHost:(SUHost*)host SPU_OBJC_DIRECT
 {
     NSNumber* updateGroupIdentifier = [host objectForUserDefaultsKey:SUUpdateGroupIdentifierKey];
     if(updateGroupIdentifier == nil) {

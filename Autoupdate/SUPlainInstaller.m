@@ -39,7 +39,7 @@
     return self;
 }
 
-- (BOOL)startInstallationToURL:(NSURL *)installationURL fromUpdateAtURL:(NSURL *)newURL withHost:(SUHost *)host progressBlock:(nullable void(^)(double))progress  error:(NSError * __autoreleasing *)error __attribute__((objc_direct))
+- (BOOL)startInstallationToURL:(NSURL *)installationURL fromUpdateAtURL:(NSURL *)newURL withHost:(SUHost *)host progressBlock:(nullable void(^)(double))progress  error:(NSError * __autoreleasing *)error SPU_OBJC_DIRECT
 {
     if (installationURL == nil || newURL == nil) {
         // this really shouldn't happen but just in case

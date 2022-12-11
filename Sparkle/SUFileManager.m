@@ -37,7 +37,7 @@ static char SUAppleQuarantineIdentifier[] = "com.apple.quarantine";
 
 // -[NSFileManager attributesOfItemAtPath:error:] won't follow symbolic links
 
-- (BOOL)_itemExistsAtURL:(NSURL *)fileURL __attribute__((objc_direct))
+- (BOOL)_itemExistsAtURL:(NSURL *)fileURL SPU_OBJC_DIRECT
 {
     NSString *path = fileURL.path;
     if (path == nil) {
@@ -46,7 +46,7 @@ static char SUAppleQuarantineIdentifier[] = "com.apple.quarantine";
     return [_fileManager attributesOfItemAtPath:path error:NULL] != nil;
 }
 
-- (BOOL)_itemExistsAtURL:(NSURL *)fileURL isDirectory:(BOOL *)isDirectory __attribute__((objc_direct))
+- (BOOL)_itemExistsAtURL:(NSURL *)fileURL isDirectory:(BOOL *)isDirectory SPU_OBJC_DIRECT
 {
     NSString *path = fileURL.path;
     if (path == nil) {
@@ -66,7 +66,7 @@ static char SUAppleQuarantineIdentifier[] = "com.apple.quarantine";
 }
 
 // Wrapper around getxattr()
-- (ssize_t)_getXAttr:(const char *)name fromFile:(NSString *)file options:(int)options __attribute__((objc_direct))
+- (ssize_t)_getXAttr:(const char *)name fromFile:(NSString *)file options:(int)options SPU_OBJC_DIRECT
 {
     char path[PATH_MAX] = {0};
     if (![file getFileSystemRepresentation:path maxLength:sizeof(path)]) {
@@ -78,7 +78,7 @@ static char SUAppleQuarantineIdentifier[] = "com.apple.quarantine";
 }
 
 // Wrapper around removexattr()
-- (int)_removeXAttr:(const char *)attr fromFile:(NSString *)file options:(int)options __attribute__((objc_direct))
+- (int)_removeXAttr:(const char *)attr fromFile:(NSString *)file options:(int)options SPU_OBJC_DIRECT
 {
     char path[PATH_MAX] = {0};
     if (![file getFileSystemRepresentation:path maxLength:sizeof(path)]) {
@@ -162,7 +162,7 @@ static char SUAppleQuarantineIdentifier[] = "com.apple.quarantine";
     return [_fileManager copyItemAtURL:sourceURL toURL:destinationURL error:error];
 }
 
-- (BOOL)_getVolumeID:(out id _Nullable __autoreleasing * _Nonnull)outVolumeIdentifier ofItemAtURL:(NSURL *)url __attribute__((objc_direct))
+- (BOOL)_getVolumeID:(out id _Nullable __autoreleasing * _Nonnull)outVolumeIdentifier ofItemAtURL:(NSURL *)url SPU_OBJC_DIRECT
 {
     NSError *error = nil;
     return [url getResourceValue:outVolumeIdentifier forKey:NSURLVolumeIdentifierKey error:&error];
@@ -365,7 +365,7 @@ static char SUAppleQuarantineIdentifier[] = "com.apple.quarantine";
     return YES;
 }
 
-- (BOOL)_updateItemAtURL:(NSURL *)targetURL withAccessTime:(struct timeval)accessTime error:(NSError * __autoreleasing *)error __attribute__((objc_direct))
+- (BOOL)_updateItemAtURL:(NSURL *)targetURL withAccessTime:(struct timeval)accessTime error:(NSError * __autoreleasing *)error SPU_OBJC_DIRECT
 {
     char path[PATH_MAX] = {0};
 

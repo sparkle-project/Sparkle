@@ -86,12 +86,12 @@ NS_ASSUME_NONNULL_BEGIN
     return [self isValidVersion:[self _version]];
 }
 
-- (BOOL)isValidVersion:(NSString * _Nullable)version __attribute__((objc_direct))
+- (BOOL)isValidVersion:(NSString * _Nullable)version SPU_OBJC_DIRECT
 {
     return (version != nil && version.length != 0);
 }
 
-- (NSString * _Nullable)_version __attribute__((objc_direct))
+- (NSString * _Nullable)_version SPU_OBJC_DIRECT
 {
     NSString *version = [self objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey];
     return ([self isValidVersion:version] ? version : nil);
@@ -130,12 +130,12 @@ NS_ASSUME_NONNULL_BEGIN
     return [path rangeOfString:@"/AppTranslocation/"].location != NSNotFound;
 }
 
-- (NSString *_Nullable)publicEDKey __attribute__((objc_direct))
+- (NSString *_Nullable)publicEDKey SPU_OBJC_DIRECT
 {
     return [self objectForInfoDictionaryKey:SUPublicEDKeyKey];
 }
 
-- (NSString *_Nullable)publicDSAKey __attribute__((objc_direct))
+- (NSString *_Nullable)publicDSAKey SPU_OBJC_DIRECT
 {
     // Maybe the key is just a string in the Info.plist.
     NSString *key = [self objectForInfoDictionaryKey:SUPublicDSAKeyKey];

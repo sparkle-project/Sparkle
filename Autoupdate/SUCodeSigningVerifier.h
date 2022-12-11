@@ -11,7 +11,7 @@
 
 #import <Foundation/Foundation.h>
 
-__attribute__((objc_direct_members)) @interface SUCodeSigningVerifier : NSObject
+SPU_OBJC_DIRECT_MEMBERS @interface SUCodeSigningVerifier : NSObject
 
 + (BOOL)codeSignatureAtBundleURL:(NSURL *)oldBundleURL matchesSignatureAtBundleURL:(NSURL *)newBundleURL error:(NSError  **)error;
 

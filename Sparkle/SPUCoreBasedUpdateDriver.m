@@ -125,7 +125,7 @@
     [_delegate basicDriverDidFindUpdateWithAppcastItem:updateItem secondaryAppcastItem:secondaryUpdateItem];
 }
 
-- (void)downloadUpdateFromAppcastItem:(SUAppcastItem *)updateItem secondaryAppcastItem:(SUAppcastItem * _Nullable)secondaryUpdateItem inBackground:(BOOL)background __attribute__((objc_direct))
+- (void)downloadUpdateFromAppcastItem:(SUAppcastItem *)updateItem secondaryAppcastItem:(SUAppcastItem * _Nullable)secondaryUpdateItem inBackground:(BOOL)background SPU_OBJC_DIRECT
 {
     _downloadDriver = [[SPUDownloadDriver alloc] initWithUpdateItem:updateItem secondaryUpdateItem:secondaryUpdateItem host:_host userAgent:_userAgent httpHeaders:_httpHeaders inBackground:background delegate:self];
     
@@ -212,7 +212,7 @@
     _resumableUpdate = nil;
 }
 
-- (void)extractUpdate:(SPUDownloadedUpdate *)downloadedUpdate __attribute__((objc_direct))
+- (void)extractUpdate:(SPUDownloadedUpdate *)downloadedUpdate SPU_OBJC_DIRECT
 {
     id updater = _updater;
     id<SPUUpdaterDelegate> updaterDelegate = _updaterDelegate;
@@ -354,7 +354,7 @@
     [_delegate basicDriverIsRequestingAbortUpdateWithError:error];
 }
 
-- (void)fallBackAndDownloadRegularUpdate __attribute__((objc_direct))
+- (void)fallBackAndDownloadRegularUpdate SPU_OBJC_DIRECT
 {
     SUAppcastItem *secondaryUpdateItem = _secondaryUpdateItem;
     assert(secondaryUpdateItem != nil);

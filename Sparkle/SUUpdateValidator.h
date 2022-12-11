@@ -13,7 +13,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-__attribute__((objc_direct_members)) @interface SUUpdateValidator : NSObject
+SPU_OBJC_DIRECT_MEMBERS @interface SUUpdateValidator : NSObject
 
 - (instancetype)initWithDownloadPath:(NSString *)downloadPath signatures:(SUSignatures *)signatures host:(SUHost *)host;
 

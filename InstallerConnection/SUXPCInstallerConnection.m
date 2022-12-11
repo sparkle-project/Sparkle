@@ -79,7 +79,7 @@
     _connection = nil;
 }
 
-- (void)invokeInvalidation __attribute__((objc_direct))
+- (void)invokeInvalidation SPU_OBJC_DIRECT
 {
     if (_invalidationBlock != nil) {
         _invalidationBlock();

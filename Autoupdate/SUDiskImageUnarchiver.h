@@ -14,7 +14,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-__attribute__((objc_direct_members)) @interface SUDiskImageUnarchiver : NSObject <SUUnarchiverProtocol>
+SPU_OBJC_DIRECT_MEMBERS @interface SUDiskImageUnarchiver : NSObject <SUUnarchiverProtocol>
 
 - (instancetype)initWithArchivePath:(NSString *)archivePath decryptionPassword:(nullable NSString *)decryptionPassword;
 

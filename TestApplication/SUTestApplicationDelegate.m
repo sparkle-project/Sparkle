@@ -333,7 +333,7 @@
     }
 }
 
-- (void)signApplicationIfRequiredAtPath:(NSString *)applicationPath completion:(void (^)(void))completionBlock __attribute__((objc_direct))
+- (void)signApplicationIfRequiredAtPath:(NSString *)applicationPath completion:(void (^)(void))completionBlock SPU_OBJC_DIRECT
 {
     // This is unfortunately necessary for testing sandboxing
     NSXPCConnection *codeSignConnection = [[NSXPCConnection alloc] initWithServiceName:@"org.sparkle-project.TestAppHelper"];

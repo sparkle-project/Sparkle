@@ -51,7 +51,7 @@
     }
 }
 
-- (void)displayReleaseNotes:(NSAttributedString *)releaseNotes __attribute__((objc_direct))
+- (void)displayReleaseNotes:(NSAttributedString *)releaseNotes SPU_OBJC_DIRECT
 {
     if (_textView == nil) {
         _preloadedReleaseNotes = releaseNotes;
@@ -60,13 +60,13 @@
     }
 }
 
-- (void)displayHTMLReleaseNotes:(NSData *)releaseNotes __attribute__((objc_direct))
+- (void)displayHTMLReleaseNotes:(NSData *)releaseNotes SPU_OBJC_DIRECT
 {
     NSAttributedString *attributedString = [[NSAttributedString alloc] initWithHTML:releaseNotes documentAttributes:NULL];
     [self displayReleaseNotes:attributedString];
 }
 
-- (void)displayPlainTextReleaseNotes:(NSData *)releaseNotes encoding:(NSStringEncoding)encoding __attribute__((objc_direct))
+- (void)displayPlainTextReleaseNotes:(NSData *)releaseNotes encoding:(NSStringEncoding)encoding SPU_OBJC_DIRECT
 {
     NSString *string = [[NSString alloc] initWithData:releaseNotes encoding:encoding];
     NSAttributedString *attributedString = [[NSAttributedString alloc] initWithString:string attributes:nil];

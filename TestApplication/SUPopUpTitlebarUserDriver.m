@@ -34,12 +34,12 @@
     return self;
 }
 
-- (void)addUpdateButtonWithTitle:(NSString *)title __attribute__((objc_direct))
+- (void)addUpdateButtonWithTitle:(NSString *)title SPU_OBJC_DIRECT
 {
     [self addUpdateButtonWithTitle:title action:nil];
 }
 
-- (void)addUpdateButtonWithTitle:(NSString *)title action:(void (^)(NSButton *button))action __attribute__((objc_direct))
+- (void)addUpdateButtonWithTitle:(NSString *)title action:(void (^)(NSButton *button))action SPU_OBJC_DIRECT
 {
     if (_updateButton == nil) {
         NSButton *updateButton = [[NSButton alloc] initWithFrame:NSMakeRect(0, 0, 160, 100)];
@@ -81,7 +81,7 @@
     }
 }
 
-- (void)removeUpdateButton __attribute__((objc_direct))
+- (void)removeUpdateButton SPU_OBJC_DIRECT
 {
     [_accessoryViewController removeFromParentViewController];
     _addedAccessory = NO;

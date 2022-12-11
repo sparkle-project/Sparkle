@@ -53,7 +53,7 @@ static NSString *SUDownloadingReason = @"Downloading update related file";
     return self;
 }
 
-- (void)startDownloadWithRequest:(NSURLRequest *)request __attribute__((objc_direct))
+- (void)startDownloadWithRequest:(NSURLRequest *)request SPU_OBJC_DIRECT
 {
     _downloadSession = [NSURLSession
         sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]
@@ -96,7 +96,7 @@ static NSString *SUDownloadingReason = @"Downloading update related file";
     });
 }
 
-- (void)enableAutomaticTermination __attribute__((objc_direct))
+- (void)enableAutomaticTermination SPU_OBJC_DIRECT
 {
     if (_disabledAutomaticTermination) {
         [[NSProcessInfo processInfo] enableAutomaticTermination:SUDownloadingReason];
@@ -104,7 +104,7 @@ static NSString *SUDownloadingReason = @"Downloading update related file";
     }
 }
 
-- (NSString *)rootPersistentDownloadCachePathForBundleIdentifier:(NSString *)bundleIdentifier __attribute__((objc_direct))
+- (NSString *)rootPersistentDownloadCachePathForBundleIdentifier:(NSString *)bundleIdentifier SPU_OBJC_DIRECT
 {
     return [[SPULocalCacheDirectory cachePathForBundleIdentifier:bundleIdentifier] stringByAppendingPathComponent:@"PersistentDownloads"];
 }
@@ -126,7 +126,7 @@ static NSString *SUDownloadingReason = @"Downloading update related file";
     });
 }
 
-- (void)_cleanup __attribute__((objc_direct))
+- (void)_cleanup SPU_OBJC_DIRECT
 {
     [self enableAutomaticTermination];
     [_download cancel];
@@ -224,7 +224,7 @@ static NSString *SUDownloadingReason = @"Downloading update related file";
     }
 }
 
-- (void)downloadDidFinish __attribute__((objc_direct))
+- (void)downloadDidFinish SPU_OBJC_DIRECT
 {
     assert(_downloadFilename != nil);
     

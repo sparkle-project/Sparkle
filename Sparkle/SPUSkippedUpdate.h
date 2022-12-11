@@ -18,7 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
  The intent is when the user is faced with a major upgrade, they can skip a major version.
  Otherwise they can choose to skip a minor version.
  */
-__attribute__((objc_direct_members)) @interface SPUSkippedUpdate : NSObject
+SPU_OBJC_DIRECT_MEMBERS @interface SPUSkippedUpdate : NSObject
 
 + (nullable SPUSkippedUpdate *)skippedUpdateForHost:(SUHost *)host;
 

@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-__attribute__((objc_direct_members)) @interface SUAdHocCodeSigning : NSObject
+SPU_OBJC_DIRECT_MEMBERS @interface SUAdHocCodeSigning : NSObject
 
 + (BOOL)codeSignApplicationAtPath:(NSString *)applicationPath;
 

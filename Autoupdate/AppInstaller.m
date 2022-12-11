@@ -166,7 +166,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     });
 }
 
-- (void)extractAndInstallUpdate __attribute__((objc_direct))
+- (void)extractAndInstallUpdate SPU_OBJC_DIRECT
 {
     [_communicator handleMessageWithIdentifier:SPUExtractionStarted data:[NSData data]];
     
@@ -229,7 +229,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     }
 }
 
-- (void)clearUpdateDirectory __attribute__((objc_direct))
+- (void)clearUpdateDirectory SPU_OBJC_DIRECT
 {
     if (_updateDirectoryPath != nil) {
         NSError *theError = nil;
@@ -240,7 +240,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     }
 }
 
-- (void)unarchiverDidFailWithError:(NSError *)error __attribute__((objc_direct))
+- (void)unarchiverDidFailWithError:(NSError *)error SPU_OBJC_DIRECT
 {
     SULog(SULogLevelError, @"Failed to unarchive file");
     SULogError(error);
@@ -285,7 +285,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     }
 }
 
-- (void)retrieveProcessIdentifierAndStartInstallation __attribute__((objc_direct))
+- (void)retrieveProcessIdentifierAndStartInstallation SPU_OBJC_DIRECT
 {
     // We use the relaunch path for the bundle to listen for termination instead of the host path
     // For a plug-in this makes a big difference; we want to wait until the app hosting the plug-in terminates
@@ -442,7 +442,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     }
 }
 
-- (void)startInstallation __attribute__((objc_direct))
+- (void)startInstallation SPU_OBJC_DIRECT
 {
     _willCompleteInstallation = YES;
     
@@ -491,7 +491,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     });
 }
 
-- (void)performStage2Installation __attribute__((objc_direct))
+- (void)performStage2Installation SPU_OBJC_DIRECT
 {
     BOOL canPerformSecondStage = _shouldShowUI || [_installer canInstallSilently];
     if (canPerformSecondStage) {
@@ -516,7 +516,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     }
 }
 
-- (void)finishInstallationAfterHostTermination __attribute__((objc_direct))
+- (void)finishInstallationAfterHostTermination SPU_OBJC_DIRECT
 {
     [_terminationListener startListeningWithCompletion:^(BOOL success) {
         if (!success) {

@@ -107,7 +107,7 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
     }
 }
 
-- (void)endWithSelection:(SPUUserUpdateChoice)choice __attribute__((objc_direct))
+- (void)endWithSelection:(SPUUserUpdateChoice)choice SPU_OBJC_DIRECT
 {
     [_webView stopLoading];
     [_webView.view removeFromSuperview]; // Otherwise it gets sent Esc presses (why?!) and gets very confused.
@@ -149,7 +149,7 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
     [self endWithSelection:SPUUserUpdateChoiceDismiss];
 }
 
-- (void)displayReleaseNotes __attribute__((objc_direct))
+- (void)displayReleaseNotes SPU_OBJC_DIRECT
 {
     [self adaptReleaseNotesAppearance];
 
@@ -201,7 +201,7 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
     }
 }
 
-- (void)adaptReleaseNotesAppearance __attribute__((objc_direct))
+- (void)adaptReleaseNotesAppearance SPU_OBJC_DIRECT
 {
     if (@available(macOS 10.14, *))
     {
@@ -258,7 +258,7 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
     [self stopReleaseNotesSpinner];
 }
 
-- (void)stopReleaseNotesSpinner __attribute__((objc_direct))
+- (void)stopReleaseNotesSpinner SPU_OBJC_DIRECT
 {
     [_releaseNotesSpinner stopAnimation:self];
     [_releaseNotesSpinner setHidden:YES];

@@ -40,7 +40,7 @@
     return (_watchedTermination || _processIdentifier == nil) ? YES : (kill(_processIdentifier.intValue, 0) != 0);
 }
 
-- (void)invokeCompletionWithSuccess:(BOOL)success __attribute__((objc_direct))
+- (void)invokeCompletionWithSuccess:(BOOL)success SPU_OBJC_DIRECT
 {
     if (_completionBlock != nil) {
         _completionBlock(success);

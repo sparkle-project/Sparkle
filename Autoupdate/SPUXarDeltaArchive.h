@@ -14,10 +14,10 @@
 NS_ASSUME_NONNULL_BEGIN
 
 // Legacy container format for binary delta archives
-__attribute__((objc_direct_members)) @interface SPUXarDeltaArchive : NSObject <SPUDeltaArchiveProtocol>
+SPU_OBJC_DIRECT_MEMBERS @interface SPUXarDeltaArchive : NSObject <SPUDeltaArchiveProtocol>
 
-- (instancetype)initWithPatchFileForWriting:(NSString *)patchFile __attribute__((objc_direct));
-- (instancetype)initWithPatchFileForReading:(NSString *)patchFile __attribute__((objc_direct));
+- (instancetype)initWithPatchFileForWriting:(NSString *)patchFile SPU_OBJC_DIRECT;
+- (instancetype)initWithPatchFileForReading:(NSString *)patchFile SPU_OBJC_DIRECT;
 
 @end
 

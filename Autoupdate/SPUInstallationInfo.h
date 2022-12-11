@@ -12,7 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class SUAppcastItem;
 
-__attribute__((objc_direct_members)) @interface SPUInstallationInfo : NSObject <NSSecureCoding>
+SPU_OBJC_DIRECT_MEMBERS @interface SPUInstallationInfo : NSObject <NSSecureCoding>
 
 - (instancetype)initWithAppcastItem:(SUAppcastItem *)appcastItem canSilentlyInstall:(BOOL)canSilentyInstall;
 

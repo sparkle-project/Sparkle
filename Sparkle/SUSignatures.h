@@ -22,7 +22,7 @@ typedef NS_ENUM(uint8_t, SUSigningInputStatus) {
     SUSigningInputStatusLastValidCase = SUSigningInputStatusPresent
 };
 
-__attribute__((objc_direct_members)) @interface SUSignatures : NSObject <NSSecureCoding> {
+SPU_OBJC_DIRECT_MEMBERS @interface SUSignatures : NSObject <NSSecureCoding> {
     unsigned char _ed25519_signature[64];
 }
 @property (nonatomic, readonly, nullable) NSData *dsaSignature;
@@ -35,7 +35,7 @@ __attribute__((objc_direct_members)) @interface SUSignatures : NSObject <NSSecur
 @end
 
 
-__attribute__((objc_direct_members)) @interface SUPublicKeys : NSObject {
+SPU_OBJC_DIRECT_MEMBERS @interface SUPublicKeys : NSObject {
     unsigned char _ed25519_public_key[32];
 }
 @property (nonatomic, readonly, nullable) NSString *dsaPubKey;

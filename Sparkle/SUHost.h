@@ -11,7 +11,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class SUPublicKeys;
 
-__attribute__((objc_direct_members)) @interface SUHost : NSObject
+SPU_OBJC_DIRECT_MEMBERS @interface SUHost : NSObject
 
 @property (nonatomic, readonly, direct) NSBundle *bundle;
 

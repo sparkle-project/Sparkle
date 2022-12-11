@@ -19,7 +19,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol SPUInstallerAgentProtocol;
 
-__attribute__((objc_direct_members)) @interface AgentConnection : NSObject
+SPU_OBJC_DIRECT_MEMBERS @interface AgentConnection : NSObject
 
 - (instancetype)initWithHostBundleIdentifier:(NSString *)bundleIdentifier delegate:(id<AgentConnectionDelegate>)delegate;
 

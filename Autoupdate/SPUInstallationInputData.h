@@ -12,7 +12,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-__attribute__((objc_direct_members)) @interface SPUInstallationInputData : NSObject <NSSecureCoding>
+SPU_OBJC_DIRECT_MEMBERS @interface SPUInstallationInputData : NSObject <NSSecureCoding>
 
 /*
  * relaunchPath - path to application bundle to relaunch and listen for termination

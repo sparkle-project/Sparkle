@@ -99,7 +99,7 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
     return self;
 }
 
-- (double)currentTime __attribute__((objc_direct))
+- (double)currentTime SPU_OBJC_DIRECT
 {
     if (_timebaseInfo.denom > 0) {
         return (1.0 * mach_absolute_time() * _timebaseInfo.numer / _timebaseInfo.denom);
@@ -155,7 +155,7 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
 
 // updateItem should be non-nil when showing an update for first time for scheduled updates
 // If appcastItem is != nil, then state must be != nil
-- (void)setUpActiveUpdateAlertForScheduledUpdate:(SUAppcastItem * _Nullable)updateItem state:(SPUUserUpdateState * _Nullable)state __attribute__((objc_direct))
+- (void)setUpActiveUpdateAlertForScheduledUpdate:(SUAppcastItem * _Nullable)updateItem state:(SPUUserUpdateState * _Nullable)state SPU_OBJC_DIRECT
 {
     // Make sure the window is loaded in any case
     [_activeUpdateAlert window];
@@ -312,7 +312,7 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
     }
 }
 
-- (void)_removeApplicationBecomeActiveObserver __attribute__((objc_direct))
+- (void)_removeApplicationBecomeActiveObserver SPU_OBJC_DIRECT
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self name:NSApplicationDidBecomeActiveNotification object:NSApp];
 }
@@ -467,7 +467,7 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
 
 #pragma mark Install & Relaunch Update
 
-- (void)_showAndConfigureStatusControllerForReadyToInstallWithAction:(SEL)selector closable:(BOOL)closable __attribute__((objc_direct))
+- (void)_showAndConfigureStatusControllerForReadyToInstallWithAction:(SEL)selector closable:(BOOL)closable SPU_OBJC_DIRECT
 {
     [self createAndShowStatusControllerWithClosable:closable];
     
@@ -525,7 +525,7 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
     }
 }
 
-- (void)closeCheckingWindow __attribute__((objc_direct))
+- (void)closeCheckingWindow SPU_OBJC_DIRECT
 {
     if (_checkingController != nil)
     {
@@ -633,7 +633,7 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
     acknowledgement();
 }
 
-- (void)showAlert:(NSAlert *)alert secondaryAction:(void (^ _Nullable)(void))secondaryAction __attribute__((objc_direct))
+- (void)showAlert:(NSAlert *)alert secondaryAction:(void (^ _Nullable)(void))secondaryAction SPU_OBJC_DIRECT
 {
     id <SPUStandardUserDriverDelegate> delegate = _delegate;
     
@@ -655,7 +655,7 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
 
 #pragma mark Download & Install Updates
 
-- (void)createAndShowStatusControllerWithClosable:(BOOL)closable __attribute__((objc_direct))
+- (void)createAndShowStatusControllerWithClosable:(BOOL)closable SPU_OBJC_DIRECT
 {
     if (_statusController == nil) {
         // We will make the status window minimizable for regular app updates which are often

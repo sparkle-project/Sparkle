@@ -24,7 +24,7 @@ typedef NS_ENUM(uint8_t, SPUDeltaItemCommands) {
 };
 
 // Represents header for our archive
-__attribute__((objc_direct_members)) @interface SPUDeltaArchiveHeader : NSObject
+SPU_OBJC_DIRECT_MEMBERS @interface SPUDeltaArchiveHeader : NSObject
 
 - (instancetype)initWithCompression:(SPUDeltaCompressionMode)compression compressionLevel:(uint8_t)compressionLevel fileSystemCompression:(bool)fileSystemCompression majorVersion:(uint16_t)majorVersion minorVersion:(uint16_t)minorVersion beforeTreeHash:(const unsigned char *)beforeTreeHash afterTreeHash:(const unsigned char *)afterTreeHash;
 
@@ -39,7 +39,7 @@ __attribute__((objc_direct_members)) @interface SPUDeltaArchiveHeader : NSObject
 @end
 
 // Represents an item we read or write to in our delta archive
-__attribute__((objc_direct_members)) @interface SPUDeltaArchiveItem : NSObject
+SPU_OBJC_DIRECT_MEMBERS @interface SPUDeltaArchiveItem : NSObject
 
 - (instancetype)initWithRelativeFilePath:(NSString *)relativeFilePath commands:(SPUDeltaItemCommands)commands mode:(uint16_t)mode;
 

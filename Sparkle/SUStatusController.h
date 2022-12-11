@@ -23,14 +23,14 @@
 
 @property (nonatomic, getter=isButtonEnabled, direct) BOOL buttonEnabled;
 
-- (instancetype)initWithHost:(SUHost *)aHost windowTitle:(NSString *)windowTitle centerPointValue:(NSValue *)centerPointValue minimizable:(BOOL)minimizable closable:(BOOL)closable __attribute__((objc_direct));
+- (instancetype)initWithHost:(SUHost *)aHost windowTitle:(NSString *)windowTitle centerPointValue:(NSValue *)centerPointValue minimizable:(BOOL)minimizable closable:(BOOL)closable SPU_OBJC_DIRECT;
 
 // Pass 0 for the max progress value to get an indeterminate progress bar.
 // Pass nil for the status text to not show it.
-- (void)beginActionWithTitle:(NSString *)title maxProgressValue:(double)maxProgressValue statusText:(NSString *)statusText __attribute__((objc_direct));
+- (void)beginActionWithTitle:(NSString *)title maxProgressValue:(double)maxProgressValue statusText:(NSString *)statusText SPU_OBJC_DIRECT;
 
 // If isDefault is YES, the button's key equivalent will be \r.
-- (void)setButtonTitle:(NSString *)buttonTitle target:(id)target action:(SEL)action isDefault:(BOOL)isDefault __attribute__((objc_direct));
+- (void)setButtonTitle:(NSString *)buttonTitle target:(id)target action:(SEL)action isDefault:(BOOL)isDefault SPU_OBJC_DIRECT;
 
 @end
 

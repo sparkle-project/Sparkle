@@ -38,7 +38,7 @@ extern int bsdiff(int argc, const char **argv);
 @property (nonatomic, readonly) NSString *fromPath;
 @property (nonatomic, readonly) BOOL changingPermissions;
 
-- (id)initWithRelativePath:(NSString *)relativePath clonedRelativePath:(NSString *)clonedRelativePath oldTree:(NSString *)oldTree newTree:(NSString *)newTree oldPermissions:(NSNumber *)oldPermissions newPermissions:(NSNumber *)permissions changingPermissions:(BOOL)changingPermissions __attribute__((objc_direct));
+- (id)initWithRelativePath:(NSString *)relativePath clonedRelativePath:(NSString *)clonedRelativePath oldTree:(NSString *)oldTree newTree:(NSString *)newTree oldPermissions:(NSNumber *)oldPermissions newPermissions:(NSNumber *)permissions changingPermissions:(BOOL)changingPermissions SPU_OBJC_DIRECT;
 
 @end
 

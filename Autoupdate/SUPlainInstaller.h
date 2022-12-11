@@ -12,7 +12,7 @@
 @class SUHost;
 @protocol SUVersionComparison;
 
-__attribute__((objc_direct_members)) @interface SUPlainInstaller : NSObject <SUInstallerProtocol>
+SPU_OBJC_DIRECT_MEMBERS @interface SUPlainInstaller : NSObject <SUInstallerProtocol>
 
 /**
  @param host The current (old) bundle host

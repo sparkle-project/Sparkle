@@ -25,7 +25,7 @@
 
 @implementation SUInstallerLauncher
 
-- (BOOL)submitProgressToolAtPath:(NSString *)progressToolPath withHostBundle:(NSBundle *)hostBundle inSystemDomainForInstaller:(BOOL)inSystemDomainForInstaller __attribute__((objc_direct))
+- (BOOL)submitProgressToolAtPath:(NSString *)progressToolPath withHostBundle:(NSBundle *)hostBundle inSystemDomainForInstaller:(BOOL)inSystemDomainForInstaller SPU_OBJC_DIRECT
 {
     SUFileManager *fileManager = [[SUFileManager alloc] init];
     
@@ -106,7 +106,7 @@
     return (submittedJob == true);
 }
 
-- (SUInstallerLauncherStatus)submitInstallerAtPath:(NSString *)installerPath withHostBundle:(NSBundle *)hostBundle updaterIdentifier:(NSString *)updaterIdentifier userName:(NSString *)userName homeDirectory:(NSString *)homeDirectory authorizationPrompt:(NSString *)authorizationPrompt inSystemDomain:(BOOL)systemDomain rootUser:(BOOL)rootUser __attribute__((objc_direct))
+- (SUInstallerLauncherStatus)submitInstallerAtPath:(NSString *)installerPath withHostBundle:(NSBundle *)hostBundle updaterIdentifier:(NSString *)updaterIdentifier userName:(NSString *)userName homeDirectory:(NSString *)homeDirectory authorizationPrompt:(NSString *)authorizationPrompt inSystemDomain:(BOOL)systemDomain rootUser:(BOOL)rootUser SPU_OBJC_DIRECT
 {
     SUFileManager *fileManager = [[SUFileManager alloc] init];
     
@@ -310,7 +310,7 @@
     return status;
 }
 
-- (NSString *)pathForBundledTool:(NSString *)toolName extension:(NSString *)extension fromBundle:(NSBundle *)bundle __attribute__((objc_direct))
+- (NSString *)pathForBundledTool:(NSString *)toolName extension:(NSString *)extension fromBundle:(NSBundle *)bundle SPU_OBJC_DIRECT
 {
     // If the path extension is empty, we don't want to add a "." at the end
     NSString *nameWithExtension = (extension.length > 0) ? [toolName stringByAppendingPathExtension:extension] : toolName;

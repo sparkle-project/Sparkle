@@ -12,7 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol InstallerProgressDelegate;
 
-__attribute__((objc_direct_members)) @interface InstallerProgressAppController : NSObject <NSApplicationDelegate>
+SPU_OBJC_DIRECT_MEMBERS @interface InstallerProgressAppController : NSObject <NSApplicationDelegate>
 
 - (instancetype)initWithApplication:(NSApplication *)application arguments:(NSArray<NSString *> *)arguments delegate:(id<InstallerProgressDelegate>)delegate;
 

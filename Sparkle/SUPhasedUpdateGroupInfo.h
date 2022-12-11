@@ -12,7 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class SUHost;
 
-__attribute__((objc_direct_members)) @interface SUPhasedUpdateGroupInfo : NSObject
+SPU_OBJC_DIRECT_MEMBERS @interface SUPhasedUpdateGroupInfo : NSObject
 
 + (NSUInteger)updateGroupForHost:(SUHost*)host;
 + (NSNumber*)setNewUpdateGroupIdentifierForHost:(SUHost*)host;

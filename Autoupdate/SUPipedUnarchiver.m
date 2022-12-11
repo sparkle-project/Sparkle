@@ -84,7 +84,7 @@ static NSArray <NSString *> * _Nullable _commandAndArgumentsConformingToTypeOfPa
 }
 
 // This method abstracts the types that use a command line tool piping data from stdin.
-- (void)extractArchivePipingDataToCommand:(NSString *)command arguments:(NSArray*)args notifier:(SUUnarchiverNotifier *)notifier __attribute__((objc_direct))
+- (void)extractArchivePipingDataToCommand:(NSString *)command arguments:(NSArray*)args notifier:(SUUnarchiverNotifier *)notifier SPU_OBJC_DIRECT
 {
     // *** GETS CALLED ON NON-MAIN THREAD!!!
 	@autoreleasepool {

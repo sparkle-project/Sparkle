@@ -176,7 +176,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     return YES;
 }
 
-- (BOOL)checkATSIssueForBundle:(NSBundle * _Nullable)bundle getBundleExists:(BOOL *)bundleExists __attribute__((objc_direct))
+- (BOOL)checkATSIssueForBundle:(NSBundle * _Nullable)bundle getBundleExists:(BOOL *)bundleExists SPU_OBJC_DIRECT
 {
     if (bundleExists != NULL) {
         *bundleExists = (bundle != nil);
@@ -189,7 +189,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     return ([bundle objectForInfoDictionaryKey:@"NSAppTransportSecurity"] == nil);
 }
 
-- (BOOL)checkIfConfiguredProperlyAndRequireFeedURL:(BOOL)requireFeedURL validateXPCServices:(BOOL)validateXPCServices error:(NSError * __autoreleasing *)error __attribute__((objc_direct))
+- (BOOL)checkIfConfiguredProperlyAndRequireFeedURL:(BOOL)requireFeedURL validateXPCServices:(BOOL)validateXPCServices error:(NSError * __autoreleasing *)error SPU_OBJC_DIRECT
 {
     NSString *hostName = _host.name;
     
@@ -348,7 +348,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 
 - (NSString *)description { return [NSString stringWithFormat:@"%@ <%@>", [self class], [_host bundlePath]]; }
 
-- (void)startUpdateCycle __attribute__((objc_direct))
+- (void)startUpdateCycle SPU_OBJC_DIRECT
 {
     BOOL shouldPrompt = NO;
     BOOL hasLaunchedBefore = [_host boolForUserDefaultsKey:SUHasLaunchedBeforeKey];
@@ -412,7 +412,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     }
 }
 
-- (void)updatePermissionRequestFinishedWithResponse:(SUUpdatePermissionResponse *)response __attribute__((objc_direct))
+- (void)updatePermissionRequestFinishedWithResponse:(SUUpdatePermissionResponse *)response SPU_OBJC_DIRECT
 {
     [self setSendsSystemProfile:response.sendSystemProfile];
     [self setAutomaticallyChecksForUpdates:response.automaticUpdateChecks];
@@ -433,7 +433,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     return _updateLastCheckedDate;
 }
 
-- (void)updateLastUpdateCheckDate __attribute__((objc_direct))
+- (void)updateLastUpdateCheckDate SPU_OBJC_DIRECT
 {
     [self willChangeValueForKey:NSStringFromSelector(@selector((lastUpdateCheckDate)))];
     // We use an intermediate property for last update check date due to https://github.com/sparkle-project/Sparkle/pull/1135
@@ -443,7 +443,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 }
 
 // Note this method is never called when sessionInProgress is YES
-- (void)scheduleNextUpdateCheckFiringImmediately:(BOOL)firingImmediately usingCurrentDate:(BOOL)usingCurrentDate __attribute__((objc_direct))
+- (void)scheduleNextUpdateCheckFiringImmediately:(BOOL)firingImmediately usingCurrentDate:(BOOL)usingCurrentDate SPU_OBJC_DIRECT
 {
     [_updaterTimer invalidate];
     
@@ -656,7 +656,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     }];
 }
 
-- (void)checkForUpdatesWithDriver:(id <SPUUpdateDriver> )d updateCheck:(SPUUpdateCheck)updateCheck installerInProgress:(BOOL)installerInProgress __attribute__((objc_direct))
+- (void)checkForUpdatesWithDriver:(id <SPUUpdateDriver> )d updateCheck:(SPUUpdateCheck)updateCheck installerInProgress:(BOOL)installerInProgress SPU_OBJC_DIRECT
 {
     assert(_driver == nil);
     if (_driver != nil) {
@@ -866,7 +866,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     [_host setObject:[feedURL absoluteString] forUserDefaultsKey:SUFeedURLKey];
 }
 
-- (NSURL * _Nullable)retrieveFeedURL:(NSError * __autoreleasing *)error __attribute__((objc_direct))
+- (NSURL * _Nullable)retrieveFeedURL:(NSError * __autoreleasing *)error SPU_OBJC_DIRECT
 {
     NSString *hostName = _host.name;
     
@@ -944,7 +944,7 @@ static NSString *escapeURLComponent(NSString *str) {
 }
 
 // Precondition: The feed URL should be valid
-- (NSURL * _Nullable)parameterizedFeedURL __attribute__((objc_direct))
+- (NSURL * _Nullable)parameterizedFeedURL SPU_OBJC_DIRECT
 {
     NSURL *baseFeedURL = [self retrieveFeedURL:NULL];
     if (baseFeedURL == nil) {

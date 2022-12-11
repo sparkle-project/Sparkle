@@ -11,7 +11,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-__attribute__((objc_direct_members)) @interface StatusInfo : NSObject <SUStatusInfoProtocol>
+SPU_OBJC_DIRECT_MEMBERS @interface StatusInfo : NSObject <SUStatusInfoProtocol>
 
 - (instancetype)initWithHostBundleIdentifier:(NSString *)bundleIdentifier;
 

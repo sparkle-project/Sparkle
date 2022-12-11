@@ -29,24 +29,24 @@ static const char *SUAppleQuarantineIdentifier = "com.apple.quarantine";
 
 @interface SUFileManager (Private)
 
-- (BOOL)_itemExistsAtURL:(NSURL *)fileURL __attribute__((objc_direct));
-- (BOOL)_itemExistsAtURL:(NSURL *)fileURL isDirectory:(nullable BOOL *)isDirectory __attribute__((objc_direct));
+- (BOOL)_itemExistsAtURL:(NSURL *)fileURL SPU_OBJC_DIRECT;
+- (BOOL)_itemExistsAtURL:(NSURL *)fileURL isDirectory:(nullable BOOL *)isDirectory SPU_OBJC_DIRECT;
 
 @end
 
 @interface SUAppcastDriver (Private)
 
-+ (SUAppcastItem *)bestItemFromAppcastItems:(NSArray *)appcastItems getDeltaItem:(SUAppcastItem *_Nullable __autoreleasing *_Nullable)deltaItem withHostVersion:(NSString *)hostVersion comparator:(id<SUVersionComparison>)comparator __attribute__((objc_direct));
++ (SUAppcastItem *)bestItemFromAppcastItems:(NSArray *)appcastItems getDeltaItem:(SUAppcastItem *_Nullable __autoreleasing *_Nullable)deltaItem withHostVersion:(NSString *)hostVersion comparator:(id<SUVersionComparison>)comparator SPU_OBJC_DIRECT;
 
-+ (SUAppcast *)filterSupportedAppcast:(SUAppcast *)appcast phasedUpdateGroup:(NSNumber * _Nullable)phasedUpdateGroup skippedUpdate:(SPUSkippedUpdate * _Nullable)skippedUpdate currentDate:(NSDate *)currentDate hostVersion:(NSString *)hostVersion versionComparator:(id<SUVersionComparison>)versionComparator testOSVersion:(BOOL)testOSVersion testMinimumAutoupdateVersion:(BOOL)testMinimumAutoupdateVersion __attribute__((objc_direct));
++ (SUAppcast *)filterSupportedAppcast:(SUAppcast *)appcast phasedUpdateGroup:(NSNumber * _Nullable)phasedUpdateGroup skippedUpdate:(SPUSkippedUpdate * _Nullable)skippedUpdate currentDate:(NSDate *)currentDate hostVersion:(NSString *)hostVersion versionComparator:(id<SUVersionComparison>)versionComparator testOSVersion:(BOOL)testOSVersion testMinimumAutoupdateVersion:(BOOL)testMinimumAutoupdateVersion SPU_OBJC_DIRECT;
 
-+ (SUAppcast *)filterAppcast:(SUAppcast *)appcast forMacOSAndAllowedChannels:(NSSet<NSString *> *)allowedChannels __attribute__((objc_direct));
++ (SUAppcast *)filterAppcast:(SUAppcast *)appcast forMacOSAndAllowedChannels:(NSSet<NSString *> *)allowedChannels SPU_OBJC_DIRECT;
 
 @end
 
 @interface SUBinaryDeltaUnarchiver (Private)
 
-+ (void)updateSpotlightImportersAtBundlePath:(NSString *)targetPath __attribute__((objc_direct));
++ (void)updateSpotlightImportersAtBundlePath:(NSString *)targetPath SPU_OBJC_DIRECT;
 
 @end
 

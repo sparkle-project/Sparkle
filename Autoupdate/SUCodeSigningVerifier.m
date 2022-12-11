@@ -209,7 +209,7 @@ static id valueOrNSNull(id value) {
     return value ? value : [NSNull null];
 }
 
-+ (NSDictionary *)codeSignatureInfoForCode:(SecStaticCodeRef)code __attribute__((objc_direct))
++ (NSDictionary *)codeSignatureInfoForCode:(SecStaticCodeRef)code SPU_OBJC_DIRECT
 {
     CFDictionaryRef signingInfo = nil;
     const SecCSFlags flags = (SecCSFlags) (kSecCSSigningInformation | kSecCSRequirementInformation | kSecCSDynamicInformation | kSecCSContentInformation);
@@ -227,7 +227,7 @@ static id valueOrNSNull(id value) {
     return nil;
 }
 
-+ (NSDictionary *)logSigningInfoForCode:(SecStaticCodeRef)code label:(NSString*)label __attribute__((objc_direct))
++ (NSDictionary *)logSigningInfoForCode:(SecStaticCodeRef)code label:(NSString*)label SPU_OBJC_DIRECT
 {
     NSDictionary *relevantInfo = [self codeSignatureInfoForCode:code];
     SULog(SULogLevelDefault, @"%@: %@", label, relevantInfo);

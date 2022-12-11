@@ -34,7 +34,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-__attribute__((objc_direct_members)) @interface SPUDownloadDriver : NSObject
+SPU_OBJC_DIRECT_MEMBERS @interface SPUDownloadDriver : NSObject
 
 - (instancetype)initWithRequestURL:(NSURL *)requestURL host:(SUHost *)host userAgent:(NSString * _Nullable)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background delegate:(id<SPUDownloadDriverDelegate>)delegate;
 

@@ -50,7 +50,7 @@
     return self;
 }
 
-- (SecKeyRef)dsaSecKeyRef __attribute__((objc_direct))
+- (SecKeyRef)dsaSecKeyRef SPU_OBJC_DIRECT
 {
     NSData *data = [_pubKeys.dsaPubKey dataUsingEncoding:NSASCIIStringEncoding];
     if (!self || !data.length) {
@@ -240,7 +240,7 @@
     return NO;
 }
 
-- (BOOL)verifyDSASignatureOfStream:(NSInputStream *)stream dsaSignature:(NSData *)dsaSignature error:(NSError * __autoreleasing *)outError __attribute__((objc_direct))
+- (BOOL)verifyDSASignatureOfStream:(NSInputStream *)stream dsaSignature:(NSData *)dsaSignature error:(NSError * __autoreleasing *)outError SPU_OBJC_DIRECT
 {
     if (!stream || !dsaSignature) {
         SULog(SULogLevelError, @"Invalid arguments to verifyStream");
