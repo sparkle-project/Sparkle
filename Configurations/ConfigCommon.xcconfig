@@ -5,19 +5,19 @@ SPARKLE_RELAUNCH_TOOL_NAME = Autoupdate
 SPARKLE_INSTALLER_PROGRESS_TOOL_NAME = Updater
 
 // Set to 1 or 0 to build and bundle the provided XPC Services in Sparkle framework
-SPARKLE_EMBED_INSTALLER_LAUNCHER_XPC_SERVICE = 0
-SPARKLE_EMBED_DOWNLOADER_XPC_SERVICE = 0
+SPARKLE_EMBED_INSTALLER_LAUNCHER_XPC_SERVICE = 1
+SPARKLE_EMBED_DOWNLOADER_XPC_SERVICE = 1
 SPARKLE_EMBED_INSTALLER_STATUS_XPC_SERVICE = 0
 SPARKLE_EMBED_INSTALLER_CONNECTION_XPC_SERVICE = 0
 
 // Set to 0 to disable building legacy 1.x SUUpdater stub
-SPARKLE_BUILD_LEGACY_SUUPDATER = 0
+SPARKLE_BUILD_LEGACY_SUUPDATER = 1
 
 // Set to 0 to not build support for package (pkg) installations
-SPARKLE_BUILD_PACKAGE_SUPPORT = 0
+SPARKLE_BUILD_PACKAGE_SUPPORT = 1
 
 // Set to 0 to only build all non-UI bits (which means client uses a custom SPUUserDriver)
-SPARKLE_BUILD_UI_BITS = 0
+SPARKLE_BUILD_UI_BITS = 1
 
 // Set these if you want to use custom name for the XPC Services
 // For the Installer one in particular, this name may show up in an authorization prompt
