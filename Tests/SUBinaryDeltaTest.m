@@ -96,7 +96,12 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
 
 - (BOOL)createAndApplyPatchWithBeforeDiffHandler:(SUDeltaHandler)beforeDiffHandler afterDiffHandler:(SUDeltaHandler)afterDiffHandler afterPatchHandler:(SUDeltaHandler)afterPatchHandler
 {
-    return [self createAndApplyPatchWithBeforeDiffHandler:beforeDiffHandler afterDiffHandler:afterDiffHandler afterPatchHandler:afterPatchHandler testingVersion2Delta:YES];
+#if SPARKLE_BUILD_LEGACY_DELTA_SUPPORT
+    BOOL testingVersion2Delta = YES;
+#else
+    BOOL testingVersion2Delta = NO;
+#endif
+    return [self createAndApplyPatchWithBeforeDiffHandler:beforeDiffHandler afterDiffHandler:afterDiffHandler afterPatchHandler:afterPatchHandler testingVersion2Delta:testingVersion2Delta];
 }
 
 - (BOOL)createAndApplyPatchWithBeforeDiffHandler:(SUDeltaHandler)beforeDiffHandler afterDiffHandler:(SUDeltaHandler)afterDiffHandler afterPatchHandler:(SUDeltaHandler)afterPatchHandler testingVersion2Delta:(BOOL)testingVersion2Delta
