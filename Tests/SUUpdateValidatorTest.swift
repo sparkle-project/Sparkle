@@ -187,7 +187,7 @@ class SUUpdateValidatorTest: XCTestCase {
     func testPostValidationWithKeyRemoval() {
         for bundleConfig in BundleConfig.allCases {
 #if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
-            testPostValidation(oldBundle: .dsaOnly, newBundle: bundleConfig, signatures: SignatureConfig(dsa: .valid, ed: .valid), expectedResult: bundleConfig.hasAnyKeys && bundleConfig != .codeSignedInvalid)
+            testPostValidation(oldBundle: .dsaOnly, newBundle: bundleConfig, signatures: SignatureConfig(ed: .valid, dsa: .valid), expectedResult: bundleConfig.hasAnyKeys && bundleConfig != .codeSignedInvalid)
 #endif
             do {
 #if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
@@ -198,7 +198,7 @@ class SUUpdateValidatorTest: XCTestCase {
                 testPostValidation(oldBundle: .edOnly, newBundle: bundleConfig, signatures: signatureConfig, expectedResult: bundleConfig.hasAnyKeys && bundleConfig != .codeSignedInvalid)
             }
 #if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
-            testPostValidation(oldBundle: .both, newBundle: bundleConfig, signatures: SignatureConfig(dsa: .valid, ed: .valid), expectedResult: bundleConfig.hasAnyKeys && bundleConfig != .codeSignedInvalid)
+            testPostValidation(oldBundle: .both, newBundle: bundleConfig, signatures: SignatureConfig(ed: .valid, dsa: .valid), expectedResult: bundleConfig.hasAnyKeys && bundleConfig != .codeSignedInvalid)
 #endif
             do {
 #if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
