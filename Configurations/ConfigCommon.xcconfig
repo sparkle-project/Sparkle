@@ -5,6 +5,8 @@ SPARKLE_RELAUNCH_TOOL_NAME = Autoupdate
 SPARKLE_INSTALLER_PROGRESS_TOOL_NAME = Updater
 
 // Set to 1 or 0 to build and bundle the provided XPC Services in Sparkle framework
+// (Note for testing purposes for sandboxed apps, disabling all XPC services and then re-enabling them
+// may not work on the same login session due to a system caching issue. See comments for setting FRAMEWORK_VERSION for more info)
 SPARKLE_EMBED_INSTALLER_LAUNCHER_XPC_SERVICE = 1
 // Embedding the downloader service also enables building legacy WebKit1 support
 SPARKLE_EMBED_DOWNLOADER_XPC_SERVICE = 1
