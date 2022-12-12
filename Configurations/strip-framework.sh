@@ -37,4 +37,5 @@ if [[ "$SPARKLE_BUILD_UI_BITS" -eq 0 ]]; then
     rm -rf "${FRAMEWORK_PATH}"/"Versions/"${FRAMEWORK_VERSION}"/Resources"/"SUStatus.nib"
     rm -rf "${FRAMEWORK_PATH}"/"Versions/"${FRAMEWORK_VERSION}"/Resources"/"Base.lproj/SUUpdateAlert.nib"
     rm -rf "${FRAMEWORK_PATH}"/"Versions/"${FRAMEWORK_VERSION}"/Resources"/"Base.lproj/SUUpdatePermissionPrompt.nib"
+    rm -rf "${FRAMEWORK_PATH}"/"Versions/"${FRAMEWORK_VERSION}"/Resources"/"ReleaseNotesColorStyle.css"
 fi
