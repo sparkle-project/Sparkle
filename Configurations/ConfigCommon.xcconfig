@@ -28,9 +28,12 @@ SPARKLE_BUILD_PACKAGE_SUPPORT = 1
 // Set to 0 to only build all non-UI bits (which means client uses a custom SPUUserDriver)
 SPARKLE_BUILD_UI_BITS = 1
 
-// Above flags for Swift tools and unit tests
+// Set to 0 to not copy localization / string files to framework
+SPARKLE_COPY_LOCALIZATIONS = 1
+
+// Compilation flags for Swift tools and unit tests
 // Remove appropriate entries to remove support
-OTHER_SWIFT_FLAGS_COMMON = -DSPARKLE_BUILD_UI_BITS -DSPARKLE_BUILD_LEGACY_DSA_SUPPORT -DSPARKLE_BUILD_PACKAGE_SUPPORT -DSPARKLE_BUILD_LEGACY_DELTA_SUPPORT
+OTHER_SWIFT_FLAGS_COMMON = -DSPARKLE_BUILD_LEGACY_DSA_SUPPORT -DSPARKLE_BUILD_PACKAGE_SUPPORT
 
 // Set these if you want to use custom name for the XPC Services
 // For the Installer one in particular, this name may show up in an authorization prompt
