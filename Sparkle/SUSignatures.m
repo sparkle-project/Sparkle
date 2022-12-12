@@ -21,6 +21,10 @@ static NSString *SUEDSignatureKey = @"SUEDSignature";
 static NSString *SUEDSignatureStatusKey = @"SUEDSignatureStatus";
 
 @implementation SUSignatures
+{
+    unsigned char _ed25519_signature[64];
+}
+
 #if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
 @synthesize dsaSignature = _dsaSignature;
 @synthesize dsaSignatureStatus = _dsaSignatureStatus;
@@ -142,6 +146,9 @@ static BOOL decodeStatus(NSCoder *decoder, NSString *key, SUSigningInputStatus *
 @end
 
 @implementation SUPublicKeys
+{
+    unsigned char _ed25519_public_key[32];
+}
 
 #if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
 @synthesize dsaPubKey = _dsaPubKey;
