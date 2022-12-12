@@ -2,6 +2,8 @@
 
 FRAMEWORK_PATH="${TARGET_BUILD_DIR}"/"${FULL_PRODUCT_NAME}"
 
+# Remove any unused XPC Services
+
 removedservices=0
 
 if [[ "$SPARKLE_EMBED_INSTALLER_LAUNCHER_XPC_SERVICE" -eq 0 ]]; then
@@ -26,5 +28,13 @@ fi
 
 if [[ "$removedservices" -eq 4 ]]; then
     rm -rf "${FRAMEWORK_PATH}"/"Versions/"${FRAMEWORK_VERSION}"/XPCServices"
-        rm -rf "${FRAMEWORK_PATH}"/"XPCServices"
+    rm -rf "${FRAMEWORK_PATH}"/"XPCServices"
+fi
+
+# Remove any unused nibs
+
+if [[ "$SPARKLE_BUILD_UI_BITS" -eq 0 ]]; then
+    rm -rf "${FRAMEWORK_PATH}"/"Versions/"${FRAMEWORK_VERSION}"/Resources"/"SUStatus.nib"
+    rm -rf "${FRAMEWORK_PATH}"/"Versions/"${FRAMEWORK_VERSION}"/Resources"/"Base.lproj/SUUpdateAlert.nib"
+    rm -rf "${FRAMEWORK_PATH}"/"Versions/"${FRAMEWORK_VERSION}"/Resources"/"Base.lproj/SUUpdatePermissionPrompt.nib"
 fi
