@@ -218,9 +218,11 @@
     }
 
     NSString *decryptionPassword = nil;
+#if SPARKLE_BUILD_DMG_SUPPORT
     if (updater != nil && [updaterDelegate respondsToSelector:@selector(decryptionPasswordForUpdater:)]) {
         decryptionPassword = [updaterDelegate decryptionPasswordForUpdater:updater];
     }
+#endif
     
     SPUInstallationInputData *installationData = [[SPUInstallationInputData alloc] initWithRelaunchPath:pathToRelaunch hostBundlePath:_host.bundlePath updateDirectoryPath:_temporaryDirectory downloadName:_downloadName installationType:_updateItem.installationType signatures:_updateItem.signatures decryptionPassword:decryptionPassword];
     
