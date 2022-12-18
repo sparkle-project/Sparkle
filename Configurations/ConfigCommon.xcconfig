@@ -1,9 +1,5 @@
 // Common
 
-SPARKLE_BUNDLE_IDENTIFIER = org.sparkle-project.Sparkle
-SPARKLE_RELAUNCH_TOOL_NAME = Autoupdate
-SPARKLE_INSTALLER_PROGRESS_TOOL_NAME = Updater
-
 // Set to 1 or 0 to build and bundle the provided XPC Services in Sparkle framework
 // (Note for testing purposes for sandboxed apps, disabling all XPC services and then re-enabling them
 // may not work on the same login session due to a system caching issue. See comments for setting FRAMEWORK_VERSION for more info)
@@ -39,6 +35,11 @@ SPARKLE_COPY_LOCALIZATIONS = 1
 // If SPARKLE_BUILD_PACKAGE_SUPPORT is set to 0, remove -DSPARKLE_BUILD_PACKAGE_SUPPORT
 // If SPARKLE_BUILD_DMG_SUPPORT is set to 0, remove -DSPARKLE_BUILD_DMG_SUPPORT
 OTHER_SWIFT_FLAGS_COMMON = -DSPARKLE_BUILD_LEGACY_DSA_SUPPORT -DSPARKLE_BUILD_PACKAGE_SUPPORT -DSPARKLE_BUILD_DMG_SUPPORT
+
+// Default Sparkle names
+SPARKLE_BUNDLE_IDENTIFIER = org.sparkle-project.Sparkle
+SPARKLE_RELAUNCH_TOOL_NAME = Autoupdate
+SPARKLE_INSTALLER_PROGRESS_TOOL_NAME = Updater
 
 // Set these if you want to use custom name for the XPC Services
 // For the Installer one in particular, this name may show up in an authorization prompt
