@@ -192,7 +192,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         if (self->_updatingMainBundle) {
             NSString *appcastUserDefaultsString = [self.host objectForUserDefaultsKey:SUFeedURLKey];
             if (appcastUserDefaultsString != nil) {
-                SULog(SULogLevelError, @"Warning: A feed URL was found stored in user defaults for %@. This was likely set using -[SPUUpdater setFeedURL:] which is deprecated. Please migrate away from using this API and use -[SPUUpdater clearFeedURLFromUserDefaults] to remove any stored defaults, otherwise Sparkle may continue to use the feed stored from the defaults. If the feed url was set via a defaults write command for testing purposes, then please ignore this warning.", self.host.name);
+                SULog(SULogLevelError, @"Warning: A feed URL was found stored in user defaults for %@. This was likely set using -[SPUUpdater setFeedURL:] which is deprecated. Please migrate away from using this API and call -[SPUUpdater clearFeedURLFromUserDefaults] to remove any stored defaults, otherwise Sparkle may continue to use the feed stored from the defaults. If the feed url was set via a defaults write command for testing purposes, then please ignore this warning.", self.host.name);
             }
         }
         
@@ -619,7 +619,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
             // Check if automatic update checking is disabled or if the user hasn't given permission for Sparkle to check
             BOOL automaticChecksInDefaults = [self automaticallyChecksForUpdates];
             if (!automaticChecksInDefaults) {
-                SULog(SULogLevelError, @"Error: Calling -[SPUUpdater checkForUpdatesInBackground] for your own bundle when Sparkle is set to ask the user permission to check for updates in the background automatically and automaticallyChecksForUpdates is NO leads to incorrect behavior");
+                SULog(SULogLevelError, @"Error: Calling -[SPUUpdater checkForUpdatesInBackground] for your own bundle when Sparkle is set to ask the user permission to check for updates in the background automatically and when automaticallyChecksForUpdates is NO leads to incorrect behavior. Recommendation: remove call to checkForUpdatesInBackground");
             }
         }
     }
