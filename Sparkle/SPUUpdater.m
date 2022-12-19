@@ -919,6 +919,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         return nil;
     }
     
+    // -retrieveFeedURL: strips the feed URL so we should do the same
     NSString *castUrlStr = [self _stripFeedString:appcastString hostName:@"" error:NULL];
     if (castUrlStr == nil) {
         return nil;
@@ -975,7 +976,6 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         return nil;
     }
     
-    // -retrieveFeedURL: strips the feed URL so we should do the same
     NSString *castUrlStr = [self _stripFeedString:appcastString hostName:hostName error:error];
     if (castUrlStr == nil) {
         return nil;
