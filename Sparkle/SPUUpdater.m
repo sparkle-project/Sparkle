@@ -75,6 +75,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     BOOL _showingPermissionRequest;
     BOOL _loggedATSWarning;
     BOOL _loggedNoSecureKeyWarning;
+    BOOL _updatingMainBundle;
 }
 
 @synthesize userAgentString = _userAgentString;
@@ -113,10 +114,13 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         
         _delegate = delegate;
         
+        NSBundle *mainBundle = [NSBundle mainBundle];
+        _updatingMainBundle = [hostBundle isEqualTo:mainBundle];
+        
         // Set up default user agent
         // Use the main bundle rather than the bundle to update for retrieving user agent information from
         // We want the user agent to reflect the updater that is doing the updating
-        SUHost *mainBundleHost = [[SUHost alloc] initWithBundle:[NSBundle mainBundle]];
+        SUHost *mainBundleHost = [[SUHost alloc] initWithBundle:mainBundle];
         _userAgentString = SPUMakeUserAgentWithHost(mainBundleHost, nil);
         _mainBundleHost = mainBundleHost;
     }
@@ -168,6 +172,16 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     // Start updater on next update cycle so we make sure the application invoking the updater is ready
     // This also gives the developer a cycle to check for updates before Sparkle's update cycle scheduler kicks in
     dispatch_async(dispatch_get_main_queue(), ^{
+        // Check if legacy/deprecated feed URL from user defaults is being used
+        // We perform this check one runloop cycle after starting the updater to give the developer
+        // a chance to call -clearFeedURLFromUserDefaults before this warning can show up
+        if (self->_updatingMainBundle) {
+            NSString *appcastUserDefaultsString = [self->_host objectForUserDefaultsKey:SUFeedURLKey];
+            if (appcastUserDefaultsString != nil) {
+                SULog(SULogLevelError, @"Warning: A feed URL was found stored in user defaults for %@. This was likely set using -[SPUUpdater setFeedURL:] which is deprecated. Please migrate away from using this API and call -[SPUUpdater clearFeedURLFromUserDefaults] to remove any stored defaults, otherwise Sparkle may continue to use the feed stored from the defaults. If the feed url was set via a defaults write command for testing purposes, then please ignore this warning.", self->_host.name);
+            }
+        }
+        
         if (!self->_sessionInProgress) {
             [self startUpdateCycle];
         }
@@ -262,8 +276,6 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         }
     }
     
-    BOOL updatingMainBundle = [_host.bundle isEqualTo:mainBundleHost.bundle];
-    
     if (feedURL != nil) {
         servingOverHttps = [[[feedURL scheme] lowercaseString] isEqualToString:@"https"];
         if (!servingOverHttps && !_loggedATSWarning) {
@@ -283,7 +295,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
             if (!foundATSPersistentIssue && !foundXPCDownloaderService) {
                 BOOL foundATSIssue = ([mainBundleHost objectForInfoDictionaryKey:@"NSAppTransportSecurity"] == nil);
                 
-                if (updatingMainBundle) {
+                if (_updatingMainBundle) {
                     // The only way we'll know for sure if there is an issue is if the main bundle is the same as the one we're updating
                     // We don't want to generate false positives..
                     foundATSMainBundleIssue = foundATSIssue;
@@ -329,7 +341,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
             }
             return NO;
         } else {
-            if (updatingMainBundle && !_loggedNoSecureKeyWarning) {
+            if (_updatingMainBundle && !_loggedNoSecureKeyWarning) {
                 SULog(SULogLevelError, @"Error: Serving updates without an EdDSA key and only using Apple Code Signing is deprecated and may be unsupported in a future release. Visit Sparkle's documentation for more information: https://sparkle-project.org/documentation/#3-segue-for-security-concerns");
                 
                 _loggedNoSecureKeyWarning = YES;
@@ -337,7 +349,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         }
     } else if (publicKeys.ed25519PubKey == nil) {
         // No EdDSA key is available, so app must be using DSA
-        if (updatingMainBundle) {
+        if (_updatingMainBundle) {
             if (error != NULL) {
                 *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUNoPublicDSAFoundError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"For security reasons, updates need to be signed with an EdDSA key for %@. Please migrate to using EdDSA (ed25519). Visit Sparkle's documentation for migration information: https://sparkle-project.org/documentation/#3-segue-for-security-concerns.", hostName] }];
             }
@@ -458,7 +470,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     }
     
     if (firingImmediately) {
-        [self checkForUpdatesInBackground];
+        [self _checkForUpdatesInBackground];
     } else {
         // This may not return the same update check interval as the developer has configured
         // Notably it may differ when we have an update that has been already downloaded and needs to resume,
@@ -525,7 +537,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
                 [self->_updaterTimer startAndFireAfterDelay:delayUntilCheck];
             } else {
                 // We're overdue! Run one now.
-                [self checkForUpdatesInBackground];
+                [self _checkForUpdatesInBackground];
             }
         });
     }
@@ -533,21 +545,11 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 
 - (void)updaterTimerDidFire
 {
-    [self checkForUpdatesInBackground];
+    [self _checkForUpdatesInBackground];
 }
 
-- (void)checkForUpdatesInBackground
+- (void)_checkForUpdatesInBackground SPU_OBJC_DIRECT
 {
-    if (!_startedUpdater) {
-        SULog(SULogLevelError, @"Error: checkForUpdatesInBackground - updater hasn't been started yet. Please call -startUpdater: first");
-        return;
-    }
-    
-    if (_sessionInProgress) {
-        SULog(SULogLevelError, @"Error: -checkForUpdatesInBackground called but .sessionInProgress == YES");
-        return;
-    }
-    
     [self setSessionInProgress:YES];
     [self setCanCheckForUpdates:NO];
     
@@ -586,6 +588,35 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
             [strongSelf checkForUpdatesWithDriver:updateDriver updateCheck:SPUUpdateCheckUpdatesInBackground installerInProgress:installerIsRunning];
         });
     }];
+}
+
+// This is the developer-facing checkForUpdatesInBackground
+// Sparkle internally uses _checkForUpdatesInBackground
+- (void)checkForUpdatesInBackground
+{
+    if (!_startedUpdater) {
+        SULog(SULogLevelError, @"Error: checkForUpdatesInBackground - updater hasn't been started yet. Please call -startUpdater: first");
+        return;
+    }
+
+    if (_sessionInProgress) {
+        SULog(SULogLevelError, @"Error: -checkForUpdatesInBackground called but .sessionInProgress == YES");
+        return;
+    }
+    
+    if (_updatingMainBundle) {
+        // Check if Sparkle is configured to ask the user's permission to enable automatic update checks
+        NSNumber *automaticChecksInInfoPlist = [_host objectForInfoDictionaryKey:SUEnableAutomaticChecksKey];
+        if (automaticChecksInInfoPlist == nil) {
+            // Check if automatic update checking is disabled or if the user hasn't given permission for Sparkle to check
+            BOOL automaticChecksInDefaults = [self automaticallyChecksForUpdates];
+            if (!automaticChecksInDefaults) {
+                SULog(SULogLevelError, @"Error: Calling -[SPUUpdater checkForUpdatesInBackground] for your own bundle when Sparkle is set to ask the user permission to check for updates in the background automatically and when automaticallyChecksForUpdates is NO leads to incorrect behavior. Recommendation: remove call to checkForUpdatesInBackground");
+            }
+        }
+    }
+    
+    [self _checkForUpdatesInBackground];
 }
 
 - (void)checkForUpdates
@@ -860,7 +891,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 - (void)setFeedURL:(NSURL * _Nullable)feedURL
 {
     if (![NSThread isMainThread]) {
-        SULog(SULogLevelError, @"Error: SPUUpdater -setFeedURL: must be called on the main thread. The call from a background thread was ignored.");
+        SULog(SULogLevelError, @"Error: -[SPUUpdater setFeedURL:] must be called on the main thread. The call from a background thread was ignored.");
         return;
     }
 
@@ -868,19 +899,56 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     [_host setObject:[feedURL absoluteString] forUserDefaultsKey:SUFeedURLKey];
 }
 
+- (nullable NSURL *)clearFeedURLFromUserDefaults
+{
+    if (![NSThread isMainThread]) {
+        // We will allow continuing even if not called on main thread
+        SULog(SULogLevelError, @"Error: -[SPUUpdater clearFeedURLFromUserDefaults] must be called on the main thread.");
+    }
+    
+    NSString *appcastString = [_host objectForUserDefaultsKey:SUFeedURLKey];
+    
+    [_host setObject:nil forUserDefaultsKey:SUFeedURLKey];
+    
+    if (appcastString == nil) {
+        return nil;
+    }
+    
+    NSString *castUrlStr = [self _stripFeedString:appcastString hostName:@"" error:NULL];
+    if (castUrlStr == nil) {
+        return nil;
+    }
+    
+    return [NSURL URLWithString:castUrlStr];
+}
+
+- (NSString * _Nullable)_stripFeedString:(NSString *)appcastString hostName:(NSString *)hostName error:(NSError * __autoreleasing *)error SPU_OBJC_DIRECT
+{
+    NSCharacterSet *quoteSet = [NSCharacterSet characterSetWithCharactersInString:@"\"\'"]; // Some feed publishers add quotes; strip 'em.
+    NSString *castUrlStr = [appcastString stringByTrimmingCharactersInSet:quoteSet];
+    if (castUrlStr == nil || [castUrlStr length] == 0) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInvalidFeedURLError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Appcast feed (%@) after trimming it of quotes is empty for %@!", appcastString, hostName] }];
+        }
+        return nil;
+    }
+    
+    return castUrlStr;
+}
+
 - (NSURL * _Nullable)retrieveFeedURL:(NSError * __autoreleasing *)error SPU_OBJC_DIRECT
 {
     NSString *hostName = _host.name;
     
     if (![NSThread isMainThread]) {
-        SULog(SULogLevelError, @"Error: SPUUpdater -retrieveFeedURL:error: must be called on the main thread.");
+        SULog(SULogLevelError, @"Error: -[SPUUpdater retrieveFeedURL:error:] must be called on the main thread.");
         if (error != NULL) {
             *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUIncorrectAPIUsageError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"SUUpdater -retriveFeedURL:error: must be called on the main thread for %@", hostName]}];
         }
         return nil;
     }
     
-    // A value in the user defaults overrides one in the Info.plist (so preferences panels can be created wherein users choose between beta / release feeds).
+    // Delegate gets first priority for determining the feed URL
     NSString *appcastString = [_host objectForKey:SUFeedURLKey];
     id<SPUUpdaterDelegate> delegate = _delegate;
     if ([delegate respondsToSelector:@selector((feedURLStringForUpdater:))]) {
@@ -890,19 +958,22 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         }
     }
     
-    if (!appcastString) { // Can't find an appcast string!
+    // A value in the user defaults overrides one in the Info.plist
+    // (as this used to be used for setting alternative feed URLs but is now deprecated)
+    if (appcastString == nil) {
+        appcastString = [_host objectForKey:SUFeedURLKey];
+    }
+    
+    if (appcastString == nil) { // Can't find an appcast string!
         if (error != NULL) {
-            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInvalidFeedURLError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"You must specify the URL of the appcast as the %@ key in either the Info.plist, or with -feedURLStringForUpdater: delegate method, or by the user defaults of %@!", SUFeedURLKey, hostName] }];
+            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInvalidFeedURLError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"You must specify the URL of the appcast as the %@ key in either the Info.plist, or with -[SPUUpdaterDelegate feedURLStringForUpdater:] for %@!", SUFeedURLKey, hostName] }];
         }
         return nil;
     }
     
-    NSCharacterSet *quoteSet = [NSCharacterSet characterSetWithCharactersInString:@"\"\'"]; // Some feed publishers add quotes; strip 'em.
-    NSString *castUrlStr = [appcastString stringByTrimmingCharactersInSet:quoteSet];
-    if (castUrlStr == nil || [castUrlStr length] == 0) {
-        if (error != NULL) {
-            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInvalidFeedURLError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Appcast feed (%@) after trimming it of quotes is empty for %@!", appcastString, hostName] }];
-        }
+    // -retrieveFeedURL: strips the feed URL so we should do the same
+    NSString *castUrlStr = [self _stripFeedString:appcastString hostName:hostName error:error];
+    if (castUrlStr == nil) {
         return nil;
     }
     
