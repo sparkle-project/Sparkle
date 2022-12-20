@@ -100,7 +100,8 @@ SU_EXPORT @interface SPUUpdater : NSObject
  You usually do not need to call this method directly. If `automaticallyChecksForUpdates` is @c YES,
  Sparkle calls this method automatically according to its update schedule using the `updateCheckInterval`
  and the `lastUpdateCheckDate`. Therefore, you should typically only consider calling this method directly if you
- opt out of automatic update checks.
+ opt out of automatic update checks. Calling this method when updating your own bundle is invalid if Sparkle is configured
+ to ask the user's permission to check for updates automatically and `automaticallyChecksForUpdates` is `NO`.
  
  This is meant for programmatically initating a check for updates in the background without the user initiating it.
  This check will not show UI if no new updates are found.
@@ -108,7 +109,7 @@ SU_EXPORT @interface SPUUpdater : NSObject
  If a new update is found, the updater's user driver may handle showing it at an appropriate (but not necessarily immediate) time.
  If you want control over when and how a new update is shown, please see https://sparkle-project.org/documentation/gentle-reminders/
  
- Note if automated updating is turned on, either a new update may be downloaded in the background to be installed silently,
+ Note if automated downloading/installing is turned on, either a new update may be downloaded in the background to be installed silently,
  or an already downloaded update may be shown.
  
  This will not find updates that the user has opted into skipping.
@@ -226,32 +227,59 @@ SU_EXPORT @interface SPUUpdater : NSObject
  The URL of the appcast used to download update information.
  
  If the updater's delegate implements `-[SPUUpdaterDelegate feedURLStringForUpdater:]`, this will return that feed URL.
- Otherwise if the feed URL has been set before, the feed URL returned will be retrieved from the host bundle's user defaults.
+ Otherwise if the feed URL has been set before using `-[SPUUpdater setFeedURL:]`, the feed URL returned will be retrieved from the host bundle's user defaults.
  Otherwise the feed URL in the host bundle's Info.plist will be returned.
  If no feed URL can be retrieved, returns nil.
  
  For setting a primary feed URL, please set the `SUFeedURL` property in your Info.plist.
- For setting an alternative feed URL, please prefer `-[SPUUpdaterDelegate feedURLStringForUpdater:]` over `-setFeedURL:`
+ For setting an alternative feed URL, please prefer `-[SPUUpdaterDelegate feedURLStringForUpdater:]` over `-setFeedURL:`.
+ Please see the documentation for `-setFeedURL:` for migrating away from that API.
  
  This property must be called on the main thread; calls from background threads will return nil.
  */
 @property (nonatomic, readonly, nullable) NSURL *feedURL;
 
 /**
- Set the URL of the appcast used to download update information. Using this method is discouraged.
+ Set the URL of the appcast used to download update information. This method is deprecated.
  
  Setting this property will persist in the host bundle's user defaults.
- To avoid this, you should consider implementing
+ To avoid this undesirable behavior, please consider implementing
  `-[SPUUpdaterDelegate feedURLStringForUpdater:]` instead of using this method.
  
- Passing nil will remove any feed URL that has been set in the host bundle's user defaults.
+ Calling `-clearFeedURLFromUserDefaults` will remove any feed URL that has been set in the host bundle's user defaults.
+ Passing nil to this method can also do this, but using `-clearFeedURLFromUserDefaults` is preferred.
+ To migrate away from using this API, you must clear and remove any feed URLs set in the user defaults through this API.
+ 
  If you do not need to alternate between multiple feeds, set the SUFeedURL in your Info.plist instead of invoking this method.
  
  For beta updates, you may consider migrating to `-[SPUUpdaterDelegate allowedChannelsForUpdater:]` in the future.
  
+ Updaters that update other developer's bundles should not call this method.
+ 
  This method must be called on the main thread; calls from background threads will have no effect.
  */
-- (void)setFeedURL:(nullable NSURL *)feedURL;
+- (void)setFeedURL:(nullable NSURL *)feedURL __deprecated_msg("Please call -[SPUUpdater clearFeedURLFromUserDefaults] to migrate away from using this API and transition to either specifying the feed URL in your Info.plist, using channels in Sparkle 2, or using -[SPUUpdaterDelegate feedURLStringForUpdater:] to specify the dynamic feed URL at runtime");
+
+/**
+ Clears any feed URL from the host bundle's user defaults that was set via `-setFeedURL:`
+ 
+ You should call this method if you have used `-setFeedURL:` in the past and want to stop using that API.
+ Otherwise for compatibility Sparkle will prefer to use the feed URL that was set in the user defaults over the one that was specified in the host bundle's Info.plist,
+ which is often undesirable (except for testing purposes).
+ 
+ If a feed URL is found stored in the host bundle's user defaults (from calling `-setFeedURL:`) before it gets cleared,
+ then that previously set URL is returned from this method.
+ 
+ This method should be called as soon as possible, after your application finished launching or right after the updater has been started
+ if you manually manage starting the updater.
+ 
+ Updaters that update other developer's bundles should not call this method.
+ 
+ This method must be called on the main thread.
+ 
+ @return A previously set feed URL in the host bundle's user defaults, if available, otherwise this returns `nil`
+ */
+- (nullable NSURL *)clearFeedURLFromUserDefaults;
 
 /**
  The host bundle that is being updated.
