@@ -1326,6 +1326,7 @@
 		729F7EAD273F1840004592DC /* SPUUserAgent+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SPUUserAgent+Private.h"; sourceTree = "<group>"; };
 		729F7EAE273F1840004592DC /* SPUUserAgent+Private.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "SPUUserAgent+Private.m"; sourceTree = "<group>"; };
 		729F7ECD27409076004592DC /* SparkleTestCodeSignApp_bad_extraneous.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = SparkleTestCodeSignApp_bad_extraneous.zip; sourceTree = "<group>"; };
+		72A40F082956120D007C7DD5 /* ConfigFrameworkRelease.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigFrameworkRelease.xcconfig; sourceTree = "<group>"; };
 		72A450511C69A68900D67EEA /* SUUpdatePermissionResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUUpdatePermissionResponse.h; sourceTree = "<group>"; };
 		72A450521C69A68900D67EEA /* SUUpdatePermissionResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUUpdatePermissionResponse.m; sourceTree = "<group>"; };
 		72A4A23F1BB6567D00E7820D /* SUFileManagerTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SUFileManagerTest.swift; sourceTree = "<group>"; };
@@ -2424,6 +2425,7 @@
 				72F94ED61CC344A7002DEE68 /* ConfigDownloaderDebug.xcconfig */,
 				FA1941D10D94A70100DD942E /* ConfigFramework.xcconfig */,
 				FA1941CA0D94A70100DD942E /* ConfigFrameworkDebug.xcconfig */,
+				72A40F082956120D007C7DD5 /* ConfigFrameworkRelease.xcconfig */,
 				724BB37E1D31D1EA005D534A /* ConfigInstallerConnection.xcconfig */,
 				724BB37F1D31D1EA005D534A /* ConfigInstallerConnectionDebug.xcconfig */,
 				726E07C11CAF1E79001A286B /* ConfigInstallerLauncher.xcconfig */,
@@ -4116,7 +4118,7 @@
 		};
 		1DEB91AF08733DA50010E9CD /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = FA1941D10D94A70100DD942E /* ConfigFramework.xcconfig */;
+			baseConfigurationReference = 72A40F082956120D007C7DD5 /* ConfigFrameworkRelease.xcconfig */;
 			buildSettings = {
 			};
 			name = Release;
