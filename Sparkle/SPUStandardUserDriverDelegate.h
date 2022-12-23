@@ -51,6 +51,19 @@ SU_EXPORT @protocol SPUStandardUserDriverDelegate <NSObject>
 - (_Nullable id <SUVersionDisplay>)standardUserDriverRequestsVersionDisplayer;
 
 /**
+ Decides whether or not the standard user driver should provide an option to show full release notes to the user.
+ 
+ When a user checks for new updates and no new update is found, Sparkle by default will offer to show the application's version history to the user
+ by providing a "Version History" button in the no new update available alert.
+ 
+ If this delegate method is implemented to return `NO`, then Sparkle will not provide an option to show full release notes to the user.
+ 
+ @param item The appcast item corresponding to the latest version available.
+ @return @c YES to allow Sparkle to show full release notes to the user, otherwise @c NO to disallow this.
+ */
+- (BOOL)standardUserDriverShouldShowVersionHistoryForAppcastItem:(SUAppcastItem *)item;
+
+/**
  Handles showing the full release notes to the user.
  
  When a user checks for new updates and no new update is found, Sparkle will offer to show the application's version history to the user

@@ -583,31 +583,36 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
             case SPUNoUpdateFoundReasonOnLatestVersion:
             case SPUNoUpdateFoundReasonOnNewerThanLatestVersion: {
                 // Show the user the past version history if available
-                NSString *localizedButtonTitle = SULocalizedString(@"Version History", nil);
 
-                // Check if the delegate implements a Version History action
+                // Check if the delegate allows showing the Version History
                 id <SPUStandardUserDriverDelegate> delegate = _delegate;
+                BOOL shouldShowVersionHistory = (![delegate respondsToSelector:@selector(standardUserDriverShouldShowVersionHistoryForAppcastItem:)] || [delegate standardUserDriverShouldShowVersionHistoryForAppcastItem:latestAppcastItem]);
                 
-                if ([delegate respondsToSelector:@selector(standardUserDriverShowVersionHistoryForAppcastItem:)]) {
-                    [alert addButtonWithTitle:localizedButtonTitle];
+                if (shouldShowVersionHistory) {
+                    NSString *localizedButtonTitle = SULocalizedString(@"Version History", nil);
                     
-                    secondaryAction = ^{
-                        [delegate standardUserDriverShowVersionHistoryForAppcastItem:latestAppcastItem];
-                    };
-                } else if (latestAppcastItem.fullReleaseNotesURL != nil) {
-                    // Open the full release notes URL if informed
-                    [alert addButtonWithTitle:localizedButtonTitle];
-                    
-                    secondaryAction = ^{
-                        [[NSWorkspace sharedWorkspace] openURL:(NSURL * _Nonnull)latestAppcastItem.fullReleaseNotesURL];
-                    };
-                } else if (latestAppcastItem.releaseNotesURL != nil) {
-                    // Fall back to opening the release notes URL
-                    [alert addButtonWithTitle:localizedButtonTitle];
-                    
-                    secondaryAction = ^{
-                        [[NSWorkspace sharedWorkspace] openURL:(NSURL * _Nonnull)latestAppcastItem.releaseNotesURL];
-                    };
+                    // Check if the delegate implements its own Version History action
+                    if ([delegate respondsToSelector:@selector(standardUserDriverShowVersionHistoryForAppcastItem:)]) {
+                        [alert addButtonWithTitle:localizedButtonTitle];
+                        
+                        secondaryAction = ^{
+                            [delegate standardUserDriverShowVersionHistoryForAppcastItem:latestAppcastItem];
+                        };
+                    } else if (latestAppcastItem.fullReleaseNotesURL != nil) {
+                        // Open the full release notes URL if informed
+                        [alert addButtonWithTitle:localizedButtonTitle];
+                        
+                        secondaryAction = ^{
+                            [[NSWorkspace sharedWorkspace] openURL:(NSURL * _Nonnull)latestAppcastItem.fullReleaseNotesURL];
+                        };
+                    } else if (latestAppcastItem.releaseNotesURL != nil) {
+                        // Fall back to opening the release notes URL
+                        [alert addButtonWithTitle:localizedButtonTitle];
+                        
+                        secondaryAction = ^{
+                            [[NSWorkspace sharedWorkspace] openURL:(NSURL * _Nonnull)latestAppcastItem.releaseNotesURL];
+                        };
+                    }
                 }
                 
                 break;
