@@ -1,3 +1,10 @@
+# 2.3.1
+
+* Fix update permission alert title text overlapping with question text in some languages (#2284) (Zorg)
+* Log the URL that failed to download correctly (#2296) (Zorg)
+* Update Czech translation (#2275) (Sam)
+* Add zh_HK (Chinese, Hong Kong) localization (#2273) (Bing Zheung)
+
 # 2.3.0
 
 * Bump minimum deployment target to macOS 10.13 (#2196) (Zorg)
