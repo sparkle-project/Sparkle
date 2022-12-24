@@ -153,7 +153,10 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 {
     [self adaptReleaseNotesAppearance];
 
-    if (@available(macOS 10.14, *)) {
+#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_14
+    if (@available(macOS 10.14, *))
+#endif
+    {
         if (!_observingAppearance) {
             [_webView.view addObserver:self forKeyPath:@"effectiveAppearance" options:0 context:nil];
             _observingAppearance = YES;
@@ -185,7 +188,10 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(__attribute__((unused)) NSDictionary<NSKeyValueChangeKey,id> *)change context:(__attribute__((unused)) void *)context {
-    if (@available(macOS 10.14, *)) {
+#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_14
+    if (@available(macOS 10.14, *))
+#endif
+    {
         if (object == _webView.view && [keyPath isEqualToString:@"effectiveAppearance"]) {
             [self adaptReleaseNotesAppearance];
         }
@@ -193,7 +199,10 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 }
 
 - (void)dealloc {
-    if (@available(macOS 10.14, *)) {
+#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_14
+    if (@available(macOS 10.14, *))
+#endif
+    {
         if (_observingAppearance) {
             [_webView.view removeObserver:self forKeyPath:@"effectiveAppearance"];
             _observingAppearance = NO;
@@ -203,7 +212,9 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 
 - (void)adaptReleaseNotesAppearance SPU_OBJC_DIRECT
 {
+#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_14
     if (@available(macOS 10.14, *))
+#endif
     {
         NSAppearanceName bestAppearance = [_webView.view.effectiveAppearance bestMatchFromAppearancesWithNames:@[NSAppearanceNameAqua, NSAppearanceNameDarkAqua]];
         if ([bestAppearance isEqualToString:NSAppearanceNameDarkAqua])
