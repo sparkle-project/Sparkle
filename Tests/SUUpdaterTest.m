@@ -37,6 +37,8 @@
         NSLog(@"Updater error: %@", error);
         abort();
     }
+    
+    [_updater clearFeedURLFromUserDefaults];
 }
 
 - (void)tearDown
@@ -59,7 +61,10 @@
 {
     NSURL *emptyURL = [NSURL URLWithString:@""];
     XCTAssertNotNil(emptyURL);
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
     [_updater setFeedURL:emptyURL]; // this WON'T throw
+#pragma clang diagnostic pop
 }
 
 @end
