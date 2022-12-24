@@ -110,13 +110,22 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
     
     BOOL version3DeltaFormatWithLZMASuccess = [self createAndApplyPatchUsingVersion:SUBinaryDeltaMajorVersion3 compressionMode:SPUDeltaCompressionModeLZMA beforeDiffHandler:beforeDiffHandler afterDiffHandler:afterDiffHandler afterPatchHandler:afterPatchHandler];
     
+#if SPARKLE_BUILD_BZIP2_DELTA_SUPPORT
     BOOL version3DeltaFormatWithBZIP2Success = [self createAndApplyPatchUsingVersion:SUBinaryDeltaMajorVersion3 compressionMode:SPUDeltaCompressionModeBzip2 beforeDiffHandler:beforeDiffHandler afterDiffHandler:afterDiffHandler afterPatchHandler:afterPatchHandler];
+#endif
     
     BOOL version3DeltaFormatWithZLIBSuccess = [self createAndApplyPatchUsingVersion:SUBinaryDeltaMajorVersion3 compressionMode:SPUDeltaCompressionModeZLIB beforeDiffHandler:beforeDiffHandler afterDiffHandler:afterDiffHandler afterPatchHandler:afterPatchHandler];
     
     BOOL version2FormatSuccess = !testingVersion2Delta || [self createAndApplyPatchUsingVersion:SUBinaryDeltaMajorVersion2 compressionMode:SPUDeltaCompressionModeDefault beforeDiffHandler:beforeDiffHandler afterDiffHandler:afterDiffHandler afterPatchHandler:afterPatchHandler];
     
-    return (version3DeltaFormatWithLZMASuccess && version3DeltaFormatWithBZIP2Success && version3DeltaFormatWithZLIBSuccess && version2FormatSuccess);
+    return (
+        version3DeltaFormatWithLZMASuccess &&
+#if SPARKLE_BUILD_BZIP2_DELTA_SUPPORT
+        version3DeltaFormatWithBZIP2Success &&
+#endif
+        version3DeltaFormatWithZLIBSuccess &&
+        version2FormatSuccess
+    );
 }
 
 - (void)createAndApplyPatchWithHandler:(SUDeltaHandler)handler

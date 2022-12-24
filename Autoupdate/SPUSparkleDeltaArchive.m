@@ -7,11 +7,14 @@
 //
 
 #import "SPUSparkleDeltaArchive.h"
-#import <bzlib.h>
 #import <sys/stat.h>
 #import <CommonCrypto/CommonDigest.h>
 #import "SUBinaryDeltaCommon.h"
 #import <compression.h>
+
+#if SPARKLE_BUILD_BZIP2_DELTA_SUPPORT
+#import <bzlib.h>
+#endif
 
 #include "AppKitPrevention.h"
 
@@ -31,7 +34,9 @@ typedef struct
 @implementation SPUSparkleDeltaArchive
 {
     FILE *_file;
+#if SPARKLE_BUILD_BZIP2_DELTA_SUPPORT
     BZFILE *_bzipFile;
+#endif
     NSString *_patchFile;
     NSError *_error;
     void *_partialChunkBuffer;
@@ -79,6 +84,7 @@ typedef struct
 
 - (void)close
 {
+#if SPARKLE_BUILD_BZIP2_DELTA_SUPPORT
     if (_bzipFile != NULL) {
         if (!_writeMode) {
             int bzerror = 0;
@@ -86,7 +92,9 @@ typedef struct
         }
         
         _bzipFile = NULL;
-    } else if (_initializedCompressionStream) {
+    } else
+#endif
+    if (_initializedCompressionStream) {
         compression_stream_destroy(&_compressionStream);
         _initializedCompressionStream = NO;
     }
@@ -137,7 +145,9 @@ typedef struct
                 return YES;
             }
         }
-        case SPUDeltaCompressionModeBzip2: {
+        case SPUDeltaCompressionModeBzip2:
+        {
+#if SPARKLE_BUILD_BZIP2_DELTA_SUPPORT
             int bzerror = 0;
             int bytesRead = BZ2_bzRead(&bzerror, _bzipFile, buffer, length);
             
@@ -157,6 +167,9 @@ typedef struct
                     _error = [NSError errorWithDomain:SPARKLE_BZIP2_ERROR_DOMAIN code:bzerror userInfo:@{ NSLocalizedDescriptionKey: @"Encountered unexpected error when reading compressed bytes from bz2 archive." }];
                     return NO;
             }
+#else
+            return NO;
+#endif
         }
         case SPUDeltaCompressionModeLZMA:
         case SPUDeltaCompressionModeLZFSE:
@@ -269,6 +282,7 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
         case SPUDeltaCompressionModeNone:
             break;
         case SPUDeltaCompressionModeBzip2: {
+#if SPARKLE_BUILD_BZIP2_DELTA_SUPPORT
             int bzerror = 0;
             
             BZFILE *bzipFile = BZ2_bzReadOpen(&bzerror, file, 0, 0, NULL, 0);
@@ -287,6 +301,10 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
             _bzipFile = bzipFile;
             
             break;
+#else
+            _error = [NSError errorWithDomain:SPARKLE_BZIP2_ERROR_DOMAIN code:-1 userInfo:@{ NSLocalizedDescriptionKey: @"Failed to open patch as bz2 file because bzip2 support is disabled" }];
+            return nil;
+#endif
         }
         case SPUDeltaCompressionModeLZMA:
         case SPUDeltaCompressionModeLZFSE:
@@ -662,7 +680,9 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
             
             return success;
         }
-        case SPUDeltaCompressionModeBzip2: {
+        case SPUDeltaCompressionModeBzip2:
+        {
+#if SPARKLE_BUILD_BZIP2_DELTA_SUPPORT
             int bzerror = 0;
             BZ2_bzWrite(&bzerror, _bzipFile, buffer, length);
             switch (bzerror) {
@@ -675,6 +695,9 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
                     _error = [NSError errorWithDomain:SPARKLE_BZIP2_ERROR_DOMAIN code:bzerror userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to write %d compressed bz2 bytes.", length] }];
                     return NO;
             }
+#else
+            return NO;
+#endif
         }
         case SPUDeltaCompressionModeLZMA:
         case SPUDeltaCompressionModeLZFSE:
@@ -742,13 +765,19 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
     uint8_t compressionLevel = 0;
     switch (compression) {
         case SPUDeltaCompressionModeBzip2:
+#if SPARKLE_BUILD_BZIP2_DELTA_SUPPORT
             // Only 1 - 9 are valid, 0 is a special case for using default 9
             if (header.compressionLevel <= 0 || header.compressionLevel > 9) {
                 compressionLevel = 9;
             } else {
                 compressionLevel = header.compressionLevel;
             }
+            
             break;
+#else
+            _error = [NSError errorWithDomain:SPARKLE_BZIP2_ERROR_DOMAIN code:-1 userInfo:@{ NSLocalizedDescriptionKey: @"Failed to write bzip2 patch because bzip2 support is disabled" }];
+            return;
+#endif
         // Some supported formats below have a documented level even though it's not customizable
         // Let's record them in the archive
         case SPUDeltaCompressionModeLZMA:
@@ -775,6 +804,7 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
         case SPUDeltaCompressionModeNone:
             break;
         case SPUDeltaCompressionModeBzip2: {
+#if SPARKLE_BUILD_BZIP2_DELTA_SUPPORT
             int bzerror = 0;
             // Compression level can be 1 - 9
             int blockSize100k = (int)compressionLevel;
@@ -794,6 +824,7 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
             }
             
             _bzipFile = bzipFile;
+#endif
             
             break;
         }
@@ -1191,6 +1222,7 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
     
     // Close up and write final data to compressed streams
     
+#if SPARKLE_BUILD_BZIP2_DELTA_SUPPORT
     if (_bzipFile != NULL) {
         int bzerror = 0;
         BZ2_bzWriteClose64(&bzerror, _bzipFile, 0, NULL, NULL, NULL, NULL);
@@ -1198,7 +1230,9 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
             _error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: @"Failed to write and close bzip2 file due to IO error" }];
             return;
         }
-    } else if (_initializedCompressionStream) {
+    } else
+#endif
+    if (_initializedCompressionStream) {
         void *compressionBuffer = _compressionBuffer;
         FILE *file = _file;
         
