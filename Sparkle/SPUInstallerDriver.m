@@ -31,11 +31,13 @@
 
 #define FIRST_INSTALLER_MESSAGE_TIMEOUT 7ull
 
+#if SPARKLE_BUILD_LEGACY_SUUPDATER
 @interface NSObject (PrivateDelegateMethods)
 
 - (nullable NSString *)_pathToRelaunchForUpdater:(SPUUpdater *)updater;
 
 @end
+#endif
 
 @interface SPUInstallerDriver () <SUInstallerCommunicationProtocol>
 @end
@@ -210,15 +212,21 @@
 - (void)sendInstallationData SPU_OBJC_DIRECT
 {
     NSString *pathToRelaunch = _applicationBundle.bundlePath;
-    // Give the delegate one more chance for determining the path to relaunch via a private API used by SUUpdater
+    
+#if SPARKLE_BUILD_DMG_SUPPORT || SPARKLE_BUILD_LEGACY_SUUPDATER
     id<SPUUpdaterDelegate> updaterDelegate = _updaterDelegate;
     id updater = _updater;
+#endif
+    
+#if SPARKLE_BUILD_LEGACY_SUUPDATER
+    // Give the delegate one more chance for determining the path to relaunch via a private API used by SUUpdater
     if (updater != nil && [updaterDelegate respondsToSelector:@selector(_pathToRelaunchForUpdater:)]) {
         NSString *relaunchPath = [(NSObject *)updaterDelegate _pathToRelaunchForUpdater:updater];
         if (relaunchPath != nil) {
             pathToRelaunch = relaunchPath;
         }
     }
+#endif
 
     NSString *decryptionPassword = nil;
 #if SPARKLE_BUILD_DMG_SUPPORT
