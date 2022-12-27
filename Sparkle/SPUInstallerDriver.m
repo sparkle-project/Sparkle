@@ -25,6 +25,7 @@
 #import "SUXPCInstallerConnection.h"
 #import "SPUDownloadedUpdate.h"
 #import "SPUInstallationType.h"
+#import "SUConstants.h"
 
 
 #include "AppKitPrevention.h"

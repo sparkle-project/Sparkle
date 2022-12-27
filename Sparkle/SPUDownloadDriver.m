@@ -18,6 +18,7 @@
 #import "SUErrors.h"
 #import "SPUDownloadedUpdate.h"
 #import "SPUDownloadData.h"
+#import "SUConstants.h"
 
 
 #include "AppKitPrevention.h"

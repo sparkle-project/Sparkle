@@ -27,6 +27,7 @@
     // (which will be after the update is trusted)
     // If we fail to load localizations in any way, we default to English
     
+#if SPARKLE_COPY_LOCALIZATIONS
     NSBundle *hostSparkleBundle;
     {
         NSURL *hostSparkleURL = [host.bundle.privateFrameworksURL URLByAppendingPathComponent:@"Sparkle.framework" isDirectory:YES];
@@ -36,8 +37,10 @@
             hostSparkleBundle = [NSBundle bundleWithURL:hostSparkleURL];
         }
     }
+#endif
     
     NSString *updatingString;
+#if SPARKLE_COPY_LOCALIZATIONS
     {
         NSString *updatingFormatStringFromBundle = (hostSparkleBundle != nil) ? SULocalizedStringFromTableInBundle(@"Updating %@", @"Sparkle", hostSparkleBundle, nil) : nil;
 
@@ -51,22 +54,41 @@
             updatingString = [@"Updating " stringByAppendingString:hostName];
         }
     }
+#else
+    {
+        NSString *hostNameFromBundle = host.name;
+        NSString *hostName = (hostNameFromBundle != nil) ? hostNameFromBundle : @"";
+        
+        updatingString = [@"Updating " stringByAppendingString:hostName];
+    }
+#endif
     
     _updatingString = updatingString;
     
     NSString *cancelUpdateTitle;
+#if SPARKLE_COPY_LOCALIZATIONS
     {
         NSString *cancelUpdateTitleFromBundle = (hostSparkleBundle != nil) ?  SULocalizedStringFromTableInBundle(@"Cancel Update", @"Sparkle", hostSparkleBundle, @"") : nil;
         cancelUpdateTitle = (cancelUpdateTitleFromBundle != nil) ? cancelUpdateTitleFromBundle : @"Cancel Update";
     }
-    
+#else
+    {
+        cancelUpdateTitle = @"Cancel Update";
+    }
+#endif
     _cancelUpdateTitle = cancelUpdateTitle;
     
     NSString *installingUpdateTitle;
+#if SPARKLE_COPY_LOCALIZATIONS
     {
         NSString *installingUpdateTitleFromBundle = (hostSparkleBundle != nil) ?  SULocalizedStringFromTableInBundle(@"Installing update…", @"Sparkle", hostSparkleBundle, @"") : nil;
         installingUpdateTitle = (installingUpdateTitleFromBundle != nil) ? installingUpdateTitleFromBundle : @"Installing update…";
     }
+#else
+    {
+        installingUpdateTitle = @"Installing update…";
+    }
+#endif
     
     _installingUpdateTitle = installingUpdateTitle;
 }
