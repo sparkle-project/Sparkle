@@ -16,19 +16,14 @@
 
 #include "AppKitPrevention.h"
 
-@interface TerminationListener ()
-
-@property (nonatomic, readonly, nullable) NSNumber *processIdentifier;
-@property (nonatomic) BOOL watchedTermination;
-@property (nonatomic, copy) void (^completionBlock)(BOOL);
-
-@end
-
 @implementation TerminationListener
-
-@synthesize completionBlock = _completionBlock;
-@synthesize processIdentifier = _processIdentifier;
-@synthesize watchedTermination = _watchedTermination;
+{
+    NSNumber *_processIdentifier;
+    
+    void (^_completionBlock)(BOOL);
+    
+    BOOL _watchedTermination;
+}
 
 - (instancetype)initWithProcessIdentifier:(NSNumber * _Nullable)processIdentifier
 {
@@ -42,22 +37,22 @@
 
 - (BOOL)terminated
 {
-    return (self.watchedTermination || self.processIdentifier == nil) ? YES : (kill(self.processIdentifier.intValue, 0) != 0);
+    return (_watchedTermination || _processIdentifier == nil) ? YES : (kill(_processIdentifier.intValue, 0) != 0);
 }
 
-- (void)invokeCompletionWithSuccess:(BOOL)success
+- (void)invokeCompletionWithSuccess:(BOOL)success SPU_OBJC_DIRECT
 {
-    if (self.completionBlock != nil) {
-        self.completionBlock(success);
-        self.completionBlock = nil;
+    if (_completionBlock != nil) {
+        _completionBlock(success);
+        _completionBlock = nil;
     }
 }
 
 - (void)startListeningWithCompletion:(void (^)(BOOL))completionBlock
 {
-    self.completionBlock = completionBlock;
+    _completionBlock = [completionBlock copy];
     
-    if (self.processIdentifier == nil) {
+    if (_processIdentifier == nil) {
         [self invokeCompletionWithSuccess:YES];
         return;
     }
@@ -66,7 +61,7 @@
     // As described in https://developer.apple.com/library/mac/technotes/tn2050/_index.html#//apple_ref/doc/uid/DTS10003081-CH1-SUBSECTION10
     // By using kqueues, we can stay away from using AppKit in case we ever decide to abandon it
     
-    pid_t processIdentifier = self.processIdentifier.intValue;
+    pid_t processIdentifier = _processIdentifier.intValue;
     int queue = kqueue();
     if (queue == -1) {
         SULog(SULogLevelError, @"Failed to create kqueue() due to error %d: %@", errno, @(strerror(errno)));
@@ -124,7 +119,7 @@ static void noteExitKQueueCallback(CFFileDescriptorRef file, CFOptionFlags __unu
     kevent(CFFileDescriptorGetNativeDescriptor(file), NULL, 0, &event, 1, NULL);
     
     TerminationListener *self = CFBridgingRelease(info);
-    self.watchedTermination = YES;
+    self->_watchedTermination = YES;
     [self invokeCompletionWithSuccess:YES];
 }
 

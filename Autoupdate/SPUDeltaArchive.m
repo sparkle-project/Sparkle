@@ -23,6 +23,7 @@ id<SPUDeltaArchiveProtocol> SPUDeltaArchiveReadPatchAndHeader(NSString *patchFil
     
     SPUDeltaArchiveHeader *header = [sparkleArchive readHeader];
     if (header == nil) {
+#if SPARKLE_BUILD_LEGACY_DELTA_SUPPORT
         NSError *archiveError = sparkleArchive.error;
         if (archiveError != nil && [archiveError.domain isEqualToString:SPARKLE_DELTA_ARCHIVE_ERROR_DOMAIN] && archiveError.code == SPARKLE_DELTA_ARCHIVE_ERROR_CODE_BAD_MAGIC) {
             // Retry with XAR archive if the magic value is unexpected
@@ -35,7 +36,9 @@ id<SPUDeltaArchiveProtocol> SPUDeltaArchiveReadPatchAndHeader(NSString *patchFil
                 *outHeader = xarHeader;
             }
             return xarArchive;
-        } else {
+        } else
+#endif
+        {
             if (outHeader != NULL) {
                 *outHeader = nil;
             }
@@ -56,7 +59,9 @@ id<SPUDeltaArchiveProtocol> SPUDeltaArchiveReadPatchAndHeader(NSString *patchFil
 @synthesize clonedRelativePath = _clonedRelativePath;
 @synthesize sourcePath = _sourcePath;
 @synthesize commands = _commands;
+#if SPARKLE_BUILD_LEGACY_DELTA_SUPPORT
 @synthesize xarContext = _xarContext;
+#endif
 @synthesize mode = _mode;
 @synthesize codedDataLength = _codedDataLength;
 
@@ -103,9 +108,6 @@ id<SPUDeltaArchiveProtocol> SPUDeltaArchiveReadPatchAndHeader(NSString *patchFil
     return self;
 }
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdirect-ivar-access"
-
 - (unsigned char *)beforeTreeHash
 {
     return _beforeTreeHash;
@@ -115,7 +117,5 @@ id<SPUDeltaArchiveProtocol> SPUDeltaArchiveReadPatchAndHeader(NSString *patchFil
 {
     return _afterTreeHash;
 }
-
-#pragma clang diagnostic pop
 
 @end

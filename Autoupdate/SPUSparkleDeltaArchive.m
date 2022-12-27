@@ -7,11 +7,14 @@
 //
 
 #import "SPUSparkleDeltaArchive.h"
-#import <bzlib.h>
 #import <sys/stat.h>
 #import <CommonCrypto/CommonDigest.h>
 #import "SUBinaryDeltaCommon.h"
 #import <compression.h>
+
+#if SPARKLE_BUILD_BZIP2_DELTA_SUPPORT
+#import <bzlib.h>
+#endif
 
 #include "AppKitPrevention.h"
 
@@ -28,39 +31,26 @@ typedef struct
     bool fileSystemCompression : 1;
 } SparkleDeltaArchiveMetadata;
 
-@interface SPUSparkleDeltaArchive ()
-
-@property (nonatomic) FILE *file;
-@property (nonatomic) BZFILE *bzipFile;
-@property (nonatomic) compression_stream compressionStream;
-@property (nonatomic) BOOL initializedCompressionStream;
-@property (nonatomic, readonly) NSString *patchFile;
-@property (nonatomic) SPUDeltaCompressionMode compression;
-@property (nonatomic, readonly) BOOL writeMode;
-@property (nonatomic) NSError *error;
-@property (nonatomic) void *partialChunkBuffer;
-@property (nonatomic) void *compressionBuffer;
-
-@property (nonatomic) NSMutableArray<SPUDeltaArchiveItem *> *writableItems;
-
-@end
-
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdirect-ivar-access"
-
 @implementation SPUSparkleDeltaArchive
+{
+    FILE *_file;
+#if SPARKLE_BUILD_BZIP2_DELTA_SUPPORT
+    BZFILE *_bzipFile;
+#endif
+    NSString *_patchFile;
+    NSError *_error;
+    void *_partialChunkBuffer;
+    void *_compressionBuffer;
+    NSMutableArray<SPUDeltaArchiveItem *> *_writableItems;
+    
+    compression_stream _compressionStream;
+    SPUDeltaCompressionMode _compression;
+    
+    BOOL _initializedCompressionStream;
+    BOOL _writeMode;
+}
 
-@synthesize file = _file;
-@synthesize bzipFile = _bzipFile;
-@synthesize compressionStream = _compressionStream;
-@synthesize initializedCompressionStream = _initializedCompressionStream;
-@synthesize patchFile = _patchFile;
-@synthesize compression = _compression;
-@synthesize writeMode = _writeMode;
-@synthesize writableItems = _writableItems;
 @synthesize error = _error;
-@synthesize partialChunkBuffer = _partialChunkBuffer;
-@synthesize compressionBuffer = _compressionBuffer;
 
 + (BOOL)maySupportSafeExtraction
 {
@@ -94,42 +84,45 @@ typedef struct
 
 - (void)close
 {
-    if (self.bzipFile != NULL) {
-        if (!self.writeMode) {
+#if SPARKLE_BUILD_BZIP2_DELTA_SUPPORT
+    if (_bzipFile != NULL) {
+        if (!_writeMode) {
             int bzerror = 0;
-            BZ2_bzReadClose(&bzerror, self.bzipFile);
+            BZ2_bzReadClose(&bzerror, _bzipFile);
         }
         
-        self.bzipFile = NULL;
-    } else if (self.initializedCompressionStream) {
+        _bzipFile = NULL;
+    } else
+#endif
+    if (_initializedCompressionStream) {
         compression_stream_destroy(&_compressionStream);
-        self.initializedCompressionStream = NO;
+        _initializedCompressionStream = NO;
     }
     
-    if (self.file != NULL) {
-        fclose(self.file);
-        self.file = NULL;
+    if (_file != NULL) {
+        fclose(_file);
+        _file = NULL;
     }
     
-    free(self.partialChunkBuffer);
-    self.partialChunkBuffer = NULL;
+    free(_partialChunkBuffer);
+    _partialChunkBuffer = NULL;
     
-    free(self.compressionBuffer);
-    self.compressionBuffer = NULL;
+    free(_compressionBuffer);
+    _compressionBuffer = NULL;
 }
 
-- (BOOL)createBuffers
+- (BOOL)createBuffers SPU_OBJC_DIRECT
 {
-    self.partialChunkBuffer = calloc(1, PARTIAL_IO_CHUNK_SIZE);
-    if (self.partialChunkBuffer == NULL) {
-        self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to calloc() %d bytes for partial chunk buffer.", PARTIAL_IO_CHUNK_SIZE] }];
+    _partialChunkBuffer = calloc(1, PARTIAL_IO_CHUNK_SIZE);
+    if (_partialChunkBuffer == NULL) {
+        _error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to calloc() %d bytes for partial chunk buffer.", PARTIAL_IO_CHUNK_SIZE] }];
         return NO;
     }
     
-    if (self.initializedCompressionStream) {
-        self.compressionBuffer = calloc(1, COMPRESSION_BUFFER_SIZE);
-        if (self.compressionBuffer == NULL) {
-            self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to calloc() %d bytes for compression buffer.", COMPRESSION_BUFFER_SIZE] }];
+    if (_initializedCompressionStream) {
+        _compressionBuffer = calloc(1, COMPRESSION_BUFFER_SIZE);
+        if (_compressionBuffer == NULL) {
+            _error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to calloc() %d bytes for compression buffer.", COMPRESSION_BUFFER_SIZE] }];
             return NO;
         }
     }
@@ -137,48 +130,53 @@ typedef struct
     return YES;
 }
 
-- (BOOL)_readBuffer:(void *)buffer length:(int32_t)length
+- (BOOL)_readBuffer:(void *)buffer length:(int32_t)length SPU_OBJC_DIRECT
 {
-    if (self.error != nil) {
+    if (_error != nil) {
         return NO;
     }
     
-    switch (self.compression) {
+    switch (_compression) {
         case SPUDeltaCompressionModeNone: {
-            if (fread(buffer, (size_t)length, 1, self.file) < 1) {
-                self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to read %d uncompressed bytes from archive.", length] }];
+            if (fread(buffer, (size_t)length, 1, _file) < 1) {
+                _error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to read %d uncompressed bytes from archive.", length] }];
                 return NO;
             } else {
                 return YES;
             }
         }
-        case SPUDeltaCompressionModeBzip2: {
+        case SPUDeltaCompressionModeBzip2:
+        {
+#if SPARKLE_BUILD_BZIP2_DELTA_SUPPORT
             int bzerror = 0;
-            int bytesRead = BZ2_bzRead(&bzerror, self.bzipFile, buffer, length);
+            int bytesRead = BZ2_bzRead(&bzerror, _bzipFile, buffer, length);
             
             switch (bzerror) {
                 case BZ_OK:
                 case BZ_STREAM_END:
                     if (bytesRead < length) {
-                        self.error = [NSError errorWithDomain:SPARKLE_BZIP2_ERROR_DOMAIN code:0 userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Only %d out of %d expected bytes were read from the bz2 archive.", bytesRead, length] }];
+                        _error = [NSError errorWithDomain:SPARKLE_BZIP2_ERROR_DOMAIN code:0 userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Only %d out of %d expected bytes were read from the bz2 archive.", bytesRead, length] }];
                         return NO;
                     } else {
                         return YES;
                     }
                 case BZ_IO_ERROR:
-                    self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: @"Encountered unexpected IO error when reading compressed bytes from bz2 archive." }];
+                    _error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: @"Encountered unexpected IO error when reading compressed bytes from bz2 archive." }];
                     return NO;
                 default:
-                    self.error = [NSError errorWithDomain:SPARKLE_BZIP2_ERROR_DOMAIN code:bzerror userInfo:@{ NSLocalizedDescriptionKey: @"Encountered unexpected error when reading compressed bytes from bz2 archive." }];
+                    _error = [NSError errorWithDomain:SPARKLE_BZIP2_ERROR_DOMAIN code:bzerror userInfo:@{ NSLocalizedDescriptionKey: @"Encountered unexpected error when reading compressed bytes from bz2 archive." }];
                     return NO;
             }
+#else
+            return NO;
+#endif
         }
         case SPUDeltaCompressionModeLZMA:
         case SPUDeltaCompressionModeLZFSE:
         case SPUDeltaCompressionModeLZ4:
         case SPUDeltaCompressionModeZLIB: {
-            FILE *file = self.file;
-            void *compressionBuffer = self.compressionBuffer;
+            FILE *file = _file;
+            void *compressionBuffer = _compressionBuffer;
             
             _compressionStream.dst_ptr = buffer;
             _compressionStream.dst_size = (size_t)length;
@@ -190,7 +188,7 @@ typedef struct
                     size_t bytesRead = fread(compressionBuffer, 1, COMPRESSION_BUFFER_SIZE, file);
                     if (bytesRead < COMPRESSION_BUFFER_SIZE) {
                         if (feof(file) == 0) {
-                            self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to read %d compressed raw bytes from archive.", length] }];
+                            _error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to read %d compressed raw bytes from archive.", length] }];
                             return NO;
                         }
                     }
@@ -202,13 +200,13 @@ typedef struct
                 
                 compression_status status = compression_stream_process(&_compressionStream, feof(file) != 0 ? COMPRESSION_STREAM_FINALIZE : 0);
                 if (status == COMPRESSION_STATUS_ERROR) {
-                    self.error = [NSError errorWithDomain:SPARKLE_COMPRESSION_ERROR_DOMAIN code:COMPRESSION_STATUS_ERROR userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to read %d compressed bytes.", length] }];
+                    _error = [NSError errorWithDomain:SPARKLE_COMPRESSION_ERROR_DOMAIN code:COMPRESSION_STATUS_ERROR userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to read %d compressed bytes.", length] }];
                     return NO;
                 }
                 
                 if (status == COMPRESSION_STATUS_END && _compressionStream.dst_size > 0) {
                     // We're expecting more bytes but we can't read any more bytes
-                    self.error = [NSError errorWithDomain:SPARKLE_DELTA_ARCHIVE_ERROR_DOMAIN code:-1 userInfo:@{ NSLocalizedDescriptionKey: @"Failed to decompress and read bytes because we reached EOF" }];
+                    _error = [NSError errorWithDomain:SPARKLE_DELTA_ARCHIVE_ERROR_DOMAIN code:-1 userInfo:@{ NSLocalizedDescriptionKey: @"Failed to decompress and read bytes because we reached EOF" }];
                     return NO;
                 }
             }
@@ -239,44 +237,44 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
 
 - (nullable SPUDeltaArchiveHeader *)readHeader
 {
-    NSString *patchFile = self.patchFile;
+    NSString *patchFile = _patchFile;
     
     char patchFilePath[PATH_MAX + 1] = {0};
     if (![patchFile getFileSystemRepresentation:patchFilePath maxLength:sizeof(patchFilePath) - 1]) {
-        self.error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to open and represent as a file system representation: %@", patchFile] }];
+        _error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to open and represent as a file system representation: %@", patchFile] }];
         return nil;
     }
     
     FILE *file = fopen(patchFilePath, "rb");
     if (file == NULL) {
-        self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to open patch file for writing value due to io error: %@", patchFile] }];
+        _error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to open patch file for writing value due to io error: %@", patchFile] }];
         return nil;
     }
     
-    self.file = file;
+    _file = file;
     
     char magic[5] = {0};
     if (fread(magic, sizeof(magic) - 1, 1, file) < 1) {
-        self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to read magic value from patch file: %@", patchFile] }];
+        _error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to read magic value from patch file: %@", patchFile] }];
         return nil;
     }
     
     if (strncmp(magic, SPARKLE_DELTA_FORMAT_MAGIC, sizeof(magic) - 1) != 0) {
-        self.error = [NSError errorWithDomain:SPARKLE_DELTA_ARCHIVE_ERROR_DOMAIN code:SPARKLE_DELTA_ARCHIVE_ERROR_CODE_BAD_MAGIC userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Patch file does not have '%@' magic value", @SPARKLE_DELTA_FORMAT_MAGIC] }];
+        _error = [NSError errorWithDomain:SPARKLE_DELTA_ARCHIVE_ERROR_DOMAIN code:SPARKLE_DELTA_ARCHIVE_ERROR_CODE_BAD_MAGIC userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Patch file does not have '%@' magic value", @SPARKLE_DELTA_FORMAT_MAGIC] }];
         return nil;
     }
     
     SPUDeltaCompressionMode compression = 0;
     if (fread(&compression, sizeof(compression), 1, file) < 1) {
-        self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to read compression value from patch file: %@", patchFile] }];
+        _error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to read compression value from patch file: %@", patchFile] }];
         return nil;
     }
     
-    self.compression = compression;
+    _compression = compression;
     
     SparkleDeltaArchiveMetadata metadata = {0};
     if (fread(&metadata, sizeof(metadata), 1, file) < 1) {
-        self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to read compression level value from patch file: %@", patchFile] }];
+        _error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to read compression level value from patch file: %@", patchFile] }];
         return nil;
     }
     
@@ -284,40 +282,45 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
         case SPUDeltaCompressionModeNone:
             break;
         case SPUDeltaCompressionModeBzip2: {
+#if SPARKLE_BUILD_BZIP2_DELTA_SUPPORT
             int bzerror = 0;
             
             BZFILE *bzipFile = BZ2_bzReadOpen(&bzerror, file, 0, 0, NULL, 0);
             if (bzipFile == NULL) {
                 switch (bzerror) {
                     case BZ_IO_ERROR:
-                        self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to open patch as bz2 file due to io error: %@", patchFile] }];
+                        _error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to open patch as bz2 file due to io error: %@", patchFile] }];
                         break;
                     default:
-                        self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:bzerror userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to open patch as bz2 file: %@", patchFile] }];
+                        _error = [NSError errorWithDomain:NSPOSIXErrorDomain code:bzerror userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to open patch as bz2 file: %@", patchFile] }];
                         break;
                 }
                 return nil;
             }
             
-            self.bzipFile = bzipFile;
+            _bzipFile = bzipFile;
             
             break;
+#else
+            _error = [NSError errorWithDomain:SPARKLE_BZIP2_ERROR_DOMAIN code:-1 userInfo:@{ NSLocalizedDescriptionKey: @"Failed to open patch as bz2 file because bzip2 support is disabled" }];
+            return nil;
+#endif
         }
         case SPUDeltaCompressionModeLZMA:
         case SPUDeltaCompressionModeLZFSE:
         case SPUDeltaCompressionModeLZ4:
         case SPUDeltaCompressionModeZLIB: {
             if (compression_stream_init(&_compressionStream, COMPRESSION_STREAM_DECODE, _compressionAlgorithmForMode(compression)) != COMPRESSION_STATUS_OK) {
-                self.error = [NSError errorWithDomain:SPARKLE_COMPRESSION_ERROR_DOMAIN code:COMPRESSION_STATUS_ERROR userInfo:@{ NSLocalizedDescriptionKey: @"Failed to open compression stream for reading" }];
+                _error = [NSError errorWithDomain:SPARKLE_COMPRESSION_ERROR_DOMAIN code:COMPRESSION_STATUS_ERROR userInfo:@{ NSLocalizedDescriptionKey: @"Failed to open compression stream for reading" }];
                 return nil;
             }
             
-            self.initializedCompressionStream = YES;
+            _initializedCompressionStream = YES;
             
             break;
         }
         default:
-            self.error = [NSError errorWithDomain:SPARKLE_DELTA_ARCHIVE_ERROR_DOMAIN code:SPARKLE_DELTA_ARCHIVE_ERROR_CODE_BAD_COMPRESSION_VALUE userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Compression value read %d is not recognized.", compression] }];
+            _error = [NSError errorWithDomain:SPARKLE_DELTA_ARCHIVE_ERROR_DOMAIN code:SPARKLE_DELTA_ARCHIVE_ERROR_CODE_BAD_COMPRESSION_VALUE userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Compression value read %d is not recognized.", compression] }];
             return nil;
     }
     
@@ -348,9 +351,9 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
     return [[SPUDeltaArchiveHeader alloc] initWithCompression:compression compressionLevel:metadata.compressionLevel fileSystemCompression:metadata.fileSystemCompression majorVersion:majorVersion minorVersion:minorVersion beforeTreeHash:beforeTreeHash afterTreeHash:afterTreeHash];
 }
 
-- (NSArray<NSString *> *)_readRelativeFilePaths
+- (NSArray<NSString *> *)_readRelativeFilePaths SPU_OBJC_DIRECT
 {
-    if (self.error != nil) {
+    if (_error != nil) {
         return nil;
     }
     
@@ -366,7 +369,7 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
     
     char *fileTableData = calloc(1, filePathSectionSize);
     if (fileTableData == NULL) {
-        self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to calloc() %llu bytes for relative file paths.", filePathSectionSize] }];
+        _error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to calloc() %llu bytes for relative file paths.", filePathSectionSize] }];
         return nil;
     }
     
@@ -393,7 +396,7 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
         if (fileTableData[index] == '\0') {
             NSString *relativePath = [fileManager stringWithFileSystemRepresentation:&fileTableData[currentStartIndex] length:index - currentStartIndex];
             if (relativePath == nil) {
-                self.error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Relative path cannot be decoded as a file system representation: %@", relativePath] }];
+                _error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Relative path cannot be decoded as a file system representation: %@", relativePath] }];
                 
                 free(fileTableData);
                 return nil;
@@ -425,7 +428,7 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
     if (relativeFilePaths.count > UINT32_MAX) {
         // Very unlikely but we should guard against this
         // Clones rely on 32-bit indexes
-        self.error = [NSError errorWithDomain:SPARKLE_DELTA_ARCHIVE_ERROR_DOMAIN code:SPARKLE_DELTA_ARCHIVE_ERROR_CODE_TOO_MANY_FILES userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"There are too many file entries to apply a patch for (more than %u)", UINT32_MAX] }];
+        _error = [NSError errorWithDomain:SPARKLE_DELTA_ARCHIVE_ERROR_DOMAIN code:SPARKLE_DELTA_ARCHIVE_ERROR_CODE_TOO_MANY_FILES userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"There are too many file entries to apply a patch for (more than %u)", UINT32_MAX] }];
         return;
     }
     
@@ -464,7 +467,7 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
                 }
                 
                 if ((NSUInteger)cloneRelativePathIndex >= relativeFilePaths.count) {
-                    self.error = [NSError errorWithDomain:SPARKLE_DELTA_ARCHIVE_ERROR_DOMAIN code:SPARKLE_DELTA_ARCHIVE_ERROR_CODE_BAD_CLONE_LOOKUP userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Index %u is past relative path table bounds of length %lu", cloneRelativePathIndex, (unsigned long)relativeFilePaths.count] }];
+                    _error = [NSError errorWithDomain:SPARKLE_DELTA_ARCHIVE_ERROR_DOMAIN code:SPARKLE_DELTA_ARCHIVE_ERROR_CODE_BAD_CLONE_LOOKUP userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Index %u is past relative path table bounds of length %lu", cloneRelativePathIndex, (unsigned long)relativeFilePaths.count] }];
                     break;
                 }
                 
@@ -525,7 +528,7 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
         }
     }
     
-    if (self.error != nil) {
+    if (_error != nil) {
         return;
     }
     
@@ -563,13 +566,13 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
             
             char itemFilePathString[PATH_MAX + 1] = {0};
             if (![itemFilePath getFileSystemRepresentation:itemFilePathString maxLength:sizeof(itemFilePathString) - 1]) {
-                self.error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Path to extract cannot be decoded and expressed as a file system representation: %@", itemFilePath] }];
+                _error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Path to extract cannot be decoded and expressed as a file system representation: %@", itemFilePath] }];
                 return NO;
             }
             
             FILE *outputFile = fopen(itemFilePathString, "wb");
             if (outputFile == NULL) {
-                self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to fopen() %@", itemFilePath] }];
+                _error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to fopen() %@", itemFilePath] }];
                 return NO;
             }
             
@@ -580,14 +583,14 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
                 while (bytesLeftoverToCopy > 0) {
                     uint64_t currentBlockSize = (bytesLeftoverToCopy >= PARTIAL_IO_CHUNK_SIZE) ? PARTIAL_IO_CHUNK_SIZE : bytesLeftoverToCopy;
                     
-                    void *tempBuffer = self.partialChunkBuffer;
+                    void *tempBuffer = _partialChunkBuffer;
                     
                     if (![self _readBuffer:tempBuffer length:(int32_t)currentBlockSize]) {
                         break;
                     }
                     
                     if (fwrite(tempBuffer, currentBlockSize, 1, outputFile) < 1) {
-                        self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to fwrite() %llu bytes during extraction.", currentBlockSize] }];
+                        _error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to fwrite() %llu bytes during extraction.", currentBlockSize] }];
                         break;
                     }
                     
@@ -597,12 +600,12 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
             
             fclose(outputFile);
             
-            if (self.error != nil) {
+            if (_error != nil) {
                 return NO;
             }
             
             if ((commands & SPUDeltaItemCommandExtract) != 0 && chmod(itemFilePathString, mode) != 0) {
-                self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to chmod() mode %d on %@", mode, itemFilePath] }];
+                _error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to chmod() mode %d on %@", mode, itemFilePath] }];
                 return NO;
             }
         } else {
@@ -610,13 +613,13 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
             
             if (PARTIAL_IO_CHUNK_SIZE < decodedLength) {
                 // Something is seriously wrong
-                self.error = [NSError errorWithDomain:SPARKLE_DELTA_ARCHIVE_ERROR_DOMAIN code:SPARKLE_DELTA_ARCHIVE_ERROR_CODE_BAD_CHUNK_SIZE userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"PARTIAL_IO_CHUNK_SIZE (%d) < decodedLength (%llu)", PARTIAL_IO_CHUNK_SIZE, decodedLength] }];
+                _error = [NSError errorWithDomain:SPARKLE_DELTA_ARCHIVE_ERROR_DOMAIN code:SPARKLE_DELTA_ARCHIVE_ERROR_CODE_BAD_CHUNK_SIZE userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"PARTIAL_IO_CHUNK_SIZE (%d) < decodedLength (%llu)", PARTIAL_IO_CHUNK_SIZE, decodedLength] }];
                 return NO;
             }
             
             if (decodedLength > PATH_MAX) {
                 // Link is too long
-                self.error = [NSError errorWithDomain:SPARKLE_DELTA_ARCHIVE_ERROR_DOMAIN code:SPARKLE_DELTA_ARCHIVE_ERROR_CODE_LINK_TOO_LONG userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Decoded length for link (%llu) is too long.", decodedLength] }];
+                _error = [NSError errorWithDomain:SPARKLE_DELTA_ARCHIVE_ERROR_DOMAIN code:SPARKLE_DELTA_ARCHIVE_ERROR_CODE_LINK_TOO_LONG userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Decoded length for link (%llu) is too long.", decodedLength] }];
                 return NO;
             }
             
@@ -628,7 +631,7 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
             NSString *destinationPath = [fileManager stringWithFileSystemRepresentation:buffer length:decodedLength];
             
             if (destinationPath == nil) {
-                self.error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Destination path for link %@ cannot be created in a file system representation: %@",itemFilePath, destinationPath] }];
+                _error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Destination path for link %@ cannot be created in a file system representation: %@",itemFilePath, destinationPath] }];
                 return NO;
             }
             
@@ -636,13 +639,13 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
             
             NSError *createLinkError = nil;
             if (![fileManager createSymbolicLinkAtPath:itemFilePath withDestinationPath:destinationPath error:&createLinkError]) {
-                self.error = createLinkError;
+                _error = createLinkError;
                 return NO;
             }
             
             char itemFilePathString[PATH_MAX + 1] = {0};
             if (![itemFilePath getFileSystemRepresentation:itemFilePathString maxLength:sizeof(itemFilePathString) - 1]) {
-                self.error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Link path to extract cannot be decoded and expressed as a file system representation: %@", itemFilePath] }];
+                _error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Link path to extract cannot be decoded and expressed as a file system representation: %@", itemFilePath] }];
                 return NO;
             }
             
@@ -654,7 +657,7 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
     } else if (S_ISDIR(mode)) {
         NSError *createDirectoryError = nil;
         if (![fileManager createDirectoryAtPath:itemFilePath withIntermediateDirectories:NO attributes:@{NSFilePosixPermissions: @(mode)} error:&createDirectoryError]) {
-            self.error = createDirectoryError;
+            _error = createDirectoryError;
             return NO;
         }
     }
@@ -662,34 +665,39 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
     return YES;
 }
 
-- (BOOL)_writeBuffer:(void *)buffer length:(int32_t)length
+- (BOOL)_writeBuffer:(void *)buffer length:(int32_t)length SPU_OBJC_DIRECT
 {
-    if (self.error != nil) {
+    if (_error != nil) {
         return NO;
     }
     
-    switch (self.compression) {
+    switch (_compression) {
         case SPUDeltaCompressionModeNone: {
-            BOOL success = (fwrite(buffer, (size_t)length, 1, self.file) == 1);
+            BOOL success = (fwrite(buffer, (size_t)length, 1, _file) == 1);
             if (!success) {
-                self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to write %d uncompressed bytes.", length] }];
+                _error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to write %d uncompressed bytes.", length] }];
             }
             
             return success;
         }
-        case SPUDeltaCompressionModeBzip2: {
+        case SPUDeltaCompressionModeBzip2:
+        {
+#if SPARKLE_BUILD_BZIP2_DELTA_SUPPORT
             int bzerror = 0;
-            BZ2_bzWrite(&bzerror, self.bzipFile, buffer, length);
+            BZ2_bzWrite(&bzerror, _bzipFile, buffer, length);
             switch (bzerror) {
                 case BZ_OK:
                     return YES;
                 case BZ_IO_ERROR:
-                    self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to write %d compressed bz2 bytes due to io error.", length] }];
+                    _error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to write %d compressed bz2 bytes due to io error.", length] }];
                     return NO;
                 default:
-                    self.error = [NSError errorWithDomain:SPARKLE_BZIP2_ERROR_DOMAIN code:bzerror userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to write %d compressed bz2 bytes.", length] }];
+                    _error = [NSError errorWithDomain:SPARKLE_BZIP2_ERROR_DOMAIN code:bzerror userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to write %d compressed bz2 bytes.", length] }];
                     return NO;
             }
+#else
+            return NO;
+#endif
         }
         case SPUDeltaCompressionModeLZMA:
         case SPUDeltaCompressionModeLZFSE:
@@ -698,21 +706,21 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
             _compressionStream.src_ptr = buffer;
             _compressionStream.src_size = (size_t)length;
             
-            FILE *file = self.file;
-            void *compressionBuffer = self.compressionBuffer;
+            FILE *file = _file;
+            void *compressionBuffer = _compressionBuffer;
             while (_compressionStream.src_size > 0) {
                 // Reset destination buffer
                 _compressionStream.dst_ptr = compressionBuffer;
                 _compressionStream.dst_size = COMPRESSION_BUFFER_SIZE;
                 
                 if (compression_stream_process(&_compressionStream, 0) == COMPRESSION_STATUS_ERROR) {
-                    self.error = [NSError errorWithDomain:SPARKLE_COMPRESSION_ERROR_DOMAIN code:COMPRESSION_STATUS_ERROR userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to write %d compressed bytes.", length] }];
+                    _error = [NSError errorWithDomain:SPARKLE_COMPRESSION_ERROR_DOMAIN code:COMPRESSION_STATUS_ERROR userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to write %d compressed bytes.", length] }];
                     return NO;
                 }
                 
                 size_t compressedBytesWritten = (size_t)(_compressionStream.dst_ptr - (uint8_t *)compressionBuffer);
                 if (compressedBytesWritten > 0 && fwrite(compressionBuffer, compressedBytesWritten, 1, file) < 1) {
-                    self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to write %zu compressed bytes.", compressedBytesWritten] }];
+                    _error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to write %zu compressed bytes.", compressedBytesWritten] }];
                     return NO;
                 }
             }
@@ -725,31 +733,31 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
 - (void)writeHeader:(SPUDeltaArchiveHeader *)header
 {
     char patchFilePath[PATH_MAX + 1] = {0};
-    if (![self.patchFile getFileSystemRepresentation:patchFilePath maxLength:sizeof(patchFilePath) - 1]) {
-        self.error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to open header and represent as a file system representation: %@", self.patchFile] }];
+    if (![_patchFile getFileSystemRepresentation:patchFilePath maxLength:sizeof(patchFilePath) - 1]) {
+        _error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to open header and represent as a file system representation: %@", _patchFile] }];
         return;
     }
     
     FILE *file = fopen(patchFilePath, "wb");
     if (file == NULL) {
-        self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to open patch file for writing: %@", self.patchFile] }];
+        _error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to open patch file for writing: %@", _patchFile] }];
         return;
     }
     
-    self.file = file;
+    _file = file;
     
     char magic[] = SPARKLE_DELTA_FORMAT_MAGIC;
     if (fwrite(magic, sizeof(magic) - 1, 1, file) < 1) {
-        self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: @"Failed to write magic value due to io error" }];
+        _error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: @"Failed to write magic value due to io error" }];
         return;
     }
     
     SPUDeltaCompressionMode compression = (header.compression == SPUDeltaCompressionModeDefault) ? SPUDeltaCompressionModeLZMA : header.compression;
     
-    self.compression = compression;
+    _compression = compression;
     
     if (fwrite(&compression, sizeof(compression), 1, file) < 1) {
-        self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: @"Failed to write compression value due to io error" }];
+        _error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: @"Failed to write compression value due to io error" }];
         return;
     }
     
@@ -757,13 +765,19 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
     uint8_t compressionLevel = 0;
     switch (compression) {
         case SPUDeltaCompressionModeBzip2:
+#if SPARKLE_BUILD_BZIP2_DELTA_SUPPORT
             // Only 1 - 9 are valid, 0 is a special case for using default 9
             if (header.compressionLevel <= 0 || header.compressionLevel > 9) {
                 compressionLevel = 9;
             } else {
                 compressionLevel = header.compressionLevel;
             }
+            
             break;
+#else
+            _error = [NSError errorWithDomain:SPARKLE_BZIP2_ERROR_DOMAIN code:-1 userInfo:@{ NSLocalizedDescriptionKey: @"Failed to write bzip2 patch because bzip2 support is disabled" }];
+            return;
+#endif
         // Some supported formats below have a documented level even though it's not customizable
         // Let's record them in the archive
         case SPUDeltaCompressionModeLZMA:
@@ -782,7 +796,7 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
     SparkleDeltaArchiveMetadata metadata = {.compressionLevel = compressionLevel, .fileSystemCompression = header.fileSystemCompression};
     
     if (fwrite(&metadata, sizeof(metadata), 1, file) < 1) {
-        self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: @"Failed to write metadata value due to io error" }];
+        _error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: @"Failed to write metadata value due to io error" }];
         return;
     }
     
@@ -790,6 +804,7 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
         case SPUDeltaCompressionModeNone:
             break;
         case SPUDeltaCompressionModeBzip2: {
+#if SPARKLE_BUILD_BZIP2_DELTA_SUPPORT
             int bzerror = 0;
             // Compression level can be 1 - 9
             int blockSize100k = (int)compressionLevel;
@@ -798,17 +813,18 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
             if (bzipFile == NULL) {
                 switch (bzerror) {
                     case BZ_IO_ERROR:
-                        self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: @"Failed to open bz2 stream for writing due to io error" }];
+                        _error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: @"Failed to open bz2 stream for writing due to io error" }];
                         break;
                     default:
-                        self.error = [NSError errorWithDomain:SPARKLE_BZIP2_ERROR_DOMAIN code:bzerror userInfo:@{ NSLocalizedDescriptionKey: @"Failed to open bz2 stream for writing" }];
+                        _error = [NSError errorWithDomain:SPARKLE_BZIP2_ERROR_DOMAIN code:bzerror userInfo:@{ NSLocalizedDescriptionKey: @"Failed to open bz2 stream for writing" }];
                         break;
                 }
                 
                 return;
             }
             
-            self.bzipFile = bzipFile;
+            _bzipFile = bzipFile;
+#endif
             
             break;
         }
@@ -817,12 +833,12 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
         case SPUDeltaCompressionModeLZ4:
         case SPUDeltaCompressionModeZLIB: {
             if (compression_stream_init(&_compressionStream, COMPRESSION_STREAM_ENCODE, _compressionAlgorithmForMode(compression)) != COMPRESSION_STATUS_OK) {
-                self.error = [NSError errorWithDomain:SPARKLE_COMPRESSION_ERROR_DOMAIN code:COMPRESSION_STATUS_ERROR userInfo:@{ NSLocalizedDescriptionKey: @"Failed to open compression stream for writing" }];
+                _error = [NSError errorWithDomain:SPARKLE_COMPRESSION_ERROR_DOMAIN code:COMPRESSION_STATUS_ERROR userInfo:@{ NSLocalizedDescriptionKey: @"Failed to open compression stream for writing" }];
                 
                 return;
             }
             
-            self.initializedCompressionStream = YES;
+            _initializedCompressionStream = YES;
             break;
         }
     }
@@ -843,16 +859,16 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
 
 - (void)addItem:(SPUDeltaArchiveItem *)item
 {
-    [self.writableItems addObject:item];
+    [_writableItems addObject:item];
 }
 
 - (void)finishEncodingItems
 {
-    if (self.error != nil) {
+    if (_error != nil) {
         return;
     }
     
-    NSMutableArray<SPUDeltaArchiveItem *> *writableItems = self.writableItems;
+    NSMutableArray<SPUDeltaArchiveItem *> *writableItems = _writableItems;
     
     // Build relative path table for tracking file clones
     NSMutableDictionary<NSString *, NSNumber *> *relativePathToIndexTable = [NSMutableDictionary dictionary];
@@ -884,7 +900,7 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
     if (relativePathToIndexTable.count > UINT32_MAX) {
         // Very unlikely but we should guard against this
         // Clones rely on 32-bit indexes
-        self.error = [NSError errorWithDomain:SPARKLE_DELTA_ARCHIVE_ERROR_DOMAIN code:SPARKLE_DELTA_ARCHIVE_ERROR_CODE_TOO_MANY_FILES userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"There are too many file entries to create a patch for (more than %u)", UINT32_MAX] }];
+        _error = [NSError errorWithDomain:SPARKLE_DELTA_ARCHIVE_ERROR_DOMAIN code:SPARKLE_DELTA_ARCHIVE_ERROR_CODE_TOO_MANY_FILES userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"There are too many file entries to create a patch for (more than %u)", UINT32_MAX] }];
         return;
     }
     
@@ -895,7 +911,7 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
         
         char relativePathString[PATH_MAX + 1] = {0};
         if (![relativePath getFileSystemRepresentation:relativePathString maxLength:sizeof(relativePathString) - 1]) {
-            self.error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Relative path cannot be retrieved and expressed as a file system representation: %@", relativePath] }];
+            _error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Relative path cannot be retrieved and expressed as a file system representation: %@", relativePath] }];
             break;
         }
         
@@ -904,14 +920,14 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
     for (NSString *clonedPathEntry in newClonedPathEntries) {
         char relativePathString[PATH_MAX + 1] = {0};
         if (![clonedPathEntry getFileSystemRepresentation:relativePathString maxLength:sizeof(relativePathString) - 1]) {
-            self.error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Relative path for clone cannot be retrieved and expressed as a file system representation: %@", clonedPathEntry] }];
+            _error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Relative path for clone cannot be retrieved and expressed as a file system representation: %@", clonedPathEntry] }];
             break;
         }
         
         totalPathLength += strlen(relativePathString) + 1;
     }
     
-    if (self.error != nil) {
+    if (_error != nil) {
         return;
     }
     
@@ -926,7 +942,7 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
         
         char pathBuffer[PATH_MAX + 1] = {0};
         if (![relativePath getFileSystemRepresentation:pathBuffer maxLength:PATH_MAX]) {
-            self.error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Relative path cannot be encoded and expressed as a file system representation: %@", relativePath] }];
+            _error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Relative path cannot be encoded and expressed as a file system representation: %@", relativePath] }];
             break;
         }
         
@@ -937,7 +953,7 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
     for (NSString *clonedPathEntry in newClonedPathEntries) {
         char pathBuffer[PATH_MAX + 1] = {0};
         if (![clonedPathEntry getFileSystemRepresentation:pathBuffer maxLength:PATH_MAX]) {
-            self.error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Relative path for clone cannot be encoded and expressed as a file system representation: %@", clonedPathEntry] }];
+            _error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Relative path for clone cannot be encoded and expressed as a file system representation: %@", clonedPathEntry] }];
             break;
         }
         
@@ -946,7 +962,7 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
         }
     }
     
-    if (self.error != nil) {
+    if (_error != nil) {
         return;
     }
     
@@ -969,13 +985,13 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
                 
                 char sourcePathString[PATH_MAX + 1] = {0};
                 if (![sourcePath getFileSystemRepresentation:sourcePathString maxLength:sizeof(sourcePathString) - 1]) {
-                    self.error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Path cannot be decoded and expressed as a file system representation while encoding cloned binary diff item: %@", sourcePath] }];
+                    _error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Path cannot be decoded and expressed as a file system representation while encoding cloned binary diff item: %@", sourcePath] }];
                     break;
                 }
                 
                 struct stat fileInfo = {0};
                 if (lstat(sourcePathString, &fileInfo) != 0) {
-                    self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to lstat() on %@", sourcePath] }];
+                    _error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to lstat() on %@", sourcePath] }];
                     break;
                 }
                 
@@ -1002,7 +1018,7 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
             NSNumber *relativePathIndex = relativePathToIndexTable[clonedRelativePath];
             if (relativePathIndex == nil) {
                 // We have quite a problem here
-                self.error = [NSError errorWithDomain:SPARKLE_DELTA_ARCHIVE_ERROR_DOMAIN code:SPARKLE_DELTA_ARCHIVE_ERROR_CODE_BAD_CLONE_LOOKUP userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Relative file path index for %@ could not be located", clonedRelativePath] }];
+                _error = [NSError errorWithDomain:SPARKLE_DELTA_ARCHIVE_ERROR_DOMAIN code:SPARKLE_DELTA_ARCHIVE_ERROR_CODE_BAD_CLONE_LOOKUP userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Relative file path index for %@ could not be located", clonedRelativePath] }];
                 break;
             }
             
@@ -1017,13 +1033,13 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
                 
                 char itemFilePathString[PATH_MAX + 1] = {0};
                 if (![itemPath getFileSystemRepresentation:itemFilePathString maxLength:sizeof(itemFilePathString) - 1]) {
-                    self.error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Path cannot be decoded and expressed as a file system representation while encoding cloned binary diff item: %@", itemPath] }];
+                    _error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Path cannot be decoded and expressed as a file system representation while encoding cloned binary diff item: %@", itemPath] }];
                     break;
                 }
                 
                 struct stat fileInfo = {0};
                 if (lstat(itemFilePathString, &fileInfo) != 0) {
-                    self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to lstat() on %@", itemPath] }];
+                    _error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to lstat() on %@", itemPath] }];
                     break;
                 }
                 
@@ -1043,13 +1059,13 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
                 
                 char sourceFilePathString[PATH_MAX + 1] = {0};
                 if (![sourcePath getFileSystemRepresentation:sourceFilePathString maxLength:sizeof(sourceFilePathString) - 1]) {
-                    self.error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Path cannot be decoded and expressed as a file system representation while encoding items: %@", sourcePath] }];
+                    _error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Path cannot be decoded and expressed as a file system representation while encoding items: %@", sourcePath] }];
                     break;
                 }
                 
                 struct stat sourceFileInfo = {0};
                 if (lstat(sourceFilePathString, &sourceFileInfo) != 0) {
-                    self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to lstat() on %@", sourcePath] }];
+                    _error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to lstat() on %@", sourcePath] }];
                     break;
                 }
                 
@@ -1085,13 +1101,13 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
             
             char itemFilePathString[PATH_MAX + 1] = {0};
             if (![itemPath getFileSystemRepresentation:itemFilePathString maxLength:sizeof(itemFilePathString) - 1]) {
-                self.error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Path cannot be decoded and expressed as a file system representation while encoding items: %@", itemPath] }];
+                _error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Path cannot be decoded and expressed as a file system representation while encoding items: %@", itemPath] }];
                 break;
             }
             
             struct stat itemFileInfo = {0};
             if (lstat(itemFilePathString, &itemFileInfo) != 0) {
-                self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to lstat() on %@", itemPath] }];
+                _error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to lstat() on %@", itemPath] }];
                 break;
             }
             
@@ -1105,7 +1121,7 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
             } else if (S_ISLNK(extractMode)) {
                 off_t fileSize = itemFileInfo.st_size;
                 if (fileSize > UINT16_MAX) {
-                    self.error = [NSError errorWithDomain:SPARKLE_DELTA_ARCHIVE_ERROR_DOMAIN code:SPARKLE_DELTA_ARCHIVE_ERROR_CODE_LINK_TOO_LONG userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Link path has a destination that is too long: %llu bytes", fileSize] }];
+                    _error = [NSError errorWithDomain:SPARKLE_DELTA_ARCHIVE_ERROR_DOMAIN code:SPARKLE_DELTA_ARCHIVE_ERROR_CODE_LINK_TOO_LONG userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Link path has a destination that is too long: %llu bytes", fileSize] }];
                     break;
                 }
                 
@@ -1125,7 +1141,7 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
         }
     }
     
-    if (self.error != nil) {
+    if (_error != nil) {
         return;
     }
     
@@ -1136,7 +1152,7 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
     }
     
     // Encode all of our file contents
-    void *tempBuffer = self.partialChunkBuffer;
+    void *tempBuffer = _partialChunkBuffer;
     for (SPUDeltaArchiveItem *item in writableItems) {
         SPUDeltaItemCommands commands = item.commands;
         if ((commands & SPUDeltaItemCommandExtract) != 0 || (commands & SPUDeltaItemCommandBinaryDiff) != 0) {
@@ -1151,13 +1167,13 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
                 if (totalItemSize > 0) {
                     char itemFilePathString[PATH_MAX + 1] = {0};
                     if (![itemPath getFileSystemRepresentation:itemFilePathString maxLength:sizeof(itemFilePathString) - 1]) {
-                        self.error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Path to finish encoding cannot be decoded and expressed as a file system representation: %@", itemPath] }];
+                        _error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Path to finish encoding cannot be decoded and expressed as a file system representation: %@", itemPath] }];
                         break;
                     }
                     
                     FILE *inputFile = fopen(itemFilePathString, "rb");
                     if (inputFile == NULL) {
-                        self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to open file for reading while encoding items: %@", itemPath] }];
+                        _error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to open file for reading while encoding items: %@", itemPath] }];
                         break;
                     }
                     
@@ -1166,7 +1182,7 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
                         uint64_t currentBlockSize = (bytesLeftoverToCopy >= PARTIAL_IO_CHUNK_SIZE) ? PARTIAL_IO_CHUNK_SIZE : bytesLeftoverToCopy;
                         
                         if (fread(tempBuffer, currentBlockSize, 1, inputFile) < 1) {
-                            self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to read %llu chunk bytes while encoding items", currentBlockSize] }];
+                            _error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to read %llu chunk bytes while encoding items", currentBlockSize] }];
                             break;
                         }
                         
@@ -1179,21 +1195,21 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
                     
                     fclose(inputFile);
                     
-                    if (self.error != nil) {
+                    if (_error != nil) {
                         break;
                     }
                 }
             } else if (S_ISLNK(extractMode)) {
                 char itemFilePathString[PATH_MAX + 1] = {0};
                 if (![itemPath getFileSystemRepresentation:itemFilePathString maxLength:sizeof(itemFilePathString) - 1]) {
-                    self.error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Link path to finish encoding cannot be decoded and expressed as a file system representation: %@", itemPath] }];
+                    _error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Link path to finish encoding cannot be decoded and expressed as a file system representation: %@", itemPath] }];
                     break;
                 }
                 
                 char linkDestination[PATH_MAX + 1] = {0};
                 ssize_t linkDestinationLength = readlink(itemFilePathString, linkDestination, PATH_MAX);
                 if (linkDestinationLength < 0) {
-                    self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to readlink() file at %@", itemPath] }];
+                    _error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to readlink() file at %@", itemPath] }];
                     break;
                 }
                 
@@ -1206,16 +1222,19 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
     
     // Close up and write final data to compressed streams
     
-    if (self.bzipFile != NULL) {
+#if SPARKLE_BUILD_BZIP2_DELTA_SUPPORT
+    if (_bzipFile != NULL) {
         int bzerror = 0;
-        BZ2_bzWriteClose64(&bzerror, self.bzipFile, 0, NULL, NULL, NULL, NULL);
+        BZ2_bzWriteClose64(&bzerror, _bzipFile, 0, NULL, NULL, NULL, NULL);
         if (bzerror == BZ_IO_ERROR) {
-            self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: @"Failed to write and close bzip2 file due to IO error" }];
+            _error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: @"Failed to write and close bzip2 file due to IO error" }];
             return;
         }
-    } else if (self.initializedCompressionStream) {
-        void *compressionBuffer = self.compressionBuffer;
-        FILE *file = self.file;
+    } else
+#endif
+    if (_initializedCompressionStream) {
+        void *compressionBuffer = _compressionBuffer;
+        FILE *file = _file;
         
         _compressionStream.src_size = 0;
         
@@ -1225,14 +1244,14 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
         
             compression_status status = compression_stream_process(&_compressionStream, COMPRESSION_STREAM_FINALIZE);
             if (status == COMPRESSION_STATUS_ERROR) {
-                self.error = [NSError errorWithDomain:SPARKLE_COMPRESSION_ERROR_DOMAIN code:COMPRESSION_STATUS_ERROR userInfo:@{ NSLocalizedDescriptionKey: @"Failed to write final bits of Compression based file" }];
+                _error = [NSError errorWithDomain:SPARKLE_COMPRESSION_ERROR_DOMAIN code:COMPRESSION_STATUS_ERROR userInfo:@{ NSLocalizedDescriptionKey: @"Failed to write final bits of Compression based file" }];
                 return;
             }
             
             size_t compressedBytesToWrite = (size_t)(_compressionStream.dst_ptr - (uint8_t *)compressionBuffer);
             if (compressedBytesToWrite > 0) {
                 if (fwrite(compressionBuffer, compressedBytesToWrite, 1, file) < 1) {
-                    self.error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: @"Failed to write and close Compression based file due to io error" }];
+                    _error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: @"Failed to write and close Compression based file due to io error" }];
                     return;
                 }
             }
@@ -1246,5 +1265,3 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
 }
 
 @end
-
-#pragma clang diagnostic pop

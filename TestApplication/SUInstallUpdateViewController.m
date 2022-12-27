@@ -8,30 +8,23 @@
 
 #import "SUInstallUpdateViewController.h"
 
-@interface SUInstallUpdateViewController ()
-
-@property (nonatomic) IBOutlet NSButton *skipUpdatesButton;
-@property (nonatomic) IBOutlet NSTextView *textView;
-@property (nonatomic, readonly) SUAppcastItem *appcastItem;
-@property (nonatomic, nullable) NSAttributedString *preloadedReleaseNotes;
-@property (nonatomic, copy) void (^reply)(SPUUserUpdateChoice);
-
-@end
-
 @implementation SUInstallUpdateViewController
-
-@synthesize skipUpdatesButton = _skipUpdatesButton;
-@synthesize textView = _textView;
-@synthesize preloadedReleaseNotes = _preloadedReleaseNotes;
-@synthesize appcastItem = _appcastItem;
-@synthesize reply = _reply;
+{
+    void (^_reply)(SPUUserUpdateChoice);
+    
+    SUAppcastItem *_appcastItem;
+    NSAttributedString *_preloadedReleaseNotes;
+    
+    IBOutlet NSTextView *_textView;
+    IBOutlet NSButton *_skipUpdatesButton;
+}
 
 - (instancetype)initWithAppcastItem:(SUAppcastItem *)appcastItem reply:(void (^)(SPUUserUpdateChoice))reply
 {
     self = [super initWithNibName:@"SUInstallUpdateViewController" bundle:nil];
     if (self != nil) {
         _appcastItem = appcastItem;
-        self.reply = reply;
+        _reply = [reply copy];
     } else {
         assert(false);
     }
@@ -42,14 +35,14 @@
 {
     [super viewDidLoad];
     
-    [[self.textView enclosingScrollView] setDrawsBackground:NO];
-    [self.textView setDrawsBackground:NO];
+    [[_textView enclosingScrollView] setDrawsBackground:NO];
+    [_textView setDrawsBackground:NO];
     
-    if (self.preloadedReleaseNotes != nil) {
-        [self displayReleaseNotes:self.preloadedReleaseNotes];
-        self.preloadedReleaseNotes = nil;
-    } else if (self.appcastItem.releaseNotesURL == nil) {
-        NSString *descriptionHTML = self.appcastItem.itemDescription;
+    if (_preloadedReleaseNotes != nil) {
+        [self displayReleaseNotes:_preloadedReleaseNotes];
+        _preloadedReleaseNotes = nil;
+    } else if (_appcastItem.releaseNotesURL == nil) {
+        NSString *descriptionHTML = _appcastItem.itemDescription;
         if (descriptionHTML != nil) {
             NSData *htmlData = [descriptionHTML dataUsingEncoding:NSUTF8StringEncoding];
             NSAttributedString *attributedString = [[NSAttributedString alloc] initWithHTML:htmlData documentAttributes:NULL];
@@ -58,22 +51,22 @@
     }
 }
 
-- (void)displayReleaseNotes:(NSAttributedString *)releaseNotes
+- (void)displayReleaseNotes:(NSAttributedString *)releaseNotes SPU_OBJC_DIRECT
 {
-    if (self.textView == nil) {
-        self.preloadedReleaseNotes = releaseNotes;
+    if (_textView == nil) {
+        _preloadedReleaseNotes = releaseNotes;
     } else {
-        [self.textView.textStorage setAttributedString:releaseNotes];
+        [_textView.textStorage setAttributedString:releaseNotes];
     }
 }
 
-- (void)displayHTMLReleaseNotes:(NSData *)releaseNotes
+- (void)displayHTMLReleaseNotes:(NSData *)releaseNotes SPU_OBJC_DIRECT
 {
     NSAttributedString *attributedString = [[NSAttributedString alloc] initWithHTML:releaseNotes documentAttributes:NULL];
     [self displayReleaseNotes:attributedString];
 }
 
-- (void)displayPlainTextReleaseNotes:(NSData *)releaseNotes encoding:(NSStringEncoding)encoding
+- (void)displayPlainTextReleaseNotes:(NSData *)releaseNotes encoding:(NSStringEncoding)encoding SPU_OBJC_DIRECT
 {
     NSString *string = [[NSString alloc] initWithData:releaseNotes encoding:encoding];
     NSAttributedString *attributedString = [[NSAttributedString alloc] initWithString:string attributes:nil];
@@ -105,25 +98,25 @@
 
 - (IBAction)installUpdate:(id)__unused sender
 {
-    if (self.reply != nil) {
-        self.reply(SPUUserUpdateChoiceInstall);
-        self.reply = nil;
+    if (_reply != nil) {
+        _reply(SPUUserUpdateChoiceInstall);
+        _reply = nil;
     }
 }
 
 - (IBAction)installUpdateLater:(id)__unused sender
 {
-    if (self.reply != nil) {
-        self.reply(SPUUserUpdateChoiceDismiss);
-        self.reply = nil;
+    if (_reply != nil) {
+        _reply(SPUUserUpdateChoiceDismiss);
+        _reply = nil;
     }
 }
 
 - (IBAction)skipUpdate:(id)__unused sender
 {
-    if (self.reply != nil) {
-        self.reply(SPUUserUpdateChoiceSkip);
-        self.reply = nil;
+    if (_reply != nil) {
+        _reply(SPUUserUpdateChoiceSkip);
+        _reply = nil;
     }
 }
 

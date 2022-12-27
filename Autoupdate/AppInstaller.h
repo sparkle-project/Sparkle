@@ -11,7 +11,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface AppInstaller : NSObject
+SPU_OBJC_DIRECT_MEMBERS @interface AppInstaller : NSObject
 
 - (instancetype)initWithHostBundleIdentifier:(NSString *)hostBundleIdentifier homeDirectory:(NSString *)homeDirectory userName:(NSString *)userName;
 

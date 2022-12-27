@@ -1,32 +1,59 @@
+/* Description text for SUUpdateAlert when the critical update has already been downloaded and ready to install. */
+"%1$@ %2$@ has been downloaded and is ready to use! This is an important update; would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ 已下載且可供使用！此為重要更新，您是否要立即安裝並重新啟動 %1$@？";
+
+/* Description text for SUUpdateAlert when the update has already been downloaded and ready to install. */
+"%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ 已下載且可供使用！您是否要立即安裝並重新啟動 %1$@？";
+
+/* No comment provided by engineer. */
+"%1$@ %2$@ is available but your macOS version is too new for this update. This update only supports up to macOS %3$@." = "%1$@ %2$@ 現在已可供下載，但您的 macOS 版本過新以致無法安裝。此更新僅支援至 macOS %3$@。";
+
+/* No comment provided by engineer. */
+"%1$@ %2$@ is available but your macOS version is too old to install it. At least macOS %3$@ is required." = "%1$@ %2$@ 現在已可供下載，但您的 macOS 版本過舊以致無法安裝。最低版本需求為 macOS %3$@。";
+
+/* No comment provided by engineer. */
+"%1$@ can’t be updated if it’s running from the location it was downloaded to." = "當從下載位置執行 %1$@ 時，無法進行更新。";
+
+/* No comment provided by engineer. */
+"%1$@ can’t be updated, because it was opened from a read-only or a temporary location." = "當 %1$@ 正從唯讀卷宗（如磁碟映像檔或光碟機）執行時，無法進行更新。";
+
 /* No comment provided by engineer. */
 "%@ %@ is currently the newest version available." = "%1$@ %2$@ 已是目前最新的版本。";
 
 /* No comment provided by engineer. */
 "%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%1$@ %2$@ 已是目前最新的版本。\n（您正在執行的版本是 %3$@。）";
 
+/* Description text for SUUpdateAlert when the critical update is downloadable. */
+"%@ %@ is now available—you have %@. This is an important update; would you like to download it now?" = "%1$@ %2$@ 現在已可供下載，您的版本則是 %3$@。此為重要更新，您想要立即下載嗎？";
+
 /* Description text for SUUpdateAlert when the update is downloadable. */
-"%@ %@ is now available—you have %@. Would you like to download it now?" = "%1$@ %2$@ 現在已可取得，您的版本則是 %3$@。您要現在下載嗎？";
+"%@ %@ is now available—you have %@. Would you like to download it now?" = "%1$@ %2$@ 現在已可供下載，您的版本則是 %3$@。您想要立即下載嗎？";
+
+/* Description text for SUUpdateAlert when the update informational with no download. */
+"%@ %@ is now available—you have %@. Would you like to learn more about this update on the web?" = "%1$@ %2$@ 現在已可供下載，您的版本則是 %3$@。您想要瞭解更多關於此更新的資訊嗎？";
 
 /* The download progress in a unit of bytes, e.g. 100 KB */
 "%@ downloaded" = "%@ 已下載";
 
-/* The download progress in units of bytes, e.g. 100 KB of 1,0 MB */
-"%@ of %@" = "%1$@ / %2$@";
-
-/* Description text for SUUpdateAlert when the update has already been downloaded and ready to install. */
-"%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ 已下載且可供使用！您是否要現在安裝並重新啟動%1$@？";
+/* No comment provided by engineer. */
+"%@ is now updated to version %@!" = "%1$@ 已更新至版本 %2$@！";
 
 /* No comment provided by engineer. */
-"%1$@ can’t be updated, because it was opened from a read-only or a temporary location." = "當 %1$@ 正從唯讀卷宗（如磁碟映像檔或光碟機）執行時，無法進行更新。";
+"%@ is now updated!" = "%@ 已完成更新！";
+
+/* The download progress in units of bytes, e.g. 100 KB of 1,0 MB */
+"%@ of %@" = "%1$@ / %2$@";
 
 /* No comment provided by engineer. */
 "A new version of %@ is available!" = "已有新版本的 %@ 可供下載！";
 
 /* No comment provided by engineer. */
-"A new version of %@ is ready to install!" = "新版本的 %@ 已準備安裝！";
+"A new version of %@ is ready to install!" = "已準備安裝新版本的 %@！";
 
 /* No comment provided by engineer. */
 "An error occurred in retrieving update information. Please try again later." = "擷取更新資訊時發生錯誤。請稍後再試一次。";
+
+/* No comment provided by engineer. */
+"An error occurred while connecting to the installer. Please try again later." = "連線到安裝程式時發生錯誤。請稍後再試一次。";
 
 /* No comment provided by engineer. */
 "An error occurred while downloading the update. Please try again later." = "下載更新項目時發生錯誤。請稍後再試一次。";
@@ -35,7 +62,19 @@
 "An error occurred while extracting the archive. Please try again later." = "解壓縮封存檔時發生錯誤。請稍後再試一次。";
 
 /* No comment provided by engineer. */
-"An error occurred while parsing the update feed." = "解析更新 feed 時發生錯誤。";
+"An error occurred while launching the installer. Please try again later." = "啟動安裝程式時發生錯誤。請稍後再試一次。";
+
+/* No comment provided by engineer. */
+"An error occurred while parsing the update feed." = "剖析更新摘要時發生錯誤。";
+
+/* No comment provided by engineer. */
+"An error occurred while running the updater. Please try again later." = "執行更新程式時發生錯誤。請稍後再試一次。";
+
+/* No comment provided by engineer. */
+"An error occurred while starting the installer. Please try again later." = "啟動安裝程式時發生錯誤。請稍後再試一次。";
+
+/* No comment provided by engineer. */
+"An important update to %@ is ready to install" = "已準備安裝 %@ 的重要更新";
 
 /* No comment provided by engineer. */
 "Cancel" = "取消";
@@ -53,13 +92,25 @@
 "Extracting update…" = "正在解壓縮更新項目⋯";
 
 /* No comment provided by engineer. */
-"Install and Relaunch" = "安裝與重新啟動";
+"Failed to resume installing update." = "嘗試繼續安裝更新失敗。";
+
+/* No comment provided by engineer. */
+"Install and Relaunch" = "安裝並重新啟動";
+
+/* Alternate title for 'Remind Me Later' button when downloaded updates can be resumed */
+"Install on Quit" = "結束時安裝";
 
 /* Take care not to overflow the status window. */
 "Installing update…" = "正在安裝更新項目⋯";
 
+/* Alternate title for 'Install Update' button when there's no download in RSS feed. */
+"Learn More…" = "瞭解更多⋯";
+
 /* No comment provided by engineer. */
 "OK" = "好";
+
+/* No comment provided by engineer. */
+"Quit %1$@, move it into your Applications folder, relaunch it from there and try again." = "請結束 %1$@ 並移至您的「應用程式」檔案夾，從該處重新啟動後再試一次。";
 
 /* No comment provided by engineer. */
 "Ready to Install" = "準備安裝";
@@ -68,13 +119,34 @@
 "Should %1$@ automatically check for updates? You can always check for updates manually from the %1$@ menu." = "%1$@ 是否應自動檢查更新項目？您可隨時從 %1$@ 選單手動檢查更新項目。";
 
 /* No comment provided by engineer. */
+"The update checker failed to start correctly. You should contact the app developer to report this issue and verify that you have the latest version." = "更新檢查程式未能正確啟動。您應聯絡軟體開發者以回報此問題並驗證您是否已有最新版本。";
+
+/* No comment provided by engineer. */
+"The update is improperly signed and could not be validated. Please try again later or contact the app developer." = "此更新並未正確簽署且無法驗證。請稍後再試一次或聯絡軟體開發者。";
+
+/* No comment provided by engineer. */
+"Unable to Check For Updates" = "無法檢查更新項目";
+
+/* No comment provided by engineer. */
 "Update Error!" = "更新發生錯誤！";
+
+/* No comment provided by engineer. */
+"Update Installed" = "已安裝更新";
 
 /* No comment provided by engineer. */
 "Updating %@" = "正在更新 %@";
 
 /* No comment provided by engineer. */
-"Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "請將 %1$@ 移至您的「應用程式」檔案夾，從該處重新啟動，然後再試一次。";
+"Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "請將 %1$@ 移至您的「應用程式」檔案夾，從該處重新啟動後再試一次。";
+
+/* No comment provided by engineer. */
+"Version History" = "版本歷程記錄";
+
+/* No comment provided by engineer. */
+"Your macOS version is too new" = "您的 macOS 版本過新";
+
+/* No comment provided by engineer. */
+"Your macOS version is too old" = "您的 macOS 版本過舊";
 
 /* Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates. */
 "You’re up-to-date!" = "您已有最新版本！";

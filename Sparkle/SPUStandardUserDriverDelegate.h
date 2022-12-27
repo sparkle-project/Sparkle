@@ -7,7 +7,15 @@
 //
 
 #import <Foundation/Foundation.h>
+#if defined(BUILDING_SPARKLE_SOURCES_EXTERNALLY)
+// Ignore incorrect warning
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wquoted-include-in-framework-header"
+#import "SUExport.h"
+#pragma clang diagnostic pop
+#else
 #import <Sparkle/SUExport.h>
+#endif
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -41,6 +49,19 @@ SU_EXPORT @protocol SPUStandardUserDriverDelegate <NSObject>
  If you don't implement this method or return @c nil, the standard version formatter will be used.
  */
 - (_Nullable id <SUVersionDisplay>)standardUserDriverRequestsVersionDisplayer;
+
+/**
+ Decides whether or not the standard user driver should provide an option to show full release notes to the user.
+ 
+ When a user checks for new updates and no new update is found, Sparkle by default will offer to show the application's version history to the user
+ by providing a "Version History" button in the no new update available alert.
+ 
+ If this delegate method is implemented to return `NO`, then Sparkle will not provide an option to show full release notes to the user.
+ 
+ @param item The appcast item corresponding to the latest version available.
+ @return @c YES to allow Sparkle to show full release notes to the user, otherwise @c NO to disallow this.
+ */
+- (BOOL)standardUserDriverShouldShowVersionHistoryForAppcastItem:(SUAppcastItem *)item;
 
 /**
  Handles showing the full release notes to the user.

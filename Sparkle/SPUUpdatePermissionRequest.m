@@ -34,7 +34,7 @@ static NSString *SPUUpdatePermissionRequestSystemProfileKey = @"SPUUpdatePermiss
 
 - (void)encodeWithCoder:(NSCoder *)encoder
 {
-    [encoder encodeObject:self.systemProfile forKey:SPUUpdatePermissionRequestSystemProfileKey];
+    [encoder encodeObject:_systemProfile forKey:SPUUpdatePermissionRequestSystemProfileKey];
 }
 
 - (instancetype)initWithSystemProfile:(NSArray<NSDictionary<NSString *, NSString *> *> *)systemProfile

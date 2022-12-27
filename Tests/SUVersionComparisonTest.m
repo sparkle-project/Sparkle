@@ -6,8 +6,7 @@
 //  Copyright 2008 Andy Matuschak. All rights reserved.
 //
 
-#import <Sparkle/Sparkle.h>
-
+#import "SUStandardVersionComparator.h"
 #import <XCTest/XCTest.h>
 
 @interface SUVersionComparisonTestCase : XCTestCase {

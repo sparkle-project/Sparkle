@@ -13,7 +13,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface SUWKWebView : NSObject <SUReleaseNotesView>
+SPU_OBJC_DIRECT_MEMBERS @interface SUWKWebView : NSObject <SUReleaseNotesView>
 
 - (instancetype)initWithColorStyleSheetLocation:(NSURL *)colorStyleSheetLocation fontFamily:(NSString *)fontFamily fontPointSize:(int)fontPointSize javaScriptEnabled:(BOOL)javaScriptEnabled;
 

@@ -23,17 +23,24 @@
     if ([SUPipedUnarchiver canUnarchivePath:path]) {
         return [[SUPipedUnarchiver alloc] initWithArchivePath:path];
         
-    } else if ([SUDiskImageUnarchiver canUnarchivePath:path]) {
+    }
+#if SPARKLE_BUILD_DMG_SUPPORT
+    else if ([SUDiskImageUnarchiver canUnarchivePath:path]) {
         return [[SUDiskImageUnarchiver alloc] initWithArchivePath:path decryptionPassword:decryptionPassword];
         
-    } else if ([SUBinaryDeltaUnarchiver canUnarchivePath:path]) {
+    }
+#endif
+    else if ([SUBinaryDeltaUnarchiver canUnarchivePath:path]) {
         assert(hostPath != nil);
         NSString *nonNullHostPath = hostPath;
         return [[SUBinaryDeltaUnarchiver alloc] initWithArchivePath:path updateHostBundlePath:nonNullHostPath];
-    } else if ([SUFlatPackageUnarchiver canUnarchivePath:path]) {
+    }
+#if SPARKLE_BUILD_PACKAGE_SUPPORT
+    else if ([SUFlatPackageUnarchiver canUnarchivePath:path]) {
         // Flat packages are only supported for guided packaage installs
         return [[SUFlatPackageUnarchiver alloc] initWithFlatPackagePath:path expectingInstallationType:installationType];
     }
+#endif
     return nil;
 }
 

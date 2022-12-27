@@ -22,20 +22,17 @@
 @end
 
 @interface SUWKWebView () <WKNavigationDelegate>
-
-@property (nonatomic, readonly) WKWebView *webView;
-@property (nonatomic) WKNavigation *currentNavigation;
-@property (nonatomic) void (^completionHandler)(NSError * _Nullable);
-@property (nonatomic) BOOL drawsWebViewBackground;
-
 @end
 
 @implementation SUWKWebView
-
-@synthesize webView = _webView;
-@synthesize currentNavigation = _currentNavigation;
-@synthesize completionHandler = _completionHandler;
-@synthesize drawsWebViewBackground = _drawsWebViewBackground;
+{
+    WKWebView *_webView;
+    WKNavigation *_currentNavigation;
+    
+    void (^_completionHandler)(NSError * _Nullable);
+    
+    BOOL _drawsWebViewBackground;
+}
 
 static WKUserScript *_userScriptWithInjectedStyleSource(NSString *styleSource)
 {
@@ -105,75 +102,75 @@ static WKUserScript *_userScriptWithInjectedStyleSource(NSString *styleSource)
 
 - (NSView *)view
 {
-    return self.webView;
+    return _webView;
 }
 
 - (void)loadHTMLString:(NSString *)htmlString baseURL:(NSURL * _Nullable)baseURL completionHandler:(void (^)(NSError * _Nullable))completionHandler
 {
-    self.completionHandler = [completionHandler copy];
+    _completionHandler = [completionHandler copy];
     
-    self.currentNavigation = [self.webView loadHTMLString:htmlString baseURL:baseURL];
+    _currentNavigation = [_webView loadHTMLString:htmlString baseURL:baseURL];
 }
 
 - (void)loadData:(NSData *)data MIMEType:(NSString *)MIMEType textEncodingName:(NSString *)textEncodingName baseURL:(NSURL *)baseURL completionHandler:(void (^)(NSError * _Nullable))completionHandler
 {
-    self.completionHandler = [completionHandler copy];
+    _completionHandler = [completionHandler copy];
 
-    self.currentNavigation = [self.webView loadData:data MIMEType:MIMEType characterEncodingName:textEncodingName baseURL:baseURL];
+    _currentNavigation = [_webView loadData:data MIMEType:MIMEType characterEncodingName:textEncodingName baseURL:baseURL];
 }
 
 - (void)setDrawsBackground:(BOOL)drawsBackground
 {
-    if (self.drawsWebViewBackground != drawsBackground) {
+    if (_drawsWebViewBackground != drawsBackground) {
         // Unfortunately we have to rely on a private API
         // FB7539179: https://github.com/feedback-assistant/reports/issues/81 | https://bugs.webkit.org/show_bug.cgi?id=155550
         // But it seems like others are already relying on it, passed App Review, and apps couldn't be broken due to compatibility
         // Note: before we were using _setDrawsTransparentBackground < macOS 10.12
-        if ([self.webView respondsToSelector:@selector(_setDrawsBackground:)]) {
-            [self.webView _setDrawsBackground:drawsBackground];
+        if ([_webView respondsToSelector:@selector(_setDrawsBackground:)]) {
+            [_webView _setDrawsBackground:drawsBackground];
         }
         
-        self.drawsWebViewBackground = drawsBackground;
+        _drawsWebViewBackground = drawsBackground;
     }
 }
 
 - (void)stopLoading
 {
-    self.completionHandler = nil;
-    [self.webView stopLoading];
+    _completionHandler = nil;
+    [_webView stopLoading];
 }
 
 - (void)webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation
 {
-    if (navigation == self.currentNavigation) {
-        if (self.completionHandler != nil) {
-            self.completionHandler(nil);
-            self.completionHandler = nil;
+    if (navigation == _currentNavigation) {
+        if (_completionHandler != nil) {
+            _completionHandler(nil);
+            _completionHandler = nil;
         }
-        self.currentNavigation = nil;
+        _currentNavigation = nil;
     }
 }
 
 - (void)webView:(WKWebView *)webView didFailNavigation:(WKNavigation *)navigation withError:(NSError *)error
 {
-    if (navigation == self.currentNavigation) {
-        if (self.completionHandler != nil) {
-            self.completionHandler(error);
-            self.completionHandler = nil;
+    if (navigation == _currentNavigation) {
+        if (_completionHandler != nil) {
+            _completionHandler(error);
+            _completionHandler = nil;
         }
-        self.currentNavigation = nil;
+        _currentNavigation = nil;
     }
 }
 
 - (void)webViewWebContentProcessDidTerminate:(WKWebView *)webView
 {
-    if (self.currentNavigation != nil) {
-        if (self.completionHandler != nil) {
-            self.completionHandler([NSError errorWithDomain:SUSparkleErrorDomain code:SUWebKitTerminationError userInfo:nil]);
-            self.completionHandler = nil;
+    if (_currentNavigation != nil) {
+        if (_completionHandler != nil) {
+            _completionHandler([NSError errorWithDomain:SUSparkleErrorDomain code:SUWebKitTerminationError userInfo:nil]);
+            _completionHandler = nil;
         }
         
-        self.currentNavigation = nil;
+        _currentNavigation = nil;
     }
 }
 
@@ -190,7 +187,7 @@ static WKUserScript *_userScriptWithInjectedStyleSource(NSString *styleSource)
         decisionHandler(WKNavigationActionPolicyCancel);
     } else {
         // Ensure we're finished loading
-        if (self.completionHandler == nil) {
+        if (_completionHandler == nil) {
             if (!isAboutBlank) {
                 [[NSWorkspace sharedWorkspace] openURL:requestURL];
             }

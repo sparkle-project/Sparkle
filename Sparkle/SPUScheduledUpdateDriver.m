@@ -17,17 +17,16 @@
 
 @interface SPUScheduledUpdateDriver() <SPUUIBasedUpdateDriverDelegate>
 
-@property (nonatomic, readonly) SPUUIBasedUpdateDriver *uiDriver;
-@property (nonatomic) BOOL showedUpdate;
-@property (nonatomic) void (^updateDidShowHandler)(void);
-
 @end
 
 @implementation SPUScheduledUpdateDriver
-
-@synthesize uiDriver = _uiDriver;
-@synthesize showedUpdate = _showedUpdate;
-@synthesize updateDidShowHandler = _updateDidShowHandler;
+{
+    SPUUIBasedUpdateDriver *_uiDriver;
+    
+    void (^_updateDidShowHandler)(void);
+    
+    BOOL _showedUpdate;
+}
 
 - (instancetype)initWithHost:(SUHost *)host applicationBundle:(NSBundle *)applicationBundle updater:(id)updater userDriver:(id <SPUUserDriver>)userDriver updaterDelegate:(nullable id <SPUUpdaterDelegate>)updaterDelegate
 {
@@ -40,46 +39,46 @@
 
 - (void)setCompletionHandler:(SPUUpdateDriverCompletion)completionBlock
 {
-    [self.uiDriver setCompletionHandler:completionBlock];
+    [_uiDriver setCompletionHandler:completionBlock];
 }
 
 - (void)setUpdateShownHandler:(void (^)(void))handler
 {
-    self.updateDidShowHandler = handler;
+    _updateDidShowHandler = [handler copy];
 }
 
 - (void)setUpdateWillInstallHandler:(void (^)(void))updateWillInstallHandler
 {
-    [self.uiDriver setUpdateWillInstallHandler:updateWillInstallHandler];
+    [_uiDriver setUpdateWillInstallHandler:updateWillInstallHandler];
 }
 
 - (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders
 {
-    [self.uiDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders inBackground:YES];
+    [_uiDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders inBackground:YES];
 }
 
 - (void)resumeInstallingUpdate
 {
-    [self.uiDriver resumeInstallingUpdate];
+    [_uiDriver resumeInstallingUpdate];
 }
 
 - (void)resumeUpdate:(id<SPUResumableUpdate>)resumableUpdate
 {
-    [self.uiDriver resumeUpdate:resumableUpdate];
+    [_uiDriver resumeUpdate:resumableUpdate];
 }
 
 - (void)uiDriverDidShowUpdate
 {
-    self.showedUpdate = YES;
+    _showedUpdate = YES;
     
-    if (self.updateDidShowHandler != nil) {
-        self.updateDidShowHandler();
+    if (_updateDidShowHandler != nil) {
+        _updateDidShowHandler();
     }
 }
 
 - (BOOL)showingUpdate
 {
-    return self.showedUpdate;
+    return _showedUpdate;
 }
 
 - (void)basicDriverIsRequestingAbortUpdateWithError:(nullable NSError *) error
@@ -104,7 +103,7 @@
 
 - (void)abortUpdateWithError:(nullable NSError *)error
 {
-    [self.uiDriver abortUpdateWithError:error showErrorToUser:self.showedUpdate];
+    [_uiDriver abortUpdateWithError:error showErrorToUser:_showedUpdate];
 }
 
 @end

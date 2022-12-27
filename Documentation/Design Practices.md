@@ -36,6 +36,12 @@ Two software components should not directly know about each other. Preferrably t
 
 See `Documentation/graph-of-sparkle.png` for a graph of how the code looks like currently. This was generated via [objc_dep](https://github.com/nst/objc_dep) (great tool). Note that there are no red edges which would mean that two nodes know of each other.
 
-## Attributes
+## Attributes & Code Size
+
+Instance variables and instance variable access should be used for private members (declared in `@implementation` block) whenever possible over properties. Preferring instance variables over properties for internal usage can significantly reduce code size. Instance variables should also be ordered by having the larger sized data members declared first.
+
+`SPU_OBJC_DIRECT_MEMBERS` should be used for any internal class in Sparkle and `SPU_OBJC_DIRECT` should be used for any other internal methods to Sparkle that doesn't need to utilize the Obj-C runtime to reduce code size. Note these attributes should not be used for *any* class or method that is exported to the developer (this includes private headers / APIs we carefully decided to expose too). For internal methods and classes that are also used by our Swift tools or unit tests, we may not expose them as direct specifically when building for those targets.
 
 `nonatomic` should really be used wherever possible with regards to obj-c properties (`atomic` is a bad default). `readonly` should be used wherever possible as well, which also implies that only ivar access should be used in initializers. `NS_ASSUME_NONNULL_BEGIN` and `NS_ASSUME_NONNULL_END` should be used around new headers whenever possible. AppKit prevention guards should be used for any non-UI class whenever possible.
+
+Sparkle has several feature flags in ConfigCommon.xcconfig (e.g. `SPARKLE_BUILD_LEGACY_SUUPDATER`, `SPARKLE_BUILD_LEGACY_DSA_SUPPORT`, `SPARKLE_BUILD_UI_BITS`, etc). This allows disabling any combination of these features and building Sparkle with a more minimal feature set. These flags (with the exception for stripping UI bits, localizations, or XPC Services) are for disabling features that are legacy or not recommended to use for most applications. Note when altering these flags, `OTHER_SWIFT_FLAGS_COMMON` may need to be updated appropriately too.

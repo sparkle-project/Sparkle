@@ -9,8 +9,17 @@
 #ifndef SULocalizations_h
 #define SULocalizations_h
 
-#import "SUConstants.h"
+#if SPARKLE_COPY_LOCALIZATIONS
+    #import "SUConstants.h"
 
-#define SULocalizedString(key, comment) NSLocalizedStringFromTableInBundle(key, @"Sparkle", (NSBundle * _Nonnull)([NSBundle bundleWithIdentifier:SUBundleIdentifier] ? [NSBundle bundleWithIdentifier:SUBundleIdentifier] : [NSBundle mainBundle]), comment)
+    // This should only be used from inside the framework (not helper tools)
+    #define SUSparkleBundle() ((NSBundle * _Nonnull)([NSBundle bundleWithIdentifier:SUBundleIdentifier]))
+
+    #define SPARKLE_TABLE @"Sparkle"
+
+    #define SULocalizedStringFromTableInBundle(key, tbl, bundle, comment) NSLocalizedStringFromTableInBundle(key, tbl, bundle, comment)
+#else
+    #define SULocalizedStringFromTableInBundle(key, tbl, bundle, comment) key
+#endif
 
 #endif /* SULocalizations_h */

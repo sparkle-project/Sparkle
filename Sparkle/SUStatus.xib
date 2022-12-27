@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="20037" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21507" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="20037"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21507"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="SUStatusController">
             <connections>
-                <outlet property="actionButton" destination="12" id="34"/>
-                <outlet property="progressBar" destination="11" id="49"/>
-                <outlet property="statusTextField" destination="16" id="MiZ-Tn-yVg"/>
+                <outlet property="_actionButton" destination="12" id="0jE-Zn-L18"/>
+                <outlet property="_progressBar" destination="11" id="Cwm-99-fCT"/>
+                <outlet property="_statusTextField" destination="16" id="oOr-uc-6cX"/>
                 <outlet property="window" destination="5" id="25"/>
             </connections>
         </customObject>
@@ -103,9 +103,6 @@
                     <constraint firstItem="8" firstAttribute="top" secondItem="6" secondAttribute="top" constant="15" id="tAo-wJ-XR0"/>
                 </constraints>
             </view>
-            <connections>
-                <binding destination="-2" name="title" keyPath="windowTitle" id="24"/>
-            </connections>
             <point key="canvasLocation" x="-158" y="132"/>
         </window>
     </objects>

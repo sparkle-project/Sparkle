@@ -10,23 +10,16 @@
 #import <AppKit/AppKit.h>
 #import <Sparkle/Sparkle.h>
 
-@interface SPUCommandLineUserDriver ()
-
-@property (nonatomic, nullable, readonly) SUUpdatePermissionResponse *updatePermissionResponse;
-@property (nonatomic, readonly) BOOL deferInstallation;
-@property (nonatomic, readonly) BOOL verbose;
-@property (nonatomic) uint64_t bytesDownloaded;
-@property (nonatomic) uint64_t bytesToDownload;
-
-@end
-
 @implementation SPUCommandLineUserDriver
-
-@synthesize updatePermissionResponse = _updatePermissionResponse;
-@synthesize deferInstallation = _deferInstallation;
-@synthesize verbose = _verbose;
-@synthesize bytesDownloaded = _bytesDownloaded;
-@synthesize bytesToDownload = _bytesToDownload;
+{
+    SUUpdatePermissionResponse *_updatePermissionResponse;
+    
+    uint64_t _bytesDownloaded;
+    uint64_t _bytesToDownload;
+    
+    BOOL _deferInstallation;
+    BOOL _verbose;
+}
 
 - (instancetype)initWithUpdatePermissionResponse:(nullable SUUpdatePermissionResponse *)updatePermissionResponse deferInstallation:(BOOL)deferInstallation verbose:(BOOL)verbose
 {
@@ -41,20 +34,20 @@
 
 - (void)showUpdatePermissionRequest:(SPUUpdatePermissionRequest *)__unused request reply:(void (^)(SUUpdatePermissionResponse *))reply
 {
-    if (self.verbose) {
-        fprintf(stderr, "Granting permission for automatic update checks with sending system profile %s...\n", self.updatePermissionResponse.sendSystemProfile ? "enabled" : "disabled");
+    if (_verbose) {
+        fprintf(stderr, "Granting permission for automatic update checks with sending system profile %s...\n", _updatePermissionResponse.sendSystemProfile ? "enabled" : "disabled");
     }
-    reply(self.updatePermissionResponse);
+    reply(_updatePermissionResponse);
 }
 
 - (void)showUserInitiatedUpdateCheckWithCancellation:(void (^)(void))__unused cancellation
 {
-    if (self.verbose) {
+    if (_verbose) {
         fprintf(stderr, "Checking for Updates...\n");
     }
 }
 
-- (void)displayReleaseNotes:(const char * _Nullable)releaseNotes
+- (void)displayReleaseNotes:(const char * _Nullable)releaseNotes SPU_OBJC_DIRECT
 {
     if (releaseNotes != NULL) {
         fprintf(stderr, "Release notes:\n");
@@ -62,7 +55,7 @@
     }
 }
 
-- (void)displayHTMLReleaseNotes:(NSData *)releaseNotes
+- (void)displayHTMLReleaseNotes:(NSData *)releaseNotes SPU_OBJC_DIRECT
 {
     // Note: this is the only API we rely on here that references AppKit
     // We shouldn't invoke it when the calling process is ran under root.
@@ -73,7 +66,7 @@
     }
 }
 
-- (void)displayPlainTextReleaseNotes:(NSData *)releaseNotes encoding:(NSStringEncoding)encoding
+- (void)displayPlainTextReleaseNotes:(NSData *)releaseNotes encoding:(NSStringEncoding)encoding SPU_OBJC_DIRECT
 {
     NSString *string = [[NSString alloc] initWithData:releaseNotes encoding:encoding];
     [self displayReleaseNotes:string.UTF8String];
@@ -81,7 +74,7 @@
 
 - (void)showUpdateWithAppcastItem:(SUAppcastItem *)appcastItem updateAdjective:(NSString *)updateAdjective
 {
-    if (self.verbose) {
+    if (_verbose) {
         fprintf(stderr, "Found %s update! (%s)\n", updateAdjective.UTF8String, appcastItem.displayVersionString.UTF8String);
         
         if (appcastItem.itemDescription != nil) {
@@ -109,8 +102,8 @@
                 reply(SPUUserUpdateChoiceInstall);
                 break;
             case SPUUserUpdateStageInstalling:
-                if (self.deferInstallation) {
-                    if (self.verbose) {
+                if (_deferInstallation) {
+                    if (_verbose) {
                         fprintf(stderr, "Deferring Installation.\n");
                     }
                     reply(SPUUserUpdateChoiceDismiss);
@@ -128,7 +121,7 @@
 
 - (void)showUpdateReleaseNotesWithDownloadData:(SPUDownloadData *)downloadData
 {
-    if (self.verbose) {
+    if (_verbose) {
         if (downloadData.MIMEType != nil && [downloadData.MIMEType isEqualToString:@"text/plain"]) {
             NSStringEncoding encoding;
             if (downloadData.textEncodingName == nil) {
@@ -150,7 +143,7 @@
 
 - (void)showUpdateReleaseNotesFailedToDownloadWithError:(NSError *)error
 {
-    if (self.verbose) {
+    if (_verbose) {
         fprintf(stderr, "Error: Unable to download release notes: %s\n", error.localizedDescription.UTF8String);
     }
 }
@@ -167,52 +160,52 @@
 
 - (void)showDownloadInitiatedWithCancellation:(void (^)(void))__unused cancellation
 {
-    if (self.verbose) {
+    if (_verbose) {
         fprintf(stderr, "Downloading Update...\n");
     }
 }
 
 - (void)showDownloadDidReceiveExpectedContentLength:(uint64_t)expectedContentLength
 {
-    if (self.verbose) {
+    if (_verbose) {
         fprintf(stderr, "Downloading %llu bytes...\n", expectedContentLength);
     }
-    self.bytesDownloaded = 0;
-    self.bytesToDownload = expectedContentLength;
+    _bytesDownloaded = 0;
+    _bytesToDownload = expectedContentLength;
 }
 
 - (void)showDownloadDidReceiveDataOfLength:(uint64_t)length
 {
-    self.bytesDownloaded += length;
+    _bytesDownloaded += length;
     
     // In case our expected content length was incorrect
-    if (self.bytesDownloaded > self.bytesToDownload) {
-        self.bytesToDownload = self.bytesDownloaded;
+    if (_bytesDownloaded > _bytesToDownload) {
+        _bytesToDownload = _bytesDownloaded;
     }
     
-    if (self.bytesToDownload > 0 && self.verbose) {
-        fprintf(stderr, "Downloaded %llu out of %llu bytes (%.0f%%)\n", self.bytesDownloaded, self.bytesToDownload, (self.bytesDownloaded * 100.0 / self.bytesToDownload));
+    if (_bytesToDownload > 0 && _verbose) {
+        fprintf(stderr, "Downloaded %llu out of %llu bytes (%.0f%%)\n", _bytesDownloaded, _bytesToDownload, (_bytesDownloaded * 100.0 / _bytesToDownload));
     }
 }
 
 - (void)showDownloadDidStartExtractingUpdate
 {
-    if (self.verbose) {
+    if (_verbose) {
         fprintf(stderr, "Extracting Update...\n");
     }
 }
 
 - (void)showExtractionReceivedProgress:(double)progress
 {
-    if (self.verbose) {
+    if (_verbose) {
         fprintf(stderr, "Extracting Update (%.0f%%)\n", progress * 100);
     }
 }
 
 - (void)showReadyToInstallAndRelaunch:(void (^)(SPUUserUpdateChoice))installUpdateHandler
 {
-    if (self.deferInstallation) {
-        if (self.verbose) {
+    if (_deferInstallation) {
+        if (_verbose) {
             fprintf(stderr, "Deferring Installation.\n");
         }
         installUpdateHandler(SPUUserUpdateChoiceDismiss);
@@ -223,14 +216,14 @@
 
 - (void)showInstallingUpdateWithApplicationTerminated:(BOOL)__unused applicationTerminated retryTerminatingApplication:(void (^)(void))__unused retryTerminatingApplication
 {
-    if (self.verbose) {
+    if (_verbose) {
         fprintf(stderr, "Installing Update...\n");
     }
 }
 
 - (void)showUpdateInstalledAndRelaunched:(BOOL)__unused relaunched acknowledgement:(void (^)(void))acknowledgement
 {
-    if (self.verbose) {
+    if (_verbose) {
        fprintf(stderr, "Installation Finished.\n");
     }
     

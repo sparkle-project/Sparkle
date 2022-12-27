@@ -7,7 +7,6 @@
 //
 
 import XCTest
-import Sparkle
 
 class SUAppcastTest: XCTestCase {
 

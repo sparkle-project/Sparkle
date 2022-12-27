@@ -17,19 +17,12 @@
 
 #include "AppKitPrevention.h"
 
-@interface SPUAppcastItemStateResolver ()
-
-@property (nonatomic, readonly) NSString *hostVersion;
-@property (nonatomic, readonly) id<SUVersionComparison> applicationVersionComparator;
-@property (nonatomic, readonly) SUStandardVersionComparator *standardVersionComparator;
-
-@end
-
 @implementation SPUAppcastItemStateResolver
-
-@synthesize hostVersion = _hostVersion;
-@synthesize applicationVersionComparator = _applicationVersionComparator;
-@synthesize standardVersionComparator = _standardVersionComparator;
+{
+    NSString *_hostVersion;
+    id<SUVersionComparison> _applicationVersionComparator;
+    SUStandardVersionComparator *_standardVersionComparator;
+}
 
 - (instancetype)initWithHostVersion:(NSString *)hostVersion applicationVersionComparator:(id<SUVersionComparison>)applicationVersionComparator standardVersionComparator:(SUStandardVersionComparator *)standardVersionComparator
 {
@@ -46,7 +39,7 @@
 {
     BOOL minimumVersionOK = YES;
     if (minimumSystemVersion != nil && ![minimumSystemVersion isEqualToString:@""]) {
-        minimumVersionOK = [self.standardVersionComparator compareVersion:(NSString * _Nonnull)minimumSystemVersion toVersion:[SUOperatingSystem systemVersionString]] != NSOrderedDescending;
+        minimumVersionOK = [_standardVersionComparator compareVersion:(NSString * _Nonnull)minimumSystemVersion toVersion:[SUOperatingSystem systemVersionString]] != NSOrderedDescending;
     }
     return minimumVersionOK;
 }
@@ -55,7 +48,7 @@
 {
     BOOL maximumVersionOK = YES;
     if (maximumSystemVersion != nil && ![maximumSystemVersion isEqualToString:@""]) {
-        maximumVersionOK = [self.standardVersionComparator compareVersion:(NSString * _Nonnull)maximumSystemVersion toVersion:[SUOperatingSystem systemVersionString]] != NSOrderedAscending;
+        maximumVersionOK = [_standardVersionComparator compareVersion:(NSString * _Nonnull)maximumSystemVersion toVersion:[SUOperatingSystem systemVersionString]] != NSOrderedAscending;
     }
     return maximumVersionOK;
 }
@@ -67,7 +60,7 @@
 
 - (BOOL)isMinimumAutoupdateVersionOK:(NSString * _Nullable)minimumAutoupdateVersion
  {
-     return [[self class] isMinimumAutoupdateVersionOK:minimumAutoupdateVersion hostVersion:self.hostVersion versionComparator:self.applicationVersionComparator];
+     return [[self class] isMinimumAutoupdateVersionOK:minimumAutoupdateVersion hostVersion:_hostVersion versionComparator:_applicationVersionComparator];
  }
 
 - (BOOL)isCriticalUpdateWithCriticalUpdateDictionary:(NSDictionary * _Nullable)criticalUpdateDictionary
@@ -84,7 +77,7 @@
     }
     
     // Update is only critical when coming from previous versions
-    return ([self.applicationVersionComparator compareVersion:self.hostVersion toVersion:criticalVersion] == NSOrderedAscending);
+    return ([_applicationVersionComparator compareVersion:_hostVersion toVersion:criticalVersion] == NSOrderedAscending);
 }
 
 - (BOOL)isInformationalUpdateWithInformationalUpdateVersions:(NSSet<NSString *> * _Nullable)informationalUpdateVersions
@@ -98,7 +91,7 @@
         return YES;
     }
     
-    NSString *hostVersion = self.hostVersion;
+    NSString *hostVersion = _hostVersion;
     
     // Informational update only for a set of host versions we're updating from
     if ([informationalUpdateVersions containsObject:hostVersion]) {
@@ -108,7 +101,7 @@
     // If an informational update version has a '<' prefix, this is an informational update if
     // hostVersion < this info update version
     for (NSString *informationalUpdateVersion in informationalUpdateVersions) {
-        if ([informationalUpdateVersion hasPrefix:@"<"] && [self.applicationVersionComparator compareVersion:hostVersion toVersion:[informationalUpdateVersion substringFromIndex:1]] == NSOrderedAscending) {
+        if ([informationalUpdateVersion hasPrefix:@"<"] && [_applicationVersionComparator compareVersion:hostVersion toVersion:[informationalUpdateVersion substringFromIndex:1]] == NSOrderedAscending) {
             return YES;
         }
     }

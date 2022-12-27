@@ -9,7 +9,7 @@
 #import <Cocoa/Cocoa.h>
 #import <Sparkle/Sparkle.h>
 
-@interface SUInstallUpdateViewController : NSViewController
+SPU_OBJC_DIRECT_MEMBERS @interface SUInstallUpdateViewController : NSViewController
 
 - (instancetype)initWithAppcastItem:(SUAppcastItem *)appcastItem reply:(void (^)(SPUUserUpdateChoice))reply;
 

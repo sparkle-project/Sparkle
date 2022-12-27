@@ -11,7 +11,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 // Appcast Item state that contains properties that depends on a host
-@interface SPUAppcastItemState : NSObject
+SPU_OBJC_DIRECT_MEMBERS @interface SPUAppcastItemState : NSObject
 
 - (instancetype)init NS_UNAVAILABLE;
 

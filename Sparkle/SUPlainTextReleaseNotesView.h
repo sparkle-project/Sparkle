@@ -14,7 +14,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface SUPlainTextReleaseNotesView : NSObject <SUReleaseNotesView>
+SPU_OBJC_DIRECT_MEMBERS @interface SUPlainTextReleaseNotesView : NSObject <SUReleaseNotesView>
 
 - (instancetype)initWithFontFamily:(NSString *)fontFamily fontPointSize:(int)fontPointSize;
 

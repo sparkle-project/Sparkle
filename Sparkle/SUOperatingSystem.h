@@ -7,7 +7,7 @@
 
 #import <Foundation/Foundation.h>
 
-@interface SUOperatingSystem : NSObject
+SPU_OBJC_DIRECT_MEMBERS @interface SUOperatingSystem : NSObject
 
 + (NSString *)systemVersionString;
 

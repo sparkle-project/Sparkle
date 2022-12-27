@@ -10,7 +10,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface TerminationListener : NSObject
+SPU_OBJC_DIRECT_MEMBERS @interface TerminationListener : NSObject
 
 - (instancetype)initWithProcessIdentifier:(NSNumber * _Nullable)processIdentifier;
 

@@ -12,7 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class SUHost;
 
-@interface SUBundleIcon : NSObject
+SPU_OBJC_DIRECT_MEMBERS @interface SUBundleIcon : NSObject
 
 + (NSURL * _Nullable)iconURLForHost:(SUHost *)host;
 

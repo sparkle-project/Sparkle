@@ -1,10 +1,19 @@
+# 2.3.1
+
+* Fix update permission alert title text overlapping with question text in some languages (#2284) (Zorg)
+* Log the URL that failed to download correctly (#2296) (Zorg)
+* Update Czech translation (#2275) (Sam)
+* Add zh_HK (Chinese, Hong Kong) localization (#2273) (Bing Zheung)
+
 # 2.3.0
 
 * Bump minimum deployment target to macOS 10.13 (#2196) (Zorg)
 * Remove and preserve necessary updates in generate_appcast (#2218) (Zorg)
 * Move old update files no longer needed to old_updates/ in archive directory in generate_appcast (#2228) (Zorg)
 * Expose maximum-versions option (per branch) in generate_appcast to preserve in the feed (#2259) (Zorg)
+* Add -p option to sign_update to only print the signed signature (#2268) (Zorg)
 * Hide automatic install check box when allowsAutomaticUpdates is disabled (#2202) (Jie)
+* Allow developer to always force allowing automatic updates (#2266) (Zorg)
 * Fix update window going haywire during resize when release notes are hidden by disabling resizing (#2200) (Zorg)
 * Allow user to re-try installing/relaunching application when quit is delayed/cancelled (#2234) (Zorg)
 * Add delta update attributes for validating an app hasn't been stripped from removed localizations or architectures (#2219) (Zorg)
@@ -14,6 +23,7 @@
 * Find potential matching running apps that are translocated in the updater agent (#2233) (Zorg)
 * Expose -[SPUStandardUserDriver activeUpdateAlert] as private API (#2255) (Zorg)
 * Add zh_CN l10n for "Version History" (#2247) (kakaiikaka)
+* Update zh_TW localization (#2271) (Chiahong)
 * Remove ed25519 git submodule in favor of including the dependency directly (#2244) (Zorg)
 * Clean up left-over code (#2243) (Eitot)
 * Update Package.resolved (#2245) (Zorg)

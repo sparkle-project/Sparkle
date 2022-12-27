@@ -20,20 +20,15 @@
 #endif
 
 @interface SUCodeSigningVerifierTest : XCTestCase
-
-@property (copy) NSURL *notSignedAppURL;
-@property (copy) NSURL *validSignedAppURL;
-@property (copy) NSURL *invalidSignedAppURL;
-@property (copy) NSURL *calculatorCopyURL;
-
 @end
 
 @implementation SUCodeSigningVerifierTest
-
-@synthesize notSignedAppURL = _notSignedAppURL;
-@synthesize validSignedAppURL = _validSignedAppURL;
-@synthesize invalidSignedAppURL = _invalidSignedAppURL;
-@synthesize calculatorCopyURL = _calculatorCopyURL;
+{
+    NSURL *_notSignedAppURL;
+    NSURL *_validSignedAppURL;
+    NSURL *_invalidSignedAppURL;
+    NSURL *_calculatorCopyURL;
+}
 
 + (NSString *)calculatorApplicationPath
 {
@@ -62,7 +57,7 @@
     NSError *error = nil;
     if ([[NSFileManager defaultManager] createDirectoryAtURL:tempDir withIntermediateDirectories:YES attributes:nil error:&error]) {
         if ([self unzip:zippedAppURL toPath:tempDir.path]) {
-            self.notSignedAppURL = [tempDir URLByAppendingPathComponent:@"SparkleTestCodeSignApp.app"];
+            _notSignedAppURL = [tempDir URLByAppendingPathComponent:@"SparkleTestCodeSignApp.app"];
             [self setupValidSignedApp];
             [self setupCalculatorCopy];
             [self setupInvalidSignedApp];
@@ -80,8 +75,8 @@
 {
     [super tearDown];
 
-    if (self.notSignedAppURL) {
-        NSURL *tempDir = [self.notSignedAppURL URLByDeletingLastPathComponent];
+    if (_notSignedAppURL != nil) {
+        NSURL *tempDir = [_notSignedAppURL URLByDeletingLastPathComponent];
         [[NSFileManager defaultManager] removeItemAtURL:tempDir error:nil];
     }
 }
@@ -89,24 +84,24 @@
 - (void)setupValidSignedApp
 {
     NSError *error = nil;
-    NSURL *tempDir = [self.notSignedAppURL URLByDeletingLastPathComponent];
+    NSURL *tempDir = [_notSignedAppURL URLByDeletingLastPathComponent];
     NSURL *signedAndValid = [tempDir URLByAppendingPathComponent:@"valid-signed.app"];
 
     [[NSFileManager defaultManager] removeItemAtURL:signedAndValid error:NULL];
-    if (![[NSFileManager defaultManager] copyItemAtURL:self.notSignedAppURL toURL:signedAndValid error:&error]) {
-        XCTFail("Failed to copy %@ to %@ with error: %@", self.notSignedAppURL, signedAndValid, error);
+    if (![[NSFileManager defaultManager] copyItemAtURL:_notSignedAppURL toURL:signedAndValid error:&error]) {
+        XCTFail("Failed to copy %@ to %@ with error: %@", _notSignedAppURL, signedAndValid, error);
     }
 
-    self.validSignedAppURL = signedAndValid;
+    _validSignedAppURL = signedAndValid;
 
-    if (![self codesignAppURL:self.validSignedAppURL]) {
-        XCTFail(@"Failed to codesign %@", self.validSignedAppURL);
+    if (![self codesignAppURL:_validSignedAppURL]) {
+        XCTFail(@"Failed to codesign %@", _validSignedAppURL);
     }
 }
 
 - (void)setupCalculatorCopy
 {
-    NSURL *tempDir = [self.notSignedAppURL URLByDeletingLastPathComponent];
+    NSURL *tempDir = [_notSignedAppURL URLByDeletingLastPathComponent];
     NSURL *calculatorCopy = [tempDir URLByAppendingPathComponent:@"calc.app"];
 
     [[NSFileManager defaultManager] removeItemAtURL:calculatorCopy error:NULL];
@@ -132,30 +127,30 @@
         XCTFail(@"Failed to remove file in calculator copy with error: %@", removeError);
     }
 
-    self.calculatorCopyURL = calculatorCopy;
+    _calculatorCopyURL = calculatorCopy;
 }
 
 - (void)setupInvalidSignedApp
 {
     NSError *error = nil;
-    NSURL *tempDir = [self.notSignedAppURL URLByDeletingLastPathComponent];
+    NSURL *tempDir = [_notSignedAppURL URLByDeletingLastPathComponent];
     NSURL *signedAndInvalid = [tempDir URLByAppendingPathComponent:@"invalid-signed.app"];
 
     [[NSFileManager defaultManager] removeItemAtURL:signedAndInvalid error:NULL];
-    if ([[NSFileManager defaultManager] copyItemAtURL:self.notSignedAppURL toURL:signedAndInvalid error:&error]) {
-        self.invalidSignedAppURL = signedAndInvalid;
-        if ([self codesignAppURL:self.invalidSignedAppURL]) {
-            NSURL *fileInAppBundleToRemove = [self.invalidSignedAppURL URLByAppendingPathComponent:@"Contents/Resources/test_app_only_dsa_pub.pem"];
+    if ([[NSFileManager defaultManager] copyItemAtURL:_notSignedAppURL toURL:signedAndInvalid error:&error]) {
+        _invalidSignedAppURL = signedAndInvalid;
+        if ([self codesignAppURL:_invalidSignedAppURL]) {
+            NSURL *fileInAppBundleToRemove = [_invalidSignedAppURL URLByAppendingPathComponent:@"Contents/Resources/test_app_only_dsa_pub.pem"];
             if (![[NSFileManager defaultManager] removeItemAtURL:fileInAppBundleToRemove error:&error]) {
                 NSLog(@"Failed to remove %@ with error %@", fileInAppBundleToRemove, error);
             }
         }
         else {
-            NSLog(@"Failed to codesign %@", self.invalidSignedAppURL);
+            NSLog(@"Failed to codesign %@", _invalidSignedAppURL);
         }
     }
     else {
-        NSLog(@"Failed to copy %@ to %@ with error %@", self.notSignedAppURL, signedAndInvalid, error);
+        NSLog(@"Failed to copy %@ to %@ with error %@", _notSignedAppURL, signedAndInvalid, error);
     }
 }
 
@@ -187,19 +182,19 @@
 
 - (void)testUnsignedApp
 {
-    XCTAssertFalse([SUCodeSigningVerifier bundleAtURLIsCodeSigned:self.notSignedAppURL], @"App not expected to be code signed");
+    XCTAssertFalse([SUCodeSigningVerifier bundleAtURLIsCodeSigned:_notSignedAppURL], @"App not expected to be code signed");
 
     NSError *error = nil;
-    XCTAssertFalse([SUCodeSigningVerifier codeSignatureIsValidAtBundleURL:self.notSignedAppURL error:&error], @"signature should not be valid as it's not code signed");
+    XCTAssertFalse([SUCodeSigningVerifier codeSignatureIsValidAtBundleURL:_notSignedAppURL error:&error], @"signature should not be valid as it's not code signed");
     XCTAssertNotNil(error, @"error should not be nil");
 }
 
 - (void)testValidSignedApp
 {
-    XCTAssertTrue([SUCodeSigningVerifier bundleAtURLIsCodeSigned:self.validSignedAppURL], @"App expected to be code signed");
+    XCTAssertTrue([SUCodeSigningVerifier bundleAtURLIsCodeSigned:_validSignedAppURL], @"App expected to be code signed");
 
     NSError *error = nil;
-    XCTAssertTrue([SUCodeSigningVerifier codeSignatureIsValidAtBundleURL:self.validSignedAppURL error:&error], @"signature should be valid");
+    XCTAssertTrue([SUCodeSigningVerifier codeSignatureIsValidAtBundleURL:_validSignedAppURL error:&error], @"signature should be valid");
     XCTAssertNil(error, @"error should be nil");
 }
 
@@ -229,7 +224,7 @@
     // We can't test our own app because matching with ad-hoc signed apps understandably does not succeed
     NSError *error = nil;
     NSURL *appPath = [NSURL fileURLWithPath:calculatorPath];
-    XCTAssertTrue([SUCodeSigningVerifier codeSignatureAtBundleURL:appPath matchesSignatureAtBundleURL:self.calculatorCopyURL error:&error], @"The calculator app is expected to have matching identity signature to its altered copy");
+    XCTAssertTrue([SUCodeSigningVerifier codeSignatureAtBundleURL:appPath matchesSignatureAtBundleURL:_calculatorCopyURL error:&error], @"The calculator app is expected to have matching identity signature to its altered copy");
 }
 
 - (void)testInvalidMatching
@@ -237,15 +232,15 @@
     NSString *calculatorPath = [SUCodeSigningVerifierTest calculatorApplicationPath];
     NSURL *appPath = [NSURL fileURLWithPath:calculatorPath];
     NSError *error = nil;
-    XCTAssertFalse([SUCodeSigningVerifier codeSignatureAtBundleURL:appPath matchesSignatureAtBundleURL:self.validSignedAppURL error:&error], @"Calculator app bundle expected to have different signature than our valid signed app");
+    XCTAssertFalse([SUCodeSigningVerifier codeSignatureAtBundleURL:appPath matchesSignatureAtBundleURL:_validSignedAppURL error:&error], @"Calculator app bundle expected to have different signature than our valid signed app");
 }
 
 - (void)testInvalidSignedApp
 {
-    XCTAssertTrue([SUCodeSigningVerifier bundleAtURLIsCodeSigned:self.invalidSignedAppURL], @"App expected to be code signed, but signature is invalid");
+    XCTAssertTrue([SUCodeSigningVerifier bundleAtURLIsCodeSigned:_invalidSignedAppURL], @"App expected to be code signed, but signature is invalid");
 
     NSError *error = nil;
-    XCTAssertFalse([SUCodeSigningVerifier codeSignatureIsValidAtBundleURL:self.invalidSignedAppURL error:&error], @"signature should not be valid");
+    XCTAssertFalse([SUCodeSigningVerifier codeSignatureIsValidAtBundleURL:_invalidSignedAppURL error:&error], @"signature should not be valid");
     XCTAssertNotNil(error, @"error should not be nil");
 }
 

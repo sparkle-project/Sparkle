@@ -10,7 +10,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface SUUnarchiverNotifier : NSObject
+SPU_OBJC_DIRECT_MEMBERS @interface SUUnarchiverNotifier : NSObject
 
 - (instancetype)initWithCompletionBlock:(void (^)(NSError * _Nullable))completionBlock progressBlock:(void (^ _Nullable)(double))progressBlock;
 

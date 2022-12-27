@@ -18,7 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 // This notifies the updater for scheduled update checks
 // This class is used so that an updater instance isn't kept alive by a scheduled update check
-@interface SPUUpdaterTimer : NSObject
+SPU_OBJC_DIRECT_MEMBERS @interface SPUUpdaterTimer : NSObject
 
 - (instancetype)initWithDelegate:(id<SPUUpdaterTimerDelegate>)delegate;
 

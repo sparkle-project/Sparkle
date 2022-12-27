@@ -11,20 +11,14 @@
 
 #include "AppKitPrevention.h"
 
-@interface SUInstallerStatus ()
-
-@property (nonatomic, copy) void (^invalidationBlock)(void);
-@property (nonatomic) NSXPCConnection *connection;
-
-@end
-
 @implementation SUInstallerStatus
 {
+    NSXPCConnection *_connection;
+    
+    void (^_invalidationBlock)(void);
+    
     BOOL _remote;
 }
-
-@synthesize invalidationBlock = _invalidationBlock;
-@synthesize connection = _connection;
 
 - (instancetype)initWithRemote:(BOOL)remote
 {
@@ -39,39 +33,42 @@
 {
     if (_remote) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            self.invalidationBlock = invalidationHandler;
+            self->_invalidationBlock = [invalidationHandler copy];
         });
     } else {
-        self.invalidationBlock = invalidationHandler;
+        _invalidationBlock = [invalidationHandler copy];
     }
 }
 
-- (void)_setServiceName:(NSString *)serviceName
+- (void)_setServiceName:(NSString *)serviceName SPU_OBJC_DIRECT
 {
     NSXPCConnection *connection = [[NSXPCConnection alloc] initWithMachServiceName:serviceName options:(NSXPCConnectionOptions)0];
     
     connection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SUStatusInfoProtocol)];
     
-    self.connection = connection;
+    _connection = connection;
     
-    __weak SUInstallerStatus *weakSelf = self;
-    self.connection.interruptionHandler = ^{
+    __weak __typeof__(self) weakSelf = self;
+    _connection.interruptionHandler = ^{
         dispatch_async(dispatch_get_main_queue(), ^{
-            [weakSelf.connection invalidate];
+            __typeof__(self) strongSelf = weakSelf;
+            if (strongSelf != nil) {
+                [strongSelf->_connection invalidate];
+            }
         });
     };
     
-    self.connection.invalidationHandler = ^{
+    _connection.invalidationHandler = ^{
         dispatch_async(dispatch_get_main_queue(), ^{
-            SUInstallerStatus *strongSelf = weakSelf;
+            __typeof__(self) strongSelf = weakSelf;
             if (strongSelf != nil) {
-                strongSelf.connection = nil;
+                strongSelf->_connection = nil;
                 [strongSelf _invokeInvalidationBlock];
             }
         });
     };
     
-    [self.connection resume];
+    [_connection resume];
 }
 
 - (void)setServiceName:(NSString *)serviceName
@@ -89,10 +86,10 @@
 {
     if (_remote) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            [(id<SUStatusInfoProtocol>)self.connection.remoteObjectProxy probeStatusInfoWithReply:reply];
+            [(id<SUStatusInfoProtocol>)self->_connection.remoteObjectProxy probeStatusInfoWithReply:reply];
         });
     } else {
-        [(id<SUStatusInfoProtocol>)self.connection.remoteObjectProxy probeStatusInfoWithReply:reply];
+        [(id<SUStatusInfoProtocol>)_connection.remoteObjectProxy probeStatusInfoWithReply:reply];
     }
 }
 
@@ -100,18 +97,18 @@
 {
     if (_remote) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            [(id<SUStatusInfoProtocol>)self.connection.remoteObjectProxy probeStatusConnectivityWithReply:reply];
+            [(id<SUStatusInfoProtocol>)self->_connection.remoteObjectProxy probeStatusConnectivityWithReply:reply];
         });
     } else {
-        [(id<SUStatusInfoProtocol>)self.connection.remoteObjectProxy probeStatusConnectivityWithReply:reply];
+        [(id<SUStatusInfoProtocol>)_connection.remoteObjectProxy probeStatusConnectivityWithReply:reply];
     }
 }
 
-- (void)_invokeInvalidationBlock
+- (void)_invokeInvalidationBlock SPU_OBJC_DIRECT
 {
-    if (self.invalidationBlock != nil) {
-        self.invalidationBlock();
-        self.invalidationBlock = nil;
+    if (_invalidationBlock != nil) {
+        _invalidationBlock();
+        _invalidationBlock = nil;
     }
 }
 
@@ -119,8 +116,8 @@
 - (void)invalidate
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self.connection invalidate];
-        self.connection = nil;
+        [self->_connection invalidate];
+        self->_connection = nil;
         
         [self _invokeInvalidationBlock];
     });

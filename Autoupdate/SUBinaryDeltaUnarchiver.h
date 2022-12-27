@@ -14,9 +14,14 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+#ifndef BUILDING_SPARKLE_TESTS
+SPU_OBJC_DIRECT_MEMBERS
+#endif
 @interface SUBinaryDeltaUnarchiver : NSObject <SUUnarchiverProtocol>
 
 - (instancetype)initWithArchivePath:(NSString *)archivePath updateHostBundlePath:(NSString *)updateHostBundlePath;
+
++ (BOOL)canUnarchivePath:(NSString *)path;
 
 @end
 

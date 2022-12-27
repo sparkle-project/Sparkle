@@ -10,7 +10,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface SPULocalCacheDirectory : NSObject
+SPU_OBJC_DIRECT_MEMBERS @interface SPULocalCacheDirectory : NSObject
 
 // Returns a path to a suitable cache directory to create specifically for Sparkle
 // Intermediate directories to this path may not exist yet

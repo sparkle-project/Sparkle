@@ -6,6 +6,8 @@
 //  Copyright 2008 Andy Matuschak. All rights reserved.
 //
 
+#if SPARKLE_BUILD_PACKAGE_SUPPORT
+
 #import "SUPackageInstaller.h"
 #import "SUConstants.h"
 #import "SUErrors.h"
@@ -14,17 +16,12 @@
 
 #include "AppKitPrevention.h"
 
-@interface SUPackageInstaller ()
-
-@property (nonatomic, readonly, copy) NSString *packagePath;
-
-@end
-
 @implementation SUPackageInstaller
+{
+    NSString *_packagePath;
+}
 
 static NSString *SUOpenUtilityPath = @"/usr/bin/open";
-
-@synthesize packagePath = _packagePath;
 
 - (instancetype)initWithPackagePath:(NSString *)packagePath
 {
@@ -52,7 +49,7 @@ static NSString *SUOpenUtilityPath = @"/usr/bin/open";
     // -W = wait until the app has quit.
     // -n = Open another instance if already open.
     // -b = app bundle identifier
-    NSArray *args = @[@"-W", @"-n", @"-b", @"com.apple.installer", self.packagePath];
+    NSArray *args = @[@"-W", @"-n", @"-b", @"com.apple.installer", _packagePath];
     
     // Known bug: if the installation fails or is canceled, Sparkle goes ahead and restarts, thinking everything is fine.
     @try {
@@ -80,3 +77,5 @@ static NSString *SUOpenUtilityPath = @"/usr/bin/open";
 }
 
 @end
+
+#endif

@@ -1,23 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="18122" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21507" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="18122"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21507"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="SUUpdatePermissionPrompt">
             <connections>
-                <outlet property="anonymousInfoDisclosureButton" destination="JW6-0z-Ud3" id="8Ac-kJ-T5e"/>
-                <outlet property="cancelButton" destination="cFC-wV-H3j" id="L2P-Ux-4Vn"/>
-                <outlet property="checkButton" destination="sMh-ha-r7R" id="2O6-G4-etk"/>
-                <outlet property="infoChoiceView" destination="ov1-yV-Uol" id="A1X-Y9-Hnh"/>
-                <outlet property="moreInfoView" destination="39" id="127"/>
-                <outlet property="placeholderHeightLayoutConstraint" destination="yis-HR-OIe" id="odJ-KG-SRB"/>
-                <outlet property="placeholderView" destination="AGr-V0-0al" id="piB-Wg-PJx"/>
-                <outlet property="promptView" destination="Yrl-Dt-Qvb" id="2a4-nD-uDx"/>
-                <outlet property="responseView" destination="0CP-x7-YFK" id="fE5-5k-8Uf"/>
-                <outlet property="stackView" destination="qNw-uD-4Bg" id="DxM-SL-1Xl"/>
+                <outlet property="_anonymousInfoDisclosureButton" destination="JW6-0z-Ud3" id="grm-Uj-KJs"/>
+                <outlet property="_automaticallyDownloadUpdatesView" destination="37T-Ef-DtX" id="Ojd-zE-6Kd"/>
+                <outlet property="_cancelButton" destination="cFC-wV-H3j" id="B1o-H0-cr1"/>
+                <outlet property="_checkButton" destination="sMh-ha-r7R" id="2Oc-EC-EcG"/>
+                <outlet property="_infoChoiceView" destination="ov1-yV-Uol" id="RSd-bn-7bu"/>
+                <outlet property="_moreInfoView" destination="39" id="ceJ-4H-FHd"/>
+                <outlet property="_placeholderHeightLayoutConstraint" destination="yis-HR-OIe" id="npL-hg-wRq"/>
+                <outlet property="_placeholderView" destination="AGr-V0-0al" id="UnQ-rl-QSS"/>
+                <outlet property="_promptView" destination="Yrl-Dt-Qvb" id="qbO-fw-1YD"/>
+                <outlet property="_responseView" destination="0CP-x7-YFK" id="AcW-Md-hSP"/>
+                <outlet property="_stackView" destination="qNw-uD-4Bg" id="EIt-kn-pJ0"/>
                 <outlet property="window" destination="5" id="126"/>
             </connections>
         </customObject>
@@ -67,13 +68,13 @@
             </declaredKeys>
         </userDefaultsController>
         <view id="Yrl-Dt-Qvb" userLabel="Prompt View">
-            <rect key="frame" x="0.0" y="0.0" width="437" height="87"/>
+            <rect key="frame" x="0.0" y="0.0" width="437" height="86"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="IgD-Pj-pc8">
-                    <rect key="frame" x="104" y="33" width="315" height="34"/>
+                    <rect key="frame" x="104" y="50" width="315" height="16"/>
                     <constraints>
-                        <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="34" id="J49-m7-iIa"/>
+                        <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="16" id="J49-m7-iIa"/>
                     </constraints>
                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Check for updates automatically?" id="gmh-T4-BO0">
                         <font key="font" metaFont="systemBold"/>
@@ -97,7 +98,7 @@
                     </connections>
                 </textField>
                 <imageView translatesAutoresizingMaskIntoConstraints="NO" id="NBn-FN-XAx">
-                    <rect key="frame" x="23" y="3" width="64" height="64"/>
+                    <rect key="frame" x="23" y="2" width="64" height="64"/>
                     <constraints>
                         <constraint firstAttribute="width" constant="64" id="KbC-i0-ZyN"/>
                         <constraint firstAttribute="height" constant="64" id="Osy-kb-JTR"/>
@@ -115,7 +116,7 @@
                 <constraint firstItem="NBn-FN-XAx" firstAttribute="leading" secondItem="Yrl-Dt-Qvb" secondAttribute="leading" constant="23" id="Xku-5M-xMC"/>
                 <constraint firstItem="tgW-Jp-Aia" firstAttribute="leading" secondItem="NBn-FN-XAx" secondAttribute="trailing" constant="19" id="fPB-MW-Oc2"/>
                 <constraint firstItem="NBn-FN-XAx" firstAttribute="top" secondItem="Yrl-Dt-Qvb" secondAttribute="top" constant="20" symbolic="YES" id="fad-TA-xIj"/>
-                <constraint firstItem="tgW-Jp-Aia" firstAttribute="top" secondItem="IgD-Pj-pc8" secondAttribute="bottom" constant="-9" id="nN4-jN-Fdn"/>
+                <constraint firstItem="tgW-Jp-Aia" firstAttribute="top" secondItem="IgD-Pj-pc8" secondAttribute="bottom" constant="8" id="nN4-jN-Fdn"/>
                 <constraint firstItem="IgD-Pj-pc8" firstAttribute="leading" secondItem="NBn-FN-XAx" secondAttribute="trailing" constant="19" id="s7w-Aw-JQY"/>
                 <constraint firstAttribute="bottom" secondItem="tgW-Jp-Aia" secondAttribute="bottom" id="uS1-FX-kSX"/>
             </constraints>
@@ -275,17 +276,16 @@ Gw
             <point key="canvasLocation" x="-291" y="554"/>
         </customView>
         <customView id="ov1-yV-Uol" userLabel="Anonymous Info View">
-            <rect key="frame" x="0.0" y="0.0" width="437" height="27"/>
+            <rect key="frame" x="0.0" y="0.0" width="437" height="25"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
                 <customView translatesAutoresizingMaskIntoConstraints="NO" id="a0k-dW-Jhx" userLabel="View">
-                    <rect key="frame" x="0.0" y="-26" width="437" height="66"/>
+                    <rect key="frame" x="0.0" y="-26" width="437" height="64"/>
                     <subviews>
                         <button focusRingType="none" translatesAutoresizingMaskIntoConstraints="NO" id="a90-Iq-FgS" userLabel="IncludeInfoButton">
-                            <rect key="frame" x="104" y="25" width="313" height="16"/>
+                            <rect key="frame" x="104" y="25" width="200" height="16"/>
                             <constraints>
-                                <constraint firstAttribute="height" constant="14" id="MvK-K5-kxt"/>
-                                <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="14" id="STF-87-eYy"/>
+                                <constraint firstAttribute="height" constant="14" id="STF-87-eYy"/>
                             </constraints>
                             <buttonCell key="cell" type="check" title="Include anonymous system profile" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" focusRingType="none" inset="2" id="gz7-LM-gNf">
                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -321,12 +321,12 @@ Gw
                         </button>
                     </subviews>
                     <constraints>
+                        <constraint firstItem="JW6-0z-Ud3" firstAttribute="leading" secondItem="a0k-dW-Jhx" secondAttribute="leading" constant="85" id="6Y1-s7-g6r"/>
                         <constraint firstItem="a90-Iq-FgS" firstAttribute="centerY" secondItem="JW6-0z-Ud3" secondAttribute="centerY" id="BNJ-xV-faQ"/>
                         <constraint firstItem="a90-Iq-FgS" firstAttribute="leading" secondItem="a0k-dW-Jhx" secondAttribute="leading" constant="105" id="ILg-Qu-R6M"/>
-                        <constraint firstItem="a90-Iq-FgS" firstAttribute="top" secondItem="a0k-dW-Jhx" secondAttribute="top" constant="26" id="Mh6-5L-xqM"/>
-                        <constraint firstAttribute="trailing" secondItem="a90-Iq-FgS" secondAttribute="trailing" constant="20" id="U4G-Eh-HPu"/>
-                        <constraint firstItem="JW6-0z-Ud3" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="a0k-dW-Jhx" secondAttribute="leading" constant="20" symbolic="YES" id="V3P-iz-aJ9"/>
-                        <constraint firstItem="a90-Iq-FgS" firstAttribute="leading" secondItem="JW6-0z-Ud3" secondAttribute="trailing" constant="4" id="axA-s0-uGg"/>
+                        <constraint firstItem="a90-Iq-FgS" firstAttribute="top" secondItem="a0k-dW-Jhx" secondAttribute="top" constant="24" id="Mh6-5L-xqM"/>
+                        <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="a90-Iq-FgS" secondAttribute="trailing" constant="20" id="U4G-Eh-HPu"/>
+                        <constraint firstItem="a90-Iq-FgS" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="JW6-0z-Ud3" secondAttribute="trailing" constant="4" id="axA-s0-uGg"/>
                         <constraint firstAttribute="width" constant="437" id="iUc-Zs-h9S"/>
                         <constraint firstAttribute="bottom" secondItem="a90-Iq-FgS" secondAttribute="bottom" constant="26" id="qij-uH-6Yl"/>
                     </constraints>
@@ -338,7 +338,45 @@ Gw
                 <constraint firstAttribute="trailing" secondItem="a0k-dW-Jhx" secondAttribute="trailing" id="rAn-bJ-Mp6"/>
                 <constraint firstAttribute="bottom" secondItem="a0k-dW-Jhx" secondAttribute="bottom" constant="-26" id="xw5-bj-VOd"/>
             </constraints>
-            <point key="canvasLocation" x="-113" y="145.5"/>
+            <point key="canvasLocation" x="-135.5" y="242.5"/>
+        </customView>
+        <customView id="37T-Ef-DtX" userLabel="Automatic Download View">
+            <rect key="frame" x="0.0" y="0.0" width="437" height="25"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+            <subviews>
+                <customView translatesAutoresizingMaskIntoConstraints="NO" id="MEW-2n-kJE" userLabel="View">
+                    <rect key="frame" x="0.0" y="-26" width="437" height="64"/>
+                    <subviews>
+                        <button focusRingType="none" translatesAutoresizingMaskIntoConstraints="NO" id="BId-kb-eYW" userLabel="automaticallyDownloadUpdatesButton">
+                            <rect key="frame" x="104" y="25" width="248" height="16"/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="14" id="kJy-g7-0Un"/>
+                            </constraints>
+                            <buttonCell key="cell" type="check" title="Automatically download and install updates" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" focusRingType="none" inset="2" id="AUc-33-qGN">
+                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                <font key="font" metaFont="smallSystem"/>
+                            </buttonCell>
+                            <connections>
+                                <binding destination="-2" name="value" keyPath="automaticallyDownloadUpdates" id="5Me-7t-mMu"/>
+                            </connections>
+                        </button>
+                    </subviews>
+                    <constraints>
+                        <constraint firstItem="BId-kb-eYW" firstAttribute="leading" secondItem="MEW-2n-kJE" secondAttribute="leading" constant="105" id="MnW-AM-QzP"/>
+                        <constraint firstAttribute="bottom" secondItem="BId-kb-eYW" secondAttribute="bottom" constant="26" id="QXK-90-kUJ"/>
+                        <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="BId-kb-eYW" secondAttribute="trailing" constant="20" id="Vk3-CH-cXd"/>
+                        <constraint firstItem="BId-kb-eYW" firstAttribute="top" secondItem="MEW-2n-kJE" secondAttribute="top" constant="24" id="YrX-aL-LAq"/>
+                        <constraint firstAttribute="width" constant="437" id="n4W-Z4-w9i"/>
+                    </constraints>
+                </customView>
+            </subviews>
+            <constraints>
+                <constraint firstAttribute="bottom" secondItem="MEW-2n-kJE" secondAttribute="bottom" constant="-26" id="4iq-ZN-n9x"/>
+                <constraint firstItem="MEW-2n-kJE" firstAttribute="top" secondItem="37T-Ef-DtX" secondAttribute="top" constant="-13" id="FCe-KY-rHW"/>
+                <constraint firstItem="MEW-2n-kJE" firstAttribute="leading" secondItem="37T-Ef-DtX" secondAttribute="leading" id="dsv-fP-ffg"/>
+                <constraint firstAttribute="trailing" secondItem="MEW-2n-kJE" secondAttribute="trailing" id="puT-Df-xgH"/>
+            </constraints>
+            <point key="canvasLocation" x="-136" y="181"/>
         </customView>
         <customView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="AGr-V0-0al" userLabel="Placeholder View">
             <rect key="frame" x="0.0" y="0.0" width="437" height="205"/>

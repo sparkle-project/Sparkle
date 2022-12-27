@@ -42,22 +42,23 @@ static NSString *SUAppcastItemDeltaFromSparkleLocalesKey = @"SUAppcastItemDeltaF
 
 @interface SUAppcastItem ()
 
-@property (readonly, nullable) SUSignatures *signatures;
-
-// Auxillary appcast item state that needs to be evaluated based on the host state
-// This may be nil if the client creates an SUAppcastItem with a deprecated initializer
-// In that case we will need to fallback to safe behavior
-@property (nonatomic, readonly, nullable) SPUAppcastItemState *state;
-
-// Indicates if we have any critical information. Used as a fallback if state is nil
-@property (nonatomic, readonly) BOOL hasCriticalInformation;
-
-// Indicates the versions we update from that are informational-only
-@property (nonatomic, readonly, nullable) NSSet<NSString *> *informationalUpdateVersions;
+@property (readonly, nonatomic, nullable) SUSignatures *signatures;
 
 @end
 
 @implementation SUAppcastItem
+{
+    // Auxillary appcast item state that needs to be evaluated based on the host state
+    // This may be nil if the client creates an SUAppcastItem with a deprecated initializer
+    // In that case we will need to fallback to safe behavior
+    SPUAppcastItemState *_state;
+    
+    // Indicates if we have any critical information. Used as a fallback if state is nil
+    BOOL _hasCriticalInformation;
+    
+    // Indicates the versions we update from that are informational-only
+    NSSet<NSString *> *_informationalUpdateVersions;
+}
 
 @synthesize dateString = _dateString;
 @synthesize deltaUpdates = _deltaUpdates;
@@ -79,9 +80,6 @@ static NSString *SUAppcastItemDeltaFromSparkleLocalesKey = @"SUAppcastItemDeltaF
 @synthesize minimumAutoupdateVersion = _minimumAutoupdateVersion;
 @synthesize ignoreSkippedUpgradesBelowVersion = _ignoreSkippedUpgradesBelowVersion;
 @synthesize phasedRolloutInterval = _phasedRolloutInterval;
-@synthesize state = _state;
-@synthesize hasCriticalInformation = _hasCriticalInformation;
-@synthesize informationalUpdateVersions = _informationalUpdateVersions;
 @synthesize channel = _channel;
 @synthesize deltaFromSparkleExecutableSize = _deltaFromSparkleExecutableSize;
 @synthesize deltaFromSparkleLocales = _deltaFromSparkleLocales;
@@ -156,116 +154,116 @@ static NSString *SUAppcastItemDeltaFromSparkleLocalesKey = @"SUAppcastItemDeltaF
 
 - (void)encodeWithCoder:(NSCoder *)encoder
 {
-    if (self.deltaUpdates != nil) {
-        [encoder encodeObject:self.deltaUpdates forKey:SUAppcastItemDeltaUpdatesKey];
+    if (_deltaUpdates != nil) {
+        [encoder encodeObject:_deltaUpdates forKey:SUAppcastItemDeltaUpdatesKey];
     }
     
-    if (self.deltaFromSparkleExecutableSize != nil) {
-        [encoder encodeObject:self.deltaFromSparkleExecutableSize forKey:SUAppcastItemDeltaFromSparkleExecutableSizeKey];
+    if (_deltaFromSparkleExecutableSize != nil) {
+        [encoder encodeObject:_deltaFromSparkleExecutableSize forKey:SUAppcastItemDeltaFromSparkleExecutableSizeKey];
     }
     
-    if (self.deltaFromSparkleLocales != nil) {
-        [encoder encodeObject:self.deltaFromSparkleLocales forKey:SUAppcastItemDeltaFromSparkleLocalesKey];
+    if (_deltaFromSparkleLocales != nil) {
+        [encoder encodeObject:_deltaFromSparkleLocales forKey:SUAppcastItemDeltaFromSparkleLocalesKey];
     }
     
-    if (self.displayVersionString != nil) {
-        [encoder encodeObject:self.displayVersionString forKey:SUAppcastItemDisplayVersionStringKey];
+    if (_displayVersionString != nil) {
+        [encoder encodeObject:_displayVersionString forKey:SUAppcastItemDisplayVersionStringKey];
     }
     
-    if (self.signatures != nil) {
-        [encoder encodeObject:self.signatures forKey:SUAppcastItemSignaturesKey];
+    if (_signatures != nil) {
+        [encoder encodeObject:_signatures forKey:SUAppcastItemSignaturesKey];
     }
     
-    if (self.fileURL != nil) {
-        [encoder encodeObject:self.fileURL forKey:SUAppcastItemFileURLKey];
+    if (_fileURL != nil) {
+        [encoder encodeObject:_fileURL forKey:SUAppcastItemFileURLKey];
     }
     
-    if (self.infoURL != nil) {
-        [encoder encodeObject:self.infoURL forKey:SUAppcastItemInfoURLKey];
+    if (_infoURL != nil) {
+        [encoder encodeObject:_infoURL forKey:SUAppcastItemInfoURLKey];
     }
     
-    [encoder encodeInt64:(int64_t)self.contentLength forKey:SUAppcastItemContentLengthKey];
+    [encoder encodeInt64:(int64_t)_contentLength forKey:SUAppcastItemContentLengthKey];
     
-    if (self.itemDescription != nil) {
-        [encoder encodeObject:self.itemDescription forKey:SUAppcastItemDescriptionKey];
+    if (_itemDescription != nil) {
+        [encoder encodeObject:_itemDescription forKey:SUAppcastItemDescriptionKey];
     }
     
-    if (self.maximumSystemVersion != nil) {
-        [encoder encodeObject:self.maximumSystemVersion forKey:SUAppcastItemMaximumSystemVersionKey];
+    if (_maximumSystemVersion != nil) {
+        [encoder encodeObject:_maximumSystemVersion forKey:SUAppcastItemMaximumSystemVersionKey];
     }
     
-    if (self.minimumSystemVersion != nil) {
-        [encoder encodeObject:self.minimumSystemVersion forKey:SUAppcastItemMinimumSystemVersionKey];
+    if (_minimumSystemVersion != nil) {
+        [encoder encodeObject:_minimumSystemVersion forKey:SUAppcastItemMinimumSystemVersionKey];
     }
     
-    if (self.minimumAutoupdateVersion != nil) {
-        [encoder encodeObject:self.minimumAutoupdateVersion forKey:SUAppcastElementMinimumAutoupdateVersion];
+    if (_minimumAutoupdateVersion != nil) {
+        [encoder encodeObject:_minimumAutoupdateVersion forKey:SUAppcastElementMinimumAutoupdateVersion];
     }
     
-    if (self.ignoreSkippedUpgradesBelowVersion != nil) {
-        [encoder encodeObject:self.ignoreSkippedUpgradesBelowVersion forKey:SUAppcastElementIgnoreSkippedUpgradesBelowVersion];
+    if (_ignoreSkippedUpgradesBelowVersion != nil) {
+        [encoder encodeObject:_ignoreSkippedUpgradesBelowVersion forKey:SUAppcastElementIgnoreSkippedUpgradesBelowVersion];
     }
     
-    if (self.state != nil) {
-        [encoder encodeObject:self.state forKey:SUAppcastItemStateKey];
+    if (_state != nil) {
+        [encoder encodeObject:_state forKey:SUAppcastItemStateKey];
     }
     
-    if (self.releaseNotesURL != nil) {
-        [encoder encodeObject:self.releaseNotesURL forKey:SUAppcastItemReleaseNotesURLKey];
+    if (_releaseNotesURL != nil) {
+        [encoder encodeObject:_releaseNotesURL forKey:SUAppcastItemReleaseNotesURLKey];
     }
     
-    if (self.fullReleaseNotesURL != nil) {
-        [encoder encodeObject:self.fullReleaseNotesURL forKey:SUAppcastItemFullReleaseNotesURLKey];
+    if (_fullReleaseNotesURL != nil) {
+        [encoder encodeObject:_fullReleaseNotesURL forKey:SUAppcastItemFullReleaseNotesURLKey];
     }
     
-    if (self.title != nil) {
-        [encoder encodeObject:self.title forKey:SUAppcastItemTitleKey];
+    if (_title != nil) {
+        [encoder encodeObject:_title forKey:SUAppcastItemTitleKey];
     }
     
-    if (self.versionString != nil) {
-        [encoder encodeObject:self.versionString forKey:SUAppcastItemVersionStringKey];
+    if (_versionString != nil) {
+        [encoder encodeObject:_versionString forKey:SUAppcastItemVersionStringKey];
     }
     
-    if (self.osString != nil) {
-        [encoder encodeObject:self.osString forKey:SUAppcastAttributeOsType];
+    if (_osString != nil) {
+        [encoder encodeObject:_osString forKey:SUAppcastAttributeOsType];
     }
     
-    if (self.propertiesDictionary != nil) {
-        [encoder encodeObject:self.propertiesDictionary forKey:SUAppcastItemPropertiesKey];
+    if (_propertiesDictionary != nil) {
+        [encoder encodeObject:_propertiesDictionary forKey:SUAppcastItemPropertiesKey];
     }
     
-    if (self.installationType != nil) {
-        [encoder encodeObject:self.installationType forKey:SUAppcastItemInstallationTypeKey];
+    if (_installationType != nil) {
+        [encoder encodeObject:_installationType forKey:SUAppcastItemInstallationTypeKey];
     }
     
-    if (self.phasedRolloutInterval != nil) {
-        [encoder encodeObject:self.phasedRolloutInterval forKey:SUAppcastElementPhasedRolloutInterval];
+    if (_phasedRolloutInterval != nil) {
+        [encoder encodeObject:_phasedRolloutInterval forKey:SUAppcastElementPhasedRolloutInterval];
     }
     
-    if (self.channel != nil) {
-        [encoder encodeObject:self.channel forKey:SUAppcastElementChannel];
+    if (_channel != nil) {
+        [encoder encodeObject:_channel forKey:SUAppcastElementChannel];
     }
 }
 
 - (BOOL)isDeltaUpdate
 {
-    NSDictionary *rssElementEnclosure = [self.propertiesDictionary objectForKey:SURSSElementEnclosure];
+    NSDictionary *rssElementEnclosure = [_propertiesDictionary objectForKey:SURSSElementEnclosure];
     return [rssElementEnclosure objectForKey:SUAppcastAttributeDeltaFrom] != nil;
 }
 
 - (BOOL)isCriticalUpdate
 {
-    if (self.state != nil) {
-        return self.state.criticalUpdate;
+    if (_state != nil) {
+        return _state.criticalUpdate;
     } else {
-        return self.hasCriticalInformation;
+        return _hasCriticalInformation;
     }
 }
 
 - (BOOL)isMajorUpgrade
 {
-    if (self.state != nil) {
-        return self.state.majorUpgrade;
+    if (_state != nil) {
+        return _state.majorUpgrade;
     } else {
         return NO;
     }
@@ -273,8 +271,8 @@ static NSString *SUAppcastItemDeltaFromSparkleLocalesKey = @"SUAppcastItemDeltaF
 
 - (BOOL)minimumOperatingSystemVersionIsOK
 {
-    if (self.state != nil) {
-        return self.state.minimumOperatingSystemVersionIsOK;
+    if (_state != nil) {
+        return _state.minimumOperatingSystemVersionIsOK;
     } else {
         return YES;
     }
@@ -282,8 +280,8 @@ static NSString *SUAppcastItemDeltaFromSparkleLocalesKey = @"SUAppcastItemDeltaF
 
 - (BOOL)maximumOperatingSystemVersionIsOK
 {
-    if (self.state != nil) {
-        return self.state.maximumOperatingSystemVersionIsOK;
+    if (_state != nil) {
+        return _state.maximumOperatingSystemVersionIsOK;
     } else {
         return YES;
     }
@@ -291,12 +289,12 @@ static NSString *SUAppcastItemDeltaFromSparkleLocalesKey = @"SUAppcastItemDeltaF
 
 - (BOOL)isMacOsUpdate
 {
-    return self.osString == nil || [self.osString isEqualToString:SUAppcastAttributeValueMacOS];
+    return _osString == nil || [_osString isEqualToString:SUAppcastAttributeValueMacOS];
 }
 
 - (NSDate *)date
 {
-    NSString *dateString = self.dateString;
+    NSString *dateString = _dateString;
     if (dateString == nil) {
         return nil;
     }
@@ -310,10 +308,10 @@ static NSString *SUAppcastItemDeltaFromSparkleLocalesKey = @"SUAppcastItemDeltaF
 
 - (BOOL)isInformationOnlyUpdate
 {
-    if (self.state != nil) {
-        return self.state.informationalUpdate;
+    if (_state != nil) {
+        return _state.informationalUpdate;
     } else {
-        return (self.informationalUpdateVersions != nil && self.informationalUpdateVersions.count == 0);
+        return (_informationalUpdateVersions != nil && _informationalUpdateVersions.count == 0);
     }
 }
 
@@ -328,7 +326,7 @@ static NSString *SUAppcastItemDeltaFromSparkleLocalesKey = @"SUAppcastItemDeltaF
 }
 
 // Initializer used for making delta items
-- (nullable instancetype)initWithDictionary:(NSDictionary *)dict relativeToURL:(NSURL * _Nullable)appcastURL state:(SPUAppcastItemState * _Nullable)state
+- (nullable instancetype)initWithDictionary:(NSDictionary *)dict relativeToURL:(NSURL * _Nullable)appcastURL state:(SPUAppcastItemState * _Nullable)state SPU_OBJC_DIRECT
 {
     return [self initWithDictionary:dict relativeToURL:nil stateResolver:nil resolvedState:state failureReason:nil];
 }
@@ -477,7 +475,11 @@ static NSString *SUAppcastItemDeltaFromSparkleLocalesKey = @"SUAppcastItemDeltaF
             }
         }
         if (enclosure) {
-            _signatures = [[SUSignatures alloc] initWithDsa:[enclosure objectForKey:SUAppcastAttributeDSASignature] ed:[enclosure objectForKey:SUAppcastAttributeEDSignature]];
+            _signatures = [[SUSignatures alloc] initWithEd:[enclosure objectForKey:SUAppcastAttributeEDSignature]
+#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
+                                                       dsa:[enclosure objectForKey:SUAppcastAttributeDSASignature]
+#endif
+            ];
             _osString = [enclosure objectForKey:SUAppcastAttributeOsType];
         }
 
@@ -546,15 +548,17 @@ static NSString *SUAppcastItemDeltaFromSparkleLocalesKey = @"SUAppcastItemDeltaF
             _displayVersionString = [_versionString copy];
         }
         
-        NSString *attributeInstallationType = [enclosure objectForKey:SUAppcastAttributeInstallationType];
         NSString *chosenInstallationType;
+#if SPARKLE_BUILD_PACKAGE_SUPPORT
+        NSString *attributeInstallationType = [enclosure objectForKey:SUAppcastAttributeInstallationType];
         if (attributeInstallationType == nil) {
             // If we have a flat package, assume installation type is guided
             // (flat / non-archived interactive packages are not supported)
             // Otherwise assume we have a normal application inside an archive
             if ([_fileURL.pathExtension isEqualToString:@"pkg"] || [_fileURL.pathExtension isEqualToString:@"mpkg"]) {
                 chosenInstallationType = SPUInstallationTypeGuidedPackage;
-            } else {
+            } else
+            {
                 chosenInstallationType = SPUInstallationTypeApplication;
             }
         } else if (!SPUValidInstallationType(attributeInstallationType)) {
@@ -569,6 +573,9 @@ static NSString *SUAppcastItemDeltaFromSparkleLocalesKey = @"SUAppcastItemDeltaF
         } else {
             chosenInstallationType = attributeInstallationType;
         }
+#else
+        chosenInstallationType = SPUInstallationTypeApplication;
+#endif
         
         _installationType = [chosenInstallationType copy];
         
@@ -618,8 +625,8 @@ static NSString *SUAppcastItemDeltaFromSparkleLocalesKey = @"SUAppcastItemDeltaF
                 SULog(SULogLevelError, @"Release notes must have a http or https URL scheme.");
                 _releaseNotesURL = nil;
             }
-        } else if ([self.itemDescription hasPrefix:@"http://"] || [self.itemDescription hasPrefix:@"https://"]) { // if the description starts with http:// or https:// use that.
-            _releaseNotesURL = [NSURL URLWithString:(NSString * _Nonnull)self.itemDescription];
+        } else if ([_itemDescription hasPrefix:@"http://"] || [_itemDescription hasPrefix:@"https://"]) { // if the description starts with http:// or https:// use that.
+            _releaseNotesURL = [NSURL URLWithString:(NSString * _Nonnull)_itemDescription];
         } else {
             _releaseNotesURL = nil;
         }

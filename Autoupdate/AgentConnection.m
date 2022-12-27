@@ -16,20 +16,16 @@
 
 @interface AgentConnection () <NSXPCListenerDelegate, SUInstallerAgentInitiationProtocol>
 
-@property (nonatomic) NSXPCListener *xpcListener;
-@property (nonatomic, nullable) NSXPCConnection *activeConnection;
-@property (nonatomic, nullable) id<SPUInstallerAgentProtocol> agent;
-@property (nonatomic, weak) id<AgentConnectionDelegate> delegate;
-@property (nonatomic) BOOL connected;
-
 @end
 
 @implementation AgentConnection
+{
+    NSXPCListener *_xpcListener;
+    NSXPCConnection *_activeConnection;
+    __weak id<AgentConnectionDelegate> _delegate;
+}
 
-@synthesize xpcListener = _xpcListener;
-@synthesize activeConnection = _activeConnection;
 @synthesize agent = _agent;
-@synthesize delegate = _delegate;
 @synthesize connected = _connected;
 @synthesize invalidationError = _invalidationError;
 
@@ -48,23 +44,23 @@
 
 - (void)startListener
 {
-    [self.xpcListener resume];
+    [_xpcListener resume];
 }
 
 - (void)invalidate
 {
-    self.delegate = nil;
+    _delegate = nil;
     
-    [self.activeConnection invalidate];
-    self.activeConnection = nil;
+    [_activeConnection invalidate];
+    _activeConnection = nil;
     
-    [self.xpcListener invalidate];
-    self.xpcListener = nil;
+    [_xpcListener invalidate];
+    _xpcListener = nil;
 }
 
 - (BOOL)listener:(NSXPCListener *)__unused listener shouldAcceptNewConnection:(NSXPCConnection *)newConnection
 {
-    if (self.activeConnection != nil) {
+    if (_activeConnection != nil) {
         [newConnection invalidate];
         return NO;
     }
@@ -74,24 +70,30 @@
     
     newConnection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SPUInstallerAgentProtocol)];
     
-    self.activeConnection = newConnection;
+    _activeConnection = newConnection;
     
-    __weak AgentConnection *weakSelf = self;
+    __weak __typeof__(self) weakSelf = self;
     newConnection.interruptionHandler = ^{
         dispatch_async(dispatch_get_main_queue(), ^{
-            [weakSelf.activeConnection invalidate];
+            __typeof__(self) strongSelf = weakSelf;
+            if (strongSelf != nil) {
+                [strongSelf->_activeConnection invalidate];
+            }
         });
     };
     
     newConnection.invalidationHandler = ^{
         dispatch_async(dispatch_get_main_queue(), ^{
-            [weakSelf.delegate agentConnectionDidInvalidate];
+            __typeof__(self) strongSelf = weakSelf;
+            if (strongSelf != nil) {
+                [strongSelf->_delegate agentConnectionDidInvalidate];
+            }
         });
     };
     
     [newConnection resume];
     
-    self.agent = newConnection.remoteObjectProxy;
+    _agent = newConnection.remoteObjectProxy;
     
     return YES;
 }
@@ -99,10 +101,10 @@
 - (void)connectionDidInitiateWithReply:(void (^)(void))acknowledgement
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        self.connected = YES;
+        self->_connected = YES;
         
-        [self.delegate agentConnectionDidInitiate];
-        self.delegate = nil;
+        [self->_delegate agentConnectionDidInitiate];
+        self->_delegate = nil;
     });
     
     acknowledgement();
@@ -111,7 +113,7 @@
 - (void)connectionWillInvalidateWithError:(NSError *)error
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        self.invalidationError = error;
+        self->_invalidationError = error;
     });
 }
 

@@ -435,9 +435,11 @@ func writeAppcast(appcastDestPath: URL, appcast: Appcast, fullReleaseNotesLink: 
         if let sig = update.edSignature {
             attributes.append(XMLNode.attribute(withName: SUAppcastAttributeEDSignature, uri: sparkleNS, stringValue: sig) as! XMLNode)
         }
+#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
         if let sig = update.dsaSignature {
             attributes.append(XMLNode.attribute(withName: SUAppcastAttributeDSASignature, uri: sparkleNS, stringValue: sig) as! XMLNode)
         }
+#endif
         enclosure!.attributes = attributes
 
         if update.deltas.count > 0 {
@@ -467,9 +469,11 @@ func writeAppcast(appcastDestPath: URL, appcast: Appcast, fullReleaseNotesLink: 
                 if let sig = delta.edSignature {
                     attributes.append(XMLNode.attribute(withName: SUAppcastAttributeEDSignature, uri: sparkleNS, stringValue: sig) as! XMLNode)
                 }
+#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
                 if let sig = delta.dsaSignature {
                     attributes.append(XMLNode.attribute(withName: SUAppcastAttributeDSASignature, uri: sparkleNS, stringValue: sig) as! XMLNode)
                 }
+#endif
                 deltas!.addChild(XMLNode.element(withName: "enclosure", children: nil, attributes: attributes) as! XMLElement)
             }
         }

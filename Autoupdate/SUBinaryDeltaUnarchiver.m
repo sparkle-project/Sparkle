@@ -16,17 +16,11 @@
 
 #include "AppKitPrevention.h"
 
-@interface SUBinaryDeltaUnarchiver ()
-
-@property (nonatomic, copy, readonly) NSString *archivePath;
-@property (nonatomic, copy, readonly) NSString *updateHostBundlePath;
-
-@end
-
 @implementation SUBinaryDeltaUnarchiver
-
-@synthesize archivePath = _archivePath;
-@synthesize updateHostBundlePath = _updateHostBundlePath;
+{
+    NSString *_archivePath;
+    NSString *_updateHostBundlePath;
+}
 
 + (BOOL)canUnarchivePath:(NSString *)path
 {
@@ -43,7 +37,11 @@
 // We used to invoke mdimport on the bundle but this is not a very good approach.
 // There's no need to do that for non-delta updates and for updates that contain no mdimporters.
 // Moreover, updating the timestamp on the mdimporter bundles is what developers have to do anyway when shipping their new update outside of Sparkle
+// Note: this is used from unit tests
 + (void)updateSpotlightImportersAtBundlePath:(NSString *)targetPath
+#ifndef BUILDING_SPARKLE_TESTS
+SPU_OBJC_DIRECT
+#endif
 {
     NSURL *targetURL = [NSURL fileURLWithPath:targetPath];
     // Only recurse if it's actually a directory.  Don't recurse into a
@@ -95,17 +93,17 @@
 
 - (void)extractDeltaWithNotifier:(SUUnarchiverNotifier *)notifier
 {
-    NSString *sourcePath = self.updateHostBundlePath;
-    NSString *targetPath = [[self.archivePath stringByDeletingLastPathComponent] stringByAppendingPathComponent:[sourcePath lastPathComponent]];
+    NSString *sourcePath = _updateHostBundlePath;
+    NSString *targetPath = [[_archivePath stringByDeletingLastPathComponent] stringByAppendingPathComponent:[sourcePath lastPathComponent]];
     
     NSError *applyDiffError = nil;
-    BOOL success = applyBinaryDelta(sourcePath, targetPath, self.archivePath, NO, ^(double progress){
+    BOOL success = applyBinaryDelta(sourcePath, targetPath, _archivePath, NO, ^(double progress){
         [notifier notifyProgress:progress];
 
     }, &applyDiffError);
     
     if (success) {
-        [[self class] updateSpotlightImportersAtBundlePath:targetPath];
+        [SUBinaryDeltaUnarchiver updateSpotlightImportersAtBundlePath:targetPath];
         [notifier notifySuccess];
     }
     else {
@@ -113,6 +111,6 @@
     }
 }
 
-- (NSString *)description { return [NSString stringWithFormat:@"%@ <%@>", [self class], self.archivePath]; }
+- (NSString *)description { return [NSString stringWithFormat:@"%@ <%@>", [self class], _archivePath]; }
 
 @end
