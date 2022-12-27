@@ -40,7 +40,7 @@
 
 - (void)notifyFailureWithError:(NSError * _Nullable)reason
 {
-    NSMutableDictionary *userInfo = [NSMutableDictionary dictionaryWithObject:SULocalizedString(@"An error occurred while extracting the archive. Please try again later.", nil) forKey:NSLocalizedDescriptionKey];
+    NSMutableDictionary *userInfo = [NSMutableDictionary dictionaryWithObject:SULocalizedStringFromTableInBundle(@"An error occurred while extracting the archive. Please try again later.", SPARKLE_TABLE, SUSparkleBundle(), nil) forKey:NSLocalizedDescriptionKey];
     if (reason) {
         [userInfo setObject:(NSError * _Nonnull)reason forKey:NSUnderlyingErrorKey];
     }

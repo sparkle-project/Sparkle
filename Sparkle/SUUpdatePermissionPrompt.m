@@ -107,7 +107,7 @@ static NSString *const SUUpdatePermissionPromptTouchBarIndentifier = @"" SPARKLE
 
 - (NSString *)promptDescription
 {
-    return [NSString stringWithFormat:SULocalizedString(@"Should %1$@ automatically check for updates? You can always check for updates manually from the %1$@ menu.", nil), _host.name];
+    return [NSString stringWithFormat:SULocalizedStringFromTableInBundle(@"Should %1$@ automatically check for updates? You can always check for updates manually from the %1$@ menu.", SPARKLE_TABLE, SUSparkleBundle(), nil), _host.name];
 }
 
 - (IBAction)toggleMoreInfo:(id)__unused sender

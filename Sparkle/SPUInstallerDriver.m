@@ -96,7 +96,7 @@
         if (underlyingError != nil) {
             if (underlyingError.code == SUValidationError) {
                 NSDictionary *userInfo = @{
-                    NSLocalizedDescriptionKey: SULocalizedString(@"The update is improperly signed and could not be validated. Please try again later or contact the app developer.", nil),
+                    NSLocalizedDescriptionKey: SULocalizedStringFromTableInBundle(@"The update is improperly signed and could not be validated. Please try again later or contact the app developer.", SPARKLE_TABLE, SUSparkleBundle(), nil),
                     NSUnderlyingErrorKey: (NSError * _Nonnull)currentInstallerError
                 };
                 
@@ -106,8 +106,10 @@
                 if (secondUnderlyingError != nil && [secondUnderlyingError.domain isEqualToString:NSCocoaErrorDomain] && secondUnderlyingError.code == NSFileWriteNoPermissionError) {
                     // Note: these error strings will only surface for external app updaters like sparkle-cli (i.e, updaters that update other app bundles)
                     
+                    NSBundle *sparkleBundle = SUSparkleBundle();
+                    
                     NSMutableDictionary *userInfo = [NSMutableDictionary dictionaryWithDictionary:@{
-                        NSLocalizedDescriptionKey: SULocalizedString(@"The installation failed due to not having permission to write the new update.", nil),
+                        NSLocalizedDescriptionKey: SULocalizedStringFromTableInBundle(@"The installation failed due to not having permission to write the new update.", SPARKLE_TABLE, sparkleBundle, nil),
                         NSUnderlyingErrorKey: (NSError * _Nonnull)currentInstallerError
                     }];
                     
@@ -120,7 +122,7 @@
                         if (![mainBundle isEqual:_host.bundle]) {
                             SUHost *mainBundleHost = [[SUHost alloc] initWithBundle:mainBundle];
                             
-                            userInfo[NSLocalizedRecoverySuggestionErrorKey] = [NSString stringWithFormat:SULocalizedString(@"You may need to allow modifications from %1$@ in System Settings under Privacy & Security and App Management to install future updates.", nil), mainBundleHost.name];
+                            userInfo[NSLocalizedRecoverySuggestionErrorKey] = [NSString stringWithFormat:SULocalizedStringFromTableInBundle(@"You may need to allow modifications from %1$@ in System Settings under Privacy & Security and App Management to install future updates.", SPARKLE_TABLE, sparkleBundle, nil), mainBundleHost.name];
                         }
                     }
                     
@@ -170,7 +172,7 @@
             __typeof__(self) strongSelf = weakSelf;
             if (strongSelf != nil && strongSelf->_installerConnection != nil && !strongSelf->_aborted) {
                 NSDictionary *genericUserInfo = @{
-                    NSLocalizedDescriptionKey: SULocalizedString(@"An error occurred while running the updater. Please try again later.", nil),
+                    NSLocalizedDescriptionKey: SULocalizedStringFromTableInBundle(@"An error occurred while running the updater. Please try again later.", SPARKLE_TABLE, SUSparkleBundle(), nil),
                     NSLocalizedFailureReasonErrorKey:@"The remote port connection was invalidated from the updater. For additional details, please check Console logs for "@SPARKLE_RELAUNCH_TOOL_NAME". If your application is sandboxed, please also ensure Installer Connection & Status entitlements are correctly set up: https://sparkle-project.org/documentation/sandboxing/"
                 };
                 
@@ -258,7 +260,7 @@
         __typeof__(self) strongSelf = weakSelf;
         if (strongSelf != nil && strongSelf->_currentStage == SPUInstallerNotStarted && currentExtractionAttempts == strongSelf->_extractionAttempts) {
             SULog(SULogLevelError, @"Timeout: Installer never started archive extraction");
-            [strongSelf->_delegate installerIsRequestingAbortInstallWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey:SULocalizedString(@"An error occurred while starting the installer. Please try again later.", nil) }]];
+            [strongSelf->_delegate installerIsRequestingAbortInstallWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey:SULocalizedStringFromTableInBundle(@"An error occurred while starting the installer. Please try again later.", SPARKLE_TABLE, SUSparkleBundle(), nil) }]];
         }
     });
 }
@@ -296,7 +298,7 @@
             [delegate installerDidFailToApplyDeltaUpdate];
         } else {
             // Don't have to store current stage because we're going to abort
-            NSDictionary *genericUserInfo = @{ NSLocalizedDescriptionKey:SULocalizedString(@"An error occurred while extracting the archive. Please try again later.", nil) };
+            NSDictionary *genericUserInfo = @{ NSLocalizedDescriptionKey:SULocalizedStringFromTableInBundle(@"An error occurred while extracting the archive. Please try again later.", SPARKLE_TABLE, SUSparkleBundle(), nil) };
             
             NSError *unarchivedError = (NSError *)SPUUnarchiveRootObjectSecurely(data, [NSError class]);
             [self _reportInstallerError:unarchivedError genericErrorCode:SUUnarchivingError genericUserInfo:genericUserInfo];
@@ -393,7 +395,7 @@
                 if (!retrievedLaunchStatus) {
 #pragma clang diagnostic pop
                     NSError *error =
-                    [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey:SULocalizedString(@"An error occurred while connecting to the installer. Please try again later.", nil) }];
+                    [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey:SULocalizedStringFromTableInBundle(@"An error occurred while connecting to the installer. Please try again later.", SPARKLE_TABLE, SUSparkleBundle(), nil) }];
                     
                     completionHandler(error);
                     
@@ -463,7 +465,7 @@
             switch (result) {
                 case SUInstallerLauncherFailure:
                     SULog(SULogLevelError, @"Error: Failed to gain authorization required to update target");
-                    completionHandler([NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey:SULocalizedString(@"An error occurred while launching the installer. Please try again later.", nil) }]);
+                    completionHandler([NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey:SULocalizedStringFromTableInBundle(@"An error occurred while launching the installer. Please try again later.", SPARKLE_TABLE, SUSparkleBundle(), nil) }]);
                     break;
                 case SUInstallerLauncherCanceled:
                     completionHandler([NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationCanceledError userInfo:nil]);

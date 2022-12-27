@@ -85,7 +85,7 @@
                         
                         NSDictionary *userInfo =
                         @{
-                          NSLocalizedDescriptionKey: SULocalizedString(@"An error occurred while downloading the update. Please try again later.", nil),
+                          NSLocalizedDescriptionKey: SULocalizedStringFromTableInBundle(@"An error occurred while downloading the update. Please try again later.", SPARKLE_TABLE, SUSparkleBundle(), nil),
                           };
                         
                         NSError *downloadError = [NSError errorWithDomain:SUSparkleErrorDomain code:SUDownloadError userInfo:userInfo];
@@ -242,7 +242,7 @@
         }
         
         NSMutableDictionary *userInfo = [NSMutableDictionary dictionaryWithDictionary:@{
-                                                                                        NSLocalizedDescriptionKey: SULocalizedString(@"An error occurred while downloading the update. Please try again later.", nil),
+                                                                                        NSLocalizedDescriptionKey: SULocalizedStringFromTableInBundle(@"An error occurred while downloading the update. Please try again later.", SPARKLE_TABLE, SUSparkleBundle(), nil),
                                                                                         NSUnderlyingErrorKey: error,
                                                                                         }];
         if (failingUrl) {

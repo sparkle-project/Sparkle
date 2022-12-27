@@ -77,9 +77,11 @@
         
         // Delay the alert four seconds so it doesn't show RIGHT as the app launches, but also doesn't interrupt the user once they really get to work.
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(4 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            NSBundle *sparkleBundle = SUSparkleBundle();
+            
             NSAlert *alert = [[NSAlert alloc] init];
-            alert.messageText = SULocalizedString(@"Unable to Check For Updates", nil);
-            alert.informativeText = SULocalizedString(@"The update checker failed to start correctly. You should contact the app developer to report this issue and verify that you have the latest version.", nil);
+            alert.messageText = SULocalizedStringFromTableInBundle(@"Unable to Check For Updates", SPARKLE_TABLE, sparkleBundle, nil);
+            alert.informativeText = SULocalizedStringFromTableInBundle(@"The update checker failed to start correctly. You should contact the app developer to report this issue and verify that you have the latest version.", SPARKLE_TABLE, sparkleBundle, nil);
             [alert runModal];
         });
     }

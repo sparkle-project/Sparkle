@@ -332,7 +332,7 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
     }
 
     if (_updateItem.informationOnlyUpdate) {
-        [_installButton setTitle:SULocalizedString(@"Learn More…", @"Alternate title for 'Install Update' button when there's no download in RSS feed.")];
+        [_installButton setTitle:SULocalizedStringFromTableInBundle(@"Learn More…", SPARKLE_TABLE, SUSparkleBundle(), @"Alternate title for 'Install Update' button when there's no download in RSS feed.")];
         [_installButton setAction:@selector(openInfoURL:)];
     }
 
@@ -371,11 +371,13 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
     }
     
     if (_state.stage == SPUUserUpdateStageInstalling) {
+        NSBundle *sparkleBundle = SUSparkleBundle();
+        
         // We're going to be relaunching pretty instantaneously
-        _installButton.title = SULocalizedString(@"Install and Relaunch", nil);
+        _installButton.title = SULocalizedStringFromTableInBundle(@"Install and Relaunch", SPARKLE_TABLE, sparkleBundle, nil);
         
         // We should be explicit that the update will be installed on quit
-        _laterButton.title = SULocalizedString(@"Install on Quit", @"Alternate title for 'Remind Me Later' button when downloaded updates can be resumed");
+        _laterButton.title = SULocalizedStringFromTableInBundle(@"Install on Quit", SPARKLE_TABLE, sparkleBundle, @"Alternate title for 'Remind Me Later' button when downloaded updates can be resumed");
     }
 
     if (_updateItem.criticalUpdate && !_updateItem.majorUpgrade) {
@@ -411,17 +413,19 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 
 - (NSString *)titleText
 {
+    NSBundle *sparkleBundle = SUSparkleBundle();
+    
     if (_updateItem.criticalUpdate)
     {
-        return [NSString stringWithFormat:SULocalizedString(@"An important update to %@ is ready to install", nil), _host.name];
+        return [NSString stringWithFormat:SULocalizedStringFromTableInBundle(@"An important update to %@ is ready to install", SPARKLE_TABLE, sparkleBundle, nil), _host.name];
     }
     else if (_state.stage == SPUUserUpdateStageDownloaded || _state.stage == SPUUserUpdateStageInstalling)
     {
-        return [NSString stringWithFormat:SULocalizedString(@"A new version of %@ is ready to install!", nil), _host.name];
+        return [NSString stringWithFormat:SULocalizedStringFromTableInBundle(@"A new version of %@ is ready to install!", SPARKLE_TABLE, sparkleBundle, nil), _host.name];
     }
     else
     {
-        return [NSString stringWithFormat:SULocalizedString(@"A new version of %@ is available!", nil), _host.name];
+        return [NSString stringWithFormat:SULocalizedStringFromTableInBundle(@"A new version of %@ is available!", SPARKLE_TABLE, sparkleBundle, nil), _host.name];
     }
 }
 
@@ -441,19 +445,21 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
     // We display a different summary depending on if it's an "info-only" item, or a "critical update" item, or if we've already downloaded the update and just need to relaunch
     NSString *finalString = nil;
 
+    NSBundle *sparkleBundle = SUSparkleBundle();
+    
     if (_updateItem.informationOnlyUpdate) {
-        finalString = [NSString stringWithFormat:SULocalizedString(@"%@ %@ is now available—you have %@. Would you like to learn more about this update on the web?", @"Description text for SUUpdateAlert when the update informational with no download."), _host.name, updateItemVersion, hostVersion];
+        finalString = [NSString stringWithFormat:SULocalizedStringFromTableInBundle(@"%@ %@ is now available—you have %@. Would you like to learn more about this update on the web?", SPARKLE_TABLE, sparkleBundle, @"Description text for SUUpdateAlert when the update informational with no download."), _host.name, updateItemVersion, hostVersion];
     } else if (_updateItem.criticalUpdate) {
         if (_state.stage == SPUUserUpdateStageNotDownloaded) {
-            finalString = [NSString stringWithFormat:SULocalizedString(@"%@ %@ is now available—you have %@. This is an important update; would you like to download it now?", @"Description text for SUUpdateAlert when the critical update is downloadable."), _host.name, updateItemVersion, hostVersion];
+            finalString = [NSString stringWithFormat:SULocalizedStringFromTableInBundle(@"%@ %@ is now available—you have %@. This is an important update; would you like to download it now?", SPARKLE_TABLE, sparkleBundle, @"Description text for SUUpdateAlert when the critical update is downloadable."), _host.name, updateItemVersion, hostVersion];
         } else {
-            finalString = [NSString stringWithFormat:SULocalizedString(@"%1$@ %2$@ has been downloaded and is ready to use! This is an important update; would you like to install it and relaunch %1$@ now?", @"Description text for SUUpdateAlert when the critical update has already been downloaded and ready to install."), _host.name, updateItemVersion];
+            finalString = [NSString stringWithFormat:SULocalizedStringFromTableInBundle(@"%1$@ %2$@ has been downloaded and is ready to use! This is an important update; would you like to install it and relaunch %1$@ now?", SPARKLE_TABLE, sparkleBundle, @"Description text for SUUpdateAlert when the critical update has already been downloaded and ready to install."), _host.name, updateItemVersion];
         }
     } else {
         if (_state.stage == SPUUserUpdateStageNotDownloaded) {
-            finalString = [NSString stringWithFormat:SULocalizedString(@"%@ %@ is now available—you have %@. Would you like to download it now?", @"Description text for SUUpdateAlert when the update is downloadable."), _host.name, updateItemVersion, hostVersion];
+            finalString = [NSString stringWithFormat:SULocalizedStringFromTableInBundle(@"%@ %@ is now available—you have %@. Would you like to download it now?", SPARKLE_TABLE, sparkleBundle, @"Description text for SUUpdateAlert when the update is downloadable."), _host.name, updateItemVersion, hostVersion];
         } else {
-            finalString = [NSString stringWithFormat:SULocalizedString(@"%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?", @"Description text for SUUpdateAlert when the update has already been downloaded and ready to install."), _host.name, updateItemVersion];
+            finalString = [NSString stringWithFormat:SULocalizedStringFromTableInBundle(@"%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?", SPARKLE_TABLE, sparkleBundle, @"Description text for SUUpdateAlert when the update has already been downloaded and ready to install."), _host.name, updateItemVersion];
         }
     }
     return finalString;

@@ -471,10 +471,12 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
 {
     [self createAndShowStatusControllerWithClosable:closable];
     
-    [_statusController beginActionWithTitle:SULocalizedString(@"Ready to Install", nil) maxProgressValue:1.0 statusText:nil];
+    NSBundle *sparkleBundle = SUSparkleBundle();
+    
+    [_statusController beginActionWithTitle:SULocalizedStringFromTableInBundle(@"Ready to Install", SPARKLE_TABLE, sparkleBundle, nil) maxProgressValue:1.0 statusText:nil];
     [_statusController setProgressValue:1.0]; // Fill the bar.
     [_statusController setButtonEnabled:YES];
-    [_statusController setButtonTitle:SULocalizedString(@"Install and Relaunch", nil) target:self action:selector isDefault:YES];
+    [_statusController setButtonTitle:SULocalizedStringFromTableInBundle(@"Install and Relaunch", SPARKLE_TABLE, sparkleBundle, nil) target:self action:selector isDefault:YES];
 }
 
 - (void)showReadyToInstallAndRelaunch:(void (^)(SPUUserUpdateChoice))installUpdateHandler
@@ -511,10 +513,12 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
     
     _cancellation = [cancellation copy];
     
-    _checkingController = [[SUStatusController alloc] initWithHost:_host windowTitle:[NSString stringWithFormat:SULocalizedString(@"Updating %@", nil), [_host name]] centerPointValue:nil minimizable:NO closable:NO];
+    NSBundle *sparkleBundle = SUSparkleBundle();
+    
+    _checkingController = [[SUStatusController alloc] initWithHost:_host windowTitle:[NSString stringWithFormat:SULocalizedStringFromTableInBundle(@"Updating %@", SPARKLE_TABLE, sparkleBundle, nil), [_host name]] centerPointValue:nil minimizable:NO closable:NO];
     [[_checkingController window] center]; // Force the checking controller to load its window.
-    [_checkingController beginActionWithTitle:SULocalizedString(@"Checking for updates…", nil) maxProgressValue:0.0 statusText:nil];
-    [_checkingController setButtonTitle:SULocalizedString(@"Cancel", nil) target:self action:@selector(cancelCheckForUpdates:) isDefault:NO];
+    [_checkingController beginActionWithTitle:SULocalizedStringFromTableInBundle(@"Checking for updates…", SPARKLE_TABLE, sparkleBundle, nil) maxProgressValue:0.0 statusText:nil];
+    [_checkingController setButtonTitle:SULocalizedStringFromTableInBundle(@"Cancel", SPARKLE_TABLE, sparkleBundle, nil) target:self action:@selector(cancelCheckForUpdates:) isDefault:NO];
     [_checkingController showWindow:self];
     
     // For background applications, obtain focus.
@@ -555,10 +559,12 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
     [_statusController close];
     _statusController = nil;
     
+    NSBundle *sparkleBundle = SUSparkleBundle();
+    
     NSAlert *alert = [[NSAlert alloc] init];
-    alert.messageText = SULocalizedString(@"Update Error!", nil);
+    alert.messageText = SULocalizedStringFromTableInBundle(@"Update Error!", SPARKLE_TABLE, sparkleBundle, nil);
     alert.informativeText = [NSString stringWithFormat:@"%@", [error localizedDescription]];
-    [alert addButtonWithTitle:SULocalizedString(@"Cancel Update", nil)];
+    [alert addButtonWithTitle:SULocalizedStringFromTableInBundle(@"Cancel Update", SPARKLE_TABLE, sparkleBundle, nil)];
     [self showAlert:alert secondaryAction:nil];
     
     acknowledgement();
@@ -579,6 +585,7 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
     void (^secondaryAction)(void) = nil;
     SUAppcastItem *latestAppcastItem = error.userInfo[SPULatestAppcastItemFoundKey];
     if (latestAppcastItem != nil) {
+        NSBundle *sparkleBundle = SUSparkleBundle();
         switch (reason) {
             case SPUNoUpdateFoundReasonOnLatestVersion:
             case SPUNoUpdateFoundReasonOnNewerThanLatestVersion: {
@@ -589,7 +596,7 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
                 BOOL shouldShowVersionHistory = (![delegate respondsToSelector:@selector(standardUserDriverShouldShowVersionHistoryForAppcastItem:)] || [delegate standardUserDriverShouldShowVersionHistoryForAppcastItem:latestAppcastItem]);
                 
                 if (shouldShowVersionHistory) {
-                    NSString *localizedButtonTitle = SULocalizedString(@"Version History", nil);
+                    NSString *localizedButtonTitle = SULocalizedStringFromTableInBundle(@"Version History", SPARKLE_TABLE, sparkleBundle, nil);
                     
                     // Check if the delegate implements its own Version History action
                     if ([delegate respondsToSelector:@selector(standardUserDriverShowVersionHistoryForAppcastItem:)]) {
@@ -621,7 +628,7 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
             case SPUNoUpdateFoundReasonSystemIsTooNew:
                 if (latestAppcastItem.infoURL != nil) {
                     // Show the user the product's link if available
-                    [alert addButtonWithTitle:SULocalizedString(@"Learn More…", nil)];
+                    [alert addButtonWithTitle:SULocalizedStringFromTableInBundle(@"Learn More…", SPARKLE_TABLE, sparkleBundle, nil)];
                     
                     secondaryAction = ^{
                         [[NSWorkspace sharedWorkspace] openURL:(NSURL * _Nonnull)latestAppcastItem.infoURL];
@@ -685,7 +692,7 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
             centerPointValue = nil;
         }
         
-        _statusController = [[SUStatusController alloc] initWithHost:_host windowTitle:[NSString stringWithFormat:SULocalizedString(@"Updating %@", nil), _host.name] centerPointValue:centerPointValue minimizable:minimizable closable:closable];
+        _statusController = [[SUStatusController alloc] initWithHost:_host windowTitle:[NSString stringWithFormat:SULocalizedStringFromTableInBundle(@"Updating %@", SPARKLE_TABLE, SUSparkleBundle(), nil), _host.name] centerPointValue:centerPointValue minimizable:minimizable closable:closable];
         
         if (_updateAlertWindowWasInactive) {
             [_statusController.window orderFront:nil];
@@ -703,9 +710,11 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
     
     [self createAndShowStatusControllerWithClosable:NO];
     
-    [_statusController beginActionWithTitle:SULocalizedString(@"Downloading update…", @"Take care not to overflow the status window.") maxProgressValue:1.0 statusText:nil];
+    NSBundle *sparkleBundle = SUSparkleBundle();
+    
+    [_statusController beginActionWithTitle:SULocalizedStringFromTableInBundle(@"Downloading update…", SPARKLE_TABLE, sparkleBundle, @"Take care not to overflow the status window.") maxProgressValue:1.0 statusText:nil];
     [_statusController setProgressValue:0.0];
-    [_statusController setButtonTitle:SULocalizedString(@"Cancel", nil) target:self action:@selector(cancelDownload:) isDefault:NO];
+    [_statusController setButtonTitle:SULocalizedStringFromTableInBundle(@"Cancel", SPARKLE_TABLE, sparkleBundle, nil) target:self action:@selector(cancelDownload:) isDefault:NO];
     
     _bytesDownloaded = 0;
 }
@@ -736,15 +745,17 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
 
     NSByteCountFormatter *formatter = [[NSByteCountFormatter alloc] init];
     [formatter setZeroPadsFractionDigits:YES];
+    
+    NSBundle *sparkleBundle = SUSparkleBundle();
 
     if (_expectedContentLength > 0.0) {
         double newProgressValue = (double)_bytesDownloaded / (double)_expectedContentLength;
         
         [_statusController setProgressValue:MIN(newProgressValue, 1.0)];
         
-        [_statusController setStatusText:[NSString stringWithFormat:SULocalizedString(@"%@ of %@", @"The download progress in units of bytes, e.g. 100 KB of 1,0 MB"), [formatter stringFromByteCount:(long long)_bytesDownloaded], [formatter stringFromByteCount:(long long)MAX(_bytesDownloaded, _expectedContentLength)]]];
+        [_statusController setStatusText:[NSString stringWithFormat:SULocalizedStringFromTableInBundle(@"%@ of %@", SPARKLE_TABLE, sparkleBundle, @"The download progress in units of bytes, e.g. 100 KB of 1,0 MB"), [formatter stringFromByteCount:(long long)_bytesDownloaded], [formatter stringFromByteCount:(long long)MAX(_bytesDownloaded, _expectedContentLength)]]];
     } else {
-        [_statusController setStatusText:[NSString stringWithFormat:SULocalizedString(@"%@ downloaded", @"The download progress in a unit of bytes, e.g. 100 KB"), [formatter stringFromByteCount:(long long)_bytesDownloaded]]];
+        [_statusController setStatusText:[NSString stringWithFormat:SULocalizedStringFromTableInBundle(@"%@ downloaded", SPARKLE_TABLE, sparkleBundle, @"The download progress in a unit of bytes, e.g. 100 KB"), [formatter stringFromByteCount:(long long)_bytesDownloaded]]];
     }
 }
 
@@ -755,9 +766,12 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
     _cancellation = nil;
     
     [self createAndShowStatusControllerWithClosable:NO];
-    [_statusController beginActionWithTitle:SULocalizedString(@"Extracting update…", @"Take care not to overflow the status window.") maxProgressValue:1.0 statusText:nil];
+    
+    NSBundle *sparkleBundle = SUSparkleBundle();
+    
+    [_statusController beginActionWithTitle:SULocalizedStringFromTableInBundle(@"Extracting update…", SPARKLE_TABLE, sparkleBundle, @"Take care not to overflow the status window.") maxProgressValue:1.0 statusText:nil];
     [_statusController setProgressValue:0.0];
-    [_statusController setButtonTitle:SULocalizedString(@"Cancel", nil) target:nil action:nil isDefault:NO];
+    [_statusController setButtonTitle:SULocalizedStringFromTableInBundle(@"Cancel", SPARKLE_TABLE, sparkleBundle, nil) target:nil action:nil isDefault:NO];
     [_statusController setButtonEnabled:NO];
 }
 
@@ -774,7 +788,7 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
     
     if (applicationTerminated) {
         // Note this will only show up if -showReadyToInstallAndRelaunch: was called beforehand
-        [_statusController beginActionWithTitle:SULocalizedString(@"Installing update…", @"Take care not to overflow the status window.") maxProgressValue:0.0 statusText:nil];
+        [_statusController beginActionWithTitle:SULocalizedStringFromTableInBundle(@"Installing update…", SPARKLE_TABLE, SUSparkleBundle(), @"Take care not to overflow the status window.") maxProgressValue:0.0 statusText:nil];
         [_statusController setButtonEnabled:NO];
     } else {
         // The "quit" event can always be canceled or delayed by the application we're updating
@@ -799,8 +813,10 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
     // Only show installed prompt when the app is not relaunched
     // When the app is relaunched, there is enough of a UI from relaunching the app.
     if (!relaunched) {
+        NSBundle *sparkleBundle = SUSparkleBundle();
+        
         NSAlert *alert = [[NSAlert alloc] init];
-        alert.messageText = SULocalizedString(@"Update Installed", nil);
+        alert.messageText = SULocalizedStringFromTableInBundle(@"Update Installed", SPARKLE_TABLE, sparkleBundle, nil);
         
         // Extract information from newly updated bundle if available
         NSString *hostName;
@@ -817,9 +833,9 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
         }
         
         if (hostVersion != nil) {
-            alert.informativeText = [NSString stringWithFormat:SULocalizedString(@"%@ is now updated to version %@!", nil), hostName, hostVersion];
+            alert.informativeText = [NSString stringWithFormat:SULocalizedStringFromTableInBundle(@"%@ is now updated to version %@!", SPARKLE_TABLE, sparkleBundle, nil), hostName, hostVersion];
         } else {
-            alert.informativeText = [NSString stringWithFormat:SULocalizedString(@"%@ is now updated!", nil), hostName];
+            alert.informativeText = [NSString stringWithFormat:SULocalizedStringFromTableInBundle(@"%@ is now updated!", SPARKLE_TABLE, sparkleBundle, nil), hostName];
         }
         [self showAlert:alert secondaryAction:nil];
     }

@@ -76,7 +76,7 @@
     SUAppcast *appcast = [[SUAppcast alloc] initWithXMLData:downloadData.data relativeToURL:downloadData.URL stateResolver:stateResolver error:&appcastError];
     
     if (appcast == nil) {
-        NSMutableDictionary *userInfo = [NSMutableDictionary dictionaryWithObject:SULocalizedString(@"An error occurred while parsing the update feed.", nil) forKey:NSLocalizedDescriptionKey];
+        NSMutableDictionary *userInfo = [NSMutableDictionary dictionaryWithObject:SULocalizedStringFromTableInBundle(@"An error occurred while parsing the update feed.", SPARKLE_TABLE, SUSparkleBundle(), nil) forKey:NSLocalizedDescriptionKey];
         
         if (appcastError != nil) {
             [userInfo setObject:appcastError forKey:NSUnderlyingErrorKey];
@@ -92,7 +92,7 @@
 {
     SULog(SULogLevelError, @"Encountered download feed error: %@", error);
 
-    NSMutableDictionary *userInfo = [NSMutableDictionary dictionaryWithDictionary:@{NSLocalizedDescriptionKey:SULocalizedString(@"An error occurred in retrieving update information. Please try again later.", nil)}];
+    NSMutableDictionary *userInfo = [NSMutableDictionary dictionaryWithDictionary:@{NSLocalizedDescriptionKey:SULocalizedStringFromTableInBundle(@"An error occurred in retrieving update information. Please try again later.", SPARKLE_TABLE, SUSparkleBundle(), nil)}];
     
     if (error != nil) {
         [userInfo setObject:error forKey:NSUnderlyingErrorKey];
