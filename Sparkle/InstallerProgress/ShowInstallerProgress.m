@@ -40,28 +40,27 @@
 #endif
     
     NSString *updatingString;
-#if SPARKLE_COPY_LOCALIZATIONS
     {
-        NSString *updatingFormatStringFromBundle = (hostSparkleBundle != nil) ? SULocalizedStringFromTableInBundle(@"Updating %@", @"Sparkle", hostSparkleBundle, nil) : nil;
-
         NSString *hostNameFromBundle = host.name;
         NSString *hostName = (hostNameFromBundle != nil) ? hostNameFromBundle : @"";
         
-        if (updatingFormatStringFromBundle != nil) {
-            // Replacing the %@ will be a bit safer than using +[NSString stringWithFormat:]
-            updatingString = [updatingFormatStringFromBundle stringByReplacingOccurrencesOfString:@"%@" withString:hostName];
-        } else {
+#if SPARKLE_COPY_LOCALIZATIONS
+        {
+            NSString *updatingFormatStringFromBundle = (hostSparkleBundle != nil) ? SULocalizedStringFromTableInBundle(@"Updating %@", @"Sparkle", hostSparkleBundle, nil) : nil;
+            
+            if (updatingFormatStringFromBundle != nil) {
+                // Replacing the %@ will be a bit safer than using +[NSString stringWithFormat:]
+                updatingString = [updatingFormatStringFromBundle stringByReplacingOccurrencesOfString:@"%@" withString:hostName];
+            } else {
+                updatingString = [@"Updating " stringByAppendingString:hostName];
+            }
+        }
+#else
+        {
             updatingString = [@"Updating " stringByAppendingString:hostName];
         }
-    }
-#else
-    {
-        NSString *hostNameFromBundle = host.name;
-        NSString *hostName = (hostNameFromBundle != nil) ? hostNameFromBundle : @"";
-        
-        updatingString = [@"Updating " stringByAppendingString:hostName];
-    }
 #endif
+    }
     
     _updatingString = updatingString;
     
