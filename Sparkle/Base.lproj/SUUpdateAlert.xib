@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21208.1" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21507" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21208.1"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21507"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="SUUpdateAlert">
             <connections>
-                <outlet property="automaticallyInstallUpdatesButton" destination="117" id="o2H-xw-Qv8"/>
-                <outlet property="descriptionField" destination="101" id="9oA-2S-eXN"/>
-                <outlet property="installButton" destination="76" id="176"/>
-                <outlet property="laterButton" destination="22" id="177"/>
-                <outlet property="releaseNotesBoxView" destination="89" id="FhX-K4-uzH"/>
-                <outlet property="releaseNotesContainerView" destination="fKC-QA-GZa" id="BYw-MA-Z5h"/>
-                <outlet property="skipButton" destination="23" id="178"/>
+                <outlet property="_automaticallyInstallUpdatesButton" destination="117" id="IBi-aO-qkM"/>
+                <outlet property="_descriptionField" destination="101" id="JkK-Xy-kns"/>
+                <outlet property="_installButton" destination="76" id="GVS-sG-rgG"/>
+                <outlet property="_laterButton" destination="22" id="dk6-u6-yYI"/>
+                <outlet property="_releaseNotesBoxView" destination="89" id="kwH-2g-hlh"/>
+                <outlet property="_releaseNotesContainerView" destination="fKC-QA-GZa" id="j3k-Pl-zNb"/>
+                <outlet property="_skipButton" destination="23" id="PPe-jC-Pvc"/>
                 <outlet property="window" destination="5" id="69"/>
             </connections>
         </customObject>

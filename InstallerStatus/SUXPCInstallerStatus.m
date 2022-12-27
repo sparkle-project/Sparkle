@@ -6,22 +6,19 @@
 //  Copyright © 2016 Sparkle Project. All rights reserved.
 //
 
+#if INSTALLER_STATUS_XPC_SERVICE_EMBEDDED
+
 #import "SUXPCInstallerStatus.h"
 
 
 #include "AppKitPrevention.h"
 
-@interface SUXPCInstallerStatus ()
-
-@property (nonatomic) NSXPCConnection *connection;
-@property (nonatomic, copy) void (^invalidationBlock)(void);
-
-@end
-
 @implementation SUXPCInstallerStatus
-
-@synthesize connection = _connection;
-@synthesize invalidationBlock = _invalidationBlock;
+{
+    NSXPCConnection *_connection;
+    
+    void (^_invalidationBlock)(void);
+}
 
 - (instancetype)init
 {
@@ -30,14 +27,17 @@
         _connection = [[NSXPCConnection alloc] initWithServiceName:@INSTALLER_STATUS_BUNDLE_ID];
         _connection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SUInstallerStatusProtocol)];
         
-        __weak SUXPCInstallerStatus *weakSelf = self;
+        __weak __typeof__(self) weakSelf = self;
         _connection.invalidationHandler = ^{
             [weakSelf invokeInvalidation];
         };
         
         _connection.interruptionHandler = ^{
-            [weakSelf invokeInvalidation];
-            [weakSelf.connection invalidate];
+            __typeof__(self) strongSelf = weakSelf;
+            if (strongSelf != nil) {
+                [strongSelf invokeInvalidation];
+                [strongSelf->_connection invalidate];
+            }
         };
         
         [_connection resume];
@@ -47,42 +47,44 @@
 
 - (void)setInvalidationHandler:(void (^)(void))invalidationHandler
 {
-    self.invalidationBlock = invalidationHandler;
+    _invalidationBlock = [invalidationHandler copy];
     
-    __weak SUXPCInstallerStatus *weakSelf = self;
-    [(id<SUInstallerStatusProtocol>)self.connection.remoteObjectProxy setInvalidationHandler:^{
+    __weak __typeof__(self) weakSelf = self;
+    [(id<SUInstallerStatusProtocol>)_connection.remoteObjectProxy setInvalidationHandler:^{
         [weakSelf invokeInvalidation];
     }];
 }
 
 - (void)setServiceName:(NSString *)serviceName
 {
-    [(id<SUInstallerStatusProtocol>)self.connection.remoteObjectProxy setServiceName:serviceName];
+    [(id<SUInstallerStatusProtocol>)_connection.remoteObjectProxy setServiceName:serviceName];
 }
 
 - (void)probeStatusInfoWithReply:(void (^)(NSData * _Nullable installationInfoData))reply
 {
-    [(id<SUInstallerStatusProtocol>)self.connection.remoteObjectProxy probeStatusInfoWithReply:reply];
+    [(id<SUInstallerStatusProtocol>)_connection.remoteObjectProxy probeStatusInfoWithReply:reply];
 }
 
 - (void)probeStatusConnectivityWithReply:(void (^)(void))reply
 {
-    [(id<SUInstallerStatusProtocol>)self.connection.remoteObjectProxy probeStatusConnectivityWithReply:reply];
+    [(id<SUInstallerStatusProtocol>)_connection.remoteObjectProxy probeStatusConnectivityWithReply:reply];
 }
 
 - (void)invalidate
 {
-    [(id<SUInstallerStatusProtocol>)self.connection.remoteObjectProxy invalidate];
-    [self.connection invalidate];
-    self.connection = nil;
+    [(id<SUInstallerStatusProtocol>)_connection.remoteObjectProxy invalidate];
+    [_connection invalidate];
+    _connection = nil;
 }
 
 - (void)invokeInvalidation
 {
-    if (self.invalidationBlock != nil) {
-        self.invalidationBlock();
-        self.invalidationBlock = nil;
+    if (_invalidationBlock != nil) {
+        _invalidationBlock();
+        _invalidationBlock = nil;
     }
 }
 
 @end
+
+#endif

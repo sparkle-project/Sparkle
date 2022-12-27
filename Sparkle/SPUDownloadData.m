@@ -42,15 +42,15 @@ static NSString *SPUDownloadMIMETypeKey = @"SPUDownloadMIMEType";
 
 - (void)encodeWithCoder:(NSCoder *)coder
 {
-    [coder encodeObject:self.data forKey:SPUDownloadDataKey];
-    [coder encodeObject:self.URL forKey:SPUDownloadURLKey];
+    [coder encodeObject:_data forKey:SPUDownloadDataKey];
+    [coder encodeObject:_URL forKey:SPUDownloadURLKey];
 
-    if (self.textEncodingName != nil) {
-        [coder encodeObject:self.textEncodingName forKey:SPUDownloadTextEncodingKey];
+    if (_textEncodingName != nil) {
+        [coder encodeObject:_textEncodingName forKey:SPUDownloadTextEncodingKey];
     }
     
-    if (self.MIMEType != nil) {
-        [coder encodeObject:self.MIMEType forKey:SPUDownloadMIMETypeKey];
+    if (_MIMEType != nil) {
+        [coder encodeObject:_MIMEType forKey:SPUDownloadMIMETypeKey];
     }
 }
 

@@ -22,32 +22,47 @@ typedef NS_ENUM(uint8_t, SUSigningInputStatus) {
     SUSigningInputStatusLastValidCase = SUSigningInputStatusPresent
 };
 
-@interface SUSignatures : NSObject <NSSecureCoding> {
-    unsigned char ed25519_signature[64];
-}
-@property (strong, readonly, nullable) NSData *dsaSignature;
-@property (readonly) SUSigningInputStatus dsaSignatureStatus;
+#ifndef BUILDING_SPARKLE_TESTS
+SPU_OBJC_DIRECT_MEMBERS
+#endif
+@interface SUSignatures : NSObject <NSSecureCoding>
+#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
+@property (nonatomic, readonly, nullable) NSData *dsaSignature;
+@property (nonatomic, readonly) SUSigningInputStatus dsaSignatureStatus;
+#endif
 
-@property (readonly, nullable, nonatomic) const unsigned char *ed25519Signature;
-@property (readonly) SUSigningInputStatus ed25519SignatureStatus;
+@property (nonatomic, readonly, nullable) const unsigned char *ed25519Signature;
+@property (nonatomic, readonly) SUSigningInputStatus ed25519SignatureStatus;
 
-- (instancetype)initWithDsa:(NSString * _Nullable)dsa ed:(NSString * _Nullable)ed;
+- (instancetype)initWithEd:(NSString * _Nullable)ed
+#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
+                       dsa:(NSString * _Nullable)dsa
+#endif
+;
 @end
 
 
-@interface SUPublicKeys : NSObject {
-    unsigned char ed25519_public_key[32];
-}
-@property (strong, readonly, nullable) NSString *dsaPubKey;
-@property (readonly) SUSigningInputStatus dsaPubKeyStatus;
+#ifndef BUILDING_SPARKLE_TESTS
+SPU_OBJC_DIRECT_MEMBERS
+#endif
+@interface SUPublicKeys : NSObject
 
-@property (readonly, nullable, nonatomic) const unsigned char *ed25519PubKey;
-@property (readonly) SUSigningInputStatus ed25519PubKeyStatus;
+#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
+@property (nonatomic, readonly, nullable) NSString *dsaPubKey;
+@property (nonatomic, readonly) SUSigningInputStatus dsaPubKeyStatus;
+#endif
+
+@property (nonatomic, readonly, nullable) const unsigned char *ed25519PubKey;
+@property (nonatomic, readonly) SUSigningInputStatus ed25519PubKeyStatus;
 
 /// Returns YES if either key is present (though they may be invalid).
-@property (readonly) BOOL hasAnyKeys;
+@property (nonatomic, readonly) BOOL hasAnyKeys;
 
-- (instancetype)initWithDsa:(NSString * _Nullable)dsa ed:(NSString * _Nullable)ed;
+- (instancetype)initWithEd:(NSString * _Nullable)ed
+#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
+                       dsa:(NSString * _Nullable)dsa
+#endif
+;
 
 @end
 

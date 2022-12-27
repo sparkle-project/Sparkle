@@ -15,23 +15,21 @@
 
 @interface SPUUserInitiatedUpdateDriver () <SPUUIBasedUpdateDriverDelegate>
 
-@property (nonatomic, readonly) SPUUIBasedUpdateDriver *uiDriver;
-@property (nonatomic, readonly) id<SPUUserDriver> userDriver;
-@property (nonatomic) BOOL showingUserInitiatedProgress;
-@property (nonatomic) BOOL showingUpdate;
-@property (nonatomic) BOOL aborted;
-@property (nonatomic) void (^updateDidShowHandler)(void);
-
 @end
 
 @implementation SPUUserInitiatedUpdateDriver
+{
+    SPUUIBasedUpdateDriver *_uiDriver;
+    id<SPUUserDriver> _userDriver;
+    
+    void (^_updateDidShowHandler)(void);
+    
+    BOOL _showingUserInitiatedProgress;
+    BOOL _showingUpdate;
+    BOOL _aborted;
+}
 
-@synthesize uiDriver = _uiDriver;
-@synthesize userDriver = _userDriver;
-@synthesize showingUserInitiatedProgress = _showingUserInitiatedProgress;
 @synthesize showingUpdate = _showingUpdate;
-@synthesize aborted = _aborted;
-@synthesize updateDidShowHandler = _updateDidShowHandler;
 
 - (instancetype)initWithHost:(SUHost *)host applicationBundle:(NSBundle *)applicationBundle updater:(id)updater userDriver:(id <SPUUserDriver>)userDriver updaterDelegate:(nullable id <SPUUpdaterDelegate>)updaterDelegate
 {
@@ -45,58 +43,58 @@
 
 - (void)setCompletionHandler:(SPUUpdateDriverCompletion)completionBlock
 {
-    [self.uiDriver setCompletionHandler:completionBlock];
+    [_uiDriver setCompletionHandler:completionBlock];
 }
 
 - (void)setUpdateShownHandler:(void (^)(void))handler
 {
-    self.updateDidShowHandler = handler;
+    _updateDidShowHandler = [handler copy];
 }
 
 - (void)setUpdateWillInstallHandler:(void (^)(void))updateWillInstallHandler
 {
-    [self.uiDriver setUpdateWillInstallHandler:updateWillInstallHandler];
+    [_uiDriver setUpdateWillInstallHandler:updateWillInstallHandler];
 }
 
 - (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders
 {
-    self.showingUserInitiatedProgress = YES;
+    _showingUserInitiatedProgress = YES;
     
-    if (self.updateDidShowHandler != nil) {
-        self.updateDidShowHandler();
-        self.updateDidShowHandler = nil;
+    if (_updateDidShowHandler != nil) {
+        _updateDidShowHandler();
+        _updateDidShowHandler = nil;
     }
     
-    [self.userDriver showUserInitiatedUpdateCheckWithCancellation:^{
+    [_userDriver showUserInitiatedUpdateCheckWithCancellation:^{
         dispatch_async(dispatch_get_main_queue(), ^{
-            if (self.showingUserInitiatedProgress) {
+            if (self->_showingUserInitiatedProgress) {
                 [self abortUpdate];
             }
         });
     }];
     
-    [self.uiDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders inBackground:NO];
+    [_uiDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders inBackground:NO];
 }
 
 - (void)resumeInstallingUpdate
 {
-    [self.uiDriver resumeInstallingUpdate];
+    [_uiDriver resumeInstallingUpdate];
 }
 
 - (void)resumeUpdate:(id<SPUResumableUpdate>)resumableUpdate
 {
-    [self.uiDriver resumeUpdate:resumableUpdate];
+    [_uiDriver resumeUpdate:resumableUpdate];
 }
 
 - (void)uiDriverDidShowUpdate
 {
     // When a new update check has not been initiated and an update has been resumed,
     // update the driver to indicate we are showing an update to the user
-    self.showingUpdate = YES;
+    _showingUpdate = YES;
     
-    if (self.updateDidShowHandler != nil) {
-        self.updateDidShowHandler();
-        self.updateDidShowHandler = nil;
+    if (_updateDidShowHandler != nil) {
+        _updateDidShowHandler();
+        _updateDidShowHandler = nil;
     }
 }
 
@@ -117,12 +115,12 @@
 
 - (void)basicDriverDidFinishLoadingAppcast
 {
-    if (self.showingUserInitiatedProgress) {
-        self.showingUserInitiatedProgress = NO;
+    if (_showingUserInitiatedProgress) {
+        _showingUserInitiatedProgress = NO;
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
-        if ([self.userDriver respondsToSelector:@selector(dismissUserInitiatedUpdateCheck)]) {
-            [self.userDriver dismissUserInitiatedUpdateCheck];
+        if ([_userDriver respondsToSelector:@selector(dismissUserInitiatedUpdateCheck)]) {
+            [_userDriver dismissUserInitiatedUpdateCheck];
         }
 #pragma clang diagnostic pop
     }
@@ -135,17 +133,17 @@
 
 - (void)abortUpdateWithError:(nullable NSError *)error
 {
-    if (self.showingUserInitiatedProgress) {
+    if (_showingUserInitiatedProgress) {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
-        if ([self.userDriver respondsToSelector:@selector(dismissUserInitiatedUpdateCheck)]) {
-            [self.userDriver dismissUserInitiatedUpdateCheck];
+        if ([_userDriver respondsToSelector:@selector(dismissUserInitiatedUpdateCheck)]) {
+            [_userDriver dismissUserInitiatedUpdateCheck];
         }
 #pragma clang diagnostic pop
-        self.showingUserInitiatedProgress = NO;
+        _showingUserInitiatedProgress = NO;
     }
-    self.aborted = YES;
-    [self.uiDriver abortUpdateWithError:error showErrorToUser:YES];
+    _aborted = YES;
+    [_uiDriver abortUpdateWithError:error showErrorToUser:YES];
 }
 
 @end

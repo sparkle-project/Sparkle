@@ -12,7 +12,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface SUTouchBarButtonGroup : NSViewController
+SPU_OBJC_DIRECT_MEMBERS @interface SUTouchBarButtonGroup : NSViewController
 
 @property (nonatomic, readonly, copy) NSArray<NSButton *> *buttons;
 

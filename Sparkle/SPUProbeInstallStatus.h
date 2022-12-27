@@ -12,7 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class SPUInstallationInfo;
 
-@interface SPUProbeInstallStatus : NSObject
+SPU_OBJC_DIRECT_MEMBERS @interface SPUProbeInstallStatus : NSObject
 
 + (void)probeInstallerInProgressForHostBundleIdentifier:(NSString *)hostBundleIdentifier completion:(void (^)(BOOL))completionHandler;
 

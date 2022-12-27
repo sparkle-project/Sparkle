@@ -14,25 +14,19 @@
 static NSString *SUInstallerConnectionKeepAliveReason = @"Installer Connection Keep Alive";
 
 @interface SUInstallerConnection () <SUInstallerCommunicationProtocol>
-
-// Intentionally not weak for XPC reasons
-@property (nonatomic) id<SUInstallerCommunicationProtocol> delegate;
-
-@property (nonatomic) BOOL disabledAutomaticTermination;
-@property (nonatomic, copy) void (^invalidationBlock)(void);
-@property (nonatomic) NSXPCConnection *connection;
-
 @end
 
 @implementation SUInstallerConnection
 {
+    NSXPCConnection *_connection;
+    // Intentionally not weak for XPC reasons
+    id<SUInstallerCommunicationProtocol> _delegate;
+    
+    void (^_invalidationBlock)(void);
+    
+    BOOL _disabledAutomaticTermination;
     BOOL _remote;
 }
-
-@synthesize delegate = _delegate;
-@synthesize disabledAutomaticTermination = _disabledAutomaticTermination;
-@synthesize invalidationBlock = _invalidationBlock;
-@synthesize connection = _connection;
 
 - (instancetype)initWithDelegate:(id<SUInstallerCommunicationProtocol>)delegate remote:(BOOL)remote
 {
@@ -50,17 +44,17 @@ static NSString *SUInstallerConnectionKeepAliveReason = @"Installer Connection K
     return self;
 }
 
-- (void)enableAutomaticTermination
+- (void)enableAutomaticTermination SPU_OBJC_DIRECT
 {
-    if (self.disabledAutomaticTermination) {
+    if (_disabledAutomaticTermination) {
         [[NSProcessInfo processInfo] enableAutomaticTermination:SUInstallerConnectionKeepAliveReason];
-        self.disabledAutomaticTermination = NO;
+        _disabledAutomaticTermination = NO;
     }
 }
 
-- (void)_setInvalidationHandler:(void (^)(void))invalidationHandler
+- (void)_setInvalidationHandler:(void (^)(void))invalidationHandler SPU_OBJC_DIRECT
 {
-    self.invalidationBlock = invalidationHandler;
+    _invalidationBlock = [invalidationHandler copy];
     
     // No longer needed because of invalidation callback
     [self enableAutomaticTermination];
@@ -77,36 +71,39 @@ static NSString *SUInstallerConnectionKeepAliveReason = @"Installer Connection K
     }
 }
 
-- (void)_setServiceName:(NSString *)serviceName systemDomain:(BOOL)systemDomain
+- (void)_setServiceName:(NSString *)serviceName systemDomain:(BOOL)systemDomain SPU_OBJC_DIRECT
 {
     NSXPCConnectionOptions options = systemDomain ? NSXPCConnectionPrivileged : 0;
     NSXPCConnection *connection = [[NSXPCConnection alloc] initWithMachServiceName:serviceName options:options];
     
     connection.exportedInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SUInstallerCommunicationProtocol)];
-    connection.exportedObject = self.delegate;
+    connection.exportedObject = _delegate;
     
     connection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SUInstallerCommunicationProtocol)];
     
-    self.connection = connection;
+    _connection = connection;
     
-    __weak SUInstallerConnection *weakSelf = self;
-    self.connection.interruptionHandler = ^{
+    __weak __typeof__(self) weakSelf = self;
+    _connection.interruptionHandler = ^{
         dispatch_async(dispatch_get_main_queue(), ^{
-            [weakSelf.connection invalidate];
+            __typeof__(self) strongSelf = weakSelf;
+            if (strongSelf != nil) {
+                [strongSelf->_connection invalidate];
+            }
         });
     };
     
-    self.connection.invalidationHandler = ^{
+    _connection.invalidationHandler = ^{
         dispatch_async(dispatch_get_main_queue(), ^{
-            SUInstallerConnection *strongSelf = weakSelf;
+            __typeof__(self) strongSelf = weakSelf;
             if (strongSelf != nil) {
-                strongSelf.connection = nil;
+                strongSelf->_connection = nil;
                 [strongSelf _invalidate];
             }
         });
     };
     
-    [self.connection resume];
+    [_connection resume];
 }
 
 - (void)setServiceName:(NSString *)serviceName systemDomain:(BOOL)systemDomain
@@ -124,22 +121,22 @@ static NSString *SUInstallerConnectionKeepAliveReason = @"Installer Connection K
 {
     if (_remote) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            [(id<SUInstallerCommunicationProtocol>)self.connection.remoteObjectProxy handleMessageWithIdentifier:identifier data:data];
+            [(id<SUInstallerCommunicationProtocol>)self->_connection.remoteObjectProxy handleMessageWithIdentifier:identifier data:data];
         });
     } else {
-        [(id<SUInstallerCommunicationProtocol>)self.connection.remoteObjectProxy handleMessageWithIdentifier:identifier data:data];
+        [(id<SUInstallerCommunicationProtocol>)_connection.remoteObjectProxy handleMessageWithIdentifier:identifier data:data];
     }
 }
 
-- (void)_invalidate
+- (void)_invalidate SPU_OBJC_DIRECT
 {
-    if (self.invalidationBlock != nil) {
-        self.invalidationBlock();
-        self.invalidationBlock = nil;
+    if (_invalidationBlock != nil) {
+        _invalidationBlock();
+        _invalidationBlock = nil;
     }
     
     // Break the retain cycle
-    self.delegate = nil;
+    _delegate = nil;
     
     [self enableAutomaticTermination];
 }
@@ -148,8 +145,8 @@ static NSString *SUInstallerConnectionKeepAliveReason = @"Installer Connection K
 - (void)invalidate
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self.connection invalidate];
-        self.connection = nil;
+        [self->_connection invalidate];
+        self->_connection = nil;
         
         [self _invalidate];
     });

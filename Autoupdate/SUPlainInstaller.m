@@ -18,25 +18,15 @@
 
 #include "AppKitPrevention.h"
 
-@interface SUPlainInstaller ()
-
-@property (nonatomic, readonly) SUHost *host;
-@property (nonatomic, copy, readonly) NSString *bundlePath;
-@property (nonatomic, copy, readonly) NSString *installationPath;
-
-@property (nonatomic) NSURL *temporaryOldDirectory;
-// We get an obj-c warning if we use 'newTemporaryDirectory' name about new + ownership stuff, so use 'temporaryNewDirectory' instead
-@property (nonatomic) NSURL *temporaryNewDirectory;
-
-@end
-
 @implementation SUPlainInstaller
-
-@synthesize host = _host;
-@synthesize bundlePath = _bundlePath;
-@synthesize installationPath = _installationPath;
-@synthesize temporaryOldDirectory = _temporaryOldDirectory;
-@synthesize temporaryNewDirectory = _temporaryNewDirectory;
+{
+    SUHost *_host;
+    NSString *_bundlePath;
+    NSString *_installationPath;
+    NSURL *_temporaryOldDirectory;
+    // We get an obj-c warning if we use 'newTemporaryDirectory' name about new + ownership stuff, so use 'temporaryNewDirectory' instead
+    NSURL *_temporaryNewDirectory;
+}
 
 - (instancetype)initWithHost:(SUHost *)host bundlePath:(NSString *)bundlePath installationPath:(NSString *)installationPath
 {
@@ -49,23 +39,7 @@
     return self;
 }
 
-// Returns the bundle version from the specified host that is appropriate to use as a filename, or nil if we're unable to retrieve one
-- (NSString *)bundleVersionAppropriateForFilenameFromHost:(SUHost *)host
-{
-    NSString *bundleVersion = [host objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey];
-    NSString *trimmedVersion = @"";
-    
-    if (bundleVersion != nil) {
-        NSMutableCharacterSet *validCharacters = [NSMutableCharacterSet alphanumericCharacterSet];
-        [validCharacters formUnionWithCharacterSet:[NSCharacterSet characterSetWithCharactersInString:@".-()"]];
-        
-        trimmedVersion = [bundleVersion stringByTrimmingCharactersInSet:[validCharacters invertedSet]];
-    }
-    
-    return trimmedVersion.length > 0 ? trimmedVersion : nil;
-}
-
-- (BOOL)startInstallationToURL:(NSURL *)installationURL fromUpdateAtURL:(NSURL *)newURL withHost:(SUHost *)host progressBlock:(nullable void(^)(double))progress  error:(NSError * __autoreleasing *)error
+- (BOOL)startInstallationToURL:(NSURL *)installationURL fromUpdateAtURL:(NSURL *)newURL withHost:(SUHost *)host progressBlock:(nullable void(^)(double))progress  error:(NSError * __autoreleasing *)error SPU_OBJC_DIRECT
 {
     if (installationURL == nil || newURL == nil) {
         // this really shouldn't happen but just in case
@@ -123,7 +97,7 @@
         return NO;
     }
     
-    self.temporaryNewDirectory = tempNewDirectoryURL;
+    _temporaryNewDirectory = tempNewDirectoryURL;
 
     if (progress) {
         progress(3/10.0);
@@ -222,7 +196,7 @@
             return NO;
         }
         
-        self.temporaryOldDirectory = tempOldDirectoryURL;
+        _temporaryOldDirectory = tempOldDirectoryURL;
 
         if (progress) {
             progress(9/10.0);
@@ -289,9 +263,9 @@
 {
     // Prevent malicious downgrades
     // Note that we may not be able to do this for package installations, hence this code being done here
-    NSString *hostVersion = [self.host version];
+    NSString *hostVersion = [_host version];
     
-    NSBundle *bundle = [NSBundle bundleWithPath:self.bundlePath];
+    NSBundle *bundle = [NSBundle bundleWithPath:_bundlePath];
     SUHost *updateHost = [[SUHost alloc] initWithBundle:bundle];
     NSString *updateVersion = [updateHost objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey];
     
@@ -314,19 +288,19 @@
 {
     // Note: we must do most installation work in the third stage due to relying on our application sitting in temporary directories.
     // It must not be possible for our update to sit in temporary directories for a very long time.
-    return [self startInstallationToURL:[NSURL fileURLWithPath:self.installationPath] fromUpdateAtURL:[NSURL fileURLWithPath:self.bundlePath] withHost:self.host progressBlock:cb error:error];
+    return [self startInstallationToURL:[NSURL fileURLWithPath:_installationPath] fromUpdateAtURL:[NSURL fileURLWithPath:_bundlePath] withHost:_host progressBlock:cb error:error];
 }
 
 - (void)performCleanup
 {
     SUFileManager *fileManager = [[SUFileManager alloc] init];
     
-    if (self.temporaryNewDirectory != nil) {
-        [fileManager removeItemAtURL:self.temporaryNewDirectory error:NULL];
+    if (_temporaryNewDirectory != nil) {
+        [fileManager removeItemAtURL:_temporaryNewDirectory error:NULL];
     }
     
-    if (self.temporaryOldDirectory != nil) {
-        [fileManager removeItemAtURL:self.temporaryOldDirectory error:NULL];
+    if (_temporaryOldDirectory != nil) {
+        [fileManager removeItemAtURL:_temporaryOldDirectory error:NULL];
     }
 }
 

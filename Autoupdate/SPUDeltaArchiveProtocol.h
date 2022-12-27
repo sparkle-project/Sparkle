@@ -24,7 +24,7 @@ typedef NS_ENUM(uint8_t, SPUDeltaItemCommands) {
 };
 
 // Represents header for our archive
-@interface SPUDeltaArchiveHeader : NSObject
+SPU_OBJC_DIRECT_MEMBERS @interface SPUDeltaArchiveHeader : NSObject
 
 - (instancetype)initWithCompression:(SPUDeltaCompressionMode)compression compressionLevel:(uint8_t)compressionLevel fileSystemCompression:(bool)fileSystemCompression majorVersion:(uint16_t)majorVersion minorVersion:(uint16_t)minorVersion beforeTreeHash:(const unsigned char *)beforeTreeHash afterTreeHash:(const unsigned char *)afterTreeHash;
 
@@ -39,7 +39,7 @@ typedef NS_ENUM(uint8_t, SPUDeltaItemCommands) {
 @end
 
 // Represents an item we read or write to in our delta archive
-@interface SPUDeltaArchiveItem : NSObject
+SPU_OBJC_DIRECT_MEMBERS @interface SPUDeltaArchiveItem : NSObject
 
 - (instancetype)initWithRelativeFilePath:(NSString *)relativeFilePath commands:(SPUDeltaItemCommands)commands mode:(uint16_t)mode;
 
@@ -58,8 +58,10 @@ typedef NS_ENUM(uint8_t, SPUDeltaItemCommands) {
 @property (nonatomic) uint16_t mode;
 
 // Private properties
+#if SPARKLE_BUILD_LEGACY_DELTA_SUPPORT
 // xar_file context for Xar delta archiver
 @property (nonatomic, nullable) const void *xarContext;
+#endif
 // Tracking length of item's data in data section, when encoding items and when extracting items
 @property (nonatomic) uint64_t codedDataLength;
 

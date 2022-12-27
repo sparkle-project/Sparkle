@@ -48,11 +48,11 @@
 
 - (void)encodeWithCoder:(NSCoder *)encoder
 {
-    [encoder encodeBool:self.majorUpgrade forKey:SPUAppcastItemStateMajorUpgradeKey];
-    [encoder encodeBool:self.criticalUpdate forKey:SPUAppcastItemStateCriticalUpdateKey];
-    [encoder encodeBool:self.informationalUpdate forKey:SPUAppcastItemStateInformationalUpdateKey];
-    [encoder encodeBool:self.minimumOperatingSystemVersionIsOK forKey:SPUAppcastItemStateMinimumOperatingSystemVersionIsOKKey];
-    [encoder encodeBool:self.maximumOperatingSystemVersionIsOK forKey:SPUAppcastItemStateMaximumOperatingSystemVersionIsOKKey];
+    [encoder encodeBool:_majorUpgrade forKey:SPUAppcastItemStateMajorUpgradeKey];
+    [encoder encodeBool:_criticalUpdate forKey:SPUAppcastItemStateCriticalUpdateKey];
+    [encoder encodeBool:_informationalUpdate forKey:SPUAppcastItemStateInformationalUpdateKey];
+    [encoder encodeBool:_minimumOperatingSystemVersionIsOK forKey:SPUAppcastItemStateMinimumOperatingSystemVersionIsOKKey];
+    [encoder encodeBool:_maximumOperatingSystemVersionIsOK forKey:SPUAppcastItemStateMaximumOperatingSystemVersionIsOKKey];
 }
 
 - (instancetype)initWithCoder:(NSCoder *)decoder

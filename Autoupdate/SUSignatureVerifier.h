@@ -19,7 +19,7 @@
 @class SUSignatures;
 @class SUPublicKeys;
 
-@interface SUSignatureVerifier : NSObject
+SPU_OBJC_DIRECT_MEMBERS @interface SUSignatureVerifier : NSObject
 
 + (BOOL)validatePath:(NSString *)path withSignatures:(SUSignatures *)signatures withPublicKeys:(SUPublicKeys *)pkeys error:(NSError * __autoreleasing *)error;
 

@@ -16,20 +16,18 @@
 #import "SULog.h"
 #import "SUSignatures.h"
 #import "SUErrors.h"
+#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
 #include <CommonCrypto/CommonDigest.h>
+#endif
 #import "ed25519.h"
 
 
 #include "AppKitPrevention.h"
 
-@interface SUSignatureVerifier ()
-@property (readonly) SUPublicKeys *pubKeys;
-@end
-
-@implementation SUSignatureVerifier {
+@implementation SUSignatureVerifier
+{
+    SUPublicKeys *_pubKeys;
 }
-
-@synthesize pubKeys = _pubKeys;
 
 + (BOOL)validatePath:(NSString *)path withSignatures:(SUSignatures *)signatures withPublicKeys:(SUPublicKeys *)pkeys error:(NSError * __autoreleasing *)error
 {
@@ -54,9 +52,10 @@
     return self;
 }
 
-- (SecKeyRef)dsaSecKeyRef {
-
-    NSData *data = [self.pubKeys.dsaPubKey dataUsingEncoding:NSASCIIStringEncoding];
+#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
+- (SecKeyRef)dsaSecKeyRef SPU_OBJC_DIRECT
+{
+    NSData *data = [_pubKeys.dsaPubKey dataUsingEncoding:NSASCIIStringEncoding];
     if (!self || !data.length) {
         SULog(SULogLevelError, @"Could not read public DSA key");
         return nil;
@@ -89,6 +88,7 @@
     CFRelease(items);
     return dsaPubKeySecKey;
 }
+#endif
 
 - (BOOL)verifyFileAtPath:(NSString *)path signatures:(SUSignatures *)signatures error:(NSError * __autoreleasing *)error
 {
@@ -106,7 +106,7 @@
         return NO;
     }
 
-    switch (self.pubKeys.ed25519PubKeyStatus) {
+    switch (_pubKeys.ed25519PubKeyStatus) {
     case SUSigningInputStatusAbsent:
         if (signatures.ed25519SignatureStatus != SUSigningInputStatusAbsent) {
             SULog(SULogLevelDefault, @"The update has an EdDSA signature, but it won't be used, because the old app doesn't have an EdDSA public key");
@@ -165,11 +165,14 @@
                 
                 return NO;
             }
-            if (ed25519_verify(signatures.ed25519Signature, data.bytes, data.length, self.pubKeys.ed25519PubKey)) {
+            if (ed25519_verify(signatures.ed25519Signature, data.bytes, data.length, _pubKeys.ed25519PubKey)) {
                 SULog(SULogLevelDefault, @"OK: EdDSA signature is correct");
+#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
                 // No need to check DSA when EdDSA verification succeeded, unless a DSA signature is provided and it's
                 // erroneously invalid
-                if (signatures.dsaSignatureStatus != SUSigningInputStatusInvalid) {
+                if (signatures.dsaSignatureStatus != SUSigningInputStatusInvalid)
+#endif
+                {
                     return YES;
                 }
             } else {
@@ -177,9 +180,11 @@
                 
                 SULog(SULogLevelError, @"%@", message);
                 
+#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
                 if (signatures.dsaSignatureStatus != SUSigningInputStatusAbsent) {
                     SULog(SULogLevelDefault, @"DSA signature won't be checked, because EdDSA verification has already failed");
                 }
+#endif
                 
                 if (error != NULL) {
                     *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUValidationError userInfo:@{ NSLocalizedDescriptionKey: message }];
@@ -192,7 +197,8 @@
         break;
     }
 
-    switch (self.pubKeys.dsaPubKeyStatus) {
+#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
+    switch (_pubKeys.dsaPubKeyStatus) {
     case SUSigningInputStatusAbsent:
         if (signatures.dsaSignatureStatus != SUSigningInputStatusAbsent) {
             SULog(SULogLevelDefault, @"The update has a DSA signature, but it can't be used, because the old app doesn't have a DSA public key");
@@ -235,6 +241,7 @@
         }
         }
     }
+#endif
 
     if (error != NULL) {
         // Use generic failure
@@ -244,7 +251,8 @@
     return NO;
 }
 
-- (BOOL)verifyDSASignatureOfStream:(NSInputStream *)stream dsaSignature:(NSData *)dsaSignature error:(NSError * __autoreleasing *)outError
+#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
+- (BOOL)verifyDSASignatureOfStream:(NSInputStream *)stream dsaSignature:(NSData *)dsaSignature error:(NSError * __autoreleasing *)outError SPU_OBJC_DIRECT
 {
     if (!stream || !dsaSignature) {
         SULog(SULogLevelError, @"Invalid arguments to verifyStream");
@@ -301,10 +309,7 @@
         return cleanup();
     }
     
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdirect-ivar-access"
     dataVerifyTransform = SecVerifyTransformCreate(dsaPubKeySecKey, (__bridge CFDataRef)dsaSignature, &error);
-#pragma clang diagnostic pop
     if (!dataVerifyTransform) {
         SULog(SULogLevelError, @"Could not understand format of the signature: %@; Signature data: %@", error, dsaSignature);
         if (outError != NULL) {
@@ -368,5 +373,6 @@
     cleanup();
     return result.boolValue;
 }
+#endif
 
 @end

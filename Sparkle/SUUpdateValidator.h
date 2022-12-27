@@ -13,6 +13,9 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+#ifndef BUILDING_SPARKLE_TESTS
+SPU_OBJC_DIRECT_MEMBERS
+#endif
 @interface SUUpdateValidator : NSObject
 
 - (instancetype)initWithDownloadPath:(NSString *)downloadPath signatures:(SUSignatures *)signatures host:(SUHost *)host;

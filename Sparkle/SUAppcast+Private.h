@@ -8,6 +8,16 @@
 
 #import <Foundation/Foundation.h>
 
+#ifdef BUILDING_SPARKLE_SOURCES_EXTERNALLY
+// Ignore incorrect warning
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wquoted-include-in-framework-header"
+#import "SUAppcast.h"
+#pragma clang diagnostic pop
+#else
+#import <Sparkle/SUAppcast.h>
+#endif
+
 NS_ASSUME_NONNULL_BEGIN
 
 @class SPUAppcastItemStateResolver;

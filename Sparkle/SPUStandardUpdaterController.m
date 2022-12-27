@@ -22,10 +22,6 @@
 // programmatically.
 
 @interface SPUStandardUpdaterController () <NSMenuItemValidation>
-
-@property (nonatomic) SPUUpdater *updater;
-@property (nonatomic) id<SPUUserDriver> userDriver;
-
 @end
 
 @implementation SPUStandardUpdaterController
@@ -38,22 +34,19 @@
     // Note: awakeFromNib might be called more than once
     // We have to use awakeFromNib otherwise the delegate outlets may not be connected yet,
     // and we aren't a proper window or view controller, so we don't have a proper "did load" point
-    if (self.updater == nil) {
+    if (_updater == nil) {
         [self _initUpdater];
         [self startUpdater];
     }
 }
 
-- (void)_initUpdater
+- (void)_initUpdater SPU_OBJC_DIRECT
 {
     NSBundle *hostBundle = [NSBundle mainBundle];
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdirect-ivar-access"
     SPUStandardUserDriver *userDriver = [[SPUStandardUserDriver alloc] initWithHostBundle:hostBundle delegate:self->userDriverDelegate];
     
-    self.updater = [[SPUUpdater alloc] initWithHostBundle:hostBundle applicationBundle:hostBundle userDriver:userDriver delegate:self->updaterDelegate];
-    self.userDriver = userDriver;
-#pragma clang diagnostic pop
+    _updater = [[SPUUpdater alloc] initWithHostBundle:hostBundle applicationBundle:hostBundle userDriver:userDriver delegate:self->updaterDelegate];
+    _userDriver = userDriver;
 }
 
 - (instancetype)initWithUpdaterDelegate:(nullable id<SPUUpdaterDelegate>)theUpdaterDelegate userDriverDelegate:(nullable id<SPUStandardUserDriverDelegate>)theUserDriverDelegate
@@ -79,14 +72,18 @@
 - (void)startUpdater
 {
     NSError *updaterError = nil;
-    if (![self.updater startUpdater:&updaterError]) {
+    if (![_updater startUpdater:&updaterError]) {
         SULog(SULogLevelError, @"Fatal updater error (%ld): %@", updaterError.code, updaterError.localizedDescription);
         
         // Delay the alert four seconds so it doesn't show RIGHT as the app launches, but also doesn't interrupt the user once they really get to work.
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(4 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+#if SPARKLE_COPY_LOCALIZATIONS
+            NSBundle *sparkleBundle = SUSparkleBundle();
+#endif
+            
             NSAlert *alert = [[NSAlert alloc] init];
-            alert.messageText = SULocalizedString(@"Unable to Check For Updates", nil);
-            alert.informativeText = SULocalizedString(@"The update checker failed to start correctly. You should contact the app developer to report this issue and verify that you have the latest version.", nil);
+            alert.messageText = SULocalizedStringFromTableInBundle(@"Unable to Check For Updates", SPARKLE_TABLE, sparkleBundle, nil);
+            alert.informativeText = SULocalizedStringFromTableInBundle(@"The update checker failed to start correctly. You should contact the app developer to report this issue and verify that you have the latest version.", SPARKLE_TABLE, sparkleBundle, nil);
             [alert runModal];
         });
     }
@@ -94,13 +91,13 @@
 
 - (IBAction)checkForUpdates:(nullable id)__unused sender
 {
-    [self.updater checkForUpdates];
+    [_updater checkForUpdates];
 }
 
 - (BOOL)validateMenuItem:(NSMenuItem *)item
 {
     if ([item action] == @selector(checkForUpdates:)) {
-        return self.updater.canCheckForUpdates;
+        return _updater.canCheckForUpdates;
     }
     return YES;
 }

@@ -21,6 +21,7 @@
 {
     NSXPCListener *_xpcListener;
     NSMutableDictionary *_pendingReplies;
+    
     NSUInteger _pendingReplyCounter;
 }
 

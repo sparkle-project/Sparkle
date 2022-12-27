@@ -20,24 +20,19 @@
 #include "AppKitPrevention.h"
 
 @interface SPUAutomaticUpdateDriver () <SPUCoreBasedUpdateDriverDelegate>
-
-@property (nonatomic, readonly, weak) id updater;
-@property (nonatomic, readonly, weak) id<SPUUserDriver> userDriver;
-@property (nonatomic, readonly, weak, nullable) id updaterDelegate;
-@property (nonatomic, readonly) SPUCoreBasedUpdateDriver *coreDriver;
-@property (nonatomic) SUAppcastItem* updateItem;
-@property (nonatomic) BOOL willInstallSilently;
-
 @end
 
 @implementation SPUAutomaticUpdateDriver
-
-@synthesize updater = _updater;
-@synthesize userDriver = _userDriver;
-@synthesize updaterDelegate = _updaterDelegate;
-@synthesize coreDriver = _coreDriver;
-@synthesize updateItem = _updateItem;
-@synthesize willInstallSilently = _willInstallSilently;
+{
+    SPUCoreBasedUpdateDriver *_coreDriver;
+    SUAppcastItem* _updateItem;
+    
+    __weak id _updater;
+    __weak id<SPUUserDriver> _userDriver;
+    __weak id _updaterDelegate;
+    
+    BOOL _willInstallSilently;
+}
 
 - (instancetype)initWithHost:(SUHost *)host applicationBundle:(NSBundle *)applicationBundle updater:(id)updater userDriver:(id <SPUUserDriver>)userDriver updaterDelegate:(nullable id <SPUUpdaterDelegate>)updaterDelegate
 {
@@ -54,7 +49,7 @@
 
 - (void)setCompletionHandler:(SPUUpdateDriverCompletion)completionBlock
 {
-    [self.coreDriver setCompletionHandler:completionBlock];
+    [_coreDriver setCompletionHandler:completionBlock];
 }
 
 - (void)setUpdateShownHandler:(void (^)(void))updateShownHandler
@@ -63,12 +58,12 @@
 
 - (void)setUpdateWillInstallHandler:(void (^)(void))updateWillInstallHandler
 {
-    [self.coreDriver setUpdateWillInstallHandler:updateWillInstallHandler];
+    [_coreDriver setUpdateWillInstallHandler:updateWillInstallHandler];
 }
 
 - (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders
 {
-    [self.coreDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders inBackground:YES requiresSilentInstall:YES];
+    [_coreDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders inBackground:YES requiresSilentInstall:YES];
 }
 
 - (void)resumeInstallingUpdate
@@ -85,13 +80,13 @@
 
 - (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)updateItem secondaryAppcastItem:(SUAppcastItem * _Nullable)secondaryUpdateItem
 {
-    self.updateItem = updateItem;
+    _updateItem = updateItem;
     
     if (updateItem.isInformationOnlyUpdate || updateItem.majorUpgrade) {
-        [self.coreDriver deferInformationalUpdate:updateItem secondaryUpdate:secondaryUpdateItem];
+        [_coreDriver deferInformationalUpdate:updateItem secondaryUpdate:secondaryUpdateItem];
         [self abortUpdate];
     } else {
-        [self.coreDriver downloadUpdateFromAppcastItem:updateItem secondaryAppcastItem:secondaryUpdateItem inBackground:YES];
+        [_coreDriver downloadUpdateFromAppcastItem:updateItem secondaryAppcastItem:secondaryUpdateItem inBackground:YES];
     }
 }
 
@@ -102,16 +97,19 @@
 
 - (void)installerDidFinishPreparationAndWillInstallImmediately:(BOOL)willInstallImmediately silently:(BOOL)willInstallSilently
 {
-    self.willInstallSilently = willInstallSilently;
+    _willInstallSilently = willInstallSilently;
     
     if (!willInstallImmediately) {
         BOOL installationHandledByDelegate = NO;
-        id<SPUUpdaterDelegate> updaterDelegate = self.updaterDelegate;
-        if (self.willInstallSilently && [updaterDelegate respondsToSelector:@selector(updater:willInstallUpdateOnQuit:immediateInstallationBlock:)]) {
-            __weak SPUAutomaticUpdateDriver *weakSelf = self;
-            installationHandledByDelegate = [updaterDelegate updater:self.updater willInstallUpdateOnQuit:self.updateItem immediateInstallationBlock:^{
+        id<SPUUpdaterDelegate> updaterDelegate = _updaterDelegate;
+        if (_willInstallSilently && [updaterDelegate respondsToSelector:@selector(updater:willInstallUpdateOnQuit:immediateInstallationBlock:)]) {
+            __weak __typeof__(self) weakSelf = self;
+            installationHandledByDelegate = [updaterDelegate updater:_updater willInstallUpdateOnQuit:_updateItem immediateInstallationBlock:^{
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    [weakSelf.coreDriver finishInstallationWithResponse:SPUUserUpdateChoiceInstall displayingUserInterface:NO];
+                    __typeof__(self) strongSelf = weakSelf;
+                    if (strongSelf != nil) {
+                        [strongSelf->_coreDriver finishInstallationWithResponse:SPUUserUpdateChoiceInstall displayingUserInterface:NO];
+                    }
                 });
             }];
         }
@@ -141,9 +139,9 @@
 
 - (void)abortUpdateWithError:(NSError *)error
 {
-    BOOL showNextUpdateImmediately = (error == nil || error.code == SUInstallationAuthorizeLaterError) && (!self.willInstallSilently || self.updateItem.criticalUpdate || self.updateItem.isInformationOnlyUpdate);
+    BOOL showNextUpdateImmediately = (error == nil || error.code == SUInstallationAuthorizeLaterError) && (!_willInstallSilently || _updateItem.criticalUpdate || _updateItem.isInformationOnlyUpdate);
     
-    [self.coreDriver abortUpdateAndShowNextUpdateImmediately:showNextUpdateImmediately error:error];
+    [_coreDriver abortUpdateAndShowNextUpdateImmediately:showNextUpdateImmediately error:error];
 }
 
 @end

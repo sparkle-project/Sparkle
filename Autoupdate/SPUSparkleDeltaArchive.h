@@ -97,7 +97,7 @@ NS_ASSUME_NONNULL_BEGIN
  (P number of blobs where P <= M commands)
  (Indexes for data blobs correspond to indexes for a filtered list of applicable commands (EXTRACT_FILE, BINARY_DIFF_FILE) that have data content)
  */
-@interface SPUSparkleDeltaArchive : NSObject <SPUDeltaArchiveProtocol>
+SPU_OBJC_DIRECT_MEMBERS @interface SPUSparkleDeltaArchive : NSObject <SPUDeltaArchiveProtocol>
 
 - (instancetype)initWithPatchFileForWriting:(NSString *)patchFile;
 - (instancetype)initWithPatchFileForReading:(NSString *)patchFile;

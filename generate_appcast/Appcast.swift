@@ -176,6 +176,7 @@ func makeAppcasts(archivesSourceDir: URL, outputPathURL: URL?, cacheDirectory ca
             
             group.enter()
             DispatchQueue.global().async {
+#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
                 if let privateDSAKey = keys.privateDSAKey {
                     do {
                         update.dsaSignature = try dsaSignature(path: update.archivePath, privateDSAKey: privateDSAKey)
@@ -185,6 +186,7 @@ func makeAppcasts(archivesSourceDir: URL, outputPathURL: URL?, cacheDirectory ca
                 } else if update.supportsDSA {
                     print("Note: did not sign with legacy DSA \(update.archivePath.path) because private DSA key file was not specified")
                 }
+#endif
                 if let publicEdKey = update.publicEdKey {
                     if let privateEdKey = keys.privateEdKey, let expectedPublicKey = keys.publicEdKey {
                         if publicEdKey == expectedPublicKey {
@@ -334,6 +336,7 @@ func makeAppcasts(archivesSourceDir: URL, outputPathURL: URL?, cacheDirectory ca
 
                 group.enter()
                 DispatchQueue.global().async {
+#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
                     if item.supportsDSA, let privateDSAKey = keys.privateDSAKey {
                         do {
                             delta.dsaSignature = try dsaSignature(path: deltaPath, privateDSAKey: privateDSAKey)
@@ -341,6 +344,7 @@ func makeAppcasts(archivesSourceDir: URL, outputPathURL: URL?, cacheDirectory ca
                             print(delta.archivePath.lastPathComponent, error)
                         }
                     }
+#endif
                     if let publicEdKey = item.publicEdKey, let privateEdKey = keys.privateEdKey {
                         do {
                             delta.edSignature = try edSignature(path: deltaPath, publicEdKey: publicEdKey, privateEdKey: privateEdKey)
@@ -348,11 +352,17 @@ func makeAppcasts(archivesSourceDir: URL, outputPathURL: URL?, cacheDirectory ca
                             print(delta.archivePath.lastPathComponent, error)
                         }
                     }
-                    if delta.dsaSignature != nil || delta.edSignature != nil {
-                        latestItem.deltas.append(delta)
-                    } else {
-                        markDeltaAsIgnored(delta: delta, markerPath: ignoreMarkerPath)
-                        print("Delta \(delta.archivePath.path) ignored, because it could not be signed")
+                    do {
+                        var hasAnyDSASignature = (delta.edSignature != nil)
+#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
+                        hasAnyDSASignature = hasAnyDSASignature || (delta.dsaSignature != nil)
+#endif
+                        if hasAnyDSASignature {
+                            latestItem.deltas.append(delta)
+                        } else {
+                            markDeltaAsIgnored(delta: delta, markerPath: ignoreMarkerPath)
+                            print("Delta \(delta.archivePath.path) ignored, because it could not be signed")
+                        }
                     }
                     group.leave()
                 }

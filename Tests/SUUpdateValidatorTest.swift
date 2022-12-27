@@ -12,7 +12,9 @@ import XCTest
 class SUUpdateValidatorTest: XCTestCase {
     enum BundleConfig: String, CaseIterable, Equatable {
         case none = "None"
+#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
         case dsaOnly = "DSAOnly"
+#endif
         case edOnly = "EDOnly"
         case both = "Both"
         case codeSignedOnly = "CodeSignedOnly"
@@ -27,8 +29,12 @@ class SUUpdateValidatorTest: XCTestCase {
             switch self {
             case .none, .codeSignedOnly, .codeSignedOnlyNew, .codeSignedInvalidOnly:
                 return false
-            case .dsaOnly, .edOnly, .both, .codeSignedBoth, .codeSignedBothNew, .codeSignedOldED, .codeSignedInvalid:
+            case .edOnly, .both, .codeSignedBoth, .codeSignedBothNew, .codeSignedOldED, .codeSignedInvalid:
                 return true
+#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
+            case .dsaOnly:
+                return true
+#endif
             }
         }
     }
@@ -38,17 +44,27 @@ class SUUpdateValidatorTest: XCTestCase {
             case none, invalid, invalidFormat, valid
         }
 
-        var dsa: State
         var ed: State
+#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
+        var dsa: State
+#endif
 
         static let allCases: [SignatureConfig] = State.allCases.flatMap { dsaState in
             State.allCases.map { edState in
-                SignatureConfig(dsa: dsaState, ed: edState)
+#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
+                SignatureConfig(ed: edState, dsa: dsaState)
+#else
+                SignatureConfig(ed: edState)
+#endif
             }
         }
 
         var debugDescription: String {
-            return "(dsa: \(self.dsa), ed: \(self.ed))"
+#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
+            return "(ed: \(self.ed), dsa: \(self.dsa))"
+#else
+            return "(ed: \(self.ed))"
+#endif
         }
     }
 
@@ -59,6 +75,7 @@ class SUUpdateValidatorTest: XCTestCase {
     }
 
     func signatures(_ config: SignatureConfig) -> SUSignatures {
+#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
         let dsaSig: String?
         switch config.dsa {
         case .none: dsaSig = nil
@@ -67,6 +84,7 @@ class SUUpdateValidatorTest: XCTestCase {
         case .invalidFormat: dsaSig = "%%wCFCIHCIYYkfZavNzTitTW5tlRp/k5AhQ40poFytqcVhIYdCxQznaXeJPJDQ=="
         case .valid: dsaSig = "MCwCFCIHCIYYkfZavNzTitTW5tlRp/k5AhQ40poFytqcVhIYdCxQznaXeJPJDQ=="
         }
+#endif
 
         let edSig: String?
         switch config.ed {
@@ -77,7 +95,11 @@ class SUUpdateValidatorTest: XCTestCase {
         case .valid: edSig = "EIawm2YkDZ2gBfkEMF2+1VuuTeXnCGZOdnMdVgPPvDZioq7bvDayXqKkIIzSjKMmeFdcFJOHdnba5ZV60+gPBw=="
         }
 
-        return SUSignatures(dsa: dsaSig, ed: edSig)
+#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
+        return SUSignatures(ed: edSig, dsa: dsaSig)
+#else
+        return SUSignatures(ed: edSig)
+#endif
     }
 
     var signedTestFilePath: String {
@@ -97,9 +119,17 @@ class SUUpdateValidatorTest: XCTestCase {
     func testPrevalidation() {
         for signatureConfig in SignatureConfig.allCases {
             testPrevalidation(bundle: .none, signatures: signatureConfig, expectedResult: false)
+#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
             testPrevalidation(bundle: .dsaOnly, signatures: signatureConfig, expectedResult: signatureConfig.dsa == .valid)
+#endif
+#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
             testPrevalidation(bundle: .edOnly, signatures: signatureConfig, expectedResult: signatureConfig.ed == .valid && signatureConfig.dsa != .invalidFormat)
+#else
+            testPrevalidation(bundle: .edOnly, signatures: signatureConfig, expectedResult: signatureConfig.ed == .valid)
+#endif
+#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
             testPrevalidation(bundle: .both, signatures: signatureConfig, expectedResult: signatureConfig.ed == .valid && signatureConfig.dsa != .invalidFormat)
+#endif
         }
     }
 
@@ -126,16 +156,28 @@ class SUUpdateValidatorTest: XCTestCase {
     func testPostValidationWithoutCodeSigning() {
         for signatureConfig in SignatureConfig.allCases {
             testPostValidation(bundle: .none, signatures: signatureConfig, expectedResult: false)
+#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
             testPostValidation(bundle: .dsaOnly, signatures: signatureConfig, expectedResult: signatureConfig.dsa == .valid)
+#endif
+#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
             testPostValidation(bundle: .edOnly, signatures: signatureConfig, expectedResult: signatureConfig.ed == .valid && signatureConfig.dsa != .invalidFormat)
+#else
+            testPostValidation(bundle: .edOnly, signatures: signatureConfig, expectedResult: signatureConfig.ed == .valid)
+#endif
+#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
             testPostValidation(bundle: .both, signatures: signatureConfig, expectedResult: signatureConfig.ed == .valid && signatureConfig.dsa != .invalidFormat)
+#endif
         }
     }
 
     func testPostValidationWithCodeSigning() {
         for signatureConfig in SignatureConfig.allCases {
             testPostValidation(bundle: .codeSignedOnly, signatures: signatureConfig, expectedResult: true)
+#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
             testPostValidation(bundle: .codeSignedBoth, signatures: signatureConfig, expectedResult: signatureConfig.ed == .valid && signatureConfig.dsa != .invalidFormat)
+#else
+            testPostValidation(bundle: .codeSignedBoth, signatures: signatureConfig, expectedResult: signatureConfig.ed == .valid)
+#endif
 
             testPostValidation(bundle: .codeSignedInvalidOnly, signatures: signatureConfig, expectedResult: false)
             testPostValidation(bundle: .codeSignedInvalid, signatures: signatureConfig, expectedResult: false)
@@ -144,16 +186,38 @@ class SUUpdateValidatorTest: XCTestCase {
 
     func testPostValidationWithKeyRemoval() {
         for bundleConfig in BundleConfig.allCases {
-            testPostValidation(oldBundle: .dsaOnly, newBundle: bundleConfig, signatures: SignatureConfig(dsa: .valid, ed: .valid), expectedResult: bundleConfig.hasAnyKeys && bundleConfig != .codeSignedInvalid)
-            testPostValidation(oldBundle: .edOnly, newBundle: bundleConfig, signatures: SignatureConfig(dsa: .valid, ed: .valid), expectedResult: bundleConfig.hasAnyKeys && bundleConfig != .codeSignedInvalid)
-            testPostValidation(oldBundle: .both, newBundle: bundleConfig, signatures: SignatureConfig(dsa: .valid, ed: .valid), expectedResult: bundleConfig.hasAnyKeys && bundleConfig != .codeSignedInvalid)
-            testPostValidation(oldBundle: .codeSignedBoth, newBundle: bundleConfig, signatures: SignatureConfig(dsa: .valid, ed: .valid), expectedResult: bundleConfig.hasAnyKeys && bundleConfig != .codeSignedInvalid)
+#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
+            testPostValidation(oldBundle: .dsaOnly, newBundle: bundleConfig, signatures: SignatureConfig(ed: .valid, dsa: .valid), expectedResult: bundleConfig.hasAnyKeys && bundleConfig != .codeSignedInvalid)
+#endif
+            do {
+#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
+                let signatureConfig = SignatureConfig(ed: .valid, dsa: .valid)
+#else
+                let signatureConfig = SignatureConfig(ed: .valid)
+#endif
+                testPostValidation(oldBundle: .edOnly, newBundle: bundleConfig, signatures: signatureConfig, expectedResult: bundleConfig.hasAnyKeys && bundleConfig != .codeSignedInvalid)
+            }
+#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
+            testPostValidation(oldBundle: .both, newBundle: bundleConfig, signatures: SignatureConfig(ed: .valid, dsa: .valid), expectedResult: bundleConfig.hasAnyKeys && bundleConfig != .codeSignedInvalid)
+#endif
+            do {
+#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
+                let signatureConfig = SignatureConfig(ed: .valid, dsa: .valid)
+#else
+                let signatureConfig = SignatureConfig(ed: .valid)
+#endif
+                testPostValidation(oldBundle: .codeSignedBoth, newBundle: bundleConfig, signatures: signatureConfig, expectedResult: bundleConfig.hasAnyKeys && bundleConfig != .codeSignedInvalid)
+            }
         }
     }
 
     func testPostValidationWithKeyRotation() {
         for signatureConfig in SignatureConfig.allCases {
+#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
             let signatureIsValid = (signatureConfig.ed == .valid && signatureConfig.dsa != .invalidFormat)
+#else
+            let signatureIsValid = (signatureConfig.ed == .valid)
+#endif
 
             // It's okay to add DSA keys or add code signing.
             testPostValidation(oldBundle: .codeSignedOnly, newBundle: .codeSignedBoth, signatures: signatureConfig, expectedResult: signatureIsValid)

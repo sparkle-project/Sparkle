@@ -14,7 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class SUHost, NSImage, NSApplication;
 
-@interface SUApplicationInfo : NSObject
+SPU_OBJC_DIRECT_MEMBERS @interface SUApplicationInfo : NSObject
 
 + (BOOL)isBackgroundApplication:(NSApplication *)application;
 

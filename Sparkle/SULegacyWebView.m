@@ -6,7 +6,7 @@
 //  Copyright © 2020 Sparkle Project. All rights reserved.
 //
 
-#if SPARKLE_BUILD_UI_BITS
+#if SPARKLE_BUILD_UI_BITS && DOWNLOADER_XPC_SERVICE_EMBEDDED
 
 #import "SULegacyWebView.h"
 #import "SUWebViewCommon.h"
@@ -17,16 +17,14 @@
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
 
 @interface SULegacyWebView () <WebPolicyDelegate, WebFrameLoadDelegate, WebUIDelegate>
-
-@property (nonatomic, readonly) WebView *webView;
-@property (nonatomic) void (^completionHandler)(NSError * _Nullable);
-
 @end
 
 @implementation SULegacyWebView
-
-@synthesize webView = _webView;
-@synthesize completionHandler = _completionHandler;
+{
+    WebView *_webView;
+    
+    void (^_completionHandler)(NSError * _Nullable);
+}
 
 - (instancetype)initWithColorStyleSheetLocation:(NSURL *)colorStyleSheetLocation fontFamily:(NSString *)fontFamily fontPointSize:(int)fontPointSize javaScriptEnabled:(BOOL)javaScriptEnabled
 {
@@ -61,38 +59,38 @@
 
 - (NSView *)view
 {
-    return self.webView;
+    return _webView;
 }
 
 - (void)loadHTMLString:(NSString *)htmlString baseURL:(NSURL * _Nullable)baseURL completionHandler:(void (^)(NSError * _Nullable))completionHandler
 {
-    self.completionHandler = [completionHandler copy];
-    [[self.webView mainFrame] loadHTMLString:htmlString baseURL:baseURL];
+    _completionHandler = [completionHandler copy];
+    [[_webView mainFrame] loadHTMLString:htmlString baseURL:baseURL];
 }
 
 - (void)loadData:(NSData *)data MIMEType:(NSString *)MIMEType textEncodingName:(NSString *)textEncodingName baseURL:(NSURL *)baseURL completionHandler:(void (^)(NSError * _Nullable))completionHandler
 {
-    self.completionHandler = [completionHandler copy];
-    [[self.webView mainFrame] loadData:data MIMEType:MIMEType textEncodingName:textEncodingName baseURL:baseURL];
+    _completionHandler = [completionHandler copy];
+    [[_webView mainFrame] loadData:data MIMEType:MIMEType textEncodingName:textEncodingName baseURL:baseURL];
 }
 
 - (void)stopLoading
 {
-    self.completionHandler = nil;
-    [self.webView stopLoading:self];
+    _completionHandler = nil;
+    [_webView stopLoading:self];
 }
 
 - (void)setDrawsBackground:(BOOL)drawsBackground
 {
-    self.webView.drawsBackground = drawsBackground;
+    _webView.drawsBackground = drawsBackground;
 }
 
 - (void)webView:(WebView *)sender didFinishLoadForFrame:(WebFrame *)frame
 {
     if ([frame parentFrame] == nil) {
-        if (self.completionHandler != nil) {
-            self.completionHandler(nil);
-            self.completionHandler = nil;
+        if (_completionHandler != nil) {
+            _completionHandler(nil);
+            _completionHandler = nil;
         }
         [sender display]; // necessary to prevent weird scroll bar artifacting
     }
@@ -101,9 +99,9 @@
 - (void)webView:(WebView *)sender didFailLoadWithError:(NSError *)error forFrame:(WebFrame *)frame
 {
     if ([frame parentFrame] == nil) {
-        if (self.completionHandler != nil) {
-            self.completionHandler(error);
-            self.completionHandler = nil;
+        if (_completionHandler != nil) {
+            _completionHandler(error);
+            _completionHandler = nil;
         }
     }
 }
@@ -122,7 +120,7 @@
     }
 
     // Ensure we are finished loading
-    if (self.completionHandler == nil) {
+    if (_completionHandler == nil) {
         if (requestURL && !isAboutBlank) {
             [[NSWorkspace sharedWorkspace] openURL:requestURL];
         }

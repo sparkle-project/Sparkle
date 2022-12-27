@@ -87,14 +87,14 @@ static NSString *SUInstallationTypeKey = @"SUInstallationType";
 
 - (void)encodeWithCoder:(NSCoder *)coder
 {
-    [coder encodeObject:self.relaunchPath forKey:SURelaunchPathKey];
-    [coder encodeObject:self.hostBundlePath forKey:SUHostBundlePathKey];
-    [coder encodeObject:self.updateDirectoryPath forKey:SUUpdateDirectoryPathKey];
-    [coder encodeObject:self.installationType forKey:SUInstallationTypeKey];
-    [coder encodeObject:self.downloadName forKey:SUDownloadNameKey];
-    [coder encodeObject:self.signatures forKey:SUSignaturesKey];
-    if (self.decryptionPassword != nil) {
-        [coder encodeObject:self.decryptionPassword forKey:SUDecryptionPasswordKey];
+    [coder encodeObject:_relaunchPath forKey:SURelaunchPathKey];
+    [coder encodeObject:_hostBundlePath forKey:SUHostBundlePathKey];
+    [coder encodeObject:_updateDirectoryPath forKey:SUUpdateDirectoryPathKey];
+    [coder encodeObject:_installationType forKey:SUInstallationTypeKey];
+    [coder encodeObject:_downloadName forKey:SUDownloadNameKey];
+    [coder encodeObject:_signatures forKey:SUSignaturesKey];
+    if (_decryptionPassword != nil) {
+        [coder encodeObject:_decryptionPassword forKey:SUDecryptionPasswordKey];
     }
 }
 

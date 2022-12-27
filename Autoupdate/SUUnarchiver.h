@@ -12,7 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol SUUnarchiverProtocol;
 
-@interface SUUnarchiver : NSObject
+SPU_OBJC_DIRECT_MEMBERS @interface SUUnarchiver : NSObject
 
 + (nullable id <SUUnarchiverProtocol>)unarchiverForPath:(NSString *)path updatingHostBundlePath:(nullable NSString *)hostPath decryptionPassword:(nullable NSString *)decryptionPassword expectingInstallationType:(NSString *)installationType;
 

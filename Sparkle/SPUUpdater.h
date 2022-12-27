@@ -7,8 +7,18 @@
 //
 
 #import <Foundation/Foundation.h>
+
+#if defined(BUILDING_SPARKLE_SOURCES_EXTERNALLY)
+// Ignore incorrect warning
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wquoted-include-in-framework-header"
+#import "SUExport.h"
+#import "SPUUserDriver.h"
+#pragma clang diagnostic pop
+#else
 #import <Sparkle/SUExport.h>
 #import <Sparkle/SPUUserDriver.h>
+#endif
 
 NS_ASSUME_NONNULL_BEGIN
 

@@ -37,8 +37,8 @@
 
 - (void)encodeWithCoder:(NSCoder *)encoder
 {
-    [encoder encodeInteger:self.stage forKey:SPUUserUpdateStateStageKey];
-    [encoder encodeBool:self.userInitiated forKey:SPUUserUpdateStateUserInitiatedKey];
+    [encoder encodeInteger:_stage forKey:SPUUserUpdateStateStageKey];
+    [encoder encodeBool:_userInitiated forKey:SPUUserUpdateStateUserInitiatedKey];
 }
 
 - (instancetype)initWithCoder:(NSCoder *)decoder

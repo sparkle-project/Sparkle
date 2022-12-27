@@ -6,6 +6,8 @@
 //  Copyright © 2021 Sparkle Project. All rights reserved.
 //
 
+#if SPARKLE_BUILD_PACKAGE_SUPPORT
+
 #import "SUFlatPackageUnarchiver.h"
 #import "SUUnarchiverNotifier.h"
 #import "SPUInstallationType.h"
@@ -14,17 +16,11 @@
 
 #include "AppKitPrevention.h"
 
-@interface SUFlatPackageUnarchiver ()
-
-@property (nonatomic, readonly) NSString *flatPackagePath;
-@property (nonatomic, readonly) NSString *expectedInstallationType;
-
-@end
-
 @implementation SUFlatPackageUnarchiver
-
-@synthesize flatPackagePath = _flatPackagePath;
-@synthesize expectedInstallationType = _expectedInstallationType;
+{
+    NSString *_flatPackagePath;
+    NSString *_expectedInstallationType;
+}
 
 + (BOOL)canUnarchivePath:(NSString *)path
 {
@@ -52,16 +48,18 @@
     
     // Flat packages must use guided package installs, not interactive
     BOOL isDirectory = NO;
-    if (![self.expectedInstallationType isEqualToString:SPUInstallationTypeGuidedPackage]) {
-        [notifier notifyFailureWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUUnarchivingError userInfo:@{ NSLocalizedDescriptionKey:[NSString stringWithFormat:@"Flat package does not have guided installation type but %@ instead", self.expectedInstallationType]}]];
-    } else if (![[NSFileManager defaultManager] fileExistsAtPath:self.flatPackagePath isDirectory:&isDirectory] || isDirectory) {
-        [notifier notifyFailureWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUUnarchivingError userInfo:@{ NSLocalizedDescriptionKey:[NSString stringWithFormat:@"Flat package does not exist at %@", self.flatPackagePath]}]];
+    if (![_expectedInstallationType isEqualToString:SPUInstallationTypeGuidedPackage]) {
+        [notifier notifyFailureWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUUnarchivingError userInfo:@{ NSLocalizedDescriptionKey:[NSString stringWithFormat:@"Flat package does not have guided installation type but %@ instead", _expectedInstallationType]}]];
+    } else if (![[NSFileManager defaultManager] fileExistsAtPath:_flatPackagePath isDirectory:&isDirectory] || isDirectory) {
+        [notifier notifyFailureWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUUnarchivingError userInfo:@{ NSLocalizedDescriptionKey:[NSString stringWithFormat:@"Flat package does not exist at %@", _flatPackagePath]}]];
     } else {
         [notifier notifyProgress:1.0];
         [notifier notifySuccess];
     }
 }
 
-- (NSString *)description { return [NSString stringWithFormat:@"%@ <%@>", [self class], self.flatPackagePath]; }
+- (NSString *)description { return [NSString stringWithFormat:@"%@ <%@>", [self class], _flatPackagePath]; }
 
 @end
+
+#endif

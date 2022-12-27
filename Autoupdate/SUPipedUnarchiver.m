@@ -14,17 +14,12 @@
 
 #include "AppKitPrevention.h"
 
-@interface SUPipedUnarchiver ()
-
-@property (nonatomic, copy, readonly) NSString *archivePath;
-
-@end
-
 @implementation SUPipedUnarchiver
+{
+    NSString *_archivePath;
+}
 
-@synthesize archivePath = _archivePath;
-
-+ (nullable NSArray <NSString *> *)commandAndArgumentsConformingToTypeOfPath:(NSString *)path
+static NSArray <NSString *> * _Nullable _commandAndArgumentsConformingToTypeOfPath(NSString *path)
 {
     NSArray <NSString *> *extractTGZ = @[@"/usr/bin/tar", @"-zxC"];
     NSArray <NSString *> *extractTBZ = @[@"/usr/bin/tar", @"-jxC"];
@@ -55,7 +50,7 @@
 
 + (BOOL)canUnarchivePath:(NSString *)path
 {
-    return ([self commandAndArgumentsConformingToTypeOfPath:path] != nil);
+    return _commandAndArgumentsConformingToTypeOfPath(path) != nil;
 }
 
 + (BOOL)mustValidateBeforeExtraction
@@ -74,7 +69,7 @@
 
 - (void)unarchiveWithCompletionBlock:(void (^)(NSError * _Nullable))completionBlock progressBlock:(void (^ _Nullable)(double))progressBlock
 {
-    NSArray <NSString *> *commandAndArguments = [[self class] commandAndArgumentsConformingToTypeOfPath:self.archivePath];
+    NSArray <NSString *> *commandAndArguments = _commandAndArgumentsConformingToTypeOfPath(_archivePath);
     assert(commandAndArguments != nil);
     
     NSString *command = commandAndArguments.firstObject;
@@ -89,26 +84,26 @@
 }
 
 // This method abstracts the types that use a command line tool piping data from stdin.
-- (void)extractArchivePipingDataToCommand:(NSString *)command arguments:(NSArray*)args notifier:(SUUnarchiverNotifier *)notifier
+- (void)extractArchivePipingDataToCommand:(NSString *)command arguments:(NSArray*)args notifier:(SUUnarchiverNotifier *)notifier SPU_OBJC_DIRECT
 {
     // *** GETS CALLED ON NON-MAIN THREAD!!!
 	@autoreleasepool {
-        NSString *destination = [self.archivePath stringByDeletingLastPathComponent];
+        NSString *destination = [_archivePath stringByDeletingLastPathComponent];
         
-        SULog(SULogLevelDefault, @"Extracting using '%@' '%@' < '%@' '%@'", command, [args componentsJoinedByString:@"' '"], self.archivePath, destination);
+        SULog(SULogLevelDefault, @"Extracting using '%@' '%@' < '%@' '%@'", command, [args componentsJoinedByString:@"' '"], _archivePath, destination);
         
         // Get the file size.
-        NSDictionary *attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:self.archivePath error:nil];
+        NSDictionary *attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:_archivePath error:nil];
         NSUInteger expectedLength = [(NSNumber *)[attributes objectForKey:NSFileSize] unsignedIntegerValue];
         
         if (expectedLength == 0) {
-            NSError *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUUnarchivingError userInfo:@{ NSLocalizedDescriptionKey:[NSString stringWithFormat:@"Extraction failed, archive '%@' is empty", self.archivePath]}];
+            NSError *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUUnarchivingError userInfo:@{ NSLocalizedDescriptionKey:[NSString stringWithFormat:@"Extraction failed, archive '%@' is empty", _archivePath]}];
             
             [notifier notifyFailureWithError:error];
             return;
         }
         
-        NSFileHandle *archiveInput = [NSFileHandle fileHandleForReadingAtPath:self.archivePath];
+        NSFileHandle *archiveInput = [NSFileHandle fileHandleForReadingAtPath:_archivePath];
         
         NSPipe *pipe = [NSPipe pipe];
         NSTask *task = [[NSTask alloc] init];
@@ -127,16 +122,29 @@
         NSFileHandle *archiveOutput = [pipe fileHandleForWriting];
         NSUInteger bytesWritten = 0;
         
+#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_15
         BOOL hasIOErrorMethods;
         if (@available(macOS 10.15, *)) {
             hasIOErrorMethods = YES;
         } else {
             hasIOErrorMethods = NO;
         }
+#endif
         
         do {
             NSData *data;
-            if (hasIOErrorMethods) {
+#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_15
+            if (!hasIOErrorMethods) {
+                @try {
+                    data = [archiveInput readDataOfLength:256*1024];
+                } @catch (NSException *exception) {
+                    SULog(SULogLevelError, @"Failed to read data from archive with exception reason %@", exception.reason);
+                    data = nil;
+                }
+            }
+            else
+#endif
+            {
                 NSError *readError = nil;
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wpartial-availability"
@@ -144,13 +152,6 @@
 #pragma clang diagnostic pop
                 if (data == nil) {
                     SULog(SULogLevelError, @"Failed to read data from archive with error %@", readError);
-                }
-            } else {
-                @try {
-                    data = [archiveInput readDataOfLength:256*1024];
-                } @catch (NSException *exception) {
-                    SULog(SULogLevelError, @"Failed to read data from archive with exception reason %@", exception.reason);
-                    data = nil;
                 }
             }
             
@@ -160,19 +161,23 @@
             }
             
             NSError *writeError = nil;
-            if (hasIOErrorMethods) {
+#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_15
+            if (!hasIOErrorMethods) {
+                @try {
+                    [archiveOutput writeData:data];
+                } @catch (NSException *exception) {
+                    SULog(SULogLevelError, @"Failed to write data to pipe with exception reason %@", exception.reason);
+                    break;
+                }
+            }
+            else
+#endif
+            {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wpartial-availability"
                 if (![archiveOutput writeData:data error:&writeError]) {
 #pragma clang diagnostic pop
                     SULog(SULogLevelError, @"Failed to write data to pipe with error %@", writeError);
-                    break;
-                }
-            } else {
-                @try {
-                    [archiveOutput writeData:data];
-                } @catch (NSException *exception) {
-                    SULog(SULogLevelError, @"Failed to write data to pipe with exception reason %@", exception.reason);
                     break;
                 }
             }
@@ -183,23 +188,37 @@
         }
         while(bytesWritten < expectedLength);
         
-        if (@available(macOS 10.15, *)) {
+#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_15
+        if (@available(macOS 10.15, *))
+#endif
+        {
             NSError *archiveOutputCloseError = nil;
             if (![archiveOutput closeAndReturnError:&archiveOutputCloseError]) {
                 SULog(SULogLevelError, @"Failed to close pipe with error %@", archiveOutputCloseError);
             }
-        } else {
+        }
+#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_15
+        else
+        {
             [archiveOutput closeFile];
         }
+#endif
         
-        if (@available(macOS 10.15, *)) {
+#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_15
+        if (@available(macOS 10.15, *))
+#endif
+        {
             NSError *archiveInputCloseError = nil;
             if (![archiveInput closeAndReturnError:&archiveInputCloseError]) {
                 SULog(SULogLevelError, @"Failed to close archive input with error %@", archiveInputCloseError);
             }
-        } else {
+        }
+#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_15
+        else
+        {
             [archiveInput closeFile];
         }
+#endif
         
         [task waitUntilExit];
         
@@ -221,6 +240,6 @@
     }
 }
 
-- (NSString *)description { return [NSString stringWithFormat:@"%@ <%@>", [self class], self.archivePath]; }
+- (NSString *)description { return [NSString stringWithFormat:@"%@ <%@>", [self class], _archivePath]; }
 
 @end

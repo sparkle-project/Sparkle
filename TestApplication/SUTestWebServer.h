@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-@interface SUTestWebServer : NSObject
+SPU_OBJC_DIRECT_MEMBERS @interface SUTestWebServer : NSObject
 
 - (instancetype)initWithPort:(int)port workingDirectory:(NSString*)workingDirectory;
 

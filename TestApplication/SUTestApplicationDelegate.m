@@ -17,20 +17,15 @@
 #import "SUBinaryDeltaCreate.h"
 
 @interface SUTestApplicationDelegate () <NSMenuItemValidation, SPUUpdaterDelegate>
-
-@property (nonatomic) SPUUpdater *updater;
-@property (nonatomic) SUUpdateSettingsWindowController *updateSettingsWindowController;
-@property (nonatomic) SUTestWebServer *webServer;
-@property (nonatomic, copy) NSString *testMode;
-
 @end
 
 @implementation SUTestApplicationDelegate
-
-@synthesize updater = _updater;
-@synthesize updateSettingsWindowController = _updateSettingsWindowController;
-@synthesize webServer = _webServer;
-@synthesize testMode = _testMode;
+{
+    SPUUpdater *_updater;
+    SUUpdateSettingsWindowController *_updateSettingsWindowController;
+    SUTestWebServer *_webServer;
+    NSString *_testMode;
+}
 
 - (void)applicationDidFinishLaunching:(NSNotification * __unused)notification
 {
@@ -44,7 +39,7 @@
         testMode = testModeEnv;
     }
     
-    self.testMode = testMode;
+    _testMode = testMode;
     
     // Check if we are already up to date
     NSString *mainBundleVersion = (NSString *)[mainBundle objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey];
@@ -283,13 +278,13 @@
                 NSLog(@"Failed to create the web server");
                 abort();
             }
-            self.webServer = webServer;
+            self->_webServer = webServer;
             
             // Set up updater and the updater settings window
             {
-                self.updateSettingsWindowController = [[SUUpdateSettingsWindowController alloc] init];
+                self->_updateSettingsWindowController = [[SUUpdateSettingsWindowController alloc] init];
                 
-                NSWindow *settingsWindow = self.updateSettingsWindowController.window;
+                NSWindow *settingsWindow = self->_updateSettingsWindowController.window;
                 
                 NSBundle *hostBundle = [NSBundle mainBundle];
                 NSBundle *applicationBundle = hostBundle;
@@ -307,8 +302,8 @@
                 
                 SPUUpdater *updater = [[SPUUpdater alloc] initWithHostBundle:hostBundle applicationBundle:applicationBundle userDriver:userDriver delegate:self];
                 
-                self.updater = updater;
-                self.updateSettingsWindowController.updater = updater;
+                self->_updater = updater;
+                self->_updateSettingsWindowController.updater = updater;
                 
                 NSError *updaterError = nil;
                 if (![updater startUpdater:&updaterError]) {
@@ -321,7 +316,7 @@
                     [alert runModal];
                 }
                 
-                [self.updateSettingsWindowController showWindow:nil];
+                [self->_updateSettingsWindowController showWindow:nil];
             }
         });
     }];
@@ -329,16 +324,16 @@
 
 - (NSSet<NSString *> *)allowedChannelsForUpdater:(SPUUpdater *)updater
 {
-    if ([self.testMode isEqualToString:@"DELTA"]) {
+    if ([_testMode isEqualToString:@"DELTA"]) {
         return [NSSet setWithObject:@"delta"];
-    } else if ([self.testMode isEqualToString:@"AUTOMATIC"]) {
+    } else if ([_testMode isEqualToString:@"AUTOMATIC"]) {
         return [NSSet setWithObject:@"automatic"];
     } else {
         return [NSSet set];
     }
 }
 
-- (void)signApplicationIfRequiredAtPath:(NSString *)applicationPath completion:(void (^)(void))completionBlock
+- (void)signApplicationIfRequiredAtPath:(NSString *)applicationPath completion:(void (^)(void))completionBlock SPU_OBJC_DIRECT
 {
     // This is unfortunately necessary for testing sandboxing
     NSXPCConnection *codeSignConnection = [[NSXPCConnection alloc] initWithServiceName:@"org.sparkle-project.TestAppHelper"];
@@ -355,18 +350,18 @@
 
 - (void)applicationWillTerminate:(NSNotification * __unused)notification
 {
-    [self.webServer close];
+    [_webServer close];
 }
 
 - (IBAction)checkForUpdates:(id __unused)sender
 {
-    [self.updater checkForUpdates];
+    [_updater checkForUpdates];
 }
 
 - (BOOL)validateMenuItem:(NSMenuItem *)menuItem
 {
     if (menuItem.action == @selector(checkForUpdates:)) {
-        return self.updater.canCheckForUpdates;
+        return _updater.canCheckForUpdates;
     }
     return YES;
 }

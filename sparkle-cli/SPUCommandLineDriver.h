@@ -12,7 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class SUUpdatePermissionResponse;
 
-@interface SPUCommandLineDriver : NSObject
+SPU_OBJC_DIRECT_MEMBERS @interface SPUCommandLineDriver : NSObject
 
 - (nullable instancetype)initWithUpdateBundlePath:(NSString *)updateBundlePath applicationBundlePath:(nullable NSString *)applicationBundlePath allowedChannels:(NSSet<NSString *> *)allowedChannels customFeedURL:(nullable NSString *)customFeedURL userAgentName:(nullable NSString *)userAgentName updatePermissionResponse:(nullable SUUpdatePermissionResponse *)updatePermissionResponse deferInstallation:(BOOL)deferInstallation interactiveInstallation:(BOOL)interactiveInstallation allowMajorUpgrades:(BOOL)allowMajorUpgrades verbose:(BOOL)verbose;
 

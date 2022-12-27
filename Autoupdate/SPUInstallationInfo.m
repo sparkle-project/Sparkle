@@ -52,9 +52,9 @@ static NSString *SUSystemDomainKey = @"SUSystemDomain";
 
 - (void)encodeWithCoder:(NSCoder *)coder
 {
-    [coder encodeObject:self.appcastItem forKey:SUAppcastItemKey];
-    [coder encodeBool:self.canSilentlyInstall forKey:SUCanSilentlyInstallKey];
-    [coder encodeBool:self.systemDomain forKey:SUSystemDomainKey];
+    [coder encodeObject:_appcastItem forKey:SUAppcastItemKey];
+    [coder encodeBool:_canSilentlyInstall forKey:SUCanSilentlyInstallKey];
+    [coder encodeBool:_systemDomain forKey:SUSystemDomainKey];
 }
 
 + (BOOL)supportsSecureCoding

@@ -10,29 +10,20 @@
 #import "SUInstallUpdateViewController.h"
 #import <AppKit/AppKit.h>
 
-@interface SUPopUpTitlebarUserDriver()
-
-@property (nonatomic, readonly) NSWindow *window;
-@property (nonatomic, nullable) SUInstallUpdateViewController *installUpdateViewController;
-@property (nonatomic) NSTitlebarAccessoryViewController *accessoryViewController;
-@property (nonatomic) BOOL addedAccessory;
-@property (nonatomic) NSButton *updateButton;
-@property (nonatomic, copy) void (^updateButtonAction)(NSButton *);
-@property (nonatomic) uint64_t expectedContentLength;
-@property (nonatomic) uint64_t contentLengthDownloaded;
-
-@end
-
 @implementation SUPopUpTitlebarUserDriver
-
-@synthesize window = _window;
-@synthesize installUpdateViewController = _installUpdateViewController;
-@synthesize accessoryViewController = _accessoryViewController;
-@synthesize addedAccessory = _addedAccessory;
-@synthesize updateButton = _updateButton;
-@synthesize updateButtonAction = _updateButtonAction;
-@synthesize expectedContentLength = _expectedContentLength;
-@synthesize contentLengthDownloaded = _contentLengthDownloaded;
+{
+    void (^_updateButtonAction)(NSButton *);
+    
+    NSWindow *_window;
+    SUInstallUpdateViewController *_installUpdateViewController;
+    NSTitlebarAccessoryViewController *_accessoryViewController;
+    NSButton *_updateButton;
+    
+    uint64_t _expectedContentLength;
+    uint64_t _contentLengthDownloaded;
+    
+    BOOL _addedAccessory;
+}
 
 - (instancetype)initWithWindow:(NSWindow *)window
 {
@@ -43,58 +34,58 @@
     return self;
 }
 
-- (void)addUpdateButtonWithTitle:(NSString *)title
+- (void)addUpdateButtonWithTitle:(NSString *)title SPU_OBJC_DIRECT
 {
     [self addUpdateButtonWithTitle:title action:nil];
 }
 
-- (void)addUpdateButtonWithTitle:(NSString *)title action:(void (^)(NSButton *button))action
+- (void)addUpdateButtonWithTitle:(NSString *)title action:(void (^)(NSButton *button))action SPU_OBJC_DIRECT
 {
-    if (self.updateButton == nil) {
+    if (_updateButton == nil) {
         NSButton *updateButton = [[NSButton alloc] initWithFrame:NSMakeRect(0, 0, 160, 100)];
         updateButton.title = title;
         updateButton.bezelStyle = NSBezelStyleRecessed;
         
-        self.updateButton = updateButton;
+        _updateButton = updateButton;
     } else {
-        self.updateButton.title = title;
+        _updateButton.title = title;
     }
     
     if (action != nil) {
-        self.updateButton.target = self;
-        self.updateButton.action = @selector(updateButtonAction:);
-        self.updateButtonAction = action;
-        self.updateButton.enabled = YES;
+        _updateButton.target = self;
+        _updateButton.action = @selector(updateButtonAction:);
+        _updateButtonAction = action;
+        _updateButton.enabled = YES;
     } else {
-        self.updateButton.enabled = NO;
-        self.updateButton.target = nil;
-        self.updateButtonAction = nil;
+        _updateButton.enabled = NO;
+        _updateButton.target = nil;
+        _updateButtonAction = nil;
     }
     
-    if (self.accessoryViewController == nil) {
-        self.accessoryViewController = [[NSTitlebarAccessoryViewController alloc] init];
-        self.accessoryViewController.layoutAttribute = NSLayoutAttributeRight;
-        self.accessoryViewController.view = self.updateButton;
+    if (_accessoryViewController == nil) {
+        _accessoryViewController = [[NSTitlebarAccessoryViewController alloc] init];
+        _accessoryViewController.layoutAttribute = NSLayoutAttributeRight;
+        _accessoryViewController.view = _updateButton;
     }
     
-    if (!self.addedAccessory) {
-        [self.window addTitlebarAccessoryViewController:self.accessoryViewController];
-        self.addedAccessory = YES;
+    if (!_addedAccessory) {
+        [_window addTitlebarAccessoryViewController:_accessoryViewController];
+        _addedAccessory = YES;
     }
 }
 
 - (void)updateButtonAction:(NSButton *)sender
 {
-    if (self.updateButtonAction != nil) {
-        self.updateButtonAction(sender);
+    if (_updateButtonAction != nil) {
+        _updateButtonAction(sender);
     }
 }
 
-- (void)removeUpdateButton
+- (void)removeUpdateButton SPU_OBJC_DIRECT
 {
-    [self.accessoryViewController removeFromParentViewController];
-    self.addedAccessory = NO;
-    self.updateButtonAction = nil;
+    [_accessoryViewController removeFromParentViewController];
+    _addedAccessory = NO;
+    _updateButtonAction = nil;
 }
 
 #pragma mark Update Permission
@@ -113,7 +104,7 @@
     NSPopover *popover = [[NSPopover alloc] init];
     popover.behavior = NSPopoverBehaviorTransient;
     
-    __weak SUPopUpTitlebarUserDriver *weakSelf = self;
+    __weak __typeof__(self) weakSelf = self;
     __block NSButton *actionButton = nil;
     
     SUInstallUpdateViewController *viewController = [[SUInstallUpdateViewController alloc] initWithAppcastItem:appcastItem reply:^(SPUUserUpdateChoice choice) {
@@ -122,10 +113,13 @@
         [popover close];
         actionButton.enabled = NO;
         
-        weakSelf.installUpdateViewController = nil;
+        __typeof__(self) strongSelf = weakSelf;
+        if (strongSelf != nil) {
+            strongSelf->_installUpdateViewController = nil;
+        }
     }];
     
-    self.installUpdateViewController = viewController;
+    _installUpdateViewController = viewController;
     
     [self addUpdateButtonWithTitle:@"Update Available" action:^(NSButton *button) {
         actionButton = button;
@@ -151,7 +145,7 @@
 
 - (void)showUpdateReleaseNotesWithDownloadData:(SPUDownloadData *)downloadData
 {
-    [self.installUpdateViewController showReleaseNotesWithDownloadData:downloadData];
+    [_installUpdateViewController showReleaseNotesWithDownloadData:downloadData];
 }
 
 - (void)showUpdateReleaseNotesFailedToDownloadWithError:(NSError *)__unused error
@@ -160,14 +154,14 @@
 
 - (void)showUpdateInFocus
 {
-    [self.window makeKeyAndOrderFront:nil];
+    [_window makeKeyAndOrderFront:nil];
     
-    if (self.updateButton.enabled) {
+    if (_updateButton.enabled) {
         // Not the proper way to do things but ignoring warnings in Test App.
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wobjc-messaging-id"
 #pragma clang diagnostic ignored "-Warc-performSelector-leaks"
-        [self.updateButton.target performSelector:self.updateButton.action withObject:self.updateButton];
+        [_updateButton.target performSelector:_updateButton.action withObject:_updateButton];
 #pragma clang diagnostic pop
     }
 }
@@ -222,21 +216,21 @@
 - (void)showDownloadDidReceiveExpectedContentLength:(uint64_t)expectedContentLength
 {
     [self addUpdateButtonWithTitle:@"Downloading…"];
-    self.contentLengthDownloaded = 0;
-    self.expectedContentLength = expectedContentLength;
+    _contentLengthDownloaded = 0;
+    _expectedContentLength = expectedContentLength;
 }
 
 - (void)showDownloadDidReceiveDataOfLength:(uint64_t)length
 {
-    self.contentLengthDownloaded += length;
+    _contentLengthDownloaded += length;
     
     // In case our expected content length was incorrect
-    if (self.contentLengthDownloaded > self.expectedContentLength) {
-        self.expectedContentLength = self.contentLengthDownloaded;
+    if (_contentLengthDownloaded > _expectedContentLength) {
+        _expectedContentLength = _contentLengthDownloaded;
     }
     
-    if (self.expectedContentLength > 0) {
-        double progress = (double)self.contentLengthDownloaded / self.expectedContentLength;
+    if (_expectedContentLength > 0) {
+        double progress = (double)_contentLengthDownloaded / _expectedContentLength;
         [self addUpdateButtonWithTitle:[NSString stringWithFormat:@"Downloading (%0.0f%%)", progress * 100] action:nil];
     }
 }

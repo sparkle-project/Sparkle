@@ -11,15 +11,10 @@
 
 #include "AppKitPrevention.h"
 
-@interface SPUUpdaterCycle ()
-
-@property (nonatomic, weak, readonly) id<SPUUpdaterCycleDelegate> delegate;
-
-@end
-
 @implementation SPUUpdaterCycle
-
-@synthesize delegate = _delegate;
+{
+    __weak id<SPUUpdaterCycleDelegate> _delegate;
+}
 
 - (instancetype)initWithDelegate:(id<SPUUpdaterCycleDelegate>)delegate
 {
@@ -32,7 +27,7 @@
 
 - (void)resetUpdateCycle
 {
-    [self.delegate resetUpdateCycle];
+    [_delegate resetUpdateCycle];
 }
 
 - (void)resetUpdateCycleAfterDelay

@@ -12,6 +12,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class SUHost;
 
+#ifndef BUILDING_SPARKLE_TESTS
+SPU_OBJC_DIRECT_MEMBERS
+#endif
 @interface SUPhasedUpdateGroupInfo : NSObject
 
 + (NSUInteger)updateGroupForHost:(SUHost*)host;

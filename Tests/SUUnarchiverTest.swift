@@ -115,6 +115,7 @@ class SUUnarchiverTest: XCTestCase
         self.unarchiveTestAppWithExtension("tar.xz")
     }
 
+#if SPARKLE_BUILD_DMG_SUPPORT
     func testUnarchivingHFSDmgWithLicenseAgreement()
     {
         self.unarchiveTestAppWithExtension("dmg")
@@ -129,7 +130,9 @@ class SUUnarchiverTest: XCTestCase
     {
         self.unarchiveTestAppWithExtension("dmg", resourceName: "SparkleTestCodeSign_apfs")
     }
+#endif
     
+#if SPARKLE_BUILD_PACKAGE_SUPPORT
     func testUnarchivingFlatPackage()
     {
         self.unarchiveTestAppWithExtension("pkg", resourceName: "test", expectingInstallationType: SPUInstallationTypeGuidedPackage)
@@ -138,4 +141,5 @@ class SUUnarchiverTest: XCTestCase
         
         self.unarchiveTestAppWithExtension("pkg", resourceName: "test", expectingInstallationType: SPUInstallationTypeApplication, expectingSuccess: false)
     }
+#endif
 }

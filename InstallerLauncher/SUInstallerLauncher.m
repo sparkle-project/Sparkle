@@ -25,7 +25,7 @@
 
 @implementation SUInstallerLauncher
 
-- (BOOL)submitProgressToolAtPath:(NSString *)progressToolPath withHostBundle:(NSBundle *)hostBundle inSystemDomainForInstaller:(BOOL)inSystemDomainForInstaller
+- (BOOL)submitProgressToolAtPath:(NSString *)progressToolPath withHostBundle:(NSBundle *)hostBundle inSystemDomainForInstaller:(BOOL)inSystemDomainForInstaller SPU_OBJC_DIRECT
 {
     SUFileManager *fileManager = [[SUFileManager alloc] init];
     
@@ -106,7 +106,7 @@
     return (submittedJob == true);
 }
 
-- (SUInstallerLauncherStatus)submitInstallerAtPath:(NSString *)installerPath withHostBundle:(NSBundle *)hostBundle updaterIdentifier:(NSString *)updaterIdentifier userName:(NSString *)userName homeDirectory:(NSString *)homeDirectory authorizationPrompt:(NSString *)authorizationPrompt inSystemDomain:(BOOL)systemDomain rootUser:(BOOL)rootUser
+- (SUInstallerLauncherStatus)submitInstallerAtPath:(NSString *)installerPath withHostBundle:(NSBundle *)hostBundle updaterIdentifier:(NSString *)updaterIdentifier userName:(NSString *)userName homeDirectory:(NSString *)homeDirectory authorizationPrompt:(NSString *)authorizationPrompt inSystemDomain:(BOOL)systemDomain rootUser:(BOOL)rootUser SPU_OBJC_DIRECT
 {
     SUFileManager *fileManager = [[SUFileManager alloc] init];
     
@@ -208,15 +208,19 @@
                             tempIconDestinationURL = [NSURL fileURLWithPath:path];
                             
                             CGImageDestinationRef imageDestination = NULL;
-                            if (@available(macOS 11, *)) {
+#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_VERSION_11_0
+                            if (@available(macOS 11, *))
+#endif
+                            {
                                 CFStringRef uti = (__bridge CFStringRef)[UTTypePNG identifier];
                                 imageDestination = CGImageDestinationCreateWithURL((CFURLRef)tempIconDestinationURL, uti, 1, NULL);
-                            } else {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-                                imageDestination = CGImageDestinationCreateWithURL((CFURLRef)tempIconDestinationURL, kUTTypePNG, 1, NULL);
-#pragma clang diagnostic pop
                             }
+#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_VERSION_11_0
+                            else
+                            {
+                                imageDestination = CGImageDestinationCreateWithURL((CFURLRef)tempIconDestinationURL, kUTTypePNG, 1, NULL);
+                            }
+#endif
                             if (imageDestination != NULL) {
                                 CGImageDestinationAddImageFromSource(imageDestination, imageSource, imageIndex, (CFDictionaryRef)@{});
                                 if (CGImageDestinationFinalize(imageDestination)) {
@@ -310,7 +314,7 @@
     return status;
 }
 
-- (NSString *)pathForBundledTool:(NSString *)toolName extension:(NSString *)extension fromBundle:(NSBundle *)bundle
+- (NSString *)pathForBundledTool:(NSString *)toolName extension:(NSString *)extension fromBundle:(NSBundle *)bundle SPU_OBJC_DIRECT
 {
     // If the path extension is empty, we don't want to add a "." at the end
     NSString *nameWithExtension = (extension.length > 0) ? [toolName stringByAppendingPathExtension:extension] : toolName;
@@ -370,14 +374,21 @@ BOOL SPUSystemNeedsAuthorizationAccessForBundlePath(NSString *bundlePath)
     return needsAuthorization;
 }
 
-static BOOL SPUUsesSystemDomainForBundlePath(NSString *path, NSString *installationType, BOOL rootUser)
+static BOOL SPUUsesSystemDomainForBundlePath(NSString *path, BOOL rootUser
+#if SPARKLE_BUILD_PACKAGE_SUPPORT
+                                             , NSString *installationType
+#endif
+)
 {
     if (!rootUser) {
+#if SPARKLE_BUILD_PACKAGE_SUPPORT
         if ([installationType isEqualToString:SPUInstallationTypeGuidedPackage]) {
             return YES;
         } else if ([installationType isEqualToString:SPUInstallationTypeInteractivePackage]) {
             return NO;
-        } else {
+        } else
+#endif
+        {
             return SPUSystemNeedsAuthorizationAccessForBundlePath(path);
         }
     } else {
@@ -396,7 +407,11 @@ static BOOL SPUUsesSystemDomainForBundlePath(NSString *path, NSString *installat
         // and that is not necessarily related to a preflight test. It's more related to being ran under a root / different user from the active GUI session
         BOOL rootUser = (geteuid() == 0);
         
-        BOOL inSystemDomain = SPUUsesSystemDomainForBundlePath(hostBundlePath, installationType, rootUser);
+        BOOL inSystemDomain = SPUUsesSystemDomainForBundlePath(hostBundlePath, rootUser
+#if SPARKLE_BUILD_PACKAGE_SUPPORT
+                                                               , installationType
+#endif
+                                                               );
         
         NSBundle *hostBundle = [NSBundle bundleWithPath:hostBundlePath];
         if (hostBundle == nil) {

@@ -13,12 +13,12 @@
 #import "SPUUpdaterDelegate.h"
 
 @interface SUUpdaterTest : XCTestCase <SPUUpdaterDelegate>
-@property (strong) SPUUpdater *updater;
 @end
 
 @implementation SUUpdaterTest
-
-@synthesize updater;
+{
+    SPUUpdater *_updater;
+}
 
 - (void)setUp
 {
@@ -29,19 +29,21 @@
 #pragma clang diagnostic ignored "-Wnonnull"
     // We really want a useless / not really functional user driver so we will pass nil here
     // For real world applications we should pass a valid user driver which is why this is not a nullable parameter
-    self.updater = [[SPUUpdater alloc] initWithHostBundle:bundle applicationBundle:bundle userDriver:nil delegate:self];
+    _updater = [[SPUUpdater alloc] initWithHostBundle:bundle applicationBundle:bundle userDriver:nil delegate:self];
 #pragma clang diagnostic pop
     
     NSError *error = nil;
-    if (![self.updater startUpdater:&error]) {
+    if (![_updater startUpdater:&error]) {
         NSLog(@"Updater error: %@", error);
         abort();
     }
+    
+    [_updater clearFeedURLFromUserDefaults];
 }
 
 - (void)tearDown
 {
-    self.updater = nil;
+    _updater = nil;
     [super tearDown];
 }
 
@@ -52,14 +54,17 @@
 
 - (void)testFeedURL
 {
-    [self.updater feedURL]; // this WON'T throw
+    [_updater feedURL]; // this WON'T throw
 }
 
 - (void)testSetTestFeedURL
 {
     NSURL *emptyURL = [NSURL URLWithString:@""];
     XCTAssertNotNil(emptyURL);
-    [self.updater setFeedURL:emptyURL]; // this WON'T throw
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+    [_updater setFeedURL:emptyURL]; // this WON'T throw
+#pragma clang diagnostic pop
 }
 
 @end
