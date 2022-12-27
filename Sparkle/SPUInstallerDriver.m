@@ -106,7 +106,9 @@
                 if (secondUnderlyingError != nil && [secondUnderlyingError.domain isEqualToString:NSCocoaErrorDomain] && secondUnderlyingError.code == NSFileWriteNoPermissionError) {
                     // Note: these error strings will only surface for external app updaters like sparkle-cli (i.e, updaters that update other app bundles)
                     
+#if SPARKLE_COPY_LOCALIZATIONS
                     NSBundle *sparkleBundle = SUSparkleBundle();
+#endif
                     
                     NSMutableDictionary *userInfo = [NSMutableDictionary dictionaryWithDictionary:@{
                         NSLocalizedDescriptionKey: SULocalizedStringFromTableInBundle(@"The installation failed due to not having permission to write the new update.", SPARKLE_TABLE, sparkleBundle, nil),

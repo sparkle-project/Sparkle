@@ -371,7 +371,9 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
     }
     
     if (_state.stage == SPUUserUpdateStageInstalling) {
+#if SPARKLE_COPY_LOCALIZATIONS
         NSBundle *sparkleBundle = SUSparkleBundle();
+#endif
         
         // We're going to be relaunching pretty instantaneously
         _installButton.title = SULocalizedStringFromTableInBundle(@"Install and Relaunch", SPARKLE_TABLE, sparkleBundle, nil);
@@ -413,7 +415,9 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 
 - (NSString *)titleText
 {
+#if SPARKLE_COPY_LOCALIZATIONS
     NSBundle *sparkleBundle = SUSparkleBundle();
+#endif
     
     if (_updateItem.criticalUpdate)
     {
@@ -445,7 +449,9 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
     // We display a different summary depending on if it's an "info-only" item, or a "critical update" item, or if we've already downloaded the update and just need to relaunch
     NSString *finalString = nil;
 
+#if SPARKLE_COPY_LOCALIZATIONS
     NSBundle *sparkleBundle = SUSparkleBundle();
+#endif
     
     if (_updateItem.informationOnlyUpdate) {
         finalString = [NSString stringWithFormat:SULocalizedStringFromTableInBundle(@"%@ %@ is now available—you have %@. Would you like to learn more about this update on the web?", SPARKLE_TABLE, sparkleBundle, @"Description text for SUUpdateAlert when the update informational with no download."), _host.name, updateItemVersion, hostVersion];

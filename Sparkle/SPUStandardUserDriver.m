@@ -471,7 +471,9 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
 {
     [self createAndShowStatusControllerWithClosable:closable];
     
+#if SPARKLE_COPY_LOCALIZATIONS
     NSBundle *sparkleBundle = SUSparkleBundle();
+#endif
     
     [_statusController beginActionWithTitle:SULocalizedStringFromTableInBundle(@"Ready to Install", SPARKLE_TABLE, sparkleBundle, nil) maxProgressValue:1.0 statusText:nil];
     [_statusController setProgressValue:1.0]; // Fill the bar.
@@ -513,7 +515,9 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
     
     _cancellation = [cancellation copy];
     
+#if SPARKLE_COPY_LOCALIZATIONS
     NSBundle *sparkleBundle = SUSparkleBundle();
+#endif
     
     _checkingController = [[SUStatusController alloc] initWithHost:_host windowTitle:[NSString stringWithFormat:SULocalizedStringFromTableInBundle(@"Updating %@", SPARKLE_TABLE, sparkleBundle, nil), [_host name]] centerPointValue:nil minimizable:NO closable:NO];
     [[_checkingController window] center]; // Force the checking controller to load its window.
@@ -559,7 +563,9 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
     [_statusController close];
     _statusController = nil;
     
+#if SPARKLE_COPY_LOCALIZATIONS
     NSBundle *sparkleBundle = SUSparkleBundle();
+#endif
     
     NSAlert *alert = [[NSAlert alloc] init];
     alert.messageText = SULocalizedStringFromTableInBundle(@"Update Error!", SPARKLE_TABLE, sparkleBundle, nil);
@@ -585,7 +591,9 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
     void (^secondaryAction)(void) = nil;
     SUAppcastItem *latestAppcastItem = error.userInfo[SPULatestAppcastItemFoundKey];
     if (latestAppcastItem != nil) {
+#if SPARKLE_COPY_LOCALIZATIONS
         NSBundle *sparkleBundle = SUSparkleBundle();
+#endif
         switch (reason) {
             case SPUNoUpdateFoundReasonOnLatestVersion:
             case SPUNoUpdateFoundReasonOnNewerThanLatestVersion: {
@@ -710,7 +718,9 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
     
     [self createAndShowStatusControllerWithClosable:NO];
     
+#if SPARKLE_COPY_LOCALIZATIONS
     NSBundle *sparkleBundle = SUSparkleBundle();
+#endif
     
     [_statusController beginActionWithTitle:SULocalizedStringFromTableInBundle(@"Downloading update…", SPARKLE_TABLE, sparkleBundle, @"Take care not to overflow the status window.") maxProgressValue:1.0 statusText:nil];
     [_statusController setProgressValue:0.0];
@@ -746,7 +756,9 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
     NSByteCountFormatter *formatter = [[NSByteCountFormatter alloc] init];
     [formatter setZeroPadsFractionDigits:YES];
     
+#if SPARKLE_COPY_LOCALIZATIONS
     NSBundle *sparkleBundle = SUSparkleBundle();
+#endif
 
     if (_expectedContentLength > 0.0) {
         double newProgressValue = (double)_bytesDownloaded / (double)_expectedContentLength;
@@ -766,8 +778,9 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
     _cancellation = nil;
     
     [self createAndShowStatusControllerWithClosable:NO];
-    
+#if SPARKLE_COPY_LOCALIZATIONS
     NSBundle *sparkleBundle = SUSparkleBundle();
+#endif
     
     [_statusController beginActionWithTitle:SULocalizedStringFromTableInBundle(@"Extracting update…", SPARKLE_TABLE, sparkleBundle, @"Take care not to overflow the status window.") maxProgressValue:1.0 statusText:nil];
     [_statusController setProgressValue:0.0];
@@ -813,7 +826,9 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
     // Only show installed prompt when the app is not relaunched
     // When the app is relaunched, there is enough of a UI from relaunching the app.
     if (!relaunched) {
+#if SPARKLE_COPY_LOCALIZATIONS
         NSBundle *sparkleBundle = SUSparkleBundle();
+#endif
         
         NSAlert *alert = [[NSAlert alloc] init];
         alert.messageText = SULocalizedStringFromTableInBundle(@"Update Installed", SPARKLE_TABLE, sparkleBundle, nil);

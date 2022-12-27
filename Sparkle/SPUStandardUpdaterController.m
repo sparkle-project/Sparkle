@@ -77,7 +77,9 @@
         
         // Delay the alert four seconds so it doesn't show RIGHT as the app launches, but also doesn't interrupt the user once they really get to work.
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(4 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+#if SPARKLE_COPY_LOCALIZATIONS
             NSBundle *sparkleBundle = SUSparkleBundle();
+#endif
             
             NSAlert *alert = [[NSAlert alloc] init];
             alert.messageText = SULocalizedStringFromTableInBundle(@"Unable to Check For Updates", SPARKLE_TABLE, sparkleBundle, nil);

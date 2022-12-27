@@ -19,7 +19,7 @@
 
     #define SULocalizedStringFromTableInBundle(key, tbl, bundle, comment) NSLocalizedStringFromTableInBundle(key, tbl, bundle, comment)
 #else
-    #define SULocalizedString(key, comment) key
+    #define SULocalizedStringFromTableInBundle(key, tbl, bundle, comment) key
 #endif
 
 #endif /* SULocalizations_h */

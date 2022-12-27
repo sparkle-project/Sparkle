@@ -68,7 +68,9 @@
     if ([_host isRunningOnReadOnlyVolume]) {
         NSString *hostName = _host.name;
         id<SPUBasicUpdateDriverDelegate> delegate = _delegate;
+#if SPARKLE_COPY_LOCALIZATIONS
         NSBundle *sparkleBundle = SUSparkleBundle();
+#endif
         if ([_host isRunningTranslocated]) {
             [delegate basicDriverIsRequestingAbortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SURunningTranslocated userInfo:@{ NSLocalizedRecoverySuggestionErrorKey: [NSString stringWithFormat:SULocalizedStringFromTableInBundle(@"Quit %1$@, move it into your Applications folder, relaunch it from there and try again.", SPARKLE_TABLE, sparkleBundle, nil), hostName], NSLocalizedDescriptionKey: [NSString stringWithFormat:SULocalizedStringFromTableInBundle(@"%1$@ can’t be updated if it’s running from the location it was downloaded to.", SPARKLE_TABLE, sparkleBundle, nil), hostName], }]];
         } else {
@@ -184,7 +186,9 @@
         NSString *localizedDescription;
         NSString *recoverySuggestion;
         
+#if SPARKLE_COPY_LOCALIZATIONS
         NSBundle *sparkleBundle = SUSparkleBundle();
+#endif
         
         SPUNoUpdateFoundReason reason;
         if (latestAppcastItem != nil) {
