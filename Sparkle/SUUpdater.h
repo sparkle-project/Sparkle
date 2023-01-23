@@ -17,6 +17,7 @@
 #import "SUExport.h"
 #import "SUVersionComparisonProtocol.h"
 #import "SUVersionDisplayProtocol.h"
+#import "SUUpdateDriver.h"
 
 @class SUAppcastItem, SUAppcast;
 
@@ -64,6 +65,7 @@ SU_EXPORT @interface SUUpdater : NSObject
  This will find updates that the user has opted into skipping.
  */
 - (IBAction)checkForUpdates:(id)sender;
+- (void)checkForUpdatesWithDriver:(SUUpdateDriver *)updateDriver;
 
 /*!
  The menu item validation used for the -checkForUpdates: action
