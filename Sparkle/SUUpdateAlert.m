@@ -178,7 +178,7 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
         NSString *itemDescription = _updateItem.itemDescription;
         if (itemDescription != nil) {
             __weak __typeof__(self) weakSelf = self;
-            [_releaseNotesView loadHTMLString:itemDescription baseURL:nil completionHandler:^(NSError * _Nullable error) {
+            [_releaseNotesView loadString:itemDescription baseURL:nil completionHandler:^(NSError * _Nullable error) {
                 if (error != nil) {
                     SULog(SULogLevelError, @"Failed to load HTML string from web view: %@", error);
                 }

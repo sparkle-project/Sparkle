@@ -62,7 +62,7 @@
     return _webView;
 }
 
-- (void)loadHTMLString:(NSString *)htmlString baseURL:(NSURL * _Nullable)baseURL completionHandler:(void (^)(NSError * _Nullable))completionHandler
+- (void)loadString:(NSString *)htmlString baseURL:(NSURL * _Nullable)baseURL completionHandler:(void (^)(NSError * _Nullable))completionHandler
 {
     _completionHandler = [completionHandler copy];
     [[_webView mainFrame] loadHTMLString:htmlString baseURL:baseURL];

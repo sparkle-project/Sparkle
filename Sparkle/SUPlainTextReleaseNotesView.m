@@ -45,78 +45,42 @@
     return _scrollView;
 }
 
-- (void)_loadContents:(NSString *)contents baseURL:(NSURL * _Nullable)baseURL inferringHTML:(BOOL)inferringHTML encoding:(NSStringEncoding)encoding completionHandler:(void (^)(NSError * _Nullable))completionHandler
+- (void)_loadString:(NSString *)contents completionHandler:(void (^)(NSError * _Nullable))completionHandler SPU_OBJC_DIRECT
 {
-    NSAttributedString *attributedString;
-    if (inferringHTML) {
-        NSMutableDictionary<NSString *, id> *options = [NSMutableDictionary dictionary];
-        options[NSCharacterEncodingDocumentOption] = @(encoding);
-        if (baseURL != nil) {
-            options[NSBaseURLDocumentOption] = baseURL;
-        }
-        
-        // Set the default font by injecting default font-size and font-family properties in the HTML
-        // See https://stackoverflow.com/questions/19921972/parsing-html-into-nsattributedtext-how-to-set-font
-        NSString *htmlStringWithDefaultStyle = [NSString stringWithFormat:@"<span style=\"font-size: %d; font-family: %@\">%@</span>", _fontPointSize, _fontFamily, contents];
-        
-        NSData *htmlDataWithDefaultStyle = [htmlStringWithDefaultStyle dataUsingEncoding:encoding];
-        
-        NSAttributedString *htmlAttributedStringWithDefaultStyling;
-        if (htmlDataWithDefaultStyle != nil) {
-            NSAttributedString *htmlAttributedString = [[NSAttributedString alloc] initWithHTML:htmlDataWithDefaultStyle options:options documentAttributes:nil];
-        
-            htmlAttributedStringWithDefaultStyling = htmlAttributedString;
-        } else {
-            htmlAttributedStringWithDefaultStyling = nil;
-        }
-        
-        if (htmlAttributedStringWithDefaultStyling != nil) {
-            attributedString = htmlAttributedStringWithDefaultStyling;
-        } else {
-            // Try falling back without styling
-            SULog(SULogLevelError, @"Error: failed to parse HTML data with default styling. Falling back to no styling.");
-            
-            NSData *htmlData = [contents dataUsingEncoding:encoding];
-            NSAttributedString *htmlAttributedString = [[NSAttributedString alloc] initWithHTML:htmlData options:options documentAttributes:nil];
-            
-            attributedString = htmlAttributedString;
-        }
-    } else {
-        attributedString = [[NSAttributedString alloc] initWithString:contents attributes:@{ NSFontAttributeName : [NSFont systemFontOfSize:(CGFloat)_fontPointSize] }];
-    }
+    NSAttributedString *attributedString = [[NSAttributedString alloc] initWithString:contents attributes:@{ NSFontAttributeName : [NSFont systemFontOfSize:(CGFloat)_fontPointSize] }];
     
     if (attributedString == nil) {
         completionHandler([NSError errorWithDomain:SUSparkleErrorDomain code:SUReleaseNotesError userInfo:nil]);
-    } else {
-        [_textView.textStorage setAttributedString:attributedString];
-        
-        NSSize contentSize = [_scrollView contentSize];
-        [_textView setFrame:NSMakeRect(0, 0, contentSize.width, contentSize.height)];
-        [_textView setMinSize:NSMakeSize(0.0, contentSize.height)];
-        [_textView setMaxSize:NSMakeSize(DBL_MAX, DBL_MAX)];
-        [_textView setVerticallyResizable:YES];
-        [_textView setHorizontallyResizable:NO];
-        [_textView setAutoresizingMask:NSViewWidthSizable];
-        [_textView setTextContainerInset:NSMakeSize(8, 8)];
-        [_textView setContinuousSpellCheckingEnabled:NO];
-        _textView.usesFontPanel = NO;
-        _textView.editable = NO;
-        
-        if (@available(macOS 10.14, *)) {
-            _textView.usesAdaptiveColorMappingForDarkAppearance = YES;
-        }
-        
-        [_scrollView setHasVerticalScroller:YES];
-        [_scrollView setHasHorizontalScroller:NO];
-        
-        completionHandler(nil);
+        return;
     }
+    
+    [_textView.textStorage setAttributedString:attributedString];
+    
+    NSSize contentSize = [_scrollView contentSize];
+    [_textView setFrame:NSMakeRect(0, 0, contentSize.width, contentSize.height)];
+    [_textView setMinSize:NSMakeSize(0.0, contentSize.height)];
+    [_textView setMaxSize:NSMakeSize(DBL_MAX, DBL_MAX)];
+    [_textView setVerticallyResizable:YES];
+    [_textView setHorizontallyResizable:NO];
+    [_textView setAutoresizingMask:NSViewWidthSizable];
+    [_textView setTextContainerInset:NSMakeSize(8, 8)];
+    [_textView setContinuousSpellCheckingEnabled:NO];
+    _textView.usesFontPanel = NO;
+    _textView.editable = NO;
+    
+    if (@available(macOS 10.14, *)) {
+        _textView.usesAdaptiveColorMappingForDarkAppearance = YES;
+    }
+    
+    [_scrollView setHasVerticalScroller:YES];
+    [_scrollView setHasHorizontalScroller:NO];
+    
+    completionHandler(nil);
 }
 
-
-- (void)loadHTMLString:(NSString *)htmlString baseURL:(NSURL * _Nullable)baseURL completionHandler:(void (^)(NSError * _Nullable))completionHandler
+- (void)loadString:(NSString *)contents baseURL:(NSURL * _Nullable)baseURL completionHandler:(void (^)(NSError * _Nullable))completionHandler
 {
-    [self _loadContents:htmlString baseURL:baseURL inferringHTML:YES encoding:NSUTF8StringEncoding completionHandler:completionHandler];
+    [self _loadString:contents completionHandler:completionHandler];
 }
 
 - (void)loadData:(NSData *)data MIMEType:(NSString *)MIMEType textEncodingName:(NSString *)textEncodingName baseURL:(NSURL *)baseURL completionHandler:(void (^)(NSError * _Nullable))completionHandler
@@ -131,7 +95,13 @@
     }
     
     NSString *contents = [[NSString alloc] initWithData:data encoding:encoding];
-    [self _loadContents:contents baseURL:baseURL inferringHTML:([MIMEType caseInsensitiveCompare:@"text/plain"] != NSOrderedSame) encoding:encoding completionHandler:completionHandler];
+    
+    if (contents == nil) {
+        completionHandler([NSError errorWithDomain:SUSparkleErrorDomain code:SUReleaseNotesError userInfo:nil]);
+        return;
+    }
+    
+    [self _loadString:contents completionHandler:completionHandler];
 }
 
 - (void)stopLoading
@@ -142,6 +112,8 @@
 {
 }
 
+// Links are not insertable yet but this is useful in case we support them in the future
+// This is also a defence in case links are somehow insertable
 - (BOOL)textView:(NSTextView *)textView clickedOnLink:(id)link atIndex:(NSUInteger)charIndex
 {
     NSURL *linkURL;
