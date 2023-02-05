@@ -295,15 +295,22 @@ class ArchiveItem: CustomStringConvertible {
         if basename.pathExtension == "tar" { // tar.gz
             basename = basename.deletingPathExtension()
         }
-        let releaseNotes = basename.appendingPathExtension("html")
-        if !FileManager.default.fileExists(atPath: releaseNotes.path) {
-            return nil
+        
+        let htmlReleaseNotes = basename.appendingPathExtension("html")
+        if FileManager.default.fileExists(atPath: htmlReleaseNotes.path) {
+            return htmlReleaseNotes
         }
-        return releaseNotes
+        
+        let plainTextReleaseNotes = basename.appendingPathExtension("txt")
+        if FileManager.default.fileExists(atPath: plainTextReleaseNotes.path) {
+            return plainTextReleaseNotes
+        }
+        
+        return nil
     }
 
     private func getReleaseNotesAsHTMLFragment(_ path: URL, _ maxCDATAThreshold: Int) -> String?  {
-        if let html = try? String(contentsOf: path) {
+        if path.pathExtension.caseInsensitiveCompare("html") == .orderedSame, let html = try? String(contentsOf: path) {
             if html.utf8.count <= maxCDATAThreshold &&
                 !html.localizedCaseInsensitiveContains("<!DOCTYPE") &&
                 !html.localizedCaseInsensitiveContains("<body") {
@@ -352,10 +359,23 @@ class ArchiveItem: CustomStringConvertible {
         }
         var localizedReleaseNotes = [(String, URL)]()
         for languageCode in Locale.isoLanguageCodes {
-            let localizedReleaseNoteURL = basename
+            let baseLocalizedReleaseNoteURL = basename
                 .appendingPathExtension(languageCode)
-                .appendingPathExtension("html")
-            if (try? localizedReleaseNoteURL.checkResourceIsReachable()) ?? false,
+            
+            let htmlLocalizedReleaseNoteURL = baseLocalizedReleaseNoteURL.appendingPathExtension("html")
+            let plainTextLocalizedReleaseNoteURL = baseLocalizedReleaseNoteURL.appendingPathExtension("txt")
+            
+            let localizedReleaseNoteURL: URL?
+            
+            if (try? htmlLocalizedReleaseNoteURL.checkResourceIsReachable()) ?? false {
+                localizedReleaseNoteURL = htmlLocalizedReleaseNoteURL
+            } else if (try? plainTextLocalizedReleaseNoteURL.checkResourceIsReachable()) ?? false {
+                localizedReleaseNoteURL = plainTextLocalizedReleaseNoteURL
+            } else {
+                localizedReleaseNoteURL = nil
+            }
+            
+            if let localizedReleaseNoteURL = localizedReleaseNoteURL,
                let localizedReleaseNoteRemoteURL = self.releaseNoteURL(for: localizedReleaseNoteURL.lastPathComponent)
             {
                 localizedReleaseNotes.append((languageCode, localizedReleaseNoteRemoteURL))

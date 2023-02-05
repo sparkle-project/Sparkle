@@ -56,7 +56,7 @@ func unarchiveUpdates(archivesSourceDir: URL, archivesDestDir: URL, disableNeste
 
     let dir = try fileManager.contentsOfDirectory(atPath: archivesSourceDir.path)
     var running = 0
-    for item in dir.filter({ !$0.hasPrefix(".") && !$0.hasSuffix(".delta") && !$0.hasSuffix(".xml") && !$0.hasSuffix(".html") }) {
+    for item in dir.filter({ !$0.hasPrefix(".") && !$0.hasSuffix(".delta") && !$0.hasSuffix(".xml") && !$0.hasSuffix(".html") && !$0.hasSuffix(".txt") }) {
         let itemPath = archivesSourceDir.appendingPathComponent(item)
         var isDir: ObjCBool = false
         if fileManager.fileExists(atPath: itemPath.path, isDirectory: &isDir) && isDir.boolValue {
