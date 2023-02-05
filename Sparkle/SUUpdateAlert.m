@@ -256,7 +256,7 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
     NSString *chosenTextEncodingName = (downloadData.textEncodingName != nil) ? downloadData.textEncodingName : @"utf-8";
     
     NSString *pathExtension = releaseNotesURL.pathExtension;
-    BOOL preferringPlainText = ([pathExtension caseInsensitiveCompare:@"txt"] == NSOrderedSame);
+    BOOL preferringPlainText = ([chosenMIMEType isEqualToString:@"text/plain"] || [pathExtension caseInsensitiveCompare:@"txt"] == NSOrderedSame);
     
     [self _createReleaseNotesViewPreferringPlainText:preferringPlainText];
     
