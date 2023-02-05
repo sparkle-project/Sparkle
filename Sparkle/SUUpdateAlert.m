@@ -165,7 +165,10 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
     if (_updateItem.releaseNotesURL == nil) {
         NSString *itemDescription = _updateItem.itemDescription;
         if (itemDescription != nil) {
-            [self _createReleaseNotesViewPreferringPlainText:NO];
+            NSString *itemDescriptionFormat = _updateItem.itemDescriptionFormat;
+            BOOL prefersPlainText = [itemDescriptionFormat isEqualToString:@"plain-text"];
+            
+            [self _createReleaseNotesViewPreferringPlainText:prefersPlainText];
             
             __weak __typeof__(self) weakSelf = self;
             [_releaseNotesView loadString:itemDescription baseURL:nil completionHandler:^(NSError * _Nullable error) {

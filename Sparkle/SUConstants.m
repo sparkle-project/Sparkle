@@ -83,6 +83,7 @@ NSString *const SUAppcastAttributeShortVersionString = @"sparkle:shortVersionStr
 NSString *const SUAppcastAttributeVersion = @"sparkle:version";
 NSString *const SUAppcastAttributeOsType = @"sparkle:os";
 NSString *const SUAppcastAttributeInstallationType = @"sparkle:installationType";
+NSString *const SUAppcastAttributeFormat = @"sparkle:format";
 
 NSString *const SUAppcastElementVersion = SUAppcastAttributeVersion;
 NSString *const SUAppcastElementShortVersionString = SUAppcastAttributeShortVersionString;

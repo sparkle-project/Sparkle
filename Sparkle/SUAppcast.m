@@ -130,6 +130,21 @@
                     [dict setObject:dateString forKey:name];
                 }
 			}
+            else if ([name isEqualToString:SURSSElementDescription]) {
+                NSString *description = node.stringValue;
+                if (description != nil) {
+                    NSDictionary *attributes = [self attributesOfNode:(NSXMLElement *)node];
+                    NSString *descriptionFormat = attributes[SUAppcastAttributeFormat];
+                    
+                    NSMutableDictionary *descriptionDict = [NSMutableDictionary dictionary];
+                    [descriptionDict setObject:description forKey:@"content"];
+                    if (descriptionFormat != nil) {
+                        [descriptionDict setObject:descriptionFormat forKey:@"format"];
+                    }
+                    
+                    [dict setObject:descriptionDict forKey:SURSSElementDescription];
+                }
+            }
 			else if ([name isEqualToString:SUAppcastElementDeltas]) {
                 NSMutableArray *deltas = [NSMutableArray array];
                 NSEnumerator *childEnum = [[node children] objectEnumerator];

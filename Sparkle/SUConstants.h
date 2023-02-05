@@ -84,6 +84,7 @@ extern NSString *const SUAppcastAttributeShortVersionString;
 extern NSString *const SUAppcastAttributeVersion;
 extern NSString *const SUAppcastAttributeOsType;
 extern NSString *const SUAppcastAttributeInstallationType;
+extern NSString *const SUAppcastAttributeFormat;
 
 extern NSString *const SUAppcastElementVersion;
 extern NSString *const SUAppcastElementShortVersionString;
