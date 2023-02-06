@@ -22,11 +22,10 @@
 {
     NSScrollView *_scrollView;
     NSTextView *_textView;
-    NSString *_fontFamily;
     int _fontPointSize;
 }
 
-- (instancetype)initWithFontFamily:(NSString *)fontFamily fontPointSize:(int)fontPointSize
+- (instancetype)initWithFontPointSize:(int)fontPointSize
 {
     self = [super init];
     if (self != nil) {
@@ -34,7 +33,6 @@
         _textView = [[NSTextView alloc] initWithFrame:NSZeroRect];
         _textView.delegate = self;
         _scrollView.documentView = _textView;
-        _fontFamily = fontFamily;
         _fontPointSize = fontPointSize;
     }
     return self;

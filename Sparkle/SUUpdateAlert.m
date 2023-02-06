@@ -325,7 +325,7 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
     }
     
     if (usesPlainText) {
-        _releaseNotesView = [[SUPlainTextReleaseNotesView alloc] initWithFontFamily:defaultFontFamily fontPointSize:defaultFontSize];
+        _releaseNotesView = [[SUPlainTextReleaseNotesView alloc] initWithFontPointSize:defaultFontSize];
     } else {
         NSURL *colorStyleURL = [[NSBundle bundleForClass:[self class]] URLForResource:@"ReleaseNotesColorStyle" withExtension:@"css"];
         
