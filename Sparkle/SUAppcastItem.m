@@ -411,18 +411,47 @@ static NSString *SUAppcastItemDeltaFromSparkleLocalesKey = @"SUAppcastItemDeltaF
         if (itemDescription != nil) {
             if ([(NSObject *)itemDescription isKindOfClass:[NSDictionary class]]) {
                 NSString *descriptionContent = itemDescription[@"content"];
+                NSString *itemDescriptionString;
                 if ([descriptionContent isKindOfClass:[NSString class]]) {
-                    _itemDescription = [descriptionContent copy];
+                    itemDescriptionString = [descriptionContent copy];
+                } else {
+                    itemDescriptionString = nil;
                 }
                 
-                NSString *descriptionFormat = itemDescription[@"format"];
-                if ([descriptionFormat isKindOfClass:[NSString class]]) {
-                    _itemDescriptionFormat = [descriptionFormat copy];
+                id descriptionFormat = itemDescription[@"format"];
+                NSString *descriptionFormatString;
+                if ([(NSObject *)descriptionFormat isKindOfClass:[NSString class]]) {
+                    descriptionFormatString = [(NSString *)descriptionFormat lowercaseString];
+                } else {
+                    descriptionFormatString = nil;
+                }
+                
+                _itemDescription = itemDescriptionString;
+                if (itemDescriptionString != nil) {
+                    if (descriptionFormatString != nil) {
+                        if (![descriptionFormatString isEqualToString:@"plain-text"] &&
+                            ![descriptionFormatString isEqualToString:@"markdown"] &&
+                            ![descriptionFormatString isEqualToString:@"html"]) {
+                            SULog(SULogLevelError, @"warning: Item '%@' has unknown format '%@' in '<%@>'. Ignoring and using 'html' instead.", _title, descriptionFormatString, SUAppcastItemDescriptionKey);
+                            
+                            _itemDescriptionFormat = @"html";
+                        } else {
+                            _itemDescriptionFormat = descriptionFormatString;
+                        }
+                    } else {
+                        _itemDescriptionFormat = @"html";
+                    }
+                } else {
+                    _itemDescriptionFormat = nil;
                 }
             } else if ([(NSObject *)itemDescription isKindOfClass:[NSString class]]) {
                 // Legacy path
-                _itemDescription = [(NSObject *)itemDescription copy];
+                _itemDescription = [(NSString *)itemDescription copy];
+                _itemDescriptionFormat = @"html";
             }
+        } else {
+            _itemDescription = nil;
+            _itemDescriptionFormat = nil;
         }
 
         NSString *theInfoURL = [dict objectForKey:SURSSElementLink];

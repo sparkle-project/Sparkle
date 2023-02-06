@@ -166,7 +166,10 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
         NSString *itemDescription = _updateItem.itemDescription;
         if (itemDescription != nil) {
             NSString *itemDescriptionFormat = _updateItem.itemDescriptionFormat;
-            BOOL prefersPlainText = [itemDescriptionFormat isEqualToString:@"plain-text"];
+            // We don't support markdown but prepare for the future in case we support it one day
+            BOOL prefersPlainText =
+                ([itemDescriptionFormat isEqualToString:@"plain-text"] ||
+                 [itemDescriptionFormat isEqualToString:@"markdown"]);
             
             [self _createReleaseNotesViewPreferringPlainText:prefersPlainText];
             
@@ -255,8 +258,15 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
     // We'll pick utf-8 as the default text encoding name if one isn't provided which I think is reasonable
     NSString *chosenTextEncodingName = (downloadData.textEncodingName != nil) ? downloadData.textEncodingName : @"utf-8";
     
+    // We don't support markdown but prepare for the future in case we support it one day
     NSString *pathExtension = releaseNotesURL.pathExtension;
-    BOOL preferringPlainText = ([chosenMIMEType isEqualToString:@"text/plain"] || [pathExtension caseInsensitiveCompare:@"txt"] == NSOrderedSame);
+    BOOL preferringPlainText =
+        ([chosenMIMEType isEqualToString:@"text/plain"] ||
+         [pathExtension caseInsensitiveCompare:@"txt"] == NSOrderedSame ||
+         [chosenMIMEType isEqualToString:@"text/markdown"] ||
+         [chosenMIMEType isEqualToString:@"text/x-markdown"] ||
+         [pathExtension caseInsensitiveCompare:@"md"] == NSOrderedSame ||
+         [pathExtension caseInsensitiveCompare:@"markdown"] == NSOrderedSame);
     
     [self _createReleaseNotesViewPreferringPlainText:preferringPlainText];
     
