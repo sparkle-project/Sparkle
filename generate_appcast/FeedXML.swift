@@ -384,14 +384,17 @@ func writeAppcast(appcastDestPath: URL, appcast: Appcast, fullReleaseNotesLink: 
             .contains(where: { $0.name == SUXMLLanguage }) }
         let relElement = results?.first
         
-        // If an existing item has a release notes item, don't automatically remove it even if the user
+        // If an existing item has a release notes item, don't automatically embed release notes even if the user
         // prefers to embed release notes (we only respect this choice for updates without a release notes item or a new item)
         let embedReleaseNotesAlways = preferToEmbedReleaseNotes && (relElement == nil)
-        if let descriptionContents = update.releaseNotesContent(embedReleaseNotesAlways: embedReleaseNotesAlways) {
+        if let (descriptionContents, descriptionFormat) = update.releaseNotesContent(embedReleaseNotesAlways: embedReleaseNotesAlways) {
             let descElement = findOrCreateElement(name: "description", parent: item)
             let cdata = XMLNode(kind: .text, options: .nodeIsCDATA)
             cdata.stringValue = descriptionContents
             descElement.setChildren([cdata])
+            if descriptionFormat != "html" {
+                descElement.addAttribute(XMLNode.attribute(withName: SUAppcastAttributeFormat, stringValue: descriptionFormat) as! XMLNode)
+            }
         } else if let existingDescriptionElement = findElement(name: "description", parent: item) {
             // The update doesn't include embedded release notes. Remove it.
             item.removeChild(at: existingDescriptionElement.index)

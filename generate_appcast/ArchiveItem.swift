@@ -309,22 +309,24 @@ class ArchiveItem: CustomStringConvertible {
         return nil
     }
 
-    private func getReleaseNotesAsFragment(_ path: URL, _ embedReleaseNotesAlways: Bool) -> String?  {
-        guard let contents = try? String(contentsOf: path) else {
+    private func getReleaseNotesAsFragment(_ path: URL, _ embedReleaseNotesAlways: Bool) -> (content: String, format: String)?  {
+        guard let content = try? String(contentsOf: path) else {
             return nil
         }
         
+        let format = (path.pathExtension.caseInsensitiveCompare("txt") == .orderedSame) ? "plain-text" : "html"
+        
         if embedReleaseNotesAlways {
-            return contents
-        } else if path.pathExtension.caseInsensitiveCompare("html") == .orderedSame && !contents.localizedCaseInsensitiveContains("<!DOCTYPE") && !contents.localizedCaseInsensitiveContains("<body")  {
+            return (content, format)
+        } else if path.pathExtension.caseInsensitiveCompare("html") == .orderedSame && !content.localizedCaseInsensitiveContains("<!DOCTYPE") && !content.localizedCaseInsensitiveContains("<body")  {
             // HTML fragments should always be embedded
-            return contents
+            return (content, format)
         } else {
             return nil
         }
     }
     
-    func releaseNotesContent(embedReleaseNotesAlways: Bool) -> String? {
+    func releaseNotesContent(embedReleaseNotesAlways: Bool) -> (content: String, format: String)? {
         if let path = self.releaseNotesPath {
             return self.getReleaseNotesAsFragment(path, embedReleaseNotesAlways)
         }
