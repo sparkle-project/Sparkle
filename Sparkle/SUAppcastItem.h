@@ -164,7 +164,9 @@ SU_EXPORT @interface SUAppcastItem : NSObject<NSSecureCoding>
  
  This is extracted from the @c sparkle:descriptionFormat attribute in the @c <description> element.
  
- If the format is not provided in the @c <description> element of the appcast item, then this property is `nil`.
+ If the format is not provided in the @c <description> element of the appcast item, then this property may default to `html`.
+ 
+ If the @c <description> element of the appcast item is not available, this property is `nil`.
  */
 @property (nonatomic, readonly, nullable) NSString *itemDescriptionFormat;
 
