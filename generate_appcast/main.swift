@@ -81,6 +81,9 @@ struct GenerateAppcast: ParsableCommand {
     @Option(name: .customLong("release-notes-url-prefix"), help: ArgumentHelp("A URL that will be used as prefix for constructing URLs for release notes.", valueName: "url"), transform: { URL(string: $0) })
     var releaseNotesURLPrefix : URL?
     
+    @Flag(name: .customLong("embed-release-notes"), help: ArgumentHelp("Embed release notes in a new update's description. By default, release note files are only embedded if they are HTML, do not include DOCTYPE or body tags, and are not long. This flag forces release note files for newly created updates to always be embedded."))
+    var embedReleaseNotes : Bool = false
+    
     @Option(name: .customLong("full-release-notes-url"), help: ArgumentHelp("A URL that will be used for the full release notes.", valueName: "url"))
     var fullReleaseNotesURL: String?
     
@@ -138,10 +141,6 @@ struct GenerateAppcast: ParsableCommand {
     @Flag(help: .hidden)
     var verbose: Bool = false
     
-    // CDATA text must contain <= this number of characters
-    @Option(name: .customLong("max-cdata-threshold"), help: .hidden)
-    var maxCDATAThreshold: Int = DEFAULT_MAX_CDATA_THRESHOLD
-    
     @Flag(name: .customLong("disable-nested-code-check"), help: .hidden)
     var disableNestedCodeCheck: Bool = false
     
@@ -160,8 +159,9 @@ struct GenerateAppcast: ParsableCommand {
         Use the --versions option if you need to insert an update that is older than the latest update in your feed, or
         if you need to insert only a specific new version with certain parameters.
         
-        .html files that have the same filename as an archive (except for the file extension) will be used for release notes for that item.
-        If the contents of these files are short (< \(DEFAULT_MAX_CDATA_THRESHOLD) characters) and do not include a DOCTYPE or body tags, they will be treated as embedded CDATA release notes.
+        .html or .txt files that have the same filename as an archive (except for the file extension) will be used for release notes for that item.
+        For HTML release notes, if the contents of these files do not include a DOCTYPE or body tags, they will be treated as embedded CDATA release notes.
+        Release notes for new items can be forced to be embedded by passing --embed-release-notes
         
         For new update entries, Sparkle infers the minimum system OS requirement based on your update's LSMinimumSystemVersion provided
         by your application's Info.plist. If none is found, \(programName) defaults to Sparkle's own minimum system requirement (macOS 10.13).
@@ -286,7 +286,7 @@ struct GenerateAppcast: ParsableCommand {
                                                                 relativeTo: archivesSourceDir)
 
                 // Write the appcast
-                let (numNewUpdates, numExistingUpdates, numUpdatesRemoved) = try writeAppcast(appcastDestPath: appcastDestPath, appcast: appcast, fullReleaseNotesLink: fullReleaseNotesURL, maxCDATAThreshold: maxCDATAThreshold, link: link, newChannel: channel, majorVersion: majorVersion, ignoreSkippedUpgradesBelowVersion: ignoreSkippedUpgradesBelowVersion, phasedRolloutInterval: phasedRolloutInterval, criticalUpdateVersion: criticalUpdateVersion, informationalUpdateVersions: informationalUpdateVersions)
+                let (numNewUpdates, numExistingUpdates, numUpdatesRemoved) = try writeAppcast(appcastDestPath: appcastDestPath, appcast: appcast, fullReleaseNotesLink: fullReleaseNotesURL, preferToEmbedReleaseNotes: embedReleaseNotes, link: link, newChannel: channel, majorVersion: majorVersion, ignoreSkippedUpgradesBelowVersion: ignoreSkippedUpgradesBelowVersion, phasedRolloutInterval: phasedRolloutInterval, criticalUpdateVersion: criticalUpdateVersion, informationalUpdateVersions: informationalUpdateVersions)
 
                 // Inform the user, pluralizing "update" if necessary
                 let pluralizeUpdates = { pluralizeWord($0, "update") }

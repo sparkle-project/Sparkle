@@ -309,30 +309,34 @@ class ArchiveItem: CustomStringConvertible {
         return nil
     }
 
-    private func getReleaseNotesAsHTMLFragment(_ path: URL, _ maxCDATAThreshold: Int) -> String?  {
-        if path.pathExtension.caseInsensitiveCompare("html") == .orderedSame, let html = try? String(contentsOf: path) {
-            if html.utf8.count <= maxCDATAThreshold &&
-                !html.localizedCaseInsensitiveContains("<!DOCTYPE") &&
-                !html.localizedCaseInsensitiveContains("<body") {
-                return html
-            }
+    private func getReleaseNotesAsFragment(_ path: URL, _ embedReleaseNotesAlways: Bool) -> String?  {
+        guard let contents = try? String(contentsOf: path) else {
+            return nil
         }
-        return nil
+        
+        if embedReleaseNotesAlways {
+            return contents
+        } else if path.pathExtension.caseInsensitiveCompare("html") == .orderedSame && !contents.localizedCaseInsensitiveContains("<!DOCTYPE") && !contents.localizedCaseInsensitiveContains("<body")  {
+            // HTML fragments should always be embedded
+            return contents
+        } else {
+            return nil
+        }
     }
     
-    func releaseNotesHTML(maxCDATAThreshold: Int) -> String? {
+    func releaseNotesContent(embedReleaseNotesAlways: Bool) -> String? {
         if let path = self.releaseNotesPath {
-            return self.getReleaseNotesAsHTMLFragment(path, maxCDATAThreshold)
+            return self.getReleaseNotesAsFragment(path, embedReleaseNotesAlways)
         }
         return nil
     }
     
-    func releaseNotesURL(maxCDATAThreshold: Int) -> URL? {
+    func releaseNotesURL(embedReleaseNotesAlways: Bool) -> URL? {
         guard let path = self.releaseNotesPath else {
             return nil
         }
         // The file is already used as inline description
-        if self.getReleaseNotesAsHTMLFragment(path, maxCDATAThreshold) != nil {
+        if self.getReleaseNotesAsFragment(path, embedReleaseNotesAlways) != nil {
             return nil
         }
         return self.releaseNoteURL(for: path.lastPathComponent)

@@ -16,13 +16,17 @@ func findElement(name: String, parent: XMLElement) -> XMLElement? {
     return nil
 }
 
+func createElement(name: String, parent: XMLElement) -> XMLElement {
+    let element = XMLElement(name: name)
+    parent.addChild(element)
+    return element
+}
+
 func findOrCreateElement(name: String, parent: XMLElement) -> XMLElement {
     if let element = findElement(name: name, parent: parent) {
         return element
     }
-    let element = XMLElement(name: name)
-    parent.addChild(element)
-    return element
+    return createElement(name: name, parent: parent)
 }
 
 func text(_ text: String) -> XMLNode {
@@ -132,7 +136,7 @@ func readAppcast(archives: [String: ArchiveItem], appcastURL: URL) throws -> [St
     return updateBranches
 }
 
-func writeAppcast(appcastDestPath: URL, appcast: Appcast, fullReleaseNotesLink: String?, maxCDATAThreshold: Int, link: String?, newChannel: String?, majorVersion: String?, ignoreSkippedUpgradesBelowVersion: String?, phasedRolloutInterval: Int?, criticalUpdateVersion: String?, informationalUpdateVersions: [String]?) throws -> (numNewUpdates: Int, numExistingUpdates: Int, numUpdatesRemoved: Int) {
+func writeAppcast(appcastDestPath: URL, appcast: Appcast, fullReleaseNotesLink: String?, preferToEmbedReleaseNotes: Bool, link: String?, newChannel: String?, majorVersion: String?, ignoreSkippedUpgradesBelowVersion: String?, phasedRolloutInterval: Int?, criticalUpdateVersion: String?, informationalUpdateVersions: [String]?) throws -> (numNewUpdates: Int, numExistingUpdates: Int, numUpdatesRemoved: Int) {
     let appBaseName = appcast.inferredAppName
 
     let sparkleNS = "http://www.andymatuschak.org/xml-namespaces/sparkle"
@@ -358,13 +362,6 @@ func writeAppcast(appcastDestPath: URL, appcast: Appcast, fullReleaseNotesLink: 
             item.addChild(shortVersionElement!)
         }
         shortVersionElement?.setChildren([text(update.shortVersion)])
-
-        if let html = update.releaseNotesHTML(maxCDATAThreshold: maxCDATAThreshold) {
-            let descElement = findOrCreateElement(name: "description", parent: item)
-            let cdata = XMLNode(kind: .text, options: .nodeIsCDATA)
-            cdata.stringValue = html
-            descElement.setChildren([cdata])
-        }
         
         // Override the minimum system version with the version from the archive,
         // only if an existing item doesn't specify one
@@ -379,7 +376,7 @@ func writeAppcast(appcastDestPath: URL, appcast: Appcast, fullReleaseNotesLink: 
             minimumSystemVersion = update.minimumSystemVersion
         }
         minVer?.setChildren([text(minimumSystemVersion)])
-
+        
         // Look for an existing release notes element
         let releaseNotesXpath = "\(SUAppcastElementReleaseNotesLink)"
         let results = ((try? item.nodes(forXPath: releaseNotesXpath)) as? [XMLElement])?
@@ -387,7 +384,20 @@ func writeAppcast(appcastDestPath: URL, appcast: Appcast, fullReleaseNotesLink: 
             .contains(where: { $0.name == SUXMLLanguage }) }
         let relElement = results?.first
         
-        if let url = update.releaseNotesURL(maxCDATAThreshold: maxCDATAThreshold) {
+        // If an existing item has a release notes item, don't automatically remove it even if the user
+        // prefers to embed release notes (we only respect this choice for updates without a release notes item or a new item)
+        let embedReleaseNotesAlways = preferToEmbedReleaseNotes && (relElement == nil)
+        if let descriptionContents = update.releaseNotesContent(embedReleaseNotesAlways: embedReleaseNotesAlways) {
+            let descElement = findOrCreateElement(name: "description", parent: item)
+            let cdata = XMLNode(kind: .text, options: .nodeIsCDATA)
+            cdata.stringValue = descriptionContents
+            descElement.setChildren([cdata])
+        } else if let existingDescriptionElement = findElement(name: "description", parent: item) {
+            // The update doesn't include embedded release notes. Remove it.
+            item.removeChild(at: existingDescriptionElement.index)
+        }
+        
+        if let url = update.releaseNotesURL(embedReleaseNotesAlways: embedReleaseNotesAlways) {
             // The update includes a valid release notes URL
             if let existingReleaseNotesElement = relElement {
                 // The existing item includes a release notes element. Update it.
