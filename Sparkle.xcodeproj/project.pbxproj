@@ -192,6 +192,7 @@
 		723ABFC5259D4CB300BDB4FA /* SUWKWebView.m in Sources */ = {isa = PBXBuildFile; fileRef = 723ABFC3259D4CB300BDB4FA /* SUWKWebView.m */; };
 		723AC010259DBDAA00BDB4FA /* SUWebViewCommon.h in Headers */ = {isa = PBXBuildFile; fileRef = 723AC00E259DBDAA00BDB4FA /* SUWebViewCommon.h */; };
 		723AC011259DBDAA00BDB4FA /* SUWebViewCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 723AC00F259DBDAA00BDB4FA /* SUWebViewCommon.m */; };
+		723AD12F29922B5F006BB02F /* test-dangerous-link.xml in Resources */ = {isa = PBXBuildFile; fileRef = 723AD12E29922B5F006BB02F /* test-dangerous-link.xml */; };
 		723B5DA71CF7AB0100365F95 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 723B5DA01CF7AB0100365F95 /* main.m */; };
 		723B5DA91CF7AB0100365F95 /* SPUDownloader.m in Sources */ = {isa = PBXBuildFile; fileRef = 723B5DA31CF7AB0100365F95 /* SPUDownloader.m */; };
 		723B5DAA1CF7AB6A00365F95 /* SPUDownloader.m in Sources */ = {isa = PBXBuildFile; fileRef = 723B5DA31CF7AB0100365F95 /* SPUDownloader.m */; };
@@ -1172,6 +1173,7 @@
 		723ABFC3259D4CB300BDB4FA /* SUWKWebView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SUWKWebView.m; sourceTree = "<group>"; };
 		723AC00E259DBDAA00BDB4FA /* SUWebViewCommon.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SUWebViewCommon.h; sourceTree = "<group>"; };
 		723AC00F259DBDAA00BDB4FA /* SUWebViewCommon.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SUWebViewCommon.m; sourceTree = "<group>"; };
+		723AD12E29922B5F006BB02F /* test-dangerous-link.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "test-dangerous-link.xml"; sourceTree = "<group>"; };
 		723B5D9F1CF7AB0100365F95 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = Downloader/Info.plist; sourceTree = SOURCE_ROOT; };
 		723B5DA01CF7AB0100365F95 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = Downloader/main.m; sourceTree = SOURCE_ROOT; };
 		723B5DA21CF7AB0100365F95 /* SPUDownloader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SPUDownloader.h; path = Downloader/SPUDownloader.h; sourceTree = SOURCE_ROOT; };
@@ -1832,6 +1834,7 @@
 				FA30773C24CBC295007BA37D /* testlocalizedreleasenotesappcast.xml */,
 				5A5DD41B249F0F4B0045EB3E /* test-relative-urls.xml */,
 				729F7EAB27366353004592DC /* test-links.xml */,
+				723AD12E29922B5F006BB02F /* test-dangerous-link.xml */,
 				5A5DD40324958AFF0045EB3E /* SUUpdateValidatorTest */,
 			);
 			path = Resources;
@@ -3100,6 +3103,7 @@
 			files = (
 				725B3A82263FBF0C0041AB8E /* testappcast_minimumAutoupdateVersion.xml in Resources */,
 				14958C6E19AEBC950061B14F /* signed-test-file.txt in Resources */,
+				723AD12F29922B5F006BB02F /* test-dangerous-link.xml in Resources */,
 				723EDC3F26885A8E000BCBA4 /* testappcast_channels.xml in Resources */,
 				720DC50427A51A6500DFF3EC /* testappcast_minimumAutoupdateVersionSkipping.xml in Resources */,
 				72AC6B2E1B9B218C00F62325 /* SparkleTestCodeSignApp.dmg in Resources */,
