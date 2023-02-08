@@ -24,7 +24,7 @@
         <sparkle:releaseNotesLink>file://sparkle-project.org/notes/relnote-1.0.txt</sparkle:releaseNotesLink>
         <sparkle:fullReleaseNotesLink>file://sparkle-project.org/fullnotes.txt</sparkle:fullReleaseNotesLink>
         <link>file://sparkle-project.org</link>
-        <enclosure url="https://sparkle-project.org/release-1.0.zip" sparkle:version="1.0" length="1346234" />
+        <enclosure url="file://sparkle-project.org/release-1.0.zip" sparkle:version="1.0" length="1346234" />
     </item>
   </channel>
 </rss>

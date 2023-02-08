@@ -935,7 +935,7 @@ class SUAppcastTest: XCTestCase {
             XCTAssertEqual(nil, items[2].releaseNotesURL?.absoluteString)
             XCTAssertEqual(nil, items[2].fullReleaseNotesURL?.absoluteString)
             XCTAssertEqual(nil, items[2].infoURL?.absoluteString)
-            XCTAssertEqual(nil, items[2].fileURL?.absoluteString)
+            XCTAssertEqual("https://sparkle-project.org/release-1.0.zip", items[2].fileURL?.absoluteString)
             
         } catch let err as NSError {
             NSLog("%@", err)
@@ -973,4 +973,21 @@ class SUAppcastTest: XCTestCase {
         }
     }
 
+    func testDangerousLink() {
+        let testFile = Bundle(for: SUAppcastTest.self).path(forResource: "test-dangerous-link", ofType: "xml")!
+        let testData = NSData(contentsOfFile: testFile)!
+        
+        do {
+            let baseURL: URL? = nil
+            
+            let stateResolver = SPUAppcastItemStateResolver(hostVersion: "1.0", applicationVersionComparator: SUStandardVersionComparator.default, standardVersionComparator: SUStandardVersionComparator.default)
+            
+            let _ = try SUAppcast(xmlData: testData as Data, relativeTo: baseURL, stateResolver: stateResolver)
+            
+            XCTFail("Appcast creation should fail when encountering dangerous link")
+        } catch let err as NSError {
+            NSLog("Expected error: %@", err)
+            XCTAssertNotNil(err)
+        }
+    }
 }
