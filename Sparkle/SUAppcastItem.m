@@ -523,8 +523,10 @@ static NSString *SUAppcastItemDeltaFromSparkleLocalesKey = @"SUAppcastItemDeltaF
             if ([fileURL.scheme caseInsensitiveCompare:@"http"] == NSOrderedSame || [fileURL.scheme caseInsensitiveCompare:@"https"] == NSOrderedSame) {
                 _fileURL = fileURL;
             } else {
-                SULog(SULogLevelError, @"File URLs must have a http or https URL scheme.");
-                _fileURL = nil;
+                if (error) {
+                    *error = @"File URLs must have a http or https URL scheme";
+                }
+                return nil;
             }
         }
         if (enclosure) {
