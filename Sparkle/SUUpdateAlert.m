@@ -314,11 +314,12 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
     if (preferringPlainText) {
         usesPlainText = YES;
     } else {
-#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_15
-        if (@available(macOS 10.15, *))
-#endif
-        {
+        if (@available(macOS 10.15, *)) {
             usesPlainText = [[NSProcessInfo processInfo] isMacCatalystApp];
+            
+            if (usesPlainText && !preferringPlainText) {
+                SULog(SULogLevelError, @"Showing HTML release notes for Catalyst apps is not supported. The release notes will be interpreted as plain text. Please serve a plain-text (.txt) release notes file. If you are using a <description> element then please specify the %@=\"plain-text\" attribute in that element.", SUAppcastAttributeFormat);
+            }
         } else {
             usesPlainText = NO;
         }
