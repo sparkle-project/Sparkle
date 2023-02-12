@@ -1,3 +1,9 @@
+# 2.3.2
+
+* Fix potential crash during download if appcast item includes invalid enclosure URL (#2317) (Zorg)
+* Add delegate method to hide showing version history option (#2303) (Zorg)
+* Finnish localization grammar fixes (#2311) (Lauri-Matti Parppei)
+
 # 2.3.1
 
 * Fix update permission alert title text overlapping with question text in some languages (#2284) (Zorg)
