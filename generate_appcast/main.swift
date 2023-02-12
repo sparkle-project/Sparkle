@@ -81,7 +81,7 @@ struct GenerateAppcast: ParsableCommand {
     @Option(name: .customLong("release-notes-url-prefix"), help: ArgumentHelp("A URL that will be used as prefix for constructing URLs for release notes.", valueName: "url"), transform: { URL(string: $0) })
     var releaseNotesURLPrefix : URL?
     
-    @Flag(name: .customLong("embed-release-notes"), help: ArgumentHelp("Embed release notes in a new update's description. By default, release note files are only embedded if they are HTML, do not include DOCTYPE or body tags, and are not long. This flag forces release note files for newly created updates to always be embedded."))
+    @Flag(name: .customLong("embed-release-notes"), help: ArgumentHelp("Embed release notes in a new update's description. By default, release note files are only embedded if they are HTML and do not include DOCTYPE or body tags. This flag forces release note files for newly created updates to always be embedded."))
     var embedReleaseNotes : Bool = false
     
     @Option(name: .customLong("full-release-notes-url"), help: ArgumentHelp("A URL that will be used for the full release notes.", valueName: "url"))
