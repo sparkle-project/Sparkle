@@ -116,7 +116,10 @@
                     }];
                     
                     // macOS 13 and later introduce a policy where Gatekeeper can block app modifications if the apps have different Team IDs
-                    if (@available(macOS 13, *)) {
+#if !defined(MAC_OS_VERSION_13_0) || MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_VERSION_13_0
+                    if (@available(macOS 13, *))
+#endif
+                    {
                         NSBundle *mainBundle = [NSBundle mainBundle];
                         if (![mainBundle isEqual:_host.bundle]) {
                             SUHost *mainBundleHost = [[SUHost alloc] initWithBundle:mainBundle];

@@ -188,23 +188,37 @@ static NSArray <NSString *> * _Nullable _commandAndArgumentsConformingToTypeOfPa
         }
         while(bytesWritten < expectedLength);
         
-        if (@available(macOS 10.15, *)) {
+#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_15
+        if (@available(macOS 10.15, *))
+#endif
+        {
             NSError *archiveOutputCloseError = nil;
             if (![archiveOutput closeAndReturnError:&archiveOutputCloseError]) {
                 SULog(SULogLevelError, @"Failed to close pipe with error %@", archiveOutputCloseError);
             }
-        } else {
+        }
+#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_15
+        else
+        {
             [archiveOutput closeFile];
         }
+#endif
         
-        if (@available(macOS 10.15, *)) {
+#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_15
+        if (@available(macOS 10.15, *))
+#endif
+        {
             NSError *archiveInputCloseError = nil;
             if (![archiveInput closeAndReturnError:&archiveInputCloseError]) {
                 SULog(SULogLevelError, @"Failed to close archive input with error %@", archiveInputCloseError);
             }
-        } else {
+        }
+#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_15
+        else
+        {
             [archiveInput closeFile];
         }
+#endif
         
         [task waitUntilExit];
         

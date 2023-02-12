@@ -185,7 +185,10 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(__attribute__((unused)) NSDictionary<NSKeyValueChangeKey,id> *)change context:(__attribute__((unused)) void *)context {
-    if (@available(macOS 10.14, *)) {
+#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_14
+    if (@available(macOS 10.14, *))
+#endif
+    {
         if (object == _releaseNotesView.view && [keyPath isEqualToString:@"effectiveAppearance"]) {
             [self adaptReleaseNotesAppearance];
         }
@@ -193,7 +196,10 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 }
 
 - (void)dealloc {
-    if (@available(macOS 10.14, *)) {
+#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_14
+    if (@available(macOS 10.14, *))
+#endif
+    {
         if (_observingAppearance) {
             [_releaseNotesView.view removeObserver:self forKeyPath:@"effectiveAppearance"];
             _observingAppearance = NO;
@@ -203,7 +209,10 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 
 - (void)adaptReleaseNotesAppearance SPU_OBJC_DIRECT
 {
-    if (@available(macOS 10.14, *)) {
+#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_14
+    if (@available(macOS 10.14, *))
+#endif
+    {
         NSAppearanceName bestAppearance = [_releaseNotesView.view.effectiveAppearance bestMatchFromAppearancesWithNames:@[NSAppearanceNameAqua, NSAppearanceNameDarkAqua]];
         if ([bestAppearance isEqualToString:NSAppearanceNameDarkAqua])
         {

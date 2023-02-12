@@ -208,13 +208,19 @@
                             tempIconDestinationURL = [NSURL fileURLWithPath:path];
                             
                             CGImageDestinationRef imageDestination = NULL;
-                            if (@available(macOS 11, *)) {
+#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_VERSION_11_0
+                            if (@available(macOS 11, *))
+#endif
+                            {
                                 CFStringRef uti = (__bridge CFStringRef)[UTTypePNG identifier];
                                 imageDestination = CGImageDestinationCreateWithURL((CFURLRef)tempIconDestinationURL, uti, 1, NULL);
-                            } else {
+                            }
+#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_VERSION_11_0
+                            else
+                            {
                                 imageDestination = CGImageDestinationCreateWithURL((CFURLRef)tempIconDestinationURL, kUTTypePNG, 1, NULL);
                             }
-                            
+#endif
                             if (imageDestination != NULL) {
                                 CGImageDestinationAddImageFromSource(imageDestination, imageSource, imageIndex, (CFDictionaryRef)@{});
                                 if (CGImageDestinationFinalize(imageDestination)) {

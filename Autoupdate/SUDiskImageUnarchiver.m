@@ -132,17 +132,24 @@
 
             [inputPipe.fileHandleForWriting writeData:promptData];
             
-            if (@available(macOS 10.15, *)) {
+#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_15
+            if (@available(macOS 10.15, *))
+#endif
+            {
                 if (![inputPipe.fileHandleForWriting writeData:promptData error:&error]) {
                     goto reportError;
                 }
-            } else {
+            }
+#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_15
+            else
+            {
                 @try {
                     [inputPipe.fileHandleForWriting writeData:promptData];
                 } @catch (NSException *) {
                     goto reportError;
                 }
             }
+#endif
             
             [inputPipe.fileHandleForWriting closeFile];
             
