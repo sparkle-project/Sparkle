@@ -38,20 +38,13 @@
         // but still better than nothing if no icon was included
         BOOL isMainBundle = [host.bundle isEqualTo:[NSBundle mainBundle]];
 
-#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_VERSION_11_0
-        if (@available(macOS 11, *))
-#endif
-        {
+        if (@available(macOS 11, *)) {
             UTType *contentType = isMainBundle ? UTTypeApplication : UTTypeBundle;
             icon = [[NSWorkspace sharedWorkspace] iconForContentType:contentType];
-        }
-#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_VERSION_11_0
-        else
-        {
+        } else {
             NSString *fileType = isMainBundle ? (__bridge NSString *)kUTTypeApplication : (__bridge NSString *)kUTTypeBundle;
             icon = [[NSWorkspace sharedWorkspace] iconForFileType:fileType];
         }
-#endif
     }
     return icon;
 }

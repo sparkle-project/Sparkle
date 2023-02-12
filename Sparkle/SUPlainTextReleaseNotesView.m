@@ -66,10 +66,7 @@
     _textView.usesFontPanel = NO;
     _textView.editable = NO;
     
-#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_14
-    if (@available(macOS 10.14, *))
-#endif
-    {
+    if (@available(macOS 10.14, *)) {
         _textView.usesAdaptiveColorMappingForDarkAppearance = YES;
     }
     
