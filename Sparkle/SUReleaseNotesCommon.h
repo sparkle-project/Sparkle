@@ -1,5 +1,5 @@
 //
-//  SUWebViewCommon.h
+//  SUReleaseNotesCommon.h
 //  Sparkle
 //
 //  Created by Mayur Pawashe on 12/31/20.
@@ -12,7 +12,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-BOOL SUWebViewIsSafeURL(NSURL *url, BOOL *isAboutBlankURL);
+BOOL SUReleaseNotesIsSafeURL(NSURL *url, BOOL *isAboutBlankURL);
 
 NS_ASSUME_NONNULL_END
 

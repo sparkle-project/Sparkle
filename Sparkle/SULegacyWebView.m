@@ -9,7 +9,7 @@
 #if SPARKLE_BUILD_UI_BITS && DOWNLOADER_XPC_SERVICE_EMBEDDED
 
 #import "SULegacyWebView.h"
-#import "SUWebViewCommon.h"
+#import "SUReleaseNotesCommon.h"
 #import "SULog.h"
 #import <WebKit/WebKit.h>
 
@@ -62,7 +62,7 @@
     return _webView;
 }
 
-- (void)loadHTMLString:(NSString *)htmlString baseURL:(NSURL * _Nullable)baseURL completionHandler:(void (^)(NSError * _Nullable))completionHandler
+- (void)loadString:(NSString *)htmlString baseURL:(NSURL * _Nullable)baseURL completionHandler:(void (^)(NSError * _Nullable))completionHandler
 {
     _completionHandler = [completionHandler copy];
     [[_webView mainFrame] loadHTMLString:htmlString baseURL:baseURL];
@@ -110,7 +110,7 @@
 {
     NSURL *requestURL = request.URL;
     BOOL isAboutBlank = NO;
-    BOOL safeURL = SUWebViewIsSafeURL(requestURL, &isAboutBlank);
+    BOOL safeURL = SUReleaseNotesIsSafeURL(requestURL, &isAboutBlank);
 
     // Do not allow redirects to dangerous protocols such as file://
     if (!safeURL) {

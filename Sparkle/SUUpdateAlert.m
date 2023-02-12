@@ -15,9 +15,10 @@
 #import "SUUpdateAlert.h"
 
 #import "SUHost.h"
-#import "SUWebView.h"
+#import "SUReleaseNotesView.h"
 #import "SUWKWebView.h"
 #import "SULegacyWebView.h"
+#import "SUPlainTextReleaseNotesView.h"
 
 #import "SUConstants.h"
 #import "SULog.h"
@@ -42,7 +43,7 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
     SPUUserUpdateState *_state;
     NSProgressIndicator *_releaseNotesSpinner;
     NSBox *_darkBackgroundView;
-    id<SUWebView> _webView;
+    id<SUReleaseNotesView> _releaseNotesView;
     
     __weak id <SUVersionDisplay> _versionDisplayer;
     
@@ -109,8 +110,8 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 
 - (void)endWithSelection:(SPUUserUpdateChoice)choice SPU_OBJC_DIRECT
 {
-    [_webView stopLoading];
-    [_webView.view removeFromSuperview]; // Otherwise it gets sent Esc presses (why?!) and gets very confused.
+    [_releaseNotesView stopLoading];
+    [_releaseNotesView.view removeFromSuperview]; // Otherwise it gets sent Esc presses (why?!) and gets very confused.
     
     NSWindow *window = self.window;
     BOOL wasKeyWindow = window.keyWindow;
@@ -149,35 +150,31 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
     [self endWithSelection:SPUUserUpdateChoiceDismiss];
 }
 
-- (void)displayReleaseNotes SPU_OBJC_DIRECT
+- (void)displayReleaseNotesSpinner SPU_OBJC_DIRECT
 {
-    [self adaptReleaseNotesAppearance];
-
-#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_14
-    if (@available(macOS 10.14, *))
-#endif
-    {
-        if (!_observingAppearance) {
-            [_webView.view addObserver:self forKeyPath:@"effectiveAppearance" options:0 context:nil];
-            _observingAppearance = YES;
-        }
-    }
-    
     // Stick a nice big spinner in the middle of the web view until the page is loaded.
-    NSRect frame = [[_webView.view superview] frame];
+    NSView *boxContentView = _releaseNotesBoxView.contentView;
+    NSRect frame = boxContentView.frame;
     _releaseNotesSpinner = [[NSProgressIndicator alloc] initWithFrame:NSMakeRect(NSMidX(frame) - 16, NSMidY(frame) - 16, 32, 32)];
     [_releaseNotesSpinner setStyle:NSProgressIndicatorStyleSpinning];
     [_releaseNotesSpinner startAnimation:self];
-    [[_webView.view superview] addSubview:_releaseNotesSpinner];
+    [boxContentView addSubview:_releaseNotesSpinner];
     
     // If there's no release notes URL, just stick the contents of the description into the web view
     // Otherwise we'll wait until the client wants us to show release notes
-	if (_updateItem.releaseNotesURL == nil)
-	{
+    if (_updateItem.releaseNotesURL == nil) {
         NSString *itemDescription = _updateItem.itemDescription;
         if (itemDescription != nil) {
+            NSString *itemDescriptionFormat = _updateItem.itemDescriptionFormat;
+            // We don't support markdown but prepare for the future in case we support it one day
+            BOOL prefersPlainText =
+                ([itemDescriptionFormat isEqualToString:@"plain-text"] ||
+                 [itemDescriptionFormat isEqualToString:@"markdown"]);
+            
+            [self _createReleaseNotesViewPreferringPlainText:prefersPlainText];
+            
             __weak __typeof__(self) weakSelf = self;
-            [_webView loadHTMLString:itemDescription baseURL:nil completionHandler:^(NSError * _Nullable error) {
+            [_releaseNotesView loadString:itemDescription baseURL:nil completionHandler:^(NSError * _Nullable error) {
                 if (error != nil) {
                     SULog(SULogLevelError, @"Failed to load HTML string from web view: %@", error);
                 }
@@ -192,7 +189,7 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
     if (@available(macOS 10.14, *))
 #endif
     {
-        if (object == _webView.view && [keyPath isEqualToString:@"effectiveAppearance"]) {
+        if (object == _releaseNotesView.view && [keyPath isEqualToString:@"effectiveAppearance"]) {
             [self adaptReleaseNotesAppearance];
         }
     }
@@ -204,7 +201,7 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 #endif
     {
         if (_observingAppearance) {
-            [_webView.view removeObserver:self forKeyPath:@"effectiveAppearance"];
+            [_releaseNotesView.view removeObserver:self forKeyPath:@"effectiveAppearance"];
             _observingAppearance = NO;
         }
     }
@@ -216,21 +213,21 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
     if (@available(macOS 10.14, *))
 #endif
     {
-        NSAppearanceName bestAppearance = [_webView.view.effectiveAppearance bestMatchFromAppearancesWithNames:@[NSAppearanceNameAqua, NSAppearanceNameDarkAqua]];
+        NSAppearanceName bestAppearance = [_releaseNotesView.view.effectiveAppearance bestMatchFromAppearancesWithNames:@[NSAppearanceNameAqua, NSAppearanceNameDarkAqua]];
         if ([bestAppearance isEqualToString:NSAppearanceNameDarkAqua])
         {
             // Remove web view background...
-            [_webView setDrawsBackground:NO];
+            [_releaseNotesView setDrawsBackground:NO];
             // ... and use NSBox to get the dynamically colored background
             if (_darkBackgroundView == nil)
             {
-                _darkBackgroundView = [[NSBox alloc] initWithFrame:_webView.view.frame];
+                _darkBackgroundView = [[NSBox alloc] initWithFrame:_releaseNotesView.view.frame];
                 _darkBackgroundView.boxType = NSBoxCustom;
                 _darkBackgroundView.fillColor = [NSColor textBackgroundColor];
                 _darkBackgroundView.borderColor = [NSColor clearColor];
                 // Using auto-resizing mask instead of contraints works well enough
                 _darkBackgroundView.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
-                [_webView.view.superview addSubview:_darkBackgroundView positioned:NSWindowBelow relativeTo:_webView.view];
+                [_releaseNotesView.view.superview addSubview:_darkBackgroundView positioned:NSWindowBelow relativeTo:_releaseNotesView.view];
                 
                 // The release note user stylesheet will not adjust to the user changing the theme until adaptReleaseNoteAppearance is called again.
                 // So lock the appearance of the background to keep the text readable if the system theme changes.
@@ -242,21 +239,39 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
             // Restore standard dark on light appearance
             [_darkBackgroundView removeFromSuperview];
             _darkBackgroundView = nil;
-            [_webView setDrawsBackground:YES];
+            [_releaseNotesView setDrawsBackground:YES];
+        }
+        
+        if (!_observingAppearance) {
+            [_releaseNotesView.view addObserver:self forKeyPath:@"effectiveAppearance" options:0 context:nil];
+            _observingAppearance = YES;
         }
     }
 }
 
 - (void)showUpdateReleaseNotesWithDownloadData:(SPUDownloadData *)downloadData
 {
-    NSURL *baseURL = _updateItem.releaseNotesURL.URLByDeletingLastPathComponent;
+    NSURL *releaseNotesURL = _updateItem.releaseNotesURL;
+    NSURL *baseURL = releaseNotesURL.URLByDeletingLastPathComponent;
     // If a MIME type isn't provided, we will pick html as the default, as opposed to plain text. Questionable decision..
     NSString *chosenMIMEType = (downloadData.MIMEType != nil) ? downloadData.MIMEType : @"text/html";
     // We'll pick utf-8 as the default text encoding name if one isn't provided which I think is reasonable
     NSString *chosenTextEncodingName = (downloadData.textEncodingName != nil) ? downloadData.textEncodingName : @"utf-8";
     
+    // We don't support markdown but prepare for the future in case we support it one day
+    NSString *pathExtension = releaseNotesURL.pathExtension;
+    BOOL preferringPlainText =
+        ([chosenMIMEType isEqualToString:@"text/plain"] ||
+         [pathExtension caseInsensitiveCompare:@"txt"] == NSOrderedSame ||
+         [chosenMIMEType isEqualToString:@"text/markdown"] ||
+         [chosenMIMEType isEqualToString:@"text/x-markdown"] ||
+         [pathExtension caseInsensitiveCompare:@"md"] == NSOrderedSame ||
+         [pathExtension caseInsensitiveCompare:@"markdown"] == NSOrderedSame);
+    
+    [self _createReleaseNotesViewPreferringPlainText:preferringPlainText];
+    
     __weak __typeof__(self) weakSelf = self;
-    [_webView loadData:downloadData.data MIMEType:chosenMIMEType textEncodingName:chosenTextEncodingName baseURL:baseURL completionHandler:^(NSError * _Nullable error) {
+    [_releaseNotesView loadData:downloadData.data MIMEType:chosenMIMEType textEncodingName:chosenTextEncodingName baseURL:baseURL completionHandler:^(NSError * _Nullable error) {
         if (error != nil) {
             SULog(SULogLevelError, @"Failed to load data from web view: %@", error);
         }
@@ -278,15 +293,67 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 - (BOOL)showsReleaseNotes
 {
     NSNumber *shouldShowReleaseNotes = [_host objectForInfoDictionaryKey:SUShowReleaseNotesKey];
-	if (shouldShowReleaseNotes == nil)
-	{
+    if (shouldShowReleaseNotes == nil) {
         // Don't show release notes if RSS item contains no description and no release notes URL:
         return (([_updateItem itemDescription] != nil
                  && [[[_updateItem itemDescription] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] length] > 0)
                 || [_updateItem releaseNotesURL] != nil);
-	}
-	else
+    }
+    else
         return [shouldShowReleaseNotes boolValue];
+}
+
+- (void)_createReleaseNotesViewPreferringPlainText:(BOOL)preferringPlainText SPU_OBJC_DIRECT
+{
+    // "-apple-system-font" is a reference to the system UI font. "-apple-system" is the new recommended token, but for backward compatibility we can't use it.
+    NSString *defaultFontFamily = @"-apple-system-font";
+    
+    int defaultFontSize = (int)[NSFont systemFontSize];
+    
+    BOOL usesPlainText;
+    if (preferringPlainText) {
+        usesPlainText = YES;
+    } else {
+        if (@available(macOS 10.15, *)) {
+            usesPlainText = [[NSProcessInfo processInfo] isMacCatalystApp];
+            
+            if (usesPlainText && !preferringPlainText) {
+                SULog(SULogLevelError, @"Error: Showing HTML release notes for Catalyst apps is not supported. The release notes will be interpreted as plain text. Please serve a plain-text (.txt) release notes file. If you are using a <description> element then please specify the %@=\"plain-text\" attribute in that element.", SUAppcastAttributeFormat);
+            }
+        } else {
+            usesPlainText = NO;
+        }
+    }
+    
+    if (usesPlainText) {
+        _releaseNotesView = [[SUPlainTextReleaseNotesView alloc] initWithFontPointSize:defaultFontSize];
+    } else {
+        NSURL *colorStyleURL = [[NSBundle bundleForClass:[self class]] URLForResource:@"ReleaseNotesColorStyle" withExtension:@"css"];
+        
+        BOOL javaScriptEnabled = [_host boolForInfoDictionaryKey:SUEnableJavaScriptKey];
+        
+        // WKWebView has a bug where it won't work in loading local HTML content in sandboxed apps that do not have an outgoing network entitlement
+        // FB6993802: https://twitter.com/sindresorhus/status/1160577243929878528 | https://github.com/feedback-assistant/reports/issues/1
+        // If the developer is using the downloader XPC service, they are very most likely are a) sandboxed b) do not use outgoing network entitlement.
+        // In this case, fall back to legacy WebKit view.
+        // (In theory it is possible for a non-sandboxed app or sandboxed app with outgoing network entitlement to use the XPC service, it's just pretty unlikely. And falling back to a legacy web view would not be too harmful in those cases).
+        BOOL useWKWebView = !SPUXPCServiceIsEnabled(SUEnableDownloaderServiceKey);
+        
+        if (useWKWebView) {
+            _releaseNotesView = [[SUWKWebView alloc] initWithColorStyleSheetLocation:colorStyleURL fontFamily:defaultFontFamily fontPointSize:defaultFontSize javaScriptEnabled:javaScriptEnabled];
+        } else {
+            _releaseNotesView = [[SULegacyWebView alloc] initWithColorStyleSheetLocation:colorStyleURL fontFamily:defaultFontFamily fontPointSize:defaultFontSize javaScriptEnabled:javaScriptEnabled];
+        }
+    }
+    
+    NSView *boxContentView = _releaseNotesBoxView.contentView;
+    assert(_releaseNotesSpinner != nil);
+    [boxContentView addSubview:_releaseNotesView.view positioned:NSWindowBelow relativeTo:_releaseNotesSpinner];
+    
+    _releaseNotesView.view.frame = boxContentView.bounds;
+    _releaseNotesView.view.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
+    
+    [self adaptReleaseNotesAppearance];
 }
 
 - (void)windowDidLoad
@@ -294,38 +361,8 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
     NSWindow *window = self.window;
     
     BOOL showReleaseNotes = [self showsReleaseNotes];
-    
     if (showReleaseNotes) {
         window.frameAutosaveName = @"SUUpdateAlert";
-        
-        NSURL *colorStyleURL = [[NSBundle bundleForClass:[self class]] URLForResource:@"ReleaseNotesColorStyle" withExtension:@"css"];
-        
-        // "-apple-system-font" is a reference to the system UI font. "-apple-system" is the new recommended token, but for backward compatibility we can't use it.
-        NSString *defaultFontFamily = @"-apple-system-font";
-        int defaultFontSize = (int)[NSFont systemFontSize];
-        
-        BOOL javaScriptEnabled = [_host boolForInfoDictionaryKey:SUEnableJavaScriptKey];
-        
-#if DOWNLOADER_XPC_SERVICE_EMBEDDED
-        // WKWebView has a bug where it won't work in loading local HTML content in sandboxed apps that do not have an outgoing network entitlement
-        // FB6993802: https://twitter.com/sindresorhus/status/1160577243929878528 | https://github.com/feedback-assistant/reports/issues/1
-        // If the developer is using the downloader XPC service, they are very most likely are a) sandboxed b) do not use outgoing network entitlement.
-        // In this case, fall back to legacy WebKit view.
-        // (In theory it is possible for a non-sandboxed app or sandboxed app with outgoing network entitlement to use the XPC service, it's just pretty unlikely. And falling back to a legacy web view would not be too harmful in those cases).
-        
-        if (SPUXPCServiceIsEnabled(SUEnableDownloaderServiceKey)) {
-            _webView = [[SULegacyWebView alloc] initWithColorStyleSheetLocation:colorStyleURL fontFamily:defaultFontFamily fontPointSize:defaultFontSize javaScriptEnabled:javaScriptEnabled];
-        } else
-#endif
-        {
-            _webView = [[SUWKWebView alloc] initWithColorStyleSheetLocation:colorStyleURL fontFamily:defaultFontFamily fontPointSize:defaultFontSize javaScriptEnabled:javaScriptEnabled];
-        }
-        
-        NSView *boxContentView = _releaseNotesBoxView.contentView;
-        [boxContentView addSubview:_webView.view];
-        
-        _webView.view.frame = boxContentView.bounds;
-        _webView.view.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
     } else {
         // Update alert should not be resizable when no release notes are available
         window.styleMask &= ~NSWindowStyleMaskResizable;
@@ -339,7 +376,7 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
     BOOL allowsAutomaticUpdates = _allowsAutomaticUpdates;
     
     if (showReleaseNotes) {
-        [self displayReleaseNotes];
+        [self displayReleaseNotesSpinner];
     } else {
         // When automatic updates aren't allowed we won't show the automatic install updates button
         // This button is removed later below
@@ -404,8 +441,8 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 
 - (BOOL)windowShouldClose:(NSNotification *) __unused note
 {
-	[self endWithSelection:SPUUserUpdateChoiceDismiss];
-	return YES;
+    [self endWithSelection:SPUUserUpdateChoiceDismiss];
+    return YES;
 }
 
 - (NSImage *)applicationIcon

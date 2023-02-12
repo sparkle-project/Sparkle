@@ -28,6 +28,7 @@ static NSString *SUAppcastItemFileURLKey = @"fileURL";
 static NSString *SUAppcastItemInfoURLKey = @"infoURL";
 static NSString *SUAppcastItemContentLengthKey = @"contentLength";
 static NSString *SUAppcastItemDescriptionKey = @"itemDescription";
+static NSString *SUAppcastItemDescriptionFormatKey = @"itemDescriptionFormat";
 static NSString *SUAppcastItemMaximumSystemVersionKey = @"maximumSystemVersion";
 static NSString *SUAppcastItemMinimumSystemVersionKey = @"minimumSystemVersion";
 static NSString *SUAppcastItemReleaseNotesURLKey = @"releaseNotesURL";
@@ -68,6 +69,7 @@ static NSString *SUAppcastItemDeltaFromSparkleLocalesKey = @"SUAppcastItemDeltaF
 @synthesize contentLength = _contentLength;
 @synthesize infoURL = _infoURL;
 @synthesize itemDescription = _itemDescription;
+@synthesize itemDescriptionFormat = _itemDescriptionFormat;
 @synthesize maximumSystemVersion = _maximumSystemVersion;
 @synthesize minimumSystemVersion = _minimumSystemVersion;
 @synthesize releaseNotesURL = _releaseNotesURL;
@@ -120,6 +122,7 @@ static NSString *SUAppcastItemDeltaFromSparkleLocalesKey = @"SUAppcastItemDeltaF
         _installationType = [installationType copy];
         
         _itemDescription = [(NSString *)[decoder decodeObjectOfClass:[NSString class] forKey:SUAppcastItemDescriptionKey] copy];
+        _itemDescriptionFormat = [(NSString *)[decoder decodeObjectOfClass:[NSString class] forKey:SUAppcastItemDescriptionFormatKey] copy];
         _maximumSystemVersion = [(NSString *)[decoder decodeObjectOfClass:[NSString class] forKey:SUAppcastItemMaximumSystemVersionKey] copy];
         _minimumSystemVersion = [(NSString *)[decoder decodeObjectOfClass:[NSString class] forKey:SUAppcastItemMinimumSystemVersionKey] copy];
         _minimumAutoupdateVersion = [(NSString *)[decoder decodeObjectOfClass:[NSString class] forKey:SUAppcastElementMinimumAutoupdateVersion] copy];
@@ -186,6 +189,10 @@ static NSString *SUAppcastItemDeltaFromSparkleLocalesKey = @"SUAppcastItemDeltaF
     
     if (_itemDescription != nil) {
         [encoder encodeObject:_itemDescription forKey:SUAppcastItemDescriptionKey];
+    }
+    
+    if (_itemDescriptionFormat != nil) {
+        [encoder encodeObject:_itemDescriptionFormat forKey:SUAppcastItemDescriptionFormatKey];
     }
     
     if (_maximumSystemVersion != nil) {
@@ -399,7 +406,53 @@ static NSString *SUAppcastItemDeltaFromSparkleLocalesKey = @"SUAppcastItemDeltaF
 
         _propertiesDictionary = [[NSDictionary alloc] initWithDictionary:dict];
         _dateString = [(NSString *)[dict objectForKey:SURSSElementPubDate] copy];
-        _itemDescription = [(NSString *)[dict objectForKey:SURSSElementDescription] copy];
+        
+        id itemDescription = [dict objectForKey:SURSSElementDescription];
+        if (itemDescription != nil) {
+            if ([(NSObject *)itemDescription isKindOfClass:[NSDictionary class]]) {
+                NSString *descriptionContent = itemDescription[@"content"];
+                NSString *itemDescriptionString;
+                if ([descriptionContent isKindOfClass:[NSString class]]) {
+                    itemDescriptionString = [descriptionContent copy];
+                } else {
+                    itemDescriptionString = nil;
+                }
+                
+                id descriptionFormat = itemDescription[@"format"];
+                NSString *descriptionFormatString;
+                if ([(NSObject *)descriptionFormat isKindOfClass:[NSString class]]) {
+                    descriptionFormatString = [(NSString *)descriptionFormat lowercaseString];
+                } else {
+                    descriptionFormatString = nil;
+                }
+                
+                _itemDescription = itemDescriptionString;
+                if (itemDescriptionString != nil) {
+                    if (descriptionFormatString != nil) {
+                        if (![descriptionFormatString isEqualToString:@"plain-text"] &&
+                            ![descriptionFormatString isEqualToString:@"markdown"] &&
+                            ![descriptionFormatString isEqualToString:@"html"]) {
+                            SULog(SULogLevelError, @"warning: Item '%@' has unknown format '%@' in '<%@>'. Ignoring and using 'html' instead.", _title, descriptionFormatString, SUAppcastItemDescriptionKey);
+                            
+                            _itemDescriptionFormat = @"html";
+                        } else {
+                            _itemDescriptionFormat = descriptionFormatString;
+                        }
+                    } else {
+                        _itemDescriptionFormat = @"html";
+                    }
+                } else {
+                    _itemDescriptionFormat = nil;
+                }
+            } else if ([(NSObject *)itemDescription isKindOfClass:[NSString class]]) {
+                // Legacy path
+                _itemDescription = [(NSString *)itemDescription copy];
+                _itemDescriptionFormat = @"html";
+            }
+        } else {
+            _itemDescription = nil;
+            _itemDescriptionFormat = nil;
+        }
 
         NSString *theInfoURL = [dict objectForKey:SURSSElementLink];
         if (theInfoURL) {

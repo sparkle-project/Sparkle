@@ -441,8 +441,19 @@ func moveOldUpdatesFromAppcasts(archivesSourceDir: URL, oldFilesDirectory: URL, 
                 print("Warning: failed to move \(archivePath.lastPathComponent) to \(oldFilesDirectory.lastPathComponent): \(error)")
             }
             
-            let releaseNotesFile = archivePath.deletingPathExtension().appendingPathExtension("html")
-            if fileManager.fileExists(atPath: releaseNotesFile.path) {
+            let htmlReleaseNotesFile = archivePath.deletingPathExtension().appendingPathExtension("html")
+            let plainTextReleaseNotesFile = archivePath.deletingPathExtension().appendingPathExtension("txt")
+            
+            let releaseNotesFile: URL?
+            if fileManager.fileExists(atPath: htmlReleaseNotesFile.path) {
+                releaseNotesFile = htmlReleaseNotesFile
+            } else if fileManager.fileExists(atPath: plainTextReleaseNotesFile.path) {
+                releaseNotesFile = plainTextReleaseNotesFile
+            } else {
+                releaseNotesFile = nil
+            }
+            
+            if let releaseNotesFile = releaseNotesFile {
                 do {
                     try suFileManager.updateModificationAndAccessTimeOfItem(at: releaseNotesFile)
                 } catch {

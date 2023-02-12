@@ -1,5 +1,5 @@
 //
-//  SUWebView.h
+//  SUReleaseNotesView.h
 //  Sparkle
 //
 //  Created by Mayur Pawashe on 12/30/20.
@@ -14,11 +14,11 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@protocol SUWebView <NSObject>
+@protocol SUReleaseNotesView <NSObject>
 
 @property (nonatomic, readonly) NSView *view;
 
-- (void)loadHTMLString:(NSString *)htmlString baseURL:(NSURL * _Nullable)baseURL completionHandler:(void (^)(NSError * _Nullable))completionHandler;
+- (void)loadString:(NSString *)string baseURL:(NSURL * _Nullable)baseURL completionHandler:(void (^)(NSError * _Nullable))completionHandler;
 
 - (void)loadData:(NSData *)data MIMEType:(NSString *)MIMEType textEncodingName:(NSString *)textEncodingName baseURL:(NSURL *)baseURL completionHandler:(void (^)(NSError * _Nullable))completionHandler;
 
