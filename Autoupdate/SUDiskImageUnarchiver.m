@@ -132,10 +132,7 @@
 
             [inputPipe.fileHandleForWriting writeData:promptData];
             
-#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_15
-            if (@available(macOS 10.15, *))
-#endif
-            {
+            if (@available(macOS 10.15, *)) {
                 if (![inputPipe.fileHandleForWriting writeData:promptData error:&error]) {
                     goto reportError;
                 }

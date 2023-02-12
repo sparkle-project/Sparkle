@@ -188,10 +188,7 @@ static NSArray <NSString *> * _Nullable _commandAndArgumentsConformingToTypeOfPa
         }
         while(bytesWritten < expectedLength);
         
-#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_15
-        if (@available(macOS 10.15, *))
-#endif
-        {
+        if (@available(macOS 10.15, *)) {
             NSError *archiveOutputCloseError = nil;
             if (![archiveOutput closeAndReturnError:&archiveOutputCloseError]) {
                 SULog(SULogLevelError, @"Failed to close pipe with error %@", archiveOutputCloseError);
@@ -204,10 +201,7 @@ static NSArray <NSString *> * _Nullable _commandAndArgumentsConformingToTypeOfPa
         }
 #endif
         
-#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_15
-        if (@available(macOS 10.15, *))
-#endif
-        {
+        if (@available(macOS 10.15, *)) {
             NSError *archiveInputCloseError = nil;
             if (![archiveInput closeAndReturnError:&archiveInputCloseError]) {
                 SULog(SULogLevelError, @"Failed to close archive input with error %@", archiveInputCloseError);

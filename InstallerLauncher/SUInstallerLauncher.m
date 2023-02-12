@@ -208,10 +208,7 @@
                             tempIconDestinationURL = [NSURL fileURLWithPath:path];
                             
                             CGImageDestinationRef imageDestination = NULL;
-#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_VERSION_11_0
-                            if (@available(macOS 11, *))
-#endif
-                            {
+                            if (@available(macOS 11, *)) {
                                 CFStringRef uti = (__bridge CFStringRef)[UTTypePNG identifier];
                                 imageDestination = CGImageDestinationCreateWithURL((CFURLRef)tempIconDestinationURL, uti, 1, NULL);
                             }
