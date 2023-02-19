@@ -9,6 +9,9 @@
 #import "SPUStandardVersionDisplay.h"
 #import "SUAppcastItem.h"
 
+
+#include "AppKitPrevention.h"
+
 @implementation SPUStandardVersionDisplay
 
 + (instancetype)standardVersionDisplay
