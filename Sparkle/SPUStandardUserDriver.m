@@ -22,6 +22,7 @@
 #import "SPUUserUpdateState.h"
 #import "SUErrors.h"
 #import "SPUInstallationType.h"
+#import "SPUStandardVersionDisplay.h"
 #import "SULog.h"
 #include <time.h>
 #include <mach/mach_time.h>
@@ -334,11 +335,13 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
     [self closeCheckingWindow];
     
     id<SPUStandardUserDriverDelegate> delegate = _delegate;
-    id <SUVersionDisplay> versionDisplayer = nil;
+    id<SUVersionDisplay> customVersionDisplayer = nil;
     
     if ([delegate respondsToSelector:@selector(standardUserDriverRequestsVersionDisplayer)]) {
-        versionDisplayer = [delegate standardUserDriverRequestsVersionDisplayer];
+        customVersionDisplayer = [delegate standardUserDriverRequestsVersionDisplayer];
     }
+    
+    id<SUVersionDisplay> versionDisplayer = (customVersionDisplayer != nil) ? customVersionDisplayer : [SPUStandardVersionDisplay standardVersionDisplay];
     
     BOOL needsToObserveUserAttention = [delegate respondsToSelector:@selector(standardUserDriverDidReceiveUserAttentionForUpdate:)];
     

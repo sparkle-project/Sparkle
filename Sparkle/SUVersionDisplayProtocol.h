@@ -18,17 +18,27 @@
 #import <Sparkle/SUExport.h>
 #endif
 
+@class SUAppcastItem;
+
+NS_ASSUME_NONNULL_BEGIN
+
 /**
     Applies special display formatting to version numbers.
 */
-SU_EXPORT @protocol SUVersionDisplay
+SU_EXPORT @protocol SUVersionDisplay <NSObject>
+
+- (NSString *)formatUpdateDisplayVersionFromUpdate:(SUAppcastItem *)update andBundleDisplayVersion:(NSString * _Nonnull __autoreleasing * _Nonnull)inOutBundleDisplayVersion withBundleVersion:(NSString *)bundleVersion;
+
+@optional
 
 /**
-    Formats two version strings.
-
-    Both versions are provided so that important distinguishing information
-    can be displayed while also leaving out unnecessary/confusing parts.
+ Formats two version strings.
+ 
+ Both versions are provided so that important distinguishing information
+ can be displayed while also leaving out unnecessary/confusing parts.
 */
-- (void)formatVersion:(NSString *_Nonnull*_Nonnull)inOutVersionA andVersion:(NSString *_Nonnull*_Nonnull)inOutVersionB;
+- (void)formatVersion:(NSString *_Nonnull*_Nonnull)inOutVersionA andVersion:(NSString *_Nonnull*_Nonnull)inOutVersionB __deprecated_msg("Please use -formatUpdateDisplayVersionFromUpdate:andBundleDisplayVersion:withBundleVersion:");
 
 @end
+
+NS_ASSUME_NONNULL_END
