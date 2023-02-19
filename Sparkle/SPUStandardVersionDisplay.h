@@ -8,11 +8,10 @@
 
 #import <Foundation/Foundation.h>
 #import "SUVersionDisplayProtocol.h"
-#import "SUExport.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-SU_EXPORT @interface SPUStandardVersionDisplay : NSObject <SUVersionDisplay>
+SPU_OBJC_DIRECT_MEMBERS @interface SPUStandardVersionDisplay : NSObject <SUVersionDisplay>
 
 + (instancetype)standardVersionDisplay;
 
