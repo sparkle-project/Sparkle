@@ -32,9 +32,11 @@
     NSString *updateDisplayVersion = update.displayVersionString;
     NSString *bundleDisplayVersion = *inOutBundleDisplayVersion;
     
-    // If the display versions are the same then append the internal versions to differentiate them
+    NSString *updateVersion = update.versionString;
+    
+    // If the display versions are the same, then append the internal versions to differentiate them
     if ([updateDisplayVersion isEqualToString:bundleDisplayVersion]) {
-        outUpdateDisplayVersion = [updateDisplayVersion stringByAppendingFormat:@" (%@)", update.versionString];
+        outUpdateDisplayVersion = [updateDisplayVersion stringByAppendingFormat:@" (%@)", updateVersion];
         outBundleDisplayVersion = [bundleDisplayVersion stringByAppendingFormat:@" (%@)", bundleVersion];
     } else {
         outUpdateDisplayVersion = updateDisplayVersion;
