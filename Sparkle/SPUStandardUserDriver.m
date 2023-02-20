@@ -601,6 +601,8 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
     
 #if SPARKLE_COPY_LOCALIZATIONS
     NSBundle *sparkleBundle = SUSparkleBundle();
+#else
+    NSBundle *sparkleBundle = nil;
 #endif
     
     // If we have a custom version displayer, then override the recovery suggestion using the
