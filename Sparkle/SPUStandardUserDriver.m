@@ -22,7 +22,9 @@
 #import "SPUUserUpdateState.h"
 #import "SUErrors.h"
 #import "SPUInstallationType.h"
+#import "SPUStandardVersionDisplay.h"
 #import "SULog.h"
+#import "SPUNoUpdateFoundInfo.h"
 #include <time.h>
 #include <mach/mach_time.h>
 #import <IOKit/pwr_mgt/IOPMLib.h>
@@ -334,11 +336,13 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
     [self closeCheckingWindow];
     
     id<SPUStandardUserDriverDelegate> delegate = _delegate;
-    id <SUVersionDisplay> versionDisplayer = nil;
+    id<SUVersionDisplay> customVersionDisplayer = nil;
     
     if ([delegate respondsToSelector:@selector(standardUserDriverRequestsVersionDisplayer)]) {
-        versionDisplayer = [delegate standardUserDriverRequestsVersionDisplayer];
+        customVersionDisplayer = [delegate standardUserDriverRequestsVersionDisplayer];
     }
+    
+    id<SUVersionDisplay> versionDisplayer = (customVersionDisplayer != nil) ? customVersionDisplayer : [SPUStandardVersionDisplay standardVersionDisplay];
     
     BOOL needsToObserveUserAttention = [delegate respondsToSelector:@selector(standardUserDriverDidReceiveUserAttentionForUpdate:)];
     
@@ -582,25 +586,51 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
     
     [self closeCheckingWindow];
     
-    NSAlert *alert = [NSAlert alertWithError:error];
+    id <SPUStandardUserDriverDelegate> delegate = _delegate;
+    
+    id<SUVersionDisplay> customVersionDisplayer;
+    if ([delegate respondsToSelector:@selector(standardUserDriverRequestsVersionDisplayer)]) {
+        customVersionDisplayer = [delegate standardUserDriverRequestsVersionDisplayer];
+    } else {
+        customVersionDisplayer = nil;
+    }
+    
+    SPUNoUpdateFoundReason reason = (SPUNoUpdateFoundReason)[(NSNumber *)error.userInfo[SPUNoUpdateFoundReasonKey] integerValue];
+    
+    SUAppcastItem *latestAppcastItem = error.userInfo[SPULatestAppcastItemFoundKey];
+    
+#if SPARKLE_COPY_LOCALIZATIONS
+    NSBundle *sparkleBundle = SUSparkleBundle();
+#else
+    NSBundle *sparkleBundle = nil;
+#endif
+    
+    // If we have a custom version displayer, then override the recovery suggestion using the
+    // proper version display
+    NSError *presentationError;
+    if (customVersionDisplayer != nil) {
+        NSString *recoverySuggestion = SPUNoUpdateFoundRecoverySuggestion(reason, latestAppcastItem, _host, customVersionDisplayer, sparkleBundle);
+        
+        NSMutableDictionary<NSErrorUserInfoKey, id> *userInfo = [error.userInfo mutableCopy];
+        userInfo[NSLocalizedRecoverySuggestionErrorKey] = recoverySuggestion;
+        
+        presentationError = [NSError errorWithDomain:error.domain code:error.code userInfo:[userInfo copy]];
+    } else {
+        presentationError = error;
+    }
+    
+    NSAlert *alert = [NSAlert alertWithError:presentationError];
     alert.alertStyle = NSAlertStyleInformational;
     
     // Can we give more information to the user?
-    SPUNoUpdateFoundReason reason = (SPUNoUpdateFoundReason)[(NSNumber *)error.userInfo[SPUNoUpdateFoundReasonKey] integerValue];
-    
     void (^secondaryAction)(void) = nil;
-    SUAppcastItem *latestAppcastItem = error.userInfo[SPULatestAppcastItemFoundKey];
     if (latestAppcastItem != nil) {
-#if SPARKLE_COPY_LOCALIZATIONS
-        NSBundle *sparkleBundle = SUSparkleBundle();
-#endif
         switch (reason) {
             case SPUNoUpdateFoundReasonOnLatestVersion:
             case SPUNoUpdateFoundReasonOnNewerThanLatestVersion: {
                 // Show the user the past version history if available
 
                 // Check if the delegate allows showing the Version History
-                id <SPUStandardUserDriverDelegate> delegate = _delegate;
                 BOOL shouldShowVersionHistory = (![delegate respondsToSelector:@selector(standardUserDriverShouldShowVersionHistoryForAppcastItem:)] || [delegate standardUserDriverShouldShowVersionHistoryForAppcastItem:latestAppcastItem]);
                 
                 if (shouldShowVersionHistory) {

@@ -20,7 +20,7 @@
 @class SUAppcastItem, SPUDownloadData, SUHost;
 SPU_OBJC_DIRECT_MEMBERS @interface SUUpdateAlert : NSWindowController
 
-- (instancetype)initWithAppcastItem:(SUAppcastItem *)item state:(SPUUserUpdateState *)state host:(SUHost *)aHost versionDisplayer:(id <SUVersionDisplay>)aVersionDisplayer completionBlock:(void (^)(SPUUserUpdateChoice, NSRect, BOOL))completionBlock didBecomeKeyBlock:(void (^)(void))didBecomeKeyBlock;
+- (instancetype)initWithAppcastItem:(SUAppcastItem *)item state:(SPUUserUpdateState *)state host:(SUHost *)aHost versionDisplayer:(id<SUVersionDisplay>)versionDisplayer completionBlock:(void (^)(SPUUserUpdateChoice, NSRect, BOOL))completionBlock didBecomeKeyBlock:(void (^)(void))didBecomeKeyBlock;
 
 - (void)showUpdateReleaseNotesWithDownloadData:(SPUDownloadData *)downloadData;
 - (void)showReleaseNotesFailedToDownload;

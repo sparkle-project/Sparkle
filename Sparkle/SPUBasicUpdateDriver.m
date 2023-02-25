@@ -19,6 +19,9 @@
 #import "SPUAppcastItemState.h"
 #import "SUAppcastItem+Private.h"
 #import "SPUInstallationType.h"
+#import "SUVersionDisplayProtocol.h"
+#import "SPUStandardVersionDisplay.h"
+#import "SPUNoUpdateFoundInfo.h"
 
 
 #include "AppKitPrevention.h"
@@ -184,10 +187,11 @@
 {
     if (!_aborted) {
         NSString *localizedDescription;
-        NSString *recoverySuggestion;
         
 #if SPARKLE_COPY_LOCALIZATIONS
         NSBundle *sparkleBundle = SUSparkleBundle();
+#else
+        NSBundle *sparkleBundle = nil;
 #endif
         
         SPUNoUpdateFoundReason reason;
@@ -197,15 +201,11 @@
                     // This means the user is a 'newer than latest' version. give a slight hint to the user instead of wrongly claiming this version is identical to the latest feed version.
                     localizedDescription = SULocalizedStringFromTableInBundle(@"You’re up-to-date!", SPARKLE_TABLE, sparkleBundle, "Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates.");
                     
-                    recoverySuggestion = [NSString stringWithFormat:SULocalizedStringFromTableInBundle(@"%@ %@ is currently the newest version available.\n(You are currently running version %@.)", SPARKLE_TABLE, sparkleBundle, nil), [_host name], latestAppcastItem.displayVersionString, [_host displayVersion]];
-                    
                     reason = SPUNoUpdateFoundReasonOnNewerThanLatestVersion;
                     break;
                 case NSOrderedSame:
                     // No new update is available and we're on the latest
                     localizedDescription = SULocalizedStringFromTableInBundle(@"You’re up-to-date!", SPARKLE_TABLE, sparkleBundle, "Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates.");
-                    
-                    recoverySuggestion = [NSString stringWithFormat:SULocalizedStringFromTableInBundle(@"%@ %@ is currently the newest version available.", SPARKLE_TABLE, sparkleBundle, nil), [_host name], [_host displayVersion]];
                     
                     reason = SPUNoUpdateFoundReasonOnLatestVersion;
                     break;
@@ -215,20 +215,14 @@
                     if (!latestAppcastItem.minimumOperatingSystemVersionIsOK) {
                         localizedDescription = SULocalizedStringFromTableInBundle(@"Your macOS version is too old", SPARKLE_TABLE, sparkleBundle, nil);
                         
-                        recoverySuggestion = [NSString stringWithFormat:SULocalizedStringFromTableInBundle(@"%1$@ %2$@ is available but your macOS version is too old to install it. At least macOS %3$@ is required.", SPARKLE_TABLE, sparkleBundle, nil), [_host name], latestAppcastItem.displayVersionString, latestAppcastItem.minimumSystemVersion];
-                        
                         reason = SPUNoUpdateFoundReasonSystemIsTooOld;
                     } else if (!latestAppcastItem.maximumOperatingSystemVersionIsOK) {
                         localizedDescription = SULocalizedStringFromTableInBundle(@"Your macOS version is too new", SPARKLE_TABLE, sparkleBundle, nil);
-                        
-                        recoverySuggestion = [NSString stringWithFormat:SULocalizedStringFromTableInBundle(@"%1$@ %2$@ is available but your macOS version is too new for this update. This update only supports up to macOS %3$@.", SPARKLE_TABLE, sparkleBundle, nil), [_host name], latestAppcastItem.displayVersionString, latestAppcastItem.maximumSystemVersion];
                         
                         reason = SPUNoUpdateFoundReasonSystemIsTooNew;
                     } else {
                         // We shouldn't realistically get here
                         localizedDescription = SULocalizedStringFromTableInBundle(@"You’re up-to-date!", SPARKLE_TABLE, sparkleBundle, "Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates.");
-                        
-                        recoverySuggestion = [NSString stringWithFormat:SULocalizedStringFromTableInBundle(@"%@ %@ is currently the newest version available.", SPARKLE_TABLE, sparkleBundle, nil), [_host name], [_host displayVersion]];
                         
                         reason = SPUNoUpdateFoundReasonUnknown;
                     }
@@ -240,10 +234,14 @@
             // There could be update items on channels the updater is not subscribed to for example. But we can't tell the user about them.
             // There could also only be update items available for other platforms or none at all.
             localizedDescription = SULocalizedStringFromTableInBundle(@"You’re up-to-date!", SPARKLE_TABLE, sparkleBundle, "Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates.");
-            recoverySuggestion = [NSString stringWithFormat:SULocalizedStringFromTableInBundle(@"%@ %@ is currently the newest version available.", SPARKLE_TABLE, sparkleBundle, nil), [_host name], [_host displayVersion]];
             
             reason = SPUNoUpdateFoundReasonOnLatestVersion;
         }
+        
+        // We use the standard version displayer here to construct a reason string,
+        // but it's possible for the user driver to override this before displaying if they wish
+        id<SUVersionDisplay> versionDisplayer = [SPUStandardVersionDisplay standardVersionDisplay];
+        NSString *recoverySuggestion = SPUNoUpdateFoundRecoverySuggestion(reason, latestAppcastItem, _host, versionDisplayer, sparkleBundle);
         
         NSString *recoveryOption = SULocalizedStringFromTableInBundle(@"OK", SPARKLE_TABLE, sparkleBundle, nil);
         
