@@ -83,6 +83,7 @@ class ArchiveItem: CustomStringConvertible {
     var edSignature: String?
     var downloadUrlPrefix: URL?
     var releaseNotesURLPrefix: URL?
+    var signingError: Error?
 
     init(version: String, shortVersion: String?, feedURL: URL?, minimumSystemVersion: String?, frameworkVersion: String?, sparkleExecutableFileSize: Int?, sparkleLocales: String?, publicEdKey: String?, supportsDSA: Bool, appPath: URL, archivePath: URL) throws {
         self.version = version
