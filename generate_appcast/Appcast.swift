@@ -56,6 +56,7 @@ func makeAppcasts(archivesSourceDir: URL, outputPathURL: URL?, cacheDirectory ca
     }
     
     let group = DispatchGroup()
+    var updateArchivesToSign: [ArchiveItem] = []
     
     var appcastByFeed: [FeedName: Appcast] = [:]
     for (feed, updates) in updatesByAppcast {
@@ -174,6 +175,8 @@ func makeAppcasts(archivesSourceDir: URL, outputPathURL: URL?, cacheDirectory ca
                 continue
             }
             
+            updateArchivesToSign.append(update)
+            
             group.enter()
             DispatchQueue.global().async {
 #if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
@@ -193,13 +196,17 @@ func makeAppcasts(archivesSourceDir: URL, outputPathURL: URL?, cacheDirectory ca
                             do {
                                 update.edSignature = try edSignature(path: update.archivePath, publicEdKey: publicEdKey, privateEdKey: privateEdKey)
                             } catch {
+                                update.signingError = error
                                 print(update, error)
                             }
                         } else {
                             print("Warning: SUPublicEDKey in the app \(update.archivePath.path) does not match key EdDSA in the Keychain. Run generate_keys and update Info.plist to match")
                         }
                     } else {
-                        print("Warning: could not sign \(update.archivePath.path) due to lack of private EdDSA key")
+                        let error = makeError(code: .insufficientSigningError, "Could not sign \(update.archivePath.path) due to lack of private EdDSA key")
+                        
+                        update.signingError = error
+                        print("Error: could not sign \(update.archivePath.path) due to lack of private EdDSA key")
                     }
                 }
 
@@ -375,6 +382,13 @@ func makeAppcasts(archivesSourceDir: URL, outputPathURL: URL?, cacheDirectory ca
     }
     
     group.wait()
+    
+    // Check for fatal signing errors
+    for update in updateArchivesToSign {
+        if let signingError = update.signingError {
+            throw signingError
+        }
+    }
 
     return appcastByFeed
 }
