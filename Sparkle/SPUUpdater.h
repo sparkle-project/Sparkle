@@ -112,6 +112,7 @@ SU_EXPORT @interface SPUUpdater : NSObject
  and the `lastUpdateCheckDate`. Therefore, you should typically only consider calling this method directly if you
  opt out of automatic update checks. Calling this method when updating your own bundle is invalid if Sparkle is configured
  to ask the user's permission to check for updates automatically and `automaticallyChecksForUpdates` is `NO`.
+ If you want to reset the updater's cycle after an updater setting change, see `resetUpdateCycle` or `resetUpdateCycleAfterShortDelay` instead.
  
  This is meant for programmatically initating a check for updates in the background without the user initiating it.
  This check will not show UI if no new updates are found.
@@ -334,15 +335,28 @@ SU_EXPORT @interface SPUUpdater : NSObject
 @property (nonatomic, readonly, copy, nullable) NSDate *lastUpdateCheckDate;
 
 /**
- Appropriately schedules or cancels the update checking timer according to the settings for the time interval and automatic checks.
-
- If you change the `updateCheckInterval` or `automaticallyChecksForUpdates` properties, the update cycle will be reset automatically after a short delay.
- The update cycle is also started automatically after the updater is started. In all these cases, this method should not be called directly.
+ Appropriately re-schedules the update checking timer according to the current updater settings.
  
- This call does not change the date of the next check, but only the internal timer.
+ This method should only be called in response to a user changing updater settings. This method may trigger a new update check to occur in the background if an updater setting such as the updater's feed or allowed channels has changed.
+ 
+ If the `updateCheckInterval` or `automaticallyChecksForUpdates` properties are changed, this method is automatically invoked after a short delay using `resetUpdateCycleAfterShortDelay`. In these cases, manually resetting the update cycle is not necessary.
+ 
+ See also `resetUpdateCycleAfterShortDelay` which gives the user a short delay before triggering a cycle reset.
  */
 - (void)resetUpdateCycle;
 
+/**
+ Appropriately re-schedules the update checking timer according to the current updater settings after a short cancellable delay.
+ 
+ This method calls `resetUpdateCycle` after a short delay to give the user a short amount of time to cancel changing an updater setting.
+ If this method is called again, any previous reset request that is still inflight will be cancelled.
+ 
+ For example, if the user changes the `automaticallyChecksForUpdates` setting to `YES`, but quickly undoes their change then
+ no cycle reset will be done.
+ 
+ If the `updateCheckInterval` or `automaticallyChecksForUpdates` properties are changed, this method is automatically invoked. In these cases, manually resetting the update cycle is not necessary.
+ */
+- (void)resetUpdateCycleAfterShortDelay;
 
 /**
  The system profile information that is sent when checking for updates.
