@@ -105,6 +105,12 @@
 		61B5FCDF09C52A9F00B25A18 /* SUUpdateAlert.h in Headers */ = {isa = PBXBuildFile; fileRef = 61B5FCA009C5228F00B25A18 /* SUUpdateAlert.h */; settings = {ATTRIBUTES = (); }; };
 		61EF67560E25B58D00F754E0 /* SUHost.m in Sources */ = {isa = PBXBuildFile; fileRef = 61EF67550E25B58D00F754E0 /* SUHost.m */; };
 		61EF67590E25C5B400F754E0 /* SUHost.h in Headers */ = {isa = PBXBuildFile; fileRef = 61EF67580E25C5B400F754E0 /* SUHost.h */; };
+		654F352529B1548700B10EEB /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 61B5F8F609C4CEB300B25A18 /* Security.framework */; };
+		654F352729B154AE00B10EEB /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 654F352629B154AE00B10EEB /* ImageIO.framework */; };
+		654F352829B154B500B10EEB /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 55C14F31136EFC2400649790 /* SystemConfiguration.framework */; };
+		654F352929B154BB00B10EEB /* ServiceManagement.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 724BB3B51D35AAC3005D534A /* ServiceManagement.framework */; };
+		654F352C29B154E900B10EEB /* UniformTypeIdentifiers.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F6D399502814387000A8C0DA /* UniformTypeIdentifiers.framework */; };
+		654F352D29B1551000B10EEB /* CoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 721BC20A1D17A5AD002BC71E /* CoreServices.framework */; };
 		7202DC9A269ABD3500737EC4 /* testappcast_phasedRollout.xml in Resources */ = {isa = PBXBuildFile; fileRef = 7202DC99269ABD3500737EC4 /* testappcast_phasedRollout.xml */; };
 		72045CE026FEE535004F96E5 /* Downloader.xpc in Copy XPC Services */ = {isa = PBXBuildFile; fileRef = 726E07EF1CAF37BD001A286B /* Downloader.xpc */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		72045CE126FEE535004F96E5 /* InstallerConnection.xpc in Copy XPC Services */ = {isa = PBXBuildFile; fileRef = 724BB36C1D31D0B7005D534A /* InstallerConnection.xpc */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -1011,6 +1017,7 @@
 		61EF67580E25C5B400F754E0 /* SUHost.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUHost.h; sourceTree = "<group>"; };
 		61F3AC1215C22D4A00260CA2 /* th */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = th; path = th.lproj/Sparkle.strings; sourceTree = "<group>"; };
 		61F614540E24A12D009F47E7 /* it */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/Sparkle.strings; sourceTree = "<group>"; };
+		654F352629B154AE00B10EEB /* ImageIO.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ImageIO.framework; path = System/Library/Frameworks/ImageIO.framework; sourceTree = SDKROOT; };
 		7202DC99269ABD3500737EC4 /* testappcast_phasedRollout.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = testappcast_phasedRollout.xml; sourceTree = "<group>"; };
 		72045CE426FEE708004F96E5 /* strip-framework.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "strip-framework.sh"; sourceTree = "<group>"; };
 		7205C43E1E13049400E370AE /* generate_appcast */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = generate_appcast; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1578,6 +1585,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				654F352D29B1551000B10EEB /* CoreServices.framework in Frameworks */,
+				654F352C29B154E900B10EEB /* UniformTypeIdentifiers.framework in Frameworks */,
+				654F352929B154BB00B10EEB /* ServiceManagement.framework in Frameworks */,
+				654F352829B154B500B10EEB /* SystemConfiguration.framework in Frameworks */,
+				654F352729B154AE00B10EEB /* ImageIO.framework in Frameworks */,
+				654F352529B1548700B10EEB /* Security.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1707,6 +1720,7 @@
 		0867D69AFE84028FC02AAC07 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				654F352629B154AE00B10EEB /* ImageIO.framework */,
 				725B81F92781AEA40041746F /* libcompression.tbd */,
 				0867D6A5FE840307C02AAC07 /* AppKit.framework */,
 				721BC2081D17A553002BC71E /* Carbon.framework */,
