@@ -65,7 +65,8 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     SPUUpdaterTimer *_updaterTimer;
     id<SPUResumableUpdate> _resumableUpdate;
     NSDate *_updateLastCheckedDate;
-    NSURL *_parameterizedFeedURL;
+    NSURL *_lastCheckedFeedURL;
+    NSSet<NSString *> * _lastAllowedChannels;
     
     __weak id<SPUUpdaterDelegate> _delegate;
     
@@ -277,6 +278,9 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     }
     
     if (feedURL != nil) {
+        _lastCheckedFeedURL = feedURL;
+        _lastAllowedChannels = [self allowedChannels];
+        
         servingOverHttps = [[[feedURL scheme] lowercaseString] isEqualToString:@"https"];
         if (!servingOverHttps && !_loggedATSWarning) {
             BOOL foundXPCDownloaderService = NO;
@@ -833,6 +837,16 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     [_updaterCycle cancelNextUpdateCycle];
 }
 
+- (NSSet<NSString *> *)allowedChannels SPU_OBJC_DIRECT
+{
+    id<SPUUpdaterDelegate> delegate = _delegate;
+    if ([delegate respondsToSelector:@selector(allowedChannelsForUpdater:)]) {
+        return [delegate allowedChannelsForUpdater:self];
+    } else {
+        return [NSSet set];
+    }
+}
+
 - (void)resetUpdateCycle
 {
     if (!_startedUpdater) {
@@ -841,14 +855,33 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     }
     
     // Note this resets the opportune time when user grants Sparkle permission to check for updates
-    // and when the user changes preferences on automatically checking for updates or the update time check interval
+    // and when the user changes preferences on a Sparkle setting such as automatically checking for updates
     if ([_userDriver respondsToSelector:@selector(resetTimeSinceOpportuneUpdateNotice)]) {
         [(id<SPUGentleUserDriverReminders>)_userDriver resetTimeSinceOpportuneUpdateNotice];
     }
     
     if (!_sessionInProgress) {
         [self cancelNextUpdateCycle];
-        [self scheduleNextUpdateCheckFiringImmediately:NO usingCurrentDate:YES];
+        
+        // If the non-parameterized feed URL or allowed set of channels have been changed by the user since the last update check,
+        // we can fire an update check in the background immediately
+        BOOL fireUpdateCheckImmediately = NO;
+        NSURL *lastCheckedFeedURL = _lastCheckedFeedURL;
+        if (lastCheckedFeedURL != nil) {
+            NSURL *currentFeedURL = [self retrieveFeedURL:NULL];
+            if (currentFeedURL != nil) {
+                if (![currentFeedURL isEqual:lastCheckedFeedURL]) {
+                    fireUpdateCheckImmediately = YES;
+                } else if (_lastAllowedChannels != nil) {
+                    NSSet<NSString *> *currentAllowedChannels = [self allowedChannels];
+                    if (currentAllowedChannels != nil && ![currentAllowedChannels isEqualToSet:_lastAllowedChannels]) {
+                        fireUpdateCheckImmediately = YES;
+                    }
+                }
+            }
+        }
+        
+        [self scheduleNextUpdateCheckFiringImmediately:fireUpdateCheckImmediately usingCurrentDate:YES];
     }
 }
 
