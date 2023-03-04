@@ -225,7 +225,7 @@ SU_EXPORT @interface SPUUpdater : NSObject
  Note that the developer can disallow automatic downloading of updates from being enabled (via `SUAllowsAutomaticUpdates` Info.plist key).
  In this case, this property will return NO regardless of how this property is set.
  
- Prefer to set SUAutomaticallyUpdate directly in your Info.plist for setting the initial value.
+ Prefer to set `SUAutomaticallyUpdate` directly in your Info.plist for setting the initial value.
  
  Setting this property will persist in the host bundle's user defaults.
  Hence developers shouldn't maintain an additional user default for this property.
@@ -301,7 +301,7 @@ SU_EXPORT @interface SPUUpdater : NSObject
  The user agent used when checking for updates.
  
  By default the user agent string returned is in the format:
- $(BundleDisplayName)/$(BundleDisplayVersion) Sparkle/$(SparkleDisplayVersion)
+ `$(BundleDisplayName)/$(BundleDisplayVersion) Sparkle/$(SparkleDisplayVersion)`
  
  BundleDisplayVersion is derived from the main application's Info.plist's CFBundleShortVersionString.
  
@@ -339,9 +339,9 @@ SU_EXPORT @interface SPUUpdater : NSObject
  
  This method should only be called in response to a user changing updater settings. This method may trigger a new update check to occur in the background if an updater setting such as the updater's feed or allowed channels has changed.
  
- If the `updateCheckInterval` or `automaticallyChecksForUpdates` properties are changed, this method is automatically invoked after a short delay using `resetUpdateCycleAfterShortDelay`. In these cases, manually resetting the update cycle is not necessary.
+ If the `updateCheckInterval` or `automaticallyChecksForUpdates` properties are changed, this method is automatically invoked after a short delay using `-resetUpdateCycleAfterShortDelay`. In these cases, manually resetting the update cycle is not necessary.
  
- See also `resetUpdateCycleAfterShortDelay` which gives the user a short delay before triggering a cycle reset.
+ See also `-resetUpdateCycleAfterShortDelay` which gives the user a short delay before triggering a cycle reset.
  */
 - (void)resetUpdateCycle;
 
