@@ -1,3 +1,18 @@
+# 2.4.0
+
+* Ask permission for automatically downloading and installing new updates (#2285) (Zorg)
+* Update `SUVersionDisplay` to better customize and display how versions are shown (#2321) (Zorg)
+* Reduce code size
+  * Enable deployment postprocessing in Release to properly strip debug symbols and strip all non-global symbols (#2286, #2305) (Zerg)
+  * Remove duplicate Sparkle localization strings in Updater app (#2288) (Zorg)
+  * Optimize codebase for generated code size (less properties, direct methods, etc) (#2305) (Zorg)
+  * Add additional settings to `ConfigCommon.xcconfig` for disabling features
+* Add deprecations/warnings for incorrect update checking usage (#2295) (Zorg)
+* Deprecate `-[SPUUpdater setFeedURL:]` API and add `-[SPUUpdater clearFeedURLFromUserDefaults]` for migrating away from `-[SPUUpdater setFeedURL:]` (#2295)
+* Exit with an error if generate_appcast cannot sign an update that must be signed (#2322) (Zorg)
+* Trigger a new update check in `-[SPUUpdater resetUpdateCycle]` if the updater's feed or allowed channels have changed (#2324) (Zorg)
+* Turn off autolinking for XPC targets to alleviate circular dependency issues (#2332) (Daniel Jalkut)
+
 # 2.3.2
 
 * Fix potential crash during download if appcast item includes invalid enclosure URL (#2317) (Zorg)
