@@ -2,7 +2,7 @@ name: "Create Draft Release"
 
 env:
   BUILDDIR: "build"
-  DEVELOPER_DIR: "/Applications/Xcode_14.1.app/Contents/Developer"
+  DEVELOPER_DIR: "/Applications/Xcode_14.2.app/Contents/Developer"
 
 on:
   workflow_dispatch:
