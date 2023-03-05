@@ -20,7 +20,7 @@ struct Create: ParsableCommand {
     @Option(name: .long, help: ArgumentHelp(COMPRESSION_METHOD_ARGUMENT_DESCRIPTION, valueName: "compression"))
     var compression: String = "default"
     
-    @Option(name: .long, help: ArgumentHelp(COMPRESSION_LEVEL_ARGUMENT_DESCRIPTION, valueName: "compression-level"))
+    @Option(name: .long, help: .hidden)
     var compressionLevel: UInt8 = 0
     
     @Argument(help: ArgumentHelp("Path to original bundle to create a patch from."))
