@@ -52,9 +52,10 @@ extern SUBinaryDeltaMajorVersion SUBinaryDeltaMajorVersionLatest;
 extern SUBinaryDeltaMajorVersion SUBinaryDeltaMajorVersionFirst;
 extern SUBinaryDeltaMajorVersion SUBinaryDeltaMajorVersionFirstSupported;
 
-#define COMPRESSION_METHOD_ARGUMENT_DESCRIPTION @"The compression method to use for generating delta updates. Supported methods for version 3 delta files are 'lzma', 'bzip2', 'zlib', 'lzfse', 'lz4', 'none', and 'default'. Note that version 2 delta files only support 'bzip2', 'none', and 'default' so other methods will be ignored if version 2 files are being generated. The 'default' compression for version 3 delta files is currently lzma."
+// Additional compression methods for version 3 patches that we have for debugging are zlib, bzip2, none
+#define COMPRESSION_METHOD_ARGUMENT_DESCRIPTION @"The compression method to use for generating delta updates. Supported methods for version 3 delta files are 'lzma' (best compression, slowest), 'lzfse' (good compression, fast), 'lz4' (worse compression, fastest), and 'default'. Note that version 2 delta files only support 'bzip2', and 'default' so other methods will be ignored if version 2 files are being generated. The 'default' compression for version 3 delta files is currently lzma."
 
-#define COMPRESSION_LEVEL_ARGUMENT_DESCRIPTION @"The compression level to use for generating delta updates. This only applies if the compression method used is bzip2 which accepts values from 1 - 9. A special value of 0 will use the default compression level."
+//#define COMPRESSION_LEVEL_ARGUMENT_DESCRIPTION @"The compression level to use for generating delta updates. This only applies if the compression method used is bzip2 which accepts values from 1 - 9. A special value of 0 will use the default compression level."
 
 SPUDeltaCompressionMode deltaCompressionModeFromDescription(NSString *description, BOOL *requestValid);
 NSString *deltaCompressionStringFromMode(SPUDeltaCompressionMode mode);
