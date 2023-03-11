@@ -63,7 +63,7 @@ struct GenerateAppcast: ParsableCommand {
     @Option(name: .customLong("ed-key-file"), help: ArgumentHelp("Path to the private EdDSA key file. If not specified, the private EdDSA key will be read from the Keychain instead. '-' can be used to echo the EdDSA key from a 'secret' environment variable to the standard input stream. For example: echo \"$PRIVATE_KEY_SECRET\" | ./\(programName) --ed-key-file -", valueName: "private-EdDSA-key-file"))
     var privateEdKeyPath: String?
     
-#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
+#if GENERATE_APPCAST_BUILD_LEGACY_DSA_SUPPORT
     @Option(name: .customShort("f"), help: ArgumentHelp("Path to the private DSA key file. Only use this option for transitioning to EdDSA from older updates.", valueName: "private-dsa-key-file"), transform: { URL(fileURLWithPath: $0) })
     var privateDSAKeyURL: URL?
     
@@ -189,7 +189,7 @@ struct GenerateAppcast: ParsableCommand {
         """)
     
     func validate() throws {
-#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
+#if GENERATE_APPCAST_BUILD_LEGACY_DSA_SUPPORT
         guard (keychainURL == nil) == (privateDSAKeyName == nil) else {
             throw ValidationError("Both -n <dsa-key-name> and -k <keychain> options must be provided together, or neither should be provided.")
         }
@@ -228,7 +228,7 @@ struct GenerateAppcast: ParsableCommand {
     func run() throws {
         // Extract the keys
         let privateDSAKey : SecKey?
-    #if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
+    #if GENERATE_APPCAST_BUILD_LEGACY_DSA_SUPPORT
         if let privateDSAKeyURL = privateDSAKeyURL {
             do {
                 privateDSAKey = try loadPrivateDSAKey(at: privateDSAKeyURL)

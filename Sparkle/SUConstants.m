@@ -72,7 +72,7 @@ NSString *const SURelaunchToolNameKey = @"SURelaunchToolName";
 NSString *const SUAppcastAttributeDeltaFrom = @"sparkle:deltaFrom";
 NSString *const SUAppcastAttributeDeltaFromSparkleExecutableSize = @"sparkle:deltaFromSparkleExecutableSize";
 NSString *const SUAppcastAttributeDeltaFromSparkleLocales = @"sparkle:deltaFromSparkleLocales";
-#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
+#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT || GENERATE_APPCAST_BUILD_LEGACY_DSA_SUPPORT
 NSString *const SUAppcastAttributeDSASignature = @"sparkle:dsaSignature";
 #endif
 NSString *const SUAppcastAttributeEDSignature = @"sparkle:edSignature";

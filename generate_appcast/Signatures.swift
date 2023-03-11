@@ -17,7 +17,7 @@ struct PrivateKeys {
     }
 }
 
-#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
+#if GENERATE_APPCAST_BUILD_LEGACY_DSA_SUPPORT
 func loadPrivateDSAKey(at privateKeyURL: URL) throws -> SecKey {
     let data = try Data(contentsOf: privateKeyURL)
 
