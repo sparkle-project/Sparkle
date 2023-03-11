@@ -185,6 +185,7 @@
 
     NSError *codeSignedError = nil;
     if (hostIsCodeSigned) {
+        // If passedCodeSigning becomes YES, this also means the new bundle's code signature is valid
         passedCodeSigning = [SUCodeSigningVerifier codeSignatureAtBundleURL:host.bundle.bundleURL matchesSignatureAtBundleURL:newHost.bundle.bundleURL error:&codeSignedError];
     }
     // End of security-critical part
@@ -201,8 +202,9 @@
         }
     }
 
+    // If the new update is code signed but it's not validly code signed, we reject it
     NSError *innerError = nil;
-    if (passedDSACheck && updateIsCodeSigned && ![SUCodeSigningVerifier codeSignatureIsValidAtBundleURL:newHost.bundle.bundleURL error:&innerError]) {
+    if (passedDSACheck && updateIsCodeSigned && !passedCodeSigning && ![SUCodeSigningVerifier codeSignatureIsValidAtBundleURL:newHost.bundle.bundleURL error:&innerError]) {
         if (error != NULL) {
             *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUValidationError userInfo:@{ NSLocalizedDescriptionKey: @"The update archive has a valid (Ed)DSA signature, but the app is also signed with Code Signing, which is corrupted. The update will be rejected.", NSUnderlyingErrorKey: innerError }];
         }
