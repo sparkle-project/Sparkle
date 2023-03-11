@@ -47,10 +47,8 @@ SPU_OBJC_DIRECT_MEMBERS
 #endif
 @interface SUPublicKeys : NSObject
 
-#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
 @property (nonatomic, readonly, nullable) NSString *dsaPubKey;
 @property (nonatomic, readonly) SUSigningInputStatus dsaPubKeyStatus;
-#endif
 
 @property (nonatomic, readonly, nullable) const unsigned char *ed25519PubKey;
 @property (nonatomic, readonly) SUSigningInputStatus ed25519PubKeyStatus;
@@ -59,9 +57,7 @@ SPU_OBJC_DIRECT_MEMBERS
 @property (nonatomic, readonly) BOOL hasAnyKeys;
 
 - (instancetype)initWithEd:(NSString * _Nullable)ed
-#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
                        dsa:(NSString * _Nullable)dsa
-#endif
 ;
 
 @end

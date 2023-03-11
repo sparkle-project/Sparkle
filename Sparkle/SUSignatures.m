@@ -150,21 +150,15 @@ static BOOL decodeStatus(NSCoder *decoder, NSString *key, SUSigningInputStatus *
     unsigned char _ed25519_public_key[32];
 }
 
-#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
 @synthesize dsaPubKey = _dsaPubKey;
-#endif
 @synthesize ed25519PubKeyStatus = _ed25519PubKeyStatus;
 
 - (instancetype)initWithEd:(NSString * _Nullable)maybeEd25519
-#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
                        dsa:(NSString * _Nullable)maybeDsa
-#endif
 {
     self = [super init];
     if (self) {
-#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
         _dsaPubKey = maybeDsa;
-#endif
         if (maybeEd25519 != nil) {
             NSData *ed = nil;
             _ed25519PubKeyStatus = decode(maybeEd25519, &ed);
@@ -185,13 +179,11 @@ static BOOL decodeStatus(NSCoder *decoder, NSString *key, SUSigningInputStatus *
     return self;
 }
 
-#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
 - (SUSigningInputStatus)dsaPubKeyStatus {
     // We don't currently do any prevalidation of DSA public keys,
     // so this is always going to be "present" or "absent".
     return (_dsaPubKey != nil) ? SUSigningInputStatusPresent : SUSigningInputStatusAbsent;
 }
-#endif
 
 - (const unsigned char *)ed25519PubKey {
     if (_ed25519PubKeyStatus == SUSigningInputStatusPresent) {
@@ -201,12 +193,8 @@ static BOOL decodeStatus(NSCoder *decoder, NSString *key, SUSigningInputStatus *
 }
 
 - (BOOL)hasAnyKeys {
-    return
-        _ed25519PubKeyStatus != SUSigningInputStatusAbsent
-#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
-        || [self dsaPubKeyStatus] != SUSigningInputStatusAbsent
-#endif
-    ;
+    return (_ed25519PubKeyStatus != SUSigningInputStatusAbsent) ||
+            ([self dsaPubKeyStatus] != SUSigningInputStatusAbsent);
 }
 
 @end

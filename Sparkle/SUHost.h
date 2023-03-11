@@ -31,9 +31,7 @@ SPU_OBJC_DIRECT_MEMBERS
 
 @property (getter=isRunningOnReadOnlyVolume, nonatomic, readonly) BOOL runningOnReadOnlyVolume;
 @property (getter=isRunningTranslocated, nonatomic, readonly) BOOL runningTranslocated;
-#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
 @property (readonly, nonatomic, copy, nullable) NSString *publicDSAKeyFileKey;
-#endif
 
 - (nullable id)objectForInfoDictionaryKey:(NSString *)key;
 - (BOOL)boolForInfoDictionaryKey:(NSString *)key;

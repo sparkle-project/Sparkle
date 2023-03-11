@@ -41,11 +41,8 @@ NSString *const SUSkippedMajorVersionKey = @"SUSkippedMajorVersion";
 NSString *const SUSkippedMajorSubreleaseVersionKey = @"SUSkippedMajorSubreleaseVersion";
 NSString *const SUScheduledCheckIntervalKey = @"SUScheduledCheckInterval";
 NSString *const SULastCheckTimeKey = @"SULastCheckTime";
-#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
-NSString *const SUExpectsDSASignatureKey = @"SUExpectsDSASignature";
 NSString *const SUPublicDSAKeyKey = @"SUPublicDSAKey";
 NSString *const SUPublicDSAKeyFileKey = @"SUPublicDSAKeyFile";
-#endif
 NSString *const SUPublicEDKeyKey = @"SUPublicEDKey";
 NSString *const SUAutomaticallyUpdateKey = @"SUAutomaticallyUpdate";
 NSString *const SUAllowsAutomaticUpdatesKey = @"SUAllowsAutomaticUpdates";
