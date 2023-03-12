@@ -74,8 +74,10 @@ struct GenerateAppcast: ParsableCommand {
     @Option(name: .customShort("s"), help: ArgumentHelp("(DEPRECATED): The private EdDSA string (128 characters). This option is deprecated. Please use the Keychain, or pass the key as standard input when using the --ed-key-file - option instead.", valueName: "private-EdDSA-key"))
     var privateEdString : String?
     
+#if GENERATE_APPCAST_BUILD_LEGACY_DSA_SUPPORT
     @Option(name: .customShort("k"), help: ArgumentHelp("The path to the keychain to look up the private DSA key. This option must be used together with `-n`. Only use this option for transitioning to EdDSA from older updates.", valueName: "keychain-for-dsa"), transform: { URL(fileURLWithPath: $0) })
     var keychainURL: URL?
+#endif
     
     @Option(name: .customLong("download-url-prefix"), help: ArgumentHelp("A URL that will be used as prefix for the URL from where updates will be downloaded.", valueName: "url"), transform: { URL(string: $0) })
     var downloadURLPrefix : URL?
