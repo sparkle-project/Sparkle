@@ -17,7 +17,7 @@
 
 @implementation SUCodeSigningVerifier
 
-+ (BOOL)codeSignatureAtBundleURL:(NSURL *)oldBundleURL matchesSignatureAtBundleURL:(NSURL *)newBundleURL error:(NSError * __autoreleasing *)error
++ (BOOL)codeSignatureIsValidAtBundleURL:(NSURL *)newBundleURL andMatchesSignatureAtBundleURL:(NSURL *)oldBundleURL error:(NSError * __autoreleasing *)error
 {
     OSStatus result;
     SecRequirementRef requirement = NULL;
@@ -148,7 +148,7 @@ finally:
         goto finally;
     }
 
-    // See in -codeSignatureAtBundleURL:matchesSignatureAtBundleURL:error: for why kSecCSCheckNestedCode is not always passed
+    // See in -codeSignatureIsValidAtBundleURL:andMatchesSignatureAtBundleURL:error: for why kSecCSCheckNestedCode is not always passed
     SecCSFlags flags = (SecCSFlags) (kSecCSDefaultFlags | kSecCSCheckAllArchitectures);
     if (checkNestedCode) {
         flags |= kSecCSCheckNestedCode;

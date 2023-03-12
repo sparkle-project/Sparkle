@@ -185,8 +185,7 @@
 
     NSError *codeSignedError = nil;
     if (hostIsCodeSigned) {
-        // If passedCodeSigning becomes YES, this also means the new bundle's code signature is valid
-        passedCodeSigning = [SUCodeSigningVerifier codeSignatureAtBundleURL:host.bundle.bundleURL matchesSignatureAtBundleURL:newHost.bundle.bundleURL error:&codeSignedError];
+        passedCodeSigning = [SUCodeSigningVerifier codeSignatureIsValidAtBundleURL:newHost.bundle.bundleURL andMatchesSignatureAtBundleURL:host.bundle.bundleURL error:&codeSignedError];
     }
     // End of security-critical part
 
