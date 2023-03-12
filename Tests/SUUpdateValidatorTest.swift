@@ -12,9 +12,7 @@ import XCTest
 class SUUpdateValidatorTest: XCTestCase {
     enum BundleConfig: String, CaseIterable, Equatable {
         case none = "None"
-#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
         case dsaOnly = "DSAOnly"
-#endif
         case edOnly = "EDOnly"
         case both = "Both"
         case codeSignedOnly = "CodeSignedOnly"
@@ -31,10 +29,8 @@ class SUUpdateValidatorTest: XCTestCase {
                 return false
             case .edOnly, .both, .codeSignedBoth, .codeSignedBothNew, .codeSignedOldED, .codeSignedInvalid:
                 return true
-#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
             case .dsaOnly:
                 return true
-#endif
             }
         }
     }
@@ -129,6 +125,8 @@ class SUUpdateValidatorTest: XCTestCase {
 #endif
 #if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
             testPrevalidation(bundle: .both, signatures: signatureConfig, expectedResult: signatureConfig.ed == .valid && signatureConfig.dsa != .invalidFormat)
+#else
+            testPrevalidation(bundle: .both, signatures: signatureConfig, expectedResult: signatureConfig.ed == .valid)
 #endif
         }
     }
@@ -166,6 +164,8 @@ class SUUpdateValidatorTest: XCTestCase {
 #endif
 #if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
             testPostValidation(bundle: .both, signatures: signatureConfig, expectedResult: signatureConfig.ed == .valid && signatureConfig.dsa != .invalidFormat)
+#else
+            testPostValidation(bundle: .both, signatures: signatureConfig, expectedResult: signatureConfig.ed == .valid)
 #endif
         }
     }
@@ -188,6 +188,8 @@ class SUUpdateValidatorTest: XCTestCase {
         for bundleConfig in BundleConfig.allCases {
 #if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
             testPostValidation(oldBundle: .dsaOnly, newBundle: bundleConfig, signatures: SignatureConfig(ed: .valid, dsa: .valid), expectedResult: bundleConfig.hasAnyKeys && bundleConfig != .codeSignedInvalid)
+#else
+            testPostValidation(oldBundle: .dsaOnly, newBundle: bundleConfig, signatures: SignatureConfig(ed: .valid), expectedResult: false)
 #endif
             do {
 #if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
@@ -199,6 +201,8 @@ class SUUpdateValidatorTest: XCTestCase {
             }
 #if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
             testPostValidation(oldBundle: .both, newBundle: bundleConfig, signatures: SignatureConfig(ed: .valid, dsa: .valid), expectedResult: bundleConfig.hasAnyKeys && bundleConfig != .codeSignedInvalid)
+#else
+            testPostValidation(oldBundle: .both, newBundle: bundleConfig, signatures: SignatureConfig(ed: .valid), expectedResult: bundleConfig.hasAnyKeys && bundleConfig != .codeSignedInvalid)
 #endif
             do {
 #if SPARKLE_BUILD_LEGACY_DSA_SUPPORT

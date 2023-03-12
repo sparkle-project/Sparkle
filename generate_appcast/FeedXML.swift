@@ -448,7 +448,7 @@ func writeAppcast(appcastDestPath: URL, appcast: Appcast, fullReleaseNotesLink: 
         if let sig = update.edSignature {
             attributes.append(XMLNode.attribute(withName: SUAppcastAttributeEDSignature, uri: sparkleNS, stringValue: sig) as! XMLNode)
         }
-#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
+#if GENERATE_APPCAST_BUILD_LEGACY_DSA_SUPPORT
         if let sig = update.dsaSignature {
             attributes.append(XMLNode.attribute(withName: SUAppcastAttributeDSASignature, uri: sparkleNS, stringValue: sig) as! XMLNode)
         }
@@ -482,7 +482,7 @@ func writeAppcast(appcastDestPath: URL, appcast: Appcast, fullReleaseNotesLink: 
                 if let sig = delta.edSignature {
                     attributes.append(XMLNode.attribute(withName: SUAppcastAttributeEDSignature, uri: sparkleNS, stringValue: sig) as! XMLNode)
                 }
-#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
+#if GENERATE_APPCAST_BUILD_LEGACY_DSA_SUPPORT
                 if let sig = delta.dsaSignature {
                     attributes.append(XMLNode.attribute(withName: SUAppcastAttributeDSASignature, uri: sparkleNS, stringValue: sig) as! XMLNode)
                 }

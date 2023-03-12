@@ -179,7 +179,7 @@ func makeAppcasts(archivesSourceDir: URL, outputPathURL: URL?, cacheDirectory ca
             
             group.enter()
             DispatchQueue.global().async {
-#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
+#if GENERATE_APPCAST_BUILD_LEGACY_DSA_SUPPORT
                 if let privateDSAKey = keys.privateDSAKey {
                     do {
                         update.dsaSignature = try dsaSignature(path: update.archivePath, privateDSAKey: privateDSAKey)
@@ -343,7 +343,7 @@ func makeAppcasts(archivesSourceDir: URL, outputPathURL: URL?, cacheDirectory ca
 
                 group.enter()
                 DispatchQueue.global().async {
-#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
+#if GENERATE_APPCAST_BUILD_LEGACY_DSA_SUPPORT
                     if item.supportsDSA, let privateDSAKey = keys.privateDSAKey {
                         do {
                             delta.dsaSignature = try dsaSignature(path: deltaPath, privateDSAKey: privateDSAKey)
@@ -361,7 +361,7 @@ func makeAppcasts(archivesSourceDir: URL, outputPathURL: URL?, cacheDirectory ca
                     }
                     do {
                         var hasAnyDSASignature = (delta.edSignature != nil)
-#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
+#if GENERATE_APPCAST_BUILD_LEGACY_DSA_SUPPORT
                         hasAnyDSASignature = hasAnyDSASignature || (delta.dsaSignature != nil)
 #endif
                         if hasAnyDSASignature {

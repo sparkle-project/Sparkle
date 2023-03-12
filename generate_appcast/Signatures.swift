@@ -17,6 +17,7 @@ struct PrivateKeys {
     }
 }
 
+#if GENERATE_APPCAST_BUILD_LEGACY_DSA_SUPPORT
 func loadPrivateDSAKey(at privateKeyURL: URL) throws -> SecKey {
     let data = try Data(contentsOf: privateKeyURL)
 
@@ -94,6 +95,7 @@ func dsaSignature(path: URL, privateDSAKey: SecKey) throws -> String {
     }
     return resultData.base64EncodedString()
 }
+#endif
 
 func edSignature(path: URL, publicEdKey: Data, privateEdKey: Data) throws -> String {
     assert(publicEdKey.count == 32)

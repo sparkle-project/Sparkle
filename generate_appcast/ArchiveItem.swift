@@ -16,7 +16,7 @@ struct UpdateBranch: Hashable {
 class DeltaUpdate {
     let fromVersion: String
     let archivePath: URL
-#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
+#if GENERATE_APPCAST_BUILD_LEGACY_DSA_SUPPORT
     var dsaSignature: String?
 #endif
     var edSignature: String?
@@ -77,7 +77,7 @@ class ArchiveItem: CustomStringConvertible {
     let archiveFileAttributes: [FileAttributeKey: Any]
     var deltas: [DeltaUpdate]
 
-#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
+#if GENERATE_APPCAST_BUILD_LEGACY_DSA_SUPPORT
     var dsaSignature: String?
 #endif
     var edSignature: String?
@@ -146,7 +146,7 @@ class ArchiveItem: CustomStringConvertible {
             }
             let shortVersion = infoPlist["CFBundleShortVersionString"] as? String
             let publicEdKey = infoPlist[SUPublicEDKeyKey] as? String
-#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
+#if GENERATE_APPCAST_BUILD_LEGACY_DSA_SUPPORT
             let supportsDSA = infoPlist[SUPublicDSAKeyKey] != nil || infoPlist[SUPublicDSAKeyFileKey] != nil
 #else
             let supportsDSA = false

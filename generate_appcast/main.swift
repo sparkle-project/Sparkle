@@ -63,17 +63,21 @@ struct GenerateAppcast: ParsableCommand {
     @Option(name: .customLong("ed-key-file"), help: ArgumentHelp("Path to the private EdDSA key file. If not specified, the private EdDSA key will be read from the Keychain instead. '-' can be used to echo the EdDSA key from a 'secret' environment variable to the standard input stream. For example: echo \"$PRIVATE_KEY_SECRET\" | ./\(programName) --ed-key-file -", valueName: "private-EdDSA-key-file"))
     var privateEdKeyPath: String?
     
+#if GENERATE_APPCAST_BUILD_LEGACY_DSA_SUPPORT
     @Option(name: .customShort("f"), help: ArgumentHelp("Path to the private DSA key file. Only use this option for transitioning to EdDSA from older updates.", valueName: "private-dsa-key-file"), transform: { URL(fileURLWithPath: $0) })
     var privateDSAKeyURL: URL?
     
     @Option(name: .customShort("n"), help: ArgumentHelp("The name of the private DSA key. This option must be used together with `-k`. Only use this option for transitioning to EdDSA from older updates.", valueName: "dsa-key-name"))
     var privateDSAKeyName: String?
+#endif
     
     @Option(name: .customShort("s"), help: ArgumentHelp("(DEPRECATED): The private EdDSA string (128 characters). This option is deprecated. Please use the Keychain, or pass the key as standard input when using the --ed-key-file - option instead.", valueName: "private-EdDSA-key"))
     var privateEdString : String?
     
+#if GENERATE_APPCAST_BUILD_LEGACY_DSA_SUPPORT
     @Option(name: .customShort("k"), help: ArgumentHelp("The path to the keychain to look up the private DSA key. This option must be used together with `-n`. Only use this option for transitioning to EdDSA from older updates.", valueName: "keychain-for-dsa"), transform: { URL(fileURLWithPath: $0) })
     var keychainURL: URL?
+#endif
     
     @Option(name: .customLong("download-url-prefix"), help: ArgumentHelp("A URL that will be used as prefix for the URL from where updates will be downloaded.", valueName: "url"), transform: { URL(string: $0) })
     var downloadURLPrefix : URL?
@@ -187,6 +191,7 @@ struct GenerateAppcast: ParsableCommand {
         """)
     
     func validate() throws {
+#if GENERATE_APPCAST_BUILD_LEGACY_DSA_SUPPORT
         guard (keychainURL == nil) == (privateDSAKeyName == nil) else {
             throw ValidationError("Both -n <dsa-key-name> and -k <keychain> options must be provided together, or neither should be provided.")
         }
@@ -195,6 +200,7 @@ struct GenerateAppcast: ParsableCommand {
         guard (keychainURL == nil) || (privateDSAKeyURL == nil) else {
             throw ValidationError("-f <private-dsa-key-file> cannot be provided if -n <dsa-key-name> and -k <keychain> is provided")
         }
+#endif
         
         guard (privateEdKeyPath == nil) || (privateEdString == nil) else {
             throw ValidationError("--ed-key-file <private-EdDSA-key-file> cannot be provided if -s <private-EdDSA-key> is provided")
@@ -224,6 +230,7 @@ struct GenerateAppcast: ParsableCommand {
     func run() throws {
         // Extract the keys
         let privateDSAKey : SecKey?
+    #if GENERATE_APPCAST_BUILD_LEGACY_DSA_SUPPORT
         if let privateDSAKeyURL = privateDSAKeyURL {
             do {
                 privateDSAKey = try loadPrivateDSAKey(at: privateDSAKeyURL)
@@ -241,6 +248,9 @@ struct GenerateAppcast: ParsableCommand {
         } else {
             privateDSAKey = nil
         }
+    #else
+        privateDSAKey = nil
+    #endif
         
         let privateEdKeyString: String?
         if let privateEdString = privateEdString {

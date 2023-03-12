@@ -30,7 +30,6 @@
     _pubEdKey = @"rhHib+w769W2/6/t+oM1ZxgjBB93BfBKMLO0Qo1etQs=";
 }
 
-#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
 - (void)testVerifyFileAtPathUsingDSA
 {
     NSString *pubKey = [NSString stringWithContentsOfFile:_pubDSAKeyFile encoding:NSASCIIStringEncoding error:nil];
@@ -40,11 +39,19 @@
 
     NSError *error = nil;
     
+#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
     XCTAssertTrue([self checkFile:_testFile
                        withDSAKey:pubKey
                         signature:validSig
                             error:&error],
                   @"Expected valid signature: %@", error);
+#else
+    XCTAssertFalse([self checkFile:_testFile
+                        withDSAKey:pubKey
+                         signature:validSig
+                             error:&error],
+                  @"Expected DSA verification to fail: %@", error);
+#endif
 
     XCTAssertFalse([self checkFile:_testFile
                         withDSAKey:@"lol"
@@ -64,11 +71,19 @@
                              error:&error],
                    @"Expected invalid signature: %@", error);
 
+#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
     XCTAssertTrue([self checkFile:_testFile
                        withDSAKey:pubKey
                         signature:@"MC0CFAsKO7cq2q7L5/FWe6ybVIQkwAwSAhUA2Q8GKsE309eugi/v3Kh1W3w3N8c="
                             error:&error],
                   @"Expected valid signature: %@", error);
+#else
+    XCTAssertFalse([self checkFile:_testFile
+                        withDSAKey:pubKey
+                         signature:@"MC0CFAsKO7cq2q7L5/FWe6ybVIQkwAwSAhUA2Q8GKsE309eugi/v3Kh1W3w3N8c="
+                             error:&error],
+                  @"Expected DSA verification to fail: %@", error);
+#endif
 
     XCTAssertFalse([self checkFile:_testFile
                         withDSAKey:pubKey
@@ -76,7 +91,6 @@
                              error:&error],
                    @"Expected invalid signature: %@", error);
 }
-#endif
 
 - (void)testVerifyFileAtPathUsingED25519
 {
@@ -115,38 +129,47 @@
                    @"Invalid signature: %@", error);
 }
 
-#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
 - (BOOL)checkFile:(NSString *)aFile withDSAKey:(NSString *)pubKey signature:(NSString *)sigString error:(NSError * __autoreleasing *)error
 {
     SUPublicKeys *pubKeys = [[SUPublicKeys alloc] initWithEd:nil dsa:pubKey];
     SUSignatureVerifier *v = [[SUSignatureVerifier alloc] initWithPublicKeys:pubKeys];
 
-    SUSignatures *sig = [[SUSignatures alloc] initWithEd:nil dsa:sigString];
+    SUSignatures *sig = [[SUSignatures alloc] initWithEd:nil
+#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
+                                                     dsa:sigString
+#endif
+    ];
 
     return [v verifyFileAtPath:aFile signatures:sig error:error];
 }
+
+static SUSignatures *_createSignatures(NSString *edString, NSString *dsaString)
+{
+#if !SPARKLE_BUILD_LEGACY_DSA_SUPPORT
+    (void)dsaString;
 #endif
+    
+    SUSignatures *sig = [[SUSignatures alloc] initWithEd:edString
+#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
+                                                     dsa:dsaString
+#endif
+    ];
+    
+    return sig;
+}
 
 - (BOOL)checkFile:(NSString *)aFile withEdKey:(NSString *)pubKey signature:(NSString *)sigString error:(NSError * __autoreleasing *)error
 {
     SUPublicKeys *pubKeys = [[SUPublicKeys alloc] initWithEd:pubKey
-#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
-                                                         dsa:nil
-#endif
-    ];
+                                                         dsa:nil];
     
     SUSignatureVerifier *v = [[SUSignatureVerifier alloc] initWithPublicKeys:pubKeys];
 
-    SUSignatures *sig = [[SUSignatures alloc] initWithEd:sigString
-#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
-                                                     dsa:nil
-#endif
-    ];
+    SUSignatures *sig = _createSignatures(sigString, nil);
 
     return [v verifyFileAtPath:aFile signatures:sig error:error];
 }
 
-#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
 - (void)testVerifyFileWithBothKeys
 {
     NSString *dsaKey = [NSString stringWithContentsOfFile:_pubDSAKeyFile encoding:NSASCIIStringEncoding error:nil];
@@ -157,10 +180,10 @@
     NSError *error = nil;
 
     XCTAssertFalse([v verifyFileAtPath:_testFile
-                            signatures:[[SUSignatures alloc] initWithEd:nil dsa:nil] error:&error],
+                            signatures:_createSignatures(nil, nil) error:&error],
                    @"Fail if no signatures are provided: %@", error);
     XCTAssertFalse([v verifyFileAtPath:_testFile
-                            signatures:[[SUSignatures alloc] initWithEd:@"lol" dsa:@"lol"] error:&error],
+                            signatures:_createSignatures(@"lol", @"lol") error:&error],
                    @"Fail if both signatures are invalid: %@", error);
 
     NSString *dsaSig = @"MCwCFCIHCIYYkfZavNzTitTW5tlRp/k5AhQ40poFytqcVhIYdCxQznaXeJPJDQ==";
@@ -169,38 +192,43 @@
     NSString *wrongEdSig = @"wTcpXCgWoa4NrJpsfzS61FXJIbv963//12U2ef9xstzVOLPHYK2N4/ojgpDV5N1/NGG1uWMBgK+kEWp0Z5zMDQ==";
 
     XCTAssertFalse([v verifyFileAtPath:_testFile
-                            signatures:[[SUSignatures alloc] initWithEd:nil dsa:dsaSig] error:&error],
+                            signatures:_createSignatures(nil, dsaSig) error:&error],
                   @"EdDSA signature must be present if app has EdDSA key: %@", error);
     
     XCTAssertTrue([v verifyFileAtPath:_testFile
-                           signatures:[[SUSignatures alloc] initWithEd:edSig dsa:nil] error:&error],
+                           signatures:_createSignatures(edSig, nil) error:&error],
                    @"Allow just an EdDSA signature if that's all that's available: %@", error);
 
     XCTAssertFalse([v verifyFileAtPath:_testFile
-                            signatures:[[SUSignatures alloc] initWithEd:wrongEdSig dsa:dsaSig] error:&error],
+                            signatures:_createSignatures(wrongEdSig, dsaSig) error:&error],
                    @"Fail on a bad Ed25519 signature regardless: %@", error);
     XCTAssertTrue([v verifyFileAtPath:_testFile
-                           signatures:[[SUSignatures alloc] initWithEd:edSig dsa:wrongDSASig] error:&error],
+                           signatures:_createSignatures(edSig, wrongDSASig) error:&error],
                    @"Allow bad DSA signature if EdDSA signature is good: %@", error);
 
     XCTAssertFalse([v verifyFileAtPath:_testFile
-                            signatures:[[SUSignatures alloc] initWithEd:@"lol" dsa:dsaSig] error:&error],
+                            signatures:_createSignatures(@"lol", dsaSig) error:&error],
                    @"Fail if the Ed25519 signature is invalid: %@", error);
+    
+#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
     XCTAssertFalse([v verifyFileAtPath:_testFile
-                            signatures:[[SUSignatures alloc] initWithEd:edSig dsa:@"lol"] error:&error],
+                            signatures:_createSignatures(edSig, @"lol") error:&error],
                    @"Fail if invalid DSA signature is used even if EdDSA signature is good: %@", error);
+#else
+    XCTAssertTrue([v verifyFileAtPath:_testFile
+                           signatures:_createSignatures(edSig, @"lol") error:&error],
+                   @"Allow invalid DSA signature if EdDSA signature is good: %@", error);
+#endif
 
     XCTAssertTrue([v verifyFileAtPath:_testFile
-                           signatures:[[SUSignatures alloc] initWithEd:edSig dsa:dsaSig] error:&error],
+                           signatures:_createSignatures(edSig, dsaSig) error:&error],
                   @"Pass if both are valid: %@", error);
 }
-#endif
 
 - (void)testVerifyFileWithWrongKey
 {
     NSError *error = nil;
     
-#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
     NSString *dsaSig = @"MCwCFCIHCIYYkfZavNzTitTW5tlRp/k5AhQ40poFytqcVhIYdCxQznaXeJPJDQ==";
     NSString *edSig = @"EIawm2YkDZ2gBfkEMF2+1VuuTeXnCGZOdnMdVgPPvDZioq7bvDayXqKkIIzSjKMmeFdcFJOHdnba5ZV60+gPBw==";
     
@@ -211,23 +239,15 @@
     SUSignatureVerifier *dsaOnlyVerifier = [[SUSignatureVerifier alloc] initWithPublicKeys:dsaOnlyKeys];
 
     XCTAssertFalse([dsaOnlyVerifier verifyFileAtPath:_testFile
-                                          signatures:[[SUSignatures alloc] initWithEd:edSig dsa:nil] error:&error],
+                                          signatures:_createSignatures(edSig, nil) error:&error],
                    @"DSA cannot verify an Ed signature: %@", error);
-#endif
     
     SUPublicKeys *edOnlyKeys = [[SUPublicKeys alloc] initWithEd:_pubEdKey
-#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
-                                                            dsa:nil
-#endif
-    ];
+                                                            dsa:nil];
     SUSignatureVerifier *edOnlyVerifier = [[SUSignatureVerifier alloc] initWithPublicKeys:edOnlyKeys];
 
     {
-        SUSignatures *signatures = [[SUSignatures alloc] initWithEd:nil
-#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
-                                                                dsa:dsaSig
-#endif
-        ];
+        SUSignatures *signatures = _createSignatures(nil, dsaSig);
         XCTAssertFalse([edOnlyVerifier verifyFileAtPath:_testFile
                                              signatures:signatures
                                                   error:&error],
@@ -236,7 +256,6 @@
 
 }
 
-#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
 - (void)testValidatePath
 {
     NSString *dsaStr = [NSString stringWithContentsOfFile:_pubDSAKeyFile encoding:NSASCIIStringEncoding error:nil];
@@ -245,13 +264,18 @@
     XCTAssertNotNil(pubkeys);
     XCTAssertNotNil(pubkeys.dsaPubKey);
 
-    SUSignatures *sig = [[SUSignatures alloc] initWithEd:nil dsa:@"MC0CFFMF3ha5kjvrJ9JTpTR8BenPN9QUAhUAzY06JRdtP17MJewxhK0twhvbKIE="];
+    SUSignatures *sig = _createSignatures(nil, @"MC0CFFMF3ha5kjvrJ9JTpTR8BenPN9QUAhUAzY06JRdtP17MJewxhK0twhvbKIE=");
     XCTAssertNotNil(sig);
+#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
     XCTAssertNotNil(sig.dsaSignature);
+#endif
 
     NSError *error = nil;
+#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
     XCTAssertTrue([SUSignatureVerifier validatePath:_testFile withSignatures:sig withPublicKeys:pubkeys error:&error], @"Expected valid signature: %@", error);
-}
+#else
+    XCTAssertFalse([SUSignatureVerifier validatePath:_testFile withSignatures:sig withPublicKeys:pubkeys error:&error], @"Expected verification to fail due to disabling DSA: %@", error);
 #endif
+}
 
 @end

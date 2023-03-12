@@ -241,6 +241,20 @@
         }
         }
     }
+#else
+    switch (_pubKeys.dsaPubKeyStatus) {
+        case SUSigningInputStatusAbsent:
+            break;
+        case SUSigningInputStatusInvalid:
+            // We don't keep track of DSA signatures, so we will ignore this mistake and treat it as if it were absent
+            break;
+        case SUSigningInputStatusPresent:
+            if (error != NULL) {
+                *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUValidationError userInfo:@{ NSLocalizedDescriptionKey: @"The old app has a DSA public key but DSA support is disabled, and the old app does not have an EdDSA public key." }];
+            }
+            
+            return NO;
+    }
 #endif
 
     if (error != NULL) {
