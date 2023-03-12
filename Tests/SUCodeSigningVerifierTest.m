@@ -214,8 +214,8 @@
     NSString *calculatorPath = [SUCodeSigningVerifierTest calculatorApplicationPath];
     NSError *error = nil;
     NSURL *appPath = [NSURL fileURLWithPath:calculatorPath];
-
-    XCTAssertTrue([SUCodeSigningVerifier codeSignatureAtBundleURL:appPath matchesSignatureAtBundleURL:appPath error:&error], @"Our valid signed app expected to having matching signature to itself");
+    
+    XCTAssertTrue([SUCodeSigningVerifier codeSignatureIsValidAtBundleURL:appPath andMatchesSignatureAtBundleURL:appPath error:&error], @"Our valid signed app expected to having matching signature to itself");
 }
 
 - (void)testValidMatching
@@ -224,7 +224,7 @@
     // We can't test our own app because matching with ad-hoc signed apps understandably does not succeed
     NSError *error = nil;
     NSURL *appPath = [NSURL fileURLWithPath:calculatorPath];
-    XCTAssertTrue([SUCodeSigningVerifier codeSignatureAtBundleURL:appPath matchesSignatureAtBundleURL:_calculatorCopyURL error:&error], @"The calculator app is expected to have matching identity signature to its altered copy");
+    XCTAssertTrue([SUCodeSigningVerifier codeSignatureIsValidAtBundleURL:_calculatorCopyURL andMatchesSignatureAtBundleURL:appPath error:&error], @"The calculator app is expected to have matching identity signature to its altered copy");
 }
 
 - (void)testInvalidMatching
@@ -232,7 +232,8 @@
     NSString *calculatorPath = [SUCodeSigningVerifierTest calculatorApplicationPath];
     NSURL *appPath = [NSURL fileURLWithPath:calculatorPath];
     NSError *error = nil;
-    XCTAssertFalse([SUCodeSigningVerifier codeSignatureAtBundleURL:appPath matchesSignatureAtBundleURL:_validSignedAppURL error:&error], @"Calculator app bundle expected to have different signature than our valid signed app");
+    
+    XCTAssertFalse([SUCodeSigningVerifier codeSignatureIsValidAtBundleURL:_validSignedAppURL andMatchesSignatureAtBundleURL:appPath error:&error], @"Calculator app bundle expected to have different signature than our valid signed app");
 }
 
 - (void)testInvalidSignedApp

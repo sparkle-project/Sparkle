@@ -273,7 +273,7 @@ func makeAppcasts(archivesSourceDir: URL, outputPathURL: URL?, cacheDirectory ca
                         print("Warning: New app is not code signed but older version (\(item)) is: \(latestItem)")
                     } else if oldAppCodeSigned && newAppCodeSigned {
                         do {
-                            try SUCodeSigningVerifier.codeSignature(atBundleURL: item.appPath, matchesSignatureAtBundleURL: latestItem.appPath)
+                            try SUCodeSigningVerifier.codeSignatureIsValid(atBundleURL: latestItem.appPath, andMatchesSignatureAtBundleURL: item.appPath)
                         } catch {
                             print("Warning: found mismatch code signing identity between \(item) and \(latestItem)")
                         }
