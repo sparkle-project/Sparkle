@@ -407,6 +407,8 @@
 		72E45CF81B640DAE005C701A /* SUUpdateSettingsWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 72E45CF61B640DAE005C701A /* SUUpdateSettingsWindowController.xib */; };
 		72E45CFC1B641961005C701A /* sparkletestcast.xml in Resources */ = {isa = PBXBuildFile; fileRef = 72E45CFB1B641961005C701A /* sparkletestcast.xml */; };
 		72E539121D68C3FA0092CE5E /* SPUDownloadData.m in Sources */ = {isa = PBXBuildFile; fileRef = 72F9EC431D5E9ED8004AC8B6 /* SPUDownloadData.m */; };
+		72EB735F29BE981300FBCEE7 /* DevSignedApp.zip in Resources */ = {isa = PBXBuildFile; fileRef = 72EB735E29BE981300FBCEE7 /* DevSignedApp.zip */; };
+		72EB736129BEB36100FBCEE7 /* DevSignedAppVersion2.zip in Resources */ = {isa = PBXBuildFile; fileRef = 72EB736029BEB36100FBCEE7 /* DevSignedAppVersion2.zip */; };
 		72EB87EA1CB8798800C37F42 /* ShowInstallerProgress.m in Sources */ = {isa = PBXBuildFile; fileRef = 72EB87E91CB8798800C37F42 /* ShowInstallerProgress.m */; };
 		72EB87EB1CB8859100C37F42 /* Updater.app in Copy Tools */ = {isa = PBXBuildFile; fileRef = 721C24451CB753E6005440CB /* Updater.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		72EB87EC1CB8887E00C37F42 /* SUStatus.xib in Resources */ = {isa = PBXBuildFile; fileRef = 55C14BD8136EF00C00649790 /* SUStatus.xib */; };
@@ -1410,6 +1412,8 @@
 		72E45CF51B640DAE005C701A /* SUUpdateSettingsWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUUpdateSettingsWindowController.m; sourceTree = "<group>"; };
 		72E45CF61B640DAE005C701A /* SUUpdateSettingsWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SUUpdateSettingsWindowController.xib; sourceTree = "<group>"; };
 		72E45CFB1B641961005C701A /* sparkletestcast.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = sparkletestcast.xml; sourceTree = "<group>"; };
+		72EB735E29BE981300FBCEE7 /* DevSignedApp.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = DevSignedApp.zip; sourceTree = "<group>"; };
+		72EB736029BEB36100FBCEE7 /* DevSignedAppVersion2.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = DevSignedAppVersion2.zip; sourceTree = "<group>"; };
 		72EB87E91CB8798800C37F42 /* ShowInstallerProgress.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ShowInstallerProgress.m; path = Sparkle/InstallerProgress/ShowInstallerProgress.m; sourceTree = SOURCE_ROOT; };
 		72EE17FA26D1CBC000C58B19 /* SUInstallerLauncher+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SUInstallerLauncher+Private.h"; sourceTree = "<group>"; };
 		72EE181826DAE6E100C58B19 /* SPUUpdateCheck.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SPUUpdateCheck.h; sourceTree = "<group>"; };
@@ -1847,6 +1851,8 @@
 				729F7ECD27409076004592DC /* SparkleTestCodeSignApp_bad_extraneous.zip */,
 				72CCDEBD27421FD500B53718 /* SparkleTestCodeSignApp_bad_header.zip */,
 				F8761EB21ADC50EB000C9034 /* SparkleTestCodeSignApp.zip */,
+				72EB735E29BE981300FBCEE7 /* DevSignedApp.zip */,
+				72EB736029BEB36100FBCEE7 /* DevSignedAppVersion2.zip */,
 				14958C6C19AEBC610061B14F /* test-pubkey.pem */,
 				5AF6C74E1AEA46D10014A3AB /* test.pkg */,
 				5AD0FA7E1C73F2E2004BCEFF /* testappcast.xml */,
@@ -3139,6 +3145,7 @@
 				725B3A82263FBF0C0041AB8E /* testappcast_minimumAutoupdateVersion.xml in Resources */,
 				14958C6E19AEBC950061B14F /* signed-test-file.txt in Resources */,
 				723AD12F29922B5F006BB02F /* test-dangerous-link.xml in Resources */,
+				72EB736129BEB36100FBCEE7 /* DevSignedAppVersion2.zip in Resources */,
 				723EDC3F26885A8E000BCBA4 /* testappcast_channels.xml in Resources */,
 				720DC50427A51A6500DFF3EC /* testappcast_minimumAutoupdateVersionSkipping.xml in Resources */,
 				72AC6B2E1B9B218C00F62325 /* SparkleTestCodeSignApp.dmg in Resources */,
@@ -3153,6 +3160,7 @@
 				5A5DD40424958B000045EB3E /* SUUpdateValidatorTest in Resources */,
 				14958C6F19AEBC980061B14F /* test-pubkey.pem in Resources */,
 				5AF6C74F1AEA46D10014A3AB /* test.pkg in Resources */,
+				72EB735F29BE981300FBCEE7 /* DevSignedApp.zip in Resources */,
 				72BC6C3D275027BF0083F14B /* SparkleTestCodeSign_apfs.dmg in Resources */,
 				720DC50627A62CDC00DFF3EC /* testappcast_minimumAutoupdateVersionSkipping2.xml in Resources */,
 				5AD0FA7F1C73F2E2004BCEFF /* testappcast.xml in Resources */,

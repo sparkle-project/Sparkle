@@ -12,13 +12,6 @@
 #import "SUAdHocCodeSigning.h"
 #import "SUFileManager.h"
 
-#if defined(__MAC_10_15)
-// In macOS 10.15 and later, pre-installed apps are installed under the System folder
-#define CALCULATOR_PATH @"/System/Applications/Calculator.app"
-#else
-#define CALCULATOR_PATH @"/Applications/Calculator.app"
-#endif
-
 @interface SUCodeSigningVerifierTest : XCTestCase
 @end
 
@@ -27,14 +20,9 @@
     NSURL *_notSignedAppURL;
     NSURL *_validSignedAppURL;
     NSURL *_invalidSignedAppURL;
-    NSURL *_calculatorCopyURL;
-}
-
-+ (NSString *)calculatorApplicationPath
-{
-    NSString *applicationsDirectory = [NSSearchPathForDirectoriesInDomains(NSApplicationDirectory, NSSystemDomainMask, NO) objectAtIndex:0];
-    NSString *calculatorPath = [applicationsDirectory stringByAppendingPathComponent:@"Calculator.app"];
-    return calculatorPath;
+    NSURL *_devSignedAppURL;
+    NSURL *_devSignedVersion2AppURL;
+    NSURL *_devInvalidSignedAppURL;
 }
 
 - (void)setUp
@@ -58,9 +46,9 @@
     if ([[NSFileManager defaultManager] createDirectoryAtURL:tempDir withIntermediateDirectories:YES attributes:nil error:&error]) {
         if ([self unzip:zippedAppURL toPath:tempDir.path]) {
             _notSignedAppURL = [tempDir URLByAppendingPathComponent:@"SparkleTestCodeSignApp.app"];
-            [self setupValidSignedApp];
-            [self setupCalculatorCopy];
-            [self setupInvalidSignedApp];
+            [self setUpValidSignedApp];
+            [self setUpDevSignedApps];
+            [self setUpInvalidSignedApp];
         }
         else {
             NSLog(@"Failed to unzip %@", zippedAppURL);
@@ -81,7 +69,7 @@
     }
 }
 
-- (void)setupValidSignedApp
+- (void)setUpValidSignedApp
 {
     NSError *error = nil;
     NSURL *tempDir = [_notSignedAppURL URLByDeletingLastPathComponent];
@@ -99,38 +87,48 @@
     }
 }
 
-- (void)setupCalculatorCopy
+- (void)setUpDevSignedApps
 {
     NSURL *tempDir = [_notSignedAppURL URLByDeletingLastPathComponent];
-    NSURL *calculatorCopy = [tempDir URLByAppendingPathComponent:@"calc.app"];
+    NSURL *devSignedAppURL = [tempDir URLByAppendingPathComponent:@"DevSignedApp.app"];
+    NSURL *devSignedAppVersion2URL = [tempDir URLByAppendingPathComponent:@"DevSignedAppVersion2.app"];
+    NSURL *devInvalidSignedAppURL = [tempDir URLByAppendingPathComponent:@"DevInvalidSignedApp.app"];
+    
+    _devSignedAppURL = devSignedAppURL;
+    _devSignedVersion2AppURL = devSignedAppVersion2URL;
+    _devInvalidSignedAppURL = devInvalidSignedAppURL;
 
-    [[NSFileManager defaultManager] removeItemAtURL:calculatorCopy error:NULL];
+    [[NSFileManager defaultManager] removeItemAtURL:devSignedAppURL error:NULL];
+    [[NSFileManager defaultManager] removeItemAtURL:devSignedAppVersion2URL error:NULL];
+    [[NSFileManager defaultManager] removeItemAtURL:devInvalidSignedAppURL error:NULL];
 
-    NSString *calculatorPath = [SUCodeSigningVerifierTest calculatorApplicationPath];
-    // Make a copy of the signed calculator app so we can match signatures later
+    // Make a copy of a signed devID app so we can match signatures later
     // Matching signatures on ad-hoc signed apps does *not* work
-    NSError *copyError = nil;
-    // Don't check the return value of this operation - seems like on 10.11 the API can say it fails even though the operation really succeeds,
-    // which sounds like some kind of (SIP / attribute?) bug
-    [[NSFileManager defaultManager] copyItemAtURL:[NSURL fileURLWithPath:calculatorPath] toURL:calculatorCopy error:&copyError];
-
-    if (![calculatorCopy checkResourceIsReachableAndReturnError:nil]) {
-        XCTFail(@"Copied calculator application does not exist");
+    
+    NSBundle *unitTestBundle = [NSBundle bundleForClass:[self class]];
+    
+    {
+        NSString *zippedAppURL = [unitTestBundle pathForResource:@"DevSignedApp" ofType:@"zip"];
+        if ([self unzip:zippedAppURL toPath:tempDir.path]) {
+            BOOL copiedApp = [[NSFileManager defaultManager] copyItemAtURL:devSignedAppURL toURL:devInvalidSignedAppURL error:NULL];
+            XCTAssertTrue(copiedApp);
+            
+            BOOL wroteData = [[NSData data] writeToURL:(NSURL * _Nonnull)[devInvalidSignedAppURL URLByAppendingPathComponent:@"Contents/Resources/foo"] atomically:YES];
+            XCTAssertTrue(wroteData);
+        } else {
+            XCTFail(@"Failed to unzip dev signed app");
+        }
     }
-
-    // Alter the signed copy slightly, this won't invalidate signature matching (although it will invalidate the integrity part of the signature)
-    // Which is what we want. If a user alters an app bundle, we should still be able to update as long as its identity is still valid
-    NSError *removeError = nil;
-    NSURL *calculatorPkgInfo = [[calculatorCopy URLByAppendingPathComponent:@"Contents"] URLByAppendingPathComponent:@"PkgInfo"];
-    XCTAssertNotNil(calculatorPkgInfo);
-    if (![[NSFileManager defaultManager] removeItemAtURL:calculatorPkgInfo error:&removeError]) {
-        XCTFail(@"Failed to remove file in calculator copy with error: %@", removeError);
+    
+    {
+        NSString *zippedAppURL = [unitTestBundle pathForResource:@"DevSignedAppVersion2" ofType:@"zip"];
+        if (![self unzip:zippedAppURL toPath:tempDir.path]) {
+            XCTFail(@"Failed to unzip dev signed app");
+        }
     }
-
-    _calculatorCopyURL = calculatorCopy;
 }
 
-- (void)setupInvalidSignedApp
+- (void)setUpInvalidSignedApp
 {
     NSError *error = nil;
     NSURL *tempDir = [_notSignedAppURL URLByDeletingLastPathComponent];
@@ -198,41 +196,79 @@
     XCTAssertNil(error, @"error should be nil");
 }
 
-- (void)testValidSignedCalculatorApp
+- (void)testValidSignedDevIdApp
 {
-    NSString *calculatorPath = [SUCodeSigningVerifierTest calculatorApplicationPath];
-    NSURL *appPath = [NSURL fileURLWithPath:calculatorPath];
-    XCTAssertTrue([SUCodeSigningVerifier bundleAtURLIsCodeSigned:appPath], @"App expected to be code signed");
+    XCTAssertTrue([SUCodeSigningVerifier bundleAtURLIsCodeSigned:_devSignedAppURL], @"App expected to be code signed");
+    
+    XCTAssertTrue([SUCodeSigningVerifier bundleAtURLIsCodeSigned:_devSignedVersion2AppURL], @"App expected to be code signed");
+
+    {
+        NSError *error = nil;
+        XCTAssertTrue([SUCodeSigningVerifier codeSignatureIsValidAtBundleURL:_devSignedAppURL error:&error], @"signature should be valid");
+        XCTAssertNil(error, @"error should be nil");
+    }
+    
+    {
+        NSError *error = nil;
+        XCTAssertTrue([SUCodeSigningVerifier codeSignatureIsValidAtBundleURL:_devSignedVersion2AppURL error:&error], @"signature should be valid");
+        XCTAssertNil(error, @"error should be nil");
+    }
+}
+
+- (void)testInvalidSignedDevIdApp
+{
+    XCTAssertTrue([SUCodeSigningVerifier bundleAtURLIsCodeSigned:_devInvalidSignedAppURL], @"App expected to be code signed");
 
     NSError *error = nil;
-    XCTAssertTrue([SUCodeSigningVerifier codeSignatureIsValidAtBundleURL:appPath error:&error], @"signature should be valid");
-    XCTAssertNil(error, @"error should be nil");
+    XCTAssertFalse([SUCodeSigningVerifier codeSignatureIsValidAtBundleURL:_devInvalidSignedAppURL error:&error], @"signature should be invalid");
+    XCTAssertNotNil(error, @"error should be not be nil");
 }
 
 - (void)testValidMatchingSelf
 {
-    NSString *calculatorPath = [SUCodeSigningVerifierTest calculatorApplicationPath];
     NSError *error = nil;
-    NSURL *appPath = [NSURL fileURLWithPath:calculatorPath];
-
-    XCTAssertTrue([SUCodeSigningVerifier codeSignatureAtBundleURL:appPath matchesSignatureAtBundleURL:appPath error:&error], @"Our valid signed app expected to having matching signature to itself");
+    
+    XCTAssertTrue([SUCodeSigningVerifier codeSignatureIsValidAtBundleURL:_devSignedAppURL andMatchesSignatureAtBundleURL:_devSignedAppURL error:&error], @"Our valid signed app expected to having matching signature to itself");
 }
 
-- (void)testValidMatching
+- (void)testValidMatchingDevIdApp
 {
-    NSString *calculatorPath = [SUCodeSigningVerifierTest calculatorApplicationPath];
     // We can't test our own app because matching with ad-hoc signed apps understandably does not succeed
-    NSError *error = nil;
-    NSURL *appPath = [NSURL fileURLWithPath:calculatorPath];
-    XCTAssertTrue([SUCodeSigningVerifier codeSignatureAtBundleURL:appPath matchesSignatureAtBundleURL:_calculatorCopyURL error:&error], @"The calculator app is expected to have matching identity signature to its altered copy");
+    
+    {
+        NSError *error = nil;
+        XCTAssertTrue([SUCodeSigningVerifier codeSignatureIsValidAtBundleURL:_devSignedAppURL andMatchesSignatureAtBundleURL:_devSignedVersion2AppURL error:&error], @"The dev ID signed app is expected to have a matching identity signature to a newer version");
+        XCTAssertNil(error);
+    }
+    
+    {
+        NSError *error = nil;
+        XCTAssertTrue([SUCodeSigningVerifier codeSignatureIsValidAtBundleURL:_devSignedVersion2AppURL andMatchesSignatureAtBundleURL:_devSignedAppURL error:&error], @"The dev ID signed app is expected to have a matching identity signature to an older version");
+        XCTAssertNil(error);
+    }
+}
+
+- (void)testInvalidMatchingWithBrokenBundle
+{
+    // We can't test our own app because matching with ad-hoc signed apps understandably does not succeed
+    {
+        NSError *error = nil;
+        XCTAssertFalse([SUCodeSigningVerifier codeSignatureIsValidAtBundleURL:_devSignedAppURL andMatchesSignatureAtBundleURL:_invalidSignedAppURL error:&error], @"The dev ID signed app is expected to not have a matching identity signature to its altered invalid copy");
+        XCTAssertNotNil(error);
+    }
+    
+    {
+        NSError *error = nil;
+        XCTAssertFalse([SUCodeSigningVerifier codeSignatureIsValidAtBundleURL:_invalidSignedAppURL andMatchesSignatureAtBundleURL:_devSignedAppURL error:&error], @"The invalid dev ID signed app is expected to not have a matching identity signature to the valid version");
+        XCTAssertNotNil(error);
+    }
 }
 
 - (void)testInvalidMatching
 {
-    NSString *calculatorPath = [SUCodeSigningVerifierTest calculatorApplicationPath];
-    NSURL *appPath = [NSURL fileURLWithPath:calculatorPath];
     NSError *error = nil;
-    XCTAssertFalse([SUCodeSigningVerifier codeSignatureAtBundleURL:appPath matchesSignatureAtBundleURL:_validSignedAppURL error:&error], @"Calculator app bundle expected to have different signature than our valid signed app");
+    
+    XCTAssertFalse([SUCodeSigningVerifier codeSignatureIsValidAtBundleURL:_validSignedAppURL andMatchesSignatureAtBundleURL:_devSignedAppURL error:&error], @"Dev ID signed app bundle expected to have different signature than our adhoc valid signed app");
 }
 
 - (void)testInvalidSignedApp
