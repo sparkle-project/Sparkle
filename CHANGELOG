@@ -1,7 +1,7 @@
 # 2.4.0
 
 * Reduce code size
-  * Enable deployment postprocessing in Release to properly strip debug symbols and strip all non-global symbols (#2286, #2305) (Zerg)
+  * Enable deployment postprocessing in Release to properly strip debug symbols and strip all non-global symbols (#2286, #2305) (Zorg)
   * Remove duplicate Sparkle localization strings in Updater app (#2288) (Zorg)
   * Optimize codebase for generated code size (less properties, direct methods, etc) (#2305) (Zorg)
   * Add additional settings to `ConfigCommon.xcconfig` for disabling features
