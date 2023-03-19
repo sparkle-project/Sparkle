@@ -6,6 +6,7 @@
   * Optimize codebase for generated code size (less properties, direct methods, etc) (#2305) (Zorg)
   * Add additional settings to `ConfigCommon.xcconfig` for disabling features
 * Ask permission for automatically downloading and installing new updates (#2285) (Zorg)
+* Add support for plain text release notes view that does not use web view (#2315) (Zorg)
 * Update `SUVersionDisplay` to better customize and display how versions are shown (#2321) (Zorg)
 * Add deprecations/warnings for incorrect background update checking usage (#2295) (Zorg)
 * Deprecate `-[SPUUpdater setFeedURL:]` API and add `-[SPUUpdater clearFeedURLFromUserDefaults]` for migrating away from `-[SPUUpdater setFeedURL:]` (#2295)
