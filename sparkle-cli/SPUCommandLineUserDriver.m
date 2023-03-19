@@ -80,7 +80,12 @@
         if (appcastItem.itemDescription != nil) {
             NSData *descriptionData = [appcastItem.itemDescription dataUsingEncoding:NSUTF8StringEncoding];
             if (descriptionData != nil) {
-                [self displayHTMLReleaseNotes:descriptionData];
+                NSString *itemDescriptionFormat = appcastItem.itemDescriptionFormat;
+                if (itemDescriptionFormat != nil && [itemDescriptionFormat isEqualToString:@"plain-text"]) {
+                    [self displayPlainTextReleaseNotes:descriptionData encoding:NSUTF8StringEncoding];
+                } else {
+                    [self displayHTMLReleaseNotes:descriptionData];
+                }
             }
         }
     }
