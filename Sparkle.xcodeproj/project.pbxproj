@@ -112,10 +112,6 @@
 		654F352C29B154E900B10EEB /* UniformTypeIdentifiers.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F6D399502814387000A8C0DA /* UniformTypeIdentifiers.framework */; };
 		654F352D29B1551000B10EEB /* CoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 721BC20A1D17A5AD002BC71E /* CoreServices.framework */; };
 		7202DC9A269ABD3500737EC4 /* testappcast_phasedRollout.xml in Resources */ = {isa = PBXBuildFile; fileRef = 7202DC99269ABD3500737EC4 /* testappcast_phasedRollout.xml */; };
-		72045CE026FEE535004F96E5 /* Downloader.xpc in Copy XPC Services */ = {isa = PBXBuildFile; fileRef = 726E07EF1CAF37BD001A286B /* Downloader.xpc */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		72045CE126FEE535004F96E5 /* InstallerConnection.xpc in Copy XPC Services */ = {isa = PBXBuildFile; fileRef = 724BB36C1D31D0B7005D534A /* InstallerConnection.xpc */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		72045CE226FEE535004F96E5 /* Installer.xpc in Copy XPC Services */ = {isa = PBXBuildFile; fileRef = 726E07AD1CAF08D6001A286B /* Installer.xpc */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		72045CE326FEE535004F96E5 /* InstallerStatus.xpc in Copy XPC Services */ = {isa = PBXBuildFile; fileRef = 724BB3931D333832005D534A /* InstallerStatus.xpc */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		720595EF1D700568000572E8 /* SUApplicationInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 725602D41C83551C00DAA70E /* SUApplicationInfo.m */; };
 		7205C4411E13049400E370AE /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7205C4401E13049400E370AE /* main.swift */; };
 		7205C44C1E1304CE00E370AE /* Appcast.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7205C4471E1304CE00E370AE /* Appcast.swift */; };
@@ -805,20 +801,6 @@
 			name = "Copy Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		72045CDF26FEE51D004F96E5 /* Copy XPC Services */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "$(CONTENTS_FOLDER_PATH)/XPCServices";
-			dstSubfolderSpec = 16;
-			files = (
-				72045CE026FEE535004F96E5 /* Downloader.xpc in Copy XPC Services */,
-				72045CE126FEE535004F96E5 /* InstallerConnection.xpc in Copy XPC Services */,
-				72045CE226FEE535004F96E5 /* Installer.xpc in Copy XPC Services */,
-				72045CE326FEE535004F96E5 /* InstallerStatus.xpc in Copy XPC Services */,
-			);
-			name = "Copy XPC Services";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		7205C43C1E13049400E370AE /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -943,6 +925,7 @@
 		37A5F28628E9219000891504 /* zh_HK */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = zh_HK; path = zh_HK.lproj/SUUpdatePermissionPrompt.strings; sourceTree = "<group>"; };
 		37A5F28728E9219000891504 /* zh_HK */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = zh_HK; path = zh_HK.lproj/SUUpdateAlert.strings; sourceTree = "<group>"; };
 		37A5F28828E9219000891504 /* zh_HK */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = zh_HK; path = zh_HK.lproj/MainMenu.strings; sourceTree = "<group>"; };
+		37ED7D0829DA6E66002795D2 /* copy-xpc-services.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "copy-xpc-services.sh"; sourceTree = "<group>"; };
 		4607BEA21948443800EF8DA4 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/Sparkle.strings; sourceTree = "<group>"; };
 		525A278F133D6AE900FD8D70 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		555CF29A196C52330000B31E /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/Sparkle.strings; sourceTree = "<group>"; };
@@ -2499,6 +2482,7 @@
 				72045CE426FEE708004F96E5 /* strip-framework.sh */,
 				720C192827127A3800740C8E /* release-move-tag.sh */,
 				720B4C2325EBFAFD005A0592 /* link-tools.sh */,
+				37ED7D0829DA6E66002795D2 /* copy-xpc-services.sh */,
 				146EC84E19A68CF8004A50C5 /* Sparkle.podspec */,
 			);
 			path = Configurations;
@@ -2873,10 +2857,10 @@
 				8DC2EF500486A6940098B216 /* Headers */,
 				8DC2EF520486A6940098B216 /* Resources */,
 				142E0E0319A6A24100E4312B /* Copy Tools */,
-				72045CDF26FEE51D004F96E5 /* Copy XPC Services */,
 				72045CE626FEE8CC004F96E5 /* Strip Framework */,
 				8DC2EF540486A6940098B216 /* Sources */,
 				8DC2EF560486A6940098B216 /* Frameworks */,
+				3770D31629D9F0F700F0BB80 /* Run Script: Copy XPC Services */,
 				6131B1910DDCDE32005215F0 /* Run Script: Set Git Version Info */,
 				720B4C2125EBFAA5005A0592 /* Run Script: Link Tools */,
 			);
@@ -3252,6 +3236,33 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		3770D31629D9F0F700F0BB80 /* Run Script: Copy XPC Services */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(BUILT_PRODUCTS_DIR)/Downloader.xpc",
+				"$(BUILT_PRODUCTS_DIR)/InstallerConnection.xpc",
+				"$(BUILT_PRODUCTS_DIR)/Installer.xpc",
+				"$(BUILT_PRODUCTS_DIR)/InstallerStatus.xpc",
+			);
+			name = "Run Script: Copy XPC Services";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(BUILT_PRODUCTS_DIR)/$(XPCSERVICES_FOLDER_PATH)/Downloader.xpc",
+				"$(BUILT_PRODUCTS_DIR)/$(XPCSERVICES_FOLDER_PATH)/InstallerConnection.xpc",
+				"$(BUILT_PRODUCTS_DIR)/$(XPCSERVICES_FOLDER_PATH)/Installer.xpc",
+				"$(BUILT_PRODUCTS_DIR)/$(XPCSERVICES_FOLDER_PATH)/InstallerStatus.xpc",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"$SRCROOT/Configurations/copy-xpc-services.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 		6131B1910DDCDE32005215F0 /* Run Script: Set Git Version Info */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
