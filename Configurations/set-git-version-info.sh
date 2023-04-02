@@ -5,6 +5,12 @@ if ! which -s git ; then
     exit 0
 fi
 
+# Don't bother updating the version for debug versions
+# This speeds up incremental builds
+if [ $CONFIGURATION == "Debug" ]; then
+    exit 0
+fi
+
 if [ -z "$SRCROOT" ] || \
    [ -z "$BUILT_PRODUCTS_DIR" ] || \
    [ -z "$INFOPLIST_PATH" ] || \
