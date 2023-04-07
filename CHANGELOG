@@ -1,3 +1,9 @@
+# 2.4.1
+
+* Remove auxiliary apps and relocate symbols in SPM package to resolve missing AvailableLibraries warnings (#2356) (Zorg)
+* Add -Wno-declaration-after-statement to silence warnings that only apply to pre-C99 (#2345) (Kent Sutherland)
+* Fix compile error when setting SPARKLE_EMBED_DOWNLOADER_XPC_SERVICE=0 (#2346) (Zorg)
+
 # 2.4.0
 
 * Reduce code size
