@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name        = "Sparkle"
-  s.version     = "2.4.0"
+  s.version     = "2.4.1-beta.1"
   s.summary     = "A software update framework for macOS"
   s.description = "Sparkle is an easy-to-use software update framework for macOS."
   s.homepage    = "https://sparkle-project.org"
