@@ -5,7 +5,7 @@ set -e
 # This guards against our archives being corrupt / created incorrectly.
 function verify_code_signatures() {
     verification_directory="$1"
-    check_test_apps="$2"
+    check_aux_apps="$2"
 
     if  [[ -z "$verification_directory" ]]; then
         echo "Provided verification directory does not exist" >&2
@@ -15,7 +15,7 @@ function verify_code_signatures() {
     # Search the current directory for all instances of the framework to verify them (XCFrameworks can have multiple copies of a framework for different platforms).
     find "${verification_directory}" -name "Sparkle.framework" -type d -exec codesign --verify -vvv --deep {} \;
     
-    if [ "$check_test_apps" = true ] ; then
+    if [ "$check_aux_apps" = true ] ; then
         codesign --verify -vvv --deep "${verification_directory}/sparkle.app"
         codesign --verify -vvv --deep "${verification_directory}/Sparkle Test App.app"
     fi
