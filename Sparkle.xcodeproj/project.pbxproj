@@ -1086,6 +1086,7 @@
 		722FB7E4260EE53F00EB571C /* SUNormalization.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SUNormalization.m; sourceTree = "<group>"; };
 		72316BD11E0DA8430039EFD9 /* SUUnarchiverNotifier.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SUUnarchiverNotifier.h; path = Autoupdate/SUUnarchiverNotifier.h; sourceTree = SOURCE_ROOT; };
 		72316BD21E0DA8430039EFD9 /* SUUnarchiverNotifier.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SUUnarchiverNotifier.m; path = Autoupdate/SUUnarchiverNotifier.m; sourceTree = SOURCE_ROOT; };
+		7235B75E29DFC0120081FE4E /* make-xcframework.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "make-xcframework.sh"; sourceTree = "<group>"; };
 		723ABCD7259A9A9D00BDB4FA /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/Sparkle.strings; sourceTree = "<group>"; };
 		723ABD37259A9BA500BDB4FA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/SUUpdateAlert.xib; sourceTree = "<group>"; };
 		723ABD4C259A9BB900BDB4FA /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/SUUpdateAlert.strings; sourceTree = "<group>"; };
@@ -2495,6 +2496,7 @@
 				EA1E285722B6622E004AA304 /* ed25519-Release.xcconfig */,
 				EA1E285922B6622E004AA304 /* ed25519-Shared.xcconfig */,
 				14732BC91960F70A00593899 /* make-release-package.sh */,
+				7235B75E29DFC0120081FE4E /* make-xcframework.sh */,
 				14652F7919A93E5F00959E44 /* set-git-version-info.sh */,
 				72045CE426FEE708004F96E5 /* strip-framework.sh */,
 				720C192827127A3800740C8E /* release-move-tag.sh */,
@@ -3321,7 +3323,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Deleting old products\nrm -rd \"$BUILT_PRODUCTS_DIR/Sparkle.xcarchive\"\nrm -rd \"$BUILT_PRODUCTS_DIR/Sparkle.xcframework\"\n\nxcodebuild archive -scheme Sparkle -archivePath \"$BUILT_PRODUCTS_DIR/Sparkle.xcarchive\" BUILD_LIBRARY_FOR_DISTRIBUTION=YES SKIP_INSTALL=NO\n\nif [ $XCODE_VERSION_MAJOR -ge \"1200\" ]; then\nxcodebuild -create-xcframework -framework \"$BUILT_PRODUCTS_DIR/Sparkle.xcarchive/Products/Library/Frameworks/Sparkle.framework\" -debug-symbols \"$BUILT_PRODUCTS_DIR/Sparkle.xcarchive/dSYMs/Sparkle.framework.dSYM\" -output \"$BUILT_PRODUCTS_DIR/Sparkle.xcframework\"\nelse\necho \"warning: Your Xcode version does not support bundling dSYMs in XCFrameworks directly. You should copy them manually into the XCFramework.\"\necho \"note: cp '$BUILT_PRODUCTS_DIR/Sparkle.xcarchive/dSYMs/Sparkle.framework.dSYM' '$BUILT_PRODUCTS_DIR/Sparkle.xcframework/your_architecture/dSYMs'\"\nxcodebuild -create-xcframework -framework \"$BUILT_PRODUCTS_DIR/Sparkle.xcarchive/Products/Library/Frameworks/Sparkle.framework\" -output \"$BUILT_PRODUCTS_DIR/Sparkle.xcframework\"\nfi\n";
+			shellScript = "\"$SRCROOT/Configurations/make-xcframework.sh\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
