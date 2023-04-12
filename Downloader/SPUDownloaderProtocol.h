@@ -17,7 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)startTemporaryDownloadWithRequest:(NSURLRequest *)request;
 
-- (void)removeDownloadDirectory:(NSString *)directoryName bundleIdentifier:(NSString *)bundleIdentifier;
+- (void)removeDownloadDirectoryWithDownloadToken:(NSString *)downloadToken bundleIdentifier:(NSString *)bundleIdentifier;
 
 - (void)cleanup:(void (^)(void))completionHandler;
 

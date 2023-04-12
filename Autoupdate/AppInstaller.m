@@ -350,12 +350,33 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
                 return;
             }
             
+            // Resolve the bookmark data for the downloaded update
+            
+            BOOL isStale = NO;
+            NSError *bookmarkError = nil;
+            NSURL *downloadURL = [NSURL URLByResolvingBookmarkData:installationData.updateURLBookmarkData options:NSURLBookmarkResolutionWithoutUI relativeToURL:nil bookmarkDataIsStale:&isStale error:&bookmarkError];
+            if (downloadURL == nil) {
+                [self cleanupAndExitWithStatus:EXIT_FAILURE error:[NSError errorWithDomain:SUSparkleErrorDomain code:SPUInstallerError userInfo:@{ NSLocalizedDescriptionKey: @"Error: Failed to resolve bookmark data from downloaded update", NSUnderlyingErrorKey: bookmarkError }]];
+                
+                return;
+            }
+            
+            if (!isStale) {
+                SULog(SULogLevelError, @"Error: bookmark data for update download is stale.. but still continuing.");
+            }
+            
+            NSString *downloadName = downloadURL.lastPathComponent;
+            if (downloadName == nil) {
+                [self cleanupAndExitWithStatus:EXIT_FAILURE error:[NSError errorWithDomain:SUSparkleErrorDomain code:SPUInstallerError userInfo:@{ NSLocalizedDescriptionKey: @"Error: Failed to retrieve download name from download URL" }]];
+                
+                return;
+            }
+            
             // Move the download archive to somewhere where probably only we will be touching it
             // This prevents eg: if a bug exists in the updater that removes files we are trying to install
             // When this tool is ran as root, we are moving it into a directory that only root will have access to
-            NSURL *downloadURL = [[NSURL fileURLWithPath:installationData.updateDirectoryPath] URLByAppendingPathComponent:installationData.downloadName];
             
-            NSURL *downloadDestinationURL = [[NSURL fileURLWithPath:cacheInstallationPath] URLByAppendingPathComponent:installationData.downloadName];
+            NSURL *downloadDestinationURL = [[NSURL fileURLWithPath:cacheInstallationPath] URLByAppendingPathComponent:downloadName];
             
             NSError *moveError = nil;
             if (![[[SUFileManager alloc] init] moveItemAtURL:downloadURL toURL:downloadDestinationURL error:&moveError]) {
@@ -389,7 +410,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
             // Some of our properties may slightly differ than our input and we don't want to make the mistake of using one of those
             self->_installationType = installationType;
             self->_relaunchPath = installationData.relaunchPath;
-            self->_downloadName = installationData.downloadName;
+            self->_downloadName = downloadName;
             self->_signatures = installationData.signatures;
             self->_updateDirectoryPath = cacheInstallationPath;
             self->_host = [[SUHost alloc] initWithBundle:hostBundle];

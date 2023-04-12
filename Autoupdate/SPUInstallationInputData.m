@@ -14,8 +14,7 @@
 
 static NSString *SURelaunchPathKey = @"SURelaunchPath";
 static NSString *SUHostBundlePathKey = @"SUHostBundlePath";
-static NSString *SUUpdateDirectoryPathKey = @"SUUpdateDirectoryPath";
-static NSString *SUDownloadNameKey = @"SUDownloadName";
+static NSString *SUUpdateURLBookmarkDataKey = @"SUUpdateURLBookmarkData";
 static NSString *SUSignaturesKey = @"SUSignatures";
 static NSString *SUDecryptionPasswordKey = @"SUDecryptionPassword";
 static NSString *SUInstallationTypeKey = @"SUInstallationType";
@@ -24,20 +23,18 @@ static NSString *SUInstallationTypeKey = @"SUInstallationType";
 
 @synthesize relaunchPath = _relaunchPath;
 @synthesize hostBundlePath = _hostBundlePath;
-@synthesize updateDirectoryPath = _updateDirectoryPath;
-@synthesize downloadName = _downloadName;
+@synthesize updateURLBookmarkData = _updateURLBookmarkData;
 @synthesize signatures = _signatures;
 @synthesize decryptionPassword = _decryptionPassword;
 @synthesize installationType = _installationType;
 
-- (instancetype)initWithRelaunchPath:(NSString *)relaunchPath hostBundlePath:(NSString *)hostBundlePath updateDirectoryPath:(NSString *)updateDirectoryPath downloadName:(NSString *)downloadName installationType:(NSString *)installationType signatures:(SUSignatures * _Nullable)signatures decryptionPassword:(nullable NSString *)decryptionPassword
+- (instancetype)initWithRelaunchPath:(NSString *)relaunchPath hostBundlePath:(NSString *)hostBundlePath updateURLBookmarkData:(NSData *)updateURLBookmarkData installationType:(NSString *)installationType signatures:(SUSignatures * _Nullable)signatures decryptionPassword:(nullable NSString *)decryptionPassword
 {
     self = [super init];
     if (self != nil) {
         _relaunchPath = [relaunchPath copy];
         _hostBundlePath = [hostBundlePath copy];
-        _updateDirectoryPath = [updateDirectoryPath copy];
-        _downloadName = [downloadName copy];
+        _updateURLBookmarkData = updateURLBookmarkData;
         
         _installationType = [installationType copy];
         assert(SPUValidInstallationType(_installationType));
@@ -60,13 +57,8 @@ static NSString *SUInstallationTypeKey = @"SUInstallationType";
         return nil;
     }
     
-    NSString *updateDirectoryPath = [decoder decodeObjectOfClass:[NSString class] forKey:SUUpdateDirectoryPathKey];
-    if (updateDirectoryPath == nil) {
-        return nil;
-    }
-    
-    NSString *downloadName = [decoder decodeObjectOfClass:[NSString class] forKey:SUDownloadNameKey];
-    if (downloadName == nil) {
+    NSData *updateURLBookmarkData = [decoder decodeObjectOfClass:[NSData class] forKey:SUUpdateURLBookmarkDataKey];
+    if (updateURLBookmarkData == nil) {
         return nil;
     }
     
@@ -82,16 +74,15 @@ static NSString *SUInstallationTypeKey = @"SUInstallationType";
     
     NSString *decryptionPassword = [decoder decodeObjectOfClass:[NSString class] forKey:SUDecryptionPasswordKey];
     
-    return [self initWithRelaunchPath:relaunchPath hostBundlePath:hostBundlePath updateDirectoryPath:updateDirectoryPath downloadName:downloadName installationType:installationType signatures:signatures decryptionPassword:decryptionPassword];
+    return [self initWithRelaunchPath:relaunchPath hostBundlePath:hostBundlePath updateURLBookmarkData:updateURLBookmarkData installationType:installationType signatures:signatures decryptionPassword:decryptionPassword];
 }
 
 - (void)encodeWithCoder:(NSCoder *)coder
 {
     [coder encodeObject:_relaunchPath forKey:SURelaunchPathKey];
     [coder encodeObject:_hostBundlePath forKey:SUHostBundlePathKey];
-    [coder encodeObject:_updateDirectoryPath forKey:SUUpdateDirectoryPathKey];
+    [coder encodeObject:_updateURLBookmarkData forKey:SUUpdateURLBookmarkDataKey];
     [coder encodeObject:_installationType forKey:SUInstallationTypeKey];
-    [coder encodeObject:_downloadName forKey:SUDownloadNameKey];
     [coder encodeObject:_signatures forKey:SUSignaturesKey];
     if (_decryptionPassword != nil) {
         [coder encodeObject:_decryptionPassword forKey:SUDecryptionPasswordKey];

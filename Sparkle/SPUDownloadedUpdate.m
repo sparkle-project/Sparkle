@@ -18,17 +18,17 @@
 @synthesize updateItem = _updateItem;
 @synthesize secondaryUpdateItem = _secondaryUpdateItem;
 
-@synthesize downloadName = _downloadName;
-@synthesize temporaryDirectory = _temporaryDirectory;
+@synthesize downloadBookmarkData = _downloadBookmarkData;
+@synthesize downloadToken = _downloadToken;
 
-- (instancetype)initWithAppcastItem:(SUAppcastItem *)updateItem secondaryAppcastItem:(SUAppcastItem * _Nullable)secondaryUpdateItem downloadName:(NSString *)downloadName temporaryDirectory:(NSString *)temporaryDirectory
+- (instancetype)initWithAppcastItem:(SUAppcastItem *)updateItem secondaryAppcastItem:(SUAppcastItem * _Nullable)secondaryUpdateItem downloadBookmarkData:(NSData *)downloadBookmarkData downloadToken:(NSString *)downloadToken
 {
     self = [super init];
     if (self != nil) {
         _updateItem = updateItem;
         _secondaryUpdateItem = secondaryUpdateItem;
-        _downloadName = [downloadName copy];
-        _temporaryDirectory = [temporaryDirectory copy];
+        _downloadBookmarkData = downloadBookmarkData;
+        _downloadToken = [downloadToken copy];
     }
     return self;
 }
