@@ -49,8 +49,7 @@
     NSBundle *_applicationBundle;
     id<SUInstallerConnectionProtocol> _installerConnection;
     SUAppcastItem *_updateItem;
-    NSString *_downloadName;
-    NSString *_temporaryDirectory;
+    NSData *_updateURLBookmarkData;
     NSError *_installerError;
     
     __weak id _updater;
@@ -191,8 +190,7 @@
 - (void)extractDownloadedUpdate:(SPUDownloadedUpdate *)downloadedUpdate silently:(BOOL)silently completion:(void (^)(NSError * _Nullable))completionHandler
 {
     _updateItem = downloadedUpdate.updateItem;
-    _temporaryDirectory = downloadedUpdate.temporaryDirectory;
-    _downloadName = downloadedUpdate.downloadName;
+    _updateURLBookmarkData = downloadedUpdate.downloadBookmarkData;
     
     _currentStage = SPUInstallerNotStarted;
     
@@ -237,11 +235,13 @@
     }
 #endif
     
-    SPUInstallationInputData *installationData = [[SPUInstallationInputData alloc] initWithRelaunchPath:pathToRelaunch hostBundlePath:_host.bundlePath updateDirectoryPath:_temporaryDirectory downloadName:_downloadName installationType:_updateItem.installationType signatures:_updateItem.signatures decryptionPassword:decryptionPassword];
+    id<SPUInstallerDriverDelegate> delegate = _delegate;
+    
+    SPUInstallationInputData *installationData = [[SPUInstallationInputData alloc] initWithRelaunchPath:pathToRelaunch hostBundlePath:_host.bundlePath updateURLBookmarkData:_updateURLBookmarkData installationType:_updateItem.installationType signatures:_updateItem.signatures decryptionPassword:decryptionPassword];
     
     NSData *archivedData = SPUArchiveRootObjectSecurely(installationData);
     if (archivedData == nil) {
-        [_delegate installerIsRequestingAbortInstallWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey:@"An error occurred while encoding the installer parameters. Please try again later." }]];
+        [delegate installerIsRequestingAbortInstallWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey:@"An error occurred while encoding the installer parameters. Please try again later." }]];
         return;
     }
     

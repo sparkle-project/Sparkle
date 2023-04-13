@@ -15,7 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol SPUDownloaderDelegate <NSObject>
 
 // This is only invoked for persistent downloads
-- (void)downloaderDidSetDestinationName:(NSString *)destinationName temporaryDirectory:(NSString *)temporaryDirectory;
+- (void)downloaderDidSetDownloadBookmarkData:(NSData *)downloadBookmarkData downloadToken:(NSString *)downloadToken;
 
 // Under rare cases, this may be called more than once, in which case the current progress should be reset back to 0
 // This is only invoked for persistent downloads

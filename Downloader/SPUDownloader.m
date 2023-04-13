@@ -109,17 +109,17 @@ static NSString *SUDownloadingReason = @"Downloading update related file";
     return [[SPULocalCacheDirectory cachePathForBundleIdentifier:bundleIdentifier] stringByAppendingPathComponent:@"PersistentDownloads"];
 }
 
-- (void)removeDownloadDirectory:(NSString *)directoryName bundleIdentifier:(NSString *)bundleIdentifier
+- (void)removeDownloadDirectoryWithDownloadToken:(NSString *)downloadToken bundleIdentifier:(NSString *)bundleIdentifier
 {
-    // Only take the directory name and compute most of the base path ourselves
+    // Only take the directory name (from the download token) and compute most of the base path ourselves
     // This way we do not have to send/trust an absolute path
     // The downloader instance that creates this temp directory isn't necessarily the same as the one
     // that clears it (eg upon skipping an already downloaded update), so we can't just preserve it here too
     dispatch_async(dispatch_get_main_queue(), ^{
         NSString *rootPersistentDownloadCachePath = [self rootPersistentDownloadCachePathForBundleIdentifier:bundleIdentifier];
         if (rootPersistentDownloadCachePath != nil) {
-            NSString *sanitizedDirectoryName = directoryName.lastPathComponent;
-            NSString *tempDir = [rootPersistentDownloadCachePath stringByAppendingPathComponent:sanitizedDirectoryName];
+            NSString *sanitizedDownloadToken = downloadToken.lastPathComponent;
+            NSString *tempDir = [rootPersistentDownloadCachePath stringByAppendingPathComponent:sanitizedDownloadToken];
             
             [[NSFileManager defaultManager] removeItemAtPath:tempDir error:NULL];
         }
@@ -201,8 +201,23 @@ static NSString *SUDownloadingReason = @"Downloading update related file";
                 NSError *error = nil;
                 if ([[NSFileManager defaultManager] moveItemAtPath:fromPath toPath:toPath error:&error]) {
                     _downloadFilename = toPath;
-                    [_delegate downloaderDidSetDestinationName:name temporaryDirectory:downloadFileNameDirectory];
-                    [self downloadDidFinish];
+                    
+                    // Create a bookmark for the download
+                    // Don't pass any options (we don't want a persistent security scoped bookmark)
+                    
+                    NSURL *downloadURL = [NSURL fileURLWithPath:toPath isDirectory:NO];
+                    
+                    NSError *bookmarkError = nil;
+                    NSData *bookmarkData = [downloadURL bookmarkDataWithOptions:0 includingResourceValuesForKeys:@[] relativeToURL:nil error:&bookmarkError];
+                    if (bookmarkData == nil) {
+                        [_delegate downloaderDidFailWithError:bookmarkError];
+                    } else {
+                        // The download token may be provided later to the downloader for removing a download
+                        // and its temporary directory
+                        NSString *downloadToken = tempDir.lastPathComponent;
+                        [_delegate downloaderDidSetDownloadBookmarkData:bookmarkData downloadToken:downloadToken];
+                        [self downloadDidFinish];
+                    }
                 } else {
                     [_delegate downloaderDidFailWithError:error];
                 }

@@ -35,8 +35,8 @@
     SUAppcastItem *_updateItem;
     SUAppcastItem * _Nullable _secondaryUpdateItem;
     SUHost *_host;
-    NSString *_temporaryDirectory;
-    NSString *_downloadName;
+    NSData *_downloadBookmarkData;
+    NSString *_downloadToken;
     
     __weak id<SPUDownloadDriverDelegate> _delegate;
     
@@ -169,12 +169,7 @@
     NSString *bundleIdentifier = _host.bundle.bundleIdentifier;
     assert(bundleIdentifier != nil);
     
-    if (bundleIdentifier != nil) {
-        // Grab eg "0bCSun8tj" from org.sparkle-project.Sparkle/PersistentDownloads/0bCSun8tj/Sparkle Test App 2.0/
-        NSString *tempDirectoryName = downloadedUpdate.temporaryDirectory.stringByDeletingLastPathComponent.lastPathComponent;
-        
-        [_downloader removeDownloadDirectory:tempDirectoryName bundleIdentifier:bundleIdentifier];
-    }
+    [_downloader removeDownloadDirectoryWithDownloadToken:downloadedUpdate.downloadToken bundleIdentifier:bundleIdentifier];
 }
 
 - (void)cleanup:(void (^)(void))completionHandler
@@ -188,7 +183,8 @@
             self->_connection = nil;
         }
 #endif
-        self->_downloadName = nil;
+        self->_downloadBookmarkData = nil;
+        self->_downloadToken = nil;
         self->_downloader = nil;
         
         completionHandler();
@@ -216,7 +212,7 @@
                 SULog(SULogLevelError, @"Warning: Downloader's expected content length (%llu) != Appcast item's length (%llu)", self->_expectedContentLength, self->_updateItem.contentLength);
             }
             
-            SPUDownloadedUpdate *downloadedUpdate = [[SPUDownloadedUpdate alloc] initWithAppcastItem:self->_updateItem secondaryAppcastItem:self->_secondaryUpdateItem downloadName:self->_downloadName temporaryDirectory:self->_temporaryDirectory];
+            SPUDownloadedUpdate *downloadedUpdate = [[SPUDownloadedUpdate alloc] initWithAppcastItem:self->_updateItem secondaryAppcastItem:self->_secondaryUpdateItem downloadBookmarkData:self->_downloadBookmarkData downloadToken:self->_downloadToken];
             
             if ([delegate respondsToSelector:@selector(downloadDriverDidDownloadUpdate:)]) {
                 [delegate downloadDriverDidDownloadUpdate:downloadedUpdate];
@@ -254,11 +250,11 @@
     });
 }
 
-- (void)downloaderDidSetDestinationName:(NSString *)destinationName temporaryDirectory:(NSString *)temporaryDirectory
+- (void)downloaderDidSetDownloadBookmarkData:(NSData *)downloadBookmarkData downloadToken:(NSString *)downloadToken
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        self->_downloadName = destinationName;
-        self->_temporaryDirectory = temporaryDirectory;
+        self->_downloadBookmarkData = downloadBookmarkData;
+        self->_downloadToken = [downloadToken copy];
     });
 }
 
