@@ -52,7 +52,25 @@ static WKUserScript *_userScriptWithInjectedStyleSource(NSString *styleSource)
     return [[WKUserScript alloc] initWithSource:scriptSource injectionTime:WKUserScriptInjectionTimeAtDocumentEnd forMainFrameOnly:YES];
 }
 
-- (instancetype)initWithColorStyleSheetLocation:(NSURL *)colorStyleSheetLocation fontFamily:(NSString *)fontFamily fontPointSize:(int)fontPointSize javaScriptEnabled:(BOOL)javaScriptEnabled
+static WKUserScript *_userScriptForExposingCurrentRelease(NSString *releaseString)
+{
+    NSString *escapedInstalledVersion = [releaseString stringByReplacingOccurrencesOfString:@"`" withString:@"\\`"]; // escape template string delimiters
+    escapedInstalledVersion = [escapedInstalledVersion stringByReplacingOccurrencesOfString:@"\"" withString:@"\\\""]; // escape attribute selector value delimiters
+    
+    // This script:
+    // 1. Creates a `sparkleInstalledVersion` global variable
+    // 2. Adds the `sparkle-installed-version` class to all elements which have a matching `data-sparkle-version` attribute
+    NSString *scriptSource = [NSString stringWithFormat:
+        @"window.sparkleInstalledVersion = `%@`;\n"
+        @"const installedVersionElements = document.querySelectorAll(`[data-sparkle-version=\"${sparkleInstalledVersion}\"]`);\n"
+        @"for (let installedVersionElement of installedVersionElements) {\n"
+        @"installedVersionElement.classList.add('sparkle-installed-version');\n"
+        @"}", escapedInstalledVersion];
+    
+    return [[WKUserScript alloc] initWithSource:scriptSource injectionTime:WKUserScriptInjectionTimeAtDocumentEnd forMainFrameOnly:YES];
+}
+
+- (instancetype)initWithColorStyleSheetLocation:(NSURL *)colorStyleSheetLocation fontFamily:(NSString *)fontFamily fontPointSize:(int)fontPointSize javaScriptEnabled:(BOOL)javaScriptEnabled installedVersion:(NSString *)installedVersion
 {
     self = [super init];
     if (self != nil) {
@@ -92,6 +110,7 @@ static WKUserScript *_userScriptWithInjectedStyleSource(NSString *styleSource)
         // Legacy WebView has exposed methods for custom stylesheets and default fonts,
         // but WKWebView seems to forgo that type of API surface in favor of user scripts like this
         [userContentController addUserScript:_userScriptWithInjectedStyleSource(finalStyleContents)];
+        [userContentController addUserScript:_userScriptForExposingCurrentRelease(installedVersion)];
         configuration.userContentController = userContentController;
         
         _webView = [[WKWebView alloc] initWithFrame:NSZeroRect configuration:configuration];
