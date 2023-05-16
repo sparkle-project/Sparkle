@@ -241,6 +241,10 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 
 - (void)showUpdateReleaseNotesWithDownloadData:(SPUDownloadData *)downloadData
 {
+    if (![self showsReleaseNotes]) {
+        return;
+    }
+    
     NSURL *releaseNotesURL = _updateItem.releaseNotesURL;
     NSURL *baseURL = releaseNotesURL.URLByDeletingLastPathComponent;
     // If a MIME type isn't provided, we will pick html as the default, as opposed to plain text. Questionable decision..
