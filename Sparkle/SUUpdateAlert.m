@@ -241,6 +241,13 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 
 - (void)showUpdateReleaseNotesWithDownloadData:(SPUDownloadData *)downloadData
 {
+    if (![self showsReleaseNotes]) {
+        if ([_host.bundle isEqual:NSBundle.mainBundle]) {
+            SULog(SULogLevelError, @"Warning: '%@' is configured to not show release notes but release notes for version %@ were downloaded. Consider either removing release notes from your appcast or implementing -[SPUUpdaterDelegate updater:shouldDownloadReleaseNotesForUpdate:]", _host.name, _updateItem.displayVersionString);
+        }
+        return;
+    }
+    
     NSURL *releaseNotesURL = _updateItem.releaseNotesURL;
     NSURL *baseURL = releaseNotesURL.URLByDeletingLastPathComponent;
     // If a MIME type isn't provided, we will pick html as the default, as opposed to plain text. Questionable decision..
