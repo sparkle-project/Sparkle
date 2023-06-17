@@ -28,6 +28,7 @@
 {
     WKWebView *_webView;
     WKNavigation *_currentNavigation;
+    NSArray<NSString *> *_customAllowedURLSchemes;
     
     void (^_completionHandler)(NSError * _Nullable);
     
@@ -52,7 +53,7 @@ static WKUserScript *_userScriptWithInjectedStyleSource(NSString *styleSource)
     return [[WKUserScript alloc] initWithSource:scriptSource injectionTime:WKUserScriptInjectionTimeAtDocumentEnd forMainFrameOnly:YES];
 }
 
-- (instancetype)initWithColorStyleSheetLocation:(NSURL *)colorStyleSheetLocation fontFamily:(NSString *)fontFamily fontPointSize:(int)fontPointSize javaScriptEnabled:(BOOL)javaScriptEnabled
+- (instancetype)initWithColorStyleSheetLocation:(NSURL *)colorStyleSheetLocation fontFamily:(NSString *)fontFamily fontPointSize:(int)fontPointSize javaScriptEnabled:(BOOL)javaScriptEnabled customAllowedURLSchemes:(NSArray<NSString *> *)customAllowedURLSchemes
 {
     self = [super init];
     if (self != nil) {
@@ -96,6 +97,8 @@ static WKUserScript *_userScriptWithInjectedStyleSource(NSString *styleSource)
         
         _webView = [[WKWebView alloc] initWithFrame:NSZeroRect configuration:configuration];
         _webView.navigationDelegate = self;
+        
+        _customAllowedURLSchemes = customAllowedURLSchemes;
     }
     return self;
 }
@@ -179,7 +182,7 @@ static WKUserScript *_userScriptWithInjectedStyleSource(NSString *styleSource)
     NSURLRequest *request = navigationAction.request;
     NSURL *requestURL = request.URL;
     BOOL isAboutBlank = NO;
-    BOOL safeURL = SUReleaseNotesIsSafeURL(requestURL, &isAboutBlank);
+    BOOL safeURL = SUReleaseNotesIsSafeURL(requestURL, _customAllowedURLSchemes, &isAboutBlank);
     
     // Do not allow redirects to dangerous protocols such as file://
     if (!safeURL) {
