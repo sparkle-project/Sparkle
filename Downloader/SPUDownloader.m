@@ -106,6 +106,7 @@ static NSString *SUDownloadingReason = @"Downloading update related file";
 
 - (NSString *)rootPersistentDownloadCachePathForBundleIdentifier:(NSString *)bundleIdentifier SPU_OBJC_DIRECT
 {
+    // Note: The installer verifies this "PersistentDownloads" path component
     return [[SPULocalCacheDirectory cachePathForBundleIdentifier:bundleIdentifier] stringByAppendingPathComponent:@"PersistentDownloads"];
 }
 
