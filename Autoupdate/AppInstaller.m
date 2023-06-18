@@ -361,6 +361,28 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
                 return;
             }
             
+            // Validate the download URL before moving it
+            {
+                NSArray<NSString *> *downloadURLPathComponents = downloadURL.URLByResolvingSymlinksInPath.pathComponents;
+                if (downloadURLPathComponents == nil) {
+                    [self cleanupAndExitWithStatus:EXIT_FAILURE error:[NSError errorWithDomain:SUSparkleErrorDomain code:SPUInstallerError userInfo:@{ NSLocalizedDescriptionKey: @"Error: Failed to retrieve path components from download URL" }]];
+                    
+                    return;
+                }
+                
+                if ([downloadURLPathComponents containsObject:@".."]) {
+                    [self cleanupAndExitWithStatus:EXIT_FAILURE error:[NSError errorWithDomain:SUSparkleErrorDomain code:SPUInstallerError userInfo:@{ NSLocalizedDescriptionKey: @"Error: download URL path components contains '..' which is unsafe" }]];
+                    
+                    return;
+                }
+                
+                if (![downloadURLPathComponents containsObject:@SPARKLE_BUNDLE_IDENTIFIER] || ![downloadURLPathComponents containsObject:@"PersistentDownloads"]) {
+                    [self cleanupAndExitWithStatus:EXIT_FAILURE error:[NSError errorWithDomain:SUSparkleErrorDomain code:SPUInstallerError userInfo:@{ NSLocalizedDescriptionKey: @"Error: download URL path components does not contain PersistentDownloads or "@SPARKLE_BUNDLE_IDENTIFIER }]];
+                    
+                    return;
+                }
+            }
+            
             if (!isStale) {
                 SULog(SULogLevelError, @"Error: bookmark data for update download is stale.. but still continuing.");
             }
