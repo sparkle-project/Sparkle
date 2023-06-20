@@ -16,7 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 SPU_OBJC_DIRECT_MEMBERS @interface SUPlainTextReleaseNotesView : NSObject <SUReleaseNotesView>
 
-- (instancetype)initWithFontPointSize:(int)fontPointSize;
+- (instancetype)initWithFontPointSize:(int)fontPointSize customAllowedURLSchemes:(NSArray<NSString *> *)customAllowedURLSchemes;
 
 @end
 

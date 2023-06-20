@@ -22,10 +22,11 @@
 {
     NSScrollView *_scrollView;
     NSTextView *_textView;
+    NSArray<NSString *> *_customAllowedURLSchemes;
     int _fontPointSize;
 }
 
-- (instancetype)initWithFontPointSize:(int)fontPointSize
+- (instancetype)initWithFontPointSize:(int)fontPointSize customAllowedURLSchemes:(NSArray<NSString *> *)customAllowedURLSchemes
 {
     self = [super init];
     if (self != nil) {
@@ -34,6 +35,7 @@
         _textView.delegate = self;
         _scrollView.documentView = _textView;
         _fontPointSize = fontPointSize;
+        _customAllowedURLSchemes = customAllowedURLSchemes;
     }
     return self;
 }
@@ -125,7 +127,7 @@
     }
     
     BOOL isAboutBlankURL;
-    if (!SUReleaseNotesIsSafeURL(linkURL, &isAboutBlankURL)) {
+    if (!SUReleaseNotesIsSafeURL(linkURL, _customAllowedURLSchemes, &isAboutBlankURL)) {
         SULog(SULogLevelDefault, @"Blocked display of %@ URL which may be dangerous", linkURL.scheme);
         return YES;
     }

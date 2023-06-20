@@ -322,8 +322,23 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
         }
     }
     
+    NSArray<NSString *> *customAllowedURLSchemes;
+    {
+        NSMutableArray<NSString *> *allowedSchemes = [NSMutableArray array];
+        id hostAllowedURLSchemes = [_host objectForInfoDictionaryKey:SUAllowedURLSchemesKey];
+        if ([(NSObject *)hostAllowedURLSchemes isKindOfClass:[NSArray class]]) {
+            for (id urlScheme in (NSArray *)hostAllowedURLSchemes) {
+                if ([(NSObject *)urlScheme isKindOfClass:[NSString class]]) {
+                    [allowedSchemes addObject:[(NSString *)urlScheme lowercaseString]];
+                }
+            }
+        }
+        
+        customAllowedURLSchemes = [allowedSchemes copy];
+    }
+    
     if (usesPlainText) {
-        _releaseNotesView = [[SUPlainTextReleaseNotesView alloc] initWithFontPointSize:defaultFontSize];
+        _releaseNotesView = [[SUPlainTextReleaseNotesView alloc] initWithFontPointSize:defaultFontSize customAllowedURLSchemes:customAllowedURLSchemes];
     } else {
         NSURL *colorStyleURL = [[NSBundle bundleForClass:[self class]] URLForResource:@"ReleaseNotesColorStyle" withExtension:@"css"];
         
@@ -337,11 +352,11 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
         // (In theory it is possible for a non-sandboxed app or sandboxed app with outgoing network entitlement to use the XPC service, it's just pretty unlikely. And falling back to a legacy web view would not be too harmful in those cases).
         BOOL useWKWebView = !SPUXPCServiceIsEnabled(SUEnableDownloaderServiceKey);
         if (!useWKWebView) {
-            _releaseNotesView = [[SULegacyWebView alloc] initWithColorStyleSheetLocation:colorStyleURL fontFamily:defaultFontFamily fontPointSize:defaultFontSize javaScriptEnabled:javaScriptEnabled];
+            _releaseNotesView = [[SULegacyWebView alloc] initWithColorStyleSheetLocation:colorStyleURL fontFamily:defaultFontFamily fontPointSize:defaultFontSize javaScriptEnabled:javaScriptEnabled customAllowedURLSchemes:customAllowedURLSchemes];
         } else
 #endif
         {
-            _releaseNotesView = [[SUWKWebView alloc] initWithColorStyleSheetLocation:colorStyleURL fontFamily:defaultFontFamily fontPointSize:defaultFontSize javaScriptEnabled:javaScriptEnabled];
+            _releaseNotesView = [[SUWKWebView alloc] initWithColorStyleSheetLocation:colorStyleURL fontFamily:defaultFontFamily fontPointSize:defaultFontSize javaScriptEnabled:javaScriptEnabled customAllowedURLSchemes:customAllowedURLSchemes];
         }
     }
     
