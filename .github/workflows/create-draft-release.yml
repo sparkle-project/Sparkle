@@ -2,7 +2,7 @@ name: "Create Draft Release"
 
 env:
   BUILDDIR: "build"
-  DEVELOPER_DIR: "/Applications/Xcode_14.2.app/Contents/Developer"
+  DEVELOPER_DIR: "/Applications/Xcode_14.3.1.app/Contents/Developer"
 
 on:
   workflow_dispatch:
@@ -29,7 +29,7 @@ concurrency:
 jobs:
   release:
     name: "Publish binaries for release"
-    runs-on: macos-12
+    runs-on: macos-13
 
     steps:
       - name: "Checkout sources"
