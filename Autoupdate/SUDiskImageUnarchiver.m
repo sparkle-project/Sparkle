@@ -62,18 +62,8 @@
         NSArray *contents = nil;
         do
 		{
-            // Using NSUUID would make creating UUIDs be done in Cocoa,
-            // and thus managed under ARC. Sadly, the class is in 10.8 and later.
-            CFUUIDRef uuid = CFUUIDCreate(NULL);
-            if (uuid)
-            {
-                NSString *uuidString = CFBridgingRelease(CFUUIDCreateString(NULL, uuid));
-                if (uuidString)
-                {
-                    mountPoint = [@"/Volumes" stringByAppendingPathComponent:uuidString];
-                }
-                CFRelease(uuid);
-            }
+            NSString *uuidString = [[NSUUID UUID] UUIDString];
+            mountPoint = [@"/Volumes" stringByAppendingPathComponent:uuidString];
 		}
         // Note: this check does not follow symbolic links, which is what we want
 		while ([[NSURL fileURLWithPath:mountPoint] checkResourceIsReachableAndReturnError:NULL]);
