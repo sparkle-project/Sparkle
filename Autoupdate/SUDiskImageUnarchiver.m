@@ -80,7 +80,7 @@
         
         NSData *promptData = [NSData dataWithBytes:"yes\n" length:4];
         
-        NSMutableArray *arguments =   [@[@"attach", _archivePath, @"-mountpoint", mountPoint, /*@"-noverify",*/ @"-nobrowse", @"-noautoopen"] mutableCopy];
+        NSMutableArray *arguments =    [@[@"attach", _archivePath, @"-mountpoint", mountPoint, /*@"-noverify",*/ @"-nobrowse", @"-noautoopen"] mutableCopy];
         
         if (_decryptionPassword) {
             NSMutableData *passwordData = [[_decryptionPassword dataUsingEncoding:NSUTF8StringEncoding] mutableCopy];
