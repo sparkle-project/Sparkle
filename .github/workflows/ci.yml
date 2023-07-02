@@ -75,8 +75,9 @@ jobs:
       - name: Extract Analyzed Warnings
         if: ${{ success() && matrix.run-analyzer && github.event_name == 'pull_request' && steps.findwarnings.outputs.analyzestatus == '0' }}
         id: warnings
+        # https://stackoverflow.com/questions/74137120/how-to-fix-or-avoid-error-unable-to-process-file-command-output-successfully
         run: |
-            echo "content=$(cat anaylze_output.txt)" >> $GITHUB_OUTPUT
+            echo "content<<EOF"$'\n'"$(cat anaylze_output.txt)"$'\n'EOF >> $GITHUB_OUTPUT
       
       - name: Post Analyzed Warnings
         if: ${{ success() && matrix.run-analyzer && github.event_name == 'pull_request' && steps.findwarnings.outputs.analyzestatus == '0' }}
