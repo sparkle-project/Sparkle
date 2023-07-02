@@ -67,16 +67,16 @@ jobs:
           DEVELOPER_DIR: ${{ matrix.xcode-path }}
         run: |
             if grep -q "warning:" anaylze_output.txt; then
-                echo '::set-output name=analyzestatus::0'
+                echo "analyzestatus=0" >> $GITHUB_OUTPUT
             else
-                echo '::set-output name=analyzestatus::1'
+                echo "analyzestatus=1" >> $GITHUB_OUTPUT
             fi
         
       - name: Extract Analyzed Warnings
         if: ${{ success() && matrix.run-analyzer && github.event_name == 'pull_request' && steps.findwarnings.outputs.analyzestatus == '0' }}
         id: warnings
         run: |
-            echo ::set-output name=content::$(cat anaylze_output.txt)
+            echo "content=$(cat anaylze_output.txt)"
       
       - name: Post Analyzed Warnings
         if: ${{ success() && matrix.run-analyzer && github.event_name == 'pull_request' && steps.findwarnings.outputs.analyzestatus == '0' }}
