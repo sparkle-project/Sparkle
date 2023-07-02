@@ -74,10 +74,9 @@ jobs:
         
       - name: Extract Analyzed Warnings
         if: ${{ success() && matrix.run-analyzer && github.event_name == 'pull_request' && steps.findwarnings.outputs.analyzestatus == '0' }}
+        id: warnings
         run: |
-            echo "ANALYZER_WARNINGS<<EOF" >> $GITHUB_ENV
-            echo "$(cat analyze_output.txt)" >> $GITHUB_ENV
-            echo "EOF" >> $GITHUB_ENV
+            echo ::set-output name=content::$(cat analyze_output.txt)
       
       - name: Post Analyzed Warnings
         if: ${{ success() && matrix.run-analyzer && github.event_name == 'pull_request' && steps.findwarnings.outputs.analyzestatus == '0' }}
@@ -86,7 +85,7 @@ jobs:
             allow-repeats: false
             repo-token: ${{ secrets.BOT_PERSONAL_ACCESS_TOKEN }}
             repo-token-user-login: 'Sparkle-Bot'
-            message: "``` ${{ env.ANALYZER_WARNINGS }} ```"
+            message: "``` ${{ steps.warnings.outputs.content }} ```"
         
       - name: Build Release Distribution
         env:
