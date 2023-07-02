@@ -58,7 +58,7 @@ jobs:
         env:
           DEVELOPER_DIR: ${{ matrix.xcode-path }}
         run: |
-            xcodebuild analyze -project Sparkle.xcodeproj -quiet -scheme Sparkle -configuration Release -derivedDataPath analyze > anaylze_output.txt
+            xcodebuild analyze -project Sparkle.xcodeproj -quiet -scheme Sparkle -configuration Release -derivedDataPath analyze > analyze_output.txt
             
       - name: Find Analyzed Warnings
         if: ${{ success() && matrix.run-analyzer && github.event_name == 'pull_request' }}
@@ -66,11 +66,18 @@ jobs:
         env:
           DEVELOPER_DIR: ${{ matrix.xcode-path }}
         run: |
-            if grep -q "warning:" anaylze_output.txt; then
+            if grep -q "warning:" analyze_output.txt; then
                 echo "analyzestatus=0" >> $GITHUB_OUTPUT
             else
                 echo "analyzestatus=1" >> $GITHUB_OUTPUT
             fi
+        
+      - name: Extract Analyzed Warnings
+        if: ${{ success() && matrix.run-analyzer && github.event_name == 'pull_request' && steps.findwarnings.outputs.analyzestatus == '0' }}
+        run: |
+            echo "ANALYZER_WARNINGS<<EOF" >> $GITHUB_ENV
+            echo "$(cat analyze_output.txt)" >> $GITHUB_ENV
+            echo "EOF" >> $GITHUB_ENV
       
       - name: Post Analyzed Warnings
         if: ${{ success() && matrix.run-analyzer && github.event_name == 'pull_request' && steps.findwarnings.outputs.analyzestatus == '0' }}
@@ -79,7 +86,7 @@ jobs:
             allow-repeats: false
             repo-token: ${{ secrets.BOT_PERSONAL_ACCESS_TOKEN }}
             repo-token-user-login: 'Sparkle-Bot'
-            message: "``` $(cat anaylze_output.txt) ```"
+            message: "``` ${{ env.ANALYZER_WARNINGS }} ```"
         
       - name: Build Release Distribution
         env:
