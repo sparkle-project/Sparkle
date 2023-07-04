@@ -22,6 +22,10 @@
 // programmatically.
 
 @interface SPUStandardUpdaterController () <NSMenuItemValidation>
+
+// Needed for KVO
+@property (nonatomic) SPUUpdater *updater;
+
 @end
 
 @implementation SPUStandardUpdaterController
@@ -45,7 +49,9 @@
     NSBundle *hostBundle = [NSBundle mainBundle];
     SPUStandardUserDriver *userDriver = [[SPUStandardUserDriver alloc] initWithHostBundle:hostBundle delegate:self->userDriverDelegate];
     
-    _updater = [[SPUUpdater alloc] initWithHostBundle:hostBundle applicationBundle:hostBundle userDriver:userDriver delegate:self->updaterDelegate];
+    SPUUpdater *updater = [[SPUUpdater alloc] initWithHostBundle:hostBundle applicationBundle:hostBundle userDriver:userDriver delegate:self->updaterDelegate];
+    [self setUpdater:updater];
+    
     _userDriver = userDriver;
 }
 
