@@ -109,8 +109,20 @@ static WKUserScript *_userScriptForExposingCurrentRelease(NSString *releaseStrin
         // In fact, we must execute javascript to properly inject our default CSS style into the DOM
         // Legacy WebView has exposed methods for custom stylesheets and default fonts,
         // but WKWebView seems to forgo that type of API surface in favor of user scripts like this
-        [userContentController addUserScript:_userScriptWithInjectedStyleSource(finalStyleContents)];
-        [userContentController addUserScript:_userScriptForExposingCurrentRelease(installedVersion)];
+        WKUserScript *userScriptWithInjectedStyleSource = _userScriptWithInjectedStyleSource(finalStyleContents);
+        if (userScriptWithInjectedStyleSource == nil) {
+            SULog(SULogLevelError, @"Failed to create script for injecting style");
+        } else {
+            [userContentController addUserScript:userScriptWithInjectedStyleSource];
+        }
+        
+        WKUserScript *userScriptForExposingCurrentRelease = _userScriptForExposingCurrentRelease(installedVersion);
+        if (userScriptForExposingCurrentRelease == nil) {
+            SULog(SULogLevelDefault, @"warning: Failed to create script for injecting version %@", installedVersion);
+        } else {
+            [userContentController addUserScript:userScriptForExposingCurrentRelease];
+        }
+        
         configuration.userContentController = userContentController;
         
         _webView = [[WKWebView alloc] initWithFrame:NSZeroRect configuration:configuration];
