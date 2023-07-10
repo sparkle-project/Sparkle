@@ -54,8 +54,13 @@ static WKUserScript *_userScriptWithInjectedStyleSource(NSString *styleSource)
 
 static WKUserScript *_userScriptForExposingCurrentRelease(NSString *releaseString)
 {
-    NSString *escapedInstalledVersion = [releaseString stringByReplacingOccurrencesOfString:@"`" withString:@"\\`"]; // escape template string delimiters
-    escapedInstalledVersion = [escapedInstalledVersion stringByReplacingOccurrencesOfString:@"\"" withString:@"\\\""]; // escape attribute selector value delimiters
+    // Check that release string can be safely injected
+    NSMutableCharacterSet *allowedCharacterSet = [NSMutableCharacterSet alphanumericCharacterSet];
+    [allowedCharacterSet addCharactersInString:@"_.- "];
+    if ([releaseString rangeOfCharacterFromSet:allowedCharacterSet.invertedSet].location != NSNotFound) {
+        SULog(SULogLevelDefault, @"warning: App version '%@' has characters unsafe for injection. The version number will not be exposed to the release notes CSS. Only [a-zA-Z0-9._- ] is allowed.", releaseString);
+        return nil;
+    }
     
     // This script:
     // 1. Creates a `sparkleInstalledVersion` global variable
@@ -65,7 +70,7 @@ static WKUserScript *_userScriptForExposingCurrentRelease(NSString *releaseStrin
         @"const installedVersionElements = document.querySelectorAll(`[data-sparkle-version=\"${sparkleInstalledVersion}\"]`);\n"
         @"for (let installedVersionElement of installedVersionElements) {\n"
         @"installedVersionElement.classList.add('sparkle-installed-version');\n"
-        @"}", escapedInstalledVersion];
+        @"}", releaseString];
     
     return [[WKUserScript alloc] initWithSource:scriptSource injectionTime:WKUserScriptInjectionTimeAtDocumentEnd forMainFrameOnly:YES];
 }
