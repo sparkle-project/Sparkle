@@ -66,11 +66,10 @@ static WKUserScript *_userScriptForExposingCurrentRelease(NSString *releaseStrin
     // 1. Creates a `sparkleInstalledVersion` global variable
     // 2. Adds the `sparkle-installed-version` class to all elements which have a matching `data-sparkle-version` attribute
     NSString *scriptSource = [NSString stringWithFormat:
-        @"window.sparkleInstalledVersion = `%@`;\n"
-        @"const installedVersionElements = document.querySelectorAll(`[data-sparkle-version=\"${sparkleInstalledVersion}\"]`);\n"
-        @"for (let installedVersionElement of installedVersionElements) {\n"
-        @"installedVersionElement.classList.add('sparkle-installed-version');\n"
-        @"}", releaseString];
+        @"document.querySelectorAll(\'[data-sparkle-version=\"%@\"]\')\n"
+        @".forEach(installedVersionElement =>\n"
+        @"installedVersionElement.classList.add('sparkle-installed-version')\n"
+        @");", releaseString];
     
     return [[WKUserScript alloc] initWithSource:scriptSource injectionTime:WKUserScriptInjectionTimeAtDocumentEnd forMainFrameOnly:YES];
 }
