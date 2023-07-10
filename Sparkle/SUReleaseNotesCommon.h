@@ -12,7 +12,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-BOOL SUReleaseNotesIsSafeURL(NSURL *url, BOOL *isAboutBlankURL);
+BOOL SUReleaseNotesIsSafeURL(NSURL *url, NSArray<NSString *> *customAllowedURLSchemes, BOOL *isAboutBlankURL);
 
 NS_ASSUME_NONNULL_END
 

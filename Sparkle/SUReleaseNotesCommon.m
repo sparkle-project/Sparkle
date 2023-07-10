@@ -13,15 +13,15 @@
 
 #include "AppKitPrevention.h"
 
-BOOL SUReleaseNotesIsSafeURL(NSURL *url, BOOL *isAboutBlankURL)
+BOOL SUReleaseNotesIsSafeURL(NSURL *url, NSArray<NSString *> *customAllowedURLSchemes, BOOL *isAboutBlankURL)
 {
     NSString *scheme = url.scheme;
     BOOL isAboutBlank = [url.absoluteString isEqualToString:@"about:blank"] || [url.absoluteString isEqualToString:@"about:srcdoc"];
-    BOOL whitelistedSafe = isAboutBlank || [@[@"http", @"https", @"macappstore", @"macappstores", @"itms-apps", @"itms-appss"] containsObject:scheme];
+    BOOL safeURL = isAboutBlank || [@[@"http", @"https", @"macappstore", @"macappstores", @"itms-apps", @"itms-appss"] containsObject:scheme] || [customAllowedURLSchemes containsObject:scheme.lowercaseString];
     
     *isAboutBlankURL = isAboutBlank;
     
-    return whitelistedSafe;
+    return safeURL;
 }
 
 #endif

@@ -22,11 +22,12 @@
 @implementation SULegacyWebView
 {
     WebView *_webView;
+    NSArray<NSString *> *_customAllowedURLSchemes;
     
     void (^_completionHandler)(NSError * _Nullable);
 }
 
-- (instancetype)initWithColorStyleSheetLocation:(NSURL *)colorStyleSheetLocation fontFamily:(NSString *)fontFamily fontPointSize:(int)fontPointSize javaScriptEnabled:(BOOL)javaScriptEnabled
+- (instancetype)initWithColorStyleSheetLocation:(NSURL *)colorStyleSheetLocation fontFamily:(NSString *)fontFamily fontPointSize:(int)fontPointSize javaScriptEnabled:(BOOL)javaScriptEnabled customAllowedURLSchemes:(NSArray<NSString *> *)customAllowedURLSchemes
 {
     self = [super init];
     if (self != nil) {
@@ -53,6 +54,8 @@
         _webView.policyDelegate = self;
         _webView.frameLoadDelegate = self;
         _webView.UIDelegate = self;
+        
+        _customAllowedURLSchemes = customAllowedURLSchemes;
     }
     return self;
 }
@@ -110,7 +113,7 @@
 {
     NSURL *requestURL = request.URL;
     BOOL isAboutBlank = NO;
-    BOOL safeURL = SUReleaseNotesIsSafeURL(requestURL, &isAboutBlank);
+    BOOL safeURL = SUReleaseNotesIsSafeURL(requestURL, _customAllowedURLSchemes, &isAboutBlank);
 
     // Do not allow redirects to dangerous protocols such as file://
     if (!safeURL) {

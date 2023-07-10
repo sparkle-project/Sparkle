@@ -1,3 +1,9 @@
+# 2.4.2
+
+* Ignore release notes download when we shouldn't show release notes (#2381) (Zorg)
+* Fix NSKeyedUnarchiver warning for not specifying keyed NSString class (#2381) (Zorg)
+* Harden verification of Sparkle update download (#2392) (Zorg)
+
 # 2.4.1
 
 * Remove auxiliary apps and relocate symbols in SPM package to resolve missing AvailableLibraries warnings (#2356) (Zorg)
