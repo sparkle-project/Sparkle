@@ -498,7 +498,7 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
                 fprintf(stderr, "\n");
             }
             if (error != NULL) {
-                *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Diffing code signed extended attributes are not supported. Detected extended attribute in before-tree on file %@", @(ent->fts_path)] }];
+                *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Diffing code signed extended attributes are not supported. Detected extended attribute in before-tree on file %@. For removing code signed extended attributes and improving your bundle's structure, please see https://developer.apple.com/documentation/bundleresources/placing_content_in_a_bundle", @(ent->fts_path)] }];
             }
             return NO;
         }
@@ -616,7 +616,7 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
                 fprintf(stderr, "\n");
             }
             if (error != NULL) {
-                *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Diffing code signed extended attributes are not supported. Detected extended attribute in after-tree on file %@", @(ent->fts_path)] }];
+                *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Diffing code signed extended attributes are not supported. Detected extended attribute in after-tree on file %@. For removing code signed extended attributes and improving your bundle's structure, please see https://developer.apple.com/documentation/bundleresources/placing_content_in_a_bundle", @(ent->fts_path)] }];
             }
             return NO;
         }
