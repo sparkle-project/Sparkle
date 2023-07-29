@@ -32,6 +32,12 @@
 
 #import <AppKit/AppKit.h>
 
+#if __MAC_OS_X_VERSION_MAX_ALLOWED < 140000
+@interface NSApplication (ActivationAPIs)
+- (void)activate;
+@end
+#endif
+
 // The amount of time the app is allowed to be idle for us to consider showing an update prompt right away when the app is active
 static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 30.0 : 5 * 60.0;
 
@@ -118,12 +124,21 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
 
 #pragma mark Update Permission
 
+- (void)_activateApplication SPU_OBJC_DIRECT
+{
+    if (@available(macOS 14, *)) {
+        [NSApp activate];
+    } else {
+        [NSApp activateIgnoringOtherApps:YES];
+    }
+}
+
 - (void)showUpdatePermissionRequest:(SPUUpdatePermissionRequest *)request reply:(void (^)(SUUpdatePermissionResponse *))reply
 {
     assert(NSThread.isMainThread);
     
     if ([SUApplicationInfo isBackgroundApplication:[NSApplication sharedApplication]]) {
-        [[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
+        [self _activateApplication];
     }
     
     __weak __typeof__(self) weakSelf = self;
@@ -169,7 +184,7 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
         if (![NSApp isActive]) {
             // If the user initiated an update check, we should make the app active,
             // regardless if it's a background running app or not
-            [NSApp activateIgnoringOtherApps:YES];
+            [self _activateApplication];
         }
         
         [_activeUpdateAlert showWindow:nil];
@@ -301,7 +316,7 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
                 [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:NSApplicationDidBecomeActiveNotification object:NSApp];
             } else {
                 if (activatingApp) {
-                    [NSApp activateIgnoringOtherApps:YES];
+                    [self _activateApplication];
                 }
                 
                 if (showingUpdateInBack) {
@@ -465,7 +480,7 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
     
     if (mayNeedToActivateApp && ![NSApp isActive]) {
         // Make the app active if it's not already active, e.g, from a menu bar extra
-        [NSApp activateIgnoringOtherApps:YES];
+        [self _activateApplication];
     }
 }
 
@@ -527,14 +542,14 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
     [[_checkingController window] center]; // Force the checking controller to load its window.
     [_checkingController beginActionWithTitle:SULocalizedStringFromTableInBundle(@"Checking for updates…", SPARKLE_TABLE, sparkleBundle, nil) maxProgressValue:0.0 statusText:nil];
     [_checkingController setButtonTitle:SULocalizedStringFromTableInBundle(@"Cancel", SPARKLE_TABLE, sparkleBundle, nil) target:self action:@selector(cancelCheckForUpdates:) isDefault:NO];
-    [_checkingController showWindow:self];
     
     // For background applications, obtain focus.
     // Useful if the update check is requested from another app like System Preferences.
-    if ([SUApplicationInfo isBackgroundApplication:[NSApplication sharedApplication]])
-    {
-        [NSApp activateIgnoringOtherApps:YES];
+    if ([SUApplicationInfo isBackgroundApplication:[NSApplication sharedApplication]]) {
+        [self _activateApplication];
     }
+    
+    [_checkingController showWindow:self];
 }
 
 - (void)closeCheckingWindow SPU_OBJC_DIRECT

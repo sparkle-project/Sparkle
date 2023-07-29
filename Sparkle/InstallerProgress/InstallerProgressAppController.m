@@ -29,6 +29,12 @@
  */
 static const NSTimeInterval SUTerminationTimeDelay = 0.3;
 
+#if __MAC_OS_X_VERSION_MAX_ALLOWED < 140000
+@interface NSApplication (ActivationAPIs)
+- (void)activate;
+@end
+#endif
+
 @interface InstallerProgressAppController () <NSApplicationDelegate, SPUInstallerAgentProtocol>
 @end
 
@@ -367,7 +373,11 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
             self->_application.applicationIconImage = [SUApplicationInfo bestIconForHost:self->_oldHost];
             
             // Activate ourselves otherwise we will probably be in the background
-            [self->_application activateIgnoringOtherApps:YES];
+            if (@available(macOS 14, *)) {
+                [self->_application activate];
+            } else {
+                [self->_application activateIgnoringOtherApps:YES];
+            }
             
             [self->_delegate installerProgressShouldDisplayWithHost:self->_oldHost];
         }
