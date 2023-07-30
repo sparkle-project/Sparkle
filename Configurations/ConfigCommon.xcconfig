@@ -60,7 +60,6 @@ ARCHS = $(ARCHS_STANDARD)
 SPARKLE_BUNDLE_IDENTIFIER = org.sparkle-project.Sparkle
 SPARKLE_RELAUNCH_TOOL_NAME = Autoupdate
 SPARKLE_INSTALLER_PROGRESS_TOOL_NAME = Updater
-//org.sparkle-project.Sparkle.Updater
 SPARKLE_INSTALLER_PROGRESS_TOOL_BUNDLE_ID = $(SPARKLE_BUNDLE_IDENTIFIER).$(SPARKLE_INSTALLER_PROGRESS_TOOL_NAME)
 
 // Set these if you want to use custom name for the XPC Services
