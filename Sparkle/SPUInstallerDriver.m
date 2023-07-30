@@ -40,6 +40,17 @@
 @end
 #endif
 
+// Note: we don't want to directly pull in AppKit here especially if the main application does not need it
+@interface NSObject (ActivationAPIs)
+// NSApplication
++ (id)sharedApplication;
+- (void)yieldActivationToApplication:(id)application;
+
+// NSRunningApplication
++ (NSArray *)runningApplicationsWithBundleIdentifier:(NSString *)bundleIdentifier;
+- (NSURL *)bundleURL;
+@end
+
 @interface SPUInstallerDriver () <SUInstallerCommunicationProtocol>
 @end
 
@@ -65,6 +76,7 @@
     BOOL _relaunch;
     BOOL _systemDomain;
     BOOL _aborted;
+    BOOL _notifiedDelegateInstallationWillFinish;
 }
 
 - (instancetype)initWithHost:(SUHost *)host applicationBundle:(NSBundle *)applicationBundle updater:(id)updater updaterDelegate:(id<SPUUpdaterDelegate>)updaterDelegate delegate:(nullable id<SPUInstallerDriverDelegate>)delegate
@@ -338,7 +350,13 @@
             hasTargetTerminated = (BOOL)*((const uint8_t *)data.bytes);
         }
         
-        [delegate installerWillFinishInstallationAndRelaunch:_relaunch];
+        // If the target was already terminated this may be the first time we notify delegate that installation is about to happen
+        // Otherwise if the target was requested to be terminated/relaunched by the user this may be the second time
+        // Avoid re-notifying the delegate twice
+        if (!_notifiedDelegateInstallationWillFinish) {
+            _notifiedDelegateInstallationWillFinish = YES;
+            [delegate installerWillFinishInstallationAndRelaunch:_relaunch];
+        }
         
         [delegate installerDidStartInstallingWithApplicationTerminated:hasTargetTerminated];
     } else if (identifier == SPUInstallationFinishedStage3) {
@@ -493,9 +511,11 @@
 {
     assert(_updateItem);
     
+    id<SPUInstallerDriverDelegate> delegate = _delegate;
+    
     if (![self mayUpdateAndRestart])
     {
-        [_delegate installerIsRequestingAbortInstallWithError:nil];
+        [delegate installerIsRequestingAbortInstallWithError:nil];
         return;
     }
     
@@ -527,12 +547,58 @@
     
     _relaunch = relaunch;
     
+    // If AppKit is loaded, we will yield to our Sparkle progress app
+    // This will let the system know it should be okay for the progress agent to activate itself (if necessary)
+    // Note we don't want to directly pull in AppKit here especially if the main application does not need it
+    if (showUI) {
+        if (@available(macOS 14, *)) {
+            // Make sure we are not root before using AppKit API
+            if (geteuid() != 0) {
+                Class applicationClass = NSClassFromString(@"NSApplication");
+                if ([applicationClass respondsToSelector:@selector(sharedApplication)]) {
+                    NSObject *application = [applicationClass sharedApplication];
+                    
+                    if ([application respondsToSelector:@selector(yieldActivationToApplication:)]) {
+                        Class runningApplicationClass = NSClassFromString(@"NSRunningApplication");
+                        if ([runningApplicationClass respondsToSelector:@selector(runningApplicationsWithBundleIdentifier:)]) {
+                            NSArray *runningApplications = [runningApplicationClass runningApplicationsWithBundleIdentifier:@SPARKLE_INSTALLER_PROGRESS_TOOL_BUNDLE_ID];
+                            
+                            NSString *hostBundleIdentifier = _host.bundle.bundleIdentifier;
+                            
+                            id targetRunningApplication = nil;
+                            for (id runningApplication in runningApplications) {
+                                if ([(NSObject *)runningApplication respondsToSelector:@selector(bundleURL)]) {
+                                    NSURL *bundleURL = [(NSObject *)runningApplication bundleURL];
+                                    
+                                    if (hostBundleIdentifier != nil && [bundleURL.pathComponents containsObject:hostBundleIdentifier]) {
+                                        targetRunningApplication = runningApplication;
+                                        break;
+                                    }
+                                }
+                            }
+                            
+                            if (targetRunningApplication != nil) {
+                                [application yieldActivationToApplication:targetRunningApplication];
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    // The user can request trying to relaunch/quit the app multiple times
+    // Avoid re-notifying the delegate twice
+    if (!_notifiedDelegateInstallationWillFinish) {
+        _notifiedDelegateInstallationWillFinish = YES;
+        [delegate installerWillFinishInstallationAndRelaunch:relaunch];
+    }
+    
     uint8_t response[2] = {(uint8_t)relaunch, (uint8_t)showUI};
     NSData *responseData = [NSData dataWithBytes:response length:sizeof(response)];
     
-    [_installerConnection handleMessageWithIdentifier:SPUResumeInstallationToStage2 data:responseData];
-    
     // the installer will send us SPUInstallationFinishedStage2 when stage 2 is done
+    [_installerConnection handleMessageWithIdentifier:SPUResumeInstallationToStage2 data:responseData];
 }
 
 - (void)cancelUpdate
