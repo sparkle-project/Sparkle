@@ -40,6 +40,7 @@
 @end
 #endif
 
+// Note: we don't want to directly pull in AppKit here especially if the main application does not need it
 @interface NSObject (ActivationAPIs)
 // NSApplication
 + (id)sharedApplication;
