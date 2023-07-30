@@ -329,7 +329,12 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
         if ([(NSObject *)hostAllowedURLSchemes isKindOfClass:[NSArray class]]) {
             for (id urlScheme in (NSArray *)hostAllowedURLSchemes) {
                 if ([(NSObject *)urlScheme isKindOfClass:[NSString class]]) {
-                    [allowedSchemes addObject:[(NSString *)urlScheme lowercaseString]];
+                    NSString *allowedURLScheme = [(NSString *)urlScheme lowercaseString];
+                    if (![allowedURLScheme isEqualToString:@"file"]) {
+                        [allowedSchemes addObject:allowedURLScheme];
+                    } else {
+                        SULog(SULogLevelError, @"Error: Found 'file' scheme in %@. Ignoring because this scheme is unsafe.", SUAllowedURLSchemesKey);
+                    }
                 }
             }
         }
