@@ -91,13 +91,13 @@ SPARKLE_ICON_NAME = AppIcon
 // If you change any of these version details, you must increase CURRENT_PROJECT_VERSION
 // These variables must have a space after the '=' too
 SPARKLE_VERSION_MAJOR = 2
-SPARKLE_VERSION_MINOR = 4
-SPARKLE_VERSION_PATCH = 2
+SPARKLE_VERSION_MINOR = 5
+SPARKLE_VERSION_PATCH = 0
 
 // This should be in SemVer format or empty, ie. "-beta.1"
 // These variables must have a space after the '=' too
-SPARKLE_VERSION_SUFFIX =
-CURRENT_PROJECT_VERSION = 2028
+SPARKLE_VERSION_SUFFIX = -beta.1
+CURRENT_PROJECT_VERSION = 2029
 
 MARKETING_VERSION = $(SPARKLE_VERSION_MAJOR).$(SPARKLE_VERSION_MINOR).$(SPARKLE_VERSION_PATCH)$(SPARKLE_VERSION_SUFFIX)
 ALWAYS_SEARCH_USER_PATHS = NO
