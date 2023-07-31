@@ -1,3 +1,13 @@
+# 2.5.0
+
+* Add ability to adapt release notes based on the currently installed version (#2373) (Nathan Manceaux-Panot)
+* Allow developers to use custom URL schemes in the release notes view (#2393) (Zorg)
+* Adopt cooperative app activation APIs in macOS 14 Sonoma (#2409) (Zorg)
+* Replace CFUUID* with NSUUID (#2395) (Eitot)
+* Fix KVO usage for updaterController.updater.* (#2404) (Zorg)
+* Report an error when detecting duplicate updates in generate_appcast (#2407) (Zorg)
+* Improve error for rejecting xattr based code signing for delta updates (#2408) (Zorg)
+
 # 2.4.2
 
 * Ignore release notes download when we shouldn't show release notes (#2381) (Zorg)
