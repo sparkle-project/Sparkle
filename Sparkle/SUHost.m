@@ -132,7 +132,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *_Nullable)publicEDKey SPU_OBJC_DIRECT
 {
-    return [self objectForInfoDictionaryKey:SUPublicEDKeyKey];
+    NSString *publicKey = [self objectForInfoDictionaryKey:SUPublicEDKeyKey];
+    if [publicKey substringFromIndex:[publicKey length] - 1] == @"%" {
+        return [publicKey substringToIndex:[publicKey length] - 1]
+    }
+    return publicKey
 }
 
 - (NSString *_Nullable)publicDSAKey SPU_OBJC_DIRECT
