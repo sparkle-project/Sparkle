@@ -68,11 +68,11 @@
             </declaredKeys>
         </userDefaultsController>
         <view id="Yrl-Dt-Qvb" userLabel="Prompt View">
-            <rect key="frame" x="0.0" y="0.0" width="437" height="86"/>
+            <rect key="frame" x="0.0" y="0.0" width="437" height="78"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="IgD-Pj-pc8">
-                    <rect key="frame" x="104" y="50" width="315" height="16"/>
+                    <rect key="frame" x="104" y="42" width="315" height="16"/>
                     <constraints>
                         <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="16" id="J49-m7-iIa"/>
                     </constraints>
@@ -83,9 +83,9 @@
                     </textFieldCell>
                 </textField>
                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="tgW-Jp-Aia">
-                    <rect key="frame" x="104" y="0.0" width="315" height="42"/>
+                    <rect key="frame" x="104" y="0.0" width="315" height="34"/>
                     <constraints>
-                        <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="42" id="HfG-Lg-91D"/>
+                        <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="34" id="HfG-Lg-91D"/>
                         <constraint firstAttribute="width" constant="311" id="lNZ-C1-ceR"/>
                     </constraints>
                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="DO NOT LOCALIZE" id="cfa-j0-Ya4">
@@ -98,7 +98,7 @@
                     </connections>
                 </textField>
                 <imageView translatesAutoresizingMaskIntoConstraints="NO" id="NBn-FN-XAx">
-                    <rect key="frame" x="23" y="2" width="64" height="64"/>
+                    <rect key="frame" x="23" y="-4" width="64" height="64"/>
                     <constraints>
                         <constraint firstAttribute="width" constant="64" id="KbC-i0-ZyN"/>
                         <constraint firstAttribute="height" constant="64" id="Osy-kb-JTR"/>
@@ -115,7 +115,7 @@
                 <constraint firstItem="IgD-Pj-pc8" firstAttribute="top" secondItem="Yrl-Dt-Qvb" secondAttribute="top" constant="20" symbolic="YES" id="Wl8-N0-skJ"/>
                 <constraint firstItem="NBn-FN-XAx" firstAttribute="leading" secondItem="Yrl-Dt-Qvb" secondAttribute="leading" constant="23" id="Xku-5M-xMC"/>
                 <constraint firstItem="tgW-Jp-Aia" firstAttribute="leading" secondItem="NBn-FN-XAx" secondAttribute="trailing" constant="19" id="fPB-MW-Oc2"/>
-                <constraint firstItem="NBn-FN-XAx" firstAttribute="top" secondItem="Yrl-Dt-Qvb" secondAttribute="top" constant="20" symbolic="YES" id="fad-TA-xIj"/>
+                <constraint firstItem="NBn-FN-XAx" firstAttribute="top" secondItem="Yrl-Dt-Qvb" secondAttribute="top" constant="18" id="fad-TA-xIj"/>
                 <constraint firstItem="tgW-Jp-Aia" firstAttribute="top" secondItem="IgD-Pj-pc8" secondAttribute="bottom" constant="8" id="nN4-jN-Fdn"/>
                 <constraint firstItem="IgD-Pj-pc8" firstAttribute="leading" secondItem="NBn-FN-XAx" secondAttribute="trailing" constant="19" id="s7w-Aw-JQY"/>
                 <constraint firstAttribute="bottom" secondItem="tgW-Jp-Aia" secondAttribute="bottom" id="uS1-FX-kSX"/>
@@ -276,14 +276,14 @@ Gw
             <point key="canvasLocation" x="-291" y="554"/>
         </customView>
         <customView id="ov1-yV-Uol" userLabel="Anonymous Info View">
-            <rect key="frame" x="0.0" y="0.0" width="437" height="25"/>
+            <rect key="frame" x="0.0" y="0.0" width="437" height="20"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
                 <customView translatesAutoresizingMaskIntoConstraints="NO" id="a0k-dW-Jhx" userLabel="View">
-                    <rect key="frame" x="0.0" y="-26" width="437" height="64"/>
+                    <rect key="frame" x="0.0" y="0.0" width="437" height="20"/>
                     <subviews>
                         <button focusRingType="none" translatesAutoresizingMaskIntoConstraints="NO" id="a90-Iq-FgS" userLabel="IncludeInfoButton">
-                            <rect key="frame" x="104" y="25" width="200" height="16"/>
+                            <rect key="frame" x="104" y="-1" width="200" height="16"/>
                             <constraints>
                                 <constraint firstAttribute="height" constant="14" id="STF-87-eYy"/>
                             </constraints>
@@ -301,7 +301,7 @@ Gw
                             </connections>
                         </button>
                         <button focusRingType="none" horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="JW6-0z-Ud3">
-                            <rect key="frame" x="85" y="25" width="16" height="16"/>
+                            <rect key="frame" x="85" y="-1" width="16" height="16"/>
                             <constraints>
                                 <constraint firstAttribute="height" constant="16" id="HMA-GI-C0a"/>
                                 <constraint firstAttribute="width" constant="16" id="Qxo-Ga-nVP"/>
@@ -324,31 +324,31 @@ Gw
                         <constraint firstItem="JW6-0z-Ud3" firstAttribute="leading" secondItem="a0k-dW-Jhx" secondAttribute="leading" constant="85" id="6Y1-s7-g6r"/>
                         <constraint firstItem="a90-Iq-FgS" firstAttribute="centerY" secondItem="JW6-0z-Ud3" secondAttribute="centerY" id="BNJ-xV-faQ"/>
                         <constraint firstItem="a90-Iq-FgS" firstAttribute="leading" secondItem="a0k-dW-Jhx" secondAttribute="leading" constant="105" id="ILg-Qu-R6M"/>
-                        <constraint firstItem="a90-Iq-FgS" firstAttribute="top" secondItem="a0k-dW-Jhx" secondAttribute="top" constant="24" id="Mh6-5L-xqM"/>
+                        <constraint firstItem="a90-Iq-FgS" firstAttribute="top" secondItem="a0k-dW-Jhx" secondAttribute="top" constant="6" id="Mh6-5L-xqM"/>
                         <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="a90-Iq-FgS" secondAttribute="trailing" constant="20" id="U4G-Eh-HPu"/>
                         <constraint firstItem="a90-Iq-FgS" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="JW6-0z-Ud3" secondAttribute="trailing" constant="4" id="axA-s0-uGg"/>
                         <constraint firstAttribute="width" constant="437" id="iUc-Zs-h9S"/>
-                        <constraint firstAttribute="bottom" secondItem="a90-Iq-FgS" secondAttribute="bottom" constant="26" id="qij-uH-6Yl"/>
+                        <constraint firstAttribute="bottom" secondItem="a90-Iq-FgS" secondAttribute="bottom" id="qij-uH-6Yl"/>
                     </constraints>
                 </customView>
             </subviews>
             <constraints>
                 <constraint firstItem="a0k-dW-Jhx" firstAttribute="leading" secondItem="ov1-yV-Uol" secondAttribute="leading" id="dE2-R0-ENa"/>
-                <constraint firstItem="a0k-dW-Jhx" firstAttribute="top" secondItem="ov1-yV-Uol" secondAttribute="top" constant="-13" id="ibf-cg-DNR"/>
+                <constraint firstItem="a0k-dW-Jhx" firstAttribute="top" secondItem="ov1-yV-Uol" secondAttribute="top" id="ibf-cg-DNR"/>
                 <constraint firstAttribute="trailing" secondItem="a0k-dW-Jhx" secondAttribute="trailing" id="rAn-bJ-Mp6"/>
-                <constraint firstAttribute="bottom" secondItem="a0k-dW-Jhx" secondAttribute="bottom" constant="-26" id="xw5-bj-VOd"/>
+                <constraint firstAttribute="bottom" secondItem="a0k-dW-Jhx" secondAttribute="bottom" id="xw5-bj-VOd"/>
             </constraints>
             <point key="canvasLocation" x="-135.5" y="242.5"/>
         </customView>
         <customView id="37T-Ef-DtX" userLabel="Automatic Download View">
-            <rect key="frame" x="0.0" y="0.0" width="437" height="25"/>
+            <rect key="frame" x="0.0" y="0.0" width="437" height="20"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
                 <customView translatesAutoresizingMaskIntoConstraints="NO" id="MEW-2n-kJE" userLabel="View">
-                    <rect key="frame" x="0.0" y="-26" width="437" height="64"/>
+                    <rect key="frame" x="0.0" y="0.0" width="437" height="20"/>
                     <subviews>
                         <button focusRingType="none" translatesAutoresizingMaskIntoConstraints="NO" id="BId-kb-eYW" userLabel="automaticallyDownloadUpdatesButton">
-                            <rect key="frame" x="104" y="25" width="248" height="16"/>
+                            <rect key="frame" x="104" y="-1" width="248" height="16"/>
                             <constraints>
                                 <constraint firstAttribute="height" constant="14" id="kJy-g7-0Un"/>
                             </constraints>
@@ -363,16 +363,16 @@ Gw
                     </subviews>
                     <constraints>
                         <constraint firstItem="BId-kb-eYW" firstAttribute="leading" secondItem="MEW-2n-kJE" secondAttribute="leading" constant="105" id="MnW-AM-QzP"/>
-                        <constraint firstAttribute="bottom" secondItem="BId-kb-eYW" secondAttribute="bottom" constant="26" id="QXK-90-kUJ"/>
+                        <constraint firstAttribute="bottom" secondItem="BId-kb-eYW" secondAttribute="bottom" id="QXK-90-kUJ"/>
                         <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="BId-kb-eYW" secondAttribute="trailing" constant="20" id="Vk3-CH-cXd"/>
-                        <constraint firstItem="BId-kb-eYW" firstAttribute="top" secondItem="MEW-2n-kJE" secondAttribute="top" constant="24" id="YrX-aL-LAq"/>
+                        <constraint firstItem="BId-kb-eYW" firstAttribute="top" secondItem="MEW-2n-kJE" secondAttribute="top" constant="6" id="YrX-aL-LAq"/>
                         <constraint firstAttribute="width" constant="437" id="n4W-Z4-w9i"/>
                     </constraints>
                 </customView>
             </subviews>
             <constraints>
-                <constraint firstAttribute="bottom" secondItem="MEW-2n-kJE" secondAttribute="bottom" constant="-26" id="4iq-ZN-n9x"/>
-                <constraint firstItem="MEW-2n-kJE" firstAttribute="top" secondItem="37T-Ef-DtX" secondAttribute="top" constant="-13" id="FCe-KY-rHW"/>
+                <constraint firstAttribute="bottom" secondItem="MEW-2n-kJE" secondAttribute="bottom" id="4iq-ZN-n9x"/>
+                <constraint firstItem="MEW-2n-kJE" firstAttribute="top" secondItem="37T-Ef-DtX" secondAttribute="top" id="FCe-KY-rHW"/>
                 <constraint firstItem="MEW-2n-kJE" firstAttribute="leading" secondItem="37T-Ef-DtX" secondAttribute="leading" id="dsv-fP-ffg"/>
                 <constraint firstAttribute="trailing" secondItem="MEW-2n-kJE" secondAttribute="trailing" id="puT-Df-xgH"/>
             </constraints>
