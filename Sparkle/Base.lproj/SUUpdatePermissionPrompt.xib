@@ -67,7 +67,7 @@
                 <string>SUSendProfileInfo</string>
             </declaredKeys>
         </userDefaultsController>
-        <view misplaced="YES" id="Yrl-Dt-Qvb" userLabel="Prompt View">
+        <view id="Yrl-Dt-Qvb" userLabel="Prompt View">
             <rect key="frame" x="0.0" y="0.0" width="437" height="78"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
