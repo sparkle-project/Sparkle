@@ -68,6 +68,16 @@ SPU_OBJC_DIRECT_MEMBERS
 - (BOOL)swapItemAtURL:(NSURL *)originalItemURL withItemAtURL:(NSURL *)newItemURL error:(NSError **)error;
 
 /**
+ * Checks if two URLs are on the same volume.
+ * @param url1 A URL pointing to the first item
+ * @param url2 A URL pointing to the second item
+ * @return YES if both URLs are on the same volume, otherwise NO
+ *
+ * If any volume retrieval error occurs during the process, this method assumes both items are on the same volume (which is the common case).
+ */
+- (BOOL)itemAtURL:(NSURL *)url1 isOnSameVolumeItemAsURL:(NSURL *)url2;
+
+/**
  * Copies an item from a source to a destination
  * @param sourceURL A URL pointing to the item to move. The item at this URL must exist.
  * @param destinationURL A URL pointing to the destination the item will be moved at. An item must not already exist at this URL.

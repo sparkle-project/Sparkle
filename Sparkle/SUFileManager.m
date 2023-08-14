@@ -174,6 +174,21 @@ SPU_OBJC_DIRECT
     return [url getResourceValue:outVolumeIdentifier forKey:NSURLVolumeIdentifierKey error:&error];
 }
 
+- (BOOL)itemAtURL:(NSURL *)url1 isOnSameVolumeItemAsURL:(NSURL *)url2
+{
+    id volumeIdentifier1 = nil;
+    BOOL foundVolume1 = [self _getVolumeID:&volumeIdentifier1 ofItemAtURL:url1];
+
+    id volumeIdentifier2 = nil;
+    BOOL foundVolume2 = [self _getVolumeID:&volumeIdentifier2 ofItemAtURL:url2];
+
+    if (foundVolume1 && foundVolume2 && ![(NSObject *)volumeIdentifier1 isEqual:volumeIdentifier2]) {
+        return NO;
+    } else {
+        return YES;
+    }
+}
+
 - (BOOL)moveItemAtURL:(NSURL *)sourceURL toURL:(NSURL *)destinationURL error:(NSError *__autoreleasing *)error
 {
     if (![self _itemExistsAtURL:sourceURL]) {
@@ -202,14 +217,8 @@ SPU_OBJC_DIRECT
     // from my experience a move may fail when moving particular files from
     // one network mount to another one. This is possibly related to the fact that
     // moving a file will try to preserve ownership but copying won't
-
-    id sourceVolumeIdentifier = nil;
-    BOOL foundSourceVolume = [self _getVolumeID:&sourceVolumeIdentifier ofItemAtURL:sourceURL];
-
-    id destinationVolumeIdentifier = nil;
-    BOOL foundDestinationVolume = [self _getVolumeID:&destinationVolumeIdentifier ofItemAtURL:destinationURLParent];
-
-    if (foundSourceVolume && foundDestinationVolume && ![(NSObject *)sourceVolumeIdentifier isEqual:destinationVolumeIdentifier]) {
+    
+    if (![self itemAtURL:sourceURL isOnSameVolumeItemAsURL:destinationURLParent]) {
         return ([self copyItemAtURL:sourceURL toURL:destinationURL error:error] && [self removeItemAtURL:sourceURL error:error]);
     }
 
