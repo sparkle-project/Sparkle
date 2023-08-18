@@ -300,12 +300,6 @@
             return NO;
         }
     }
-    
-    if (!_newAndOldBundlesOnSameVolume) {
-        if (@available(macOS 14, *)) {
-            [self _performGatekeeperScanOfBundlePath:installationURL.path];
-        }
-    }
 
     if (progress) {
         progress(11/11.0);
