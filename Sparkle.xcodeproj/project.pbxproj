@@ -262,7 +262,6 @@
 		7267E59F1D3D8A6F00D1BF90 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E59E1D3D8A6F00D1BF90 /* main.m */; };
 		7267E5A21D3D8A7E00D1BF90 /* AppInstaller.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5A11D3D8A7E00D1BF90 /* AppInstaller.m */; };
 		7267E5A81D3D8A9900D1BF90 /* AgentConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5A71D3D8A9900D1BF90 /* AgentConnection.m */; };
-		7267E5AB1D3D8AA800D1BF90 /* TerminationListener.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5AA1D3D8AA800D1BF90 /* TerminationListener.m */; };
 		7267E5AE1D3D8AB700D1BF90 /* SPUInstallationInputData.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5AD1D3D8AB700D1BF90 /* SPUInstallationInputData.m */; };
 		7267E5B11D3D8AD500D1BF90 /* SPUMessageTypes.h in Headers */ = {isa = PBXBuildFile; fileRef = 7267E5AF1D3D8AD500D1BF90 /* SPUMessageTypes.h */; };
 		7267E5B21D3D8AD500D1BF90 /* SPUMessageTypes.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5B01D3D8AD500D1BF90 /* SPUMessageTypes.m */; };
@@ -1273,8 +1272,6 @@
 		7267E5A41D3D8A8A00D1BF90 /* StatusInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = StatusInfo.m; path = Autoupdate/StatusInfo.m; sourceTree = SOURCE_ROOT; };
 		7267E5A61D3D8A9900D1BF90 /* AgentConnection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AgentConnection.h; path = Autoupdate/AgentConnection.h; sourceTree = SOURCE_ROOT; };
 		7267E5A71D3D8A9900D1BF90 /* AgentConnection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AgentConnection.m; path = Autoupdate/AgentConnection.m; sourceTree = SOURCE_ROOT; };
-		7267E5A91D3D8AA800D1BF90 /* TerminationListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TerminationListener.h; path = Autoupdate/TerminationListener.h; sourceTree = SOURCE_ROOT; };
-		7267E5AA1D3D8AA800D1BF90 /* TerminationListener.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TerminationListener.m; path = Autoupdate/TerminationListener.m; sourceTree = SOURCE_ROOT; };
 		7267E5AC1D3D8AB700D1BF90 /* SPUInstallationInputData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SPUInstallationInputData.h; path = Autoupdate/SPUInstallationInputData.h; sourceTree = SOURCE_ROOT; };
 		7267E5AD1D3D8AB700D1BF90 /* SPUInstallationInputData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SPUInstallationInputData.m; path = Autoupdate/SPUInstallationInputData.m; sourceTree = SOURCE_ROOT; };
 		7267E5AF1D3D8AD500D1BF90 /* SPUMessageTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SPUMessageTypes.h; path = Autoupdate/SPUMessageTypes.h; sourceTree = SOURCE_ROOT; };
@@ -1888,8 +1885,6 @@
 				7267E5AD1D3D8AB700D1BF90 /* SPUInstallationInputData.m */,
 				729924921DF4A45000DBCDF5 /* SUUpdateValidator.h */,
 				729924931DF4A45000DBCDF5 /* SUUpdateValidator.m */,
-				7267E5A91D3D8AA800D1BF90 /* TerminationListener.h */,
-				7267E5AA1D3D8AA800D1BF90 /* TerminationListener.m */,
 			);
 			path = Autoupdate;
 			sourceTree = "<group>";
@@ -3579,7 +3574,6 @@
 				7267E5881D3D89B300D1BF90 /* SUUnarchiver.m in Sources */,
 				72316BD31E0DA8430039EFD9 /* SUUnarchiverNotifier.m in Sources */,
 				729924941DF4A45000DBCDF5 /* SUUpdateValidator.m in Sources */,
-				7267E5AB1D3D8AA800D1BF90 /* TerminationListener.m in Sources */,
 				722FB7E5260EE53F00EB571C /* SUNormalization.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
