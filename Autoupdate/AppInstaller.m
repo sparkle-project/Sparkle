@@ -272,7 +272,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 
 - (void)agentConnectionDidInvalidate
 {
-    if (!_finishedValidation || !_agentInitiatedConnection) {
+    if (!_finishedValidation || !_agentInitiatedConnection || !_targetTerminated) {
         NSMutableDictionary *userInfo = [NSMutableDictionary dictionaryWithDictionary:@{ NSLocalizedDescriptionKey: @"Error: Agent connection invalidated before installation began" }];
         
         NSError *agentError = _agentConnection.invalidationError;
