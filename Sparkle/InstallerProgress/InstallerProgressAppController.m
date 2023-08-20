@@ -260,6 +260,10 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
 - (void)registerApplicationBundlePath:(NSString *)applicationBundlePath reply:(void (^)(BOOL))reply
 {
     dispatch_async(dispatch_get_main_queue(), ^{
+#pragma clang diagnostic push
+#if __has_warning("-Wcompletion-handler")
+#pragma clang diagnostic ignored "-Wcompletion-handler"
+#endif
         if (applicationBundlePath != nil && !self->_willTerminate && self->_targetRunningApplication == nil) {
             NSBundle *applicationBundle = [NSBundle bundleWithPath:applicationBundlePath];
             if (applicationBundle == nil) {
@@ -294,8 +298,9 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
             self->_applicationInitiallyAlive = !targetDead;
             self->_targetRunningApplication = firstRunningApplication;
         } else {
-            assert(false);
+            SULog(SULogLevelError, @"Error: -registerApplicationBundlePath:reply: called in unexpected state");
         }
+#pragma clang diagnostic pop
     });
 }
 
@@ -308,6 +313,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
             
             [_targetRunningApplication removeObserver:self forKeyPath:isTerminatedKeyPath];
             _terminationCompletionHandler = nil;
+            _targetRunningApplication = nil;
         }
     } else {
         [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
@@ -321,7 +327,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
 #if __has_warning("-Wcompletion-handler")
 #pragma clang diagnostic ignored "-Wcompletion-handler"
 #endif
-        if (self->_terminationCompletionHandler == nil) {
+        if (self->_targetRunningApplication != nil && self->_terminationCompletionHandler == nil) {
             if (self->_targetRunningApplication.terminated) {
                 completionHandler();
             } else {
@@ -330,7 +336,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
                 [self->_targetRunningApplication addObserver:self forKeyPath:NSStringFromSelector(@selector(isTerminated)) options:NSKeyValueObservingOptionNew context:NULL];
             }
         } else {
-            // This shouldn't happen
+            SULog(SULogLevelError, @"Error: -listenForTerminationWithCompletion: called in unexpected state");
         }
 #pragma clang diagnostic pop
     });
