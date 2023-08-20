@@ -366,7 +366,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
             }
             
             // Resolve the bookmark data for the downloaded update
-            
+            // See "Share file access between processes with URL bookmarks" in https://developer.apple.com/documentation/security/app_sandbox/accessing_files_from_the_macos_app_sandbox
             BOOL isStale = NO;
             NSError *bookmarkError = nil;
             NSURL *downloadURL = [NSURL URLByResolvingBookmarkData:installationData.updateURLBookmarkData options:NSURLBookmarkResolutionWithoutUI relativeToURL:nil bookmarkDataIsStale:&isStale error:&bookmarkError];
