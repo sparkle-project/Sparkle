@@ -41,24 +41,6 @@
     return self;
 }
 
-- (void)_performGatekeeperScanOfBundlePath:(NSString *)bundlePath SPU_OBJC_DIRECT
-{
-    NSURL *gktoolURL = [NSURL fileURLWithPath:@"/usr/bin/gktool" isDirectory:NO];
-    if ([gktoolURL checkResourceIsReachableAndReturnError:NULL]) {
-        NSTask *gatekeeperScanTask = [[NSTask alloc] init];
-        gatekeeperScanTask.executableURL = gktoolURL;
-        gatekeeperScanTask.arguments = @[@"scan", bundlePath];
-        
-        NSError *taskError;
-        if (![gatekeeperScanTask launchAndReturnError:&taskError]) {
-            // Not a fatal error
-            SULog(SULogLevelError, @"Failed to perform GateKeeper scan on '%@' with error %@", bundlePath, taskError);
-        } else {
-            [gatekeeperScanTask waitUntilExit];
-        }
-    }
-}
-
 - (void)_performInitialInstallationWithFileManager:(SUFileManager *)fileManager oldBundleURL:(NSURL *)oldBundleURL newBundleURL:(NSURL *)newBundleURL progressBlock:(nullable void(^)(double))progress SPU_OBJC_DIRECT
 {
     // Release our new app from quarantine
@@ -110,7 +92,23 @@
     // Perform a pre-warmup Gatekeeper scan
     // We should not try to modify the new bundle beyond this point
     if (@available(macOS 14, *)) {
-        [self _performGatekeeperScanOfBundlePath:newBundleURL.path];
+        NSString *newBundlePath = newBundleURL.path;
+        if (newBundlePath != nil) {
+            NSURL *gktoolURL = [NSURL fileURLWithPath:@"/usr/bin/gktool" isDirectory:NO];
+            if ([gktoolURL checkResourceIsReachableAndReturnError:NULL]) {
+                NSTask *gatekeeperScanTask = [[NSTask alloc] init];
+                gatekeeperScanTask.executableURL = gktoolURL;
+                gatekeeperScanTask.arguments = @[@"scan", newBundlePath];
+                
+                NSError *taskError;
+                if (![gatekeeperScanTask launchAndReturnError:&taskError]) {
+                    // Not a fatal error
+                    SULog(SULogLevelError, @"Failed to perform GateKeeper scan on '%@' with error %@", newBundleURL.path, taskError);
+                } else {
+                    [gatekeeperScanTask waitUntilExit];
+                }
+            }
+        }
     }
 }
 
