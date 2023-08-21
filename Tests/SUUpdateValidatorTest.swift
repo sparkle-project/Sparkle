@@ -143,7 +143,7 @@ class SUUpdateValidatorTest: XCTestCase {
         let newBundle = self.bundle(newBundleConfig)
         try! FileManager.default.copyItem(at: newBundle.bundleURL, to: URL(fileURLWithPath: updateDirectory).appendingPathComponent(oldBundle.bundleURL.lastPathComponent))
 
-        let result = (try? validator.validate(withUpdateDirectory: updateDirectory)) != nil
+        let result = (try? validator.validate(withUpdateDirectory: updateDirectory, matchesAppleCodeSignature: nil)) != nil
         XCTAssertEqual(result, expectedResult, "oldBundle: \(oldBundleConfig), newBundle: \(newBundleConfig), signatures: \(signatureConfig)", line: line)
     }
 
