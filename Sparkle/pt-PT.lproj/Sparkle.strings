@@ -77,4 +77,4 @@
 "Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "Use o Finder para copiar o %1$@ para a sua pasta Aplicações, reinicie-o aí e tente novamente.";
 
 /* Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates. */
-"You’re up-to-date!" = "Está actualizado!";
+"You’re up to date!" = "Está actualizado!";

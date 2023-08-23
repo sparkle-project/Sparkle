@@ -77,4 +77,4 @@
 "Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "Flytta %1$@ till mappen Program, starta om det därifrån, och försök igen.";
 
 /* Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates. */
-"You’re up-to-date!" = "Du är uppdaterad!";
+"You’re up to date!" = "Du är uppdaterad!";

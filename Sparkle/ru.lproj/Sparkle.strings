@@ -80,4 +80,4 @@
 "Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "Переместите %1$@ в Папку приложений, перезапустите его оттуда и повторите попытку.";
 
 /* Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates. */
-"You’re up-to-date!" = "У вас все обновлено!";
+"You’re up to date!" = "У вас все обновлено!";

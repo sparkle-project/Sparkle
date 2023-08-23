@@ -80,4 +80,4 @@
 "Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "%1$@ ไปยังโฟลเดอร์แอปพลิเคชัน และเรียกใช้งาน จากนั้นลองใหม่อีกครั้ง";
 
 /* Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates. */
-"You’re up-to-date!" = "คุณมีเวอร์ชั่นล่าสุดแล้ว!";
+"You’re up to date!" = "คุณมีเวอร์ชั่นล่าสุดแล้ว!";

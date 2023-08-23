@@ -86,5 +86,5 @@
 "Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "Flytt %1$@ til Programmer-katalogen, start på ny og prøv igjen.";
 
 /* Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates. */
-"You’re up-to-date!" = "Ingen nye oppdateringer";
+"You’re up to date!" = "Ingen nye oppdateringer";
 

@@ -199,13 +199,13 @@
             switch (hostToLatestAppcastItemComparisonResult) {
                 case NSOrderedDescending:
                     // This means the user is a 'newer than latest' version. give a slight hint to the user instead of wrongly claiming this version is identical to the latest feed version.
-                    localizedDescription = SULocalizedStringFromTableInBundle(@"You’re up-to-date!", SPARKLE_TABLE, sparkleBundle, "Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates.");
+                    localizedDescription = SULocalizedStringFromTableInBundle(@"You’re up to date!", SPARKLE_TABLE, sparkleBundle, "Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates.");
                     
                     reason = SPUNoUpdateFoundReasonOnNewerThanLatestVersion;
                     break;
                 case NSOrderedSame:
                     // No new update is available and we're on the latest
-                    localizedDescription = SULocalizedStringFromTableInBundle(@"You’re up-to-date!", SPARKLE_TABLE, sparkleBundle, "Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates.");
+                    localizedDescription = SULocalizedStringFromTableInBundle(@"You’re up to date!", SPARKLE_TABLE, sparkleBundle, "Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates.");
                     
                     reason = SPUNoUpdateFoundReasonOnLatestVersion;
                     break;
@@ -222,7 +222,7 @@
                         reason = SPUNoUpdateFoundReasonSystemIsTooNew;
                     } else {
                         // We shouldn't realistically get here
-                        localizedDescription = SULocalizedStringFromTableInBundle(@"You’re up-to-date!", SPARKLE_TABLE, sparkleBundle, "Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates.");
+                        localizedDescription = SULocalizedStringFromTableInBundle(@"You’re up to date!", SPARKLE_TABLE, sparkleBundle, "Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates.");
                         
                         reason = SPUNoUpdateFoundReasonUnknown;
                     }
@@ -233,7 +233,7 @@
             // We will need to assume the user is up to date if the feed doen't have any applicable update items
             // There could be update items on channels the updater is not subscribed to for example. But we can't tell the user about them.
             // There could also only be update items available for other platforms or none at all.
-            localizedDescription = SULocalizedStringFromTableInBundle(@"You’re up-to-date!", SPARKLE_TABLE, sparkleBundle, "Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates.");
+            localizedDescription = SULocalizedStringFromTableInBundle(@"You’re up to date!", SPARKLE_TABLE, sparkleBundle, "Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates.");
             
             reason = SPUNoUpdateFoundReasonOnLatestVersion;
         }

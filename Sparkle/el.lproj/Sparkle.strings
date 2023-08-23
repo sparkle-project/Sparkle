@@ -77,4 +77,4 @@
 "Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "Αντιγράψτε το %1$@ στον φάκελο εφαρμογών συστήματος, επανεκκινήστε το από εκεί και ξαναδοκιμάστε.";
 
 /* Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates. */
-"You’re up-to-date!" = "Είστε ενημερωμένοι!";
+"You’re up to date!" = "Είστε ενημερωμένοι!";

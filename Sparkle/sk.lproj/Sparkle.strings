@@ -77,4 +77,4 @@
 "Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "Presuňte aplikáciu %1$@ do priečinka Applications, spustite ju odtiaľ a potom znova skúste aktualizáciu.";
 
 /* Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates. */
-"You’re up-to-date!" = "Máte aktuálnu verziu!";
+"You’re up to date!" = "Máte aktuálnu verziu!";
