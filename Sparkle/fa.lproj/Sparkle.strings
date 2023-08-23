@@ -95,4 +95,4 @@
 "Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "از Finder برای کپی کردن %1$@ به پوشهٔ برنامه استفاده کنید، سپس %1$@ را دوباره باز کرده و مجدداً امتحان کنید.";
 
 /* Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates. */
-"You’re up-to-date!" = "برنامهٔ شما به‌روز است";
+"You’re up to date!" = "برنامهٔ شما به‌روز است";

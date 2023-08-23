@@ -77,4 +77,4 @@
 "Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "%1$@을(를) 응용프로그램 폴더로 이동하여 다시 실행해 주십시오.";
 
 /* Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates. */
-"You’re up-to-date!" = "최신 버전입니다.";
+"You’re up to date!" = "최신 버전입니다.";

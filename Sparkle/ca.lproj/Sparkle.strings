@@ -59,4 +59,4 @@
 "Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "Moveu %1$@ al vostre directori Aplicacions, reinicieu-lo, i torneu a provar-ho.";
 
 /* Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates. */
-"You’re up-to-date!" = "Ja esteu al dia!";
+"You’re up to date!" = "Ja esteu al dia!";

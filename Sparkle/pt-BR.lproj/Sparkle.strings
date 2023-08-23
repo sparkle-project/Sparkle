@@ -140,7 +140,7 @@
 "Version History" = "Histórico de Versões";
 
 /* Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates. */
-"You’re up-to-date!" = "O app está atualizado!";
+"You’re up to date!" = "O app está atualizado!";
 
 /* No comment provided by engineer. */
 "Your macOS version is too new" = "A versão do macOS é nova demais";

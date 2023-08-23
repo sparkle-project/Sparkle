@@ -77,4 +77,4 @@
 "Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "Poskusite %1$@ premakniti v direktorij z aplikacijami (Applications), ga ponovno zagnati in šele nato posodobiti.";
 
 /* Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates. */
-"You’re up-to-date!" = "Uporabljate zadnjo verzijo.";
+"You’re up to date!" = "Uporabljate zadnjo verzijo.";

@@ -149,4 +149,4 @@
 "Your macOS version is too old" = "您的 macOS 版本過舊";
 
 /* Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates. */
-"You’re up-to-date!" = "您已有最新版本！";
+"You’re up to date!" = "您已有最新版本！";
