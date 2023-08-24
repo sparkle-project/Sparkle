@@ -506,7 +506,9 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 {
     _willCompleteInstallation = YES;
     
-    _installerQueue = dispatch_queue_create("org.sparkle-project.sparkle.installer", DISPATCH_QUEUE_SERIAL);
+    dispatch_queue_attr_t queuePriority = dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL, QOS_CLASS_USER_INITIATED, 0);
+    
+    _installerQueue = dispatch_queue_create("org.sparkle-project.sparkle.installer", queuePriority);
     
     dispatch_async(_installerQueue, ^{
         NSError *installerError = nil;
