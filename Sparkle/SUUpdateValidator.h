@@ -24,7 +24,7 @@ SPU_OBJC_DIRECT_MEMBERS
 - (BOOL)validateDownloadPathWithError:(NSError **)error;
 
 // This is "post" validation, after an archive has been extracted
-- (BOOL)validateWithUpdateDirectory:(NSString *)updateDirectory matchesAppleCodeSignature:(nullable BOOL *)matchesAppleCodeSignature error:(NSError **)error;
+- (BOOL)validateWithUpdateDirectory:(NSString *)updateDirectory error:(NSError **)error;
 
 @end
 

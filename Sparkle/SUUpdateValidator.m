@@ -60,7 +60,7 @@
     return NO;
 }
 
-- (BOOL)validateWithUpdateDirectory:(NSString *)updateDirectory matchesAppleCodeSignature:(BOOL *)outMatchesAppleCodeSignature error:(NSError * __autoreleasing *)error
+- (BOOL)validateWithUpdateDirectory:(NSString *)updateDirectory error:(NSError * __autoreleasing *)error
 {
     SUSignatures *signatures = _signatures;
     NSString *downloadPath = _downloadPath;
@@ -90,10 +90,6 @@
 #if SPARKLE_BUILD_PACKAGE_SUPPORT
         // Check to see if we have a package or bundle to validate
         if (isPackage) {
-            if (outMatchesAppleCodeSignature != NULL) {
-                *outMatchesAppleCodeSignature = NO;
-            }
-            
             // If we get here, then the appcast installation type was lying to us.. This error will be caught later when starting the installer.
             // For package type updates, all we do is check if the EdDSA signature is valid
             NSError *innerError = nil;
@@ -109,16 +105,12 @@
 #endif
         {
             // For application bundle updates, we check both the EdDSA and Apple code signing signatures
-            return [self validateUpdateForHost:host downloadedToPath:downloadPath newBundleURL:installSourceURL signatures:signatures matchesAppleCodeSignature:outMatchesAppleCodeSignature error:error];
+            return [self validateUpdateForHost:host downloadedToPath:downloadPath newBundleURL:installSourceURL signatures:signatures error:error];
         }
     }
 #if SPARKLE_BUILD_PACKAGE_SUPPORT
     else if (isPackage) {
         // We already prevalidated the package and nothing else needs to be done
-        if (outMatchesAppleCodeSignature != NULL) {
-            *outMatchesAppleCodeSignature = NO;
-        }
-        
         return YES;
     }
 #endif
@@ -128,17 +120,8 @@
         // if the developer signed their application properly with their Apple ID
         // Currently, this case only gets hit for binary delta updates
         
-        BOOL newBundleIsCodeSigned = [SUCodeSigningVerifier bundleAtURLIsCodeSigned:installSourceURL];
-        BOOL oldBundleIsCodeSigned = [SUCodeSigningVerifier bundleAtURLIsCodeSigned:host.bundle.bundleURL];
-        
-        BOOL matchesCodeSignature = (oldBundleIsCodeSigned && newBundleIsCodeSigned && [SUCodeSigningVerifier codeSignatureIsValidAtBundleURL:installSourceURL andMatchesSignatureAtBundleURL:host.bundle.bundleURL error:NULL]);
-        
-        if (outMatchesAppleCodeSignature != NULL) {
-            *outMatchesAppleCodeSignature = matchesCodeSignature;
-        }
-        
         NSError *innerError = nil;
-        if (!matchesCodeSignature && newBundleIsCodeSigned && ![SUCodeSigningVerifier codeSignatureIsValidAtBundleURL:installSourceURL error:&innerError]) {
+        if ([SUCodeSigningVerifier bundleAtURLIsCodeSigned:installSourceURL] && ![SUCodeSigningVerifier codeSignatureIsValidAtBundleURL:installSourceURL error:&innerError]) {
             if (error != NULL) {
                 *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUValidationError userInfo:@{ NSLocalizedDescriptionKey: @"Failed to validate apple code sign signature on bundle after archive validation", NSUnderlyingErrorKey: innerError }];
             }
@@ -158,7 +141,7 @@
  *  * old and new Code Signing identity are the same and valid
  *
  */
-- (BOOL)validateUpdateForHost:(SUHost *)host downloadedToPath:(NSString *)downloadedPath newBundleURL:(NSURL *)newBundleURL signatures:(SUSignatures *)signatures matchesAppleCodeSignature:(BOOL *)outMatchesAppleCodeSignature error:(NSError * __autoreleasing *)error SPU_OBJC_DIRECT
+- (BOOL)validateUpdateForHost:(SUHost *)host downloadedToPath:(NSString *)downloadedPath newBundleURL:(NSURL *)newBundleURL signatures:(SUSignatures *)signatures error:(NSError * __autoreleasing *)error SPU_OBJC_DIRECT
 {
     NSBundle *newBundle = [NSBundle bundleWithURL:newBundleURL];
     if (newBundle == nil) {
@@ -204,9 +187,6 @@
     NSError *codeSignedError = nil;
     if (hostIsCodeSigned) {
         passedCodeSigning = [SUCodeSigningVerifier codeSignatureIsValidAtBundleURL:newHost.bundle.bundleURL andMatchesSignatureAtBundleURL:host.bundle.bundleURL error:&codeSignedError];
-    }
-    if (outMatchesAppleCodeSignature != NULL) {
-        *outMatchesAppleCodeSignature = passedCodeSigning;
     }
     // End of security-critical part
 

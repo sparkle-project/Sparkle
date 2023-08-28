@@ -83,7 +83,6 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     BOOL _performedStage3Installation;
     
     BOOL _targetTerminated;
-    BOOL _matchesAppleCodeSignature;
 }
 
 - (instancetype)initWithHostBundleIdentifier:(NSString *)hostBundleIdentifier homeDirectory:(NSString *)homeDirectory userName:(NSString *)userName
@@ -204,7 +203,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
                  [self->_communicator handleMessageWithIdentifier:SPUValidationStarted data:[NSData data]];
                  
                  NSError *validationError = nil;
-                 BOOL validationSuccess = [self->_updateValidator validateWithUpdateDirectory:self->_updateDirectoryPath matchesAppleCodeSignature:&self->_matchesAppleCodeSignature error:&validationError];
+                 BOOL validationSuccess = [self->_updateValidator validateWithUpdateDirectory:self->_updateDirectoryPath error:&validationError];
                  
                  if (!validationSuccess) {
                      [self cleanupAndExitWithStatus:EXIT_FAILURE error:[NSError errorWithDomain:SUSparkleErrorDomain code:SPUInstallerError userInfo:@{ NSLocalizedDescriptionKey: @"Update validation was a failure", NSUnderlyingErrorKey: validationError }]];
@@ -247,7 +246,6 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     
     // No longer need update validator until next possible extraction (eg: if initial delta update fails)
     _updateValidator = nil;
-    _matchesAppleCodeSignature = NO;
     
     // Client could try update again with different inputs
     // Eg: one common case is if a delta update fails, client may want to fall back to regular update
@@ -512,7 +510,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     
     dispatch_async(_installerQueue, ^{
         NSError *installerError = nil;
-        id <SUInstallerProtocol> installer = [SUInstaller installerForHost:self->_host expectedInstallationType:self->_installationType updateDirectory:self->_updateDirectoryPath allowGateKeeperScan:self->_matchesAppleCodeSignature homeDirectory:self->_homeDirectory userName:self->_userName error:&installerError];
+        id <SUInstallerProtocol> installer = [SUInstaller installerForHost:self->_host expectedInstallationType:self->_installationType updateDirectory:self->_updateDirectoryPath homeDirectory:self->_homeDirectory userName:self->_userName error:&installerError];
         
         if (installer == nil) {
             dispatch_async(dispatch_get_main_queue(), ^{

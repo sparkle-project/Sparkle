@@ -56,7 +56,7 @@
     NSError *installerError = nil;
     // Note: we may not be using the "correct" home directory or user name (they will be root) but our test pkg does not have
     // pre/post install scripts so it doesn't matter
-    id<SUInstallerProtocol> installer = [SUInstaller installerForHost:host expectedInstallationType:SPUInstallationTypeGuidedPackage updateDirectory:[path stringByDeletingLastPathComponent] allowGateKeeperScan:NO homeDirectory:NSHomeDirectory() userName:NSUserName() error:&installerError];
+    id<SUInstallerProtocol> installer = [SUInstaller installerForHost:host expectedInstallationType:SPUInstallationTypeGuidedPackage updateDirectory:[path stringByDeletingLastPathComponent] homeDirectory:NSHomeDirectory() userName:NSUserName() error:&installerError];
     
     if (installer == nil) {
         XCTFail(@"Installer is nil with error: %@", installerError);

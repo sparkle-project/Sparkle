@@ -28,17 +28,15 @@
     NSURL *_temporaryNewDirectory;
     
     BOOL _newAndOldBundlesOnSameVolume;
-    BOOL _allowGateKeeperScan;
 }
 
-- (instancetype)initWithHost:(SUHost *)host bundlePath:(NSString *)bundlePath installationPath:(NSString *)installationPath allowGateKeeperScan:(BOOL)allowGateKeeperScan
+- (instancetype)initWithHost:(SUHost *)host bundlePath:(NSString *)bundlePath installationPath:(NSString *)installationPath
 {
     self = [super init];
     if (self != nil) {
         _host = host;
         _bundlePath = [bundlePath copy];
         _installationPath = [installationPath copy];
-        _allowGateKeeperScan = allowGateKeeperScan;
     }
     return self;
 }
@@ -89,30 +87,6 @@
     
     if (progress) {
         progress(8/11.0);
-    }
-    
-    if (_allowGateKeeperScan) {
-        // Perform a pre-warmup GateKeeper scan
-        // We should not try to modify the new bundle beyond this point
-        if (@available(macOS 14, *)) {
-            NSString *newBundlePath = newBundleURL.path;
-            if (newBundlePath != nil) {
-                NSURL *gktoolURL = [NSURL fileURLWithPath:@"/usr/bin/gktool" isDirectory:NO];
-                if ([gktoolURL checkResourceIsReachableAndReturnError:NULL]) {
-                    NSTask *gatekeeperScanTask = [[NSTask alloc] init];
-                    gatekeeperScanTask.executableURL = gktoolURL;
-                    gatekeeperScanTask.arguments = @[@"scan", newBundlePath];
-                    
-                    NSError *taskError;
-                    if (![gatekeeperScanTask launchAndReturnError:&taskError]) {
-                        // Not a fatal error
-                        SULog(SULogLevelError, @"Failed to perform GateKeeper scan on '%@' with error %@", newBundleURL.path, taskError);
-                    } else {
-                        [gatekeeperScanTask waitUntilExit];
-                    }
-                }
-            }
-        }
     }
 }
 
