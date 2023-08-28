@@ -73,7 +73,7 @@ The installer figures out what kind of installer to use (regular, guided pkg, in
 
 Once the type of installer is found, the first stage of installation is performed:
 
-* Regular application installer 1st stage: Makes sure this update is not a downgrade.
+* Regular application installer 1st stage: Makes sure this update is not a downgrade and do all initial installation work if possible (such as clearing quarantine, changing owner/group, updating modification date, invoking GateKeeper scan). This initial work is not done if the bundle has to transfer to another volume; in this case, this work will be done in a later stage.
 * Guided Package installer 1st stage: Does nothing.
 * Interactive Package installer (deprecated) 1st stage: Makes sure /usr/bin/open utility is available.
 
@@ -111,7 +111,7 @@ In the case termination of the application is delayed or canceled, the user driv
 
 When the target application is terminated, if the updater allowed the installer to show UI progress and the installation type doesn't show progress on its own (only interactive package installer shows progress on its own), then the installer sends a `SPUUpdaterAlivePing` message to the updater. If the updater is still alive by now and receives the message, the updater will then send back a `SPUUpdaterAlivePong` message. This lets the installer know that the updater is still active after the target application is terminated, and whether the installer should later be responsible for displaying updater progress or not if a short time passes by, and the installation is still not finished. If the updater is still not alive, then the installer should be responsible for showing progress if otherwise allowed.
 
-If the installer decides to show progress, it sends a message to the progress agent to show progress UI. Under most circumstances, the installation will finish faster than this point is reached however (exceptions may be potentially large updates with many scattered files, guided package installers, and updates over a remote network mount). If the connection to the updater is still connected after this short time passes (eg: like with sparkle-cli), then it's the updater's job to show progress instead.
+If the installer decides to show progress, it sends a message to the progress agent to show progress UI. Under most circumstances, the installation will finish faster than this point is reached however (exceptions may be guided package installers and updates over a remote network mount). If the connection to the updater is still connected after this short time passes (eg: like with sparkle-cli), then it's the updater's job to show progress instead.
 
 ### Finishing the Installation
 The installer starts stage 3 of the installation after the target application is terminated as well. The third stage does the final installation for updating and replacing the new updated bundle.

@@ -7,7 +7,6 @@
 //
 
 #import "AppInstaller.h"
-#import "TerminationListener.h"
 #import "SUInstaller.h"
 #import "SUUpdateValidator.h"
 #import "SULog.h"
@@ -52,8 +51,6 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     id<SUInstallerCommunicationProtocol> _communicator;
     AgentConnection *_agentConnection;
 
-    TerminationListener *_terminationListener;
-
     SUUpdateValidator *_updateValidator;
 
     NSString *_hostBundleIdentifier;
@@ -84,6 +81,8 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     BOOL _performedStage1Installation;
     BOOL _performedStage2Installation;
     BOOL _performedStage3Installation;
+    
+    BOOL _targetTerminated;
 }
 
 - (instancetype)initWithHostBundleIdentifier:(NSString *)hostBundleIdentifier homeDirectory:(NSString *)homeDirectory userName:(NSString *)userName
@@ -273,7 +272,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 
 - (void)agentConnectionDidInvalidate
 {
-    if (!_finishedValidation || !_agentInitiatedConnection) {
+    if (!_finishedValidation || !_agentInitiatedConnection || !_targetTerminated) {
         NSMutableDictionary *userInfo = [NSMutableDictionary dictionaryWithDictionary:@{ NSLocalizedDescriptionKey: @"Error: Agent connection invalidated before installation began" }];
         
         NSError *agentError = _agentConnection.invalidationError;
@@ -291,15 +290,31 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     // For a plug-in this makes a big difference; we want to wait until the app hosting the plug-in terminates
     // Otherwise for an app, the relaunch path and host path should be identical
     
-    [_agentConnection.agent registerApplicationBundlePath:_relaunchPath reply:^(NSNumber * _Nullable processIdentifier) {
+    __block BOOL receivedResponse = NO;
+    [_agentConnection.agent registerApplicationBundlePath:_relaunchPath reply:^(BOOL targetTerminated) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            self->_terminationListener = [[TerminationListener alloc] initWithProcessIdentifier:processIdentifier];
+            receivedResponse = YES;
+            
+            if (!targetTerminated) {
+                [self->_agentConnection.agent listenForTerminationWithCompletion:^{
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        self->_targetTerminated = YES;
+                        
+                        if (self->_performedStage1Installation) {
+                            [self finishInstallationAfterHostTermination];
+                        }
+                    });
+                }];
+            } else {
+                self->_targetTerminated = YES;
+            }
+            
             [self startInstallation];
         });
     }];
     
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(RETRIEVE_PROCESS_IDENTIFIER_TIMEOUT * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        if (self->_terminationListener == nil) {
+        if (!receivedResponse) {
             [self cleanupAndExitWithStatus:EXIT_FAILURE error:[NSError errorWithDomain:SUSparkleErrorDomain code:SPUInstallerError userInfo:@{ NSLocalizedDescriptionKey: @"Timeout error: failed to retreive process identifier from agent" }]];
         }
     });
@@ -351,7 +366,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
             }
             
             // Resolve the bookmark data for the downloaded update
-            
+            // See "Share file access between processes with URL bookmarks" in https://developer.apple.com/documentation/security/app_sandbox/accessing_files_from_the_macos_app_sandbox
             BOOL isStale = NO;
             NSError *bookmarkError = nil;
             NSURL *downloadURL = [NSURL URLByResolvingBookmarkData:installationData.updateURLBookmarkData options:NSURLBookmarkResolutionWithoutUI relativeToURL:nil bookmarkDataIsStale:&isStale error:&bookmarkError];
@@ -489,7 +504,9 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 {
     _willCompleteInstallation = YES;
     
-    _installerQueue = dispatch_queue_create("org.sparkle-project.sparkle.installer", DISPATCH_QUEUE_SERIAL);
+    dispatch_queue_attr_t queuePriority = dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL, QOS_CLASS_USER_INITIATED, 0);
+    
+    _installerQueue = dispatch_queue_create("org.sparkle-project.sparkle.installer", queuePriority);
     
     dispatch_async(_installerQueue, ^{
         NSError *installerError = nil;
@@ -517,9 +534,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
         dispatch_async(dispatch_get_main_queue(), ^{
             self->_installer = installer;
             
-            uint8_t targetTerminated = (uint8_t)self->_terminationListener.terminated;
-            
-            uint8_t sendInformation[] = {canPerformSilentInstall, targetTerminated};
+            uint8_t sendInformation[] = {canPerformSilentInstall, (uint8_t)self->_targetTerminated};
             
             NSData *sendData = [NSData dataWithBytes:sendInformation length:sizeof(sendInformation)];
             
@@ -527,9 +542,11 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
             
             self->_performedStage1Installation = YES;
             
-            // Stage 2 can still be run before we finish installation
-            // if the updater requests for it before the app is terminated
-            [self finishInstallationAfterHostTermination];
+            if (self->_targetTerminated) {
+                // Stage 2 can still be run before we finish installation
+                // if the updater requests for it before the app is terminated
+                [self finishInstallationAfterHostTermination];
+            }
         });
     });
 }
@@ -541,7 +558,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
         _performedStage2Installation = YES;
         
         dispatch_async(dispatch_get_main_queue(), ^{
-            uint8_t targetTerminated = (uint8_t)self->_terminationListener.terminated;
+            uint8_t targetTerminated = (uint8_t)self->_targetTerminated;
             
             NSData *sendData = [NSData dataWithBytes:&targetTerminated length:sizeof(targetTerminated)];
             [self->_communicator handleMessageWithIdentifier:SPUInstallationFinishedStage2 data:sendData];
@@ -561,76 +578,71 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 
 - (void)finishInstallationAfterHostTermination SPU_OBJC_DIRECT
 {
-    [_terminationListener startListeningWithCompletion:^(BOOL success) {
-        if (!success) {
-            [self cleanupAndExitWithStatus:EXIT_FAILURE error:[NSError errorWithDomain:SUSparkleErrorDomain code:SPUInstallerError userInfo:@{ NSLocalizedDescriptionKey: @"Failed to listen for application termination" }]];
+    assert(self->_targetTerminated);
+    
+    // Show our installer progress UI tool if only after a certain amount of time passes,
+    // and if our installer is silent (i.e, doesn't show progress on its own)
+    __block BOOL shouldShowUIProgress = YES;
+    if (self->_shouldShowUI && [self->_installer canInstallSilently]) {
+        // Ask the updater if it is still alive
+        // If they are, we will receive a pong response back
+        // Reset if we received a pong just to be on the safe side
+        self->_receivedUpdaterPong = NO;
+        [self->_communicator handleMessageWithIdentifier:SPUUpdaterAlivePing data:[NSData data]];
+        
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(SUDisplayProgressTimeDelay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            // Make sure we're still eligible for showing the installer progress
+            // Also if the updater process is still alive, showing the progress should not be our duty
+            // if the communicator object is nil, the updater definitely isn't alive. However, if it is not nil,
+            // this does not necessarily mean the updater is alive, so we should also check if we got a recent response back from the updater
+            if (shouldShowUIProgress && (!self->_receivedUpdaterPong || self->_communicator == nil)) {
+                [self->_agentConnection.agent showProgress];
+            }
+        });
+    }
+        
+    dispatch_async(self->_installerQueue, ^{
+        if (!self->_performedStage2Installation) {
+            [self performStage2Installation];
+        }
+        
+        if (!self->_performedStage2Installation) {
+            // We failed and we're going to exit shortly
             return;
         }
         
-        // Show our installer progress UI tool if only after a certain amount of time passes,
-        // and if our installer is silent (i.e, doesn't show progress on its own)
-        __block BOOL shouldShowUIProgress = YES;
-        if (self->_shouldShowUI && [self->_installer canInstallSilently]) {
-            // Ask the updater if it is still alive
-            // If they are, we will receive a pong response back
-            // Reset if we received a pong just to be on the safe side
-            self->_receivedUpdaterPong = NO;
-            [self->_communicator handleMessageWithIdentifier:SPUUpdaterAlivePing data:[NSData data]];
-            
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(SUDisplayProgressTimeDelay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                // Make sure we're still eligible for showing the installer progress
-                // Also if the updater process is still alive, showing the progress should not be our duty
-                // if the communicator object is nil, the updater definitely isn't alive. However, if it is not nil,
-                // this does not necessarily mean the updater is alive, so we should also check if we got a recent response back from the updater
-                if (shouldShowUIProgress && (!self->_receivedUpdaterPong || self->_communicator == nil)) {
-                    [self->_agentConnection.agent showProgress];
-                }
-            });
-        }
-        
-        dispatch_async(self->_installerQueue, ^{
-            if (!self->_performedStage2Installation) {
-                [self performStage2Installation];
-            }
-            
-            if (!self->_performedStage2Installation) {
-                // We failed and we're going to exit shortly
-                return;
-            }
-            
-            NSError *thirdStageError = nil;
-            if (![self->_installer performFinalInstallationProgressBlock:nil error:&thirdStageError]) {
-                [self->_installer performCleanup];
-                self->_installer = nil;
-                
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [self cleanupAndExitWithStatus:EXIT_FAILURE error:[NSError errorWithDomain:SUSparkleErrorDomain code:SPUInstallerError userInfo:@{ NSLocalizedDescriptionKey: @"Failed to finalize installation", NSUnderlyingErrorKey: thirdStageError }]];
-                });
-                return;
-            }
-            
-            self->_performedStage3Installation = YES;
+        NSError *thirdStageError = nil;
+        if (![self->_installer performFinalInstallationProgressBlock:nil error:&thirdStageError]) {
+            [self->_installer performCleanup];
+            self->_installer = nil;
             
             dispatch_async(dispatch_get_main_queue(), ^{
-                // Make sure to stop our displayed progress before we move onto cleanup & relaunch
-                // This will also stop the agent from broadcasting the status info service, which we want to do before
-                // we relaunch the app because the relaunched app could check the service upon launch..
-                [self->_agentConnection.agent stopProgress];
-                shouldShowUIProgress = NO;
-                
-                [self->_communicator handleMessageWithIdentifier:SPUInstallationFinishedStage3 data:[NSData data]];
-                
-                if (self->_shouldRelaunch) {
-                    // This will also signal to the agent that it will terminate soon
-                    [self->_agentConnection.agent relaunchApplication];
-                }
-                
-                [self->_installer performCleanup];
-                
-                [self cleanupAndExitWithStatus:EXIT_SUCCESS error:nil];
+                [self cleanupAndExitWithStatus:EXIT_FAILURE error:[NSError errorWithDomain:SUSparkleErrorDomain code:SPUInstallerError userInfo:@{ NSLocalizedDescriptionKey: @"Failed to finalize installation", NSUnderlyingErrorKey: thirdStageError }]];
             });
+            return;
+        }
+        
+        self->_performedStage3Installation = YES;
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            // Make sure to stop our displayed progress before we move onto cleanup & relaunch
+            // This will also stop the agent from broadcasting the status info service, which we want to do before
+            // we relaunch the app because the relaunched app could check the service upon launch..
+            [self->_agentConnection.agent stopProgress];
+            shouldShowUIProgress = NO;
+            
+            [self->_communicator handleMessageWithIdentifier:SPUInstallationFinishedStage3 data:[NSData data]];
+            
+            if (self->_shouldRelaunch) {
+                // This will also signal to the agent that it will terminate soon
+                [self->_agentConnection.agent relaunchApplication];
+            }
+            
+            [self->_installer performCleanup];
+            
+            [self cleanupAndExitWithStatus:EXIT_SUCCESS error:nil];
         });
-    }];
+    });
 }
 
 - (void)cleanupAndExitWithStatus:(int)status error:(NSError * _Nullable)error __attribute__((noreturn))

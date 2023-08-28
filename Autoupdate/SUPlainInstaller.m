@@ -26,6 +26,8 @@
     NSURL *_temporaryOldDirectory;
     // We get an obj-c warning if we use 'newTemporaryDirectory' name about new + ownership stuff, so use 'temporaryNewDirectory' instead
     NSURL *_temporaryNewDirectory;
+    
+    BOOL _newAndOldBundlesOnSameVolume;
 }
 
 - (instancetype)initWithHost:(SUHost *)host bundlePath:(NSString *)bundlePath installationPath:(NSString *)installationPath
@@ -39,7 +41,57 @@
     return self;
 }
 
-- (BOOL)startInstallationToURL:(NSURL *)installationURL fromUpdateAtURL:(NSURL *)newURL withHost:(SUHost *)host progressBlock:(nullable void(^)(double))progress  error:(NSError * __autoreleasing *)error SPU_OBJC_DIRECT
+- (void)_performInitialInstallationWithFileManager:(SUFileManager *)fileManager oldBundleURL:(NSURL *)oldBundleURL newBundleURL:(NSURL *)newBundleURL progressBlock:(nullable void(^)(double))progress SPU_OBJC_DIRECT
+{
+    // Release our new app from quarantine
+    NSError *quarantineError = nil;
+    if (![fileManager releaseItemFromQuarantineAtRootURL:newBundleURL error:&quarantineError]) {
+        // Not big enough of a deal to fail the entire installation
+        SULog(SULogLevelError, @"Failed to release quarantine at %@ with error %@", newBundleURL.path, quarantineError);
+    }
+    
+    if (progress) {
+        progress(5/11.0);
+    }
+    
+    // Try to preserve Finder Tags
+    NSArray *resourceTags = nil;
+    BOOL retrievedResourceTags = [oldBundleURL getResourceValue:&resourceTags forKey:NSURLTagNamesKey error:NULL];
+    if (retrievedResourceTags && resourceTags.count > 0) {
+        [newBundleURL setResourceValue:resourceTags forKey:NSURLTagNamesKey error:NULL];
+    }
+    
+    if (progress) {
+        progress(6/11.0);
+    }
+    
+    // Update owner and group (if possible)
+    NSError *changeOwnerAndGroupError = nil;
+    if (![fileManager changeOwnerAndGroupOfItemAtRootURL:newBundleURL toMatchURL:oldBundleURL error:&changeOwnerAndGroupError]) {
+        // Not a fatal error
+        SULog(SULogLevelError, @"Failed to change owner and group of new app at %@ to match old app at %@", newBundleURL.path, oldBundleURL.path);
+        SULog(SULogLevelError, @"Error: %@", changeOwnerAndGroupError);
+    }
+    
+    if (progress) {
+        progress(7/11.0);
+    }
+    
+    // Register the new bundle with LaunchServices and the system
+    NSError *touchError = nil;
+    if (![fileManager updateModificationAndAccessTimeOfItemAtURL:newBundleURL error:&touchError]) {
+        // Not a fatal error, but a pretty unfortunate one
+        SULog(SULogLevelError, @"Failed to update modification and access time of new app at %@", newBundleURL.path);
+        SULog(SULogLevelError, @"Error: %@", touchError);
+    }
+    
+    if (progress) {
+        progress(8/11.0);
+    }
+}
+
+
+- (BOOL)startInstallationToURL:(NSURL *)installationURL fromUpdateAtURL:(NSURL *)newURL withHost:(SUHost *)host progressBlock:(nullable void(^)(double))progress error:(NSError * __autoreleasing *)error SPU_OBJC_DIRECT
 {
     if (installationURL == nil || newURL == nil) {
         // this really shouldn't happen but just in case
@@ -51,7 +103,7 @@
     }
 
     if (progress) {
-        progress(1/10.0);
+        progress(1/11.0);
     }
 
     SUFileManager *fileManager = [[SUFileManager alloc] init];
@@ -60,19 +112,21 @@
     // The system periodically cleans up files by looking at the mod & access times, so we have to make sure they're up to date
     // They could be potentially be preserved when archiving an application, but also an update could just be sitting on the system for a long time
     // before being installed
-    NSError *accessTimeError = nil;
-    if (![fileManager updateAccessTimeOfItemAtRootURL:newURL error:&accessTimeError]) {
-        if (error != NULL) {
-            NSMutableDictionary *userInfo = [NSMutableDictionary dictionaryWithDictionary:@{ NSLocalizedDescriptionKey: @"Failed to recursively update new application's modification time before moving into temporary directory" }];
-            
-            if (accessTimeError != nil) {
-                userInfo[NSUnderlyingErrorKey] = accessTimeError;
+    if (!_newAndOldBundlesOnSameVolume) {
+        NSError *accessTimeError = nil;
+        if (![fileManager updateAccessTimeOfItemAtRootURL:newURL error:&accessTimeError]) {
+            if (error != NULL) {
+                NSMutableDictionary *userInfo = [NSMutableDictionary dictionaryWithDictionary:@{ NSLocalizedDescriptionKey: @"Failed to recursively update new application's modification time before moving into temporary directory" }];
+                
+                if (accessTimeError != nil) {
+                    userInfo[NSUnderlyingErrorKey] = accessTimeError;
+                }
+                
+                *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:userInfo];
             }
             
-            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:userInfo];
+            return NO;
         }
-        
-        return NO;
     }
     
     NSURL *oldURL = [NSURL fileURLWithPath:host.bundlePath];
@@ -86,89 +140,60 @@
     }
     
     if (progress) {
-        progress(2/10.0);
+        progress(2/11.0);
     }
     
-    // Create a temporary directory for our new app that resides on our destination's volume
-    // We use oldURL here instead of installationURL because in the case of normalization, installationURL may not exist
-    // And we don't want to use either of the URL's parent directories because the parent directory could be on a different volume
-    NSURL *tempNewDirectoryURL = [fileManager makeTemporaryDirectoryAppropriateForDirectoryURL:oldURL error:error];
-    if (tempNewDirectoryURL == nil) {
-        return NO;
-    }
-    
-    _temporaryNewDirectory = tempNewDirectoryURL;
-
-    if (progress) {
-        progress(3/10.0);
-    }
-
-    // Move the new app to our temporary directory
-    NSString *newURLLastPathComponent = newURL.lastPathComponent;
-    NSURL *newTempURL = [tempNewDirectoryURL URLByAppendingPathComponent:newURLLastPathComponent];
-    NSError *newTempMoveError = nil;
-    if (![fileManager moveItemAtURL:newURL toURL:newTempURL error:&newTempMoveError]) {
-        if (error != NULL) {
-            NSMutableDictionary *userInfo = [NSMutableDictionary dictionaryWithDictionary:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to move the new app from %@ to its temp directory at %@", newURL.path, newTempURL.path] }];
-            
-            if (newTempMoveError != nil) {
-                userInfo[NSUnderlyingErrorKey] = newTempMoveError;
-            }
-            
-            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:userInfo];
+    NSURL *tempNewDirectoryURL;
+    if (!_newAndOldBundlesOnSameVolume) {
+        // Create a temporary directory for our new app that resides on our destination's volume
+        // We use oldURL here instead of installationURL because in the case of normalization, installationURL may not exist
+        // And we don't want to use either of the URL's parent directories because the parent directory could be on a different volume
+        tempNewDirectoryURL = [fileManager makeTemporaryDirectoryAppropriateForDirectoryURL:oldURL error:error];
+        if (tempNewDirectoryURL == nil) {
+            return NO;
         }
-        return NO;
+        
+        _temporaryNewDirectory = tempNewDirectoryURL;
+    } else {
+        tempNewDirectoryURL = nil;
     }
 
     if (progress) {
-        progress(4/10.0);
+        progress(3/11.0);
     }
 
-    // Release our new app from quarantine
-    NSError *quarantineError = nil;
-    if (![fileManager releaseItemFromQuarantineAtRootURL:newTempURL error:&quarantineError]) {
-        // Not big enough of a deal to fail the entire installation
-        SULog(SULogLevelError, @"Failed to release quarantine at %@ with error %@", newTempURL.path, quarantineError);
+    // Move the new app to our temporary directory if needed
+    NSURL *newFinalURL;
+    if (!_newAndOldBundlesOnSameVolume) {
+        NSString *newURLLastPathComponent = newURL.lastPathComponent;
+        newFinalURL = [tempNewDirectoryURL URLByAppendingPathComponent:newURLLastPathComponent];
+        NSError *newTempMoveError = nil;
+        if (![fileManager moveItemAtURL:newURL toURL:newFinalURL error:&newTempMoveError]) {
+            if (error != NULL) {
+                NSMutableDictionary *userInfo = [NSMutableDictionary dictionaryWithDictionary:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to move the new app from %@ to its temp directory at %@", newURL.path, newFinalURL.path] }];
+                
+                if (newTempMoveError != nil) {
+                    userInfo[NSUnderlyingErrorKey] = newTempMoveError;
+                }
+                
+                *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:userInfo];
+            }
+            return NO;
+        }
+    } else {
+        newFinalURL = newURL;
     }
 
     if (progress) {
-        progress(5/10.0);
+        progress(4/11.0);
     }
     
-    // Try to preserve Finder Tags
-    NSArray *resourceTags = nil;
-    BOOL retrievedResourceTags = [oldURL getResourceValue:&resourceTags forKey:NSURLTagNamesKey error:NULL];
-    if (retrievedResourceTags && resourceTags.count > 0) {
-        [newTempURL setResourceValue:resourceTags forKey:NSURLTagNamesKey error:NULL];
-    }
-    
-    if (progress) {
-        progress(6/10.0);
-    }
-    
-    // We must leave moving the app to its destination as the final step in installing it, so that
-    // it's not possible our new app can be left in an incomplete state at the final destination
-    
-    NSError *changeOwnerAndGroupError = nil;
-    if (![fileManager changeOwnerAndGroupOfItemAtRootURL:newTempURL toMatchURL:oldURL error:&changeOwnerAndGroupError]) {
-        // Not a fatal error
-        SULog(SULogLevelError, @"Failed to change owner and group of new app at %@ to match old app at %@", newTempURL.path, oldURL.path);
-        SULog(SULogLevelError, @"Error: %@", changeOwnerAndGroupError);
+    if (!_newAndOldBundlesOnSameVolume) {
+        [self _performInitialInstallationWithFileManager:fileManager oldBundleURL:oldURL newBundleURL:newFinalURL progressBlock:progress];
     }
 
     if (progress) {
-        progress(7/10.0);
-    }
-
-    NSError *touchError = nil;
-    if (![fileManager updateModificationAndAccessTimeOfItemAtURL:newTempURL error:&touchError]) {
-        // Not a fatal error, but a pretty unfortunate one
-        SULog(SULogLevelError, @"Failed to update modification and access time of new app at %@", newTempURL.path);
-        SULog(SULogLevelError, @"Error: %@", touchError);
-    }
-
-    if (progress) {
-        progress(8/10.0);
+        progress(9/11.0);
     }
     
     // First try swapping the application atomically
@@ -180,7 +205,7 @@
     } else {
         // We will be cleaning up the temporary directory later in -performCleanup:
         // We don't want to clean it up now because it can take some time
-        swappedApp = [fileManager swapItemAtURL:installationURL withItemAtURL:newTempURL error:&swapError];
+        swappedApp = [fileManager swapItemAtURL:installationURL withItemAtURL:newFinalURL error:&swapError];
     }
     
     if (!swappedApp) {
@@ -199,7 +224,7 @@
         _temporaryOldDirectory = tempOldDirectoryURL;
 
         if (progress) {
-            progress(9/10.0);
+            progress(10/11.0);
         }
         
         NSString *oldURLFilename = oldURL.lastPathComponent;
@@ -229,14 +254,14 @@
         }
 
         if (progress) {
-            progress(9.5/10.0);
+            progress(10.5/11.0);
         }
 
         // Move the new app to its final destination
         NSError *installMoveError = nil;
-        if (![fileManager moveItemAtURL:newTempURL toURL:installationURL error:&installMoveError]) {
+        if (![fileManager moveItemAtURL:newFinalURL toURL:installationURL error:&installMoveError]) {
             if (error != NULL) {
-                NSMutableDictionary *userInfo = [NSMutableDictionary dictionaryWithDictionary:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to move new app at %@ to final destination %@", newTempURL.path, installationURL.path] }];
+                NSMutableDictionary *userInfo = [NSMutableDictionary dictionaryWithDictionary:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to move new app at %@ to final destination %@", newFinalURL.path, installationURL.path] }];
                 
                 if (installMoveError != nil) {
                     userInfo[NSUnderlyingErrorKey] = installMoveError;
@@ -253,7 +278,7 @@
     }
 
     if (progress) {
-        progress(10/10.0);
+        progress(11/11.0);
     }
 
     return YES;
@@ -279,6 +304,15 @@
         }
         
         return NO;
+    }
+    
+    SUFileManager *fileManager = [[SUFileManager alloc] init];
+    
+    _newAndOldBundlesOnSameVolume = [fileManager itemAtURL:bundle.bundleURL isOnSameVolumeItemAsURL:_host.bundle.bundleURL];
+    
+    // We can do a lot of the installation work ahead of time if the new app update does not need to be copied to another volume
+    if (_newAndOldBundlesOnSameVolume) {
+        [self _performInitialInstallationWithFileManager:fileManager oldBundleURL:_host.bundle.bundleURL newBundleURL:bundle.bundleURL progressBlock:NULL];
     }
     
     return YES;
