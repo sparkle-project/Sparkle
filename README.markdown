@@ -54,7 +54,7 @@ If you are adding a symbol to the public API you must decorate the declaration w
 
 You do not usually need to build a Sparkle distribution unless you're making changes to Sparkle itself.
 
-To build a Sparkle distribution, `cd` to the root of the Sparkle source tree and run `make release`. Sparkle-*VERSION*.tar.xz (or .bz2) will be created in a temporary directory and revealed in Finder after the build has completed.
+To build a Sparkle distribution, `cd` to the root of the Sparkle source tree and run `make release`. Sparkle-*VERSION*.tar.xz (or .bz2) will be created and revealed in Finder after the build has completed.
 
 Alternatively, build the Distribution scheme in the Xcode UI.
 

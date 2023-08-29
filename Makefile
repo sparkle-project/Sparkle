@@ -3,7 +3,7 @@
 all: build
 
 ifndef BUILDDIR
-    BUILDDIR := $(shell mktemp -d "$(TMPDIR)/Sparkle.XXXXXX")
+    BUILDDIR := $(shell mkdir -p "build" && mktemp -d "build/Sparkle.XXXXXX")
 endif
 
 localizable-strings:
