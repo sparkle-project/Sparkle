@@ -5,8 +5,11 @@
 * Adopt cooperative app activation APIs in macOS 14 Sonoma (#2409) (Zorg)
 * Improve permission prompt layout (#2420) (Zorg)
 * Remove hyphenation in "You're up to date" message (#2425) (Zorg, Dom Neill)
-* Replace CFUUID* with NSUUID (#2395) (Eitot)
+* Pre-warm installs before relaunch and resolve sporadic failures in CI (#2421) (Zorg)
+* Fix make release not building distribution successfully (#2430) (Zorg)
+* Fix Updater app not starting when running Sparkle as root (e.g. from CLI with sudo or a daemon) on macOS 14 Sonoma (#2432) (Zorg)
 * Fix KVO usage for updaterController.updater.* (#2404) (Zorg)
+* Replace CFUUID* with NSUUID (#2395) (Eitot)
 * Report an error when detecting duplicate updates in generate_appcast (#2407) (Zorg)
 * Improve error for rejecting xattr based code signing for delta updates (#2408) (Zorg)
 
