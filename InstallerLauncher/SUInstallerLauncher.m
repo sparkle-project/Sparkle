@@ -449,26 +449,10 @@ static BOOL SPUUsesSystemDomainForBundlePath(NSString *path, BOOL rootUser
             return;
         }
         
-        // It may be tempting here to validate/match the signature of the installer and progress tool, however this is not very reliable
-        // We can't compare the signature of this framework/XPC service (depending how it's run) to the host bundle because
-        // they could be different (eg: take a look at sparkle-cli). We also can't easily tell if the signature of the service/framework is the same as the bundle it's inside.
-        // The service/framework also need not even be signed in the first place. We'll just assume for now the original bundle hasn't been tampered with
-        
-        NSString *rootLauncherCachePath = [[SPULocalCacheDirectory cachePathForBundleIdentifier:hostBundleIdentifier] stringByAppendingPathComponent:@"Launcher"];
-        
-        [SPULocalCacheDirectory removeOldItemsInDirectory:rootLauncherCachePath];
-        
-        NSString *launcherCachePath = [SPULocalCacheDirectory createUniqueDirectoryInDirectory:rootLauncherCachePath];
-        if (launcherCachePath == nil) {
-            SULog(SULogLevelError, @"Failed to create cache directory for progress tool in %@", rootLauncherCachePath);
-            completionHandler(SUInstallerLauncherFailure, inSystemDomain);
-            return;
-        }
-        
-        SUFileManager *fileManager = [[SUFileManager alloc] init];
-        
         NSString *userName;
         NSString *homeDirectory;
+        uid_t uid = 0;
+        gid_t gid = 0;
         if (!rootUser) {
             // Normal path
             homeDirectory = NSHomeDirectory();
@@ -479,9 +463,6 @@ static BOOL SPUUsesSystemDomainForBundlePath(NSString *path, BOOL rootUser
         } else {
             // As the root user we need to obtain the user name and home directory reflecting
             // the user's console session.
-            
-            uid_t uid = 0;
-            gid_t gid = 0;
             CFStringRef userNameRef = SCDynamicStoreCopyConsoleUser(NULL, &uid, &gid);
             if (userNameRef == NULL) {
                 SULog(SULogLevelError, @"Failed to retrieve user name from the console user");
@@ -497,7 +478,35 @@ static BOOL SPUUsesSystemDomainForBundlePath(NSString *path, BOOL rootUser
                 completionHandler(SUInstallerLauncherFailure, inSystemDomain);
                 return;
             }
-            
+        }
+        
+        // It may be tempting here to validate/match the signature of the installer and progress tool, however this is not very reliable
+        // We can't compare the signature of this framework/XPC service (depending how it's run) to the host bundle because
+        // they could be different (eg: take a look at sparkle-cli). We also can't easily tell if the signature of the service/framework is the same as the bundle it's inside.
+        // The service/framework also need not even be signed in the first place. We'll just assume for now the original bundle hasn't been tampered with
+        NSString *cachePath = rootUser ?
+            [SPULocalCacheDirectory cachePathForBundleIdentifier:hostBundleIdentifier userName:userName] :
+            [SPULocalCacheDirectory cachePathForBundleIdentifier:hostBundleIdentifier];
+        
+        NSString *rootLauncherCachePath = [cachePath stringByAppendingPathComponent:@"Launcher"];
+        
+        [SPULocalCacheDirectory removeOldItemsInDirectory:rootLauncherCachePath];
+        
+        NSDictionary<NSFileAttributeKey, id> *fileAttributes = rootUser ?
+            @{NSFileOwnerAccountID: @(uid), NSFileGroupOwnerAccountID: @(gid)} :
+            nil;
+        
+        NSString *launcherCachePath = [SPULocalCacheDirectory createUniqueDirectoryInDirectory:rootLauncherCachePath intermediateDirectoryFileAttributes:fileAttributes];
+        
+        if (launcherCachePath == nil) {
+            SULog(SULogLevelError, @"Failed to create cache directory for progress tool in %@", rootLauncherCachePath);
+            completionHandler(SUInstallerLauncherFailure, inSystemDomain);
+            return;
+        }
+        
+        SUFileManager *fileManager = [[SUFileManager alloc] init];
+        
+        if (rootUser) {
             // Ensure the console user has ownership of the launcher cache directory
             // Otherwise the updater may not launch and not be able to clean up itself
             NSError *changeOwnerAndGroupError = nil;
