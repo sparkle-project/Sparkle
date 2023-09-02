@@ -16,17 +16,35 @@ static NSTimeInterval OLD_ITEM_DELETION_INTERVAL = 86400 * 10; // 10 days
 
 @implementation SPULocalCacheDirectory
 
-// It is important to note this may return a different path whether invoked from a sanboxed vs non-sandboxed process, or from a different user
++ (NSString *)_cachePathForCacheDirectory:(NSURL *)cacheURL bundleIdentifier:(NSString *)bundleIdentifier SPU_OBJC_DIRECT
+{
+    NSString *resultPath = [[[cacheURL URLByAppendingPathComponent:bundleIdentifier isDirectory:YES] URLByAppendingPathComponent:@SPARKLE_BUNDLE_IDENTIFIER isDirectory:YES] path];
+    assert(resultPath != nil);
+    
+    return resultPath;
+}
+
+// It is important to note this may return a different path whether invoked from a sanboxed vs non-sandboxed process
 // For this reason, this method should not be a part of SUHost because its behavior depends on what kind of process it's being invoked from
 + (NSString *)cachePathForBundleIdentifier:(NSString *)bundleIdentifier
 {
     NSURL *cacheURL = [[NSFileManager defaultManager] URLForDirectory:NSCachesDirectory inDomain:NSUserDomainMask appropriateForURL:nil create:NO error:NULL];
     assert(cacheURL != nil);
     
-    NSString *resultPath = [[[cacheURL URLByAppendingPathComponent:bundleIdentifier] URLByAppendingPathComponent:@SPARKLE_BUNDLE_IDENTIFIER] path];
-    assert(resultPath != nil);
+    return [self _cachePathForCacheDirectory:cacheURL bundleIdentifier:bundleIdentifier];
+}
+
++ (NSString *)cachePathForBundleIdentifier:(NSString *)bundleIdentifier userName:(NSString *)userName
+{
+    NSString *homeDirectory = NSHomeDirectoryForUser(userName);
+    assert(homeDirectory != nil);
     
-    return resultPath;
+    NSURL *homeDirectoryURL = [NSURL fileURLWithPath:homeDirectory isDirectory:YES];
+    
+    NSURL *cacheURL = [[homeDirectoryURL URLByAppendingPathComponent:@"Library" isDirectory:YES] URLByAppendingPathComponent:@"Caches" isDirectory:YES];
+    assert(cacheURL != nil);
+    
+    return [self _cachePathForCacheDirectory:cacheURL bundleIdentifier:bundleIdentifier];
 }
 
 + (void)removeOldItemsInDirectory:(NSString *)directory
@@ -58,11 +76,11 @@ static NSTimeInterval OLD_ITEM_DELETION_INTERVAL = 86400 * 10; // 10 days
     }
 }
 
-+ (NSString * _Nullable)createUniqueDirectoryInDirectory:(NSString *)directory
++ (NSString * _Nullable)createUniqueDirectoryInDirectory:(NSString *)directory intermediateDirectoryFileAttributes:(NSDictionary<NSFileAttributeKey, id> *)intermediateDirectoryFileAttributes
 {
     NSFileManager *fileManager = [NSFileManager defaultManager];
     NSError *createError = nil;
-    if (![fileManager createDirectoryAtPath:directory withIntermediateDirectories:YES attributes:nil error:&createError]) {
+    if (![fileManager createDirectoryAtPath:directory withIntermediateDirectories:YES attributes:intermediateDirectoryFileAttributes error:&createError]) {
         SULog(SULogLevelError, @"Failed to create directory with intermediate components at %@ with error %@", directory, createError);
         return nil;
     }
@@ -75,6 +93,11 @@ static NSTimeInterval OLD_ITEM_DELETION_INTERVAL = 86400 * 10; // 10 days
         }
     }
     return nil;
+}
+
++ (NSString * _Nullable)createUniqueDirectoryInDirectory:(NSString *)directory
+{
+    return [self createUniqueDirectoryInDirectory:directory intermediateDirectoryFileAttributes:nil];
 }
 
 @end
