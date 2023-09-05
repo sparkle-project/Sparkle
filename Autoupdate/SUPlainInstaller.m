@@ -41,7 +41,7 @@
     return self;
 }
 
-- (void)_performInitialInstallationWithFileManager:(SUFileManager *)fileManager oldBundleURL:(NSURL *)oldBundleURL newBundleURL:(NSURL *)newBundleURL progressBlock:(nullable void(^)(double))progress SPU_OBJC_DIRECT
+- (void)_performInitialInstallationWithFileManager:(SUFileManager *)fileManager oldBundleURL:(NSURL *)oldBundleURL newBundleURL:(NSURL *)newBundleURL gatekeeperScan:(BOOL)gatekeeperScan progressBlock:(nullable void(^)(double))progress SPU_OBJC_DIRECT
 {
     // Release our new app from quarantine
     NSError *quarantineError = nil;
@@ -87,6 +87,34 @@
     
     if (progress) {
         progress(8/11.0);
+    }
+    
+    if (gatekeeperScan) {
+        // Perform a Gatekeeper scan so users do not see the 'Verifying...' dialog when the update is launched
+        if (@available(macOS 14, *)) {
+            NSURL *gktoolURL = [NSURL fileURLWithPath:@"/usr/bin/gktool" isDirectory:NO];
+            if ([gktoolURL checkResourceIsReachableAndReturnError:NULL]) {
+                NSString *newBundlePath = newBundleURL.path;
+                assert(newBundlePath != nil);
+                
+                NSTask *gatekeeperScanTask = [[NSTask alloc] init];
+                gatekeeperScanTask.executableURL = gktoolURL;
+                gatekeeperScanTask.arguments = @[@"scan", newBundlePath];
+
+                NSError *taskError;
+                if (![gatekeeperScanTask launchAndReturnError:&taskError]) {
+                    // Not a fatal error
+                    SULog(SULogLevelError, @"Failed to perform GateKeeper scan on '%@' with error %@", newBundlePath, taskError);
+                } else {
+                    [gatekeeperScanTask waitUntilExit];
+                    int terminationStatus = gatekeeperScanTask.terminationStatus;
+                    if (terminationStatus != 0) {
+                        // Not a fatal error
+                        SULog(SULogLevelError, @"gktool returned error status %d for GateKeeper scan on '%@'", terminationStatus, newBundlePath);
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -143,45 +171,38 @@
         progress(2/11.0);
     }
     
-    NSURL *tempNewDirectoryURL;
-    if (!_newAndOldBundlesOnSameVolume) {
-        // Create a temporary directory for our new app that resides on our destination's volume
-        // We use oldURL here instead of installationURL because in the case of normalization, installationURL may not exist
-        // And we don't want to use either of the URL's parent directories because the parent directory could be on a different volume
-        tempNewDirectoryURL = [fileManager makeTemporaryDirectoryAppropriateForDirectoryURL:oldURL error:error];
-        if (tempNewDirectoryURL == nil) {
-            return NO;
-        }
-        
-        _temporaryNewDirectory = tempNewDirectoryURL;
-    } else {
-        tempNewDirectoryURL = nil;
+    // Create a temporary directory for our new app that resides on our destination's volume
+    // We use oldURL here instead of installationURL because in the case of normalization, installationURL may not exist
+    // And we don't want to use either of the URL's parent directories because the parent directory could be on a different volume
+    // Note it is still important to use a temporary directory for the new update even if the bundles are on the same volume
+    // Swapping the bundles when the new bundle is not in a temporary directory created for installation can cause problems.
+    // For example, if we didn't do this, atomically swapping app bundles may fail after performing a Gatekeeper scan
+    NSURL *tempNewDirectoryURL = [fileManager makeTemporaryDirectoryAppropriateForDirectoryURL:oldURL error:error];
+    if (tempNewDirectoryURL == nil) {
+        return NO;
     }
+    
+    _temporaryNewDirectory = tempNewDirectoryURL;
 
     if (progress) {
         progress(3/11.0);
     }
 
-    // Move the new app to our temporary directory if needed
-    NSURL *newFinalURL;
-    if (!_newAndOldBundlesOnSameVolume) {
-        NSString *newURLLastPathComponent = newURL.lastPathComponent;
-        newFinalURL = [tempNewDirectoryURL URLByAppendingPathComponent:newURLLastPathComponent];
-        NSError *newTempMoveError = nil;
-        if (![fileManager moveItemAtURL:newURL toURL:newFinalURL error:&newTempMoveError]) {
-            if (error != NULL) {
-                NSMutableDictionary *userInfo = [NSMutableDictionary dictionaryWithDictionary:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to move the new app from %@ to its temp directory at %@", newURL.path, newFinalURL.path] }];
-                
-                if (newTempMoveError != nil) {
-                    userInfo[NSUnderlyingErrorKey] = newTempMoveError;
-                }
-                
-                *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:userInfo];
+    // Move the new app to our temporary directory
+    NSString *newURLLastPathComponent = newURL.lastPathComponent;
+    NSURL *newTempURL = [tempNewDirectoryURL URLByAppendingPathComponent:newURLLastPathComponent];
+    NSError *newTempMoveError = nil;
+    if (![fileManager moveItemAtURL:newURL toURL:newTempURL error:&newTempMoveError]) {
+        if (error != NULL) {
+            NSMutableDictionary *userInfo = [NSMutableDictionary dictionaryWithDictionary:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to move the new app from %@ to its temp directory at %@", newURL.path, newTempURL.path] }];
+            
+            if (newTempMoveError != nil) {
+                userInfo[NSUnderlyingErrorKey] = newTempMoveError;
             }
-            return NO;
+            
+            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:userInfo];
         }
-    } else {
-        newFinalURL = newURL;
+        return NO;
     }
 
     if (progress) {
@@ -189,7 +210,7 @@
     }
     
     if (!_newAndOldBundlesOnSameVolume) {
-        [self _performInitialInstallationWithFileManager:fileManager oldBundleURL:oldURL newBundleURL:newFinalURL progressBlock:progress];
+        [self _performInitialInstallationWithFileManager:fileManager oldBundleURL:oldURL newBundleURL:newTempURL gatekeeperScan:NO progressBlock:progress];
     }
 
     if (progress) {
@@ -205,7 +226,7 @@
     } else {
         // We will be cleaning up the temporary directory later in -performCleanup:
         // We don't want to clean it up now because it can take some time
-        swappedApp = [fileManager swapItemAtURL:installationURL withItemAtURL:newFinalURL error:&swapError];
+        swappedApp = [fileManager swapItemAtURL:installationURL withItemAtURL:newTempURL error:&swapError];
     }
     
     if (!swappedApp) {
@@ -259,9 +280,9 @@
 
         // Move the new app to its final destination
         NSError *installMoveError = nil;
-        if (![fileManager moveItemAtURL:newFinalURL toURL:installationURL error:&installMoveError]) {
+        if (![fileManager moveItemAtURL:newTempURL toURL:installationURL error:&installMoveError]) {
             if (error != NULL) {
-                NSMutableDictionary *userInfo = [NSMutableDictionary dictionaryWithDictionary:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to move new app at %@ to final destination %@", newFinalURL.path, installationURL.path] }];
+                NSMutableDictionary *userInfo = [NSMutableDictionary dictionaryWithDictionary:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to move new app at %@ to final destination %@", newTempURL.path, installationURL.path] }];
                 
                 if (installMoveError != nil) {
                     userInfo[NSUnderlyingErrorKey] = installMoveError;
@@ -312,7 +333,7 @@
     
     // We can do a lot of the installation work ahead of time if the new app update does not need to be copied to another volume
     if (_newAndOldBundlesOnSameVolume) {
-        [self _performInitialInstallationWithFileManager:fileManager oldBundleURL:_host.bundle.bundleURL newBundleURL:bundle.bundleURL progressBlock:NULL];
+        [self _performInitialInstallationWithFileManager:fileManager oldBundleURL:_host.bundle.bundleURL newBundleURL:bundle.bundleURL gatekeeperScan:YES progressBlock:NULL];
     }
     
     return YES;
