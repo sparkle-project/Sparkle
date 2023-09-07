@@ -326,10 +326,17 @@
     } else {
         auxiliaryToolURL = [bundle URLForAuxiliaryExecutable:nameWithExtension];
     }
-    assert(auxiliaryToolURL != nil);
+    
+    if (auxiliaryToolURL == nil) {
+        SULog(SULogLevelError, @"Error: Cannot retrieve path for auxiliary tool: %@", nameWithExtension);
+        return nil;
+    }
     
     NSURL *resolvedAuxiliaryToolURL = [auxiliaryToolURL URLByResolvingSymlinksInPath];
-    assert(resolvedAuxiliaryToolURL != nil);
+    if (resolvedAuxiliaryToolURL == nil) {
+        SULog(SULogLevelError, @"Error: Cannot retrieve resolved path for auxiliary tool path: %@", auxiliaryToolURL.path);
+        return nil;
+    }
     
     return resolvedAuxiliaryToolURL.path;
 }
