@@ -216,12 +216,12 @@
     // Now that we reached here, we are dealing with multiple nodes
     NSMutableArray<NSString *> *languages = [NSMutableArray array];
     for (NSXMLElement *node in nodes) {
-        NSString *nodeLanguage = [[node attributeForName:@"xml:lang"] stringValue];
+        NSString *nodeLanguage = [[node attributeForName:SUXMLLanguage] stringValue];
         NSString *language;
         if (nodeLanguage.length == 0) {
             language = @"en";
             
-            SULog(SULogLevelError, @"Error: Multiple nodes for %@ element are present and one of them does not have xml:lang attribute specified. Defaulting to xml:lang=\"en\" but not all versions of Sparkle handle an implicit set language. Please specify the xml:lang attribute explicitly for all %@ elements.", name, name);
+            SULog(SULogLevelError, @"Error: Multiple nodes for %@ element are present and one of them does not have %@ attribute specified. Defaulting to %@=\"en\" but not all versions of Sparkle handle an implicit set language. Please specify the %@ attribute explicitly for all %@ elements.", name, SUXMLLanguage, SUXMLLanguage, SUXMLLanguage, name);
         } else {
             language = nodeLanguage;
         }
