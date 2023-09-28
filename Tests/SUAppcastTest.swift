@@ -875,9 +875,39 @@ class SUAppcastTest: XCTestCase {
             
             let stateResolver = SPUAppcastItemStateResolver(hostVersion: "1.0", applicationVersionComparator: SUStandardVersionComparator.default, standardVersionComparator: SUStandardVersionComparator.default)
             
-            let appcast = try SUAppcast(xmlData: testFileData, relativeTo: testFileUrl, stateResolver: stateResolver)
-            let items = appcast.items
-            XCTAssertEqual("https://sparkle-project.org/#localized_notes_link_works", items[0].releaseNotesURL!.absoluteString)
+            let fullAppcast = try SUAppcast(xmlData: testFileData, relativeTo: testFileUrl, stateResolver: stateResolver)
+            
+            do {
+                let appcast = SUAppcastDriver.filterAppcast(fullAppcast, forMacOSAndAllowedChannels: ["english-later"])
+                let items = appcast.items
+                XCTAssertEqual(items.count, 1)
+                XCTAssertEqual(items[0].versionString, "6.0")
+                XCTAssertEqual("https://sparkle-project.org/#localized_notes_link_works", items[0].releaseNotesURL!.absoluteString)
+            }
+            
+            do {
+                let appcast = SUAppcastDriver.filterAppcast(fullAppcast, forMacOSAndAllowedChannels: ["english-first"])
+                let items = appcast.items
+                XCTAssertEqual(items.count, 1)
+                XCTAssertEqual(items[0].versionString, "6.1")
+                XCTAssertEqual("https://sparkle-project.org/#localized_notes_link_works", items[0].releaseNotesURL!.absoluteString)
+            }
+            
+            do {
+                let appcast = SUAppcastDriver.filterAppcast(fullAppcast, forMacOSAndAllowedChannels: ["english-first-implicit"])
+                let items = appcast.items
+                XCTAssertEqual(items.count, 1)
+                XCTAssertEqual(items[0].versionString, "6.2")
+                XCTAssertEqual("https://sparkle-project.org/#localized_notes_link_works", items[0].releaseNotesURL!.absoluteString)
+            }
+            
+            do {
+                let appcast = SUAppcastDriver.filterAppcast(fullAppcast, forMacOSAndAllowedChannels: ["english-later-implicit"])
+                let items = appcast.items
+                XCTAssertEqual(items.count, 1)
+                XCTAssertEqual(items[0].versionString, "6.3")
+                XCTAssertEqual("https://sparkle-project.org/#localized_notes_link_works", items[0].releaseNotesURL!.absoluteString)
+            }
         } catch let err as NSError {
             NSLog("%@", err)
             XCTFail(err.localizedDescription)
