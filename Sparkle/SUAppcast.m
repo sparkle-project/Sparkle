@@ -115,7 +115,7 @@
         }
 
         for (NSString *name in nodesDict) {
-            node = [self bestNodeInNodes:[nodesDict objectForKey:name]];
+            node = [self bestNodeInNodes:[nodesDict objectForKey:name] name:name];
             if ([name isEqualToString:SURSSElementEnclosure] || [name isEqualToString:SUAppcastElementCriticalUpdate]) {
                 // These are flattened as a separate dictionary for some reason
                 NSDictionary *innerDict = [self attributesOfNode:(NSXMLElement *)node];
@@ -205,7 +205,7 @@
     return appcastItems;
 }
 
-- (NSXMLNode *)bestNodeInNodes:(NSArray *)nodes SPU_OBJC_DIRECT
+- (NSXMLNode *)bestNodeInNodes:(NSArray *)nodes name:(NSString *)name SPU_OBJC_DIRECT
 {
     // We use this method to pick out the localized version of a node when one's available.
     if ([nodes count] == 1)
@@ -213,19 +213,37 @@
     else if ([nodes count] == 0)
         return nil;
 
-    NSMutableArray *languages = [NSMutableArray array];
-    NSString *lang;
-    NSUInteger i;
+    // Now that we reached here, we are dealing with multiple nodes
+    NSMutableArray<NSString *> *languages = [NSMutableArray array];
     for (NSXMLElement *node in nodes) {
-        lang = [[node attributeForName:@"xml:lang"] stringValue];
-        [languages addObject:(lang ? lang : @"")];
+        NSString *nodeLanguage = [[node attributeForName:SUXMLLanguage] stringValue];
+        NSString *language;
+        if (nodeLanguage.length == 0) {
+            language = @"en";
+            
+            SULog(SULogLevelError, @"Error: Multiple nodes for %@ element are present and one of them does not have %@ attribute specified. Defaulting to %@=\"en\" but not all versions of Sparkle handle an implicit set language. Please specify the %@ attribute explicitly for all %@ elements.", name, SUXMLLanguage, SUXMLLanguage, SUXMLLanguage, name);
+        } else {
+            language = nodeLanguage;
+        }
+        
+        [languages addObject:language];
     }
-    lang = [[NSBundle preferredLocalizationsFromArray:languages] objectAtIndex:0];
-    i = [languages indexOfObject:([languages containsObject:lang] ? lang : @"")];
-    if (i == NSNotFound) {
-        i = 0;
+    
+    NSString *preferredLanguage = [[NSBundle preferredLocalizationsFromArray:languages] objectAtIndex:0];
+    if (preferredLanguage == nil) {
+        SULog(SULogLevelError, @"Error: Failed to obtain preferred localizations from %@ for node %@.", languages, name);
+        
+        return [nodes objectAtIndex:0];
     }
-    return [nodes objectAtIndex:i];
+    
+    NSUInteger preferredLanguageIndex = [languages indexOfObject:preferredLanguage];
+    if (preferredLanguageIndex == NSNotFound) {
+        SULog(SULogLevelError, @"Error: Failed to find preferred language index for %@ for node %@.", preferredLanguage, name);
+        
+        return [nodes objectAtIndex:0];
+    }
+    
+    return [nodes objectAtIndex:preferredLanguageIndex];
 }
 
 - (SUAppcast *)copyByFilteringItems:(BOOL (^)(SUAppcastItem *))filterBlock
