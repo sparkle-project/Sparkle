@@ -869,6 +869,12 @@ class SUAppcastTest: XCTestCase {
                                                             ofType: "xml")!
         let testFileUrl = URL(fileURLWithPath: testFile)
         XCTAssertNotNil(testFileUrl)
+        
+        let preferredLanguage = Bundle.preferredLocalizations(from: ["en", "es"])[0]
+        
+        NSLog("Using preferred locale %@", preferredLanguage)
+        
+        let expectedReleaseNotesLink = (preferredLanguage == "es") ? "https://sparkle-project.org/notes.es.html" : "https://sparkle-project.org/notes.en.html"
 
         do {
             let testFileData = try Data(contentsOf: testFileUrl)
@@ -882,7 +888,7 @@ class SUAppcastTest: XCTestCase {
                 let items = appcast.items
                 XCTAssertEqual(items.count, 1)
                 XCTAssertEqual(items[0].versionString, "6.0")
-                XCTAssertEqual("https://sparkle-project.org/#localized_notes_link_works", items[0].releaseNotesURL!.absoluteString)
+                XCTAssertEqual(expectedReleaseNotesLink, items[0].releaseNotesURL!.absoluteString)
             }
             
             do {
@@ -890,7 +896,7 @@ class SUAppcastTest: XCTestCase {
                 let items = appcast.items
                 XCTAssertEqual(items.count, 1)
                 XCTAssertEqual(items[0].versionString, "6.1")
-                XCTAssertEqual("https://sparkle-project.org/#localized_notes_link_works", items[0].releaseNotesURL!.absoluteString)
+                XCTAssertEqual(expectedReleaseNotesLink, items[0].releaseNotesURL!.absoluteString)
             }
             
             do {
@@ -898,7 +904,7 @@ class SUAppcastTest: XCTestCase {
                 let items = appcast.items
                 XCTAssertEqual(items.count, 1)
                 XCTAssertEqual(items[0].versionString, "6.2")
-                XCTAssertEqual("https://sparkle-project.org/#localized_notes_link_works", items[0].releaseNotesURL!.absoluteString)
+                XCTAssertEqual(expectedReleaseNotesLink, items[0].releaseNotesURL!.absoluteString)
             }
             
             do {
@@ -906,7 +912,7 @@ class SUAppcastTest: XCTestCase {
                 let items = appcast.items
                 XCTAssertEqual(items.count, 1)
                 XCTAssertEqual(items[0].versionString, "6.3")
-                XCTAssertEqual("https://sparkle-project.org/#localized_notes_link_works", items[0].releaseNotesURL!.absoluteString)
+                XCTAssertEqual(expectedReleaseNotesLink, items[0].releaseNotesURL!.absoluteString)
             }
         } catch let err as NSError {
             NSLog("%@", err)
