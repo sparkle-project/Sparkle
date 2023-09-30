@@ -26,3 +26,7 @@ https://github.com/sparkle-project/Sparkle#troubleshooting
 ## Possible Fix
 
 [not obligatory, but suggest fixes or reasons for the bug]
+
+## Version
+
+[please specify versions of Sparkle this is applicable to]
