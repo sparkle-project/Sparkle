@@ -25,6 +25,7 @@ static NSArray <NSString *> * _Nullable _commandAndArgumentsConformingToTypeOfPa
     NSArray <NSString *> *extractTBZ = @[@"/usr/bin/tar", @"-jxC"];
     NSArray <NSString *> *extractTXZ = extractTGZ;
     
+    // Note: keep this list in sync with generate_appcast's unarchiveUpdates()
     NSDictionary <NSString *, NSArray<NSString *> *> *extractCommandDictionary =
     @{
       @".zip" : @[@"/usr/bin/ditto", @"-x",@"-k",@"-"],
