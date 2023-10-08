@@ -64,7 +64,7 @@ func unarchiveUpdates(archivesSourceDir: URL, archivesDestDir: URL, disableNeste
         let itemURL = archivesSourceDir.appendingPathComponent(item)
         let fileExtension = itemURL.pathExtension
         // Note: keep this list in sync with SUPipedUnarchiver
-        guard ["zip", "tar", "gz", "tgz", "bz2", "xz", "txz", "lzma", "dmg"].contains(fileExtension) else {
+        guard ["zip", "tar", "gz", "tgz", "bz2", "tbz", "xz", "txz", "lzma", "dmg"].contains(fileExtension) else {
             continue
         }
         
