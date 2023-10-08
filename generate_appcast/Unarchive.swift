@@ -56,7 +56,18 @@ func unarchiveUpdates(archivesSourceDir: URL, archivesDestDir: URL, disableNeste
     // so we can ignore duplicate archive entries before trying to unarchive archives in parallel
     var fileEntries: [URL: URL] = [:]
     let dir = try fileManager.contentsOfDirectory(atPath: archivesSourceDir.path)
-    for item in dir.filter({ !$0.hasPrefix(".") && !$0.hasSuffix(".delta") && !$0.hasSuffix(".xml") && !$0.hasSuffix(".html") && !$0.hasSuffix(".txt") }) {
+    for item in dir {
+        if item.hasPrefix(".") {
+            continue
+        }
+        
+        let itemURL = archivesSourceDir.appendingPathComponent(item)
+        let fileExtension = itemURL.pathExtension
+        // Note: keep this list in sync with SUPipedUnarchiver
+        guard ["zip", "tar", "gz", "tgz", "bz2", "tbz", "xz", "txz", "lzma", "dmg"].contains(fileExtension) else {
+            continue
+        }
+        
         let itemPath = archivesSourceDir.appendingPathComponent(item)
         
         // Ignore directories
