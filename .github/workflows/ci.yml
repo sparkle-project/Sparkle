@@ -26,6 +26,9 @@ jobs:
     name: Build and Test Sparkle
     runs-on: ${{ matrix.macos }}
 
+    permissions:
+      pull-requests: write
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -80,11 +83,9 @@ jobs:
       
       - name: Post Analyzed Warnings
         if: ${{ success() && matrix.run-analyzer && github.event_name == 'pull_request' && steps.findwarnings.outputs.analyzestatus == '0' }}
-        uses: mshick/add-pr-comment@v1
+        uses: mshick/add-pr-comment@v2
         with:
             allow-repeats: false
-            repo-token: ${{ secrets.BOT_PERSONAL_ACCESS_TOKEN }}
-            repo-token-user-login: 'Sparkle-Bot'
             message: "``` ${{ steps.warnings.outputs.content }} ```"
         
       - name: Build Release Distribution
