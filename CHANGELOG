@@ -1,3 +1,9 @@
+# 2.5.1
+
+* Default to English for XML nodes when no xml:lang is present (#2440) (Zorg)
+* Filter for archive files in generate_appcast more intelligently (#2448) (Zorg)
+* Use correct entitlements and dsym files when using custom bundle id and XPC names in ConfigCommon (#2446) (floorish)
+
 # 2.5.0
 
 * Add ability to adapt release notes based on the currently installed version (#2373) (Nathan Manceaux-Panot)
