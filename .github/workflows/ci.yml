@@ -26,9 +26,12 @@ jobs:
     name: Build and Test Sparkle
     runs-on: ${{ matrix.macos }}
 
+    permissions:
+      pull-requests: write
+
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           submodules: true
           fetch-depth: 0
@@ -80,11 +83,9 @@ jobs:
       
       - name: Post Analyzed Warnings
         if: ${{ success() && matrix.run-analyzer && github.event_name == 'pull_request' && steps.findwarnings.outputs.analyzestatus == '0' }}
-        uses: mshick/add-pr-comment@v1
+        uses: mshick/add-pr-comment@v2
         with:
             allow-repeats: false
-            repo-token: ${{ secrets.BOT_PERSONAL_ACCESS_TOKEN }}
-            repo-token-user-login: 'Sparkle-Bot'
             message: "``` ${{ steps.warnings.outputs.content }} ```"
         
       - name: Build Release Distribution
@@ -94,13 +95,13 @@ jobs:
           xcodebuild build -project Sparkle.xcodeproj -scheme Distribution -configuration Release -derivedDataPath build
       - name: Archive Test Results
         if: failure()
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: build-logs
           path: build/Logs
       - name: Upload Distribution
         if: ${{ success() && matrix.upload-dist }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: Sparkle-distribution-${{ matrix.xcode }}.tar.xz
           path: build/Build/Products/Release/sparkle-dist.tar.xz
