@@ -33,7 +33,7 @@ jobs:
 
     steps:
       - name: "Checkout sources"
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           token: ${{ secrets.BOT_PERSONAL_ACCESS_TOKEN }}
           submodules: true
