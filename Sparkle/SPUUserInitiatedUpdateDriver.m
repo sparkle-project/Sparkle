@@ -117,12 +117,9 @@
 {
     if (_showingUserInitiatedProgress) {
         _showingUserInitiatedProgress = NO;
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
         if ([_userDriver respondsToSelector:@selector(dismissUserInitiatedUpdateCheck)]) {
             [_userDriver dismissUserInitiatedUpdateCheck];
         }
-#pragma clang diagnostic pop
     }
 }
 
