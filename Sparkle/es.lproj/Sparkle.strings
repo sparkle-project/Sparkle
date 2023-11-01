@@ -2,7 +2,7 @@
 "%@ %@ is currently the newest version available." = "%1$@ %2$@ es la versión más nueva disponible.";
 
 /* No comment provided by engineer. */
-"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%1$@ %2$@ es la versión más nueva disponible.\n(You are currently running version %3$@.)";
+"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%1$@ %2$@ es la versión más nueva disponible.\n(Actualmente estás corriendo la versión %3$@.)";
 
 /* Description text for SUUpdateAlert when the update is downloadable. */
 "%@ %@ is now available—you have %@. Would you like to download it now?" = "%1$@ %2$@ ya está disponible (tienes la %3$@). ¿Quisieras descargarla ahora?";
@@ -87,6 +87,9 @@
 
 /* No comment provided by engineer. */
 "Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "Usa Finder para copiar %1$@ a la carpeta Aplicaciones, vuélvela a abrir desde ahí e inténtalo de nuevo.";
+
+/* No comment provided by engineer. */
+"Version History" = "Historial de versiones";
 
 /* Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates. */
 "You’re up to date!" = "¡Está actualizado!";
