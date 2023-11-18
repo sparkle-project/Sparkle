@@ -14,6 +14,7 @@
 #import "SULog.h"
 #import "SUSignatures.h"
 #import "SUErrors.h"
+#import "SPUVerifierInformation.h"
 
 
 #include "AppKitPrevention.h"
@@ -23,17 +24,19 @@
     SUHost *_host;
     SUSignatures *_signatures;
     NSString *_downloadPath;
+    SPUVerifierInformation *_verifierInformation;
     
     BOOL _prevalidatedSignature;
 }
 
-- (instancetype)initWithDownloadPath:(NSString *)downloadPath signatures:(SUSignatures *)signatures host:(SUHost *)host
+- (instancetype)initWithDownloadPath:(NSString *)downloadPath signatures:(SUSignatures *)signatures host:(SUHost *)host verifierInformation:(SPUVerifierInformation * _Nullable)verifierInformation
 {
     self = [super init];
     if (self != nil) {
         _downloadPath = [downloadPath copy];
         _signatures = signatures;
         _host = host;
+        _verifierInformation = verifierInformation;
     }
     return self;
 }
@@ -49,7 +52,7 @@
         }
     } else {
         NSError *innerError = nil;
-        if ([SUSignatureVerifier validatePath:_downloadPath withSignatures:signatures withPublicKeys:publicKeys error:&innerError]) {
+        if ([SUSignatureVerifier validatePath:_downloadPath withSignatures:signatures withPublicKeys:publicKeys verifierInformation:_verifierInformation error:&innerError]) {
             _prevalidatedSignature = YES;
             return YES;
         }
@@ -94,7 +97,7 @@
             // For package type updates, all we do is check if the EdDSA signature is valid
             NSError *innerError = nil;
             SUPublicKeys *publicKeys = host.publicKeys;
-            BOOL validationCheckSuccess = [SUSignatureVerifier validatePath:downloadPath withSignatures:signatures withPublicKeys:publicKeys error:&innerError];
+            BOOL validationCheckSuccess = [SUSignatureVerifier validatePath:downloadPath withSignatures:signatures withPublicKeys:publicKeys verifierInformation:_verifierInformation error:&innerError];
             if (!validationCheckSuccess) {
                 if (error != NULL) {
                     *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUValidationError userInfo:@{ NSLocalizedDescriptionKey: @"EdDSA signature validation of the package failed. The update contains an installer package, and valid EdDSA signatures are mandatory for all installer packages. The update will be rejected. Sign the installer with a valid EdDSA key or use an .app bundle update instead.", NSUnderlyingErrorKey: innerError }];
@@ -156,6 +159,8 @@
     SUHost *newHost = [[SUHost alloc] initWithBundle:newBundle];
     SUPublicKeys *newPublicKeys = newHost.publicKeys;
     
+    _verifierInformation.actualVersion = newHost.version;
+    
     BOOL oldHasLegacyDSAKey = publicKeys.dsaPubKeyStatus != SUSigningInputStatusAbsent;
     BOOL oldHasEdDSAKey = publicKeys.ed25519PubKeyStatus != SUSigningInputStatusAbsent;
     BOOL oldHasAnyDSAKey = oldHasLegacyDSAKey || oldHasEdDSAKey;
@@ -181,7 +186,7 @@
     NSError *dsaError = nil;
     if (oldHasAnyDSAKey) {
         // it's critical to check against the old public key, rather than the new key
-        passedDSACheck = [SUSignatureVerifier validatePath:downloadedPath withSignatures:signatures withPublicKeys:publicKeys error:&dsaError];
+        passedDSACheck = [SUSignatureVerifier validatePath:downloadedPath withSignatures:signatures withPublicKeys:publicKeys verifierInformation:_verifierInformation error:&dsaError];
     }
 
     NSError *codeSignedError = nil;
@@ -194,7 +199,7 @@
     // In that case, the check ensures that the app author has correctly used DSA keys, so that the app will be updateable in the next version.
     if (!passedDSACheck && newHasAnyDSAKey) {
         NSError *innerError = nil;
-        if (![SUSignatureVerifier validatePath:downloadedPath withSignatures:signatures withPublicKeys:newPublicKeys error:&innerError]) {
+        if (![SUSignatureVerifier validatePath:downloadedPath withSignatures:signatures withPublicKeys:newPublicKeys verifierInformation:_verifierInformation error:&innerError]) {
             if (error != NULL) {
                 *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUValidationError userInfo:@{ NSLocalizedDescriptionKey: @"The update has a public (Ed)DSA key, but the public key shipped with the update doesn't match the signature. To prevent future problems, the update will be rejected.", NSUnderlyingErrorKey: innerError }];
             }

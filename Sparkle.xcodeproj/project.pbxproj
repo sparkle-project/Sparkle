@@ -392,6 +392,8 @@
 		72BC6C3D275027BF0083F14B /* SparkleTestCodeSign_apfs.dmg in Resources */ = {isa = PBXBuildFile; fileRef = 72BC6C3C275027BF0083F14B /* SparkleTestCodeSign_apfs.dmg */; };
 		72BEBFEF1D7287570019146B /* SUSpotlightImporterTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72BEBFEE1D7287560019146B /* SUSpotlightImporterTest.swift */; };
 		72CCDEBE27421FD500B53718 /* SparkleTestCodeSignApp_bad_header.zip in Resources */ = {isa = PBXBuildFile; fileRef = 72CCDEBD27421FD500B53718 /* SparkleTestCodeSignApp_bad_header.zip */; };
+		72D04F3D2B094C8400A6DEAA /* SPUVerifierInformation.m in Sources */ = {isa = PBXBuildFile; fileRef = 72D04F3C2B094C8400A6DEAA /* SPUVerifierInformation.m */; };
+		72D04F3E2B097D4300A6DEAA /* SPUVerifierInformation.m in Sources */ = {isa = PBXBuildFile; fileRef = 72D04F3C2B094C8400A6DEAA /* SPUVerifierInformation.m */; };
 		72D60CD928C2BAE900189AB8 /* SPUStandardUserDriver+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 72D60CD828C2BA2100189AB8 /* SPUStandardUserDriver+Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		72D954811CBACC35006F28BD /* InstallerProgressAppController.m in Sources */ = {isa = PBXBuildFile; fileRef = 72D954801CBACC35006F28BD /* InstallerProgressAppController.m */; };
 		72D954831CBAD34F006F28BD /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 72D954821CBAD34F006F28BD /* main.m */; };
@@ -1384,6 +1386,8 @@
 		72BC6C3C275027BF0083F14B /* SparkleTestCodeSign_apfs.dmg */ = {isa = PBXFileReference; lastKnownFileType = file; path = SparkleTestCodeSign_apfs.dmg; sourceTree = "<group>"; };
 		72BEBFEE1D7287560019146B /* SUSpotlightImporterTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SUSpotlightImporterTest.swift; sourceTree = "<group>"; };
 		72CCDEBD27421FD500B53718 /* SparkleTestCodeSignApp_bad_header.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = SparkleTestCodeSignApp_bad_header.zip; sourceTree = "<group>"; };
+		72D04F3B2B094C8400A6DEAA /* SPUVerifierInformation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SPUVerifierInformation.h; sourceTree = "<group>"; };
+		72D04F3C2B094C8400A6DEAA /* SPUVerifierInformation.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SPUVerifierInformation.m; sourceTree = "<group>"; };
 		72D60CD828C2BA2100189AB8 /* SPUStandardUserDriver+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SPUStandardUserDriver+Private.h"; sourceTree = "<group>"; };
 		72D9547F1CBACC35006F28BD /* InstallerProgressAppController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = InstallerProgressAppController.h; path = Sparkle/InstallerProgress/InstallerProgressAppController.h; sourceTree = SOURCE_ROOT; };
 		72D954801CBACC35006F28BD /* InstallerProgressAppController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = InstallerProgressAppController.m; path = Sparkle/InstallerProgress/InstallerProgressAppController.m; sourceTree = SOURCE_ROOT; };
@@ -2096,6 +2100,8 @@
 				7267E5991D3D8A5A00D1BF90 /* SUCodeSigningVerifier.m */,
 				7267E59A1D3D8A5A00D1BF90 /* SUSignatureVerifier.h */,
 				7267E59B1D3D8A5A00D1BF90 /* SUSignatureVerifier.m */,
+				72D04F3B2B094C8400A6DEAA /* SPUVerifierInformation.h */,
+				72D04F3C2B094C8400A6DEAA /* SPUVerifierInformation.m */,
 			);
 			name = Verifiers;
 			path = ..;
@@ -3344,6 +3350,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				72D04F3E2B097D4300A6DEAA /* SPUVerifierInformation.m in Sources */,
 				72266A8C29464D0200645376 /* SUSignatures.m in Sources */,
 				72266A8B29464CEA00645376 /* SUHost.m in Sources */,
 				72266A8A2946493C00645376 /* SUCodeSigningVerifier.m in Sources */,
@@ -3557,6 +3564,7 @@
 				7267E57F1D3D896700D1BF90 /* SUBinaryDeltaUnarchiver.m in Sources */,
 				7267E59C1D3D8A5A00D1BF90 /* SUCodeSigningVerifier.m in Sources */,
 				7267E5CC1D3D8C6B00D1BF90 /* SUConstants.m in Sources */,
+				72D04F3D2B094C8400A6DEAA /* SPUVerifierInformation.m in Sources */,
 				7267E5861D3D89B300D1BF90 /* SUDiskImageUnarchiver.m in Sources */,
 				7267E59D1D3D8A5A00D1BF90 /* SUSignatureVerifier.m in Sources */,
 				7267E5E71D3D90AA00D1BF90 /* SUFileManager.m in Sources */,
