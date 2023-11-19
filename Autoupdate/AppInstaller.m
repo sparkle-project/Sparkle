@@ -27,6 +27,7 @@
 #import "SPUInstallerAgentProtocol.h"
 #import "SPUInstallationType.h"
 #import "SPULocalCacheDirectory.h"
+#import "SPUVerifierInformation.h"
 
 
 #include "AppKitPrevention.h"
@@ -63,6 +64,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     SUSignatures *_signatures;
     NSString *_relaunchPath;
     NSString *_installationType;
+    SPUVerifierInformation *_verifierInformation;
 
     id<SUInstallerProtocol> _installer;
 
@@ -179,7 +181,15 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
         
         success = NO;
     } else {
-        _updateValidator = [[SUUpdateValidator alloc] initWithDownloadPath:archivePath signatures:_signatures host:_host];
+        NSError *fileAttributesError = nil;
+        NSDictionary<NSFileAttributeKey, id> *archiveFileAttributes = [NSFileManager.defaultManager attributesOfItemAtPath:archivePath error:&fileAttributesError];
+        if (archiveFileAttributes == nil) {
+            SULog(SULogLevelError, @"Failed to retrieve file attributes from archive: %@.", fileAttributesError);
+        } else {
+            _verifierInformation.actualContentLength = (uint64_t)(archiveFileAttributes.fileSize);
+        }
+        
+        _updateValidator = [[SUUpdateValidator alloc] initWithDownloadPath:archivePath signatures:_signatures host:_host verifierInformation:_verifierInformation];
 
         // Delta & package updates will require validation before extraction
         // Normal application updates are a bit more lenient allowing developers to change one of apple dev ID or EdDSA keys
@@ -451,6 +461,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
             self->_signatures = installationData.signatures;
             self->_updateDirectoryPath = cacheInstallationPath;
             self->_host = [[SUHost alloc] initWithBundle:hostBundle];
+            self->_verifierInformation = [[SPUVerifierInformation alloc] initWithExpectedVersion:installationData.expectedVersion expectedContentLength:installationData.expectedContentLength];
             
             [self extractAndInstallUpdate];
         });

@@ -21,8 +21,10 @@ SPU_OBJC_DIRECT_MEMBERS @interface SPUInstallationInputData : NSObject <NSSecure
  * downloadName - name of update archive in update directory
  * signatures - signatures for the update that came from the appcast item
  * decryptionPassword - optional decryption password for dmg archives
+ * expectedVersion - optional expected version of the new update
+ * expectedContentLength - optional expected content length of the new download archive
  */
-- (instancetype)initWithRelaunchPath:(NSString *)relaunchPath hostBundlePath:(NSString *)hostBundlePath updateURLBookmarkData:(NSData *)updateURLBookmarkData installationType:(NSString *)installationType signatures:(SUSignatures * _Nullable)signatures decryptionPassword:(nullable NSString *)decryptionPassword;
+- (instancetype)initWithRelaunchPath:(NSString *)relaunchPath hostBundlePath:(NSString *)hostBundlePath updateURLBookmarkData:(NSData *)updateURLBookmarkData installationType:(NSString *)installationType signatures:(SUSignatures * _Nullable)signatures decryptionPassword:(nullable NSString *)decryptionPassword expectedVersion:(NSString *)expectedVersion expectedContentLength:(uint64_t)expectedContentLength;
 
 @property (nonatomic, copy, readonly) NSString *relaunchPath;
 @property (nonatomic, copy, readonly) NSString *hostBundlePath;
@@ -30,6 +32,8 @@ SPU_OBJC_DIRECT_MEMBERS @interface SPUInstallationInputData : NSObject <NSSecure
 @property (nonatomic, copy, readonly) NSString *installationType;
 @property (nonatomic, readonly, nullable) SUSignatures *signatures; // nullable because although not using signatures is deprecated, it's still supported
 @property (nonatomic, copy, readonly, nullable) NSString *decryptionPassword;
+@property (nonatomic, copy, readonly, nullable) NSString *expectedVersion;
+@property (nonatomic, readonly) uint64_t expectedContentLength;
 
 @end
 

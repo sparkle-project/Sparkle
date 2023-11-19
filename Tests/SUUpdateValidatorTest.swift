@@ -106,7 +106,7 @@ class SUUpdateValidatorTest: XCTestCase {
     func testPrevalidation(bundle bundleConfig: BundleConfig, signatures signatureConfig: SignatureConfig, expectedResult: Bool, line: UInt = #line) {
         let host = SUHost(bundle: self.bundle(bundleConfig))
         let signatures = self.signatures(signatureConfig)
-        let validator = SUUpdateValidator(downloadPath: self.signedTestFilePath, signatures: signatures, host: host)
+        let validator = SUUpdateValidator(downloadPath: self.signedTestFilePath, signatures: signatures, host: host, verifierInformation: nil)
 
         let result = (try? validator.validateDownloadPath()) != nil
         XCTAssertEqual(result, expectedResult, "bundle: \(bundleConfig), signatures: \(signatureConfig)", line: line)
@@ -136,7 +136,7 @@ class SUUpdateValidatorTest: XCTestCase {
         let host = SUHost(bundle: oldBundle)
         let signatures = self.signatures(signatureConfig)
 
-        let validator = SUUpdateValidator(downloadPath: self.signedTestFilePath, signatures: signatures, host: host)
+        let validator = SUUpdateValidator(downloadPath: self.signedTestFilePath, signatures: signatures, host: host, verifierInformation: nil)
 
         let updateDirectory = temporaryDirectory("SUUpdateValidatorTest")!
         defer { try! FileManager.default.removeItem(atPath: updateDirectory) }
