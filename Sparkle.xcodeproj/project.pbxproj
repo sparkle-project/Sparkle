@@ -247,6 +247,9 @@
 		725F97841C8AA90000265BE4 /* SUPopUpTitlebarUserDriver.m in Sources */ = {isa = PBXBuildFile; fileRef = 725F97831C8AA90000265BE4 /* SUPopUpTitlebarUserDriver.m */; };
 		725F97A51C8B304D00265BE4 /* SUInstallUpdateViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 725F97A31C8B304D00265BE4 /* SUInstallUpdateViewController.m */; };
 		725F97A61C8B304D00265BE4 /* SUInstallUpdateViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 725F97A41C8B304D00265BE4 /* SUInstallUpdateViewController.xib */; };
+		72666DC62B0B28F4001511B0 /* keypair.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72666DC52B0B28F4001511B0 /* keypair.swift */; };
+		72666DC72B0B28F4001511B0 /* keypair.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72666DC52B0B28F4001511B0 /* keypair.swift */; };
+		72666DC82B0B28F4001511B0 /* keypair.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72666DC52B0B28F4001511B0 /* keypair.swift */; };
 		7267E5751D3D895B00D1BF90 /* SUBinaryDeltaApply.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E56F1D3D895B00D1BF90 /* SUBinaryDeltaApply.m */; };
 		7267E5761D3D895B00D1BF90 /* SUBinaryDeltaApply.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E56F1D3D895B00D1BF90 /* SUBinaryDeltaApply.m */; };
 		7267E5771D3D895B00D1BF90 /* SUBinaryDeltaCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5711D3D895B00D1BF90 /* SUBinaryDeltaCommon.m */; };
@@ -1248,6 +1251,7 @@
 		725F97A21C8B304D00265BE4 /* SUInstallUpdateViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUInstallUpdateViewController.h; sourceTree = "<group>"; };
 		725F97A31C8B304D00265BE4 /* SUInstallUpdateViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUInstallUpdateViewController.m; sourceTree = "<group>"; };
 		725F97A41C8B304D00265BE4 /* SUInstallUpdateViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SUInstallUpdateViewController.xib; sourceTree = "<group>"; };
+		72666DC52B0B28F4001511B0 /* keypair.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = keypair.swift; sourceTree = "<group>"; };
 		7267E56E1D3D895B00D1BF90 /* SUBinaryDeltaApply.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SUBinaryDeltaApply.h; path = Autoupdate/SUBinaryDeltaApply.h; sourceTree = SOURCE_ROOT; };
 		7267E56F1D3D895B00D1BF90 /* SUBinaryDeltaApply.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SUBinaryDeltaApply.m; path = Autoupdate/SUBinaryDeltaApply.m; sourceTree = SOURCE_ROOT; };
 		7267E5701D3D895B00D1BF90 /* SUBinaryDeltaCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SUBinaryDeltaCommon.h; path = Autoupdate/SUBinaryDeltaCommon.h; sourceTree = SOURCE_ROOT; };
@@ -2268,6 +2272,14 @@
 			name = "User Driver";
 			sourceTree = "<group>";
 		};
+		72666DC42B0B28D4001511B0 /* common_cli */ = {
+			isa = PBXGroup;
+			children = (
+				72666DC52B0B28F4001511B0 /* keypair.swift */,
+			);
+			path = common_cli;
+			sourceTree = "<group>";
+		};
 		726B2B5E1C645FC900388755 /* UI Tests */ = {
 			isa = PBXGroup;
 			children = (
@@ -2442,6 +2454,7 @@
 		EA1E288122B6688A004AA304 /* Command Line Tools */ = {
 			isa = PBXGroup;
 			children = (
+				72666DC42B0B28D4001511B0 /* common_cli */,
 				7205C43F1E13049400E370AE /* generate_appcast */,
 				EA1E285F22B66487004AA304 /* generate_keys */,
 				EA1E287722B666EB004AA304 /* sign_update */,
@@ -3441,6 +3454,7 @@
 				7205C4571E13061F00E370AE /* SUUnarchiver.m in Sources */,
 				7205C4581E13061F00E370AE /* SUUnarchiverNotifier.m in Sources */,
 				7205C4501E1304CE00E370AE /* Unarchive.swift in Sources */,
+				72666DC62B0B28F4001511B0 /* keypair.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3701,6 +3715,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				EA1E286122B66487004AA304 /* main.swift in Sources */,
+				72666DC72B0B28F4001511B0 /* keypair.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3709,6 +3724,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				EA1E287922B666EB004AA304 /* main.swift in Sources */,
+				72666DC82B0B28F4001511B0 /* keypair.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

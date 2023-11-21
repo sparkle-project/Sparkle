@@ -14,3 +14,11 @@ void ed25519_create_keypair(unsigned char *public_key, unsigned char *private_ke
     ge_scalarmult_base(&A, private_key);
     ge_p3_tobytes(public_key, &A);
 }
+
+// https://github.com/orlp/ed25519/issues/10
+void ed25519_convert_ref10_private_key(unsigned char *private_key, const unsigned char *ref10_private_key) {
+    sha512(ref10_private_key, 32, private_key);
+    private_key[0] &= 248;
+    private_key[31] &= 63;
+    private_key[31] |= 64;
+}

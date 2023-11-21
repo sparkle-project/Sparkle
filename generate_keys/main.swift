@@ -89,7 +89,7 @@ func findKeyPair(account: String) -> Data? {
     exit(1)
 }
 
-func generateKeyPair() -> (publicEdKey: Data, privateEdKey: Data) {
+func generateKeyPair() -> (publicEdKey: Data, seed: Data) {
     var seed = Array<UInt8>(repeating: 0, count: 32)
     var publicEdKey = Array<UInt8>(repeating: 0, count: 32)
     var privateEdKey = Array<UInt8>(repeating: 0, count: 64)
@@ -99,10 +99,10 @@ func generateKeyPair() -> (publicEdKey: Data, privateEdKey: Data) {
     }
     ed25519_create_keypair(&publicEdKey, &privateEdKey, seed)
     
-    return (Data(publicEdKey), Data(privateEdKey))
+    return (Data(publicEdKey), Data(seed))
 }
 
-func storeKeyPair(account: String, publicEdKey: Data, privateEdKey: Data) {
+func storeKeyPair(account: String, publicEdKey: Data, privateData: Data) {
     let query = commonKeychainItemAttributes(account: account).merging([
         /// Mark the new item as sensitive (requires keychain password to export - e.g. a private key).
         kSecAttrIsSensitive as String: kCFBooleanTrue!,
@@ -121,7 +121,7 @@ func storeKeyPair(account: String, publicEdKey: Data, privateEdKey: Data) {
         kSecAttrDescription as String: "private key",
 
         /// The actual data content of the new item.
-        kSecValueData       as String: (privateEdKey + publicEdKey).base64EncodedData() as CFData
+        kSecValueData       as String: (privateData + publicEdKey).base64EncodedData() as CFData
     
     ], uniquingKeysWith: { $1 }) as CFDictionary
     
@@ -163,7 +163,7 @@ struct GenerateKeys: ParsableCommand {
     @Flag(name: .customShort("p"), help: ArgumentHelp("Looks up and just prints the existing public key stored in the Keychain."))
     var lookUpPublicKey: Bool = false
     
-    @Option(name: .customShort("x"), help: ArgumentHelp("Exports your private key from your login keychain and writes it to private-key-file. Note the contents of this sensitive exported file are the same as the password to the \"\(PRIVATE_KEY_LABEL)\" item in your keychain.", valueName: "private-key-file"))
+    @Option(name: .customShort("x"), help: ArgumentHelp("Exports your private key from your login keychain and writes it to private-key-file. Note the contents of this sensitive exported file are the same as the password to the \"\(PRIVATE_KEY_LABEL)\" item in your keychain. For advanced usage if the private key is generated in the new format (i.e. the key file is 88 bytes or 64 bytes after base64 decoding), then the exported key file is the base64 encoding of the seed concatenated with the public key. The seed and the public key can be used with other libraries that support EdDSA signing.", valueName: "private-key-file"))
     var exportedPrivateKeyFile: String?
     
     @Option(name: .customShort("f"), help: ArgumentHelp("Imports the private key from private-key-file into your keychain instead of generating a new key. This file has likely been exported via -x option from another machine. Any existing \"\(PRIVATE_KEY_LABEL)\" items listed in Keychain Access may need to be removed manually first before proceeding.", valueName: "private-key-file"))
@@ -207,7 +207,9 @@ struct GenerateKeys: ParsableCommand {
         if lookUpPublicKey {
             /// Lookup mode - print just the pubkey and exit
             if let keyPair = findKeyPair(account: account) {
-                let pubKey = keyPair[64...]
+                guard let pubKey = decodePublicKey(keyPair: keyPair) else {
+                    failure("Stored private key must be 64 or 96 bytes (for the older format) decoded. Instead it is \(keyPair.count) bytes decoded.")
+                }
                 print(pubKey.base64EncodedString())
             } else {
                 failure("No existing signing key found!")
@@ -230,34 +232,34 @@ struct GenerateKeys: ParsableCommand {
             }
         } else if let importedPrivateKeyFile = importedPrivateKeyFile {
             /// Import mode - import the specifed key-pair file
-            let privateAndPublicBase64KeyFile = importedPrivateKeyFile
-            let privateAndPublicBase64Key: String
+            let keyPairBase64File = importedPrivateKeyFile
+            let keyPairBase64: String
             do {
-                privateAndPublicBase64Key = try String(contentsOfFile: privateAndPublicBase64KeyFile)
+                keyPairBase64 = try String(contentsOfFile: keyPairBase64File)
             } catch {
                 failure("Failed to read private-key-file: \(error)")
             }
             
-            guard let privateAndPublicKey = Data(base64Encoded: privateAndPublicBase64Key.trimmingCharacters(in: .whitespacesAndNewlines), options: .init()) else {
-                failure("Failed to decode base64 encoded key data from: \(privateAndPublicBase64Key)")
+            guard let keyPair = Data(base64Encoded: keyPairBase64.trimmingCharacters(in: .whitespacesAndNewlines), options: .init()) else {
+                failure("Failed to decode base64 encoded key data from: \(keyPairBase64)")
             }
             
-            guard privateAndPublicKey.count == 64 + 32 else {
-                failure("Imported key must be 96 bytes decoded. Instead it is \(privateAndPublicKey.count) bytes decoded.")
+            guard let (privateData, publicKey) = decodePrivateDataAndPublicKey(keyPair: keyPair) else {
+                failure("Imported key must be 64 or 96 bytes (for the older format) decoded. Instead it is \(keyPair.count) bytes decoded.")
             }
             
             print("Importing signing key..\n")
             
-            let publicKey = privateAndPublicKey[64...]
-            let privateKey = privateAndPublicKey[0..<64]
-            
-            storeKeyPair(account: account, publicEdKey: publicKey, privateEdKey: privateKey)
+            storeKeyPair(account: account, publicEdKey: publicKey, privateData: privateData)
             
             printNewPublicKeyUsage(publicKey)
         } else {
             /// Default mode - find an existing public key and print its usage, or generate new keys
             if let keyPair = findKeyPair(account: account) {
-                let pubKey = keyPair[64...]
+                guard let pubKey = decodePublicKey(keyPair: keyPair) else {
+                    failure("Stored private key must be 64 or 96 bytes (for the older format) decoded. Instead it is \(keyPair.count) bytes decoded.")
+                }
+                
                 print("""
                     A pre-existing signing key was found. This is how it should appear in your Info.plist:
 
@@ -268,8 +270,8 @@ struct GenerateKeys: ParsableCommand {
             } else {
                 print("Generating a new signing key. This may take a moment, depending on your machine.")
                 
-                let (pubKey, privKey) = generateKeyPair()
-                storeKeyPair(account: account, publicEdKey: pubKey, privateEdKey: privKey)
+                let (pubKey, seed) = generateKeyPair()
+                storeKeyPair(account: account, publicEdKey: pubKey, privateData: seed)
                 
                 printNewPublicKeyUsage(pubKey)
             }
