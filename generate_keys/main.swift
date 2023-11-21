@@ -89,7 +89,7 @@ func findSecret(account: String) -> Data? {
     exit(1)
 }
 
-func generateKeyPair() -> (publicEdKey: Data, seed: Data) {
+func generatePublicKeyAndSeed() -> (publicEdKey: Data, seed: Data) {
     var seed = Array<UInt8>(repeating: 0, count: 32)
     var publicEdKey = Array<UInt8>(repeating: 0, count: 32)
     var privateEdKey = Array<UInt8>(repeating: 0, count: 64)
@@ -270,7 +270,7 @@ struct GenerateKeys: ParsableCommand {
             } else {
                 print("Generating a new signing key. This may take a moment, depending on your machine.")
                 
-                let (pubKey, seed) = generateKeyPair()
+                let (pubKey, seed) = generatePublicKeyAndSeed()
                 // New keys that are generated only store the seed as the secret
                 // Old keys store private orlp/Ed25519 key + public key
                 storeSecret(account: account, publicEdKey: pubKey, secret: seed)

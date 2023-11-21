@@ -51,19 +51,19 @@ func findKeysInKeychain(account: String) throws -> (Data, Data) {
     throw ExitCode.failure
 }
 
-func findKeys(inFile keyPairFile: String) throws -> (Data, Data) {
-    let keyPair: String
-    if keyPairFile == "-" && !FileManager.default.fileExists(atPath: keyPairFile) {
+func findKeys(inFile secretFile: String) throws -> (Data, Data) {
+    let secretString: String
+    if secretFile == "-" && !FileManager.default.fileExists(atPath: secretFile) {
         if let line = readLine(strippingNewline: true) {
-            keyPair = line
+            secretString = line
         } else {
             print("ERROR! Unable to read EdDSA private key from standard input")
             throw ExitCode(1)
         }
     } else {
-        keyPair = try String(contentsOfFile: keyPairFile)
+        secretString = try String(contentsOfFile: secretFile)
     }
-    return try findKeys(inString: keyPair, allowNewFormat: true)
+    return try findKeys(inString: secretString, allowNewFormat: true)
 }
 
 func findKeys(inString secretBase64String: String, allowNewFormat: Bool) throws -> (Data, Data) {
