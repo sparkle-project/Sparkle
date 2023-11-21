@@ -47,7 +47,7 @@ func loadPrivateKeys(_ account: String, _ privateDSAKey: SecKey?, _ privateEdStr
             if let data = Data(base64Encoded: encoded) {
                 secret = data
             } else {
-                print("Error: Failed to base64 decode key pair data from keychain")
+                print("Error: Failed to base64 decode secret data from keychain")
                 return nil
             }
         } else {
@@ -57,7 +57,7 @@ func loadPrivateKeys(_ account: String, _ privateDSAKey: SecKey?, _ privateEdStr
 
     if let secret {
         guard let (privateKey, publicKey) = decodePrivateAndPublicKeys(secret: secret) else {
-            print("Error: Failed to decode private and public keys from keypair data")
+            print("Error: Failed to decode private and public keys from secret data")
             return nil
         }
         privateEdKey = privateKey

@@ -208,7 +208,7 @@ struct GenerateKeys: ParsableCommand {
             /// Lookup mode - print just the pubkey and exit
             if let secret = findSecret(account: account) {
                 guard let (_, pubKey) = decodePrivateAndPublicKeys(secret: secret) else {
-                    failure("Stored private key must be 64 or 96 bytes (for the older format) decoded. Instead it is \(secret.count) bytes decoded.")
+                    failure("Stored private key must be 32 or 96 bytes (for the older format) decoded. Instead it is \(secret.count) bytes decoded.")
                 }
                 print(pubKey.base64EncodedString())
             } else {
@@ -257,7 +257,7 @@ struct GenerateKeys: ParsableCommand {
             /// Default mode - find an existing public key and print its usage, or generate new keys
             if let secret = findSecret(account: account) {
                 guard let (_, pubKey) = decodePrivateAndPublicKeys(secret: secret) else {
-                    failure("Stored private key must be 64 or 96 bytes (for the older format) decoded. Instead it is \(secret.count) bytes decoded.")
+                    failure("Stored private key must be 32 or 96 bytes (for the older format) decoded. Instead it is \(secret.count) bytes decoded.")
                 }
                 
                 print("""
