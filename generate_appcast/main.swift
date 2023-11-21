@@ -13,15 +13,15 @@ func loadPrivateKeys(_ account: String, _ privateDSAKey: SecKey?, _ privateEdStr
     var privateEdKey: Data?
     var publicEdKey: Data?
     var item: CFTypeRef?
-    var keyPair: Data?
+    var secret: Data?
 
     // private + public key is provided as argument (for older format)
     if let privateEdString {
         if let data = Data(base64Encoded: privateEdString) {
-            if allowNewPrivateKey || keyPairUsesOldHashedSeed(keyPair: data) {
+            if allowNewPrivateKey || secretUsesOldHashedSeed(secret: data) {
                 // We always allow the old format without private seed
-                keyPair = data
-            } else if !allowNewPrivateKey && keyPairUsesRegularSeed(keyPair: data) {
+                secret = data
+            } else if !allowNewPrivateKey && secretUsesRegularSeed(secret: data) {
                 // Don't support deprecated option for newly generated keys
                 print("Error: specifying private key as the argument is no longer supported.")
                 return nil
@@ -45,7 +45,7 @@ func loadPrivateKeys(_ account: String, _ privateDSAKey: SecKey?, _ privateEdStr
         ] as CFDictionary, &item)
         if res == errSecSuccess, let encoded = item as? Data {
             if let data = Data(base64Encoded: encoded) {
-                keyPair = data
+                secret = data
             } else {
                 print("Error: Failed to base64 decode key pair data from keychain")
                 return nil
@@ -55,8 +55,8 @@ func loadPrivateKeys(_ account: String, _ privateDSAKey: SecKey?, _ privateEdStr
         }
     }
 
-    if let keyPair {
-        guard let (privateKey, publicKey) = decodePrivateAndPublicKeys(keyPair: keyPair) else {
+    if let secret {
+        guard let (privateKey, publicKey) = decodePrivateAndPublicKeys(secret: secret) else {
             print("Error: Failed to decode private and public keys from keypair data")
             return nil
         }

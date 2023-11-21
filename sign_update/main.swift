@@ -25,13 +25,13 @@ func findKeysInKeychain(account: String) throws -> (Data, Data) {
             throw ExitCode.failure
         }
         
-        guard let keyPair = Data(base64Encoded: encoded) else {
+        guard let secret = Data(base64Encoded: encoded) else {
             print("ERROR! Unable to decode data from Keychain as base64")
             throw ExitCode.failure
         }
         
-        guard let (privateKey, publicKey) = decodePrivateAndPublicKeys(keyPair: keyPair) else {
-            print("ERROR! Key pair data stored in keychain has \(keyPair.count) bytes which is invalid")
+        guard let (privateKey, publicKey) = decodePrivateAndPublicKeys(secret: secret) else {
+            print("ERROR! Key pair data stored in keychain has \(secret.count) bytes which is invalid")
             throw ExitCode.failure
         }
         
@@ -66,19 +66,19 @@ func findKeys(inFile keyPairFile: String) throws -> (Data, Data) {
     return try findKeys(inString: keyPair, allowNewFormat: true)
 }
 
-func findKeys(inString keyPair: String, allowNewFormat: Bool) throws -> (Data, Data) {
-    guard let keyPairData = Data(base64Encoded: keyPair.trimmingCharacters(in: .whitespacesAndNewlines), options: .init()) else {
-        print("ERROR! Failed to decode base64 encoded key data from: \(keyPair)")
+func findKeys(inString secretBase64String: String, allowNewFormat: Bool) throws -> (Data, Data) {
+    guard let secret = Data(base64Encoded: secretBase64String.trimmingCharacters(in: .whitespacesAndNewlines), options: .init()) else {
+        print("ERROR! Failed to decode base64 encoded key data from: \(secretBase64String)")
         throw ExitCode.failure
     }
     
-    guard allowNewFormat || !keyPairUsesRegularSeed(keyPair: keyPairData) else {
+    guard allowNewFormat || !secretUsesRegularSeed(secret: secret) else {
         print("ERROR! Specifying private key as an argument is no longer supported.")
         throw ExitCode.failure
     }
     
-    guard let (privateKey, publicKey) = decodePrivateAndPublicKeys(keyPair: keyPairData) else {
-        print("ERROR! Imported key must be 64 bytes or 96 bytes (for the older format) decoded. Instead it is \(keyPairData.count) bytes decoded.")
+    guard let (privateKey, publicKey) = decodePrivateAndPublicKeys(secret: secret) else {
+        print("ERROR! Imported key must be 64 bytes or 96 bytes (for the older format) decoded. Instead it is \(secret.count) bytes decoded.")
         throw ExitCode.failure
     }
     
