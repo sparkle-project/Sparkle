@@ -19,8 +19,23 @@ func findKeysInKeychain(account: String) throws -> (Data, Data) {
         kSecAttrProtocol as String: kSecAttrProtocolSSH,
         kSecReturnData as String: kCFBooleanTrue!,
         ] as CFDictionary, &item)
-    if res == errSecSuccess, let encoded = item as? Data, let keys = Data(base64Encoded: encoded) {
-        return (keys[0..<64], keys[64..<(64+32)])
+    if res == errSecSuccess {
+        guard let encoded = item as? Data else {
+            print("ERROR! Unable to decode data from Keychain")
+            throw ExitCode.failure
+        }
+        
+        guard let secret = Data(base64Encoded: encoded) else {
+            print("ERROR! Unable to decode data from Keychain as base64")
+            throw ExitCode.failure
+        }
+        
+        guard let (privateKey, publicKey) = decodePrivateAndPublicKeys(secret: secret) else {
+            print("ERROR! Key pair data stored in keychain has \(secret.count) bytes which is invalid")
+            throw ExitCode.failure
+        }
+        
+        return (privateKey, publicKey)
     } else if res == errSecItemNotFound {
         print("ERROR! Signing key not found for account \(account). Please run generate_keys tool first or provide key with --ed-key-file <private_key_file>")
     } else if res == errSecAuthFailed {
@@ -36,34 +51,36 @@ func findKeysInKeychain(account: String) throws -> (Data, Data) {
     throw ExitCode.failure
 }
 
-func findKeys(inFile privateAndPublicBase64KeyFile: String) throws -> (Data, Data) {
-    let privateAndPublicBase64Key: String
-    if privateAndPublicBase64KeyFile == "-" && !FileManager.default.fileExists(atPath: privateAndPublicBase64KeyFile) {
+func findKeys(inFile secretFile: String) throws -> (Data, Data) {
+    let secretString: String
+    if secretFile == "-" && !FileManager.default.fileExists(atPath: secretFile) {
         if let line = readLine(strippingNewline: true) {
-            privateAndPublicBase64Key = line
+            secretString = line
         } else {
             print("ERROR! Unable to read EdDSA private key from standard input")
             throw ExitCode(1)
         }
     } else {
-        privateAndPublicBase64Key = try String(contentsOfFile: privateAndPublicBase64KeyFile)
+        secretString = try String(contentsOfFile: secretFile)
     }
-    return try findKeys(inString: privateAndPublicBase64Key)
+    return try findKeys(inString: secretString, allowNewFormat: true)
 }
 
-func findKeys(inString privateAndPublicBase64Key: String) throws -> (Data, Data) {
-    guard let privateAndPublicKey = Data(base64Encoded: privateAndPublicBase64Key.trimmingCharacters(in: .whitespacesAndNewlines), options: .init()) else {
-        print("ERROR! Failed to decode base64 encoded key data from: \(privateAndPublicBase64Key)")
+func findKeys(inString secretBase64String: String, allowNewFormat: Bool) throws -> (Data, Data) {
+    guard let secret = Data(base64Encoded: secretBase64String.trimmingCharacters(in: .whitespacesAndNewlines), options: .init()) else {
+        print("ERROR! Failed to decode base64 encoded key data from: \(secretBase64String)")
         throw ExitCode.failure
     }
     
-    guard privateAndPublicKey.count == 64 + 32 else {
-        print("ERROR! Imported key must be 96 bytes decoded. Instead it is \(privateAndPublicKey.count) bytes decoded.")
+    guard allowNewFormat || !secretUsesRegularSeed(secret: secret) else {
+        print("ERROR! Specifying private key as an argument is no longer supported.")
         throw ExitCode.failure
     }
     
-    let publicKey = privateAndPublicKey[64...]
-    let privateKey = privateAndPublicKey[0..<64]
+    guard let (privateKey, publicKey) = decodePrivateAndPublicKeys(secret: secret) else {
+        print("ERROR! Imported key must be 64 bytes or 96 bytes (for the older format) decoded. Instead it is \(secret.count) bytes decoded.")
+        throw ExitCode.failure
+    }
     
     return (privateKey, publicKey)
 }
@@ -100,7 +117,7 @@ struct SignUpdate: ParsableCommand {
     @Argument(help: "The signature to verify when --verify is passed.")
     var verifySignature: String?
     
-    @Option(name: .customShort("s"), help: ArgumentHelp("(DEPRECATED): The private EdDSA (ed25519) key. Please use the Keychain, or pass the key as standard input when using --ed-key-file - instead.", valueName: "private-key"))
+    @Option(name: .customShort("s"), help: ArgumentHelp("(DEPRECATED): The private EdDSA (ed25519) key. Please use the Keychain, or pass the key as standard input when using --ed-key-file - instead. This option is no longer supported for newly generated keys. ", valueName: "private-key"))
     var privateKey: String?
     
     static var configuration: CommandConfiguration = CommandConfiguration(
@@ -127,7 +144,7 @@ struct SignUpdate: ParsableCommand {
         if let privateKey = privateKey {
             fputs("Warning: The -s option for passing the private EdDSA key is insecure and deprecated. Please see its help usage for more information.\n", stderr)
             
-            (priv, pub) = try findKeys(inString: privateKey)
+            (priv, pub) = try findKeys(inString: privateKey, allowNewFormat: false)
         } else if let privateKeyFile = privateKeyFile {
             (priv, pub) = try findKeys(inFile: privateKeyFile)
         } else {
