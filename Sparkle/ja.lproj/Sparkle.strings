@@ -29,7 +29,7 @@
 "%1$@ %2$@ has been downloaded and is ready to use! This is an important update; would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@がダウンロードされました! これは重要なアップデートです。今すぐ%1$@をインストールして再起動しますか?";
 
 /* Description text for SUUpdateAlert when the update has already been downloaded and ready to install. */
-"%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@がダウンロードされました! 今すぐ %1$@ をインストールして再起動しますか?";
+"%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@がダウンロードされました! 今すぐ%1$@をインストールして再起動しますか?";
 
 /* No comment provided by engineer. */
 "%1$@ %2$@ is available but your macOS version is too new for this update. This update only supports up to macOS %3$@." = "%1$@ %2$@が入手可能ですが、インストールするにはmacOSのバージョンが新しすぎます。このアップデートはmacOS %3$@までしか対応していません。";
@@ -38,10 +38,10 @@
 "%1$@ %2$@ is available but your macOS version is too old to install it. At least macOS %3$@ is required." = "%1$@ %2$@が入手可能ですが、インストールするにはmacOSのバージョンが古すぎます。macOS %3$@以降が必要です。";
 
 /* No comment provided by engineer. */
-"%1$@ can’t be updated if it’s running from the location it was downloaded to." = "この場所ではダウンロードされたアップデータを%1$@に適用できません。";
+"%1$@ can’t be updated if it’s running from the location it was downloaded to." = "この場所ではダウンロードされたアップデートを%1$@に適用できません。";
 
 /* No comment provided by engineer. */
-"%1$@ can’t be updated, because it was opened from a read-only or a temporary location." = "%1$@は読み出し専用またはテンポラリな場所で開かれているためアップデートできません。";
+"%1$@ can’t be updated, because it was opened from a read-only or a temporary location." = "%1$@は読み出し専用または一時的な場所で開かれているためアップデートできません。";
 
 /* No comment provided by engineer. */
 "A new version of %@ is available!" = "新しいバージョンの%@が入手できます!";
