@@ -1,3 +1,10 @@
+# 2.5.2
+
+* Don't clean up update directory when Autoupdate receives SIGTERM (#2479) (Zorg)
+* Update Japanese localization (#2475) (1024jp)
+* Improve Turkish translations (#2464) (Emir SARI)
+* Update Spanish translation for 'You are currently running version %@.' and 'Version History' (#2463) (Billy Gray)
+
 # 2.5.1
 
 * Default to English for XML nodes when no xml:lang is present (#2440) (Zorg)
