@@ -10,7 +10,7 @@ let url = "https://github.com/sparkle-project/Sparkle/releases/download/\(tag)/S
 
 let package = Package(
     name: "Sparkle",
-    platforms: [.macOS(.v10_11)],
+    platforms: [.macOS(.v10_13)],
     products: [
         .library(
             name: "Sparkle",
