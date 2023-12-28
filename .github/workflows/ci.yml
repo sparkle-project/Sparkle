@@ -10,16 +10,16 @@ jobs:
   build:
     strategy:
       matrix:
-        xcode: ['xcode14.3.1', 'xcode15']
+        xcode: ['xcode14.3.1', 'xcode15.1']
         include:
-            - xcode: 'xcode15'
-              xcode-path: '/Applications/Xcode_15.0.app/Contents/Developer'
-              upload-dist: false
+            - xcode: 'xcode15.1'
+              xcode-path: '/Applications/Xcode_15.1.app/Contents/Developer'
+              upload-dist: true
               run-analyzer: true
               macos: 'macos-13'
             - xcode: 'xcode14.3.1'
               xcode-path: '/Applications/Xcode_14.3.1.app/Contents/Developer'
-              upload-dist: true
+              upload-dist: false
               run-analyzer: false
               macos: 'macos-13'
             
