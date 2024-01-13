@@ -34,9 +34,9 @@ if [ "$ACTION" = "" ] ; then
 
     mkdir -p "$CONFIGURATION_BUILD_DIR/staging"
     mkdir -p "$CONFIGURATION_BUILD_DIR/staging-spm"
-    cp "$SRCROOT/CHANGELOG" "$SRCROOT/LICENSE" "$SRCROOT/INSTALL" "$SRCROOT/Resources/SampleAppcast.xml" "$CONFIGURATION_BUILD_DIR/staging"
-    cp "$SRCROOT/CHANGELOG" "$SRCROOT/LICENSE" "$SRCROOT/INSTALL" "$SRCROOT/Resources/SampleAppcast.xml" "$CONFIGURATION_BUILD_DIR/staging-spm"
-    cp -R "$SRCROOT/bin" "$CONFIGURATION_BUILD_DIR/staging"
+    cp "$PROJECT_DIR/CHANGELOG" "$PROJECT_DIR/LICENSE" "$PROJECT_DIR/INSTALL" "$PROJECT_DIR/Resources/SampleAppcast.xml" "$CONFIGURATION_BUILD_DIR/staging"
+    cp "$PROJECT_DIR/CHANGELOG" "$PROJECT_DIR/LICENSE" "$PROJECT_DIR/INSTALL" "$PROJECT_DIR/Resources/SampleAppcast.xml" "$CONFIGURATION_BUILD_DIR/staging-spm"
+    cp -R "$PROJECT_DIR/bin" "$CONFIGURATION_BUILD_DIR/staging"
     cp "$CONFIGURATION_BUILD_DIR/BinaryDelta" "$CONFIGURATION_BUILD_DIR/staging/bin"
     cp "$CONFIGURATION_BUILD_DIR/generate_appcast" "$CONFIGURATION_BUILD_DIR/staging/bin"
     cp "$CONFIGURATION_BUILD_DIR/generate_keys" "$CONFIGURATION_BUILD_DIR/staging/bin"
@@ -50,8 +50,8 @@ if [ "$ACTION" = "" ] ; then
         mkdir -p "$CONFIGURATION_BUILD_DIR/staging/Entitlements"
         mkdir -p "$CONFIGURATION_BUILD_DIR/staging-spm/Entitlements"
         
-        cp -R "$SRCROOT/Downloader/org.sparkle-project.Downloader.entitlements" "$CONFIGURATION_BUILD_DIR/staging/Entitlements/$DOWNLOADER_NAME.entitlements"
-        cp -R "$SRCROOT/Downloader/org.sparkle-project.Downloader.entitlements" "$CONFIGURATION_BUILD_DIR/staging-spm/Entitlements/$DOWNLOADER_NAME.entitlements"
+        cp -R "$PROJECT_DIR/Downloader/org.sparkle-project.Downloader.entitlements" "$CONFIGURATION_BUILD_DIR/staging/Entitlements/$DOWNLOADER_NAME.entitlements"
+        cp -R "$PROJECT_DIR/Downloader/org.sparkle-project.Downloader.entitlements" "$CONFIGURATION_BUILD_DIR/staging-spm/Entitlements/$DOWNLOADER_NAME.entitlements"
     fi
 
     mkdir -p "$CONFIGURATION_BUILD_DIR/staging/Symbols"
@@ -119,7 +119,7 @@ if [ "$ACTION" = "" ] ; then
     rm -rf "$CONFIGURATION_BUILD_DIR/staging"
 
     # Get latest git tag
-    cd "$SRCROOT"
+    cd "$PROJECT_DIR"
     latest_git_tag=$( git describe --tags --abbrev=0 || true )
 
     if [ -n "$latest_git_tag" ] ; then
@@ -138,7 +138,7 @@ if [ "$ACTION" = "" ] ; then
         rm -rf "/tmp/sparkle-spm-extract"
         rm -rf "$CONFIGURATION_BUILD_DIR/staging-spm"
         
-        cd "$SRCROOT"
+        cd "$PROJECT_DIR"
     
         # Check semantic versioning
         if [[ $latest_git_tag =~ ^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-((0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*)(\.(0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*))*))?(\\+([0-9a-zA-Z-]+(\.[0-9a-zA-Z-]+)*))?$ ]]; then
@@ -150,9 +150,9 @@ if [ "$ACTION" = "" ] ; then
         
             # Generate new Package manifest, podspec, and carthage files
         cd "$CONFIGURATION_BUILD_DIR"
-        cp "$SRCROOT/Package.swift" "$CONFIGURATION_BUILD_DIR"
-        cp "$SRCROOT/Sparkle.podspec" "$CONFIGURATION_BUILD_DIR"
-        cp "$SRCROOT/Carthage-dev.json" "$CONFIGURATION_BUILD_DIR"
+        cp "$PROJECT_DIR/Package.swift" "$CONFIGURATION_BUILD_DIR"
+        cp "$PROJECT_DIR/Sparkle.podspec" "$CONFIGURATION_BUILD_DIR"
+        cp "$PROJECT_DIR/Carthage-dev.json" "$CONFIGURATION_BUILD_DIR"
     fi
     
     if [ -z "$latest_git_tag" ] ; then
@@ -162,7 +162,7 @@ if [ "$ACTION" = "" ] ; then
         spm_checksum=$(swift package compute-checksum "Sparkle-for-Swift-Package-Manager.zip")
         rm -rf ".build"
         sed -E -i '' -e "/let tag/ s/\".+\"/\"$latest_git_tag\"/" -e "/let version/ s/\".+\"/\"$MARKETING_VERSION\"/" -e "/let checksum/ s/[[:xdigit:]]{64}/$spm_checksum/" "Package.swift"
-        cp "Package.swift" "$SRCROOT"
+        cp "Package.swift" "$PROJECT_DIR"
         echo "Package.swift updated with the following values:"
         echo "Version: $MARKETING_VERSION"
         echo "Tag: $latest_git_tag"
@@ -170,10 +170,10 @@ if [ "$ACTION" = "" ] ; then
 
         sed -E -i '' -e "/s\.version.+=/ s/\".+\"/\"$MARKETING_VERSION\"/" "Sparkle.podspec"
         
-        "$SRCROOT/Configurations/update-carthage.py" "Carthage-dev.json" "$MARKETING_VERSION"
-        cp "Sparkle.podspec" "$SRCROOT"
+        "$PROJECT_DIR/Configurations/update-carthage.py" "Carthage-dev.json" "$MARKETING_VERSION"
+        cp "Sparkle.podspec" "$PROJECT_DIR"
         # Note the Carthage-dev.json file will finally be copied to the website repo in Carthage/Sparkle.json in the end
-        cp "Carthage-dev.json" "$SRCROOT"
+        cp "Carthage-dev.json" "$PROJECT_DIR"
         echo "Sparkle.podspec and Carthage-dev.json updated with following values:"
         echo "Version: $MARKETING_VERSION"
     else
