@@ -5,7 +5,7 @@ if ! which -s git ; then
     exit 0
 fi
 
-if [ -z "$SRCROOT" ] || \
+if [ -z "$PROJECT_DIR" ] || \
    [ -z "$BUILT_PRODUCTS_DIR" ] || \
    [ -z "$INFOPLIST_PATH" ] || \
    [ -z "$MARKETING_VERSION" ]; then
@@ -16,7 +16,7 @@ fi
 version="$MARKETING_VERSION"
 
 # Get version in format 1.x.x-commits-hash
-gitversion=$( cd "$SRCROOT"; git describe --tags --match '[12].*' || true )
+gitversion=$( cd "$PROJECT_DIR"; git describe --tags --match '[12].*' || true )
 if [ -z "$gitversion" ] ; then
     echo "$0: Can't find a Git hash!" 1>&2
     exit 0

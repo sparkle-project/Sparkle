@@ -2614,7 +2614,7 @@
 /* Begin PBXLegacyTarget section */
 		14732BC51960F69300593899 /* Distribution */ = {
 			isa = PBXLegacyTarget;
-			buildArgumentsString = "$(SRCROOT)/Configurations/make-release-package.sh $(ACTION)";
+			buildArgumentsString = "$(PROJECT_DIR)/Configurations/make-release-package.sh $(ACTION)";
 			buildConfigurationList = 14732BC61960F69300593899 /* Build configuration list for PBXLegacyTarget "Distribution" */;
 			buildPhases = (
 			);
@@ -3283,7 +3283,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"$SRCROOT/Configurations/set-git-version-info.sh\"\n";
+			shellScript = "\"$PROJECT_DIR/Configurations/set-git-version-info.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		72045CE626FEE8CC004F96E5 /* Strip Framework */ = {
@@ -3303,7 +3303,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"$SRCROOT/Configurations/strip-framework.sh\"\n";
+			shellScript = "\"$PROJECT_DIR/Configurations/strip-framework.sh\"\n";
 		};
 		720B4C2125EBFAA5005A0592 /* Run Script: Link Tools */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -3322,7 +3322,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"$SRCROOT/Configurations/link-tools.sh\"\n";
+			shellScript = "\"$PROJECT_DIR/Configurations/link-tools.sh\"\n";
 		};
 		895C5DC524D78E460058A82D /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -3339,7 +3339,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"$SRCROOT/Configurations/make-xcframework.sh\"\n";
+			shellScript = "\"$PROJECT_DIR/Configurations/make-xcframework.sh\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
