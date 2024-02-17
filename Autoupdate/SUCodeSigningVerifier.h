@@ -24,6 +24,9 @@ SPU_OBJC_DIRECT_MEMBERS
 + (BOOL)codeSignatureIsValidAtBundleURL:(NSURL *)bundleURL error:(NSError *__autoreleasing *)error;
 
 + (BOOL)bundleAtURLIsCodeSigned:(NSURL *)bundleURL;
+
++ (BOOL)teamIdentifierAtURL:(NSURL *)url1 matchesTeamIdentifierAtURL:(NSURL *)url2;
+
 @end
 
 #endif

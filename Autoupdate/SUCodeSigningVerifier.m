@@ -258,4 +258,43 @@ static id valueOrNSNull(id value) {
     return (result == 0);
 }
 
+static NSString * _Nullable teamIdentifierAtURL(NSURL *url)
+{
+    SecStaticCodeRef staticCode = NULL;
+    OSStatus staticCodeResult = SecStaticCodeCreateWithPath((__bridge CFURLRef)url, kSecCSDefaultFlags, &staticCode);
+    if (staticCodeResult != noErr) {
+        SULog(SULogLevelError, @"Failed to get static code for retrieving team identifier: %d", staticCodeResult);
+        return nil;
+    }
+    
+    CFDictionaryRef cfSigningInformation = NULL;
+    OSStatus copySigningInfoCode = SecCodeCopySigningInformation(staticCode, kSecCSSigningInformation,
+        &cfSigningInformation);
+    
+    NSDictionary *signingInformation = CFBridgingRelease(cfSigningInformation);
+    
+    if (copySigningInfoCode != noErr) {
+        SULog(SULogLevelError, @"Failed to get signing information for retrieving team identifier: %d", copySigningInfoCode);
+        return nil;
+    }
+    
+    // Note this will return nil for ad-hoc or unsigned binaries
+    return signingInformation[@"teamid"];
+}
+
++ (BOOL)teamIdentifierAtURL:(NSURL *)url1 matchesTeamIdentifierAtURL:(NSURL *)url2
+{
+    NSString *teamIdentifierForURL1 = teamIdentifierAtURL(url1);
+    if (teamIdentifierForURL1 == nil) {
+        return NO;
+    }
+    
+    NSString *teamIdentifierForURL2 = teamIdentifierAtURL(url2);
+    if (teamIdentifierForURL2 == nil) {
+        return NO;
+    }
+    
+    return [teamIdentifierForURL1 isEqualToString:teamIdentifierForURL2];
+}
+
 @end

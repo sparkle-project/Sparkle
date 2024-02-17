@@ -14,6 +14,7 @@
 #import "SUErrors.h"
 #import "SUVersionComparisonProtocol.h"
 #import "SUStandardVersionComparator.h"
+#import "SUCodeSigningVerifier.h"
 
 
 #include "AppKitPrevention.h"
@@ -41,7 +42,7 @@
     return self;
 }
 
-- (void)_performInitialInstallationWithFileManager:(SUFileManager *)fileManager oldBundleURL:(NSURL *)oldBundleURL newBundleURL:(NSURL *)newBundleURL progressBlock:(nullable void(^)(double))progress SPU_OBJC_DIRECT
+- (void)_performInitialInstallationWithFileManager:(SUFileManager *)fileManager oldBundleURL:(NSURL *)oldBundleURL newBundleURL:(NSURL *)newBundleURL skipGatekeeperScan:(BOOL)skipGatekeeperScan progressBlock:(nullable void(^)(double))progress SPU_OBJC_DIRECT
 {
     // Release our new app from quarantine
     NSError *quarantineError = nil;
@@ -87,6 +88,48 @@
     
     if (progress) {
         progress(8/11.0);
+    }
+    
+    if (!skipGatekeeperScan)
+    {
+        // Perform a Gatekeeper scan to pre-warm the app launch
+        // This avoids users seeing a "Verifying..." dialog when the installed update is launched
+        // Note the tool we use to perform the Gatekeeper scan (gktool) is technically available on macOS 14.0,
+        // however there are some potential bugs/issues with performing a Gatekeeper scan on versions before 14.4:
+        // https://github.com/sparkle-project/Sparkle/issues/2491
+        if (@available(macOS 14.4, *)) {
+            // Only perform Gatekeeper scan if we're updating an app bundle
+            NSString *newBundlePath = newBundleURL.path;
+            if ([newBundlePath.pathExtension caseInsensitiveCompare:@"app"] == NSOrderedSame) {
+                // We only invoke gktool if Autoupdate is signed with the same team identifier as the new update bundle
+                // Otherwise we may unfortunately run into some Privacy & Security prompt bugs in the OS (note this is *not* a security check)
+                // This does overall imply that for an app to test the gktool path, this path may often skipped for most common development workflows that don't
+                // re-sign Sparkle's Autoupdate helper
+                NSURL *mainExecutableURL = NSBundle.mainBundle.executableURL;
+                if (mainExecutableURL != nil && [SUCodeSigningVerifier teamIdentifierAtURL:mainExecutableURL matchesTeamIdentifierAtURL:newBundleURL]) {
+                    NSURL *gktoolURL = [NSURL fileURLWithPath:@"/usr/bin/gktool" isDirectory:NO];
+                    if ([gktoolURL checkResourceIsReachableAndReturnError:NULL]) {
+                        NSTask *gatekeeperScanTask = [[NSTask alloc] init];
+                        gatekeeperScanTask.executableURL = gktoolURL;
+                        gatekeeperScanTask.arguments = @[@"scan", newBundlePath];
+
+                        NSError *taskError;
+                        if (![gatekeeperScanTask launchAndReturnError:&taskError]) {
+                            // Not a fatal error
+                            SULog(SULogLevelError, @"Failed to perform GateKeeper scan on '%@' with error %@", newBundlePath, taskError);
+                        } else {
+                            [gatekeeperScanTask waitUntilExit];
+                            
+                            if (gatekeeperScanTask.terminationStatus != 0) {
+                                SULog(SULogLevelError, @"gktool failed and returned exit status %d", gatekeeperScanTask.terminationStatus);
+                            }
+                        }
+                    }
+                } else {
+                    SULog(SULogLevelDefault, @"Skipping invocation of gktool because Autoupdate is not signed with same identity as the new update %@", newBundleURL.lastPathComponent);
+                }
+            }
+        }
     }
 }
 
@@ -189,7 +232,9 @@
     }
     
     if (!_newAndOldBundlesOnSameVolume) {
-        [self _performInitialInstallationWithFileManager:fileManager oldBundleURL:oldURL newBundleURL:newFinalURL progressBlock:progress];
+        // If we're updating a bundle on another volume, the install process can be pretty slow.
+        // In this case let's get out of the way and skip the Gatekeeper scan
+        [self _performInitialInstallationWithFileManager:fileManager oldBundleURL:oldURL newBundleURL:newFinalURL skipGatekeeperScan:YES progressBlock:progress];
     }
 
     if (progress) {
@@ -312,7 +357,7 @@
     
     // We can do a lot of the installation work ahead of time if the new app update does not need to be copied to another volume
     if (_newAndOldBundlesOnSameVolume) {
-        [self _performInitialInstallationWithFileManager:fileManager oldBundleURL:_host.bundle.bundleURL newBundleURL:bundle.bundleURL progressBlock:NULL];
+        [self _performInitialInstallationWithFileManager:fileManager oldBundleURL:_host.bundle.bundleURL newBundleURL:bundle.bundleURL skipGatekeeperScan:NO progressBlock:NULL];
     }
     
     return YES;
