@@ -1,23 +1,47 @@
-/* No comment provided by engineer. */
-"%@ %@ is currently the newest version available." = "%1$@ %2$@이(가) 현재 최신 버전입니다.";
-
-/* No comment provided by engineer. */
-"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%1$@ %2$@이(가) 현재 최신 버전입니다.\n(You are currently running version %3$@.)";
-
-/* Description text for SUUpdateAlert when the update is downloadable. */
-"%@ %@ is now available—you have %@. Would you like to download it now?" = "%1$@ %2$@이(가) 업데이트 되었습니다. (현재 버전 : %3$@) 다운로드 하시겠습니까?";
-
-/* The download progress in a unit of bytes, e.g. 100 KB */
-"%@ downloaded" = "%@ 다운로드 완료";
-
-/* The download progress in units of bytes, e.g. 100 KB of 1,0 MB */
-"%@ of %@" = "%1$@ / %2$@";
+/* Description text for SUUpdateAlert when the critical update has already been downloaded and ready to install. */
+"%1$@ %2$@ has been downloaded and is ready to use! This is an important update; would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ 이(가) 다운로드 되었습니다. 프로그램을 업데이트하고 재실행 하시겠습니까?\n이 업데이트는 중요한 업데이트입니다.";
 
 /* Description text for SUUpdateAlert when the update has already been downloaded and ready to install. */
 "%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@이(가) 다운로드 되었습니다. 프로그램을 업데이트하고 재실행 하시겠습니까?";
 
 /* No comment provided by engineer. */
-"%1$@ can’t be updated, because it was opened from a read-only or a temporary location." = "%1$@이(가) 디스크 이미지나 CD 드라이브 같은 읽기 전용 볼륨에서 실행되고 있으므로 업데이트 할 수 없습니다.";
+"%1$@ %2$@ is available but your macOS version is too new for this update. This update only supports up to macOS %3$@." = "%1$@ %2$@ 업데이트는 macOS %3$@ 버전까지만 지원합니다.";
+
+/* No comment provided by engineer. */
+"%1$@ %2$@ is available but your macOS version is too old to install it. At least macOS %3$@ is required." = "%1$@ %2$@ 업데이트는 최소 macOS %3$@ 버전을 요구합니다.";
+
+/* No comment provided by engineer. */
+"%1$@ can’t be updated if it’s running from the location it was downloaded to." = "%1$@ 이(가) 다운로드된 위치에서 실행 중인 경우에는 업데이트할 수 없습니다.";
+
+/* No comment provided by engineer. */
+"%1$@ can’t be updated, because it was opened from a read-only or a temporary location." = "%1$@ 이(가) 디스크 이미지나 CD 드라이브 같은 읽기 전용 볼륨에서 실행되고 있으므로 업데이트할 수 없습니다.";
+
+/* No comment provided by engineer. */
+"%@ %@ is currently the newest version available." = "%1$@ %2$@ 이(가) 현재 최신 버전입니다.";
+
+/* No comment provided by engineer. */
+"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%1$@ %2$@ 이(가) 현재 최신 버전입니다.\n(현재 실행 중인 버전 : %3$@)";
+
+/* Description text for SUUpdateAlert when the critical update is downloadable. */
+"%@ %@ is now available—you have %@. This is an important update; would you like to download it now?" = "%1$@ %2$@ 업데이트를 설치할 수 있습니다. 다운로드 하시겠습니까?\n이 업데이트는 중요한 업데이트입니다. (현재 버전 : %3$@)";
+
+/* Description text for SUUpdateAlert when the update is downloadable. */
+"%@ %@ is now available—you have %@. Would you like to download it now?" = "%1$@ %2$@ 이(가) 업데이트 되었습니다. 다운로드 하시겠습니까? (현재 버전 : %3$@)";
+
+/* Description text for SUUpdateAlert when the update informational with no download. */
+"%@ %@ is now available—you have %@. Would you like to learn more about this update on the web?" = "%1$@ %2$@ 이(가) 업데이트 되었습니다. 업데이트에 대한 더 많은 정보를 확인하시겠습니까? (현재 버전 : %3$@)";
+
+/* The download progress in a unit of bytes, e.g. 100 KB */
+"%@ downloaded" = "%@ 다운로드 완료";
+
+/* No comment provided by engineer. */
+"%@ is now updated to version %@!" = "%1$@ 이(가) %2$@ 버전으로 업데이트 되었습니다!";
+
+/* No comment provided by engineer. */
+"%@ is now updated!" = "%@ 이(가) 업데이트 되었습니다!";
+
+/* The download progress in units of bytes, e.g. 100 KB of 1,0 MB */
+"%@ of %@" = "%1$@ / %2$@";
 
 /* No comment provided by engineer. */
 "A new version of %@ is available!" = "%@ 새 버전이 있습니다.";
@@ -29,13 +53,28 @@
 "An error occurred in retrieving update information. Please try again later." = "업데이트 정보를 수집하는 중 오류가 발생하였습니다. 나중에 다시 시도해 주십시오.";
 
 /* No comment provided by engineer. */
+"An error occurred while connecting to the installer. Please try again later." = "설치 프로그램에 연결하는 중 오류가 발생하였습니다. 나중에 다시 시도해 주십시오.";
+
+/* No comment provided by engineer. */
 "An error occurred while downloading the update. Please try again later." = "업데이트를 다운로드 하는 중 오류가 발생하였습니다. 나중에 다시 시도해 주십시오.";
 
 /* No comment provided by engineer. */
 "An error occurred while extracting the archive. Please try again later." = "압축 파일을 푸는 중 오류가 발생하였습니다. 나중에 다시 시도해 주십시오.";
 
 /* No comment provided by engineer. */
+"An error occurred while launching the installer. Please try again later." = "설치 프로그램을 실행하는 중 오류가 발생하였습니다. 나중에 다시 시도해 주십시오.";
+
+/* No comment provided by engineer. */
 "An error occurred while parsing the update feed." = "업데이트 피드를 분석하는 중 오류가 발생하였습니다.";
+
+/* No comment provided by engineer. */
+"An error occurred while running the updater. Please try again later." = "업데이트를 진행하는 중 오류가 발생하였습니다. 나중에 다시 시도해 주십시오.";
+
+/* No comment provided by engineer. */
+"An error occurred while starting the installer. Please try again later." = "설치 프로그램을 시작하는 중 오류가 발생하였습니다. 나중에 다시 시도해 주십시오.";
+
+/* No comment provided by engineer. */
+"An important update to %@ is ready to install" = "(중요 업데이트) %@ 을(를) 설치할 준비가 완료되었습니다.";
 
 /* No comment provided by engineer. */
 "Cancel" = "취소";
@@ -53,28 +92,61 @@
 "Extracting update…" = "압축 푸는 중…";
 
 /* No comment provided by engineer. */
+"Failed to resume installing update." = "업데이트 설치를 재개하지 못했습니다.";
+
+/* No comment provided by engineer. */
 "Install and Relaunch" = "설치 & 재실행";
+
+/* Alternate title for 'Remind Me Later' button when downloaded updates can be resumed */
+"Install on Quit" = "종료 시 설치";
 
 /* Take care not to overflow the status window. */
 "Installing update…" = "설치 중…";
+
+/* Alternate title for 'Install Update' button when there's no download in RSS feed. */
+"Learn More…" = "더 알아보기…";
 
 /* No comment provided by engineer. */
 "OK" = "확인";
 
 /* No comment provided by engineer. */
+"Quit %1$@, move it into your Applications folder, relaunch it from there and try again." = "%1$@ 을(를) 종료하고, 응용 프로그램 폴더로 옮긴 다음 다시 실행해 주십시오.";
+
+/* No comment provided by engineer. */
 "Ready to Install" = "설치 준비 완료";
 
 /* No comment provided by engineer. */
-"Should %1$@ automatically check for updates? You can always check for updates manually from the %1$@ menu." = "%1$@ 업데이트 확인을 자동으로 할까요? %1$@ 메뉴에서 수동 설정을 할 수 있습니다.";
+"Should %1$@ automatically check for updates? You can always check for updates manually from the %1$@ menu." = "%1$@ 업데이트 확인을 자동으로 할까요? %1$@ 메뉴에서 수동으로 변경 할 수 있습니다.";
+
+/* No comment provided by engineer. */
+"The update checker failed to start correctly. You should contact the app developer to report this issue and verify that you have the latest version." = "업데이트 확인 도구가 올바르게 시작되지 않았습니다. 이 문제를 앱 개발자에게 알려주고 사용 중인 버전이 최신 버전인지 확인해주세요.";
+
+/* No comment provided by engineer. */
+"The update is improperly signed and could not be validated. Please try again later or contact the app developer." = "업데이트가 잘못 서명되어 유효성 검사를 할 수 없습니다. 나중에 다시 시도하거나 앱 개발자에게 문의해주세요.";
+
+/* No comment provided by engineer. */
+"Unable to Check For Updates" = "업데이트를 확인할 수 없습니다.";
 
 /* No comment provided by engineer. */
 "Update Error!" = "업데이트 오류!";
 
 /* No comment provided by engineer. */
+"Update Installed" = "업데이트가 설치되었습니다.";
+
+/* No comment provided by engineer. */
 "Updating %@" = "%@ 업데이트 중";
 
 /* No comment provided by engineer. */
-"Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "%1$@을(를) 응용프로그램 폴더로 이동하여 다시 실행해 주십시오.";
+"Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "%1$@ 을(를) 응용 프로그램 폴더로 옮긴 다음 다시 실행해 주십시오.";
+
+/* No comment provided by engineer. */
+"Version History" = "버전 기록";
+
+/* No comment provided by engineer. */
+"Your macOS version is too new" = "사용 중인 macOS 버전이 너무 높습니다.";
+
+/* No comment provided by engineer. */
+"Your macOS version is too old" = "사용 중인 macOS 버전이 너무 낮습니다.";
 
 /* Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates. */
 "You’re up to date!" = "최신 버전입니다.";
