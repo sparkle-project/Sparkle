@@ -16,7 +16,7 @@ jobs:
               xcode-path: '/Applications/Xcode_15.2.app/Contents/Developer'
               upload-dist: true
               run-analyzer: true
-              macos: 'macos-14'
+              macos: 'macos-13'
             - xcode: 'xcode14.3.1'
               xcode-path: '/Applications/Xcode_14.3.1.app/Contents/Developer'
               upload-dist: false
