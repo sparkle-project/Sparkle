@@ -90,8 +90,7 @@
         progress(8/11.0);
     }
     
-    if (!skipGatekeeperScan)
-    {
+    if (!skipGatekeeperScan) {
         // Perform a Gatekeeper scan to pre-warm the app launch
         // This avoids users seeing a "Verifying..." dialog when the installed update is launched
         // Note the tool we use to perform the Gatekeeper scan (gktool) is technically available on macOS 14.0,
