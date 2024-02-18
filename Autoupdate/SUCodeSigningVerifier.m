@@ -279,7 +279,7 @@ static NSString * _Nullable teamIdentifierAtURL(NSURL *url)
     }
     
     // Note this will return nil for ad-hoc or unsigned binaries
-    return signingInformation[@"teamid"];
+    return signingInformation[(NSString *)kSecCodeInfoTeamIdentifier];
 }
 
 + (BOOL)teamIdentifierAtURL:(NSURL *)url1 matchesTeamIdentifierAtURL:(NSURL *)url2
