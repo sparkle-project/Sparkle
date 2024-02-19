@@ -22,7 +22,7 @@ Pod::Spec.new do |s|
   s.source   = { :http => "https://github.com/sparkle-project/Sparkle/releases/download/#{s.version}/Sparkle-#{s.version}.tar.xz" }
   s.source_files = 'Sparkle.framework/Versions/B/Headers/*.h'
 
-  s.preserve_paths = ['bin/*', 'Entitlements', 'Symbols']
+  s.preserve_paths = ['bin/*', 'Symbols']
   s.public_header_files = 'Sparkle.framework/Versions/B/Headers/*.h'
   s.vendored_frameworks  = 'Sparkle.framework'
   s.xcconfig            = {

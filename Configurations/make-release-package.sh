@@ -45,14 +45,6 @@ if [ "$ACTION" = "" ] ; then
     cp -R "$CONFIGURATION_BUILD_DIR/sparkle.app" "$CONFIGURATION_BUILD_DIR/staging"
     cp -R "$CONFIGURATION_BUILD_DIR/Sparkle.framework" "$CONFIGURATION_BUILD_DIR/staging"
     cp -R "$CONFIGURATION_BUILD_DIR/Sparkle.xcframework" "$CONFIGURATION_BUILD_DIR/staging-spm"
-    
-    if [[ "$SPARKLE_EMBED_DOWNLOADER_XPC_SERVICE" -eq 1 ]]; then
-        mkdir -p "$CONFIGURATION_BUILD_DIR/staging/Entitlements"
-        mkdir -p "$CONFIGURATION_BUILD_DIR/staging-spm/Entitlements"
-        
-        cp -R "$PROJECT_DIR/Downloader/org.sparkle-project.Downloader.entitlements" "$CONFIGURATION_BUILD_DIR/staging/Entitlements/$DOWNLOADER_NAME.entitlements"
-        cp -R "$PROJECT_DIR/Downloader/org.sparkle-project.Downloader.entitlements" "$CONFIGURATION_BUILD_DIR/staging-spm/Entitlements/$DOWNLOADER_NAME.entitlements"
-    fi
 
     mkdir -p "$CONFIGURATION_BUILD_DIR/staging/Symbols"
 

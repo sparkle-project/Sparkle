@@ -70,13 +70,32 @@ INSTALLER_STATUS_NAME = InstallerStatus
 INSTALLER_LAUNCHER_NAME = Installer
 DOWNLOADER_NAME = Downloader
 
+// Initialize sandboxed entitlements variables to use no entitlements (don't modify these)
+DOWNLOADER_SANDBOXED_ENTITLEMENTS =
+INSTALLER_CONNECTION_ENTITLEMENTS =
+INSTALLER_STATUS_ENTITLEMENTS =
+
 // Set this to your own prefix if you want to use XPC Service bundle IDs with different prefix
 XPC_SERVICE_BUNDLE_ID_PREFIX = org.sparkle-project
 
 INSTALLER_CONNECTION_BUNDLE_ID = ${XPC_SERVICE_BUNDLE_ID_PREFIX}.InstallerConnection
 INSTALLER_STATUS_BUNDLE_ID = ${XPC_SERVICE_BUNDLE_ID_PREFIX}.InstallerStatus
 INSTALLER_LAUNCHER_BUNDLE_ID = ${XPC_SERVICE_BUNDLE_ID_PREFIX}.InstallerLauncher
-DOWNLOADER_BUNDLE_ID = ${XPC_SERVICE_BUNDLE_ID_PREFIX}.Downloader
+DOWNLOADER_BUNDLE_ID = ${XPC_SERVICE_BUNDLE_ID_PREFIX}.DownloaderService
+
+// The Downloader XPC Service is not sandboxed by default.
+// Uncomment this line to enable Sandboxing for this service.
+// If this is done, you *must* set a custom XPC_SERVICE_BUNDLE_ID_PREFIX for your app sabove.
+// Otherwise sandboxed apps that use the same sandboxed Downloader Service may conflict with each other.
+
+//DOWNLOADER_SANDBOXED_ENTITLEMENTS = Downloader/Downloader.entitlements
+
+// Similar to the Downloader XPC Service, uncomment these lines if you want to sandbox the Connection/Status services
+// If this is done, you *must* set a custom XPC_SERVICE_BUNDLE_ID_PREFIX for your app above.
+
+//INSTALLER_CONNECTION_ENTITLEMENTS = InstallerConnection/InstallerConnection.entitlements
+//INSTALLER_STATUS_ENTITLEMENTS = InstallerStatus/InstallerStatus.entitlements
+
 
 // If your app file on disk is named "MyApp 1.1b4", Sparkle usually updates it
 // in place, giving you an app named 1.1b4 that is actually 1.2. Turn the
