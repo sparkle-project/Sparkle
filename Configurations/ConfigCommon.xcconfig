@@ -86,7 +86,7 @@ INSTALLER_STATUS_ENTITLEMENTS =
 
 // The Downloader XPC Service is not sandboxed by default.
 // Uncomment this line to enable Sandboxing for this service.
-// If this is done, you *must* set a custom XPC_SERVICE_BUNDLE_ID_PREFIX for your app sabove.
+// If this is done, you *must* set a custom XPC_SERVICE_BUNDLE_ID_PREFIX for your app above.
 // Otherwise sandboxed apps that use the same sandboxed Downloader Service may conflict with each other.
 
 //DOWNLOADER_SANDBOXED_ENTITLEMENTS = Downloader/Downloader.entitlements
