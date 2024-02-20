@@ -70,11 +70,6 @@ INSTALLER_STATUS_NAME = InstallerStatus
 INSTALLER_LAUNCHER_NAME = Installer
 DOWNLOADER_NAME = Downloader
 
-// Initialize sandboxed entitlements variables to use no entitlements (don't modify these)
-DOWNLOADER_SANDBOXED_ENTITLEMENTS =
-INSTALLER_CONNECTION_ENTITLEMENTS =
-INSTALLER_STATUS_ENTITLEMENTS =
-
 // Set this to your own prefix if you want to use XPC Service bundle IDs with different prefix
 XPC_SERVICE_BUNDLE_ID_PREFIX = org.sparkle-project
 
@@ -82,6 +77,12 @@ INSTALLER_CONNECTION_BUNDLE_ID = ${XPC_SERVICE_BUNDLE_ID_PREFIX}.InstallerConnec
 INSTALLER_STATUS_BUNDLE_ID = ${XPC_SERVICE_BUNDLE_ID_PREFIX}.InstallerStatus
 INSTALLER_LAUNCHER_BUNDLE_ID = ${XPC_SERVICE_BUNDLE_ID_PREFIX}.InstallerLauncher
 DOWNLOADER_BUNDLE_ID = ${XPC_SERVICE_BUNDLE_ID_PREFIX}.DownloaderService
+
+// Initialize sandboxed entitlements variables to use no entitlements
+// Don't modify these. See commented out section below instead.
+DOWNLOADER_SANDBOXED_ENTITLEMENTS =
+INSTALLER_CONNECTION_ENTITLEMENTS =
+INSTALLER_STATUS_ENTITLEMENTS =
 
 // The Downloader XPC Service is not sandboxed by default.
 // Uncomment this line to enable Sandboxing for this service.
