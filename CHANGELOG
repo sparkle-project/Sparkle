@@ -1,3 +1,14 @@
+# 2.6.0
+
+* Perform Gatekeeper scan to pre-warm app launch (#2505) (Zorg)
+* Disable sandboxing for the Downloader XPC service by default to fix downloader prompt warnings (#2511) (Zorg)
+* Store private seed as the secret for newly generated keys (#2472) (Zorg)
+* Improve signing error message to developers (#2471) (Zorg)
+* Update Korean localization (#2504) (CheolHyun Mun)
+* Use $PROJECT_DIR instead of $SRCROOT (#2489) (Zorg)
+* Set Package.swift minimum deployment to macOS 10.13 (#2481) (Zorg)
+* Fix false positive analyzer warning about resumableUpdate type (#2454) (Zorg)
+
 # 2.5.2
 
 * Don't clean up update directory when Autoupdate receives SIGTERM (#2479) (Zorg)
