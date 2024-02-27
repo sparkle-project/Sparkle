@@ -29,6 +29,7 @@
     NSURL *_temporaryNewDirectory;
     
     BOOL _newAndOldBundlesOnSameVolume;
+    BOOL _canPerformSafeAtomicSwap;
 }
 
 - (instancetype)initWithHost:(SUHost *)host bundlePath:(NSString *)bundlePath installationPath:(NSString *)installationPath
@@ -100,32 +101,23 @@
             // Only perform Gatekeeper scan if we're updating an app bundle
             NSString *newBundlePath = newBundleURL.path;
             if ([newBundlePath.pathExtension caseInsensitiveCompare:@"app"] == NSOrderedSame) {
-                // We only invoke gktool if Autoupdate is signed with the same team identifier as the new update bundle
-                // Otherwise we may unfortunately run into some Privacy & Security prompt bugs in the OS (note this is *not* a security check)
-                // This does overall imply that for an app to test the gktool path, this path may often skipped for most common development workflows that don't
-                // re-sign Sparkle's Autoupdate helper
-                NSURL *mainExecutableURL = NSBundle.mainBundle.executableURL;
-                if (mainExecutableURL != nil && [SUCodeSigningVerifier teamIdentifierAtURL:mainExecutableURL matchesTeamIdentifierAtURL:newBundleURL]) {
-                    NSURL *gktoolURL = [NSURL fileURLWithPath:@"/usr/bin/gktool" isDirectory:NO];
-                    if ([gktoolURL checkResourceIsReachableAndReturnError:NULL]) {
-                        NSTask *gatekeeperScanTask = [[NSTask alloc] init];
-                        gatekeeperScanTask.executableURL = gktoolURL;
-                        gatekeeperScanTask.arguments = @[@"scan", newBundlePath];
+                NSURL *gktoolURL = [NSURL fileURLWithPath:@"/usr/bin/gktool" isDirectory:NO];
+                if ([gktoolURL checkResourceIsReachableAndReturnError:NULL]) {
+                    NSTask *gatekeeperScanTask = [[NSTask alloc] init];
+                    gatekeeperScanTask.executableURL = gktoolURL;
+                    gatekeeperScanTask.arguments = @[@"scan", newBundlePath];
 
-                        NSError *taskError;
-                        if (![gatekeeperScanTask launchAndReturnError:&taskError]) {
-                            // Not a fatal error
-                            SULog(SULogLevelError, @"Failed to perform GateKeeper scan on '%@' with error %@", newBundlePath, taskError);
-                        } else {
-                            [gatekeeperScanTask waitUntilExit];
-                            
-                            if (gatekeeperScanTask.terminationStatus != 0) {
-                                SULog(SULogLevelError, @"gktool failed and returned exit status %d", gatekeeperScanTask.terminationStatus);
-                            }
+                    NSError *taskError;
+                    if (![gatekeeperScanTask launchAndReturnError:&taskError]) {
+                        // Not a fatal error
+                        SULog(SULogLevelError, @"Failed to perform GateKeeper scan on '%@' with error %@", newBundlePath, taskError);
+                    } else {
+                        [gatekeeperScanTask waitUntilExit];
+                        
+                        if (gatekeeperScanTask.terminationStatus != 0) {
+                            SULog(SULogLevelError, @"gktool failed and returned exit status %d", gatekeeperScanTask.terminationStatus);
                         }
                     }
-                } else {
-                    SULog(SULogLevelDefault, @"Skipping invocation of gktool because Autoupdate is not signed with same identity as the new update %@", newBundleURL.lastPathComponent);
                 }
             }
         }
@@ -243,8 +235,8 @@
     // First try swapping the application atomically
     NSError *swapError = nil;
     BOOL swappedApp;
-    // If the app is normalized and the installation path differs, go through the old swap path
-    if (SPARKLE_NORMALIZE_INSTALLED_APPLICATION_NAME && ![oldURL.path isEqual:installationURL.path]) {
+    // If we can not safely perform an atomic swap, or if the app is normalized and the installation path differs, go through the old swap path
+    if (!_canPerformSafeAtomicSwap || (SPARKLE_NORMALIZE_INSTALLED_APPLICATION_NAME && ![oldURL.path isEqual:installationURL.path])) {
         swappedApp = NO;
     } else {
         // We will be cleaning up the temporary directory later in -performCleanup:
@@ -352,11 +344,25 @@
     
     SUFileManager *fileManager = [[SUFileManager alloc] init];
     
+    if (@available(macOS 13.0, *)) {
+        NSURL *mainExecutableURL = NSBundle.mainBundle.executableURL;
+        // If Autoupdate is not signed with the same Team ID as the new update,
+        // we may run into Privacy & Security prompt issues from the OS
+        // To avoid these, we skip the gatekeeper scan and skip performing an atomic swap during install
+        _canPerformSafeAtomicSwap = (mainExecutableURL != nil && [SUCodeSigningVerifier teamIdentifierAtURL:mainExecutableURL matchesTeamIdentifierAtURL:bundle.bundleURL]);
+    } else {
+        _canPerformSafeAtomicSwap = YES;
+    }
+    
+    if (!_canPerformSafeAtomicSwap) {
+        SULog(SULogLevelDefault, @"Skipping atomic rename/swap and gatekeeper scan because Autoupdate is not signed with same identity as the new update %@", bundle.bundleURL.lastPathComponent);
+    }
+    
     _newAndOldBundlesOnSameVolume = [fileManager itemAtURL:bundle.bundleURL isOnSameVolumeItemAsURL:_host.bundle.bundleURL];
     
     // We can do a lot of the installation work ahead of time if the new app update does not need to be copied to another volume
     if (_newAndOldBundlesOnSameVolume) {
-        [self _performInitialInstallationWithFileManager:fileManager oldBundleURL:_host.bundle.bundleURL newBundleURL:bundle.bundleURL skipGatekeeperScan:NO progressBlock:NULL];
+        [self _performInitialInstallationWithFileManager:fileManager oldBundleURL:_host.bundle.bundleURL newBundleURL:bundle.bundleURL skipGatekeeperScan:!_canPerformSafeAtomicSwap progressBlock:NULL];
     }
     
     return YES;
