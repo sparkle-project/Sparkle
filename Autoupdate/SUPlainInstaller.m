@@ -43,7 +43,7 @@
     return self;
 }
 
-- (void)_performInitialInstallationWithFileManager:(SUFileManager *)fileManager oldBundleURL:(NSURL *)oldBundleURL newBundleURL:(NSURL *)newBundleURL skipGatekeeperScan:(BOOL)skipGatekeeperScan progressBlock:(nullable void(^)(double))progress SPU_OBJC_DIRECT
+- (void)_performInitialInstallationWithFileManager:(SUFileManager *)fileManager oldBundleURL:(NSURL *)oldBundleURL newBundleURL:(NSURL *)newBundleURL performGatekeeperScan:(BOOL)performGatekeeperScan progressBlock:(nullable void(^)(double))progress SPU_OBJC_DIRECT
 {
     // Release our new app from quarantine
     NSError *quarantineError = nil;
@@ -91,7 +91,7 @@
         progress(8/11.0);
     }
     
-    if (!skipGatekeeperScan) {
+    if (performGatekeeperScan) {
         // Perform a Gatekeeper scan to pre-warm the app launch
         // This avoids users seeing a "Verifying..." dialog when the installed update is launched
         // Note the tool we use to perform the Gatekeeper scan (gktool) is technically available on macOS 14.0,
@@ -225,7 +225,7 @@
     if (!_newAndOldBundlesOnSameVolume) {
         // If we're updating a bundle on another volume, the install process can be pretty slow.
         // In this case let's get out of the way and skip the Gatekeeper scan
-        [self _performInitialInstallationWithFileManager:fileManager oldBundleURL:oldURL newBundleURL:newFinalURL skipGatekeeperScan:YES progressBlock:progress];
+        [self _performInitialInstallationWithFileManager:fileManager oldBundleURL:oldURL newBundleURL:newFinalURL performGatekeeperScan:NO progressBlock:progress];
     }
 
     if (progress) {
@@ -362,7 +362,7 @@
     
     // We can do a lot of the installation work ahead of time if the new app update does not need to be copied to another volume
     if (_newAndOldBundlesOnSameVolume) {
-        [self _performInitialInstallationWithFileManager:fileManager oldBundleURL:_host.bundle.bundleURL newBundleURL:bundle.bundleURL skipGatekeeperScan:!_canPerformSafeAtomicSwap progressBlock:NULL];
+        [self _performInitialInstallationWithFileManager:fileManager oldBundleURL:_host.bundle.bundleURL newBundleURL:bundle.bundleURL performGatekeeperScan:_canPerformSafeAtomicSwap progressBlock:NULL];
     }
     
     return YES;
