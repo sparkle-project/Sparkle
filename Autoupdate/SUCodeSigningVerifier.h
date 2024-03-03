@@ -11,6 +11,8 @@
 
 #import <Foundation/Foundation.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 #ifndef BUILDING_SPARKLE_TESTS
 SPU_OBJC_DIRECT_MEMBERS
 #endif
@@ -25,8 +27,10 @@ SPU_OBJC_DIRECT_MEMBERS
 
 + (BOOL)bundleAtURLIsCodeSigned:(NSURL *)bundleURL;
 
-+ (BOOL)teamIdentifierAtURL:(NSURL *)url1 matchesTeamIdentifierAtURL:(NSURL *)url2;
++ (NSString * _Nullable)teamIdentifierAtURL:(NSURL *)url;
 
 @end
+
+NS_ASSUME_NONNULL_END
 
 #endif
