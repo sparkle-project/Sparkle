@@ -346,10 +346,18 @@
     
     if (@available(macOS 13.0, *)) {
         NSURL *mainExecutableURL = NSBundle.mainBundle.executableURL;
-        // If Autoupdate is not signed with the same Team ID as the new update,
-        // we may run into Privacy & Security prompt issues from the OS
-        // To avoid these, we skip the gatekeeper scan and skip performing an atomic swap during install
-        _canPerformSafeAtomicSwap = (mainExecutableURL != nil && [SUCodeSigningVerifier teamIdentifierAtURL:mainExecutableURL matchesTeamIdentifierAtURL:bundle.bundleURL]);
+        if (mainExecutableURL == nil) {
+            // This shouldn't happen
+            _canPerformSafeAtomicSwap = NO;
+        } else {
+            NSString *installerTeamIdentifier = [SUCodeSigningVerifier teamIdentifierAtURL:mainExecutableURL];
+            NSString *bundleTeamIdentifier = [SUCodeSigningVerifier teamIdentifierAtURL:bundle.bundleURL];
+            
+            // If the new update is code signed and Autoupdate is not signed with the same Team ID as the new update,
+            // then we may run into Privacy & Security prompt issues from the OS
+            // To avoid these, we skip the gatekeeper scan and skip performing an atomic swap during install
+            _canPerformSafeAtomicSwap = (bundleTeamIdentifier == nil || (installerTeamIdentifier != nil && [installerTeamIdentifier isEqualToString:bundleTeamIdentifier]));
+        }
     } else {
         _canPerformSafeAtomicSwap = YES;
     }
