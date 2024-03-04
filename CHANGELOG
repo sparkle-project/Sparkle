@@ -3,10 +3,11 @@
 * Perform Gatekeeper scan to pre-warm app launch (#2505) (Zorg)
 * Disable sandboxing for the Downloader XPC service by default to fix downloader prompt warnings (#2511) (Zorg)
 * Store private seed as the secret for newly generated keys (#2472) (Zorg)
-* Improve signing error message to developers (#2471) (Zorg)
+* Improve signing error message to developers if they serve the wrong update file (#2471) (Zorg)
+* Prevent app modification warnings from external updaters (like sparkli-cli) by improving installation (#2516) (Zorg)
 * Update Korean localization (#2504) (CheolHyun Mun)
 * Use $PROJECT_DIR instead of $SRCROOT (#2489) (Zorg)
-* Set Package.swift minimum deployment to macOS 10.13 (#2481) (Zorg)
+* Set Package.swift minimum deployment to macOS 10.13 (#2481) (Eitot)
 * Fix false positive analyzer warning about resumableUpdate type (#2454) (Zorg)
 
 # 2.5.2
