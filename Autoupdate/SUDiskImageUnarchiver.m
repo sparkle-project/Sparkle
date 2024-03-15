@@ -62,15 +62,25 @@
         NSArray *contents = nil;
         do
 		{
-            NSString *uuidString = [[NSUUID UUID] UUIDString];
-            mountPoint = [@"/Volumes" stringByAppendingPathComponent:uuidString];
+            // Using NSUUID would make creating UUIDs be done in Cocoa,
+                        // and thus managed under ARC. Sadly, the class is in 10.8 and later.
+                        CFUUIDRef uuid = CFUUIDCreate(NULL);
+                        if (uuid)
+                        {
+                            NSString *uuidString = CFBridgingRelease(CFUUIDCreateString(NULL, uuid));
+                            if (uuidString)
+                            {
+                                mountPoint = [@"/Volumes" stringByAppendingPathComponent:uuidString];
+                            }
+                            CFRelease(uuid);
+                        }
 		}
         // Note: this check does not follow symbolic links, which is what we want
 		while ([[NSURL fileURLWithPath:mountPoint] checkResourceIsReachableAndReturnError:NULL]);
         
         NSData *promptData = [NSData dataWithBytes:"yes\n" length:4];
         
-        NSMutableArray *arguments = [@[@"attach", _archivePath, @"-mountpoint", mountPoint, /*@"-noverify",*/ @"-nobrowse", @"-noautoopen"] mutableCopy];
+        NSMutableArray *arguments =    [@[@"attach", _archivePath, @"-mountpoint", mountPoint, /*@"-noverify",*/ @"-nobrowse", @"-noautoopen"] mutableCopy];
         
         if (_decryptionPassword) {
             NSMutableData *passwordData = [[_decryptionPassword dataUsingEncoding:NSUTF8StringEncoding] mutableCopy];
