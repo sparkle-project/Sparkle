@@ -17,7 +17,7 @@
 
     #define SPARKLE_TABLE @"Sparkle"
 
-    #define SULocalizedStringFromTableInBundle(key, tbl, bundle, comment) NSLocalizedStringFromTableInBundle(key, tbl, bundle, comment)
+    #define SULocalizedStringFromTableInBundle(key, tbl, bundle, comment) ((bundle) ? NSLocalizedStringFromTableInBundle(key, tbl, bundle, comment) : (key))
 #else
     #define SULocalizedStringFromTableInBundle(key, tbl, bundle, comment) key
 #endif
