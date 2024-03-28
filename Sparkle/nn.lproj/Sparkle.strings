@@ -1,0 +1,90 @@
+/* No comment provided by engineer. */
+"%@ %@ is currently the newest version available." = "%1$@ %2$@ er nyaste versjon.";
+
+/* No comment provided by engineer. */
+"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%1$@ %2$@ er nyaste versjon.\n(Du køyrer versjon %3$@ akkurat no.)";
+
+/* Description text for SUUpdateAlert when the update is downloadable. */
+"%@ %@ is now available—you have %@. Would you like to download it now?" = "%1$@ %2$@ er no tilgjengeleg — du har %3$@. Ynskjer du å lasta ned og installera no?";
+
+/* The download progress in a unit of bytes, e.g. 100 KB */
+"%@ downloaded" = "%@ nedlasta";
+
+/* The download progress in units of bytes, e.g. 100 KB of 1,0 MB */
+"%@ of %@" = "%1$@ av %2$@";
+
+/* Description text for SUUpdateAlert when the critical update has already been downloaded and ready to install. */
+"%1$@ %2$@ has been downloaded and is ready to use! This is an important update; would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@  er lasta ned og er klar til bruk!  Dette er ei viktig oppdatering; ynskjer du å installera og starta om att %1$@ no?";
+
+/* Description text for SUUpdateAlert when the update has already been downloaded and ready to install. */
+"%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ er lasta ned og er klar til bruk! Ynskjer du å installera og starta om att %1$@ no?";
+
+/* No comment provided by engineer. */
+"%1$@ can’t be updated, because it was opened from a read-only or a temporary location." = "%1$@ kan ikkje oppdaterast frå ei eining som berre kan lesast, t.d. frå ein cd";
+
+/* No comment provided by engineer. */
+"A new version of %@ is available!" = "Ein ny versjon av %@ er tilgjengeleg!";
+
+/* No comment provided by engineer. */
+"A new version of %@ is ready to install!" = "Ein ny versjon av %@ er klar for installering!";
+
+/* No comment provided by engineer. */
+"An error occurred in retrieving update information. Please try again later." = "Ein feil oppstod ved henting av oppdateringsinformasjon. Ver greid og prøv igjen seinare.";
+
+/* No comment provided by engineer. */
+"An error occurred while downloading the update. Please try again later." = "Ein feil oppstod under nedlasting av oppdateringa. Ver greid og prøv igjen seinare.";
+
+/* No comment provided by engineer. */
+"An error occurred while extracting the archive. Please try again later." = "Ein feil oppstod under utpakking av oppdateringa. Ver greid og prøv igjen seinare.";
+
+/* No comment provided by engineer. */
+"An error occurred while parsing the update feed." = "Ein feil oppstod under lesing av oppdateringsstraumen.";
+
+/* No comment provided by engineer. */
+"An important update to %@ is ready to install" = "Ei viktig oppdatering for %@ er klar til å verta installert";
+
+/* No comment provided by engineer. */
+"Cancel" = "Avbryt";
+
+/* No comment provided by engineer. */
+"Cancel Update" = "Avbryt oppdateringa";
+
+/* No comment provided by engineer. */
+"Checking for updates…" = "Ser etter oppdateringar…";
+
+/* Take care not to overflow the status window. */
+"Downloading update…" = "Lastar ned oppdateringa…";
+
+/* Take care not to overflow the status window. */
+"Extracting update…" = "Pakkar ut oppdateringa…";
+
+/* No comment provided by engineer. */
+"Install and Relaunch" = "Installer og start på nytt";
+
+/* Take care not to overflow the status window. */
+"Installing update…" = "Installerer oppdateringa…";
+
+/* Alternate title for 'Install Update' button when there's no download in RSS feed. */
+"Learn More…" = "Meir info…";
+
+/* No comment provided by engineer. */
+"OK" = "Greitt";
+
+/* No comment provided by engineer. */
+"Ready to Install" = "Klar til å installera";
+
+/* No comment provided by engineer. */
+"Should %1$@ automatically check for updates? You can always check for updates manually from the %1$@ menu." = "Skal %1$@ sjå automatisk etter oppdateringar? Du kan når som helst sjå etter manuelt i %1$@-menyen.";
+
+/* No comment provided by engineer. */
+"Update Error!" = "Feil ved oppdateringa!";
+
+/* No comment provided by engineer. */
+"Updating %@" = "Oppdaterer %@";
+
+/* No comment provided by engineer. */
+"Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "Flytt %1$@ til Programmer-mappa, start på nytt og prøv igjen.";
+
+/* Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates. */
+"You’re up to date!" = "Ingen nye oppdateringar";
+
