@@ -80,7 +80,7 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  *
  * A reply of `SPUUserUpdateChoiceInstall` begins or resumes downloading, extracting, or installing the update.
  * If the state.stage is `SPUUserUpdateStateInstalling`, this may send a quit event to the application and relaunch it immediately (in this state, this behaves as a fast "install and Relaunch").
- * If the state.stage is `SPUUpdateStateNotDownloaded` or `SPUUpdateStateDownloaded` the user may be presented an authorization prompt to install the update before `-showDownloadDidStartExtractingUpdate` is called if authorization is required for installation. For example, this may occur if the update on disk is owned by a different user (e.g. root or admin for non-admin users), or if the update is a package install.
+ * If the state.stage is `SPUUpdateStateNotDownloaded` or `SPUUpdateStateDownloaded` the user may be presented an authorization prompt to install the update after `-showDownloadDidStartExtractingUpdate` is called if authorization is required for installation. For example, this may occur if the update on disk is owned by a different user (e.g. root or admin for non-admin users), or if the update is a package install.
  * Do not use a reply of `SPUUserUpdateChoiceInstall` if @c appcastItem.informationOnlyUpdate is YES.
  *
  * A reply of `SPUUserUpdateChoiceDismiss` dismisses the update for the time being. The user may be reminded of the update at a later point.
@@ -187,7 +187,7 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  * Before this point, `showDownloadDidReceiveDataOfLength:` or `showUpdateFoundWithAppcastItem:state:reply:` may be called.
  * An update can potentially resume at this point after having been automatically downloaded in the background (without the user driver)  before.
  *
- * Also note before extraction starts, the user may be shown an authorization prompt to install the update if authorization is required for installation.
+ * After extraction starts, the user may be shown an authorization prompt to install the update if authorization is required for installation.
  * For example, this may occur if the update on disk is owned by a different user (e.g. root or admin for non-admin users), or if the update is a package install.
  */
 - (void)showDownloadDidStartExtractingUpdate;
