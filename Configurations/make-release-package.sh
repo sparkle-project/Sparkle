@@ -77,12 +77,6 @@ if [ "$ACTION" = "" ] ; then
 
     cd "$CONFIGURATION_BUILD_DIR/staging"
 
-    if [ -x "$(command -v xz)" ]; then
-        XZ_EXISTS=1
-    else
-        XZ_EXISTS=0
-    fi
-
     rm -rf "/tmp/sparkle-extract"
     mkdir -p "/tmp/sparkle-extract"
 
@@ -162,10 +156,6 @@ if [ "$ACTION" = "" ] ; then
         echo "Version: $MARKETING_VERSION"
     else
         echo "warning: Xcode version $XCODE_VERSION_ACTUAL does not support computing checksums for Swift Packages. Please update the Package manifest manually."
-    fi
-
-    if [ "$XZ_EXISTS" -ne 1 ] ; then
-        echo "WARNING: xz compression is used for official releases but bz2 is being used instead because xz tool is not installed on your system."
     fi
 
     rm -rf "$CONFIGURATION_BUILD_DIR/staging-spm"
