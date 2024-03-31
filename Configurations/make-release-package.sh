@@ -87,21 +87,13 @@ if [ "$ACTION" = "" ] ; then
     mkdir -p "/tmp/sparkle-extract"
 
     # Sorted file list groups similar files together, which improves tar compression
-    if [ "$XZ_EXISTS" -eq 1 ] ; then
-        find . \! -type d | rev | sort | rev | tar cv --files-from=- | xz -9 > "../Sparkle-$MARKETING_VERSION.tar.xz"
+    find . \! -type d | rev | sort | rev | tar --no-xattrs -cJvf "../Sparkle-$MARKETING_VERSION.tar.xz" --files-from=-
+        
+    # Copy archived distribution for CI
+    cp -f "../Sparkle-$MARKETING_VERSION.tar.xz" "../sparkle-dist.tar.xz"
 
-        # Copy archived distribution for CI
-        cp -f "../Sparkle-$MARKETING_VERSION.tar.xz" "../sparkle-dist.tar.xz"
-
-        # Extract archive for testing binary validity
-        tar -xf "../Sparkle-$MARKETING_VERSION.tar.xz" -C "/tmp/sparkle-extract"
-    else
-        # Fallback to bz2 compression if xz utility is not available
-        find . \! -type d | rev | sort | rev | tar cjvf "../Sparkle-$MARKETING_VERSION.tar.bz2" --files-from=-
-
-        # Extract archive for testing binary validity
-        tar -xf "../Sparkle-$MARKETING_VERSION.tar.bz2" -C "/tmp/sparkle-extract"
-    fi
+    # Extract archive for testing binary validity
+    tar -xf "../Sparkle-$MARKETING_VERSION.tar.xz" -C "/tmp/sparkle-extract"
 
     # Test code signing validity of the extracted products
     # This guards against our archives being corrupt / created incorrectly
