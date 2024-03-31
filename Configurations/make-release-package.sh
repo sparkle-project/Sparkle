@@ -77,31 +77,17 @@ if [ "$ACTION" = "" ] ; then
 
     cd "$CONFIGURATION_BUILD_DIR/staging"
 
-    if [ -x "$(command -v xz)" ]; then
-        XZ_EXISTS=1
-    else
-        XZ_EXISTS=0
-    fi
-
     rm -rf "/tmp/sparkle-extract"
     mkdir -p "/tmp/sparkle-extract"
 
     # Sorted file list groups similar files together, which improves tar compression
-    if [ "$XZ_EXISTS" -eq 1 ] ; then
-        find . \! -type d | rev | sort | rev | tar cv --files-from=- | xz -9 > "../Sparkle-$MARKETING_VERSION.tar.xz"
+    find . \! -type d | rev | sort | rev | tar --no-xattrs -cJvf "../Sparkle-$MARKETING_VERSION.tar.xz" --files-from=-
+        
+    # Copy archived distribution for CI
+    cp -f "../Sparkle-$MARKETING_VERSION.tar.xz" "../sparkle-dist.tar.xz"
 
-        # Copy archived distribution for CI
-        cp -f "../Sparkle-$MARKETING_VERSION.tar.xz" "../sparkle-dist.tar.xz"
-
-        # Extract archive for testing binary validity
-        tar -xf "../Sparkle-$MARKETING_VERSION.tar.xz" -C "/tmp/sparkle-extract"
-    else
-        # Fallback to bz2 compression if xz utility is not available
-        find . \! -type d | rev | sort | rev | tar cjvf "../Sparkle-$MARKETING_VERSION.tar.bz2" --files-from=-
-
-        # Extract archive for testing binary validity
-        tar -xf "../Sparkle-$MARKETING_VERSION.tar.bz2" -C "/tmp/sparkle-extract"
-    fi
+    # Extract archive for testing binary validity
+    tar -xf "../Sparkle-$MARKETING_VERSION.tar.xz" -C "/tmp/sparkle-extract"
 
     # Test code signing validity of the extracted products
     # This guards against our archives being corrupt / created incorrectly
@@ -170,10 +156,6 @@ if [ "$ACTION" = "" ] ; then
         echo "Version: $MARKETING_VERSION"
     else
         echo "warning: Xcode version $XCODE_VERSION_ACTUAL does not support computing checksums for Swift Packages. Please update the Package manifest manually."
-    fi
-
-    if [ "$XZ_EXISTS" -ne 1 ] ; then
-        echo "WARNING: xz compression is used for official releases but bz2 is being used instead because xz tool is not installed on your system."
     fi
 
     rm -rf "$CONFIGURATION_BUILD_DIR/staging-spm"
