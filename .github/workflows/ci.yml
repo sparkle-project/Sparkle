@@ -61,7 +61,7 @@ jobs:
         env:
           DEVELOPER_DIR: ${{ matrix.xcode-path }}
         run: |
-            xcodebuild analyze -project Sparkle.xcodeproj -quiet -scheme Sparkle -configuration Release -derivedDataPath analyze > anaylze_output.txt
+            xcodebuild analyze -project Sparkle.xcodeproj -quiet -scheme Sparkle -configuration Release -derivedDataPath analyze > analyze_output.txt
             
       - name: Find Analyzed Warnings
         if: ${{ success() && matrix.run-analyzer && github.event_name == 'pull_request' }}
@@ -69,17 +69,17 @@ jobs:
         env:
           DEVELOPER_DIR: ${{ matrix.xcode-path }}
         run: |
-            if grep -q "warning:" anaylze_output.txt; then
-                echo '::set-output name=analyzestatus::0'
+            if grep -q "warning:" analyze_output.txt; then
+                echo "analyzestatus=0" >> $GITHUB_OUTPUT
             else
-                echo '::set-output name=analyzestatus::1'
+                echo "analyzestatus=1" >> $GITHUB_OUTPUT
             fi
         
       - name: Extract Analyzed Warnings
         if: ${{ success() && matrix.run-analyzer && github.event_name == 'pull_request' && steps.findwarnings.outputs.analyzestatus == '0' }}
         id: warnings
         run: |
-            echo ::set-output name=content::$(cat anaylze_output.txt)
+            echo ::set-output name=content::$(cat analyze_output.txt)
       
       - name: Post Analyzed Warnings
         if: ${{ success() && matrix.run-analyzer && github.event_name == 'pull_request' && steps.findwarnings.outputs.analyzestatus == '0' }}
