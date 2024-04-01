@@ -95,13 +95,13 @@ jobs:
           xcodebuild build -project Sparkle.xcodeproj -scheme Distribution -configuration Release -derivedDataPath build
       - name: Archive Test Results
         if: failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: build-logs
           path: build/Logs
       - name: Upload Distribution
         if: ${{ success() && matrix.upload-dist }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: Sparkle-distribution-${{ matrix.xcode }}.tar.xz
           path: build/Build/Products/Release/sparkle-dist.tar.xz
