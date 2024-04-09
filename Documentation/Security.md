@@ -20,7 +20,7 @@ For XPC Services, it's significant to understand they can be used independent of
 
 We have code that detects whether or not XPC services are available and enabled by the main application bundle. This is simpler and more efficient than attempting to create a connection and wait for a timeout. We don't have *any* checks for seeing if the "current process" is sandboxed; doing so is a rather broken behavior. The XPC Services are important, not the sandboxing.
 
-I said above that XPC services are looked up in the main bundle. One may think this assumption doesn't hold for helpers or plug-ins inside applications. My response to that is they probably don't need the services, and they probably shoudn't be injecting Sparkle inside the host application anyway due to unintended conflicts and other consequences. A more appropriate approach may be to bundle a separate tool such as the sparkle command line utility.
+I said above that XPC services are looked up in the main bundle. One may think this assumption doesn't hold for helpers or plug-ins inside applications. My response to that is they probably don't need the services, and they probably shouldn't be injecting Sparkle inside the host application anyway due to unintended conflicts and other consequences. A more appropriate approach may be to bundle a separate tool such as the sparkle command line utility.
 
 The `InstallerLauncher` XPC service needs a `JoinExistingSession` key set to `YES` otherwise authorization will not work properly, and even less so on older systems. It took me forever to debug this, so it's worth mentioning.
 

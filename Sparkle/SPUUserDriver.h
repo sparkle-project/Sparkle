@@ -46,7 +46,7 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
 - (void)showUpdatePermissionRequest:(SPUUpdatePermissionRequest *)request reply:(void (^)(SUUpdatePermissionResponse *))reply;
 
 /**
- * Show the user initating an update check
+ * Show the user initiating an update check
  *
  * Respond to the user initiating an update check. Sparkle uses this to show the user a window with an indeterminate progress bar.
  *
@@ -68,7 +68,7 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  *
  *  `SPUUpdateStateInstalling` - Update has been downloaded and already started installing.
  *
- *  The `userIntiated` property on the @c state indicates if the update was initiated by the user or if it was automatically scheduled in the background.
+ *  The `userInitiated` property on the @c state indicates if the update was initiated by the user or if it was automatically scheduled in the background.
  *
  *  Additionally, these properties on the @c appcastItem are of importance:
  *

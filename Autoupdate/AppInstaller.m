@@ -325,7 +325,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(RETRIEVE_PROCESS_IDENTIFIER_TIMEOUT * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         if (!receivedResponse) {
-            [self cleanupAndExitWithStatus:EXIT_FAILURE error:[NSError errorWithDomain:SUSparkleErrorDomain code:SPUInstallerError userInfo:@{ NSLocalizedDescriptionKey: @"Timeout error: failed to retreive process identifier from agent" }]];
+            [self cleanupAndExitWithStatus:EXIT_FAILURE error:[NSError errorWithDomain:SUSparkleErrorDomain code:SPUInstallerError userInfo:@{ NSLocalizedDescriptionKey: @"Timeout error: failed to retrieve process identifier from agent" }]];
         }
     });
 }
@@ -453,7 +453,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
                 return;
             }
             
-            // Carry these properities separately rather than using the SUInstallationInputData object
+            // Carry these properties separately rather than using the SUInstallationInputData object
             // Some of our properties may slightly differ than our input and we don't want to make the mistake of using one of those
             self->_installationType = installationType;
             self->_relaunchPath = installationData.relaunchPath;

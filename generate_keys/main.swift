@@ -231,7 +231,7 @@ struct GenerateKeys: ParsableCommand {
                 failure("Failed to write exported file: \(error)")
             }
         } else if let importedPrivateKeyFile = importedPrivateKeyFile {
-            /// Import mode - import the specifed key-pair file
+            /// Import mode - import the specified key-pair file
             let secretBase64File = importedPrivateKeyFile
             let secretBase64: String
             do {

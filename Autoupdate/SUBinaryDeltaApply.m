@@ -291,7 +291,7 @@ BOOL applyBinaryDelta(NSString *source, NSString *finalDestination, NSString *pa
                 // Remove the file non-writable we're patching that may cause issues
                 [fileManager removeItemAtPath:destinationFilePath error:NULL];
                 
-                // We will need to preserve permissons if there is no need to make permission changes later on
+                // We will need to preserve permissions if there is no need to make permission changes later on
                 needsToCopyFilePermissions = (commands & SPUDeltaItemCommandModifyPermissions) == 0;
             } else {
                 needsToCopyFilePermissions = ((commands & SPUDeltaItemCommandClone) != 0) && ((commands & SPUDeltaItemCommandModifyPermissions) == 0);

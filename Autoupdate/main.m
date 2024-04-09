@@ -31,7 +31,7 @@ int main(int __unused argc, const char __unused *argv[])
             // Don't clear the update directory because the installer may be in middle of installing an update
             // We still need to set an event handler for receiving SIGTERM though, otherwise our job may not terminate
             // (This is also recommended from the developer documentation).
-            // Simply exit with SIGTERM if we recieve this signal
+            // Simply exit with SIGTERM if we receive this signal
             exit(SIGTERM);
         });
         dispatch_resume(sigtermSource);

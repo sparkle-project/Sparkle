@@ -225,7 +225,7 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
     }];
 }
 
-- (void)testSameNonexistantSymlinkDiff
+- (void)testSameNonexistentSymlinkDiff
 {
     [self createAndApplyPatchWithHandler:^(NSFileManager *fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
         NSString *sourceFile = [sourceDirectory stringByAppendingPathComponent:@"A"];
@@ -246,7 +246,7 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
     }];
 }
 
-- (void)testDifferentNonexistantSymlinkDiff
+- (void)testDifferentNonexistentSymlinkDiff
 {
     [self createAndApplyPatchWithHandler:^(NSFileManager *fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
         NSString *sourceFile = [sourceDirectory stringByAppendingPathComponent:@"A"];
@@ -267,7 +267,7 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
     }];
 }
 
-- (void)testNonexistantSymlinkPermissionDiff
+- (void)testNonexistentSymlinkPermissionDiff
 {
     [self createAndApplyPatchWithBeforeDiffHandler:^(NSFileManager *fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
         NSString *sourceFile = [sourceDirectory stringByAppendingPathComponent:@"A"];
@@ -309,7 +309,7 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
     }];
 }
 
-- (void)testNonexistantSymlinkPermissionBadDiff
+- (void)testNonexistentSymlinkPermissionBadDiff
 {
     // Even though destination has a 0777 symlink permission, we only respect 0755 for symlinks
     [self createAndApplyPatchWithBeforeDiffHandler:^(NSFileManager *fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
@@ -962,7 +962,7 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
         NSNumber *permissionAttribute = attributes[NSFilePosixPermissions];
         XCTAssertNotNil(permissionAttribute);
         
-        // Test default symlink permissons are correct
+        // Test default symlink permissions are correct
         unsigned short permissions = permissionAttribute.unsignedShortValue & PERMISSION_FLAGS;
         XCTAssertEqual(permissions, VALID_SYMBOLIC_LINK_PERMISSIONS);
     }];

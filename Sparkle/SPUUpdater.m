@@ -722,7 +722,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         }
         
         // Notify host app that update driver has finished
-        // As long as we're not going to immmediately kick off a new check
+        // As long as we're not going to immediately kick off a new check
         if (!shouldShowUpdateImmediately && [delegate respondsToSelector:@selector((updater:didFinishUpdateCycleForUpdateCheck:error:))]) {
             [delegate updater:self didFinishUpdateCycleForUpdateCheck:updateCheck error:error];
         }
@@ -977,7 +977,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     if (![NSThread isMainThread]) {
         SULog(SULogLevelError, @"Error: -[SPUUpdater retrieveFeedURL:error:] must be called on the main thread.");
         if (error != NULL) {
-            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUIncorrectAPIUsageError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"SUUpdater -retriveFeedURL:error: must be called on the main thread for %@", hostName]}];
+            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUIncorrectAPIUsageError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"SUUpdater -retrieveFeedURL:error: must be called on the main thread for %@", hostName]}];
         }
         return nil;
     }

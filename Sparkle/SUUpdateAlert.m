@@ -31,7 +31,7 @@
 #import "SPUXPCServiceInfo.h"
 #import "SPUUserUpdateState.h"
 
-static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDENTIFIER ".SUUpdateAlert";
+static NSString *const SUUpdateAlertTouchBarIdentifier = @"" SPARKLE_BUNDLE_IDENTIFIER ".SUUpdateAlert";
 
 @interface SUUpdateAlert () <NSTouchBarDelegate>
 @end
@@ -215,7 +215,7 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
                 _darkBackgroundView.boxType = NSBoxCustom;
                 _darkBackgroundView.fillColor = [NSColor textBackgroundColor];
                 _darkBackgroundView.borderColor = [NSColor clearColor];
-                // Using auto-resizing mask instead of contraints works well enough
+                // Using auto-resizing mask instead of constraints works well enough
                 _darkBackgroundView.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
                 [_releaseNotesView.view.superview addSubview:_darkBackgroundView positioned:NSWindowBelow relativeTo:_releaseNotesView.view];
                 
@@ -531,15 +531,15 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 - (NSTouchBar *)makeTouchBar
 {
     NSTouchBar *touchBar = [[NSTouchBar alloc] init];
-    touchBar.defaultItemIdentifiers = @[SUUpdateAlertTouchBarIndentifier,];
-    touchBar.principalItemIdentifier = SUUpdateAlertTouchBarIndentifier;
+    touchBar.defaultItemIdentifiers = @[SUUpdateAlertTouchBarIdentifier,];
+    touchBar.principalItemIdentifier = SUUpdateAlertTouchBarIdentifier;
     touchBar.delegate = self;
     return touchBar;
 }
 
 - (NSTouchBarItem *)touchBar:(NSTouchBar * __unused)touchBar makeItemForIdentifier:(NSTouchBarItemIdentifier)identifier
 {
-    if ([identifier isEqualToString:SUUpdateAlertTouchBarIndentifier]) {
+    if ([identifier isEqualToString:SUUpdateAlertTouchBarIdentifier]) {
         NSCustomTouchBarItem* item = [[NSCustomTouchBarItem alloc] initWithIdentifier:identifier];
         item.viewController = [[SUTouchBarButtonGroup alloc] initByReferencingButtons:@[_installButton, _laterButton, _skipButton]];
         return item;

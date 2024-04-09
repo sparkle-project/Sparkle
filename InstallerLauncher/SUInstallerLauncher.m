@@ -447,7 +447,7 @@ static BOOL SPUUsesSystemDomainForBundlePath(NSString *path, BOOL rootUser
             return;
         }
         
-        // We do however have to copy the progress tool app somewhere safe due to its external depedencies
+        // We do however have to copy the progress tool app somewhere safe due to its external dependencies
         NSString *progressToolResourcePath = [self pathForBundledTool:@""SPARKLE_INSTALLER_PROGRESS_TOOL_NAME extension:@"app" fromBundle:ourBundle];
         
         if (progressToolResourcePath == nil) {

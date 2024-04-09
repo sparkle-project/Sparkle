@@ -14,7 +14,7 @@
 #import "SULocalizations.h"
 #import "SUTouchBarButtonGroup.h"
 
-static NSString *const SUStatusControllerTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDENTIFIER ".SUStatusController";
+static NSString *const SUStatusControllerTouchBarIdentifier = @"" SPARKLE_BUNDLE_IDENTIFIER ".SUStatusController";
 
 @interface SUStatusController () <NSTouchBarDelegate>
 
@@ -162,15 +162,15 @@ static NSString *const SUStatusControllerTouchBarIndentifier = @"" SPARKLE_BUNDL
 - (NSTouchBar *)makeTouchBar
 {
     NSTouchBar *touchBar = [[NSTouchBar alloc] init];
-    touchBar.defaultItemIdentifiers = @[ SUStatusControllerTouchBarIndentifier,];
-    touchBar.principalItemIdentifier = SUStatusControllerTouchBarIndentifier;
+    touchBar.defaultItemIdentifiers = @[ SUStatusControllerTouchBarIdentifier,];
+    touchBar.principalItemIdentifier = SUStatusControllerTouchBarIdentifier;
     touchBar.delegate = self;
     return touchBar;
 }
 
 - (NSTouchBarItem *)touchBar:(NSTouchBar * __unused)touchBar makeItemForIdentifier:(NSTouchBarItemIdentifier)identifier
 {
-    if ([identifier isEqualToString:SUStatusControllerTouchBarIndentifier]) {
+    if ([identifier isEqualToString:SUStatusControllerTouchBarIdentifier]) {
         NSCustomTouchBarItem *item = [[NSCustomTouchBarItem alloc] initWithIdentifier:identifier];
         SUTouchBarButtonGroup *group = [[SUTouchBarButtonGroup alloc] initByReferencingButtons:@[_actionButton,]];
         item.viewController = group;
