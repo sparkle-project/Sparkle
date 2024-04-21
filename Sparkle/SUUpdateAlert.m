@@ -42,7 +42,7 @@ static NSString *const SUUpdateAlertTouchBarIdentifier = @"" SPARKLE_BUNDLE_IDEN
     SUHost *_host;
     SPUUserUpdateState *_state;
     NSProgressIndicator *_releaseNotesSpinner;
-    NSBox *_darkBackgroundView;
+    NSBox *_backgroundView;
     id<SUReleaseNotesView> _releaseNotesView;
     id<SUVersionDisplay> _versionDisplayer;
     
@@ -58,7 +58,6 @@ static NSString *const SUUpdateAlertTouchBarIdentifier = @"" SPARKLE_BUNDLE_IDEN
     void(^_completionBlock)(SPUUserUpdateChoice, NSRect, BOOL);
     
     BOOL _allowsAutomaticUpdates;
-    BOOL _observingAppearance;
 }
 
 - (instancetype)initWithAppcastItem:(SUAppcastItem *)item state:(SPUUserUpdateState *)state host:(SUHost *)aHost versionDisplayer:(id<SUVersionDisplay>)versionDisplayer completionBlock:(void (^)(SPUUserUpdateChoice, NSRect, BOOL))completionBlock didBecomeKeyBlock:(void (^)(void))didBecomeKeyBlock
@@ -179,62 +178,6 @@ static NSString *const SUUpdateAlertTouchBarIdentifier = @"" SPARKLE_BUNDLE_IDEN
                 }
                 [weakSelf stopReleaseNotesSpinner];
             }];
-        }
-    }
-}
-
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(__attribute__((unused)) NSDictionary<NSKeyValueChangeKey,id> *)change context:(__attribute__((unused)) void *)context {
-    if (@available(macOS 10.14, *)) {
-        if (object == _releaseNotesView.view && [keyPath isEqualToString:@"effectiveAppearance"]) {
-            [self adaptReleaseNotesAppearance];
-        }
-    }
-}
-
-- (void)dealloc {
-    if (@available(macOS 10.14, *)) {
-        if (_observingAppearance) {
-            [_releaseNotesView.view removeObserver:self forKeyPath:@"effectiveAppearance"];
-            _observingAppearance = NO;
-        }
-    }
-}
-
-- (void)adaptReleaseNotesAppearance SPU_OBJC_DIRECT
-{
-    if (@available(macOS 10.14, *)) {
-        NSAppearanceName bestAppearance = [_releaseNotesView.view.effectiveAppearance bestMatchFromAppearancesWithNames:@[NSAppearanceNameAqua, NSAppearanceNameDarkAqua]];
-        if ([bestAppearance isEqualToString:NSAppearanceNameDarkAqua])
-        {
-            // Remove web view background...
-            [_releaseNotesView setDrawsBackground:NO];
-            // ... and use NSBox to get the dynamically colored background
-            if (_darkBackgroundView == nil)
-            {
-                _darkBackgroundView = [[NSBox alloc] initWithFrame:_releaseNotesView.view.frame];
-                _darkBackgroundView.boxType = NSBoxCustom;
-                _darkBackgroundView.fillColor = [NSColor textBackgroundColor];
-                _darkBackgroundView.borderColor = [NSColor clearColor];
-                // Using auto-resizing mask instead of constraints works well enough
-                _darkBackgroundView.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
-                [_releaseNotesView.view.superview addSubview:_darkBackgroundView positioned:NSWindowBelow relativeTo:_releaseNotesView.view];
-                
-                // The release note user stylesheet will not adjust to the user changing the theme until adaptReleaseNoteAppearance is called again.
-                // So lock the appearance of the background to keep the text readable if the system theme changes.
-                _darkBackgroundView.appearance = _darkBackgroundView.effectiveAppearance;
-            }
-        }
-        else
-        {
-            // Restore standard dark on light appearance
-            [_darkBackgroundView removeFromSuperview];
-            _darkBackgroundView = nil;
-            [_releaseNotesView setDrawsBackground:YES];
-        }
-        
-        if (!_observingAppearance) {
-            [_releaseNotesView.view addObserver:self forKeyPath:@"effectiveAppearance" options:0 context:nil];
-            _observingAppearance = YES;
         }
     }
 }
@@ -372,7 +315,22 @@ static NSString *const SUUpdateAlertTouchBarIdentifier = @"" SPARKLE_BUNDLE_IDEN
     _releaseNotesView.view.frame = boxContentView.bounds;
     _releaseNotesView.view.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
     
-    [self adaptReleaseNotesAppearance];
+    if (@available(macOS 10.14, *)) {
+        // We need a transparent background
+        // This avoids a "white flash" that may be present when the webview initially loads in dark mode
+        // This also is necessary for macOS 10.14, otherwise the background may stay white on 10.14 (but not in later OS's)
+        [_releaseNotesView setDrawsBackground:NO];
+        
+        // Use NSBox to get the proper dynamically colored background behind the release notes view when
+        // the release notes view background is transparent
+        _backgroundView = [[NSBox alloc] initWithFrame:_releaseNotesView.view.frame];
+        _backgroundView.boxType = NSBoxCustom;
+        _backgroundView.fillColor = [NSColor textBackgroundColor];
+        _backgroundView.borderColor = [NSColor clearColor];
+        // Using auto-resizing mask instead of constraints works well enough
+        _backgroundView.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
+        [_releaseNotesView.view.superview addSubview:_backgroundView positioned:NSWindowBelow relativeTo:_releaseNotesView.view];
+    }
 }
 
 - (void)windowDidLoad
