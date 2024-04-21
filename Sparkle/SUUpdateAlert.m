@@ -322,7 +322,7 @@ static NSString *const SUUpdateAlertTouchBarIdentifier = @"" SPARKLE_BUNDLE_IDEN
         [_releaseNotesView setDrawsBackground:NO];
         
         // Use NSBox to get the proper dynamically colored background behind the release notes view when
-        // the release notes view is transparent
+        // the release notes view background is transparent
         _backgroundView = [[NSBox alloc] initWithFrame:_releaseNotesView.view.frame];
         _backgroundView.boxType = NSBoxCustom;
         _backgroundView.fillColor = [NSColor textBackgroundColor];
