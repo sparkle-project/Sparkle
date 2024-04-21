@@ -230,7 +230,7 @@
             }
         } else {
             // When no updates are found in the appcast
-            // We will need to assume the user is up to date if the feed doen't have any applicable update items
+            // We will need to assume the user is up to date if the feed doesn't have any applicable update items
             // There could be update items on channels the updater is not subscribed to for example. But we can't tell the user about them.
             // There could also only be update items available for other platforms or none at all.
             localizedDescription = SULocalizedStringFromTableInBundle(@"You’re up to date!", SPARKLE_TABLE, sparkleBundle, "Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates.");

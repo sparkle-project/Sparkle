@@ -750,7 +750,7 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
       return originalTreeState[key1] ? NSOrderedAscending : NSOrderedDescending;
     }];
     
-    // Using a couple of heursitics we track if files have been moved to other locations within the app bundle
+    // Using a couple of heuristics we track if files have been moved to other locations within the app bundle
     NSMutableDictionary<NSString *, NSString *> *frameworkVersionsSubstitutes = [NSMutableDictionary dictionary];
     NSMutableDictionary<NSString *, NSString *> *fileSubstitutes = [NSMutableDictionary dictionary];
     if (MAJOR_VERSION_IS_AT_LEAST(majorVersion, SUBinaryDeltaMajorVersion3)) {

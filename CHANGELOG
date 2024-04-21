@@ -400,7 +400,7 @@ If you are migrating from earlier beta versions of Sparkle 2 and use sandboxing,
 # 1.20.0
 
  * `generate_appcast` option to read private key directly from the keychain (Tamás Lustyik)
- * Add delegate callbacks for fininshed download and extraction related events (Csaba Horony)
+ * Add delegate callbacks for finished download and extraction related events (Csaba Horony)
  * Don't check for updates if Do Not Disturb is on (Kornel)
  * Expose `CodesigningVerifier`, add codesign info API (sunuslee)
  * Threading fixes:
@@ -750,7 +750,7 @@ Important security fixes:
  * All the user defaults keys are now private; instead, SUUpdater is KVC-compliant for automaticallyChecksForUpdates, updateCheckInterval, and feedURL.
 * Reduced the size of the English-only framework by 25%.
 * System profiling information is now only submitted to the server once per week; this will help normalize your statistics across users with different interval preferences.
-* The feedParamatersForUpdater: delegate method now requires "displayKey" and "displayVersion" keys so that it can inform the user what's being sent.
+* The feedParametersForUpdater: delegate method now requires "displayKey" and "displayVersion" keys so that it can inform the user what's being sent.
 * Added a delegate method called pathToRelaunchForUpdater: which can be used for plugins to provide the path which should be used when relaunching the client after installing an update.
 * Added support for xml:lang to pick localized nodes in appcasts (for release notes, etc).
 * Fixed a bug which would cause the "checking for updates" window to not disappear in certain extraordinary error conditions.

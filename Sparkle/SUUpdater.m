@@ -196,7 +196,7 @@ static NSMutableDictionary *sharedUpdaters = nil;
 {
     if (_delayShowingUserUpdate) {
         // We don't know if SUUpdater delegate will call checkForUpdates: or checkForUpdatesInBackground
-        // to bring a deffered update alert back in 1.x.
+        // to bring a deferred update alert back in 1.x.
         // So if checkForUpdatesInBackground is called we will bring the update back in focus
         [self checkForUpdates:nil];
     } else {

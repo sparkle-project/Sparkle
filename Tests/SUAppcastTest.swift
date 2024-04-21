@@ -71,10 +71,10 @@ class SUAppcastTest: XCTestCase {
             XCTAssertEqual(latestDeltaItem!.fileURL!.lastPathComponent, "3.0_from_2.0.patch")
 
             // Test a delta item that does not exist
-            var nonexistantDeltaItem: SUAppcastItem?
-            SUAppcastDriver.bestItem(fromAppcastItems: supportedAppcastItems, getDeltaItem: &nonexistantDeltaItem, withHostVersion: "2.1", comparator: SUStandardVersionComparator())
+            var nonexistentDeltaItem: SUAppcastItem?
+            SUAppcastDriver.bestItem(fromAppcastItems: supportedAppcastItems, getDeltaItem: &nonexistentDeltaItem, withHostVersion: "2.1", comparator: SUStandardVersionComparator())
 
-            XCTAssertNil(nonexistantDeltaItem)
+            XCTAssertNil(nonexistentDeltaItem)
         } catch let err as NSError {
             NSLog("%@", err)
             XCTFail(err.localizedDescription)

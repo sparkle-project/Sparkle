@@ -34,7 +34,7 @@ void SULog(SULogLevel level, NSString *format, ...)
     switch (level) {
         case SULogLevelDefault:
             // See docs for OS_LOG_TYPE_DEFAULT
-            // By default, OS_LOG_TYPE_DEFAULT seems to be more noticable than OS_LOG_TYPE_INFO
+            // By default, OS_LOG_TYPE_DEFAULT seems to be more noticeable than OS_LOG_TYPE_INFO
             os_log(logger, "%{public}@", logMessage);
             break;
         case SULogLevelError:
