@@ -249,7 +249,6 @@ static NSString *SUDownloadingReason = @"Downloading update related file";
         NSData *data = [NSData dataWithContentsOfFile:_downloadFilename];
         if (data != nil) {
             NSURLResponse *response = _download.response;
-            assert(response != nil);
 
             NSURL *responseURL = response.URL;
             if (responseURL == nil) {
