@@ -22,15 +22,6 @@
 
 @implementation SUInstaller
 
-+ (BOOL)isAliasFolderAtPath:(NSString *)path SPU_OBJC_DIRECT
-{
-    NSNumber *aliasFlag = nil;
-    [[NSURL fileURLWithPath:path] getResourceValue:&aliasFlag forKey:NSURLIsAliasFileKey error:nil];
-    NSNumber *directoryFlag = nil;
-    [[NSURL fileURLWithPath:path] getResourceValue:&directoryFlag forKey:NSURLIsDirectoryKey error:nil];
-    return aliasFlag.boolValue && directoryFlag.boolValue;
-}
-
 + (nullable NSString *)installSourcePathInUpdateFolder:(NSString *)inUpdateFolder forHost:(SUHost *)host
 #if SPARKLE_BUILD_PACKAGE_SUPPORT
                                              isPackage:(BOOL *)isPackagePtr isGuided:(BOOL *)isGuidedPtr
@@ -55,6 +46,34 @@
 
     while ((currentFile = [dirEnum nextObject])) {
         NSString *currentPath = [inUpdateFolder stringByAppendingPathComponent:currentFile];
+        
+        // Ignore all symbolic links and aliases
+        {
+            NSURL *currentPathURL = [NSURL fileURLWithPath:currentPath];
+            
+            NSNumber *symbolicLinkFlag = nil;
+            [currentPathURL getResourceValue:&symbolicLinkFlag forKey:NSURLIsSymbolicLinkKey error:NULL];
+            if (symbolicLinkFlag.boolValue) {
+                // NSDirectoryEnumerator won't recurse into symlinked directories
+                continue;
+            }
+            
+            NSNumber *aliasFlag = nil;
+            [currentPathURL getResourceValue:&aliasFlag forKey:NSURLIsAliasFileKey error:NULL];
+            
+            if (aliasFlag.boolValue) {
+                NSNumber *directoryFlag = nil;
+                [currentPathURL getResourceValue:&directoryFlag forKey:NSURLIsDirectoryKey error:NULL];
+
+                // Some DMGs have symlinks into /Applications! That's no good!
+                if (directoryFlag.boolValue) {
+                    [dirEnum skipDescendents];
+                }
+                
+                continue;
+            }
+        }
+        
         NSString *currentFilename = [currentFile lastPathComponent];
 #if SPARKLE_BUILD_PACKAGE_SUPPORT
         NSString *currentExtension = [currentFile pathExtension];
@@ -92,10 +111,6 @@
                 break;
             }
         }
-
-        // Some DMGs have symlinks into /Applications! That's no good!
-        if ([self isAliasFolderAtPath:currentPath])
-            [dirEnum skipDescendents];
     }
 
 #if SPARKLE_BUILD_PACKAGE_SUPPORT

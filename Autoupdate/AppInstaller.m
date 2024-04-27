@@ -59,6 +59,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     NSString *_userName;
     SUHost *_host;
     NSString *_updateDirectoryPath;
+    NSString *_extractionDirectory;
     NSString *_downloadName;
     NSString *_decryptionPassword;
     SUSignatures *_signatures;
@@ -172,7 +173,8 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     [_communicator handleMessageWithIdentifier:SPUExtractionStarted data:[NSData data]];
     
     NSString *archivePath = [_updateDirectoryPath stringByAppendingPathComponent:_downloadName];
-    id<SUUnarchiverProtocol> unarchiver = [SUUnarchiver unarchiverForPath:archivePath updatingHostBundlePath:_host.bundlePath decryptionPassword:_decryptionPassword expectingInstallationType:_installationType];
+    
+    id<SUUnarchiverProtocol> unarchiver = [SUUnarchiver unarchiverForPath:archivePath extractionDirectory:_extractionDirectory updatingHostBundlePath:_host.bundlePath decryptionPassword:_decryptionPassword expectingInstallationType:_installationType];
     
     NSError *unarchiverError = nil;
     BOOL success = NO;
@@ -213,7 +215,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
                  [self->_communicator handleMessageWithIdentifier:SPUValidationStarted data:[NSData data]];
                  
                  NSError *validationError = nil;
-                 BOOL validationSuccess = [self->_updateValidator validateWithUpdateDirectory:self->_updateDirectoryPath error:&validationError];
+                 BOOL validationSuccess = [self->_updateValidator validateWithUpdateDirectory:self->_extractionDirectory error:&validationError];
                  
                  if (!validationSuccess) {
                      [self cleanupAndExitWithStatus:EXIT_FAILURE error:[NSError errorWithDomain:SUSparkleErrorDomain code:SPUInstallerError userInfo:@{ NSLocalizedDescriptionKey: @"Update validation was a failure", NSUnderlyingErrorKey: validationError }]];
@@ -263,6 +265,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     // but may as well set other fields to nil too
     [self clearUpdateDirectory];
     _downloadName = nil;
+    _extractionDirectory = nil;
     _decryptionPassword = nil;
     _signatures = nil;
     _relaunchPath = nil;
@@ -453,6 +456,13 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
                 return;
             }
             
+            NSString *extractionDirectory = [SPULocalCacheDirectory createUniqueDirectoryInDirectory:cacheInstallationPath];
+            if (extractionDirectory == nil) {
+                [self cleanupAndExitWithStatus:EXIT_FAILURE error:[NSError errorWithDomain:SUSparkleErrorDomain code:SPUInstallerError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Error: Failed to create installation extraction directory in %@", cacheInstallationPath] }]];
+                
+                return;
+            }
+            
             // Carry these properties separately rather than using the SUInstallationInputData object
             // Some of our properties may slightly differ than our input and we don't want to make the mistake of using one of those
             self->_installationType = installationType;
@@ -460,6 +470,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
             self->_downloadName = downloadName;
             self->_signatures = installationData.signatures;
             self->_updateDirectoryPath = cacheInstallationPath;
+            self->_extractionDirectory = extractionDirectory;
             self->_host = [[SUHost alloc] initWithBundle:hostBundle];
             self->_verifierInformation = [[SPUVerifierInformation alloc] initWithExpectedVersion:installationData.expectedVersion expectedContentLength:installationData.expectedContentLength];
             
@@ -521,7 +532,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     
     dispatch_async(_installerQueue, ^{
         NSError *installerError = nil;
-        id <SUInstallerProtocol> installer = [SUInstaller installerForHost:self->_host expectedInstallationType:self->_installationType updateDirectory:self->_updateDirectoryPath homeDirectory:self->_homeDirectory userName:self->_userName error:&installerError];
+        id <SUInstallerProtocol> installer = [SUInstaller installerForHost:self->_host expectedInstallationType:self->_installationType updateDirectory:self->_extractionDirectory homeDirectory:self->_homeDirectory userName:self->_userName error:&installerError];
         
         if (installer == nil) {
             dispatch_async(dispatch_get_main_queue(), ^{
