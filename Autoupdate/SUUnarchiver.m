@@ -18,27 +18,25 @@
 
 @implementation SUUnarchiver
 
-+ (nullable id <SUUnarchiverProtocol>)unarchiverForPath:(NSString *)path updatingHostBundlePath:(nullable NSString *)hostPath decryptionPassword:(nullable NSString *)decryptionPassword expectingInstallationType:(NSString *)installationType
++ (nullable id <SUUnarchiverProtocol>)unarchiverForPath:(NSString *)path extractionDirectory:(NSString *)extractionDirectory updatingHostBundlePath:(nullable NSString *)hostPath decryptionPassword:(nullable NSString *)decryptionPassword expectingInstallationType:(NSString *)installationType
 {
     if ([SUPipedUnarchiver canUnarchivePath:path]) {
-        return [[SUPipedUnarchiver alloc] initWithArchivePath:path];
-        
+        return [[SUPipedUnarchiver alloc] initWithArchivePath:path extractionDirectory:extractionDirectory];
     }
 #if SPARKLE_BUILD_DMG_SUPPORT
     else if ([SUDiskImageUnarchiver canUnarchivePath:path]) {
-        return [[SUDiskImageUnarchiver alloc] initWithArchivePath:path decryptionPassword:decryptionPassword];
-        
+        return [[SUDiskImageUnarchiver alloc] initWithArchivePath:path extractionDirectory:extractionDirectory decryptionPassword:decryptionPassword];
     }
 #endif
     else if ([SUBinaryDeltaUnarchiver canUnarchivePath:path]) {
         assert(hostPath != nil);
         NSString *nonNullHostPath = hostPath;
-        return [[SUBinaryDeltaUnarchiver alloc] initWithArchivePath:path updateHostBundlePath:nonNullHostPath];
+        return [[SUBinaryDeltaUnarchiver alloc] initWithArchivePath:path extractionDirectory:extractionDirectory updateHostBundlePath:nonNullHostPath];
     }
 #if SPARKLE_BUILD_PACKAGE_SUPPORT
     else if ([SUFlatPackageUnarchiver canUnarchivePath:path]) {
         // Flat packages are only supported for guided packaage installs
-        return [[SUFlatPackageUnarchiver alloc] initWithFlatPackagePath:path expectingInstallationType:installationType];
+        return [[SUFlatPackageUnarchiver alloc] initWithFlatPackagePath:path extractionDirectory:extractionDirectory expectingInstallationType:installationType];
     }
 #endif
     return nil;
