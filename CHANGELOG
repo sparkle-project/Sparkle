@@ -1,3 +1,8 @@
+# 1.27.2
+
+ * Extract archives in a separate directory from the input archive (#2552) (Zorg)
+ * Fix incorrect xz log warning in make release (#2044) (trss)
+
 # 1.27.1
 
  * Use px instead of pt when specifying font size to fix default font size in WebView from #1962 (regressed in 1.25.0 with WKWebView adoption) (Daniel Jalkut)
