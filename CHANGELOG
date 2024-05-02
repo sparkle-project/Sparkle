@@ -1,3 +1,14 @@
+# 2.6.1
+
+* Extract archives in a separate directory from the input archive (#2550) (Zorg)
+* Fix the release notes WebKit view not updating background when transitioning from light to dark mode (#2542) (Zorg)
+* Add NN (Norwegian Nynorsk) locale (#2532) (Sjur N Moshagen, Zorg)
+* Create tar.xz files with built-in tar and remove bzip2 fallback for creating a release distribution (#2535) (Zorg)
+* Add fallback in case SULocalizedStringFromTableInBundle() fails (#2533) (Zorg)
+* Remove assert on download response being available fixing rare crash (#2547) (Zorg)
+* Clarify when authoriation prompt may show in SPUUserDriver documentation (#2531, #2534) (Zorg)
+* Fix typos in codebase (#2537) (Viktor Szépe)
+
 # 2.6.0
 
 * Perform Gatekeeper scan to pre-warm app launch (#2505) (Zorg)
