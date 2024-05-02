@@ -18,21 +18,20 @@
 
 @implementation SUUnarchiver
 
-+ (nullable id <SUUnarchiverProtocol>)unarchiverForPath:(NSString *)path updatingHostBundlePath:(nullable NSString *)hostPath decryptionPassword:(nullable NSString *)decryptionPassword
++ (nullable id <SUUnarchiverProtocol>)unarchiverForPath:(NSString *)path extractionDirectory:(NSString *)extractionDirectory updatingHostBundlePath:(nullable NSString *)hostPath decryptionPassword:(nullable NSString *)decryptionPassword
 {
     if ([SUPipedUnarchiver canUnarchivePath:path]) {
-        return [[SUPipedUnarchiver alloc] initWithArchivePath:path];
-        
+        return [[SUPipedUnarchiver alloc] initWithArchivePath:path extractionDirectory:extractionDirectory];
     } else if ([SUDiskImageUnarchiver canUnarchivePath:path]) {
-        return [[SUDiskImageUnarchiver alloc] initWithArchivePath:path decryptionPassword:decryptionPassword];
+        return [[SUDiskImageUnarchiver alloc] initWithArchivePath:path extractionDirectory:extractionDirectory decryptionPassword:decryptionPassword];
         
     } else if ([SUBinaryDeltaUnarchiver canUnarchivePath:path]) {
         assert(hostPath != nil);
         NSString *nonNullHostPath = hostPath;
-        return [[SUBinaryDeltaUnarchiver alloc] initWithArchivePath:path updateHostBundlePath:nonNullHostPath];
+        return [[SUBinaryDeltaUnarchiver alloc] initWithArchivePath:path extractionDirectory:extractionDirectory updateHostBundlePath:nonNullHostPath];
         
     } else if ([SUFlatPackageUnarchiver canUnarchivePath:path]) {
-        return [[SUFlatPackageUnarchiver alloc] initWithFlatPackagePath:path];
+        return [[SUFlatPackageUnarchiver alloc] initWithFlatPackagePath:path extractionDirectory:extractionDirectory];
     }
     return nil;
 }

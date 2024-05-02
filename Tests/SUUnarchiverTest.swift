@@ -24,10 +24,9 @@ class SUUnarchiverTest: XCTestCase
         let unarchivedSuccessExpectation = super.expectation(description: "Unarchived Success (format: \(archiveExtension))")
         let unarchivedFailureExpectation = super.expectation(description: "Unarchived Failure (format: \(archiveExtension))")
 
-        let tempArchiveURL = tempDirectoryURL.appendingPathComponent(archiveResourceURL.lastPathComponent)
         let extractedAppURL = tempDirectoryURL.appendingPathComponent(appName).appendingPathExtension("app")
 
-        self.unarchiveTestAppWithExtension(archiveExtension, appName: appName, tempDirectoryURL: tempDirectoryURL, tempArchiveURL: tempArchiveURL, archiveResourceURL: archiveResourceURL, password: password, expectingSuccess: expectingSuccess, testExpectation: unarchivedSuccessExpectation)
+        self.unarchiveTestAppWithExtension(archiveExtension, appName: appName, tempDirectoryURL: tempDirectoryURL, archiveResourceURL: archiveResourceURL, password: password, expectingSuccess: expectingSuccess, testExpectation: unarchivedSuccessExpectation)
         self.unarchiveNonExistentFileTestFailureAppWithExtension(archiveExtension, tempDirectoryURL: tempDirectoryURL, password: password, testExpectation: unarchivedFailureExpectation)
 
         super.waitForExpectations(timeout: 30.0, handler: nil)
@@ -40,7 +39,7 @@ class SUUnarchiverTest: XCTestCase
 
     func unarchiveNonExistentFileTestFailureAppWithExtension(_ archiveExtension: String, tempDirectoryURL: URL, password: String?, testExpectation: XCTestExpectation) {
         let tempArchiveURL = tempDirectoryURL.appendingPathComponent("error-invalid").appendingPathExtension(archiveExtension)
-        let unarchiver = SUUnarchiver.unarchiver(forPath: tempArchiveURL.path, updatingHostBundlePath: nil, decryptionPassword: password)!
+        let unarchiver = SUUnarchiver.unarchiver(forPath: tempArchiveURL.path, extractionDirectory: tempDirectoryURL.path, updatingHostBundlePath: nil, decryptionPassword: password)!
 
         unarchiver.unarchive(completionBlock: {(error: Error?) -> Void in
             XCTAssertNotNil(error)
@@ -49,13 +48,8 @@ class SUUnarchiverTest: XCTestCase
     }
 
     // swiftlint:disable function_parameter_count
-    func unarchiveTestAppWithExtension(_ archiveExtension: String, appName: String, tempDirectoryURL: URL, tempArchiveURL: URL, archiveResourceURL: URL, password: String?, expectingSuccess: Bool, testExpectation: XCTestExpectation) {
-
-        let fileManager = FileManager.default
-
-        try! fileManager.copyItem(at: archiveResourceURL, to: tempArchiveURL)
-
-        let unarchiver = SUUnarchiver.unarchiver(forPath: tempArchiveURL.path, updatingHostBundlePath: nil, decryptionPassword: password)!
+    func unarchiveTestAppWithExtension(_ archiveExtension: String, appName: String, tempDirectoryURL: URL, archiveResourceURL: URL, password: String?, expectingSuccess: Bool, testExpectation: XCTestExpectation) {
+        let unarchiver = SUUnarchiver.unarchiver(forPath: archiveResourceURL.path, extractionDirectory: tempDirectoryURL.path, updatingHostBundlePath: nil, decryptionPassword: password)!
 
         unarchiver.unarchive(completionBlock: {(error: Error?) -> Void in
             if expectingSuccess {

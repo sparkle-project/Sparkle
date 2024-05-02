@@ -30,6 +30,7 @@
 
 #import "SPUURLRequest.h"
 #import "SPUDownloaderSession.h"
+#import "SPULocalCacheDirectory.h"
 
 @interface SUBasicUpdateDriver ()
 
@@ -38,6 +39,7 @@
 @property (assign) NSComparisonResult latestAppcastItemComparisonResult;
 @property (strong) SPUDownloader *download;
 @property (copy) NSString *downloadPath;
+@property (copy) NSString *extractionDirectory;
 
 @property (strong) SUAppcastItem *nonDeltaUpdateItem;
 @property (copy) NSString *tempDir;
@@ -54,6 +56,7 @@
 @synthesize latestAppcastItemComparisonResult;
 @synthesize download;
 @synthesize downloadPath;
+@synthesize extractionDirectory = _extractionDirectory;
 
 @synthesize nonDeltaUpdateItem;
 @synthesize tempDir;
@@ -383,6 +386,7 @@
 {
     self.tempDir = temporaryDirectory;
     self.downloadPath = [temporaryDirectory stringByAppendingPathComponent:destinationName];
+    self.extractionDirectory = [SPULocalCacheDirectory createUniqueDirectoryInDirectory:temporaryDirectory];
 }
 
 - (void)downloaderDidReceiveExpectedContentLength:(int64_t)__unused expectedContentLength
@@ -441,22 +445,30 @@
 
 - (void)extractUpdate
 {
-    id<SUUpdaterPrivate> updater = self.updater;
-    id<SUUnarchiverProtocol> unarchiver = [SUUnarchiver unarchiverForPath:self.downloadPath updatingHostBundlePath:self.host.bundlePath decryptionPassword:updater.decryptionPassword];
-
     BOOL success = NO;
-    if (!unarchiver) {
-        SULog(SULogLevelError, @"Error: No valid unarchiver for %@!", self.downloadPath);
+    
+    id<SUUpdaterPrivate> updater = self.updater;
+    
+    id<SUUnarchiverProtocol> unarchiver;
+    if (self.extractionDirectory == nil) {
+        SULog(SULogLevelError, @"Error: Failed to create temporary extraction directory for %@!", self.downloadPath);
+        unarchiver = nil;
     } else {
-        self.updateValidator = [[SUUpdateValidator alloc] initWithDownloadPath:self.downloadPath signatures:self.updateItem.signatures host:self.host];
-
-        // Currently unsafe archives are the only case where we can prevalidate before extraction, but that could change in the future
-        BOOL needsPrevalidation = [[unarchiver class] mustValidateBeforeExtraction];
-
-        if (needsPrevalidation) {
-            success = [self.updateValidator validateDownloadPath];
+        unarchiver = [SUUnarchiver unarchiverForPath:self.downloadPath extractionDirectory:self.extractionDirectory updatingHostBundlePath:self.host.bundlePath decryptionPassword:updater.decryptionPassword];
+        
+        if (!unarchiver) {
+            SULog(SULogLevelError, @"Error: No valid unarchiver for %@!", self.downloadPath);
         } else {
-            success = YES;
+            self.updateValidator = [[SUUpdateValidator alloc] initWithDownloadPath:self.downloadPath signatures:self.updateItem.signatures host:self.host];
+
+            // Currently unsafe archives are the only case where we can prevalidate before extraction, but that could change in the future
+            BOOL needsPrevalidation = [[unarchiver class] mustValidateBeforeExtraction];
+
+            if (needsPrevalidation) {
+                success = [self.updateValidator validateDownloadPath];
+            } else {
+                success = YES;
+            }
         }
     }
 
@@ -560,8 +572,9 @@
 {
     assert(self.updateItem);
     assert(self.updateValidator);
+    assert(self.extractionDirectory);
 
-    BOOL validationCheckSuccess = [self.updateValidator validateWithUpdateDirectory:self.tempDir];
+    BOOL validationCheckSuccess = [self.updateValidator validateWithUpdateDirectory:self.extractionDirectory];
     if (!validationCheckSuccess) {
         NSDictionary *userInfo = @{
                                    NSLocalizedDescriptionKey: SULocalizedString(@"An error occurred while extracting the archive. Please try again later.", nil),

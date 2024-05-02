@@ -17,6 +17,7 @@
 
 @property (nonatomic, copy, readonly) NSString *archivePath;
 @property (nullable, nonatomic, copy, readonly) NSString *decryptionPassword;
+@property (nonatomic, copy, readonly) NSString *extractionDirectory;
 
 @end
 
@@ -24,6 +25,7 @@
 
 @synthesize archivePath = _archivePath;
 @synthesize decryptionPassword = _decryptionPassword;
+@synthesize extractionDirectory = _extractionDirectory;
 
 + (BOOL)canUnarchivePath:(NSString *)path
 {
@@ -35,12 +37,13 @@
     return NO;
 }
 
-- (instancetype)initWithArchivePath:(NSString *)archivePath decryptionPassword:(nullable NSString *)decryptionPassword
+- (instancetype)initWithArchivePath:(NSString *)archivePath extractionDirectory:(NSString *)extractionDirectory decryptionPassword:(nullable NSString *)decryptionPassword
 {
     self = [super init];
     if (self != nil) {
         _archivePath = [archivePath copy];
         _decryptionPassword = [decryptionPassword copy];
+        _extractionDirectory = [extractionDirectory copy];
     }
     return self;
 }
@@ -158,7 +161,7 @@
         for (NSString *item in contents)
         {
             NSString *fromPath = [mountPoint stringByAppendingPathComponent:item];
-            NSString *toPath = [[self.archivePath stringByDeletingLastPathComponent] stringByAppendingPathComponent:item];
+            NSString *toPath = [self.extractionDirectory stringByAppendingPathComponent:item];
             
             // We skip any files in the DMG which are not readable.
             if (![manager isReadableFileAtPath:fromPath]) {
