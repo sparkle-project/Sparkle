@@ -20,6 +20,7 @@
 
 @property (nonatomic, copy, readonly) NSString *archivePath;
 @property (nonatomic, copy, readonly) NSString *updateHostBundlePath;
+@property (nonatomic, copy, readonly) NSString *extractionDirectory;
 
 @end
 
@@ -27,6 +28,7 @@
 
 @synthesize archivePath = _archivePath;
 @synthesize updateHostBundlePath = _updateHostBundlePath;
+@synthesize extractionDirectory = _extractionDirectory;
 
 + (BOOL)canUnarchivePath:(NSString *)path
 {
@@ -73,12 +75,13 @@
     }
 }
 
-- (instancetype)initWithArchivePath:(NSString *)archivePath updateHostBundlePath:(NSString *)updateHostBundlePath
+- (instancetype)initWithArchivePath:(NSString *)archivePath extractionDirectory:(NSString *)extractionDirectory updateHostBundlePath:(NSString *)updateHostBundlePath
 {
     self = [super init];
     if (self != nil) {
         _archivePath = [archivePath copy];
         _updateHostBundlePath = [updateHostBundlePath copy];
+        _extractionDirectory = [extractionDirectory copy];
     }
     return self;
 }
@@ -96,7 +99,7 @@
 - (void)extractDeltaWithNotifier:(SUUnarchiverNotifier *)notifier
 {
     NSString *sourcePath = self.updateHostBundlePath;
-    NSString *targetPath = [[self.archivePath stringByDeletingLastPathComponent] stringByAppendingPathComponent:[sourcePath lastPathComponent]];
+    NSString *targetPath = [self.extractionDirectory stringByAppendingPathComponent:[sourcePath lastPathComponent]];
     
     NSError *applyDiffError = nil;
     BOOL success = applyBinaryDelta(sourcePath, targetPath, self.archivePath, NO, ^(double progress){

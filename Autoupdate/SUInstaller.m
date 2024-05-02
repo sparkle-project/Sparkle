@@ -22,15 +22,6 @@
 
 @implementation SUInstaller
 
-+ (BOOL)isAliasFolderAtPath:(NSString *)path
-{
-    NSNumber *aliasFlag = nil;
-    [[NSURL fileURLWithPath:path] getResourceValue:&aliasFlag forKey:NSURLIsAliasFileKey error:nil];
-    NSNumber *directoryFlag = nil;
-    [[NSURL fileURLWithPath:path] getResourceValue:&directoryFlag forKey:NSURLIsDirectoryKey error:nil];
-    return aliasFlag.boolValue && directoryFlag.boolValue;
-}
-
 + (nullable NSString *)installSourcePathInUpdateFolder:(NSString *)inUpdateFolder forHost:(SUHost *)host isPackage:(BOOL *)isPackagePtr isGuided:(BOOL *)isGuidedPtr
 {
     NSParameterAssert(inUpdateFolder);
@@ -49,6 +40,34 @@
 
     while ((currentFile = [dirEnum nextObject])) {
         NSString *currentPath = [inUpdateFolder stringByAppendingPathComponent:currentFile];
+        
+        // Ignore all symbolic links and aliases
+        {
+            NSURL *currentPathURL = [NSURL fileURLWithPath:currentPath];
+            
+            NSNumber *symbolicLinkFlag = nil;
+            [currentPathURL getResourceValue:&symbolicLinkFlag forKey:NSURLIsSymbolicLinkKey error:NULL];
+            if (symbolicLinkFlag.boolValue) {
+                // NSDirectoryEnumerator won't recurse into symlinked directories
+                continue;
+            }
+            
+            NSNumber *aliasFlag = nil;
+            [currentPathURL getResourceValue:&aliasFlag forKey:NSURLIsAliasFileKey error:NULL];
+            
+            if (aliasFlag.boolValue) {
+                NSNumber *directoryFlag = nil;
+                [currentPathURL getResourceValue:&directoryFlag forKey:NSURLIsDirectoryKey error:NULL];
+                
+                // Some DMGs have symlinks into /Applications! That's no good!
+                if (directoryFlag.boolValue) {
+                    [dirEnum skipDescendents];
+                }
+                
+                continue;
+            }
+        }
+        
         NSString *currentFilename = [currentFile lastPathComponent];
         NSString *currentExtension = [currentFile pathExtension];
         NSString *currentFilenameNoExtension = [currentFilename stringByDeletingPathExtension];
@@ -78,10 +97,6 @@
                 break;
             }
         }
-
-        // Some DMGs have symlinks into /Applications! That's no good!
-        if ([self isAliasFolderAtPath:currentPath])
-            [dirEnum skipDescendents];
     }
 
     // We don't have a valid path. Try to use the fallback package.

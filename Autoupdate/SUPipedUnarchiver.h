@@ -16,7 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface SUPipedUnarchiver : NSObject <SUUnarchiverProtocol>
 
-- (instancetype)initWithArchivePath:(NSString *)archivePath;
+- (instancetype)initWithArchivePath:(NSString *)archivePath extractionDirectory:(NSString *)extractionDirectory;
 
 @end
 
