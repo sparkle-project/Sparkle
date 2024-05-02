@@ -19,13 +19,13 @@ SPARKLE_NORMALIZE_INSTALLED_APPLICATION_NAME = 0
 // These variables must have a space after the '=' too
 SPARKLE_VERSION_MAJOR = 1
 SPARKLE_VERSION_MINOR = 27
-SPARKLE_VERSION_PATCH = 1
+SPARKLE_VERSION_PATCH = 2
 
 // This should be in SemVer format or empty, ie. "-rc.1"
 // These variables must have a space after the '=' too
 SPARKLE_VERSION_SUFFIX =
 // This is now a monotonically increasing ID number, even across prereleases, but let's keep this below 2.0
-CURRENT_PROJECT_VERSION = 1.106
+CURRENT_PROJECT_VERSION = 1.107
 
 MARKETING_VERSION = $(SPARKLE_VERSION_MAJOR).$(SPARKLE_VERSION_MINOR).$(SPARKLE_VERSION_PATCH)$(SPARKLE_VERSION_SUFFIX)
 
