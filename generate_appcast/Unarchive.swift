@@ -6,6 +6,13 @@
 import Foundation
 
 func unarchive(itemPath: URL, archiveDestDir: URL, callback: @escaping (Error?) -> Void) {
+    // Create extraction directory if it does not exist
+    do {
+        try FileManager.default.createDirectory(at: archiveDestDir, withIntermediateDirectories: true, attributes: nil)
+    } catch {
+        callback(makeError(code: .unarchivingError, "Failed to create archive destination directory at \(archiveDestDir)"))
+    }
+    
     if let unarchiver = SUUnarchiver.unarchiver(forPath: itemPath.path, extractionDirectory: archiveDestDir.path, updatingHostBundlePath: nil, decryptionPassword: nil, expectingInstallationType: SPUInstallationTypeApplication) {
         unarchiver.unarchive(completionBlock: { (error: Error?) in
             if error != nil {
