@@ -59,6 +59,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 @property (nonatomic, readonly) NSString *userName;
 @property (nonatomic) SUHost *host;
 @property (nonatomic, copy) NSString *updateDirectoryPath;
+@property (nonatomic, copy) NSString *extractionDirectory;
 @property (nonatomic, copy) NSString *downloadName;
 @property (nonatomic, copy) NSString *decryptionPassword;
 @property (nonatomic, strong) SUSignatures *signatures;
@@ -94,6 +95,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 @synthesize updateValidator = _updateValidator;
 @synthesize host = _host;
 @synthesize updateDirectoryPath = _updateDirectoryPath;
+@synthesize extractionDirectory = _extractionDirectory;
 @synthesize downloadName = _downloadName;
 @synthesize decryptionPassword = _decryptionPassword;
 @synthesize signatures = _signatures;
@@ -193,7 +195,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     [self.communicator handleMessageWithIdentifier:SPUExtractionStarted data:[NSData data]];
     
     NSString *archivePath = [self.updateDirectoryPath stringByAppendingPathComponent:self.downloadName];
-    id<SUUnarchiverProtocol> unarchiver = [SUUnarchiver unarchiverForPath:archivePath updatingHostBundlePath:self.host.bundlePath decryptionPassword:self.decryptionPassword expectingInstallationType:self.installationType];
+    id<SUUnarchiverProtocol> unarchiver = [SUUnarchiver unarchiverForPath:archivePath  extractionDirectory:self.extractionDirectory updatingHostBundlePath:self.host.bundlePath decryptionPassword:self.decryptionPassword expectingInstallationType:self.installationType];
     
     NSError *unarchiverError = nil;
     BOOL success = NO;
@@ -226,7 +228,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
                  [self.communicator handleMessageWithIdentifier:SPUValidationStarted data:[NSData data]];
                  
                  NSError *validationError = nil;
-                 BOOL validationSuccess = [self.updateValidator validateWithUpdateDirectory:self.updateDirectoryPath error:&validationError];
+                 BOOL validationSuccess = [self.updateValidator validateWithUpdateDirectory:self.extractionDirectory error:&validationError];
                  
                  if (!validationSuccess) {
                      [self cleanupAndExitWithStatus:EXIT_FAILURE error:[NSError errorWithDomain:SUSparkleErrorDomain code:SPUInstallerError userInfo:@{ NSLocalizedDescriptionKey: @"Update validation was a failure", NSUnderlyingErrorKey: validationError }]];
@@ -276,6 +278,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     // but may as well set other fields to nil too
     [self clearUpdateDirectory];
     self.downloadName = nil;
+    self.extractionDirectory = nil;
     self.decryptionPassword = nil;
     self.signatures = nil;
     self.relaunchPath = nil;
@@ -407,6 +410,13 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
                 return;
             }
             
+            NSString *extractionDirectory = [SPULocalCacheDirectory createUniqueDirectoryInDirectory:cacheInstallationPath];
+            if (extractionDirectory == nil) {
+                [self cleanupAndExitWithStatus:EXIT_FAILURE error:[NSError errorWithDomain:SUSparkleErrorDomain code:SPUInstallerError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Error: Failed to create installation extraction directory in %@", cacheInstallationPath] }]];
+                
+                return;
+            }
+            
             // Carry these properities separately rather than using the SUInstallationInputData object
             // Some of our properties may slightly differ than our input and we don't want to make the mistake of using one of those
             self.installationType = installationType;
@@ -414,6 +424,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
             self.downloadName = installationData.downloadName;
             self.signatures = installationData.signatures;
             self.updateDirectoryPath = cacheInstallationPath;
+            self.extractionDirectory = extractionDirectory;
             self.host = [[SUHost alloc] initWithBundle:hostBundle];
             
             [self extractAndInstallUpdate];
@@ -463,7 +474,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     
     dispatch_async(self.installerQueue, ^{
         NSError *installerError = nil;
-        id <SUInstallerProtocol> installer = [SUInstaller installerForHost:self.host expectedInstallationType:self.installationType updateDirectory:self.updateDirectoryPath homeDirectory:self.homeDirectory userName:self.userName error:&installerError];
+        id <SUInstallerProtocol> installer = [SUInstaller installerForHost:self.host expectedInstallationType:self.installationType updateDirectory:self.extractionDirectory homeDirectory:self.homeDirectory userName:self.userName error:&installerError];
         
         if (installer == nil) {
             dispatch_async(dispatch_get_main_queue(), ^{

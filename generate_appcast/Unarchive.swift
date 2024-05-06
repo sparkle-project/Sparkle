@@ -8,38 +8,26 @@ import Foundation
 func unarchive(itemPath: URL, archiveDestDir: URL, callback: @escaping (Error?) -> Void) {
     let fileManager = FileManager.default
     let tempDir = archiveDestDir.appendingPathExtension("tmp")
-    let itemCopy = tempDir.appendingPathComponent(itemPath.lastPathComponent)
 
+    _ = try? fileManager.removeItem(at: tempDir)
     _ = try? fileManager.createDirectory(at: tempDir, withIntermediateDirectories: true, attributes: [:])
 
-    do {
-        do {
-            try fileManager.linkItem(at: itemPath, to: itemCopy)
-        } catch {
-            try fileManager.copyItem(at: itemPath, to: itemCopy)
-        }
-        if let unarchiver = SUUnarchiver.unarchiver(forPath: itemCopy.path, updatingHostBundlePath: nil, decryptionPassword: nil, expectingInstallationType: SPUInstallationTypeApplication) {
-            unarchiver.unarchive(completionBlock: { (error: Error?) in
-                if error != nil {
-                    callback(error)
-                    return
-                }
+    if let unarchiver = SUUnarchiver.unarchiver(forPath: itemPath.path, extractionDirectory: tempDir.path, updatingHostBundlePath: nil, decryptionPassword: nil, expectingInstallationType: SPUInstallationTypeApplication) {
+        unarchiver.unarchive(completionBlock: { (error: Error?) in
+            if error != nil {
+                callback(error)
+                return
+            }
 
-                _ = try? fileManager.removeItem(at: itemCopy)
-                do {
-                    try fileManager.moveItem(at: tempDir, to: archiveDestDir)
-                    callback(nil)
-                } catch {
-                    callback(error)
-                }
-            }, progressBlock: nil)
-        } else {
-            _ = try? fileManager.removeItem(at: itemCopy)
-            callback(makeError(code: .unarchivingError, "Not a supported archive format: \(itemCopy)"))
-        }
-    } catch {
-        _ = try? fileManager.removeItem(at: tempDir)
-        callback(error)
+            do {
+                try fileManager.moveItem(at: tempDir, to: archiveDestDir)
+                callback(nil)
+            } catch {
+                callback(error)
+            }
+        }, progressBlock: nil)
+    } else {
+        callback(makeError(code: .unarchivingError, "Not a supported archive format: \(itemPath.path)"))
     }
 }
 
