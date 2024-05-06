@@ -6,17 +6,28 @@
 import Foundation
 
 func unarchive(itemPath: URL, archiveDestDir: URL, callback: @escaping (Error?) -> Void) {
-    if let unarchiver = SUUnarchiver.unarchiver(forPath: itemPath.path, extractionDirectory: archiveDestDir.path, updatingHostBundlePath: nil, decryptionPassword: nil) {
+    let fileManager = FileManager.default
+    let tempDir = archiveDestDir.appendingPathExtension("tmp")
+
+    _ = try? fileManager.removeItem(at: tempDir)
+    _ = try? fileManager.createDirectory(at: tempDir, withIntermediateDirectories: true, attributes: [:])
+
+    if let unarchiver = SUUnarchiver.unarchiver(forPath: itemPath.path, extractionDirectory: tempDir.path, updatingHostBundlePath: nil, decryptionPassword: nil) {
         unarchiver.unarchive(completionBlock: { (error: Error?) in
             if error != nil {
                 callback(error)
                 return
             }
-            
-            callback(nil)
+
+            do {
+                try fileManager.moveItem(at: tempDir, to: archiveDestDir)
+                callback(nil)
+            } catch {
+                callback(error)
+            }
         }, progressBlock: nil)
     } else {
-        callback(makeError(code: .unarchivingError, "Not a supported archive format: \(itemPath)"))
+        callback(makeError(code: .unarchivingError, "Not a supported archive format: \(itemPath.path)"))
     }
 }
 
