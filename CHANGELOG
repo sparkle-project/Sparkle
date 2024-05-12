@@ -1,3 +1,7 @@
+# 1.27.3
+
+ * Create and use temp extraction directory in generate_appcast again (#2556) (Zorg)
+
 # 1.27.2
 
  * Extract archives in a separate directory from the input archive (#2552) (Zorg)
