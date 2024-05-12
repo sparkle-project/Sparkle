@@ -549,7 +549,11 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 
 - (void)updaterTimerDidFire
 {
-    [self _checkForUpdatesInBackground];
+    // User can perform a checkForUpdates check around the same time the timer is ready to fire
+    if (!_sessionInProgress)
+    {
+        [self _checkForUpdatesInBackground];
+    }
 }
 
 - (void)_checkForUpdatesInBackground SPU_OBJC_DIRECT
@@ -695,8 +699,8 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 
 - (void)checkForUpdatesWithDriver:(id <SPUUpdateDriver> )d updateCheck:(SPUUpdateCheck)updateCheck installerInProgress:(BOOL)installerInProgress SPU_OBJC_DIRECT
 {
-    assert(_driver == nil);
     if (_driver != nil) {
+        SULog(SULogLevelError, @"Error: checkForUpdatesWithDriver:updateCheck:installerInProgress: called when _driver != nil");
         return;
     }
     
