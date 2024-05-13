@@ -257,6 +257,15 @@ Please visit [Sparkle's website](http://sparkle-project.org) for more informatio
 
 If you are migrating from earlier beta versions of Sparkle 2 and use sandboxing, please re-familiarize yourself with the [Sandboxing guide](https://sparkle-project.org/documentation/sandboxing/). Some of the XPC Services are now optional and integration with XPC Services and code signing have been simplified. The SPUUserDriver protocol for custom user interfaces has been greatly simplified too.
 
+# 1.27.3
+
+ * Create and use temp extraction directory in generate_appcast again (#2556) (Zorg)
+
+# 1.27.2
+
+ * Extract archives in a separate directory from the input archive (#2552) (Zorg)
+ * Fix incorrect xz log warning in make release (#2044) (trss)
+
 # 1.27.1
 
  * Use px instead of pt when specifying font size to fix default font size in WebView from #1962 (regressed in 1.25.0 with WKWebView adoption) (Daniel Jalkut)
