@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21701" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21701"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="22690"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -29,7 +29,7 @@
             <windowCollectionBehavior key="collectionBehavior" fullScreenAuxiliary="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="83" y="492" width="488" height="379"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="875"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2304" height="1271"/>
             <view key="contentView" id="6">
                 <rect key="frame" x="0.0" y="0.0" width="437" height="379"/>
                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -71,7 +71,7 @@
             <rect key="frame" x="0.0" y="0.0" width="437" height="78"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
-                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="IgD-Pj-pc8">
+                <textField focusRingType="none" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="IgD-Pj-pc8">
                     <rect key="frame" x="104" y="42" width="315" height="16"/>
                     <constraints>
                         <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="16" id="J49-m7-iIa"/>
@@ -82,7 +82,7 @@
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="tgW-Jp-Aia">
+                <textField focusRingType="none" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="tgW-Jp-Aia">
                     <rect key="frame" x="104" y="0.0" width="315" height="34"/>
                     <constraints>
                         <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="34" id="HfG-Lg-91D"/>
@@ -123,11 +123,11 @@
             <point key="canvasLocation" x="-241" y="-37"/>
         </view>
         <customView hidden="YES" id="39" userLabel="MoreInfoView">
-            <rect key="frame" x="0.0" y="0.0" width="437" height="205"/>
+            <rect key="frame" x="0.0" y="0.0" width="434" height="205"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
-                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="46" userLabel="SystemProfileInfo">
-                    <rect key="frame" x="107" y="123" width="312" height="70"/>
+                <textField focusRingType="none" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="46" userLabel="SystemProfileInfo">
+                    <rect key="frame" x="104" y="123" width="312" height="70"/>
                     <constraints>
                         <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="70" id="Csk-S6-dh4"/>
                         <constraint firstAttribute="width" constant="308" id="iAG-SY-yVp"/>
@@ -142,13 +142,13 @@ This is the information that would be sent:</string>
                     </textFieldCell>
                 </textField>
                 <scrollView autohidesScrollers="YES" horizontalLineScroll="16" horizontalPageScroll="0.0" verticalLineScroll="16" verticalPageScroll="0.0" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="40" userLabel="ScrollView">
-                    <rect key="frame" x="109" y="0.0" width="308" height="115"/>
+                    <rect key="frame" x="103" y="0.0" width="314" height="115"/>
                     <clipView key="contentView" id="sbp-rk-wxX">
-                        <rect key="frame" x="1" y="1" width="306" height="113"/>
+                        <rect key="frame" x="1" y="1" width="312" height="113"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" multipleSelection="NO" autosaveColumns="NO" typeSelect="NO" rowHeight="14" id="41">
-                                <rect key="frame" x="0.0" y="0.0" width="306" height="113"/>
+                                <rect key="frame" x="0.0" y="0.0" width="312" height="113"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <size key="intercellSpacing" width="3" height="2"/>
                                 <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -206,10 +206,9 @@ This is the information that would be sent:</string>
             </subviews>
             <constraints>
                 <constraint firstItem="46" firstAttribute="top" secondItem="39" secondAttribute="top" constant="12" id="0rj-EA-SIj"/>
-                <constraint firstItem="40" firstAttribute="trailing" secondItem="46" secondAttribute="trailing" id="5Ze-wu-AsK"/>
-                <constraint firstItem="40" firstAttribute="width" secondItem="46" secondAttribute="width" id="AfJ-OK-Apa"/>
-                <constraint firstItem="40" firstAttribute="leading" secondItem="46" secondAttribute="leading" id="Qg9-kp-Lzl"/>
-                <constraint firstItem="46" firstAttribute="leading" secondItem="39" secondAttribute="leading" constant="109" id="TMg-61-Tbj"/>
+                <constraint firstItem="40" firstAttribute="trailing" secondItem="46" secondAttribute="trailing" constant="3" id="5Ze-wu-AsK"/>
+                <constraint firstItem="40" firstAttribute="leading" secondItem="46" secondAttribute="leading" constant="-3" id="Qg9-kp-Lzl"/>
+                <constraint firstItem="46" firstAttribute="leading" secondItem="39" secondAttribute="leading" constant="106" id="TMg-61-Tbj"/>
                 <constraint firstAttribute="trailing" secondItem="46" secondAttribute="trailing" constant="20" id="fYg-If-EVL"/>
                 <constraint firstAttribute="bottom" secondItem="40" secondAttribute="bottom" id="o4Y-3j-NmQ"/>
                 <constraint firstItem="40" firstAttribute="top" secondItem="46" secondAttribute="bottom" constant="8" symbolic="YES" id="seb-Gl-jtw"/>
@@ -223,11 +222,8 @@ This is the information that would be sent:</string>
                 <customView translatesAutoresizingMaskIntoConstraints="NO" id="ilj-QP-33p" userLabel="View">
                     <rect key="frame" x="0.0" y="0.0" width="437" height="55"/>
                     <subviews>
-                        <button verticalHuggingPriority="750" tag="1" translatesAutoresizingMaskIntoConstraints="NO" id="sMh-ha-r7R">
+                        <button tag="1" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="sMh-ha-r7R">
                             <rect key="frame" x="260" y="13" width="164" height="32"/>
-                            <constraints>
-                                <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="150" id="gon-Nu-M8r"/>
-                            </constraints>
                             <buttonCell key="cell" type="push" title="Check Automatically" bezelStyle="rounded" alignment="center" state="on" borderStyle="border" tag="1" inset="2" id="OhZ-1K-DmA">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                 <font key="font" metaFont="system"/>
@@ -235,15 +231,15 @@ This is the information that would be sent:</string>
 DQ
 </string>
                             </buttonCell>
+                            <constraints>
+                                <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="150" id="gon-Nu-M8r"/>
+                            </constraints>
                             <connections>
                                 <action selector="finishPrompt:" target="-2" id="sms-z7-2Ij"/>
                             </connections>
                         </button>
                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="cFC-wV-H3j">
                             <rect key="frame" x="145" y="13" width="115" height="32"/>
-                            <constraints>
-                                <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="101" id="Fta-eR-U3P"/>
-                            </constraints>
                             <buttonCell key="cell" type="push" title="Don’t Check" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="cCJ-V0-aTi">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                 <font key="font" metaFont="system"/>
@@ -251,6 +247,9 @@ DQ
 Gw
 </string>
                             </buttonCell>
+                            <constraints>
+                                <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="101" id="Fta-eR-U3P"/>
+                            </constraints>
                             <connections>
                                 <action selector="finishPrompt:" target="-2" id="QJG-fs-Y9u"/>
                             </connections>
@@ -284,13 +283,13 @@ Gw
                     <subviews>
                         <button focusRingType="none" translatesAutoresizingMaskIntoConstraints="NO" id="a90-Iq-FgS" userLabel="IncludeInfoButton">
                             <rect key="frame" x="104" y="-1" width="200" height="16"/>
-                            <constraints>
-                                <constraint firstAttribute="height" constant="14" id="STF-87-eYy"/>
-                            </constraints>
                             <buttonCell key="cell" type="check" title="Include anonymous system profile" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" focusRingType="none" inset="2" id="gz7-LM-gNf">
                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                 <font key="font" metaFont="smallSystem"/>
                             </buttonCell>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="14" id="STF-87-eYy"/>
+                            </constraints>
                             <connections>
                                 <binding destination="-2" name="value" keyPath="shouldSendProfile" id="HPm-tg-NCZ">
                                     <dictionary key="options">
@@ -302,14 +301,14 @@ Gw
                         </button>
                         <button focusRingType="none" horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="JW6-0z-Ud3">
                             <rect key="frame" x="85" y="-1" width="16" height="16"/>
-                            <constraints>
-                                <constraint firstAttribute="height" constant="16" id="HMA-GI-C0a"/>
-                                <constraint firstAttribute="width" constant="16" id="Qxo-Ga-nVP"/>
-                            </constraints>
                             <buttonCell key="cell" type="disclosureTriangle" bezelStyle="disclosure" imagePosition="overlaps" alignment="center" borderStyle="border" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="yd4-Id-v7q">
                                 <behavior key="behavior" pushIn="YES" changeBackground="YES" changeGray="YES" lightByContents="YES"/>
                                 <font key="font" metaFont="system"/>
                             </buttonCell>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="16" id="HMA-GI-C0a"/>
+                                <constraint firstAttribute="width" constant="16" id="Qxo-Ga-nVP"/>
+                            </constraints>
                             <connections>
                                 <action selector="toggleMoreInfo:" target="-2" id="AqY-Mp-X0q"/>
                                 <binding destination="-2" name="hidden" keyPath="shouldAskAboutProfile" id="IJh-ox-Lrn">
@@ -349,13 +348,13 @@ Gw
                     <subviews>
                         <button focusRingType="none" translatesAutoresizingMaskIntoConstraints="NO" id="BId-kb-eYW" userLabel="automaticallyDownloadUpdatesButton">
                             <rect key="frame" x="104" y="-1" width="248" height="16"/>
-                            <constraints>
-                                <constraint firstAttribute="height" constant="14" id="kJy-g7-0Un"/>
-                            </constraints>
                             <buttonCell key="cell" type="check" title="Automatically download and install updates" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" focusRingType="none" inset="2" id="AUc-33-qGN">
                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                 <font key="font" metaFont="smallSystem"/>
                             </buttonCell>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="14" id="kJy-g7-0Un"/>
+                            </constraints>
                             <connections>
                                 <binding destination="-2" name="value" keyPath="automaticallyDownloadUpdates" id="5Me-7t-mMu"/>
                             </connections>
