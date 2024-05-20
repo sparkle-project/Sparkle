@@ -248,6 +248,10 @@ struct GenerateAppcast: ParsableCommand {
     }
     
     func run() throws {
+        // Ignore SIGPIPE because we won't want read or write failures due to broken pipe to unexpectably
+        // terminate the process, when extracting archives
+        signal(SIGPIPE, SIG_IGN)
+        
         // Extract the keys
         let privateDSAKey : SecKey?
     #if GENERATE_APPCAST_BUILD_LEGACY_DSA_SUPPORT
