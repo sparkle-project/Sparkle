@@ -121,8 +121,6 @@
             }
             
             [notifier notifyProgress:0.125];
-
-            [inputPipe.fileHandleForWriting writeData:promptData];
             
             if (@available(macOS 10.15, *)) {
                 if (![inputPipe.fileHandleForWriting writeData:promptData error:&error]) {
