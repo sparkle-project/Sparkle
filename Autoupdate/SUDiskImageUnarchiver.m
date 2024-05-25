@@ -72,7 +72,9 @@
         
         NSData *promptData = [NSData dataWithBytes:"yes\n" length:4];
         
-        NSMutableArray *arguments = [@[@"attach", _archivePath, @"-mountpoint", mountPoint, /*@"-noverify",*/ @"-nobrowse", @"-noautoopen"] mutableCopy];
+        // Finder doesn't verify disk images anymore beyond the code signing signature (if available)
+        // Opt out of the old CRC checksum checks
+        NSMutableArray *arguments = [@[@"attach", _archivePath, @"-mountpoint", mountPoint, @"-noverify", @"-nobrowse", @"-noautoopen"] mutableCopy];
         
         if (_decryptionPassword) {
             NSMutableData *passwordData = [[_decryptionPassword dataUsingEncoding:NSUTF8StringEncoding] mutableCopy];
