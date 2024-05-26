@@ -92,6 +92,11 @@
         NSData *output = nil;
         NSInteger taskResult = -1;
         
+        NSSet<NSString *> *documentTypesToIgnore = [NSSet setWithArray:@[@"rtf", @"txt", @"pdf", @"rtfd"]];
+        
+        NSURL *mountPointURL = [NSURL fileURLWithPath:mountPoint isDirectory:YES];
+        NSURL *extractionDirectoryURL = [NSURL fileURLWithPath:_extractionDirectory isDirectory:YES];
+        
         {
             NSTask *task = [[NSTask alloc] init];
             task.launchPath = @"/usr/bin/hdiutil";
@@ -172,21 +177,41 @@
 
 		for (NSString *item in contents)
 		{
-            NSString *fromPath = [mountPoint stringByAppendingPathComponent:item];
-            NSString *toPath = [_extractionDirectory stringByAppendingPathComponent:item];
-            
+            // Include all files in progress even if they are skippable
             itemsCopied += 1.0;
             [notifier notifyProgress:0.5 + itemsCopied/(totalItems*2.0)];
             
-            // We skip any files in the DMG which are not readable but include the item in the progress
-            if (![manager isReadableFileAtPath:fromPath]) {
+            NSURL *fromPathURL = [mountPointURL URLByAppendingPathComponent:item];
+            
+            NSString *lastPathComponent = fromPathURL.lastPathComponent;
+            
+            // Ignore hidden files
+            if ([lastPathComponent hasPrefix:@"."]) {
                 continue;
             }
-
-            SULog(SULogLevelDefault, @"copyItemAtPath:%@ toPath:%@", fromPath, toPath);
-
-			if (![manager copyItemAtPath:fromPath toPath:toPath error:&error])
-			{
+            
+            // Ignore aliases
+            NSNumber *aliasFlag = nil;
+            if ([fromPathURL getResourceValue:&aliasFlag forKey:NSURLIsAliasFileKey error:NULL] && aliasFlag.boolValue) {
+                continue;
+            }
+            
+            // Ignore symbolic links
+            NSNumber *symbolicFLag = nil;
+            if ([fromPathURL getResourceValue:&symbolicFLag forKey:NSURLIsSymbolicLinkKey error:NULL] && symbolicFLag.boolValue) {
+                continue;
+            }
+            
+            // Ignore auxiliary file document types
+            NSString *pathExtension = fromPathURL.pathExtension;
+            if ([documentTypesToIgnore containsObject:pathExtension]) {
+                continue;
+            }
+            
+            NSURL *toPathURL = [extractionDirectoryURL URLByAppendingPathComponent:item];
+            
+            // Copy the item finally
+            if (![manager copyItemAtURL:fromPathURL toURL:toPathURL error:&error]) {
                 goto reportError;
             }
         }
