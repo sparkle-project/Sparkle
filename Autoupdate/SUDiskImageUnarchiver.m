@@ -197,14 +197,20 @@
             }
             
             // Ignore symbolic links
-            NSNumber *symbolicFLag = nil;
-            if ([fromPathURL getResourceValue:&symbolicFLag forKey:NSURLIsSymbolicLinkKey error:NULL] && symbolicFLag.boolValue) {
+            NSNumber *symbolicFlag = nil;
+            if ([fromPathURL getResourceValue:&symbolicFlag forKey:NSURLIsSymbolicLinkKey error:NULL] && symbolicFlag.boolValue) {
                 continue;
             }
             
             // Ignore auxiliary file document types
             NSString *pathExtension = fromPathURL.pathExtension;
             if ([documentTypesToIgnore containsObject:pathExtension]) {
+                continue;
+            }
+            
+            // Ensure file is readable
+            NSNumber *isReadableFlag = nil;
+            if ([fromPathURL getResourceValue:&isReadableFlag forKey:NSURLIsReadableKey error:NULL] && !isReadableFlag.boolValue) {
                 continue;
             }
             
