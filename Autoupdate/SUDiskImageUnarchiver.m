@@ -190,6 +190,12 @@
                 continue;
             }
             
+            // Ignore auxiliary file document types
+            NSString *pathExtension = fromPathURL.pathExtension;
+            if ([documentTypesToIgnore containsObject:pathExtension]) {
+                continue;
+            }
+            
             // Ignore aliases
             NSNumber *aliasFlag = nil;
             if ([fromPathURL getResourceValue:&aliasFlag forKey:NSURLIsAliasFileKey error:NULL] && aliasFlag.boolValue) {
@@ -199,12 +205,6 @@
             // Ignore symbolic links
             NSNumber *symbolicFlag = nil;
             if ([fromPathURL getResourceValue:&symbolicFlag forKey:NSURLIsSymbolicLinkKey error:NULL] && symbolicFlag.boolValue) {
-                continue;
-            }
-            
-            // Ignore auxiliary file document types
-            NSString *pathExtension = fromPathURL.pathExtension;
-            if ([documentTypesToIgnore containsObject:pathExtension]) {
                 continue;
             }
             
