@@ -91,9 +91,9 @@ static NSUInteger fileCountForDirectory(NSFileManager *fileManager, NSString *it
         do {
             NSString *uuidString = [[NSUUID UUID] UUIDString];
             mountPoint = [@"/Volumes" stringByAppendingPathComponent:uuidString];
-		}
+        }
         // Note: this check does not follow symbolic links, which is what we want
-		while ([[NSURL fileURLWithPath:mountPoint] checkResourceIsReachableAndReturnError:NULL]);
+        while ([[NSURL fileURLWithPath:mountPoint] checkResourceIsReachableAndReturnError:NULL]);
         
         NSData *promptData = [NSData dataWithBytes:"yes\n" length:4];
         
