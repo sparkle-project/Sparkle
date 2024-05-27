@@ -234,8 +234,8 @@ static NSUInteger fileCountForDirectory(NSFileManager *fileManager, NSString *it
             NSString *pathExtension = fromPathURL.pathExtension;
             
             if (isDirectory) {
-                // Skip directory types that aren't bundles
-                if ([pathExtension isEqualTo:@"rtfd"]) {
+                // Skip directory types that aren't bundles or regular directories
+                if ([pathExtension isEqualToString:@"rtfd"]) {
                     continue;
                 }
             } else {
