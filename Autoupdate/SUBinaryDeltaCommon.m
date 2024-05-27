@@ -7,7 +7,6 @@
 //
 
 #include "SUBinaryDeltaCommon.h"
-#import "SUFileManager.h"
 #include <CommonCrypto/CommonDigest.h>
 #include <Foundation/Foundation.h>
 #include <fcntl.h>
@@ -358,10 +357,9 @@ BOOL removeTree(NSString *path)
     return [fileManager removeItemAtPath:path error:nil];
 }
 
-BOOL copyTree(NSString *source, NSString *dest)
+BOOL copyTree(NSFileManager *fileManager, NSString *source, NSString *dest)
 {
-    // SUFileManager will be more reliable for copying items especially across network mounts
-    return [[[SUFileManager alloc] init] copyItemAtURL:[NSURL fileURLWithPath:source] toURL:[NSURL fileURLWithPath:dest] error:NULL];
+    return [fileManager copyItemAtURL:[NSURL fileURLWithPath:source] toURL:[NSURL fileURLWithPath:dest] error:NULL];
 }
 
 BOOL modifyPermissions(NSString *path, mode_t desiredPermissions)
