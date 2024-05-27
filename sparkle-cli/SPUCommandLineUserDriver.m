@@ -167,6 +167,7 @@
 - (void)showDownloadInitiatedWithCancellation:(void (^)(void))__unused cancellation
 {
     if (_verbose) {
+        _lastProgressReported = nil;
         fprintf(stderr, "Downloading Update...\n");
     }
 }
