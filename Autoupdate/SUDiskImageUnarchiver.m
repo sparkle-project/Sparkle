@@ -15,11 +15,18 @@
 
 #include "AppKitPrevention.h"
 
+@interface SUDiskImageUnarchiver () <NSFileManagerDelegate>
+@end
+
 @implementation SUDiskImageUnarchiver
 {
     NSString *_archivePath;
     NSString *_decryptionPassword;
     NSString *_extractionDirectory;
+    
+    SUUnarchiverNotifier *_notifier;
+    double _currentExtractionProgress;
+    double _fileProgressIncrement;
 }
 
 + (BOOL)canUnarchivePath:(NSString *)path
@@ -49,6 +56,25 @@
         SUUnarchiverNotifier *notifier = [[SUUnarchiverNotifier alloc] initWithCompletionBlock:completionBlock progressBlock:progressBlock];
         [self extractDMGWithNotifier:notifier];
     });
+}
+
+static NSUInteger fileCountForDirectory(NSFileManager *fileManager, NSString *itemPath)
+{
+    NSUInteger fileCount = 0;
+    NSDirectoryEnumerator *dirEnum = [fileManager enumeratorAtPath:itemPath];
+    for (NSString * __unused currentFile in dirEnum) {
+        fileCount++;
+    }
+    
+    return fileCount;
+}
+
+- (BOOL)fileManager:(NSFileManager *)fileManager shouldCopyItemAtURL:(NSURL *)srcURL toURL:(NSURL *)dstURL
+{
+    _currentExtractionProgress += _fileProgressIncrement;
+    [_notifier notifyProgress:_currentExtractionProgress];
+    
+    return YES;
 }
 
 // Called on a non-main thread.
@@ -92,10 +118,10 @@
         NSData *output = nil;
         NSInteger taskResult = -1;
         
-        NSSet<NSString *> *documentTypesToIgnore = [NSSet setWithArray:@[@"rtf", @"txt", @"pdf", @"rtfd"]];
-        
         NSURL *mountPointURL = [NSURL fileURLWithPath:mountPoint isDirectory:YES];
         NSURL *extractionDirectoryURL = [NSURL fileURLWithPath:_extractionDirectory isDirectory:YES];
+        NSMutableArray<NSString *> *itemsToExtract = [NSMutableArray array];
+        NSUInteger totalFileExtractionCount = 0;
         
         {
             NSTask *task = [[NSTask alloc] init];
@@ -127,7 +153,7 @@
                 goto reportError;
             }
             
-            [notifier notifyProgress:0.125];
+            [notifier notifyProgress:0.1];
             
             if (@available(macOS 10.15, *)) {
                 if (![inputPipe.fileHandleForWriting writeData:promptData error:&error]) {
@@ -153,7 +179,7 @@
             taskResult = task.terminationStatus;
         }
         
-        [notifier notifyProgress:0.5];
+        [notifier notifyProgress:0.2];
 
 		if (taskResult != 0)
 		{
@@ -171,28 +197,17 @@
             SULog(SULogLevelError, @"Couldn't enumerate contents of archive mounted at %@: %@", mountPoint, error);
             goto reportError;
         }
-
-        double itemsCopied = 0;
-        double totalItems = (double)[contents count];
-
+        
+        // Sparkle can support installing pkg files, app bundles, and other bundle types for plug-ins
+        // We must not filter any of those out
 		for (NSString *item in contents)
 		{
-            // Include all files in progress even if they are skippable
-            itemsCopied += 1.0;
-            [notifier notifyProgress:0.5 + itemsCopied/(totalItems*2.0)];
-            
             NSURL *fromPathURL = [mountPointURL URLByAppendingPathComponent:item];
             
             NSString *lastPathComponent = fromPathURL.lastPathComponent;
             
             // Ignore hidden files
             if ([lastPathComponent hasPrefix:@"."]) {
-                continue;
-            }
-            
-            // Ignore auxiliary file document types
-            NSString *pathExtension = fromPathURL.pathExtension;
-            if ([documentTypesToIgnore containsObject:pathExtension]) {
                 continue;
             }
             
@@ -214,10 +229,48 @@
                 continue;
             }
             
-            NSURL *toPathURL = [extractionDirectoryURL URLByAppendingPathComponent:item];
+            NSNumber *isDirectoryFlag = nil;
+            if (![fromPathURL getResourceValue:&isDirectoryFlag forKey:NSURLIsDirectoryKey error:NULL]) {
+                continue;
+            }
             
-            // Copy the item finally
-            if (![manager copyItemAtURL:fromPathURL toURL:toPathURL error:&error]) {
+            BOOL isDirectory = isDirectoryFlag.boolValue;
+            NSString *pathExtension = fromPathURL.pathExtension;
+            
+            if (isDirectory) {
+                // Skip directory types that aren't bundles
+                if ([pathExtension isEqualTo:@"rtfd"]) {
+                    continue;
+                }
+            } else {
+                // The only non-directory files we care about are (m)pkg files
+                if (![pathExtension isEqualToString:@"pkg"] && ![pathExtension isEqualToString:@"mpkg"]) {
+                    continue;
+                }
+            }
+            
+            if (isDirectory) {
+                totalFileExtractionCount += fileCountForDirectory(manager, fromPathURL.path);
+            } else {
+                totalFileExtractionCount++;
+            }
+            
+            [itemsToExtract addObject:item];
+        }
+        
+        [notifier notifyProgress:0.3];
+        _currentExtractionProgress = 0.3;
+        
+        _fileProgressIncrement = 0.65 / totalFileExtractionCount;
+        _notifier = notifier;
+        
+        // Copy all items we want to extract and notify of progress
+        manager.delegate = self;
+        for (NSString *item in itemsToExtract) {
+            NSURL *fromURL = [mountPointURL URLByAppendingPathComponent:item];
+            NSURL *toURL = [extractionDirectoryURL URLByAppendingPathComponent:item];
+            
+            if (![manager copyItemAtURL:fromURL toURL:toURL error:&error]) {
                 goto reportError;
             }
         }
@@ -241,6 +294,8 @@
                 SULog(SULogLevelError, @"Failed to unmount %@", mountPoint);
                 SULog(SULogLevelError, @"Error: %@", launchCleanupError);
             }
+            
+            [notifier notifyProgress:1.0];
         } else {
             SULog(SULogLevelError, @"Can't mount DMG %@", _archivePath);
         }
