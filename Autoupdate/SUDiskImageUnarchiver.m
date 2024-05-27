@@ -15,11 +15,18 @@
 
 #include "AppKitPrevention.h"
 
+@interface SUDiskImageUnarchiver () <NSFileManagerDelegate>
+@end
+
 @implementation SUDiskImageUnarchiver
 {
     NSString *_archivePath;
     NSString *_decryptionPassword;
     NSString *_extractionDirectory;
+    
+    SUUnarchiverNotifier *_notifier;
+    double _currentExtractionProgress;
+    double _fileProgressIncrement;
 }
 
 + (BOOL)canUnarchivePath:(NSString *)path
@@ -51,6 +58,25 @@
     });
 }
 
+static NSUInteger fileCountForDirectory(NSFileManager *fileManager, NSString *itemPath)
+{
+    NSUInteger fileCount = 0;
+    NSDirectoryEnumerator *dirEnum = [fileManager enumeratorAtPath:itemPath];
+    for (NSString * __unused currentFile in dirEnum) {
+        fileCount++;
+    }
+    
+    return fileCount;
+}
+
+- (BOOL)fileManager:(NSFileManager *)fileManager shouldCopyItemAtURL:(NSURL *)srcURL toURL:(NSURL *)dstURL
+{
+    _currentExtractionProgress += _fileProgressIncrement;
+    [_notifier notifyProgress:_currentExtractionProgress];
+    
+    return YES;
+}
+
 // Called on a non-main thread.
 - (void)extractDMGWithNotifier:(SUUnarchiverNotifier *)notifier SPU_OBJC_DIRECT
 {
@@ -62,13 +88,12 @@
         NSFileManager *manager;
         NSError *error = nil;
         NSArray *contents = nil;
-        do
-		{
+        do {
             NSString *uuidString = [[NSUUID UUID] UUIDString];
             mountPoint = [@"/Volumes" stringByAppendingPathComponent:uuidString];
-		}
+        }
         // Note: this check does not follow symbolic links, which is what we want
-		while ([[NSURL fileURLWithPath:mountPoint] checkResourceIsReachableAndReturnError:NULL]);
+        while ([[NSURL fileURLWithPath:mountPoint] checkResourceIsReachableAndReturnError:NULL]);
         
         NSData *promptData = [NSData dataWithBytes:"yes\n" length:4];
         
@@ -91,6 +116,11 @@
         
         NSData *output = nil;
         NSInteger taskResult = -1;
+        
+        NSURL *mountPointURL = [NSURL fileURLWithPath:mountPoint isDirectory:YES];
+        NSURL *extractionDirectoryURL = [NSURL fileURLWithPath:_extractionDirectory isDirectory:YES];
+        NSMutableArray<NSString *> *itemsToExtract = [NSMutableArray array];
+        NSUInteger totalFileExtractionCount = 0;
         
         {
             NSTask *task = [[NSTask alloc] init];
@@ -122,8 +152,6 @@
                 goto reportError;
             }
             
-            [notifier notifyProgress:0.125];
-            
             if (@available(macOS 10.15, *)) {
                 if (![inputPipe.fileHandleForWriting writeData:promptData error:&error]) {
                     goto reportError;
@@ -147,49 +175,101 @@
             
             taskResult = task.terminationStatus;
         }
-        
-        [notifier notifyProgress:0.5];
 
-		if (taskResult != 0)
-		{
+        if (taskResult != 0) {
             NSString *resultStr = output ? [[NSString alloc] initWithData:output encoding:NSUTF8StringEncoding] : nil;
             SULog(SULogLevelError, @"hdiutil failed with code: %ld data: <<%@>>", (long)taskResult, resultStr);
             goto reportError;
         }
         mountedSuccessfully = YES;
         
+        // Mounting can take some time, so increment progress
+        _currentExtractionProgress = 0.1;
+        [notifier notifyProgress:_currentExtractionProgress];
+        
         // Now that we've mounted it, we need to copy out its contents.
         manager = [[NSFileManager alloc] init];
         contents = [manager contentsOfDirectoryAtPath:mountPoint error:&error];
-        if (contents == nil)
-        {
+        if (contents == nil) {
             SULog(SULogLevelError, @"Couldn't enumerate contents of archive mounted at %@: %@", mountPoint, error);
             goto reportError;
         }
-
-        double itemsCopied = 0;
-        double totalItems = (double)[contents count];
-
-		for (NSString *item in contents)
-		{
-            NSString *fromPath = [mountPoint stringByAppendingPathComponent:item];
-            NSString *toPath = [_extractionDirectory stringByAppendingPathComponent:item];
+        
+        // Sparkle can support installing pkg files, app bundles, and other bundle types for plug-ins
+        // We must not filter any of those out
+        for (NSString *item in contents) {
+            NSURL *fromPathURL = [mountPointURL URLByAppendingPathComponent:item];
             
-            itemsCopied += 1.0;
-            [notifier notifyProgress:0.5 + itemsCopied/(totalItems*2.0)];
+            NSString *lastPathComponent = fromPathURL.lastPathComponent;
             
-            // We skip any files in the DMG which are not readable but include the item in the progress
-            if (![manager isReadableFileAtPath:fromPath]) {
+            // Ignore hidden files
+            if ([lastPathComponent hasPrefix:@"."]) {
                 continue;
             }
-
-            SULog(SULogLevelDefault, @"copyItemAtPath:%@ toPath:%@", fromPath, toPath);
-
-			if (![manager copyItemAtPath:fromPath toPath:toPath error:&error])
-			{
+            
+            // Ignore aliases
+            NSNumber *aliasFlag = nil;
+            if ([fromPathURL getResourceValue:&aliasFlag forKey:NSURLIsAliasFileKey error:NULL] && aliasFlag.boolValue) {
+                continue;
+            }
+            
+            // Ignore symbolic links
+            NSNumber *symbolicFlag = nil;
+            if ([fromPathURL getResourceValue:&symbolicFlag forKey:NSURLIsSymbolicLinkKey error:NULL] && symbolicFlag.boolValue) {
+                continue;
+            }
+            
+            // Ensure file is readable
+            NSNumber *isReadableFlag = nil;
+            if ([fromPathURL getResourceValue:&isReadableFlag forKey:NSURLIsReadableKey error:NULL] && !isReadableFlag.boolValue) {
+                continue;
+            }
+            
+            NSNumber *isDirectoryFlag = nil;
+            if (![fromPathURL getResourceValue:&isDirectoryFlag forKey:NSURLIsDirectoryKey error:NULL]) {
+                continue;
+            }
+            
+            BOOL isDirectory = isDirectoryFlag.boolValue;
+            NSString *pathExtension = fromPathURL.pathExtension;
+            
+            if (isDirectory) {
+                // Skip directory types that aren't bundles or regular directories
+                if ([pathExtension isEqualToString:@"rtfd"]) {
+                    continue;
+                }
+            } else {
+                // The only non-directory files we care about are (m)pkg files
+                if (![pathExtension isEqualToString:@"pkg"] && ![pathExtension isEqualToString:@"mpkg"]) {
+                    continue;
+                }
+            }
+            
+            if (isDirectory) {
+                totalFileExtractionCount += fileCountForDirectory(manager, fromPathURL.path);
+            } else {
+                totalFileExtractionCount++;
+            }
+            
+            [itemsToExtract addObject:item];
+        }
+        
+        _fileProgressIncrement = (0.99 - _currentExtractionProgress) / totalFileExtractionCount;
+        _notifier = notifier;
+        
+        // Copy all items we want to extract and notify of progress
+        manager.delegate = self;
+        for (NSString *item in itemsToExtract) {
+            NSURL *fromURL = [mountPointURL URLByAppendingPathComponent:item];
+            NSURL *toURL = [extractionDirectoryURL URLByAppendingPathComponent:item];
+            
+            if (![manager copyItemAtURL:fromURL toURL:toURL error:&error]) {
+                SULog(SULogLevelError, @"Failed to copy '%@' to '%@' with error: %@", fromURL.path, toURL.path, error);
                 goto reportError;
             }
         }
+        
+        [notifier notifyProgress:1.0];
         
         [notifier notifySuccess];
         goto finally;
