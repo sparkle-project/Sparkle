@@ -153,8 +153,6 @@ static NSUInteger fileCountForDirectory(NSFileManager *fileManager, NSString *it
                 goto reportError;
             }
             
-            [notifier notifyProgress:0.1];
-            
             if (@available(macOS 10.15, *)) {
                 if (![inputPipe.fileHandleForWriting writeData:promptData error:&error]) {
                     goto reportError;
@@ -178,8 +176,6 @@ static NSUInteger fileCountForDirectory(NSFileManager *fileManager, NSString *it
             
             taskResult = task.terminationStatus;
         }
-        
-        [notifier notifyProgress:0.2];
 
 		if (taskResult != 0)
 		{
@@ -188,6 +184,10 @@ static NSUInteger fileCountForDirectory(NSFileManager *fileManager, NSString *it
             goto reportError;
         }
         mountedSuccessfully = YES;
+        
+        // Mounting can take some time, so increment progress
+        _currentExtractionProgress = 0.1;
+        [notifier notifyProgress:_currentExtractionProgress];
         
         // Now that we've mounted it, we need to copy out its contents.
         manager = [[NSFileManager alloc] init];
@@ -258,10 +258,7 @@ static NSUInteger fileCountForDirectory(NSFileManager *fileManager, NSString *it
             [itemsToExtract addObject:item];
         }
         
-        [notifier notifyProgress:0.3];
-        _currentExtractionProgress = 0.3;
-        
-        _fileProgressIncrement = 0.65 / totalFileExtractionCount;
+        _fileProgressIncrement = (0.99 - _currentExtractionProgress) / totalFileExtractionCount;
         _notifier = notifier;
         
         // Copy all items we want to extract and notify of progress
@@ -274,6 +271,8 @@ static NSUInteger fileCountForDirectory(NSFileManager *fileManager, NSString *it
                 goto reportError;
             }
         }
+        
+        [notifier notifyProgress:1.0];
         
         [notifier notifySuccess];
         goto finally;
@@ -294,8 +293,6 @@ static NSUInteger fileCountForDirectory(NSFileManager *fileManager, NSString *it
                 SULog(SULogLevelError, @"Failed to unmount %@", mountPoint);
                 SULog(SULogLevelError, @"Error: %@", launchCleanupError);
             }
-            
-            [notifier notifyProgress:1.0];
         } else {
             SULog(SULogLevelError, @"Can't mount DMG %@", _archivePath);
         }
