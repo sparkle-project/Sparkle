@@ -24,16 +24,21 @@ class SUUnarchiverTest: XCTestCase
         let unarchivedSuccessExpectation = super.expectation(description: "Unarchived Success (format: \(archiveExtension))")
         let unarchivedFailureExpectation = super.expectation(description: "Unarchived Failure (format: \(archiveExtension))")
 
-        let extractedAppURL = tempDirectoryURL.appendingPathComponent(extractedAppName).appendingPathExtension("app")
-
         self.unarchiveTestAppWithExtension(archiveExtension, appName: appName, tempDirectoryURL: tempDirectoryURL, archiveResourceURL: archiveResourceURL, password: password, expectingInstallationType: installationType, expectingSuccess: expectingSuccess, testExpectation: unarchivedSuccessExpectation)
         self.unarchiveNonExistentFileTestFailureAppWithExtension(archiveExtension, tempDirectoryURL: tempDirectoryURL, password: password, expectingInstallationType: installationType, testExpectation: unarchivedFailureExpectation)
 
         super.waitForExpectations(timeout: 30.0, handler: nil)
 
-        if !archiveExtension.hasSuffix("pkg") && expectingSuccess {
-            XCTAssertTrue(fileManager.fileExists(atPath: extractedAppURL.path))
-            XCTAssertEqual("6a60ab31430cfca8fb499a884f4a29f73e59b472", hashOfTree(extractedAppURL.path))
+        if expectingSuccess {
+            if installationType == SPUInstallationTypeApplication {
+                let extractedAppURL = tempDirectoryURL.appendingPathComponent(extractedAppName).appendingPathExtension("app")
+                
+                XCTAssertTrue(fileManager.fileExists(atPath: extractedAppURL.path))
+                XCTAssertEqual("6a60ab31430cfca8fb499a884f4a29f73e59b472", hashOfTree(extractedAppURL.path))
+            } else if archiveExtension != "pkg" {
+                let extractedPackageURL = tempDirectoryURL.appendingPathComponent(extractedAppName).appendingPathExtension("pkg")
+                XCTAssertTrue(fileManager.fileExists(atPath: extractedPackageURL.path))
+            }
         }
     }
 
@@ -124,6 +129,16 @@ class SUUnarchiverTest: XCTestCase
     func testUnarchivingAPFSDMG()
     {
         self.unarchiveTestAppWithExtension("dmg", resourceName: "SparkleTestCodeSign_apfs")
+    }
+    
+    func testUnarchivingAPFSAdhocSignedDMGWithAuxFiles()
+    {
+        self.unarchiveTestAppWithExtension("dmg", resourceName: "SparkleTestCodeSign_apfs_lzma_aux_files")
+    }
+    
+    func testUnarchivingAPFSDMGWithPackage()
+    {
+        self.unarchiveTestAppWithExtension("dmg", resourceName: "SparkleTestCodeSign_pkg", expectingInstallationType: SPUInstallationTypeGuidedPackage)
     }
 #endif
     
