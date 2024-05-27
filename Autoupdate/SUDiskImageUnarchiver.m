@@ -88,8 +88,7 @@ static NSUInteger fileCountForDirectory(NSFileManager *fileManager, NSString *it
         NSFileManager *manager;
         NSError *error = nil;
         NSArray *contents = nil;
-        do
-		{
+        do {
             NSString *uuidString = [[NSUUID UUID] UUIDString];
             mountPoint = [@"/Volumes" stringByAppendingPathComponent:uuidString];
 		}
@@ -177,8 +176,7 @@ static NSUInteger fileCountForDirectory(NSFileManager *fileManager, NSString *it
             taskResult = task.terminationStatus;
         }
 
-		if (taskResult != 0)
-		{
+        if (taskResult != 0) {
             NSString *resultStr = output ? [[NSString alloc] initWithData:output encoding:NSUTF8StringEncoding] : nil;
             SULog(SULogLevelError, @"hdiutil failed with code: %ld data: <<%@>>", (long)taskResult, resultStr);
             goto reportError;
@@ -192,16 +190,14 @@ static NSUInteger fileCountForDirectory(NSFileManager *fileManager, NSString *it
         // Now that we've mounted it, we need to copy out its contents.
         manager = [[NSFileManager alloc] init];
         contents = [manager contentsOfDirectoryAtPath:mountPoint error:&error];
-        if (contents == nil)
-        {
+        if (contents == nil) {
             SULog(SULogLevelError, @"Couldn't enumerate contents of archive mounted at %@: %@", mountPoint, error);
             goto reportError;
         }
         
         // Sparkle can support installing pkg files, app bundles, and other bundle types for plug-ins
         // We must not filter any of those out
-		for (NSString *item in contents)
-		{
+        for (NSString *item in contents) {
             NSURL *fromPathURL = [mountPointURL URLByAppendingPathComponent:item];
             
             NSString *lastPathComponent = fromPathURL.lastPathComponent;
@@ -268,6 +264,7 @@ static NSUInteger fileCountForDirectory(NSFileManager *fileManager, NSString *it
             NSURL *toURL = [extractionDirectoryURL URLByAppendingPathComponent:item];
             
             if (![manager copyItemAtURL:fromURL toURL:toURL error:&error]) {
+                SULog(SULogLevelError, @"Failed to copy '%@' to '%@' with error: %@", fromURL.path, toURL.path, error);
                 goto reportError;
             }
         }
