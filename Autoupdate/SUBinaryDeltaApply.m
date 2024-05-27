@@ -141,7 +141,9 @@ BOOL applyBinaryDelta(NSString *source, NSString *finalDestination, NSString *pa
 
     progressCallback(3/7.0);
 
-    if (!copyTree(source, destination)) {
+    NSFileManager *fileManager = [[NSFileManager alloc] init];
+    
+    if (!copyTree(fileManager, source, destination)) {
         if (verbose) {
             fprintf(stderr, "\n");
         }
@@ -156,7 +158,6 @@ BOOL applyBinaryDelta(NSString *source, NSString *finalDestination, NSString *pa
     if (verbose) {
         fprintf(stderr, "\nPatching...");
     }
-    NSFileManager *fileManager = [[NSFileManager alloc] init];
     
     // Ensure error is cleared out in advance
     if (error != NULL) {
