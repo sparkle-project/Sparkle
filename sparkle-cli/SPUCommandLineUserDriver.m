@@ -13,6 +13,7 @@
 @implementation SPUCommandLineUserDriver
 {
     SUUpdatePermissionResponse *_updatePermissionResponse;
+    NSString *_lastProgressReported;
     
     uint64_t _bytesDownloaded;
     uint64_t _bytesToDownload;
@@ -189,13 +190,21 @@
     }
     
     if (_bytesToDownload > 0 && _verbose) {
-        fprintf(stderr, "Downloaded %llu out of %llu bytes (%.0f%%)\n", _bytesDownloaded, _bytesToDownload, (_bytesDownloaded * 100.0 / _bytesToDownload));
+        NSString *currentProgressPercentage = [NSString stringWithFormat:@"%.0f%%", (_bytesDownloaded * 100.0 / _bytesToDownload)];
+        
+        // Only report progress advancement when percentage significantly advances
+        if (_lastProgressReported == nil || ![_lastProgressReported isEqualToString:currentProgressPercentage]) {
+            fprintf(stderr, "Downloaded %llu out of %llu bytes (%s)\n", _bytesDownloaded, _bytesToDownload, currentProgressPercentage.UTF8String);
+            
+            _lastProgressReported = currentProgressPercentage;
+        }
     }
 }
 
 - (void)showDownloadDidStartExtractingUpdate
 {
     if (_verbose) {
+        _lastProgressReported = nil;
         fprintf(stderr, "Extracting Update...\n");
     }
 }
@@ -203,7 +212,14 @@
 - (void)showExtractionReceivedProgress:(double)progress
 {
     if (_verbose) {
-        fprintf(stderr, "Extracting Update (%.0f%%)\n", progress * 100);
+        NSString *currentProgressPercentage = [NSString stringWithFormat:@"%.0f%%", progress * 100];
+        
+        // Only report progress advancement when percentage significantly advances
+        if (_lastProgressReported == nil || ![_lastProgressReported isEqualToString:currentProgressPercentage]) {
+            fprintf(stderr, "Extracting Update (%s)\n", currentProgressPercentage.UTF8String);
+            
+            _lastProgressReported = currentProgressPercentage;
+        }
     }
 }
 
