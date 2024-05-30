@@ -1,53 +1,152 @@
-/* No comment provided by engineer. */
-"%@ %@ is currently the newest version available." = "%1$@ %2$@ היא הגרסה האחונה הזמינה.";
+/* Description text for SUUpdateAlert when the critical update has already been downloaded and ready to install. */
+"%1$@ %2$@ has been downloaded and is ready to use! This is an important update; would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ הורד והוא מוכן לשימוש! זהו עדכון חשוב; האם תרצה להתקין אותו ולהפעיל מחדש את %1$@ כעת?";
+
+/* Description text for SUUpdateAlert when the update has already been downloaded and ready to install. */
+"%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ הורד והוא מוכן לשימוש! האם תרצה להתקין אותו ולהפעיל מחדש את %1$@ כעת?";
 
 /* No comment provided by engineer. */
-"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%1$@ %2$@ היא הגרסה האחונה הזמינה.\n(You are currently running version %3$@.)";
+"%1$@ %2$@ is available but your macOS version is too new for this update. This update only supports up to macOS %3$@." = "%1$@ %2$@ זמין, אך גרסת ה-macOS שלך חדשה מדי עבור עדכון זה. עדכון זה תומך רק עד macOS %3$@.";
+
+/* No comment provided by engineer. */
+"%1$@ %2$@ is available but your macOS version is too old to install it. At least macOS %3$@ is required." = "%1$@ %2$@ זמין אך גרסת ה-macOS שלך ישנה מדי. נדרשת לפחות macOS %3$@.";
+
+/* No comment provided by engineer. */
+"%1$@ can’t be updated if it’s running from the location it was downloaded to." = "לא ניתן לעדכן את %1$@ כשהוא פועל מתיקיית ההורדות.";
+
+/* No comment provided by engineer. */
+"%1$@ can’t be updated, because it was opened from a read-only or a temporary location." = "לא ניתן לעדכן את %1$@ מכיוון שהוא נפתח ממיקום זמני או לקריאה בלבד.";
+
+/* No comment provided by engineer. */
+"%@ %@ is currently the newest version available." = "%@ %@ היא הגרסה החדשה ביותר שזמינה כרגע.";
+
+/* No comment provided by engineer. */
+"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%@ %@ היא הגרסה החדשה ביותר שזמינה.\n(אתה מפעיל כעת את גרסה %@.)";
+
+/* Description text for SUUpdateAlert when the critical update is downloadable. */
+"%@ %@ is now available—you have %@. This is an important update; would you like to download it now?" = "%@ %@ זמין - אתה משתמש ב-%@. זהו עדכון חשוב; האם תרצה להוריד אותו כעת?";
 
 /* Description text for SUUpdateAlert when the update is downloadable. */
-"%@ %@ is now available—you have %@. Would you like to download it now?" = "%1$@ %2$@ זמין כעת (לך יש %3$@). ברצונך להוריד כעת?";
+"%@ %@ is now available—you have %@. Would you like to download it now?" = "%@ %@ זמין - אתה משתמש ב-%@. האם תרצה להוריד אותו כעת?";
+
+/* Description text for SUUpdateAlert when the update informational with no download. */
+"%@ %@ is now available—you have %@. Would you like to learn more about this update on the web?" = "%@ %@ זמין - אתה משתמש ב-%@. האם תרצה ללמוד עוד על עדכון זה?";
+
+/* The download progress in a unit of bytes, e.g. 100 KB */
+"%@ downloaded" = "%@ הורדו";
+
+/* No comment provided by engineer. */
+"%@ is now updated to version %@!" = "%@ מעודכן כעת לגרסה %@!";
+
+/* No comment provided by engineer. */
+"%@ is now updated!" = "%@ מעודכן כעת!";
+
+/* The download progress in units of bytes, e.g. 100 KB of 1,0 MB */
+"%@ of %@" = "%@ מתוך %@";
 
 /* No comment provided by engineer. */
 "A new version of %@ is available!" = "גרסה חדשה של %@ זמינה!";
 
 /* No comment provided by engineer. */
-"An error occurred in retrieving update information. Please try again later." = "שגיאה בקבלת מידע על עדכונים. אנא נסה שנית במועד מאוחר יותר.";
+"A new version of %@ is ready to install!" = "גרסה חדשה של %@ מוכנה להתקנה!";
 
 /* No comment provided by engineer. */
-"An error occurred while extracting the archive. Please try again later." = "שגיאה בפתיחת הקובת המקווץ. אנא נסה שנית במועד מאוחר יותר.";
+"An error occurred in retrieving update information. Please try again later." = "אירעה שגיאה בקבלת מידע העדכון. אנא נסה שוב מאוחר יותר.";
+
+/* No comment provided by engineer. */
+"An error occurred while connecting to the installer. Please try again later." = "אירעה שגיאה בעת התחברות למתקין. אנא נסה שוב מאוחר יותר.";
+
+/* No comment provided by engineer. */
+"An error occurred while downloading the update. Please try again later." = "אירעה שגיאה בעת הורדת העדכון. אנא נסה שוב מאוחר יותר.";
+
+/* No comment provided by engineer. */
+"An error occurred while extracting the archive. Please try again later." = "אירעה שגיאה בעת חילוץ העדכון. אנא נסה שוב מאוחר יותר.";
+
+/* No comment provided by engineer. */
+"An error occurred while launching the installer. Please try again later." = "אירעה שגיאה בעת הפעלת המתקין. אנא נסה שוב מאוחר יותר.";
+
+/* No comment provided by engineer. */
+"An error occurred while parsing the update feed." = "אירעה שגיאה במהלך ניתוח רשימת העדכונים.";
+
+/* No comment provided by engineer. */
+"An error occurred while running the updater. Please try again later." = "אירעה שגיאה בעת הפעלת המעדכן. אנא נסה שוב מאוחר יותר.";
+
+/* No comment provided by engineer. */
+"An error occurred while starting the installer. Please try again later." = "אירעה שגיאה בעת הפעלת המתקין. בבקשה נסה שוב מאוחר יותר.";
+
+/* No comment provided by engineer. */
+"An important update to %@ is ready to install" = "עדכון חשוב ל-%@ מוכן להתקנה";
 
 /* No comment provided by engineer. */
 "Cancel" = "ביטול";
 
 /* No comment provided by engineer. */
-"Cancel Update" = "בטל עדכון";
-
-/* Take care not to overflow the status window. */
-"Downloading update…" = "מוריד עדכון…";
-
-/* Take care not to overflow the status window. */
-"Extracting update…" = "פותח עדכון…";
+"Cancel Update" = "בטל את העדכון";
 
 /* No comment provided by engineer. */
-"Install and Relaunch" = "התקן ואתחל";
-
-/* Alternate title for 'Remind Me Later' button when downloaded updates can be resumed */
-"Install on Quit" = "אתחל מאוחר יותר";
+"Checking for updates…" = "מחפש עדכונים…";
 
 /* Take care not to overflow the status window. */
-"Installing update…" = "מתקין עידכון…";
+"Downloading update…" = "מוריד את העדכון…";
+
+/* Take care not to overflow the status window. */
+"Extracting update…" = "מחלץ את העדכון…";
+
+/* No comment provided by engineer. */
+"Failed to resume installing update." = "חידוש התקנת העדכון נכשל.";
+
+/* No comment provided by engineer. */
+"Install and Relaunch" = "עדכן והפעל מחדש";
+
+/* Alternate title for 'Remind Me Later' button when downloaded updates can be resumed */
+"Install on Quit" = "התקן בעת סגירת היישום";
+
+/* Take care not to overflow the status window. */
+"Installing update…" = "מתקין את העדכון";
+
+/* Alternate title for 'Install Update' button when there's no download in RSS feed. */
+"Learn More…" = "למד עוד…";
 
 /* No comment provided by engineer. */
 "OK" = "אישור";
 
 /* No comment provided by engineer. */
-"Ready to Install" = "מוכן להתקנה!";
+"Quit %1$@, move it into your Applications folder, relaunch it from there and try again." = "צא מ-%1$@, העבר אותו לתיקיית היישומים שלך, הפעל אותו מחדש משם ונסה שוב.";
 
 /* No comment provided by engineer. */
-"Update Error!" = "שגיאה בעדכון!";
+"Ready to Install" = "מוכן להתקנה";
 
 /* No comment provided by engineer. */
-"Updating %@" = "מעדכן %@";
+"Should %1$@ automatically check for updates? You can always check for updates manually from the %1$@ menu." = "האם %1$@ צריך לבדוק באופן אוטומטי אם יש עדכונים? תוכל תמיד לחפש עדכונים באופן ידני מהתפריט של %1$@.";
+
+/* No comment provided by engineer. */
+"The update checker failed to start correctly. You should contact the app developer to report this issue and verify that you have the latest version." = "בודק העדכונים לא הצליח לפעול כראוי. עליך ליצור קשר עם מפתח היישום כדי לדווח על בעיה זו ולוודא שיש לך את הגרסה העדכנית ביותר.";
+
+/* No comment provided by engineer. */
+"The update is improperly signed and could not be validated. Please try again later or contact the app developer." = "העדכון חתום בצורה לא נכונה ולא ניתן היה לאמת אותו. נסה שוב מאוחר יותר או צור קשר עם מפתח היישום.";
+
+/* No comment provided by engineer. */
+"Unable to Check For Updates" = "לא ניתן לחפש עדכונים";
+
+/* No comment provided by engineer. */
+"Update Error!" = "העדכון נכשל!";
+
+/* No comment provided by engineer. */
+"Update Installed" = "העדכון הותקן בהצלחה";
+
+/* No comment provided by engineer. */
+"Updating %@" = "עדכון %@";
+
+/* No comment provided by engineer. */
+"Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "השתמש ב-Finder כדי להעתיק את %1$@ לתיקיית היישומים, הפעל אותו מחדש משם ונסה שוב.";
+
+/* No comment provided by engineer. */
+"Version History" = "היסטוריית גרסאות";
+
+/* No comment provided by engineer. */
+"Your macOS version is too new" = "גרסת ה-macOS שלך חדשה מדי";
+
+/* No comment provided by engineer. */
+"Your macOS version is too old" = "גרסת ה-macOS שלך ישנה מדי";
 
 /* Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates. */
-"You’re up to date!" = "התכנה עדכנית!";
+"You’re up to date!" = "לא נמצאו עדכונים חדשים!";
