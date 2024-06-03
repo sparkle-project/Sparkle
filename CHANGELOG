@@ -1,3 +1,9 @@
+# 2.6.3
+
+* Guard update timer update check against sessionInProgress to fix rare crash when checking for updates (#2561)
+* Remove extra writeData: call when unarchiving disk images (#2562)
+* Ignore crashes due to SIGPIPE in generate_appcast when failing to extract zip files (#2563)
+
 # 2.6.2
 
 * Create and use temp extraction directory in generate_appcast again (#2555) (Zorg)
