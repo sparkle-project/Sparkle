@@ -86,7 +86,7 @@ jobs:
         run: git push
 
       - name: "Draft a release"
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           draft: true
           prerelease: ${{ env.PRERELEASE_VERSION }}
