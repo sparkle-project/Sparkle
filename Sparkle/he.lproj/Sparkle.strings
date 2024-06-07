@@ -150,3 +150,42 @@
 
 /* Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates. */
 "You’re up to date!" = "לא נמצאו עדכונים חדשים!";
+
+/* System profile key for OS version */
+"OS Version" = "OS Version";
+
+/* System profile key for CPU Type */
+"CPU Type" = "CPU Type";
+
+/* System profile key for CPU is 64-bit? */
+"CPU is 64-Bit?" = "CPU is 64-Bit?";
+
+/* System profile yes value for CPU is 64-bit? */
+"Yes" = "Yes";
+
+/* System profile no value for CPU is 64-bit? */
+"No" = "No";
+
+/* System profile key for CPU Subtype */
+"CPU Subtype" = "CPU Subtype";
+
+/* System profile key for Mac Model */
+"Mac Model" = "Mac Model";
+
+/* System profile key for Number of CPUs */
+"Number of CPUs" = "Number of CPUs";
+
+/* System profile key for Preferred Language */
+"Preferred Language" = "Preferred Language";
+
+/* System profile key for Application Name */
+"Application Name" = "Application Name";
+
+/* System profile key for Application Version */
+"Application Version" = "Application Version";
+
+/* System profile key for CPU Speed (MHz) */
+"CPU Speed (MHz)" = "CPU Speed (MHz)";
+
+/* System profile key for Memory (MB) */
+"Memory (MB)" = "Memory (MB)";
