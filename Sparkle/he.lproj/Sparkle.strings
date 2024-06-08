@@ -1,17 +1,17 @@
 /* Description text for SUUpdateAlert when the critical update has already been downloaded and ready to install. */
-"%1$@ %2$@ has been downloaded and is ready to use! This is an important update; would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ הורד והוא מוכן לשימוש! זהו עדכון חשוב; האם תרצה להתקין אותו ולהפעיל מחדש את %1$@ כעת?";
+"%1$@ %2$@ has been downloaded and is ready to use! This is an important update; would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ הורד והוא מוכן לשימוש! זהו עדכון חשוב; האם ברצונך להתקין אותו ולהפעיל מחדש את %1$@ כעת?";
 
 /* Description text for SUUpdateAlert when the update has already been downloaded and ready to install. */
-"%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ הורד והוא מוכן לשימוש! האם תרצה להתקין אותו ולהפעיל מחדש את %1$@ כעת?";
+"%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ הורד והוא מוכן לשימוש! האם ברצונך להתקין אותו ולהפעיל מחדש את %1$@ כעת?";
 
 /* No comment provided by engineer. */
 "%1$@ %2$@ is available but your macOS version is too new for this update. This update only supports up to macOS %3$@." = "%1$@ %2$@ זמין, אך גרסת ה-macOS שלך חדשה מדי עבור עדכון זה. עדכון זה תומך רק עד macOS %3$@.";
 
 /* No comment provided by engineer. */
-"%1$@ %2$@ is available but your macOS version is too old to install it. At least macOS %3$@ is required." = "%1$@ %2$@ זמין אך גרסת ה-macOS שלך ישנה מדי. נדרשת לפחות macOS %3$@.";
+"%1$@ %2$@ is available but your macOS version is too old to install it. At least macOS %3$@ is required." = "%1$@ %2$@ זמין אך גרסת ה-macOS שלך ישנה מדי. נדרשת macOS %3$@ לפחות.";
 
 /* No comment provided by engineer. */
-"%1$@ can’t be updated if it’s running from the location it was downloaded to." = "לא ניתן לעדכן את %1$@ כשהוא פועל מתיקיית ההורדות.";
+"%1$@ can’t be updated if it’s running from the location it was downloaded to." = "לא ניתן לעדכן את %1$@ כשהוא פועל מהמיקום אליו הוא הורד.";
 
 /* No comment provided by engineer. */
 "%1$@ can’t be updated, because it was opened from a read-only or a temporary location." = "לא ניתן לעדכן את %1$@ מכיוון שהוא נפתח ממיקום זמני או לקריאה בלבד.";
@@ -23,13 +23,13 @@
 "%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%@ %@ היא הגרסה החדשה ביותר שזמינה.\n(אתה מפעיל כעת את גרסה %@.)";
 
 /* Description text for SUUpdateAlert when the critical update is downloadable. */
-"%@ %@ is now available—you have %@. This is an important update; would you like to download it now?" = "%@ %@ זמין - אתה משתמש ב-%@. זהו עדכון חשוב; האם תרצה להוריד אותו כעת?";
+"%@ %@ is now available—you have %@. This is an important update; would you like to download it now?" = "%@ %@ זמין - אתה משתמש ב-%@. זהו עדכון חשוב; האם ברצונך להוריד אותו כעת?";
 
 /* Description text for SUUpdateAlert when the update is downloadable. */
-"%@ %@ is now available—you have %@. Would you like to download it now?" = "%@ %@ זמין - אתה משתמש ב-%@. האם תרצה להוריד אותו כעת?";
+"%@ %@ is now available—you have %@. Would you like to download it now?" = "%@ %@ זמין - אתה משתמש ב-%@. האם ברצונך להוריד אותו כעת?";
 
 /* Description text for SUUpdateAlert when the update informational with no download. */
-"%@ %@ is now available—you have %@. Would you like to learn more about this update on the web?" = "%@ %@ זמין - אתה משתמש ב-%@. האם תרצה ללמוד עוד על עדכון זה?";
+"%@ %@ is now available—you have %@. Would you like to learn more about this update on the web?" = "%@ %@ זמין - אתה משתמש ב-%@. האם ברצונך ללמוד עוד על עדכון זה?";
 
 /* The download progress in a unit of bytes, e.g. 100 KB */
 "%@ downloaded" = "%@ הורדו";
@@ -152,40 +152,40 @@
 "You’re up to date!" = "לא נמצאו עדכונים חדשים!";
 
 /* System profile key for OS version */
-"OS Version" = "OS Version";
+"OS Version" = "גרסת מערכת ההפעלה";
 
 /* System profile key for CPU Type */
-"CPU Type" = "CPU Type";
+"CPU Type" = "סוג מעבד";
 
 /* System profile key for CPU is 64-bit? */
-"CPU is 64-Bit?" = "CPU is 64-Bit?";
+"CPU is 64-Bit?" = "מעבד 64-bit?"
 
 /* System profile yes value for CPU is 64-bit? */
-"Yes" = "Yes";
+"Yes" = "כן";
 
 /* System profile no value for CPU is 64-bit? */
-"No" = "No";
+"No" = "לא";
 
 /* System profile key for CPU Subtype */
-"CPU Subtype" = "CPU Subtype";
+"CPU Subtype" = "תת-סוג מעבד";
 
 /* System profile key for Mac Model */
-"Mac Model" = "Mac Model";
+"Mac Model" = "דגם ה-Mac";
 
 /* System profile key for Number of CPUs */
-"Number of CPUs" = "Number of CPUs";
+"Number of CPUs" = "מספר ליבות מעבד";
 
 /* System profile key for Preferred Language */
-"Preferred Language" = "Preferred Language";
+"Preferred Language" = "שפה מועדפת";
 
 /* System profile key for Application Name */
-"Application Name" = "Application Name";
+"Application Name" = "שם היישום";
 
 /* System profile key for Application Version */
-"Application Version" = "Application Version";
+"Application Version" = "גרסת היישום";
 
 /* System profile key for CPU Speed (MHz) */
-"CPU Speed (MHz)" = "CPU Speed (MHz)";
+"CPU Speed (MHz)" = "מהירות מעבד (MHz)";
 
 /* System profile key for Memory (MB) */
-"Memory (MB)" = "Memory (MB)";
+"Memory (MB)" = "זיכרון (MB)";
