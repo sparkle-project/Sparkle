@@ -158,7 +158,7 @@
 "CPU Type" = "סוג מעבד";
 
 /* System profile key for CPU is 64-bit? */
-"CPU is 64-Bit?" = "מעבד 64-bit?"
+"CPU is 64-Bit?" = "מעבד 64-bit?";
 
 /* System profile yes value for CPU is 64-bit? */
 "Yes" = "כן";
