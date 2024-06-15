@@ -21,8 +21,8 @@
 
 // Note: the framework bundle version must be bumped, and generate_appcast must be updated to compare it,
 // when we add/change new major versions and defaults. Unit tests need to be updated to use new versions too.
-SUBinaryDeltaMajorVersion SUBinaryDeltaMajorVersionDefault = SUBinaryDeltaMajorVersion3;
-SUBinaryDeltaMajorVersion SUBinaryDeltaMajorVersionLatest = SUBinaryDeltaMajorVersion3;
+SUBinaryDeltaMajorVersion SUBinaryDeltaMajorVersionDefault = SUBinaryDeltaMajorVersion4;
+SUBinaryDeltaMajorVersion SUBinaryDeltaMajorVersionLatest = SUBinaryDeltaMajorVersion4;
 SUBinaryDeltaMajorVersion SUBinaryDeltaMajorVersionFirst = SUBinaryDeltaMajorVersion1;
 SUBinaryDeltaMajorVersion SUBinaryDeltaMajorVersionFirstSupported = SUBinaryDeltaMajorVersion2;
 
@@ -115,6 +115,8 @@ uint16_t latestMinorVersionForMajorVersion(SUBinaryDeltaMajorVersion majorVersio
             return 4;
         case SUBinaryDeltaMajorVersion3:
             return 1;
+        case SUBinaryDeltaMajorVersion4:
+            return 0;
     }
     return 0;
 }
