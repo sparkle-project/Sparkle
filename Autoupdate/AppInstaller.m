@@ -415,11 +415,39 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
                 SULog(SULogLevelError, @"Error: bookmark data for update download is stale.. but still continuing.");
             }
             
-            NSString *downloadName = downloadURL.lastPathComponent;
-            if (downloadName == nil) {
+            NSString *originalDownloadName = downloadURL.lastPathComponent;
+            if (originalDownloadName == nil) {
                 [self cleanupAndExitWithStatus:EXIT_FAILURE error:[NSError errorWithDomain:SUSparkleErrorDomain code:SPUInstallerError userInfo:@{ NSLocalizedDescriptionKey: @"Error: Failed to retrieve download name from download URL" }]];
                 
                 return;
+            }
+            
+            // Randomize the download name if possible
+            // This adds better security if there are any vulnerabilities in extracting/executing archives
+            // which allow writing in unexpected locations. For zip/tar/dmg archives we may also extract them before
+            // performing signing validation (due to key rotation).
+            NSString *downloadName;
+            NSString *randomizedUUIDString = [[NSUUID UUID] UUIDString];
+            if (randomizedUUIDString != nil) {
+                // Find the real path extension of the download name
+                // We cannot use -[NSString pathExtension] because it may not give us the full path extension
+                // E.g. for "foo.tar.xz" we need "tar.xz", not "xz"
+                NSString *downloadPathExtension;
+                NSRange pathExtensionDelimiterRange = [originalDownloadName rangeOfString:@"."];
+                if (pathExtensionDelimiterRange.location == NSNotFound) {
+                    downloadPathExtension = @"";
+                } else {
+                    downloadPathExtension = [originalDownloadName substringFromIndex:pathExtensionDelimiterRange.location + 1];
+                }
+                
+                NSString *randomizedDownloadName = [randomizedUUIDString stringByAppendingPathExtension:downloadPathExtension];
+                if (randomizedDownloadName != nil) {
+                    downloadName = randomizedDownloadName;
+                } else {
+                    downloadName = originalDownloadName;
+                }
+            } else {
+                downloadName = originalDownloadName;
             }
             
             // Move the download archive to somewhere where probably only we will be touching it
