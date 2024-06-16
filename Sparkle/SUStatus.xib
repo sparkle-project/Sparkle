@@ -70,7 +70,7 @@
                         </connections>
                     </button>
                     <textField focusRingType="none" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="16">
-                        <rect key="frame" x="106" y="23" width="146" height="16"/>
+                        <rect key="frame" x="106" y="22" width="146" height="16"/>
                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Small System Font Text" id="56">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -88,14 +88,16 @@
                 </subviews>
                 <constraints>
                     <constraint firstAttribute="trailing" secondItem="11" secondAttribute="trailing" constant="20" id="1eu-lX-1HN"/>
-                    <constraint firstItem="12" firstAttribute="top" secondItem="11" secondAttribute="bottom" constant="9" id="3RZ-xs-4zc"/>
+                    <constraint firstItem="12" firstAttribute="top" relation="greaterThanOrEqual" secondItem="11" secondAttribute="bottom" constant="9" id="3RZ-xs-4zc"/>
                     <constraint firstItem="8" firstAttribute="leading" secondItem="7" secondAttribute="trailing" constant="20" id="5bq-w6-BOU"/>
                     <constraint firstItem="7" firstAttribute="top" secondItem="6" secondAttribute="top" constant="15" id="9Mg-Ac-X6m"/>
                     <constraint firstItem="11" firstAttribute="top" secondItem="8" secondAttribute="bottom" constant="9" id="B9k-9V-CdX"/>
                     <constraint firstItem="11" firstAttribute="leading" secondItem="7" secondAttribute="trailing" constant="19" id="EQn-l8-5gk"/>
                     <constraint firstItem="16" firstAttribute="leading" secondItem="7" secondAttribute="trailing" constant="20" id="LTo-e9-myp"/>
-                    <constraint firstItem="16" firstAttribute="top" secondItem="11" secondAttribute="bottom" constant="9" id="ViF-iJ-I4A"/>
+                    <constraint firstItem="16" firstAttribute="top" relation="greaterThanOrEqual" secondItem="11" secondAttribute="bottom" constant="9" id="ViF-iJ-I4A"/>
                     <constraint firstItem="7" firstAttribute="leading" secondItem="6" secondAttribute="leading" constant="24" id="ZLG-dr-gmv"/>
+                    <constraint firstItem="16" firstAttribute="firstBaseline" secondItem="12" secondAttribute="firstBaseline" id="dHQ-hW-3QN"/>
+                    <constraint firstItem="12" firstAttribute="top" secondItem="11" secondAttribute="bottom" priority="750" constant="9" id="e4R-KE-ofU"/>
                     <constraint firstAttribute="bottom" secondItem="12" secondAttribute="bottom" constant="19" id="iY3-LJ-ivz"/>
                     <constraint firstItem="12" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="16" secondAttribute="trailing" constant="25" id="k07-gJ-v9t"/>
                     <constraint firstAttribute="trailing" secondItem="12" secondAttribute="trailing" constant="20" id="onJ-J5-mra"/>
