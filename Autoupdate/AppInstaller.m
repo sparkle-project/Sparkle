@@ -427,9 +427,19 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
             // which allow writing in unexpected locations. For zip/tar/dmg archives we may also extract them before
             // performing signing validation (due to key rotation).
             NSString *downloadName;
-            NSString *downloadPathExtension = originalDownloadName.pathExtension;
             NSString *randomizedUUIDString = [[NSUUID UUID] UUIDString];
             if (randomizedUUIDString != nil) {
+                // Find the real path extension of the download name
+                // We cannot use -[NSString pathExtension] because it may not give us the full path extension
+                // E.g. for "foo.tar.xz" we need "tar.xz", not "xz"
+                NSString *downloadPathExtension;
+                NSRange pathExtensionDelimiterRange = [originalDownloadName rangeOfString:@"."];
+                if (pathExtensionDelimiterRange.location == NSNotFound) {
+                    downloadPathExtension = @"";
+                } else {
+                    downloadPathExtension = [originalDownloadName substringFromIndex:pathExtensionDelimiterRange.location + 1];
+                }
+                
                 NSString *randomizedDownloadName = [randomizedUUIDString stringByAppendingPathExtension:downloadPathExtension];
                 if (randomizedDownloadName != nil) {
                     downloadName = randomizedDownloadName;
