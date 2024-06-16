@@ -335,6 +335,8 @@
 		726F2CE61BC9C33D001971A4 /* SUOperatingSystem.m in Sources */ = {isa = PBXBuildFile; fileRef = 726F2CE41BC9C33D001971A4 /* SUOperatingSystem.m */; };
 		726F2CE81BC9C48F001971A4 /* SUConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 61299A5F09CA6EB100B7442F /* SUConstants.m */; };
 		726F2CEB1BC9C733001971A4 /* SUConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 61299A5F09CA6EB100B7442F /* SUConstants.m */; };
+		726FC0362C1E787A00177986 /* SparkleTestCodeSignApp.aar in Resources */ = {isa = PBXBuildFile; fileRef = 726FC0352C1E787A00177986 /* SparkleTestCodeSignApp.aar */; };
+		726FC0382C1E96AA00177986 /* SparkleTestCodeSignApp.enc.aar in Resources */ = {isa = PBXBuildFile; fileRef = 726FC0372C1E96AA00177986 /* SparkleTestCodeSignApp.enc.aar */; };
 		727DBAE526B5BBFD00111F0C /* ArgumentParser in Frameworks */ = {isa = PBXBuildFile; productRef = 727DBAE426B5BBFD00111F0C /* ArgumentParser */; };
 		727DBAE726B5C47800111F0C /* ArgumentParser in Frameworks */ = {isa = PBXBuildFile; productRef = 727DBAE626B5C47800111F0C /* ArgumentParser */; };
 		727DBAE926B5C48A00111F0C /* ArgumentParser in Frameworks */ = {isa = PBXBuildFile; productRef = 727DBAE826B5C48A00111F0C /* ArgumentParser */; };
@@ -1330,6 +1332,8 @@
 		726E4A361C89116000C57C6A /* SPUStandardUserDriverDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPUStandardUserDriverDelegate.h; sourceTree = "<group>"; };
 		726F2CE31BC9C33D001971A4 /* SUOperatingSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUOperatingSystem.h; sourceTree = "<group>"; };
 		726F2CE41BC9C33D001971A4 /* SUOperatingSystem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUOperatingSystem.m; sourceTree = "<group>"; };
+		726FC0352C1E787A00177986 /* SparkleTestCodeSignApp.aar */ = {isa = PBXFileReference; lastKnownFileType = file; path = SparkleTestCodeSignApp.aar; sourceTree = "<group>"; };
+		726FC0372C1E96AA00177986 /* SparkleTestCodeSignApp.enc.aar */ = {isa = PBXFileReference; lastKnownFileType = file; path = SparkleTestCodeSignApp.enc.aar; sourceTree = "<group>"; };
 		726FD2CB25F4BE5F00123BC6 /* fa */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fa; path = fa.lproj/MainMenu.strings; sourceTree = "<group>"; };
 		726FD2CC25F4BE5F00123BC6 /* fa */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fa; path = fa.lproj/Sparkle.strings; sourceTree = "<group>"; };
 		727F340A2605321D00020E85 /* SULog+NSError.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "SULog+NSError.m"; sourceTree = "<group>"; };
@@ -1868,6 +1872,8 @@
 				729F7ECD27409076004592DC /* SparkleTestCodeSignApp_bad_extraneous.zip */,
 				72CCDEBD27421FD500B53718 /* SparkleTestCodeSignApp_bad_header.zip */,
 				F8761EB21ADC50EB000C9034 /* SparkleTestCodeSignApp.zip */,
+				726FC0352C1E787A00177986 /* SparkleTestCodeSignApp.aar */,
+				726FC0372C1E96AA00177986 /* SparkleTestCodeSignApp.enc.aar */,
 				72EB735E29BE981300FBCEE7 /* DevSignedApp.zip */,
 				72EB736029BEB36100FBCEE7 /* DevSignedAppVersion2.zip */,
 				14958C6C19AEBC610061B14F /* test-pubkey.pem */,
@@ -3191,10 +3197,12 @@
 				5AF6C74F1AEA46D10014A3AB /* test.pkg in Resources */,
 				72EB735F29BE981300FBCEE7 /* DevSignedApp.zip in Resources */,
 				72BC6C3D275027BF0083F14B /* SparkleTestCodeSign_apfs.dmg in Resources */,
+				726FC0382C1E96AA00177986 /* SparkleTestCodeSignApp.enc.aar in Resources */,
 				720DC50627A62CDC00DFF3EC /* testappcast_minimumAutoupdateVersionSkipping2.xml in Resources */,
 				5AD0FA7F1C73F2E2004BCEFF /* testappcast.xml in Resources */,
 				FA30773D24CBC295007BA37D /* testlocalizedreleasenotesappcast.xml in Resources */,
 				72CCDEBE27421FD500B53718 /* SparkleTestCodeSignApp_bad_header.zip in Resources */,
+				726FC0362C1E787A00177986 /* SparkleTestCodeSignApp.aar in Resources */,
 				722545B626805FF80036465C /* testappcast_info_updates.xml in Resources */,
 				7202DC9A269ABD3500737EC4 /* testappcast_phasedRollout.xml in Resources */,
 				5F1510A21C96E591006E1629 /* testnamespaces.xml in Resources */,
