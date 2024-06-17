@@ -5,13 +5,13 @@
 "%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%1$@ %2$@ ist zurzeit die neueste verfügbare Version.\n(Die derzeit installierte Version ist %3$@.)";
 
 /* Description text for SUUpdateAlert when the critical update is downloadable. */
-"%@ %@ is now available—you have %@. This is an important update; would you like to download it now?" = "%1$@ %2$@ ist verfügbar – du verwendest Version %3$@. Dies ist ein wichtiges Update. Möchtest du die neue Version jetzt laden?";
+"%@ %@ is now available—you have %@. This is an important update; would you like to download it now?" = "%1$@ %2$@ ist verfügbar – du verwendest Version %3$@. Dies ist ein wichtiges Update. Möchtest du die neue Version jetzt laden?";
 
 /* Description text for SUUpdateAlert when the update is downloadable. */
-"%@ %@ is now available—you have %@. Would you like to download it now?" = "%1$@ %2$@ ist verfügbar – du verwendest Version %3$@. Möchtest du die neue Version jetzt laden?";
+"%@ %@ is now available—you have %@. Would you like to download it now?" = "%1$@ %2$@ ist verfügbar – du verwendest Version %3$@. Möchtest du die neue Version jetzt laden?";
 
 /* Description text for SUUpdateAlert when the update informational with no download. */
-"%@ %@ is now available—you have %@. Would you like to learn more about this update on the web?" = "%1$@ %2$@ ist verfügbar – du verwendest Version %3$@. Möchtest du mehr über dieses Update erfahren?";
+"%@ %@ is now available—you have %@. Would you like to learn more about this update on the web?" = "%1$@ %2$@ ist verfügbar – du verwendest Version %3$@. Möchtest du mehr über dieses Update erfahren?";
 
 /* The download progress in a unit of bytes, e.g. 100 KB */
 "%@ downloaded" = "%@ geladen";
@@ -77,6 +77,12 @@
 "An important update to %@ is ready to install" = "Ein wichtiges Update von %@ steht zur Installation bereit";
 
 /* No comment provided by engineer. */
+"Application Name" = "App-Name";
+
+/* No comment provided by engineer. */
+"Application Version" = "App-Version";
+
+/* No comment provided by engineer. */
 "Cancel" = "Abbrechen";
 
 /* No comment provided by engineer. */
@@ -84,6 +90,18 @@
 
 /* No comment provided by engineer. */
 "Checking for updates…" = "Nach Updates suchen …";
+
+/* No comment provided by engineer. */
+"CPU is 64-Bit?" = "CPU ist 64-Bit?";
+
+/* No comment provided by engineer. */
+"CPU Speed (MHz)" = "CPU-Geschwindigkeit (MHz)";
+
+/* No comment provided by engineer. */
+"CPU Subtype" = "CPU-Untertyp";
+
+/* No comment provided by engineer. */
+"CPU Type" = "CPU-Typ";
 
 /* Take care not to overflow the status window. */
 "Downloading update…" = "Update laden …";
@@ -103,11 +121,32 @@
 /* Take care not to overflow the status window. */
 "Installing update…" = "Update installieren …";
 
+/* No comment provided by engineer. */
+"Interactive based packages cannot be installed as the root user." = "Interaktive Installationspakete können nicht als root-Benutzer installiert werden.";
+
 /* Alternate title for 'Install Update' button when there's no download in RSS feed. */
 "Learn More…" = "Mehr über …";
 
 /* No comment provided by engineer. */
+"Mac Model" = "Mac-Modell";
+
+/* No comment provided by engineer. */
+"Memory (MB)" = "Speicher (MB)";
+
+/* No comment provided by engineer. */
+"No" = "Nein";
+
+/* No comment provided by engineer. */
+"Number of CPUs" = "Anzahl der CPUs";
+
+/* No comment provided by engineer. */
 "OK" = "OK";
+
+/* No comment provided by engineer. */
+"OS Version" = "OS-Version";
+
+/* No comment provided by engineer. */
+"Preferred Language" = "Bevorzugte Sprache";
 
 /* No comment provided by engineer. */
 "Quit %1$@, move it into your Applications folder, relaunch it from there and try again." = "Beende „%1$@“, bewege es in den Ordner „Programme“, starte das Programm von dort erneut und versuche es noch einmal.";
@@ -117,6 +156,9 @@
 
 /* No comment provided by engineer. */
 "Should %1$@ automatically check for updates? You can always check for updates manually from the %1$@ menu." = "Soll %1$@ automatisch nach Updates suchen? Du kannst im %1$@-Menü auch manuell nach Updates suchen.";
+
+/* No comment provided by engineer. */
+"The installation failed due to not having permission to write the new update." = "Die Installation ist fehlgeschlagen aufgrund fehlender Berechtigung zum Schreiben des neuen Updates.";
 
 /* No comment provided by engineer. */
 "The update checker failed to start correctly. You should contact the app developer to report this issue and verify that you have the latest version." = "Das Aktualisierungsprogramm wurde nicht richtig gestartet. Du solltest den App-Entwickler kontaktieren, um diesen Fehler zu melden und zu prüfen, ob du die neueste Version hast.";
@@ -141,6 +183,12 @@
 
 /* No comment provided by engineer. */
 "Version History" = "Versionsverlauf";
+
+/* No comment provided by engineer. */
+"Yes" = "Ja";
+
+/* No comment provided by engineer. */
+"You may need to allow modifications from %1$@ in System Settings under Privacy & Security and App Management to install future updates." = "Du musst möglicherweise %1$@ in den Systemeinstellungen unter „Datenschutz & Sicherheit“ und „App-Verwaltung“ hinzufügen, um künftige Updates zu installieren.";
 
 /* Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates. */
 "You’re up to date!" = "Du bist auf dem neuesten Stand!";
