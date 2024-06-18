@@ -42,7 +42,7 @@ static NSArray <NSString *> * _Nullable _commandAndArgumentsConformingToTypeOfPa
     
     // At least the latest versions of 10.15 understand how to extract aar files
     // Versions before 10.15 do not understand extracting newly created aar files
-    // Note macOS 10.15 does not support encrypted aea files, if we ever want to support those one day
+    // Note encrypted aea files are supported in macOS 12 onwards, if we ever want to support those one day
     if (@available(macOS 10.15.7, *)) {
         NSString *appleArchiveCommand;
         if (@available(macOS 11, *)) {
