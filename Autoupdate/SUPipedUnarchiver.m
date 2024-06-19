@@ -27,8 +27,8 @@ static NSArray <NSString *> * _Nullable _commandAndArgumentsConformingToTypeOfPa
     NSArray <NSString *> *extractTXZ = extractTGZ;
     
     // Note: keep this list in sync with generate_appcast's unarchiveUpdates()
-    NSDictionary <NSString *, NSArray<NSString *> *> *extractCommandDictionary =
-    @{
+    NSMutableDictionary <NSString *, NSArray<NSString *> *> *extractCommandDictionary =
+    [@{
       @".zip" : @[@"/usr/bin/ditto", @"-x",@"-k",@"-"],
       @".tar" : @[@"/usr/bin/tar", @"-xC"],
       @".tar.gz" : extractTGZ,
@@ -37,8 +37,28 @@ static NSArray <NSString *> * _Nullable _commandAndArgumentsConformingToTypeOfPa
       @".tbz" : extractTBZ,
       @".tar.xz" : extractTXZ,
       @".txz" : extractTXZ,
-      @".tar.lzma" : extractTXZ
-    };
+      @".tar.lzma" : extractTXZ,
+    } mutableCopy];
+    
+    // At least the latest versions of 10.15 understand how to extract aar files
+    // Versions before 10.15 do not understand extracting newly created aar files
+    // Note encrypted aea files are supported in macOS 12 onwards, if we ever want to support those one day
+    if (@available(macOS 10.15.7, *)) {
+        NSString *appleArchiveCommand;
+        if (@available(macOS 11, *)) {
+            appleArchiveCommand = @"/usr/bin/aa";
+        } else {
+            // In 10.15 the utility was named yaa, which was later renamed to aar
+            appleArchiveCommand = @"/usr/bin/yaa";
+        }
+        
+        NSArray <NSString *> *extractAppleArchive = @[appleArchiveCommand, @"extract", @"-d"];
+        
+        [extractCommandDictionary addEntriesFromDictionary:@{
+            @".aar" : extractAppleArchive,
+            @".yaa" : extractAppleArchive,
+        }];
+    }
     
     NSString *lastPathComponent = [path lastPathComponent];
     for (NSString *currentType in extractCommandDictionary)
@@ -93,10 +113,12 @@ static NSArray <NSString *> * _Nullable _commandAndArgumentsConformingToTypeOfPa
 	@autoreleasepool {
         NSString *destination = _extractionDirectory;
         
+        NSFileManager *fileManager = [NSFileManager defaultManager];
+        
         SULog(SULogLevelDefault, @"Extracting using '%@' '%@' < '%@' '%@'", command, [args componentsJoinedByString:@"' '"], _archivePath, destination);
         
         // Get the file size.
-        NSDictionary *attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:_archivePath error:nil];
+        NSDictionary *attributes = [fileManager attributesOfItemAtPath:_archivePath error:nil];
         NSUInteger expectedLength = [(NSNumber *)[attributes objectForKey:NSFileSize] unsignedIntegerValue];
         
         if (expectedLength == 0) {
