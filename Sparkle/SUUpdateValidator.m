@@ -121,7 +121,7 @@
     {
         // Because we already validated the EdDSA signature, this is just a consistency check to see
         // if the developer signed their application properly with their Apple ID
-        // Currently, this case only gets hit for binary delta updates
+        // Currently, this case gets hit for binary delta updates and .aar/.yaa archives
         
         NSError *innerError = nil;
         if ([SUCodeSigningVerifier bundleAtURLIsCodeSigned:installSourceURL] && ![SUCodeSigningVerifier codeSignatureIsValidAtBundleURL:installSourceURL error:&innerError]) {

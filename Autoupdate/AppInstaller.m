@@ -193,9 +193,9 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
         
         _updateValidator = [[SUUpdateValidator alloc] initWithDownloadPath:archivePath signatures:_signatures host:_host verifierInformation:_verifierInformation];
 
-        // Delta & package updates will require validation before extraction
+        // Delta, package updates, and .aar/.yaa archives will require validation before extraction
         // Normal application updates are a bit more lenient allowing developers to change one of apple dev ID or EdDSA keys
-        BOOL needsPrevalidation = [[unarchiver class] mustValidateBeforeExtraction] || ![_installationType isEqualToString:SPUInstallationTypeApplication];
+        BOOL needsPrevalidation = [[unarchiver class] mustValidateBeforeExtractionWithArchivePath:archivePath] || ![_installationType isEqualToString:SPUInstallationTypeApplication];
 
         if (needsPrevalidation) {
             success = [_updateValidator validateDownloadPathWithError:&unarchiverError];
