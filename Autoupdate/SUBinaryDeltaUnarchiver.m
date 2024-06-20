@@ -28,7 +28,7 @@
     return [[path pathExtension] isEqualToString:@"delta"];
 }
 
-+ (BOOL)mustValidateBeforeExtraction
++ (BOOL)mustValidateBeforeExtractionWithArchivePath:(NSString *)archivePath
 {
     return YES;
 }

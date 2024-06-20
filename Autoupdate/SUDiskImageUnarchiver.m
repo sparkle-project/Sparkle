@@ -34,7 +34,7 @@
     return [[path pathExtension] isEqualToString:@"dmg"];
 }
 
-+ (BOOL)mustValidateBeforeExtraction
++ (BOOL)mustValidateBeforeExtractionWithArchivePath:(NSString *)archivePath
 {
     return NO;
 }

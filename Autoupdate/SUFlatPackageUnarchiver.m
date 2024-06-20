@@ -28,7 +28,7 @@
     return [path.pathExtension isEqualToString:@"pkg"] || [path.pathExtension isEqualToString:@"mpkg"];
 }
 
-+ (BOOL)mustValidateBeforeExtraction
++ (BOOL)mustValidateBeforeExtractionWithArchivePath:(NSString *)archivePath
 {
     return YES;
 }

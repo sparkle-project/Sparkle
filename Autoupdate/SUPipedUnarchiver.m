@@ -75,9 +75,9 @@ static NSArray <NSString *> * _Nullable _commandAndArgumentsConformingToTypeOfPa
     return _commandAndArgumentsConformingToTypeOfPath(path) != nil;
 }
 
-+ (BOOL)mustValidateBeforeExtraction
++ (BOOL)mustValidateBeforeExtractionWithArchivePath:(NSString *)archivePath
 {
-    return NO;
+    return ([archivePath hasSuffix:@".aar"] || [archivePath hasSuffix:@".yaa"]);
 }
 
 - (instancetype)initWithArchivePath:(NSString *)archivePath extractionDirectory:(NSString *)extractionDirectory
