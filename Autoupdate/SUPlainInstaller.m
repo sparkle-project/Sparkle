@@ -344,6 +344,7 @@
     
     SUFileManager *fileManager = [[SUFileManager alloc] init];
     
+    BOOL updateHasCustomUpdateSecurityPolicy = NO;
     if (@available(macOS 13.0, *)) {
         // If the new update is notarized / developer ID code signed and Autoupdate is not signed with the same Team ID as the new update,
         // then we may run into Privacy & Security prompt issues from the OS
@@ -357,7 +358,8 @@
             // This shouldn't happen
             _canPerformSafeAtomicSwap = NO;
         } else {
-            if (updateHost.hasUpdateSecurityPolicy) {
+            updateHasCustomUpdateSecurityPolicy = updateHost.hasUpdateSecurityPolicy;
+            if (updateHasCustomUpdateSecurityPolicy) {
                 // We don't handle working around a custom update security policy
                 _canPerformSafeAtomicSwap = NO;
             } else {
@@ -373,7 +375,11 @@
     }
     
     if (!_canPerformSafeAtomicSwap) {
-        SULog(SULogLevelDefault, @"Skipping atomic rename/swap and gatekeeper scan because Autoupdate is not signed with same identity as the new update %@", bundle.bundleURL.lastPathComponent);
+        if (updateHasCustomUpdateSecurityPolicy) {
+            SULog(SULogLevelDefault, @"Skipping atomic rename/swap and gatekeeper scan because new update %@ has a custom NSUpdateSecurityPolicy", bundle.bundleURL.lastPathComponent);
+        } else {
+            SULog(SULogLevelDefault, @"Skipping atomic rename/swap and gatekeeper scan because Autoupdate is not signed with same identity as the new update %@", bundle.bundleURL.lastPathComponent);
+        }
     }
     
     _newAndOldBundlesOnSameVolume = [fileManager itemAtURL:bundle.bundleURL isOnSameVolumeItemAsURL:_host.bundle.bundleURL];
