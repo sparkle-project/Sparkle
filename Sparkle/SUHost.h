@@ -33,6 +33,8 @@ SPU_OBJC_DIRECT_MEMBERS
 @property (getter=isRunningTranslocated, nonatomic, readonly) BOOL runningTranslocated;
 @property (readonly, nonatomic, copy, nullable) NSString *publicDSAKeyFileKey;
 
+@property (nonatomic, readonly) BOOL hasUpdateSecurityPolicy;
+
 - (nullable id)objectForInfoDictionaryKey:(NSString *)key;
 - (BOOL)boolForInfoDictionaryKey:(NSString *)key;
 - (nullable id)objectForUserDefaultsKey:(NSString *)defaultName;

@@ -345,18 +345,28 @@
     SUFileManager *fileManager = [[SUFileManager alloc] init];
     
     if (@available(macOS 13.0, *)) {
+        // If the new update is notarized / developer ID code signed and Autoupdate is not signed with the same Team ID as the new update,
+        // then we may run into Privacy & Security prompt issues from the OS
+        // which think we are modifying the update (but we're not)
+        // To avoid these, we skip the gatekeeper scan and skip performing an atomic swap during install
+        // If the update has a custom update security policy, the same team ID policy may not apply,
+        // so in that case we will also skip performing an atomic swap
+        
         NSURL *mainExecutableURL = NSBundle.mainBundle.executableURL;
         if (mainExecutableURL == nil) {
             // This shouldn't happen
             _canPerformSafeAtomicSwap = NO;
         } else {
-            NSString *installerTeamIdentifier = [SUCodeSigningVerifier teamIdentifierAtURL:mainExecutableURL];
-            NSString *bundleTeamIdentifier = [SUCodeSigningVerifier teamIdentifierAtURL:bundle.bundleURL];
-            
-            // If the new update is code signed and Autoupdate is not signed with the same Team ID as the new update,
-            // then we may run into Privacy & Security prompt issues from the OS
-            // To avoid these, we skip the gatekeeper scan and skip performing an atomic swap during install
-            _canPerformSafeAtomicSwap = (bundleTeamIdentifier == nil || (installerTeamIdentifier != nil && [installerTeamIdentifier isEqualToString:bundleTeamIdentifier]));
+            if (updateHost.hasUpdateSecurityPolicy) {
+                // We don't handle working around a custom update security policy
+                _canPerformSafeAtomicSwap = NO;
+            } else {
+                NSString *installerTeamIdentifier = [SUCodeSigningVerifier teamIdentifierAtURL:mainExecutableURL];
+                NSString *bundleTeamIdentifier = [SUCodeSigningVerifier teamIdentifierAtURL:bundle.bundleURL];
+                
+                // If bundleTeamIdentifier is nil, then the update isn't code signed so atomic swap is okay
+                _canPerformSafeAtomicSwap = (bundleTeamIdentifier == nil || (installerTeamIdentifier != nil && [installerTeamIdentifier isEqualToString:bundleTeamIdentifier]));
+            }
         }
     } else {
         _canPerformSafeAtomicSwap = YES;
