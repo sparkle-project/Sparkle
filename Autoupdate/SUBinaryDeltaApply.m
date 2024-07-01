@@ -152,6 +152,16 @@ BOOL applyBinaryDelta(NSString *source, NSString *finalDestination, NSString *pa
         }
         return NO;
     }
+    
+    // Preserve file creation date only for the root item if the date is recorded
+    // (requires major version 4 or later)
+    NSDate *bundleCreationDate = header.bundleCreationDate;
+    if (bundleCreationDate != nil) {
+        NSError *setFileCreationDateError = nil;
+        if (![fileManager setAttributes:@{NSFileCreationDate: bundleCreationDate} ofItemAtPath:destination error:&setFileCreationDateError]) {
+            fprintf(stderr, "\nWarning: failed to set file creation date: %s", setFileCreationDateError.localizedDescription.UTF8String);
+        }
+    }
 
     progressCallback(4/7.0);
 

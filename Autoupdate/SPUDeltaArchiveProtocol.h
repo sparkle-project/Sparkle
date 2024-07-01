@@ -26,7 +26,7 @@ typedef NS_ENUM(uint8_t, SPUDeltaItemCommands) {
 // Represents header for our archive
 SPU_OBJC_DIRECT_MEMBERS @interface SPUDeltaArchiveHeader : NSObject
 
-- (instancetype)initWithCompression:(SPUDeltaCompressionMode)compression compressionLevel:(uint8_t)compressionLevel fileSystemCompression:(bool)fileSystemCompression majorVersion:(uint16_t)majorVersion minorVersion:(uint16_t)minorVersion beforeTreeHash:(const unsigned char *)beforeTreeHash afterTreeHash:(const unsigned char *)afterTreeHash;
+- (instancetype)initWithCompression:(SPUDeltaCompressionMode)compression compressionLevel:(uint8_t)compressionLevel fileSystemCompression:(bool)fileSystemCompression majorVersion:(uint16_t)majorVersion minorVersion:(uint16_t)minorVersion beforeTreeHash:(const unsigned char *)beforeTreeHash afterTreeHash:(const unsigned char *)afterTreeHash bundleCreationDate:(nullable NSDate *)bundleCreationDate;
 
 @property (nonatomic, readonly) SPUDeltaCompressionMode compression;
 @property (nonatomic, readonly) uint8_t compressionLevel;
@@ -35,6 +35,7 @@ SPU_OBJC_DIRECT_MEMBERS @interface SPUDeltaArchiveHeader : NSObject
 @property (nonatomic, readonly) uint16_t minorVersion;
 @property (nonatomic, readonly) unsigned char *beforeTreeHash;
 @property (nonatomic, readonly) unsigned char *afterTreeHash;
+@property (nonatomic, readonly, nullable) NSDate *bundleCreationDate;
 
 @end
 

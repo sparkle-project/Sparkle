@@ -723,7 +723,23 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
 #endif
     }
     
-    SPUDeltaArchiveHeader *header = [[SPUDeltaArchiveHeader alloc] initWithCompression:compression compressionLevel:compressionLevel fileSystemCompression:foundFilesystemCompression majorVersion:majorVersion minorVersion:minorVersion beforeTreeHash:beforeHash afterTreeHash:afterHash];
+    // Record creation date of root bundle item
+    NSDate *bundleCreationDate;
+    if (MAJOR_VERSION_IS_AT_LEAST(majorVersion, SUBinaryDeltaMajorVersion4)) {
+        NSError *fileAttributesError = nil;
+        NSDictionary<NSFileAttributeKey, id> *fileAttributes = [[NSFileManager defaultManager] attributesOfItemAtPath:destination error:&fileAttributesError];
+        
+        if (fileAttributes != nil) {
+            bundleCreationDate = fileAttributes[NSFileCreationDate];
+        } else {
+            bundleCreationDate = nil;
+            fprintf(stderr, "\nWarning: unable to retrieve file creation date of new bundle: %s", fileAttributesError.localizedDescription.UTF8String);
+        }
+    } else {
+        bundleCreationDate = nil;
+    }
+    
+    SPUDeltaArchiveHeader *header = [[SPUDeltaArchiveHeader alloc] initWithCompression:compression compressionLevel:compressionLevel fileSystemCompression:foundFilesystemCompression majorVersion:majorVersion minorVersion:minorVersion beforeTreeHash:beforeHash afterTreeHash:afterHash bundleCreationDate:bundleCreationDate];
     
     [archive writeHeader:header];
     if (archive.error != nil) {

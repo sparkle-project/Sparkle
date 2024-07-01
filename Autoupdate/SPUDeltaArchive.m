@@ -89,8 +89,9 @@ id<SPUDeltaArchiveProtocol> SPUDeltaArchiveReadPatchAndHeader(NSString *patchFil
 @synthesize fileSystemCompression = _fileSystemCompression;
 @synthesize majorVersion = _majorVersion;
 @synthesize minorVersion = _minorVersion;
+@synthesize bundleCreationDate = _bundleCreationDate;
 
-- (instancetype)initWithCompression:(SPUDeltaCompressionMode)compression compressionLevel:(uint8_t)compressionLevel fileSystemCompression:(bool)fileSystemCompression majorVersion:(uint16_t)majorVersion minorVersion:(uint16_t)minorVersion beforeTreeHash:(const unsigned char *)beforeTreeHash afterTreeHash:(const unsigned char *)afterTreeHash
+- (instancetype)initWithCompression:(SPUDeltaCompressionMode)compression compressionLevel:(uint8_t)compressionLevel fileSystemCompression:(bool)fileSystemCompression majorVersion:(uint16_t)majorVersion minorVersion:(uint16_t)minorVersion beforeTreeHash:(const unsigned char *)beforeTreeHash afterTreeHash:(const unsigned char *)afterTreeHash bundleCreationDate:(nullable NSDate *)bundleCreationDate
 {
     self = [super init];
     if (self != nil)
@@ -104,6 +105,8 @@ id<SPUDeltaArchiveProtocol> SPUDeltaArchiveReadPatchAndHeader(NSString *patchFil
         
         memcpy(_beforeTreeHash, beforeTreeHash, sizeof(_beforeTreeHash));
         memcpy(_afterTreeHash, afterTreeHash, sizeof(_afterTreeHash));
+        
+        _bundleCreationDate = bundleCreationDate;
     }
     return self;
 }

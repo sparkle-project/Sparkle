@@ -101,29 +101,32 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
 #else
     BOOL testingVersion2Delta = NO;
 #endif
-    return [self createAndApplyPatchWithBeforeDiffHandler:beforeDiffHandler afterDiffHandler:afterDiffHandler afterPatchHandler:afterPatchHandler testingVersion2Delta:testingVersion2Delta];
+    return [self createAndApplyPatchWithBeforeDiffHandler:beforeDiffHandler afterDiffHandler:afterDiffHandler afterPatchHandler:afterPatchHandler testingVersion3Delta:YES testingVersion2Delta:testingVersion2Delta];
 }
 
-- (BOOL)createAndApplyPatchWithBeforeDiffHandler:(SUDeltaHandler)beforeDiffHandler afterDiffHandler:(SUDeltaHandler)afterDiffHandler afterPatchHandler:(SUDeltaHandler)afterPatchHandler testingVersion2Delta:(BOOL)testingVersion2Delta
+- (BOOL)createAndApplyPatchWithBeforeDiffHandler:(SUDeltaHandler)beforeDiffHandler afterDiffHandler:(SUDeltaHandler)afterDiffHandler afterPatchHandler:(SUDeltaHandler)afterPatchHandler testingVersion3Delta:(BOOL)testingVersion3Delta testingVersion2Delta:(BOOL)testingVersion2Delta
 {
-    XCTAssertEqual(SUBinaryDeltaMajorVersion3, SUBinaryDeltaMajorVersionLatest);
+    XCTAssertEqual(SUBinaryDeltaMajorVersion4, SUBinaryDeltaMajorVersionLatest);
     
-    BOOL version3DeltaFormatWithLZMASuccess = [self createAndApplyPatchUsingVersion:SUBinaryDeltaMajorVersion3 compressionMode:SPUDeltaCompressionModeLZMA beforeDiffHandler:beforeDiffHandler afterDiffHandler:afterDiffHandler afterPatchHandler:afterPatchHandler];
+    BOOL version4DeltaFormatWithLZMASuccess = [self createAndApplyPatchUsingVersion:SUBinaryDeltaMajorVersion4 compressionMode:SPUDeltaCompressionModeLZMA beforeDiffHandler:beforeDiffHandler afterDiffHandler:afterDiffHandler afterPatchHandler:afterPatchHandler];
     
 #if SPARKLE_BUILD_BZIP2_DELTA_SUPPORT
-    BOOL version3DeltaFormatWithBZIP2Success = [self createAndApplyPatchUsingVersion:SUBinaryDeltaMajorVersion3 compressionMode:SPUDeltaCompressionModeBzip2 beforeDiffHandler:beforeDiffHandler afterDiffHandler:afterDiffHandler afterPatchHandler:afterPatchHandler];
+    BOOL version4DeltaFormatWithBZIP2Success = [self createAndApplyPatchUsingVersion:SUBinaryDeltaMajorVersion4 compressionMode:SPUDeltaCompressionModeBzip2 beforeDiffHandler:beforeDiffHandler afterDiffHandler:afterDiffHandler afterPatchHandler:afterPatchHandler];
 #endif
     
-    BOOL version3DeltaFormatWithZLIBSuccess = [self createAndApplyPatchUsingVersion:SUBinaryDeltaMajorVersion3 compressionMode:SPUDeltaCompressionModeZLIB beforeDiffHandler:beforeDiffHandler afterDiffHandler:afterDiffHandler afterPatchHandler:afterPatchHandler];
+    BOOL version4DeltaFormatWithZLIBSuccess = [self createAndApplyPatchUsingVersion:SUBinaryDeltaMajorVersion4 compressionMode:SPUDeltaCompressionModeZLIB beforeDiffHandler:beforeDiffHandler afterDiffHandler:afterDiffHandler afterPatchHandler:afterPatchHandler];
+    
+    BOOL version3DeltaFormatWithLZMASuccess = !testingVersion3Delta || [self createAndApplyPatchUsingVersion:SUBinaryDeltaMajorVersion3 compressionMode:SPUDeltaCompressionModeLZMA beforeDiffHandler:beforeDiffHandler afterDiffHandler:afterDiffHandler afterPatchHandler:afterPatchHandler];
     
     BOOL version2FormatSuccess = !testingVersion2Delta || [self createAndApplyPatchUsingVersion:SUBinaryDeltaMajorVersion2 compressionMode:SPUDeltaCompressionModeDefault beforeDiffHandler:beforeDiffHandler afterDiffHandler:afterDiffHandler afterPatchHandler:afterPatchHandler];
     
     return (
-        version3DeltaFormatWithLZMASuccess &&
+        version4DeltaFormatWithLZMASuccess &&
 #if SPARKLE_BUILD_BZIP2_DELTA_SUPPORT
-        version3DeltaFormatWithBZIP2Success &&
+        version4DeltaFormatWithBZIP2Success &&
 #endif
-        version3DeltaFormatWithZLIBSuccess &&
+        version4DeltaFormatWithZLIBSuccess &&
+        version3DeltaFormatWithLZMASuccess &&
         version2FormatSuccess
     );
 }
@@ -1001,7 +1004,7 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
         // Test that we only respect valid symlink permissions for >= version 3 deltas
         unsigned short permissions = permissionAttribute.unsignedShortValue & PERMISSION_FLAGS;
         XCTAssertEqual(permissions, VALID_SYMBOLIC_LINK_PERMISSIONS);
-    } testingVersion2Delta:NO];
+    } testingVersion3Delta:YES testingVersion2Delta:NO];
 }
 
 - (void)testSmallFilePermissionChangeWithNoContentChange
@@ -1410,7 +1413,7 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
                 XCTFail(@"Second destination file is not compressed!");
             }
         }
-    } testingVersion2Delta:NO];
+    } testingVersion3Delta:YES testingVersion2Delta:NO];
 }
 
 - (void)testNoFileSystemCompression
@@ -1455,7 +1458,7 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
                 XCTFail(@"Second destination file is compressed!");
             }
         }
-    } testingVersion2Delta:NO];
+    } testingVersion3Delta:YES testingVersion2Delta:NO];
 }
 
 - (void)testFrameworkVersionChanged
@@ -2205,6 +2208,47 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
     } afterDiffHandler:nil afterPatchHandler:nil];
     
     XCTAssertFalse(success);
+}
+
+- (void)testBundleCreationDate
+{
+    NSDate *sourceDate = [NSDate dateWithTimeIntervalSinceReferenceDate:420111117.0];
+    NSDate *destinationDate = [NSDate dateWithTimeIntervalSinceReferenceDate:530112117.0];
+    
+    BOOL success = [self createAndApplyPatchWithBeforeDiffHandler:^(NSFileManager *fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
+        NSString *sourceFile = [sourceDirectory stringByAppendingPathComponent:@"A"];
+        NSString *destinationFile = [destinationDirectory stringByAppendingPathComponent:@"A"];
+        
+        XCTAssertTrue([[NSData data] writeToFile:sourceFile atomically:YES]);
+        XCTAssertTrue([[NSData dataWithBytes:"loltest" length:7] writeToFile:destinationFile atomically:YES]);
+        
+        {
+            NSError *setFileCreationDateError = nil;
+            if (![fileManager setAttributes:@{NSFileCreationDate: sourceDate} ofItemAtPath:sourceDirectory error:&setFileCreationDateError]) {
+                XCTFail(@"Failed to modify file creation date for source directory: %@", setFileCreationDateError.localizedDescription);
+            }
+        }
+        
+        {
+            NSError *setFileCreationDateError = nil;
+            if (![fileManager setAttributes:@{NSFileCreationDate: destinationDate} ofItemAtPath:destinationDirectory error:&setFileCreationDateError]) {
+                XCTFail(@"Failed to modify file creation date for destination directory: %@", setFileCreationDateError.localizedDescription);
+            }
+        }
+    } afterDiffHandler:nil afterPatchHandler:^(NSFileManager *fileManager, NSString * __unused sourceDirectory, NSString *destinationDirectory) {
+        NSError *fileAttributesError = nil;
+        NSDictionary<NSFileAttributeKey, id> *fileAttributes = [fileManager attributesOfItemAtPath:destinationDirectory error:&fileAttributesError];
+        
+        if (fileAttributes == nil) {
+            XCTFail(@"Failed to retrieve file attributes from destination directory: %@", fileAttributesError.localizedDescription);
+        }
+        
+        NSDate *fileCreationDate = fileAttributes[NSFileCreationDate];
+        XCTAssertNotNil(fileCreationDate);
+        
+        XCTAssertEqualObjects(destinationDate, fileCreationDate);
+    } testingVersion3Delta:NO testingVersion2Delta:NO];
+    XCTAssertTrue(success);
 }
 
 @end
