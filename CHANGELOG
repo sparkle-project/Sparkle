@@ -1,3 +1,7 @@
+# 2.6.4
+
+* Fix app modification prompt from appearing when downloaded update overrides NSUpdateSecurityPolicy (#2593)
+
 # 2.6.3
 
 * Guard update timer update check against sessionInProgress to fix rare crash when checking for updates (#2561)

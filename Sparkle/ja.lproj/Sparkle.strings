@@ -77,6 +77,12 @@
 "An important update to %@ is ready to install" = "%@の重要なアップデートがインストールできます。";
 
 /* No comment provided by engineer. */
+"Application Name" = "アプリ名";
+
+/* No comment provided by engineer. */
+"Application Version" = "アプリバージョン";
+
+/* No comment provided by engineer. */
 "Cancel" = "キャンセル";
 
 /* No comment provided by engineer. */
@@ -84,6 +90,18 @@
 
 /* No comment provided by engineer. */
 "Checking for updates…" = "アップデートを確認しています…";
+
+/* No comment provided by engineer. */
+"CPU is 64-Bit?" = "CPUは64-Bit?";
+
+/* No comment provided by engineer. */
+"CPU Speed (MHz)" = "CPUスピード (MHz)";
+
+/* No comment provided by engineer. */
+"CPU Subtype" = "CPUサブタイプ";
+
+/* No comment provided by engineer. */
+"CPU Type" = "CPUタイプ";
 
 /* Take care not to overflow the status window. */
 "Downloading update…" = "アップデートをダウンロードしています…";
@@ -103,11 +121,32 @@
 /* Take care not to overflow the status window. */
 "Installing update…" = "アップデートをインストールしています…";
 
+/* No comment provided by engineer. */
+"Interactive based packages cannot be installed as the root user." = "対話ベースのパッケージはルートユーザではインストールできません。";
+
 /* Alternate title for 'Install Update' button when there's no download in RSS feed. */
 "Learn More…" = "詳しい情報…";
 
 /* No comment provided by engineer. */
+"Mac Model" = "Macモデル";
+
+/* No comment provided by engineer. */
+"Memory (MB)" = "メモリ (MB)";
+
+/* No comment provided by engineer. */
+"No" = "いいえ";
+
+/* No comment provided by engineer. */
+"Number of CPUs" = "CPU数";
+
+/* No comment provided by engineer. */
 "OK" = "OK";
+
+/* No comment provided by engineer. */
+"OS Version" = "OSバージョン";
+
+/* No comment provided by engineer. */
+"Preferred Language" = "優先する言語";
 
 /* No comment provided by engineer. */
 "Quit %1$@, move it into your Applications folder, relaunch it from there and try again." = "%1$@を終了させ、アプリケーションフォルダに移動の上再度お試しください。";
@@ -117,6 +156,9 @@
 
 /* No comment provided by engineer. */
 "Should %1$@ automatically check for updates? You can always check for updates manually from the %1$@ menu." = " %1$@のアップデートを自動で確認しますか? アップデートは%1$@メニューから手動でいつでも確認することができます。";
+
+/* No comment provided by engineer. */
+"The installation failed due to not having permission to write the new update." = "新しいアップデートを書き込むアクセス権がないためインストールできませんでした。";
 
 /* No comment provided by engineer. */
 "The update checker failed to start correctly. You should contact the app developer to report this issue and verify that you have the latest version." = "アップデートチェッカーが正しくスタートできませんでした。アプリケーション開発者に連絡をしてこの不具合を報告し、最新バージョンであることを確認してください。";
@@ -141,6 +183,12 @@
 
 /* No comment provided by engineer. */
 "Version History" = "バージョン履歴";
+
+/* No comment provided by engineer. */
+"Yes" = "はい";
+
+/* No comment provided by engineer. */
+"You may need to allow modifications from %1$@ in System Settings under Privacy & Security and App Management to install future updates." = "今後アップデートをインストールするには、システム設定の「プライバシーとセキュリティ」と「アプリ管理」で%1$@からの変更を許可する必要があります。";
 
 /* No comment provided by engineer. */
 "Your macOS version is too new" = "このmacOSのバージョンは新しすぎます";

@@ -161,6 +161,13 @@ NS_ASSUME_NONNULL_BEGIN
     return key;
 }
 
+- (BOOL)hasUpdateSecurityPolicy
+{
+    NSDictionary<NSString *, id> *updateSecurityPolicy = [self objectForInfoDictionaryKey:@"NSUpdateSecurityPolicy"];
+    
+    return (updateSecurityPolicy != nil);
+}
+
 - (SUPublicKeys *)publicKeys
 {
     return [[SUPublicKeys alloc] initWithEd:[self publicEDKey]

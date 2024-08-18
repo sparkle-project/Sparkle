@@ -12,7 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol SUUnarchiverProtocol <NSObject>
 
-+ (BOOL)mustValidateBeforeExtraction;
++ (BOOL)mustValidateBeforeExtractionWithArchivePath:(NSString *)archivePath;
 
 - (void)unarchiveWithCompletionBlock:(void (^)(NSError * _Nullable))completionBlock progressBlock:(void (^ _Nullable)(double))progressBlock;
 

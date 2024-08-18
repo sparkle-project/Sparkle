@@ -77,6 +77,12 @@
 "An important update to %@ is ready to install" = "An important update to %@ is ready to install";
 
 /* No comment provided by engineer. */
+"Application Name" = "Application Name";
+
+/* No comment provided by engineer. */
+"Application Version" = "Application Version";
+
+/* No comment provided by engineer. */
 "Cancel" = "Cancel";
 
 /* No comment provided by engineer. */
@@ -84,6 +90,18 @@
 
 /* No comment provided by engineer. */
 "Checking for updates…" = "Checking for updates…";
+
+/* No comment provided by engineer. */
+"CPU is 64-Bit?" = "CPU is 64-Bit?";
+
+/* No comment provided by engineer. */
+"CPU Speed (MHz)" = "CPU Speed (MHz)";
+
+/* No comment provided by engineer. */
+"CPU Subtype" = "CPU Subtype";
+
+/* No comment provided by engineer. */
+"CPU Type" = "CPU Type";
 
 /* Take care not to overflow the status window. */
 "Downloading update…" = "Downloading update…";
@@ -103,11 +121,32 @@
 /* Take care not to overflow the status window. */
 "Installing update…" = "Installing update…";
 
+/* No comment provided by engineer. */
+"Interactive based packages cannot be installed as the root user." = "Interactive based packages cannot be installed as the root user.";
+
 /* Alternate title for 'Install Update' button when there's no download in RSS feed. */
 "Learn More…" = "Learn More…";
 
 /* No comment provided by engineer. */
+"Mac Model" = "Mac Model";
+
+/* No comment provided by engineer. */
+"Memory (MB)" = "Memory (MB)";
+
+/* No comment provided by engineer. */
+"No" = "No";
+
+/* No comment provided by engineer. */
+"Number of CPUs" = "Number of CPUs";
+
+/* No comment provided by engineer. */
 "OK" = "OK";
+
+/* No comment provided by engineer. */
+"OS Version" = "OS Version";
+
+/* No comment provided by engineer. */
+"Preferred Language" = "Preferred Language";
 
 /* No comment provided by engineer. */
 "Quit %1$@, move it into your Applications folder, relaunch it from there and try again." = "Quit %1$@, move it into your Applications folder, relaunch it from there and try again.";
@@ -117,6 +156,9 @@
 
 /* No comment provided by engineer. */
 "Should %1$@ automatically check for updates? You can always check for updates manually from the %1$@ menu." = "Should %1$@ automatically check for updates? You can always check for updates manually from the %1$@ menu.";
+
+/* No comment provided by engineer. */
+"The installation failed due to not having permission to write the new update." = "The installation failed due to not having permission to write the new update.";
 
 /* No comment provided by engineer. */
 "The update checker failed to start correctly. You should contact the app developer to report this issue and verify that you have the latest version." = "The update checker failed to start correctly. You should contact the app developer to report this issue and verify that you have the latest version.";
@@ -141,6 +183,12 @@
 
 /* No comment provided by engineer. */
 "Version History" = "Version History";
+
+/* No comment provided by engineer. */
+"Yes" = "Yes";
+
+/* No comment provided by engineer. */
+"You may need to allow modifications from %1$@ in System Settings under Privacy & Security and App Management to install future updates." = "You may need to allow modifications from %1$@ in System Settings under Privacy & Security and App Management to install future updates.";
 
 /* No comment provided by engineer. */
 "Your macOS version is too new" = "Your macOS version is too new";

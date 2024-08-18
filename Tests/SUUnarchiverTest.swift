@@ -157,4 +157,18 @@ class SUUnarchiverTest: XCTestCase
         self.unarchiveTestAppWithExtension("pkg", resourceName: "test", expectingInstallationType: SPUInstallationTypeApplication, expectingSuccess: false)
     }
 #endif
+    
+    func testUnarchivingAppleArchive() {
+        self.unarchiveTestAppWithExtension("aar", resourceName: "SparkleTestCodeSignApp")
+    }
+    
+    // If we support encrypted archives one day we will use "aea" file extension
+    // Password to this archive is whatisgoingonforeveroneday!
+    func testUnarchivingEncryptedAppleArchiveWithoutPassword() {
+        signal(SIGPIPE, SIG_IGN)
+        
+        self.unarchiveTestAppWithExtension("enc.aar", resourceName: "SparkleTestCodeSignApp", expectingSuccess: false)
+        
+        signal(SIGPIPE, SIG_DFL)
+    }
 }

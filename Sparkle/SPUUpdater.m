@@ -76,6 +76,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     BOOL _showingPermissionRequest;
     BOOL _loggedATSWarning;
     BOOL _loggedNoSecureKeyWarning;
+    BOOL _loggedUpdateSecurityPolicyWarning;
     BOOL _updatingMainBundle;
 }
 
@@ -358,6 +359,14 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
                 *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUNoPublicDSAFoundError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"For security reasons, updates need to be signed with an EdDSA key for %@. Please migrate to using EdDSA (ed25519). Visit Sparkle's documentation for migration information: https://sparkle-project.org/documentation/#3-segue-for-security-concerns.", hostName] }];
             }
             return NO;
+        }
+    }
+    
+    if (_updatingMainBundle) {
+        if (!_loggedUpdateSecurityPolicyWarning && mainBundleHost.hasUpdateSecurityPolicy) {
+            SULog(SULogLevelDefault, @"Warning: %@ has a custom NSUpdateSecurityPolicy in its Info.plist. This may cause issues when installing updates. Please consider removing this key for your builds using Sparkle if you do not really require a custom update security policy.", hostName);
+            
+            _loggedUpdateSecurityPolicyWarning = YES;
         }
     }
     
