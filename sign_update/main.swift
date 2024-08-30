@@ -61,13 +61,13 @@ func findKeys(inFile secretFile: String) throws -> (Data, Data) {
             throw ExitCode(1)
         }
     } else {
-        secretString = try String(contentsOfFile: secretFile)
+        secretString = try decodeSecretString(filePath: secretFile)
     }
     return try findKeys(inString: secretString, allowNewFormat: true)
 }
 
 func findKeys(inString secretBase64String: String, allowNewFormat: Bool) throws -> (Data, Data) {
-    guard let secret = Data(base64Encoded: secretBase64String.trimmingCharacters(in: .whitespacesAndNewlines), options: .init()) else {
+    guard let secret = Data(base64Encoded: secretBase64String, options: .init()) else {
         print("ERROR! Failed to decode base64 encoded key data from: \(secretBase64String)")
         throw ExitCode.failure
     }
@@ -141,7 +141,7 @@ struct SignUpdate: ParsableCommand {
     func run() throws {
         let (priv, pub): (Data, Data)
         
-        if let privateKey = privateKey {
+        if let privateKey = privateKey?.trimmingCharacters(in: .whitespacesAndNewlines) {
             fputs("Warning: The -s option for passing the private EdDSA key is insecure and deprecated. Please see its help usage for more information.\n", stderr)
             
             (priv, pub) = try findKeys(inString: privateKey, allowNewFormat: false)

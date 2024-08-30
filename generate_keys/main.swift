@@ -235,12 +235,12 @@ struct GenerateKeys: ParsableCommand {
             let secretBase64File = importedPrivateKeyFile
             let secretBase64: String
             do {
-                secretBase64 = try String(contentsOfFile: secretBase64File)
+                secretBase64 = try decodeSecretString(filePath: secretBase64File)
             } catch {
-                failure("Failed to read private-key-file: \(error)")
+                failure("Failed to read private-key-file: \(error.localizedDescription)")
             }
             
-            guard let secret = Data(base64Encoded: secretBase64.trimmingCharacters(in: .whitespacesAndNewlines), options: .init()) else {
+            guard let secret = Data(base64Encoded: secretBase64, options: .init()) else {
                 failure("Failed to decode base64 encoded key data from: \(secretBase64)")
             }
             

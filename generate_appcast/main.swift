@@ -285,19 +285,22 @@ struct GenerateAppcast: ParsableCommand {
             allowNewPrivateKey = false
         } else if let privateEdKeyPath = privateEdKeyPath {
             do {
-                let privateKeyString: String
                 if privateEdKeyPath == "-" && !FileManager.default.fileExists(atPath: privateEdKeyPath) {
                     if let line = readLine(strippingNewline: true) {
-                        privateKeyString = line
+                        privateEdKeyString = line
                     } else {
                         print("Unable to read EdDSA private key from standard input")
                         throw ExitCode(1)
                     }
                 } else {
-                    privateKeyString = try String(contentsOf: URL(fileURLWithPath: privateEdKeyPath))
+                    do {
+                        privateEdKeyString = try decodeSecretString(filePath: privateEdKeyPath)
+                    } catch {
+                        print(error.localizedDescription)
+                        throw ExitCode(1)
+                    }
                 }
                 
-                privateEdKeyString = privateKeyString
                 allowNewPrivateKey = true
             } catch {
                 print("Unable to load EdDSA private key from", privateEdKeyPath, "\n", error)
