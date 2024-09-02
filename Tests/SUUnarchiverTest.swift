@@ -43,7 +43,8 @@ class SUUnarchiverTest: XCTestCase
     }
 
     func unarchiveNonExistentFileTestFailureAppWithExtension(_ archiveExtension: String, tempDirectoryURL: URL, password: String?, expectingInstallationType installationType: String, testExpectation: XCTestExpectation) {
-        let tempArchiveURL = tempDirectoryURL.appendingPathComponent("error-invalid").appendingPathExtension(archiveExtension)
+        let tempArchiveURL = tempDirectoryURL.deletingLastPathComponent().appendingPathComponent("error-invalid").appendingPathExtension(archiveExtension)
+        
         let unarchiver = SUUnarchiver.unarchiver(forPath: tempArchiveURL.path, extractionDirectory: tempDirectoryURL.path, updatingHostBundlePath: nil, decryptionPassword: password, expectingInstallationType: installationType)!
 
         unarchiver.unarchive(completionBlock: {(error: Error?) -> Void in

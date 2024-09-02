@@ -20,7 +20,8 @@
     NSString *_extractionDirectory;
 }
 
-static NSArray <NSString *> * _Nullable _commandAndArgumentsConformingToTypeOfPath(NSString *path)
+// pipingData == NO is only supported for zip archives
+static NSArray<NSString *> * _Nullable _argumentsConformingToTypeOfPath(NSString *path, BOOL pipingData, NSString * __autoreleasing *outCommand)
 {
     NSArray <NSString *> *extractTGZ = @[@"/usr/bin/tar", @"-zxC"];
     NSArray <NSString *> *extractTBZ = @[@"/usr/bin/tar", @"-jxC"];
@@ -29,7 +30,7 @@ static NSArray <NSString *> * _Nullable _commandAndArgumentsConformingToTypeOfPa
     // Note: keep this list in sync with generate_appcast's unarchiveUpdates()
     NSMutableDictionary <NSString *, NSArray<NSString *> *> *extractCommandDictionary =
     [@{
-      @".zip" : @[@"/usr/bin/ditto", @"-x",@"-k",@"-"],
+      @".zip" : (pipingData ? @[@"/usr/bin/ditto", @"-x", @"-k", @"-"] : @[@"/usr/bin/ditto", @"-x", @"-k", path]),
       @".tar" : @[@"/usr/bin/tar", @"-xC"],
       @".tar.gz" : extractTGZ,
       @".tgz" : extractTGZ,
@@ -64,7 +65,12 @@ static NSArray <NSString *> * _Nullable _commandAndArgumentsConformingToTypeOfPa
     for (NSString *currentType in extractCommandDictionary)
     {
         if ([lastPathComponent hasSuffix:currentType]) {
-            return [extractCommandDictionary objectForKey:currentType];
+            NSArray<NSString *> *commandAndArguments = [extractCommandDictionary objectForKey:currentType];
+            if (outCommand != NULL) {
+                *outCommand = commandAndArguments.firstObject;
+            }
+            
+            return [commandAndArguments subarrayWithRange:NSMakeRange(1, commandAndArguments.count - 1)];
         }
     }
     return nil;
@@ -72,7 +78,7 @@ static NSArray <NSString *> * _Nullable _commandAndArgumentsConformingToTypeOfPa
 
 + (BOOL)canUnarchivePath:(NSString *)path
 {
-    return _commandAndArgumentsConformingToTypeOfPath(path) != nil;
+    return _argumentsConformingToTypeOfPath(path, YES, NULL) != nil;
 }
 
 + (BOOL)mustValidateBeforeExtractionWithArchivePath:(NSString *)archivePath
@@ -92,60 +98,136 @@ static NSArray <NSString *> * _Nullable _commandAndArgumentsConformingToTypeOfPa
 
 - (void)unarchiveWithCompletionBlock:(void (^)(NSError * _Nullable))completionBlock progressBlock:(void (^ _Nullable)(double))progressBlock
 {
-    NSArray <NSString *> *commandAndArguments = _commandAndArgumentsConformingToTypeOfPath(_archivePath);
-    assert(commandAndArguments != nil);
-    
-    NSString *command = commandAndArguments.firstObject;
+    NSString *command = nil;
+    NSArray<NSString *> *arguments = _argumentsConformingToTypeOfPath(_archivePath, YES, &command);
+    assert(arguments != nil);
     assert(command != nil);
     
-    NSArray <NSString *> *arguments = [commandAndArguments subarrayWithRange:NSMakeRange(1, commandAndArguments.count - 1)];
-    
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        SUUnarchiverNotifier *notifier = [[SUUnarchiverNotifier alloc] initWithCompletionBlock:completionBlock progressBlock:progressBlock];
-        [self extractArchivePipingDataToCommand:command arguments:arguments notifier:notifier];
+        @autoreleasepool {
+            SUUnarchiverNotifier *notifier = [[SUUnarchiverNotifier alloc] initWithCompletionBlock:completionBlock progressBlock:progressBlock];
+            NSError *extractError = nil;
+            if ([self extractArchivePipingData:YES command:command arguments:arguments notifier:notifier error:&extractError]) {
+                [notifier notifySuccess];
+            } else {
+                // If we fail due to an IO PIPE write failure for zip files,
+                // we may re-attempt extracting the archive without piping archive data
+                // (and without fine grained progress reporting).
+                // This is to workaround a bug in ditto which causes extraction to fail when piping data for
+                // some types of constructed zip files.
+                // Note this bug is fixed on macOS 15+, so this workaround is not needed there.
+                // https://github.com/sparkle-project/Sparkle/issues/2544
+                BOOL useNonPipingWorkaround;
+                if (@available(macOS 15, *)) {
+                    useNonPipingWorkaround = NO;
+                } else {
+                    NSError *underlyingError = extractError.userInfo[NSUnderlyingErrorKey];
+                    
+                    useNonPipingWorkaround = [self->_archivePath.pathExtension isEqualToString:@"zip"] && ([extractError.domain isEqualToString:SUSparkleErrorDomain] && extractError.code == SUUnarchivingError && [underlyingError.domain isEqualToString:NSPOSIXErrorDomain] && underlyingError.code == EPIPE);
+                }
+                
+                if (!useNonPipingWorkaround) {
+                    [notifier notifyFailureWithError:extractError];
+                } else {
+                    // Re-create the extraction directory, then try extracting without piping
+                    
+                    NSFileManager *fileManager = [NSFileManager defaultManager];
+                    
+                    NSURL *extractionDirectoryURL = [NSURL fileURLWithPath:self->_extractionDirectory isDirectory:YES];
+                    
+                    NSError *removeError = nil;
+                    if (![fileManager removeItemAtURL:extractionDirectoryURL error:&removeError]) {
+                        SULog(SULogLevelError, @"Failed to remove extraction directory path for non-piping workaround with error: %@", removeError);
+                        
+                        [notifier notifyFailureWithError:extractError];
+                    } else {
+                        NSError *createError = nil;
+                        if (![fileManager createDirectoryAtPath:self->_extractionDirectory withIntermediateDirectories:NO attributes:nil error:&createError]) {
+                            SULog(SULogLevelError, @"Failed to create new extraction directory path for non-piping workaround with error: %@", createError);
+                            
+                            [notifier notifyFailureWithError:extractError];
+                        } else {
+                            // The ditto command will be the same so no need to fetch it again
+                            NSArray<NSString *> *nonPipingArguments = _argumentsConformingToTypeOfPath(self->_archivePath, NO, NULL);
+                            assert(nonPipingArguments != nil);
+                            
+                            NSError *nonPipingExtractError = nil;
+                            if ([self extractArchivePipingData:NO command:command arguments:nonPipingArguments notifier:notifier error:&nonPipingExtractError]) {
+                                [notifier notifySuccess];
+                            } else {
+                                [notifier notifyFailureWithError:nonPipingExtractError];
+                            }
+                        }
+                    }
+                }
+            }
+        }
     });
 }
 
 // This method abstracts the types that use a command line tool piping data from stdin.
-- (void)extractArchivePipingDataToCommand:(NSString *)command arguments:(NSArray*)args notifier:(SUUnarchiverNotifier *)notifier SPU_OBJC_DIRECT
+- (BOOL)extractArchivePipingData:(BOOL)pipingData command:(NSString *)command arguments:(NSArray*)args notifier:(SUUnarchiverNotifier *)notifier error:(NSError * __autoreleasing *)outError SPU_OBJC_DIRECT
 {
     // *** GETS CALLED ON NON-MAIN THREAD!!!
-	@autoreleasepool {
-        NSString *destination = _extractionDirectory;
-        
-        NSFileManager *fileManager = [NSFileManager defaultManager];
-        
+    NSString *destination = _extractionDirectory;
+    
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    
+    if (pipingData) {
         SULog(SULogLevelDefault, @"Extracting using '%@' '%@' < '%@' '%@'", command, [args componentsJoinedByString:@"' '"], _archivePath, destination);
-        
-        // Get the file size.
+    } else {
+        SULog(SULogLevelDefault, @"Extracting using '%@' '%@' '%@'", command, [args componentsJoinedByString:@"' '"], destination);
+    }
+    
+    // Get expected file size for piping the archive
+    NSUInteger expectedLength;
+    if (pipingData) {
         NSDictionary *attributes = [fileManager attributesOfItemAtPath:_archivePath error:nil];
-        NSUInteger expectedLength = [(NSNumber *)[attributes objectForKey:NSFileSize] unsignedIntegerValue];
+        expectedLength = [(NSNumber *)[attributes objectForKey:NSFileSize] unsignedIntegerValue];
         
         if (expectedLength == 0) {
             NSError *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUUnarchivingError userInfo:@{ NSLocalizedDescriptionKey:[NSString stringWithFormat:@"Extraction failed, archive '%@' is empty", _archivePath]}];
             
-            [notifier notifyFailureWithError:error];
-            return;
+            if (outError != NULL) {
+                *outError = error;
+            }
+            
+            return NO;
         }
-        
+    } else {
+        expectedLength = 0;
+    }
+    
+    NSTask *task = [[NSTask alloc] init];
+    
+    NSPipe *pipe;
+    if (pipingData) {
+        pipe = [NSPipe pipe];
+        [task setStandardInput:pipe];
+    } else {
+        pipe = nil;
+    }
+    
+    [task setStandardError:[NSFileHandle fileHandleWithStandardError]];
+    [task setStandardOutput:[NSFileHandle fileHandleWithStandardOutput]];
+    [task setLaunchPath:command];
+    [task setArguments:[args arrayByAddingObject:destination]];
+    
+    NSError *launchError = nil;
+    if (![task launchAndReturnError:&launchError]) {
+        if (outError != NULL) {
+            *outError = launchError;
+        }
+        return NO;
+    }
+    
+    NSError *underlyingOutError = nil;
+    NSUInteger bytesWritten = 0;
+    
+    if (pipingData) {
         NSFileHandle *archiveInput = [NSFileHandle fileHandleForReadingAtPath:_archivePath];
         
-        NSPipe *pipe = [NSPipe pipe];
-        NSTask *task = [[NSTask alloc] init];
-        [task setStandardInput:pipe];
-        [task setStandardError:[NSFileHandle fileHandleWithStandardError]];
-        [task setStandardOutput:[NSFileHandle fileHandleWithStandardOutput]];
-        [task setLaunchPath:command];
-        [task setArguments:[args arrayByAddingObject:destination]];
-        
-        NSError *launchError = nil;
-        if (![task launchAndReturnError:&launchError]) {
-            [notifier notifyFailureWithError:launchError];
-            return;
-        }
-        
         NSFileHandle *archiveOutput = [pipe fileHandleForWriting];
-        NSUInteger bytesWritten = 0;
         
 #if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_15
         BOOL hasIOErrorMethods;
@@ -177,6 +259,7 @@ static NSArray <NSString *> * _Nullable _commandAndArgumentsConformingToTypeOfPa
 #pragma clang diagnostic pop
                 if (data == nil) {
                     SULog(SULogLevelError, @"Failed to read data from archive with error %@", readError);
+                    underlyingOutError = readError;
                 }
             }
             
@@ -192,6 +275,14 @@ static NSArray <NSString *> * _Nullable _commandAndArgumentsConformingToTypeOfPa
                     [archiveOutput writeData:data];
                 } @catch (NSException *exception) {
                     SULog(SULogLevelError, @"Failed to write data to pipe with exception reason %@", exception.reason);
+                    
+                    if ([exception.name isEqualToString:NSFileHandleOperationException]) {
+                        NSError *underlyingFileHandleError = exception.userInfo[@"NSFileHandleOperationExceptionUnderlyingError"];
+                        NSError *underlyingPOSIXError = underlyingFileHandleError.userInfo[NSUnderlyingErrorKey];
+                        
+                        underlyingOutError = underlyingPOSIXError;
+                    }
+                    
                     break;
                 }
             }
@@ -203,6 +294,10 @@ static NSArray <NSString *> * _Nullable _commandAndArgumentsConformingToTypeOfPa
                 if (![archiveOutput writeData:data error:&writeError]) {
 #pragma clang diagnostic pop
                     SULog(SULogLevelError, @"Failed to write data to pipe with error %@", writeError);
+                    
+                    NSError *underlyingPOSIXError = writeError.userInfo[NSUnderlyingErrorKey];
+                    
+                    underlyingOutError = underlyingPOSIXError;
                     break;
                 }
             }
@@ -238,25 +333,42 @@ static NSArray <NSString *> * _Nullable _commandAndArgumentsConformingToTypeOfPa
             [archiveInput closeFile];
         }
 #endif
-        
-        [task waitUntilExit];
-        
-        if ([task terminationStatus] != 0) {
-            NSError *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUUnarchivingError userInfo:@{ NSLocalizedDescriptionKey:[NSString stringWithFormat:@"Extraction failed, command '%@' returned %d", command, [task terminationStatus]]}];
-            
-            [notifier notifyFailureWithError:error];
-            return;
-        }
-        
-        if (bytesWritten != expectedLength) {
-            NSError *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUUnarchivingError userInfo:@{ NSLocalizedDescriptionKey:[NSString stringWithFormat:@"Extraction failed, command '%@' got only %ld of %ld bytes", command, (long)bytesWritten, (long)expectedLength]}];
-            
-            [notifier notifyFailureWithError:error];
-            return;
-        }
-        
-        [notifier notifySuccess];
     }
+    
+    [task waitUntilExit];
+    
+    if ([task terminationStatus] != 0) {
+        NSMutableDictionary *userInfo = [@{ NSLocalizedDescriptionKey:[NSString stringWithFormat:@"Extraction failed, command '%@' returned %d", command, [task terminationStatus]]} mutableCopy];
+        
+        if (underlyingOutError != nil) {
+            userInfo[NSUnderlyingErrorKey] = underlyingOutError;
+        }
+        
+        NSError *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUUnarchivingError userInfo:[userInfo copy]];
+        
+        if (outError != NULL) {
+            *outError = error;
+        }
+        
+        return NO;
+    }
+    
+    if (!pipingData) {
+        [notifier notifyProgress:1.0];
+    } else if (bytesWritten != expectedLength) {
+        // Don't set underlying error in this case
+        // This may fail due to a write PIPE error but we don't currently support extracting archives that have
+        // extraneous data leftover because these may be corrupt.
+        // We don't want to later workaround extraction by not piping the data.
+        NSError *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUUnarchivingError userInfo:@{ NSLocalizedDescriptionKey:[NSString stringWithFormat:@"Extraction failed, command '%@' got only %ld of %ld bytes", command, (long)bytesWritten, (long)expectedLength]}];
+        
+        if (outError != NULL) {
+            *outError = error;
+        }
+        return NO;
+    }
+    
+    return YES;
 }
 
 - (NSString *)description { return [NSString stringWithFormat:@"%@ <%@>", [self class], _archivePath]; }
