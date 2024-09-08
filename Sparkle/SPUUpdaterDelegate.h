@@ -137,7 +137,10 @@ SU_EXPORT extern NSString *const SUSystemProfilerPreferredLanguageKey;
 /**
  Returns whether Sparkle should prompt the user about checking for new updates automatically.
  
- Use this to override the default behavior. This method is not called if SUEnableAutomaticChecks is defined in Info.plist or
+ Use this to override the default behavior, which is to prompt for permission to check for updates on second app launch
+ (if SUEnableAutomaticChecks is not specified).
+ 
+ This method is not called if SUEnableAutomaticChecks is defined in Info.plist or
  if the user has responded to a permission prompt before.
  
  @param updater The updater instance.
