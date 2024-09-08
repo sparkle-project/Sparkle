@@ -292,7 +292,7 @@ static NSMutableDictionary *sharedUpdaters = nil;
 - (BOOL)updaterShouldPromptForPermissionToCheckForUpdates:(SPUUpdater *)__unused updater
 {
     BOOL shouldPrompt = YES;
-    if ([_delegate respondsToSelector:@selector(updater:didFinishLoadingAppcast:)]) {
+    if ([_delegate respondsToSelector:@selector(updaterShouldPromptForPermissionToCheckForUpdates:)]) {
         shouldPrompt = [_delegate updaterShouldPromptForPermissionToCheckForUpdates:self];
     }
     return shouldPrompt;
