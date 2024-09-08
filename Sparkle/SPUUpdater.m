@@ -382,19 +382,18 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 
     id<SPUUpdaterDelegate> delegate = _delegate;
     
-    // If the user has been asked about automatic checks, don't bother prompting
+    // If the user has been asked about automatic checks or the developer has overridden the setting, don't bother prompting
     // When the user answers to the permission prompt, this will be set to either @YES or @NO instead of nil
-    if ([_host objectForUserDefaultsKey:SUEnableAutomaticChecksKey] != nil) {
+    if ([_host objectForKey:SUEnableAutomaticChecksKey] != nil) {
         shouldPrompt = NO;
     }
     // Does the delegate want to take care of the logic for when we should ask permission to update?
     else if ([delegate respondsToSelector:@selector((updaterShouldPromptForPermissionToCheckForUpdates:))]) {
         shouldPrompt = [delegate updaterShouldPromptForPermissionToCheckForUpdates:self];
     }
-    // Has the user been asked already? And don't ask if the host has a default value set in its Info.plist.
-    else if ([_host objectForKey:SUEnableAutomaticChecksKey] == nil) {
+    else {
         // We wait until the second launch of the updater for this host bundle, unless explicitly overridden via SUPromptUserOnFirstLaunchKey.
-        shouldPrompt = [_host objectForKey:SUPromptUserOnFirstLaunchKey] || hasLaunchedBefore;
+        shouldPrompt = hasLaunchedBefore || [_host boolForInfoDictionaryKey:SUPromptUserOnFirstLaunchKey];
     }
     
     if (!hasLaunchedBefore) {
