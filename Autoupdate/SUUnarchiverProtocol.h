@@ -14,7 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (BOOL)mustValidateBeforeExtractionWithArchivePath:(NSString *)archivePath;
 
-- (void)unarchiveWithCompletionBlock:(void (^)(NSError * _Nullable))completionBlock progressBlock:(void (^ _Nullable)(double))progressBlock;
+- (void)unarchiveWithCompletionBlock:(void (^)(NSError * _Nullable))completionBlock progressBlock:(void (^ _Nullable)(double))progressBlock waitForCleanup:(BOOL)waitForCleanup;
 
 - (NSString *)description;
 

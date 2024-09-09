@@ -96,7 +96,7 @@ static NSArray<NSString *> * _Nullable _argumentsConformingToTypeOfPath(NSString
     return self;
 }
 
-- (void)unarchiveWithCompletionBlock:(void (^)(NSError * _Nullable))completionBlock progressBlock:(void (^ _Nullable)(double))progressBlock
+- (void)unarchiveWithCompletionBlock:(void (^)(NSError * _Nullable))completionBlock progressBlock:(void (^ _Nullable)(double))progressBlock waitForCleanup:(BOOL)__unused waitForCleanup
 {
     NSString *command = nil;
     NSArray<NSString *> *arguments = _argumentsConformingToTypeOfPath(_archivePath, YES, &command);

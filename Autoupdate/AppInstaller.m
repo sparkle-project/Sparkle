@@ -236,7 +236,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
                  
                  [self->_communicator handleMessageWithIdentifier:SPUExtractedArchiveWithProgress data:data];
              }
-         }];
+         } waitForCleanup:NO];
     }
 }
 
