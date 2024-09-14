@@ -290,14 +290,6 @@ static NSUInteger fileCountForDirectory(NSFileManager *fileManager, NSString *it
         success = NO;
 
     finally:
-        if (!waitForCleanup) {
-            if (success) {
-                [notifier notifySuccess];
-            } else {
-                [notifier notifyFailureWithError:error];
-            }
-        }
-        
         if (mountedSuccessfully) {
             NSTask *task = [[NSTask alloc] init];
             task.launchPath = @"/usr/bin/hdiutil";
@@ -316,12 +308,10 @@ static NSUInteger fileCountForDirectory(NSFileManager *fileManager, NSString *it
             SULog(SULogLevelError, @"Can't mount DMG %@", _archivePath);
         }
         
-        if (waitForCleanup) {
-            if (success) {
-                [notifier notifySuccess];
-            } else {
-                [notifier notifyFailureWithError:error];
-            }
+        if (success) {
+            [notifier notifySuccess];
+        } else {
+            [notifier notifyFailureWithError:error];
         }
     }
 }
