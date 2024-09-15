@@ -100,11 +100,11 @@ static NSUInteger fileCountForDirectory(NSFileManager *fileManager, NSString *it
         
         // Prepare stdin data for passwords and license agreements
         {
+            // If no password is supplied, we will still be asked a password.
+            // In that case we respond with an empty password.
             NSData *decryptionPasswordData = [_decryptionPassword dataUsingEncoding:NSUTF8StringEncoding];
             if (decryptionPasswordData != nil) {
                 [inputData appendData:decryptionPasswordData];
-            } else {
-                [inputData appendBytes:"y" length:1];
             }
             
             // From the hdiutil docs:
