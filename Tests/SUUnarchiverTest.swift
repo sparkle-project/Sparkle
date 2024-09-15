@@ -50,7 +50,7 @@ class SUUnarchiverTest: XCTestCase
         unarchiver.unarchive(completionBlock: {(error: Error?) -> Void in
             XCTAssertNotNil(error)
             testExpectation.fulfill()
-        }, progressBlock: nil)
+        }, progressBlock: nil, waitForCleanup: true)
     }
 
     // swiftlint:disable function_parameter_count
@@ -65,7 +65,7 @@ class SUUnarchiverTest: XCTestCase
                 XCTAssertNotNil(error)
             }
             testExpectation.fulfill()
-        }, progressBlock: nil)
+        }, progressBlock: nil, waitForCleanup: true)
     }
 
     func testUnarchivingZip()
@@ -132,9 +132,34 @@ class SUUnarchiverTest: XCTestCase
         self.unarchiveTestAppWithExtension("enc.nolicense.dmg", password: "testpass")
     }
     
+    func testUnarchivingEncryptedDmgWithLicenseAndWithIncorrectPassword()
+    {
+        self.unarchiveTestAppWithExtension("enc.dmg", password: "moo", expectingSuccess: false)
+    }
+    
+    func testUnarchivingEncryptedDmgWithLicenseAndWithoutPassword()
+    {
+        self.unarchiveTestAppWithExtension("enc.dmg", expectingSuccess: false)
+    }
+    
+    func testUnarchivingEncryptedDmgWithoutLicenseAndWithIncorrectPassword()
+    {
+        self.unarchiveTestAppWithExtension("enc.nolicense.dmg", password: "moo", expectingSuccess: false)
+    }
+    
+    func testUnarchivingEncryptedDmgWithoutLicenseAndWithoutPassword()
+    {
+        self.unarchiveTestAppWithExtension("enc.nolicense.dmg", expectingSuccess: false)
+    }
+    
     func testUnarchivingAPFSDMG()
     {
         self.unarchiveTestAppWithExtension("dmg", resourceName: "SparkleTestCodeSign_apfs")
+    }
+    
+    func testUnarchivingAPFSDMGWithBogusPassword()
+    {
+        self.unarchiveTestAppWithExtension("dmg", password: "moo", resourceName: "SparkleTestCodeSign_apfs")
     }
     
     func testUnarchivingAPFSAdhocSignedDMGWithAuxFiles()

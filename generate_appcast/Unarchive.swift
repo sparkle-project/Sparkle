@@ -25,7 +25,7 @@ func unarchive(itemPath: URL, archiveDestDir: URL, callback: @escaping (Error?) 
             } catch {
                 callback(error)
             }
-        }, progressBlock: nil)
+        }, progressBlock: nil, waitForCleanup: true)
     } else {
         callback(makeError(code: .unarchivingError, "Not a supported archive format: \(itemPath.path)"))
     }
