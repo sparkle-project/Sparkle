@@ -499,6 +499,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
             self->_signatures = installationData.signatures;
             self->_updateDirectoryPath = cacheInstallationPath;
             self->_extractionDirectory = extractionDirectory;
+            self->_decryptionPassword = installationData.decryptionPassword;
             self->_host = [[SUHost alloc] initWithBundle:hostBundle];
             self->_verifierInformation = [[SPUVerifierInformation alloc] initWithExpectedVersion:installationData.expectedVersion expectedContentLength:installationData.expectedContentLength];
             
