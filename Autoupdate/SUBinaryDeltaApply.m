@@ -92,8 +92,6 @@ BOOL applyBinaryDelta(NSString *source, NSString *finalDestination, NSString *pa
 
     progressCallback(1/7.0);
     
-    NSDate *beforeHashDate = [NSDate date];
-    
     unsigned char beforeHash[BINARY_DELTA_HASH_LENGTH] = {0};
     if (!getRawHashOfTreeWithVersion(beforeHash, source, majorDiffVersion)) {
         if (verbose) {
@@ -105,8 +103,6 @@ BOOL applyBinaryDelta(NSString *source, NSString *finalDestination, NSString *pa
         return NO;
     }
     
-    NSLog(@"Before hash took %f seconds", [[NSDate date] timeIntervalSinceDate:beforeHashDate]);
-
     if (memcmp(beforeHash, expectedBeforeHash, BINARY_DELTA_HASH_LENGTH) != 0) {
         if (verbose) {
             fprintf(stderr, "\n");
@@ -464,8 +460,6 @@ BOOL applyBinaryDelta(NSString *source, NSString *finalDestination, NSString *pa
         fprintf(stderr, "\nVerifying destination...");
     }
     
-    NSDate *afterHashDate = [NSDate date];
-    
     unsigned char afterHash[BINARY_DELTA_HASH_LENGTH] = {0};
     if (!getRawHashOfTreeWithVersion(afterHash, finalDestination, majorDiffVersion)) {
         if (verbose) {
@@ -478,8 +472,6 @@ BOOL applyBinaryDelta(NSString *source, NSString *finalDestination, NSString *pa
         return NO;
     }
     
-    NSLog(@"After hash took %f seconds", [[NSDate date] timeIntervalSinceDate:afterHashDate]);
-
     if (memcmp(afterHash, expectedAfterHash, BINARY_DELTA_HASH_LENGTH) != 0) {
         if (verbose) {
             fprintf(stderr, "\n");
