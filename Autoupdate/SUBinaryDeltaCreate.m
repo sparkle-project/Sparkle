@@ -508,7 +508,7 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
     // This dictionary will help us keep track of clones
     NSMutableDictionary<NSData *, NSMutableArray<NSString *> *> *beforeHashToFileKeyDictionary = MAJOR_VERSION_IS_AT_LEAST(majorVersion, SUBinaryDeltaMajorVersion3) ? [NSMutableDictionary dictionary] : nil;
     
-    unsigned char beforeHash[CC_SHA1_DIGEST_LENGTH] = {0};
+    unsigned char beforeHash[BINARY_DELTA_HASH_LENGTH] = {0};
     if (!getRawHashOfTreeAndFileTablesWithVersion(beforeHash, source, majorVersion, beforeHashToFileKeyDictionary, nil)) {
         if (verbose) {
             fprintf(stderr, "\n");
@@ -686,7 +686,7 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
     // This dictionary will help us keep track of clones
     NSMutableDictionary<NSString *, NSData *> *afterFileKeyToHashDictionary = MAJOR_VERSION_IS_AT_LEAST(majorVersion, SUBinaryDeltaMajorVersion3) ? [NSMutableDictionary dictionary] : nil;
     
-    unsigned char afterHash[CC_SHA1_DIGEST_LENGTH] = {0};
+    unsigned char afterHash[BINARY_DELTA_HASH_LENGTH] = {0};
     if (!getRawHashOfTreeAndFileTablesWithVersion(afterHash, destination, majorVersion, nil, afterFileKeyToHashDictionary)) {
         if (verbose) {
             fprintf(stderr, "\n");

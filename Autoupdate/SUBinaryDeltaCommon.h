@@ -44,7 +44,8 @@ typedef NS_ENUM(uint16_t, SUBinaryDeltaMajorVersion)
     // Note: support for creating or applying version 1 deltas have been removed
     SUBinaryDeltaMajorVersion1 = 1,
     SUBinaryDeltaMajorVersion2 = 2,
-    SUBinaryDeltaMajorVersion3 = 3
+    SUBinaryDeltaMajorVersion3 = 3,
+    SUBinaryDeltaMajorVersion4 = 4
 };
 
 extern SUBinaryDeltaMajorVersion SUBinaryDeltaMajorVersionDefault;
@@ -57,12 +58,16 @@ extern SUBinaryDeltaMajorVersion SUBinaryDeltaMajorVersionFirstSupported;
 
 //#define COMPRESSION_LEVEL_ARGUMENT_DESCRIPTION @"The compression level to use for generating delta updates. This only applies if the compression method used is bzip2 which accepts values from 1 - 9. A special value of 0 will use the default compression level."
 
+// This is the same as CC_SHA1_DIGEST_LENGTH
+// Major versions >= 4 use a crc32 hash (using a subset of these bytes) while older versions use a sha1 hash
+#define BINARY_DELTA_HASH_LENGTH 20
+
 SPUDeltaCompressionMode deltaCompressionModeFromDescription(NSString *description, BOOL *requestValid);
 NSString *deltaCompressionStringFromMode(SPUDeltaCompressionMode mode);
 
 extern int compareFiles(const FTSENT **a, const FTSENT **b);
-BOOL getRawHashOfTreeWithVersion(unsigned char *hashBuffer, NSString *path, uint16_t majorVersion);
-BOOL getRawHashOfTreeAndFileTablesWithVersion(unsigned char *hashBuffer, NSString *path, uint16_t majorVersion, NSMutableDictionary<NSData *, NSMutableArray<NSString *> *> *hashToFileKeyDictionary, NSMutableDictionary<NSString *, NSData *> *fileKeyToHashDictionary);
+BOOL getRawHashOfTreeWithVersion(void *hashBuffer, NSString *path, uint16_t majorVersion);
+BOOL getRawHashOfTreeAndFileTablesWithVersion(void *hashBuffer, NSString *path, uint16_t majorVersion, NSMutableDictionary<NSData *, NSMutableArray<NSString *> *> *hashToFileKeyDictionary, NSMutableDictionary<NSString *, NSData *> *fileKeyToHashDictionary);
 NSString *displayHashFromRawHash(const unsigned char *hash);
 void getRawHashFromDisplayHash(unsigned char *hash, NSString *hexHash);
 extern NSString *hashOfTreeWithVersion(NSString *path, uint16_t majorVersion);

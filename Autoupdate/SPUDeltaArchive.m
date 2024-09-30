@@ -10,7 +10,7 @@
 #import "SPUDeltaArchiveProtocol.h"
 #import "SPUSparkleDeltaArchive.h"
 #import "SPUXarDeltaArchive.h"
-#import <CommonCrypto/CommonDigest.h>
+#import "SUBinaryDeltaCommon.h"
 
 
 #include "AppKitPrevention.h"
@@ -80,8 +80,8 @@ id<SPUDeltaArchiveProtocol> SPUDeltaArchiveReadPatchAndHeader(NSString *patchFil
 
 @implementation SPUDeltaArchiveHeader
 {
-    unsigned char _beforeTreeHash[CC_SHA1_DIGEST_LENGTH];
-    unsigned char _afterTreeHash[CC_SHA1_DIGEST_LENGTH];
+    unsigned char _beforeTreeHash[BINARY_DELTA_HASH_LENGTH];
+    unsigned char _afterTreeHash[BINARY_DELTA_HASH_LENGTH];
 }
 
 @synthesize compression = _compression;
