@@ -301,7 +301,7 @@ BOOL getRawHashOfTreeAndFileTablesWithVersion(void *hashBuffer, NSString *path, 
     CC_SHA1_CTX hashContext;
     uLong crc32ChecksumValue = 0;
     
-    if (majorVersion < 4) {
+    if (majorVersion < SUBinaryDeltaMajorVersion4) {
         CC_SHA1_Init(&hashContext);
     }
 
