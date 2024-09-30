@@ -34,7 +34,8 @@ class SUUnarchiverTest: XCTestCase
                 let extractedAppURL = tempDirectoryURL.appendingPathComponent(extractedAppName).appendingPathExtension("app")
                 
                 XCTAssertTrue(fileManager.fileExists(atPath: extractedAppURL.path))
-                XCTAssertEqual("6a60ab31430cfca8fb499a884f4a29f73e59b472", hashOfTree(extractedAppURL.path))
+                XCTAssertEqual("6a60ab31430cfca8fb499a884f4a29f73e59b472", hashOfTreeWithVersion(extractedAppURL.path, 3))
+                XCTAssertEqual("52111bc200000000000000000000000000000000", hashOfTree(extractedAppURL.path))
             } else if archiveExtension != "pkg" {
                 let extractedPackageURL = tempDirectoryURL.appendingPathComponent(extractedAppName).appendingPathExtension("pkg")
                 XCTAssertTrue(fileManager.fileExists(atPath: extractedPackageURL.path))
