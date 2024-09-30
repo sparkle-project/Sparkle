@@ -12,15 +12,19 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class SUHost, SUAppcastItem;
 
+#ifndef BUILDING_SPARKLE_TESTS
+#define SPUSkippedUpdateDefinitionAttribute SPU_OBJC_DIRECT_MEMBERS
+#else
+#define SPUSkippedUpdateDefinitionAttribute __attribute__((objc_runtime_name("SPUTestSkippedUpdate")))
+#endif
+
 /*
  A skipped update tracks an optional minor version and an optional major version the user may skip.
  The minor and major versions are independent versions, so the user can choose to skip at most two separate versions.
  The intent is when the user is faced with a major upgrade, they can skip a major version.
  Otherwise they can choose to skip a minor version.
  */
-#ifndef BUILDING_SPARKLE_TESTS
-SPU_OBJC_DIRECT_MEMBERS
-#endif
+SPUSkippedUpdateDefinitionAttribute
 @interface SPUSkippedUpdate : NSObject
 
 + (nullable SPUSkippedUpdate *)skippedUpdateForHost:(SUHost *)host;

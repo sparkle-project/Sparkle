@@ -173,7 +173,6 @@
 		722545B626805FF80036465C /* testappcast_info_updates.xml in Resources */ = {isa = PBXBuildFile; fileRef = 722545B526805FF80036465C /* testappcast_info_updates.xml */; };
 		72266A872946359600645376 /* SUFileManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5E41D3D90AA00D1BF90 /* SUFileManager.m */; };
 		72266A88294635BA00645376 /* SUAppcastDriver.m in Sources */ = {isa = PBXBuildFile; fileRef = 72B767C91C9B707000A07552 /* SUAppcastDriver.m */; };
-		72266A89294636FB00645376 /* SUStandardVersionComparator.m in Sources */ = {isa = PBXBuildFile; fileRef = 61A225A30D1C4AC000430CCD /* SUStandardVersionComparator.m */; };
 		72266A8A2946493C00645376 /* SUCodeSigningVerifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5991D3D8A5A00D1BF90 /* SUCodeSigningVerifier.m */; };
 		72266A8B29464CEA00645376 /* SUHost.m in Sources */ = {isa = PBXBuildFile; fileRef = 61EF67550E25B58D00F754E0 /* SUHost.m */; };
 		72266A8C29464D0200645376 /* SUSignatures.m in Sources */ = {isa = PBXBuildFile; fileRef = EA1E286D22B665E8004AA304 /* SUSignatures.m */; };
@@ -3386,7 +3385,6 @@
 				72266A8C29464D0200645376 /* SUSignatures.m in Sources */,
 				72266A8B29464CEA00645376 /* SUHost.m in Sources */,
 				72266A8A2946493C00645376 /* SUCodeSigningVerifier.m in Sources */,
-				72266A89294636FB00645376 /* SUStandardVersionComparator.m in Sources */,
 				72266A88294635BA00645376 /* SUAppcastDriver.m in Sources */,
 				72266A872946359600645376 /* SUFileManager.m in Sources */,
 				725EE488277D398100D820CE /* SPUDeltaArchive.m in Sources */,

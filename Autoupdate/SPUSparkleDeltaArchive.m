@@ -348,7 +348,19 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
         return nil;
     }
     
-    return [[SPUDeltaArchiveHeader alloc] initWithCompression:compression compressionLevel:metadata.compressionLevel fileSystemCompression:metadata.fileSystemCompression majorVersion:majorVersion minorVersion:minorVersion beforeTreeHash:beforeTreeHash afterTreeHash:afterTreeHash];
+    NSDate *bundleCreationDate;
+    if (MAJOR_VERSION_IS_AT_LEAST(majorVersion, SUBinaryDeltaMajorVersion4)) {
+        double bundleCreationTimeInterval = 0;
+        if (![self _readBuffer:&bundleCreationTimeInterval length:sizeof(bundleCreationTimeInterval)]) {
+            return nil;
+        }
+        
+        bundleCreationDate = (bundleCreationTimeInterval != 0.0) ? [NSDate dateWithTimeIntervalSinceReferenceDate:bundleCreationTimeInterval] : nil;
+    } else {
+        bundleCreationDate = nil;
+    }
+    
+    return [[SPUDeltaArchiveHeader alloc] initWithCompression:compression compressionLevel:metadata.compressionLevel fileSystemCompression:metadata.fileSystemCompression majorVersion:majorVersion minorVersion:minorVersion beforeTreeHash:beforeTreeHash afterTreeHash:afterTreeHash bundleCreationDate:bundleCreationDate];
 }
 
 - (NSArray<NSString *> *)_readRelativeFilePaths SPU_OBJC_DIRECT
@@ -855,6 +867,14 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
     
     [self _writeBuffer:header.beforeTreeHash length:CC_SHA1_DIGEST_LENGTH];
     [self _writeBuffer:header.afterTreeHash length:CC_SHA1_DIGEST_LENGTH];
+    
+    if (MAJOR_VERSION_IS_AT_LEAST(majorVersion, SUBinaryDeltaMajorVersion4)) {
+        NSDate *bundleCreationDate = header.bundleCreationDate;
+        
+        // If bundleCreationDate == nil, we will write out a 0 time interval
+        double timeInterval = bundleCreationDate.timeIntervalSinceReferenceDate;
+        [self _writeBuffer:&timeInterval length:sizeof(timeInterval)];
+    }
 }
 
 - (void)addItem:(SPUDeltaArchiveItem *)item
@@ -883,7 +903,7 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
     
     // Clone commands reference relative file paths in this table but sometimes there may not
     // be an entry if extraction for an original item was skipped. Fill out any missing file path entries.
-    // For example, if A.app has Contents/A and B.app has Contents/A and Contents/A and Contents/B,
+    // For example, if A.app has Contents/A and B.app has Contents/A and Contents/B,
     // where A and B's contents are the same and A is the same in both apps, normally we would not record Contents/A because its extraction was skipped. However now B is a clone of A so we need a record for A.
     NSMutableArray<NSString *> *newClonedPathEntries = [NSMutableArray array];
     for (SPUDeltaArchiveItem *item in writableItems) {
