@@ -460,6 +460,8 @@ static NSMutableDictionary *sharedUpdaters = nil;
     }
 }
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-implementations"
 - (id<SUVersionComparison>)versionComparatorForUpdater:(SPUUpdater *)__unused updater
 {
     id<SUVersionComparison> versionComparator;
@@ -468,6 +470,7 @@ static NSMutableDictionary *sharedUpdaters = nil;
     }
     return versionComparator;
 }
+#pragma clang diagnostic pop
 
 // Private SPUUpdater API that allows us to defer providing an application path to relaunch
 - (NSString * _Nullable)_pathToRelaunchForUpdater:(SPUUpdater *)__unused updater
