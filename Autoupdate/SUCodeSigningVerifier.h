@@ -14,8 +14,12 @@
 NS_ASSUME_NONNULL_BEGIN
 
 #ifndef BUILDING_SPARKLE_TESTS
-SPU_OBJC_DIRECT_MEMBERS
+#define SUCodeSigningVerifierDefinitionAttribute SPU_OBJC_DIRECT_MEMBERS
+#else
+#define SUCodeSigningVerifierDefinitionAttribute __attribute__((objc_runtime_name("SUTestCodeSigningVerifier")))
 #endif
+
+SUCodeSigningVerifierDefinitionAttribute
 @interface SUCodeSigningVerifier : NSObject
 
 + (BOOL)codeSignatureIsValidAtBundleURL:(NSURL *)newBundleURL andMatchesSignatureAtBundleURL:(NSURL *)oldBundleURL error:(NSError **)error;

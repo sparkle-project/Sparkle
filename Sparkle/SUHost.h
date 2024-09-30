@@ -12,8 +12,12 @@ NS_ASSUME_NONNULL_BEGIN
 @class SUPublicKeys;
 
 #ifndef BUILDING_SPARKLE_TESTS
-SPU_OBJC_DIRECT_MEMBERS
+#define SUHostDefinitionAttribute SPU_OBJC_DIRECT_MEMBERS
+#else
+#define SUHostDefinitionAttribute __attribute__((objc_runtime_name("SUTestHost")))
 #endif
+
+SUHostDefinitionAttribute
 @interface SUHost : NSObject
 
 @property (nonatomic, readonly) NSBundle *bundle;

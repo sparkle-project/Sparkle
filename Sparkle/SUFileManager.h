@@ -11,14 +11,18 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+#ifndef BUILDING_SPARKLE_TESTS
+#define SUFileManagerDefinitionAttribute SPU_OBJC_DIRECT_MEMBERS
+#else
+#define SUFileManagerDefinitionAttribute __attribute__((objc_runtime_name("SUTestFileManager")))
+#endif
+
 /**
  * A class used for performing file operations more suitable than NSFileManager for performing installation work.
  * All operations on this class may be used on thread other than the main thread.
  * This class provides just basic file operations and stays away from including much application-level logic.
  */
-#ifndef BUILDING_SPARKLE_TESTS
-SPU_OBJC_DIRECT_MEMBERS
-#endif
+SUFileManagerDefinitionAttribute
 @interface SUFileManager : NSObject
 
 /**

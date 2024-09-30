@@ -23,8 +23,12 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 #ifndef BUILDING_SPARKLE_TESTS
-SPU_OBJC_DIRECT_MEMBERS
+#define SUAppcastDriverDefinitionAttribute SPU_OBJC_DIRECT_MEMBERS
+#else
+#define SUAppcastDriverDefinitionAttribute __attribute__((objc_runtime_name("SUTestAppcastDriver")))
 #endif
+
+SUAppcastDriverDefinitionAttribute
 @interface SUAppcastDriver : NSObject
 
 - (instancetype)initWithHost:(SUHost *)host updater:(id)updater updaterDelegate:(nullable id <SPUUpdaterDelegate>)updaterDelegate delegate:(nullable id <SUAppcastDriverDelegate>)delegate;
