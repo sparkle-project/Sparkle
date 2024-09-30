@@ -404,6 +404,7 @@ BOOL getRawHashOfTreeAndFileTablesWithVersion(void *hashBuffer, NSString *path, 
 
     if (majorVersion >= SUBinaryDeltaMajorVersion4) {
         uint64_t encodedCrc32ChecksumValue = crc32ChecksumValue;
+        memset(hashBuffer, 0, BINARY_DELTA_HASH_LENGTH);
         memcpy(hashBuffer, &encodedCrc32ChecksumValue, sizeof(encodedCrc32ChecksumValue));
     } else {
         CC_SHA1_Final(hashBuffer, &hashContext);
