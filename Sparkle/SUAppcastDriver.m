@@ -429,11 +429,14 @@ SPU_OBJC_DIRECT
 {
     id<SUVersionComparison> comparator = nil;
     
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
     // Give the delegate a chance to provide a custom version comparator
     id<SPUUpdaterDelegate> updaterDelegate = _updaterDelegate;
     if ([updaterDelegate respondsToSelector:@selector((versionComparatorForUpdater:))]) {
         comparator = [updaterDelegate versionComparatorForUpdater:_updater];
     }
+#pragma clang diagnostic pop
     
     // If we don't get a comparator from the delegate, use the default comparator
     if (comparator == nil) {

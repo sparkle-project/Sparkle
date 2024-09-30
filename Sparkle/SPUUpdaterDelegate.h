@@ -386,7 +386,7 @@ SU_EXPORT extern NSString *const SUSystemProfilerPreferredLanguageKey;
  @param updater The updater instance.
  @return The custom version comparator or @c nil if you don't want to be delegated this task.
  */
-- (nullable id<SUVersionComparison>)versionComparatorForUpdater:(SPUUpdater *)updater __deprecated_msg("Custom version comparators are deprecated because they are incompatible with the way the system compares different versions of an app.");
+- (nullable id<SUVersionComparison>)versionComparatorForUpdater:(SPUUpdater *)updater __deprecated_msg("Custom version comparators are deprecated because they are incompatible with how the system compares different versions of an app.");
 
 /**
  Called when a background update will be scheduled after a delay.
