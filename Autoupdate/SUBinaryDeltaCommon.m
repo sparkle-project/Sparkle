@@ -321,7 +321,7 @@ BOOL getRawHashOfTreeAndFileTablesWithVersion(void *hashBuffer, NSString *path, 
         }
 
         NSData *fileHashKey;
-        if (majorVersion >= 4) {
+        if (majorVersion >= SUBinaryDeltaMajorVersion4) {
             if (ent->fts_info == FTS_D) {
                 fileHashKey = nil;
             } else {
@@ -374,7 +374,7 @@ BOOL getRawHashOfTreeAndFileTablesWithVersion(void *hashBuffer, NSString *path, 
 
         const char *relativePathBytes = [relativePath fileSystemRepresentation];
         
-        if (majorVersion >= 4) {
+        if (majorVersion >= SUBinaryDeltaMajorVersion4) {
             crc32ChecksumValue = crc32(crc32ChecksumValue, (const void *)relativePathBytes, (uInt)strlen(relativePathBytes));
         } else {
             CC_SHA1_Update(&hashContext, relativePathBytes, (CC_LONG)strlen(relativePathBytes));
@@ -389,7 +389,7 @@ BOOL getRawHashOfTreeAndFileTablesWithVersion(void *hashBuffer, NSString *path, 
         // hardcoding a value helps avoid differences between filesystems.
         uint16_t hashedPermissions = (ent->fts_info == FTS_SL) ? VALID_SYMBOLIC_LINK_PERMISSIONS : permissions;
 
-        if (majorVersion >= 4) {
+        if (majorVersion >= SUBinaryDeltaMajorVersion4) {
             crc32ChecksumValue = crc32(crc32ChecksumValue, (const void *)&type, sizeof(type));
             crc32ChecksumValue = crc32(crc32ChecksumValue, (const void *)&hashedPermissions, sizeof(hashedPermissions));
         } else {
@@ -402,7 +402,7 @@ BOOL getRawHashOfTreeAndFileTablesWithVersion(void *hashBuffer, NSString *path, 
     
     fts_close(fts);
 
-    if (majorVersion >= 4) {
+    if (majorVersion >= SUBinaryDeltaMajorVersion4) {
         uint64_t encodedCrc32ChecksumValue = crc32ChecksumValue;
         memcpy(hashBuffer, &encodedCrc32ChecksumValue, sizeof(encodedCrc32ChecksumValue));
     } else {

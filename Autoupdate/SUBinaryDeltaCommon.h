@@ -32,8 +32,6 @@
 #define VERBOSE_MODIFIED "Modified" // file's metadata is modified
 #define VERBOSE_CLONED "Cloned" // file is cloned in content from a differently named file
 
-#define MAJOR_VERSION_IS_AT_LEAST(actualMajor, expectedMajor) (actualMajor >= expectedMajor)
-
 // Relative path of custom icon data that may be set on a bundle via a resource fork
 #define CUSTOM_ICON_PATH @"/Icon\r"
 

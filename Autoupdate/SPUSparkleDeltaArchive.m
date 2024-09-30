@@ -349,7 +349,7 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
     }
     
     NSDate *bundleCreationDate;
-    if (MAJOR_VERSION_IS_AT_LEAST(majorVersion, SUBinaryDeltaMajorVersion4)) {
+    if (majorVersion >= SUBinaryDeltaMajorVersion4) {
         double bundleCreationTimeInterval = 0;
         if (![self _readBuffer:&bundleCreationTimeInterval length:sizeof(bundleCreationTimeInterval)]) {
             return nil;
@@ -868,7 +868,7 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
     [self _writeBuffer:header.beforeTreeHash length:BINARY_DELTA_HASH_LENGTH];
     [self _writeBuffer:header.afterTreeHash length:BINARY_DELTA_HASH_LENGTH];
     
-    if (MAJOR_VERSION_IS_AT_LEAST(majorVersion, SUBinaryDeltaMajorVersion4)) {
+    if (majorVersion >= SUBinaryDeltaMajorVersion4) {
         NSDate *bundleCreationDate = header.bundleCreationDate;
         
         // If bundleCreationDate == nil, we will write out a 0 time interval
