@@ -438,7 +438,7 @@ NSString *displayHashFromRawHash(const unsigned char *hash)
 
 NSString *hashOfTreeWithVersion(NSString *path, uint16_t majorVersion)
 {
-    unsigned char hash[BINARY_DELTA_HASH_LENGTH];
+    unsigned char hash[BINARY_DELTA_HASH_LENGTH] = {0};
     if (!getRawHashOfTreeWithVersion(hash, path, majorVersion)) {
         return nil;
     }
