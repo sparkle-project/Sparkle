@@ -299,7 +299,8 @@ BOOL getRawHashOfTreeAndFileTablesWithVersion(void *hashBuffer, NSString *path, 
     }
 
     CC_SHA1_CTX hashContext;
-    uLong crc32ChecksumValue = 0;
+    const uLong initialCrc32Value = crc32(0L, Z_NULL, 0);
+    uLong crc32ChecksumValue = initialCrc32Value;
     
     if (majorVersion < SUBinaryDeltaMajorVersion4) {
         CC_SHA1_Init(&hashContext);
@@ -323,9 +324,11 @@ BOOL getRawHashOfTreeAndFileTablesWithVersion(void *hashBuffer, NSString *path, 
         NSData *fileHashKey;
         if (majorVersion >= SUBinaryDeltaMajorVersion4) {
             if (ent->fts_info == FTS_D) {
+                // No need to hash any further values for directories
+                // We hash relative file path and file type later
                 fileHashKey = nil;
             } else {
-                uLong fileContentsChecksum = 0;
+                uLong fileContentsChecksum = initialCrc32Value;
                 if (!_crc32HashOfFileContents(&fileContentsChecksum, ent, tempBuffer, tempBufferSize)) {
                     fts_close(fts);
                     free(tempBuffer);
