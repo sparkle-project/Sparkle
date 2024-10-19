@@ -119,21 +119,97 @@
 #endif
     else
     {
-        // Because we already validated the EdDSA signature, this is just a consistency check to see
-        // if the developer signed their application properly with their Apple ID
-        // Currently, this case gets hit for binary delta updates and .aar/.yaa archives
+        // We already validated the EdDSA signature
+        // Let's check if the update passes Sparkle's basic update policy and that the update is properly signed
+        // Currently, this case gets hit only for binary delta updates and .aar/.yaa archives
+        
+        NSBundle *newBundle = [NSBundle bundleWithURL:installSourceURL];
+        SUHost *newHost = [[SUHost alloc] initWithBundle:newBundle];
+        
+        SUPublicKeys *publicKeys = host.publicKeys;
+        SUPublicKeys *newPublicKeys = newHost.publicKeys;
+        
+        BOOL oldHasAnyDSAKey = NO;
+        BOOL newHasAnyDSAKey = NO;
+        BOOL migratesDSAKeys = NO;
+        BOOL hostIsCodeSigned = NO;
+        BOOL updateIsCodeSigned = NO;
+        
+        [self getHostIsCodeSigned:&hostIsCodeSigned updateIsCodeSigned:&updateIsCodeSigned hostHasAnyDSAKey:&oldHasAnyDSAKey updateHasAnyDSAKey:&newHasAnyDSAKey migratesDSAKeys:&migratesDSAKeys hostPublicKeys:publicKeys updatePublicKeys:newPublicKeys hostBundleURL:host.bundle.bundleURL updateBundleURL:installSourceURL];
+        
+        if (![self passesBasicUpdatePolicyWithHostIsCodeSigned:hostIsCodeSigned updateIsCodeSigned:updateIsCodeSigned hostHasAnyDSAKey:oldHasAnyDSAKey updateHasAnyDSAKey:newHasAnyDSAKey error:error]) {
+            return NO;
+        }
         
         NSError *innerError = nil;
-        if ([SUCodeSigningVerifier bundleAtURLIsCodeSigned:installSourceURL] && ![SUCodeSigningVerifier codeSignatureIsValidAtBundleURL:installSourceURL error:&innerError]) {
+        if (updateIsCodeSigned && ![SUCodeSigningVerifier codeSignatureIsValidAtBundleURL:installSourceURL error:&innerError]) {
             if (error != NULL) {
                 *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUValidationError userInfo:@{ NSLocalizedDescriptionKey: @"Failed to validate apple code sign signature on bundle after archive validation", NSUnderlyingErrorKey: innerError }];
             }
             
             return NO;
-        } else {
-            return YES;
         }
+        
+        return YES;
     }
+}
+
+- (void)getHostIsCodeSigned:(BOOL *)outHostIsCodeSigned updateIsCodeSigned:(BOOL *)outUpdateIsCodeSigned hostHasAnyDSAKey:(BOOL *)outHostHasAnyDSAKey updateHasAnyDSAKey:(BOOL *)outUpdateHasAnyDSAKey migratesDSAKeys:(BOOL *)outMigratesDSAKeys hostPublicKeys:(SUPublicKeys *)hostPublicKeys updatePublicKeys:(SUPublicKeys *)updatePublicKeys hostBundleURL:(NSURL *)hostBundleURL updateBundleURL:(NSURL *)updateBundleURL SPU_OBJC_DIRECT
+{
+    BOOL oldHasLegacyDSAKey = hostPublicKeys.dsaPubKeyStatus != SUSigningInputStatusAbsent;
+    BOOL oldHasEdDSAKey = hostPublicKeys.ed25519PubKeyStatus != SUSigningInputStatusAbsent;
+    BOOL oldHasAnyDSAKey = oldHasLegacyDSAKey || oldHasEdDSAKey;
+    if (outHostHasAnyDSAKey != NULL) {
+        *outHostHasAnyDSAKey = oldHasAnyDSAKey;
+    }
+    
+    BOOL newHasLegacyDSAKey = updatePublicKeys.dsaPubKeyStatus != SUSigningInputStatusAbsent;
+    BOOL newHasEdDSAKey = updatePublicKeys.ed25519PubKeyStatus != SUSigningInputStatusAbsent;
+    BOOL newHasAnyDSAKey = newHasLegacyDSAKey || newHasEdDSAKey;
+    if (outUpdateHasAnyDSAKey != NULL) {
+        *outUpdateHasAnyDSAKey = newHasAnyDSAKey;
+    }
+    
+    BOOL migratesDSAKeys = oldHasLegacyDSAKey && !oldHasEdDSAKey && newHasEdDSAKey && !newHasLegacyDSAKey;
+    if (outMigratesDSAKeys != NULL) {
+        *outMigratesDSAKeys = migratesDSAKeys;
+    }
+    
+    BOOL hostIsCodeSigned = [SUCodeSigningVerifier bundleAtURLIsCodeSigned:hostBundleURL];
+    if (outHostIsCodeSigned != NULL) {
+        *outHostIsCodeSigned = hostIsCodeSigned;
+    }
+    
+    BOOL updateIsCodeSigned = [SUCodeSigningVerifier bundleAtURLIsCodeSigned:updateBundleURL];
+    if (outUpdateIsCodeSigned != NULL) {
+        *outUpdateIsCodeSigned = updateIsCodeSigned;
+    }
+}
+
+// This is not essential for security, only a policy
+- (BOOL)passesBasicUpdatePolicyWithHostIsCodeSigned:(BOOL)hostIsCodeSigned updateIsCodeSigned:(BOOL)updateIsCodeSigned hostHasAnyDSAKey:(BOOL)hostHasAnyDSAKey updateHasAnyDSAKey:(BOOL)updateHasAnyDSAKey error:(NSError * __autoreleasing *)error SPU_OBJC_DIRECT
+{
+    // Don't allow removal of (Ed)DSA keys
+    if (hostHasAnyDSAKey && !updateHasAnyDSAKey) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUValidationError userInfo:@{ NSLocalizedDescriptionKey: @"A public (Ed)DSA key was found in the old bundle but no public (Ed)DSA key was found in the new update. Sparkle only supports rotation, but not removal of (Ed)DSA keys. Please add an EdDSA key to the new app." }];
+        }
+        return NO;
+    }
+    
+    // Don't allow removal of code signing
+    if (hostIsCodeSigned && !updateIsCodeSigned) {
+        if (error != NULL) {
+            if (hostHasAnyDSAKey) {
+                *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUValidationError userInfo:@{ NSLocalizedDescriptionKey: @"The old bundle is code signed but the update is not code signed. Sparkle only supports rotation, but not removal of Apple Code Signing identity. Please code sign the new app. If no Apple Code Signing identity is available, adhoc signing can be used at minimum." }];
+            } else {
+                *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUValidationError userInfo:@{ NSLocalizedDescriptionKey: @"The old bundle is code signed but the update is not code signed. Please code sign the new app with the same signing identity." }];
+            }
+        }
+        return NO;
+    }
+    
+    return YES;
 }
 
 /**
@@ -161,21 +237,15 @@
     
     _verifierInformation.actualVersion = newHost.version;
     
-    BOOL oldHasLegacyDSAKey = publicKeys.dsaPubKeyStatus != SUSigningInputStatusAbsent;
-    BOOL oldHasEdDSAKey = publicKeys.ed25519PubKeyStatus != SUSigningInputStatusAbsent;
-    BOOL oldHasAnyDSAKey = oldHasLegacyDSAKey || oldHasEdDSAKey;
-    BOOL newHasLegacyDSAKey = newPublicKeys.dsaPubKeyStatus != SUSigningInputStatusAbsent;
-    BOOL newHasEdDSAKey = newPublicKeys.ed25519PubKeyStatus != SUSigningInputStatusAbsent;
-    BOOL newHasAnyDSAKey = newHasLegacyDSAKey || newHasEdDSAKey;
-    BOOL migratesDSAKeys = oldHasLegacyDSAKey && !oldHasEdDSAKey && newHasEdDSAKey && !newHasLegacyDSAKey;
-    BOOL updateIsCodeSigned = [SUCodeSigningVerifier bundleAtURLIsCodeSigned:newHost.bundle.bundleURL];
-    BOOL hostIsCodeSigned = [SUCodeSigningVerifier bundleAtURLIsCodeSigned:host.bundle.bundleURL];
-
-    // This is not essential for security, only a policy
-    if (oldHasAnyDSAKey && !newHasAnyDSAKey) {
-        if (error != NULL) {
-            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUValidationError userInfo:@{ NSLocalizedDescriptionKey: @"A public (Ed)DSA key was found in the old bundle but no public (Ed)DSA key was found in the new update. Sparkle only supports rotation, but not removal of (Ed)DSA keys. Please add an EdDSA key to the new app." }];
-        }
+    BOOL oldHasAnyDSAKey = NO;
+    BOOL newHasAnyDSAKey = NO;
+    BOOL migratesDSAKeys = NO;
+    BOOL hostIsCodeSigned = NO;
+    BOOL updateIsCodeSigned = NO;
+    
+    [self getHostIsCodeSigned:&hostIsCodeSigned updateIsCodeSigned:&updateIsCodeSigned hostHasAnyDSAKey:&oldHasAnyDSAKey updateHasAnyDSAKey:&newHasAnyDSAKey migratesDSAKeys:&migratesDSAKeys hostPublicKeys:publicKeys updatePublicKeys:newPublicKeys hostBundleURL:host.bundle.bundleURL updateBundleURL:newHost.bundle.bundleURL];
+    
+    if (![self passesBasicUpdatePolicyWithHostIsCodeSigned:hostIsCodeSigned updateIsCodeSigned:updateIsCodeSigned hostHasAnyDSAKey:oldHasAnyDSAKey updateHasAnyDSAKey:newHasAnyDSAKey error:error]) {
         return NO;
     }
 
