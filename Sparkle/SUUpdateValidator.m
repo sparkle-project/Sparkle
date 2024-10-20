@@ -131,11 +131,10 @@
         
         BOOL oldHasAnyDSAKey = NO;
         BOOL newHasAnyDSAKey = NO;
-        BOOL migratesDSAKeys = NO;
         BOOL hostIsCodeSigned = NO;
         BOOL updateIsCodeSigned = NO;
         
-        [self getHostIsCodeSigned:&hostIsCodeSigned updateIsCodeSigned:&updateIsCodeSigned hostHasAnyDSAKey:&oldHasAnyDSAKey updateHasAnyDSAKey:&newHasAnyDSAKey migratesDSAKeys:&migratesDSAKeys hostPublicKeys:publicKeys updatePublicKeys:newPublicKeys hostBundleURL:host.bundle.bundleURL updateBundleURL:installSourceURL];
+        [self getHostIsCodeSigned:&hostIsCodeSigned updateIsCodeSigned:&updateIsCodeSigned hostHasAnyDSAKey:&oldHasAnyDSAKey updateHasAnyDSAKey:&newHasAnyDSAKey migratesDSAKeys:NULL hostPublicKeys:publicKeys updatePublicKeys:newPublicKeys hostBundleURL:host.bundle.bundleURL updateBundleURL:installSourceURL];
         
         if (![self passesBasicUpdatePolicyWithHostIsCodeSigned:hostIsCodeSigned updateIsCodeSigned:updateIsCodeSigned hostHasAnyDSAKey:oldHasAnyDSAKey updateHasAnyDSAKey:newHasAnyDSAKey error:error]) {
             return NO;
