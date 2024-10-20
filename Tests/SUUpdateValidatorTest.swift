@@ -33,6 +33,15 @@ class SUUpdateValidatorTest: XCTestCase {
                 return true
             }
         }
+        
+        var isValidCodeSigned: Bool {
+            switch self {
+            case .codeSignedOnly, .codeSignedOnlyNew, .codeSignedBothNew, .codeSignedOldED, .codeSignedBoth:
+                return true
+            case .none, .dsaOnly, .edOnly, .both, .codeSignedInvalid, .codeSignedInvalidOnly:
+                return false
+            }
+        }
     }
 
     struct SignatureConfig: CaseIterable, Equatable, CustomDebugStringConvertible {
@@ -210,7 +219,7 @@ class SUUpdateValidatorTest: XCTestCase {
 #else
                 let signatureConfig = SignatureConfig(ed: .valid)
 #endif
-                testPostValidation(oldBundle: .codeSignedBoth, newBundle: bundleConfig, signatures: signatureConfig, expectedResult: bundleConfig.hasAnyKeys && bundleConfig != .codeSignedInvalid)
+                testPostValidation(oldBundle: .codeSignedBoth, newBundle: bundleConfig, signatures: signatureConfig, expectedResult: bundleConfig.hasAnyKeys && bundleConfig.isValidCodeSigned)
             }
         }
     }
@@ -240,8 +249,8 @@ class SUUpdateValidatorTest: XCTestCase {
             // You can't change two things at once.
             testPostValidation(oldBundle: .codeSignedOldED, newBundle: .codeSignedBothNew, signatures: signatureConfig, expectedResult: false)
 
-            // It's permitted to remove code signing too.
-            testPostValidation(oldBundle: .codeSignedBoth, newBundle: .both, signatures: signatureConfig, expectedResult: signatureIsValid)
+            // You can't remove code signing.
+            testPostValidation(oldBundle: .codeSignedBoth, newBundle: .both, signatures: signatureConfig, expectedResult: false)
         }
     }
 }
