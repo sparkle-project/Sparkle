@@ -200,7 +200,7 @@
     if (hostIsCodeSigned && !updateIsCodeSigned) {
         if (error != NULL) {
             if (hostHasAnyDSAKey) {
-                *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUValidationError userInfo:@{ NSLocalizedDescriptionKey: @"The old bundle is code signed but the update is not code signed. Sparkle only supports rotation, but not removal of Apple Code Signing identity. Please code sign the new app. If no Apple Code Signing identity is available, adhoc signing can be used at minimum." }];
+                *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUValidationError userInfo:@{ NSLocalizedDescriptionKey: @"The old bundle is code signed but the update is not code signed. Sparkle only supports rotation, but not removal of Apple Code Signing identity. Please code sign the new app. If no Apple Code Signing certificate is available, adhoc signing can be used at minimum." }];
             } else {
                 *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUValidationError userInfo:@{ NSLocalizedDescriptionKey: @"The old bundle is code signed but the update is not code signed. Please code sign the new app with the same signing identity." }];
             }
