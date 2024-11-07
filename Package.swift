@@ -10,7 +10,10 @@ let url = "https://github.com/sparkle-project/Sparkle/releases/download/\(tag)/S
 
 let package = Package(
     name: "Sparkle",
-    platforms: [.macOS(.v10_13)], // leaving "10.13" as a breadcrumb for searching
+    platforms: [
+        .macOS(.v10_13)], // leaving "10.13" as a breadcrumb for searching
+        .iOS(.v11)  // Add no-op iOS support for Xcode Previews
+    ],
     products: [
         .library(
             name: "Sparkle",
@@ -21,6 +24,14 @@ let package = Package(
             name: "Sparkle",
             url: url,
             checksum: checksum
+        ),
+            // New SparkleNoOp target for iOS
+        .target(
+            name: "SparkleNoOp",
+            path: "Sources/SparkleNoOp",
+            exclude: [],
+            sources: ["SparkleNoOp.swift"],  // The no-op implementation for iOS
+            publicHeadersPath: "include"
         )
     ]
 )
