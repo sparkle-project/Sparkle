@@ -506,9 +506,9 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
     fts_close(fts);
 
     // This dictionary will help us keep track of clones
-    NSMutableDictionary<NSData *, NSMutableArray<NSString *> *> *beforeHashToFileKeyDictionary = MAJOR_VERSION_IS_AT_LEAST(majorVersion, SUBinaryDeltaMajorVersion3) ? [NSMutableDictionary dictionary] : nil;
+    NSMutableDictionary<NSData *, NSMutableArray<NSString *> *> *beforeHashToFileKeyDictionary = (majorVersion >= SUBinaryDeltaMajorVersion3) ? [NSMutableDictionary dictionary] : nil;
     
-    unsigned char beforeHash[CC_SHA1_DIGEST_LENGTH] = {0};
+    unsigned char beforeHash[BINARY_DELTA_HASH_LENGTH] = {0};
     if (!getRawHashOfTreeAndFileTablesWithVersion(beforeHash, source, majorVersion, beforeHashToFileKeyDictionary, nil)) {
         if (verbose) {
             fprintf(stderr, "\n");
@@ -644,7 +644,7 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
         // If we find any executable files that are using file system compression, that is sufficient
         // for recording that the applier should re-apply file system compression.
         // We check for executable files because they are likely candidates to be compressed.
-        if (!foundFilesystemCompression && MAJOR_VERSION_IS_AT_LEAST(majorVersion, SUBinaryDeltaMajorVersion3) && ent->fts_info == FTS_F && (ent->fts_statp->st_mode & (S_IXUSR | S_IXGRP | S_IXOTH)) != 0 && (ent->fts_statp->st_flags & UF_COMPRESSED) != 0) {
+        if (!foundFilesystemCompression && (majorVersion >= SUBinaryDeltaMajorVersion3) && ent->fts_info == FTS_F && (ent->fts_statp->st_mode & (S_IXUSR | S_IXGRP | S_IXOTH)) != 0 && (ent->fts_statp->st_flags & UF_COMPRESSED) != 0) {
             foundFilesystemCompression = true;
             
             if (verbose) {
@@ -684,9 +684,9 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
     fts_close(fts);
 
     // This dictionary will help us keep track of clones
-    NSMutableDictionary<NSString *, NSData *> *afterFileKeyToHashDictionary = MAJOR_VERSION_IS_AT_LEAST(majorVersion, SUBinaryDeltaMajorVersion3) ? [NSMutableDictionary dictionary] : nil;
+    NSMutableDictionary<NSString *, NSData *> *afterFileKeyToHashDictionary = (majorVersion >= SUBinaryDeltaMajorVersion3) ? [NSMutableDictionary dictionary] : nil;
     
-    unsigned char afterHash[CC_SHA1_DIGEST_LENGTH] = {0};
+    unsigned char afterHash[BINARY_DELTA_HASH_LENGTH] = {0};
     if (!getRawHashOfTreeAndFileTablesWithVersion(afterHash, destination, majorVersion, nil, afterFileKeyToHashDictionary)) {
         if (verbose) {
             fprintf(stderr, "\n");
@@ -725,7 +725,7 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
     
     // Record creation date of root bundle item
     NSDate *bundleCreationDate;
-    if (MAJOR_VERSION_IS_AT_LEAST(majorVersion, SUBinaryDeltaMajorVersion4)) {
+    if (majorVersion >= SUBinaryDeltaMajorVersion4) {
         NSError *fileAttributesError = nil;
         NSDictionary<NSFileAttributeKey, id> *fileAttributes = [[NSFileManager defaultManager] attributesOfItemAtPath:destination error:&fileAttributesError];
         
@@ -769,7 +769,7 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
     // Using a couple of heuristics we track if files have been moved to other locations within the app bundle
     NSMutableDictionary<NSString *, NSString *> *frameworkVersionsSubstitutes = [NSMutableDictionary dictionary];
     NSMutableDictionary<NSString *, NSString *> *fileSubstitutes = [NSMutableDictionary dictionary];
-    if (MAJOR_VERSION_IS_AT_LEAST(majorVersion, SUBinaryDeltaMajorVersion3)) {
+    if (majorVersion >= SUBinaryDeltaMajorVersion3) {
         // Heuristic #1: track if an old framework version was removed and a new framework version was added
         // Keep track of these prefixes in a dictionary
         // Eg: /Contents/Frameworks/Foo.framework/Versions/B/ (new) -> /Contents/Frameworks/Foo.framework/Versions/A/ (old)
@@ -887,7 +887,7 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
                 NSNumber *newPermissions = nil;
                 BOOL clonePermissionsChanged = NO;
                 BOOL clonedBinaryDiff = NO;
-                NSString *clonedRelativePath = MAJOR_VERSION_IS_AT_LEAST(majorVersion, SUBinaryDeltaMajorVersion3) ? cloneableRelativePath(afterFileKeyToHashDictionary, beforeHashToFileKeyDictionary, frameworkVersionsSubstitutes, fileSubstitutes, originalTreeState, newInfo, key, &newPermissions, &clonePermissionsChanged, &clonedBinaryDiff) : nil;
+                NSString *clonedRelativePath = (majorVersion >= SUBinaryDeltaMajorVersion3) ? cloneableRelativePath(afterFileKeyToHashDictionary, beforeHashToFileKeyDictionary, frameworkVersionsSubstitutes, fileSubstitutes, originalTreeState, newInfo, key, &newPermissions, &clonePermissionsChanged, &clonedBinaryDiff) : nil;
                 if (clonedRelativePath != nil) {
                     if (clonedBinaryDiff) {
                         NSDictionary *cloneInfo = originalTreeState[clonedRelativePath];

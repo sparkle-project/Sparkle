@@ -338,18 +338,18 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
         return nil;
     }
     
-    unsigned char beforeTreeHash[CC_SHA1_DIGEST_LENGTH] = {0};
+    unsigned char beforeTreeHash[BINARY_DELTA_HASH_LENGTH] = {0};
     if (![self _readBuffer:beforeTreeHash length:sizeof(beforeTreeHash)]) {
         return nil;
     }
     
-    unsigned char afterTreeHash[CC_SHA1_DIGEST_LENGTH] = {0};
+    unsigned char afterTreeHash[BINARY_DELTA_HASH_LENGTH] = {0};
     if (![self _readBuffer:afterTreeHash length:sizeof(afterTreeHash)]) {
         return nil;
     }
     
     NSDate *bundleCreationDate;
-    if (MAJOR_VERSION_IS_AT_LEAST(majorVersion, SUBinaryDeltaMajorVersion4)) {
+    if (majorVersion >= SUBinaryDeltaMajorVersion4) {
         double bundleCreationTimeInterval = 0;
         if (![self _readBuffer:&bundleCreationTimeInterval length:sizeof(bundleCreationTimeInterval)]) {
             return nil;
@@ -865,10 +865,10 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
     uint16_t minorVersion = header.minorVersion;
     [self _writeBuffer:&minorVersion length:sizeof(minorVersion)];
     
-    [self _writeBuffer:header.beforeTreeHash length:CC_SHA1_DIGEST_LENGTH];
-    [self _writeBuffer:header.afterTreeHash length:CC_SHA1_DIGEST_LENGTH];
+    [self _writeBuffer:header.beforeTreeHash length:BINARY_DELTA_HASH_LENGTH];
+    [self _writeBuffer:header.afterTreeHash length:BINARY_DELTA_HASH_LENGTH];
     
-    if (MAJOR_VERSION_IS_AT_LEAST(majorVersion, SUBinaryDeltaMajorVersion4)) {
+    if (majorVersion >= SUBinaryDeltaMajorVersion4) {
         NSDate *bundleCreationDate = header.bundleCreationDate;
         
         // If bundleCreationDate == nil, we will write out a 0 time interval

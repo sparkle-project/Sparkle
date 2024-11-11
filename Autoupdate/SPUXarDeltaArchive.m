@@ -159,10 +159,10 @@ extern char *xar_get_safe_path(xar_file_t f) __attribute__((weak_import));
         }
     }
     
-    unsigned char rawExpectedBeforeHash[CC_SHA1_DIGEST_LENGTH] = {0};
+    unsigned char rawExpectedBeforeHash[BINARY_DELTA_HASH_LENGTH] = {0};
     getRawHashFromDisplayHash(rawExpectedBeforeHash, expectedBeforeHash);
     
-    unsigned char rawExpectedAfterHash[CC_SHA1_DIGEST_LENGTH] = {0};
+    unsigned char rawExpectedAfterHash[BINARY_DELTA_HASH_LENGTH] = {0};
     getRawHashFromDisplayHash(rawExpectedAfterHash, expectedAfterHash);
     
     // I wasn't able to figure out how to retrieve the compression options from xar,

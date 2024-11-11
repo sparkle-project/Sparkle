@@ -92,7 +92,7 @@ BOOL applyBinaryDelta(NSString *source, NSString *finalDestination, NSString *pa
 
     progressCallback(1/7.0);
     
-    unsigned char beforeHash[CC_SHA1_DIGEST_LENGTH] = {0};
+    unsigned char beforeHash[BINARY_DELTA_HASH_LENGTH] = {0};
     if (!getRawHashOfTreeWithVersion(beforeHash, source, majorDiffVersion)) {
         if (verbose) {
             fprintf(stderr, "\n");
@@ -102,8 +102,8 @@ BOOL applyBinaryDelta(NSString *source, NSString *finalDestination, NSString *pa
         }
         return NO;
     }
-
-    if (memcmp(beforeHash, expectedBeforeHash, CC_SHA1_DIGEST_LENGTH) != 0) {
+    
+    if (memcmp(beforeHash, expectedBeforeHash, BINARY_DELTA_HASH_LENGTH) != 0) {
         if (verbose) {
             fprintf(stderr, "\n");
         }
@@ -460,7 +460,7 @@ BOOL applyBinaryDelta(NSString *source, NSString *finalDestination, NSString *pa
         fprintf(stderr, "\nVerifying destination...");
     }
     
-    unsigned char afterHash[CC_SHA1_DIGEST_LENGTH] = {0};
+    unsigned char afterHash[BINARY_DELTA_HASH_LENGTH] = {0};
     if (!getRawHashOfTreeWithVersion(afterHash, finalDestination, majorDiffVersion)) {
         if (verbose) {
             fprintf(stderr, "\n");
@@ -471,8 +471,8 @@ BOOL applyBinaryDelta(NSString *source, NSString *finalDestination, NSString *pa
         removeTree(finalDestination);
         return NO;
     }
-
-    if (memcmp(afterHash, expectedAfterHash, CC_SHA1_DIGEST_LENGTH) != 0) {
+    
+    if (memcmp(afterHash, expectedAfterHash, BINARY_DELTA_HASH_LENGTH) != 0) {
         if (verbose) {
             fprintf(stderr, "\n");
         }
