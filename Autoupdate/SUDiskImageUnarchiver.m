@@ -35,7 +35,7 @@
     return [[path pathExtension] isEqualToString:@"dmg"];
 }
 
-+ (BOOL)mustValidateBeforeExtractionWithArchivePath:(NSString *)archivePath
++ (BOOL)mustValidateBeforeExtraction
 {
     return NO;
 }
@@ -49,6 +49,11 @@
         _extractionDirectory = [extractionDirectory copy];
     }
     return self;
+}
+
+- (BOOL)needsRequiresSignedArchivesKey
+{
+    return NO;
 }
 
 - (void)unarchiveWithCompletionBlock:(void (^)(NSError * _Nullable))completionBlock progressBlock:(void (^ _Nullable)(double))progressBlock waitForCleanup:(BOOL)waitForCleanup

@@ -23,8 +23,10 @@ SPU_OBJC_DIRECT_MEMBERS
 
 - (instancetype)initWithDownloadPath:(NSString *)downloadPath signatures:(SUSignatures *)signatures host:(SUHost *)host verifierInformation:(SPUVerifierInformation * _Nullable)verifierInformation;
 
+- (BOOL)validateHostHasPublicKeys:(NSError **)error;
+
 // This is "pre" validation, before the archive has been extracted
-- (BOOL)validateDownloadPathWithError:(NSError **)error;
+- (BOOL)validateDownloadPathWithFallbackOnCodeSigning:(BOOL)fallbackOnCodeSigning error:(NSError **)error;
 
 // This is "post" validation, after an archive has been extracted
 - (BOOL)validateWithUpdateDirectory:(NSString *)updateDirectory error:(NSError **)error;

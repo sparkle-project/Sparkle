@@ -26,12 +26,17 @@
     CFErrorRef cfError = NULL;
 
     result = SecStaticCodeCreateWithPath((__bridge CFURLRef)oldBundleURL, kSecCSDefaultFlags, &oldCode);
-    if (result == errSecCSUnsigned) {
+    if (result != noErr) {
         if (error != NULL) {
-            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInsufficientSigningError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Bundle is not code signed: %@", newBundleURL] }];
+            NSString *errorMessage =
+                (result == errSecCSUnsigned) ?
+                [NSString stringWithFormat:@"Bundle is not code signed: %@", oldBundleURL.path] :
+                [NSString stringWithFormat:@"Failed to get static code (%d): %@", result, oldBundleURL.path];
+        
+            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInsufficientSigningError userInfo:@{ NSLocalizedDescriptionKey: errorMessage }];
         }
         
-        return NO;
+        goto finally;
     }
 
     result = SecCodeCopyDesignatedRequirement(oldCode, kSecCSDefaultFlags, &requirement);
@@ -258,15 +263,8 @@ static id valueOrNSNull(id value) {
     return (result == 0);
 }
 
-+ (NSString * _Nullable)teamIdentifierAtURL:(NSURL *)url
+static NSString * _Nullable SUTeamIdentifierFromStaticCode(SecStaticCodeRef staticCode)
 {
-    SecStaticCodeRef staticCode = NULL;
-    OSStatus staticCodeResult = SecStaticCodeCreateWithPath((__bridge CFURLRef)url, kSecCSDefaultFlags, &staticCode);
-    if (staticCodeResult != noErr) {
-        SULog(SULogLevelError, @"Failed to get static code for retrieving team identifier: %d", staticCodeResult);
-        return nil;
-    }
-    
     CFDictionaryRef cfSigningInformation = NULL;
     OSStatus copySigningInfoCode = SecCodeCopySigningInformation(staticCode, kSecCSSigningInformation,
         &cfSigningInformation);
@@ -280,6 +278,153 @@ static id valueOrNSNull(id value) {
     
     // Note this will return nil for ad-hoc or unsigned binaries
     return signingInformation[(NSString *)kSecCodeInfoTeamIdentifier];
+}
+
++ (NSString * _Nullable)teamIdentifierAtURL:(NSURL *)url
+{
+    SecStaticCodeRef staticCode = NULL;
+    OSStatus staticCodeResult = SecStaticCodeCreateWithPath((__bridge CFURLRef)url, kSecCSDefaultFlags, &staticCode);
+    if (staticCodeResult != noErr) {
+        SULog(SULogLevelError, @"Failed to get static code for retrieving team identifier: %d", staticCodeResult);
+        return nil;
+    }
+    
+    NSString *teamIdentifier = SUTeamIdentifierFromStaticCode(staticCode);
+    
+    if (staticCode != NULL) {
+        CFRelease(staticCode);
+    }
+    
+    return teamIdentifier;
+}
+
++ (BOOL)codeSignatureIsValidAtDownloadURL:(NSURL *)downloadURL andMatchesDeveloperIDTeamFromOldBundleURL:(NSURL *)oldBundleURL error:(NSError * __autoreleasing *)error
+{
+    NSString *teamIdentifier = nil;
+    NSString *requirementString = nil;
+    SecRequirementRef requirement = NULL;
+    SecStaticCodeRef oldStaticCode = NULL;
+    SecStaticCodeRef downloadStaticCode = NULL;
+    OSStatus result;
+    
+    result = SecStaticCodeCreateWithPath((__bridge CFURLRef)oldBundleURL, kSecCSDefaultFlags, &oldStaticCode);
+    if (result != errSecSuccess) {
+        if (error != NULL) {
+            NSString *errorMessage =
+                (result == errSecCSUnsigned) ?
+                [NSString stringWithFormat:@"Bundle is not code signed: %@", oldBundleURL.path] :
+                [NSString stringWithFormat:@"Failed to get static code (%d): %@", result, oldBundleURL.path];
+        
+            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInsufficientSigningError userInfo:@{ NSLocalizedDescriptionKey: errorMessage }];
+        }
+        
+        goto finally;
+    }
+    
+    teamIdentifier = SUTeamIdentifierFromStaticCode(oldStaticCode);
+    if (teamIdentifier == nil) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInsufficientSigningError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to get team identifier: %@", oldBundleURL.path] }];
+        }
+        
+        goto finally;
+    }
+    
+    // Create a designated requirement with developer ID signing with this team ID
+    // Validate it against code signing check of this archive
+    // CertificateIssuedByApple = anchor apple generic
+    // IssuerIsDeveloperID = certificate 1[field.1.2.840.113635.100.6.2.6]
+    // LeafIsDeveloperIDApp = certificate leaf[field.1.2.840.113635.100.6.1.13]
+    // DeveloperIDTeamID = certificate leaf[subject.OU]
+    // https://developer.apple.com/documentation/technotes/tn3127-inside-code-signing-requirements#Xcode-designated-requirement-for-Developer-ID-code
+    requirementString = [NSString stringWithFormat:@"anchor apple generic and certificate 1[field.1.2.840.113635.100.6.2.6] and certificate leaf[field.1.2.840.113635.100.6.1.13] and certificate leaf[subject.OU] = %@", teamIdentifier];
+    
+    result = SecRequirementCreateWithString((__bridge CFStringRef)requirementString, kSecCSDefaultFlags, &requirement);
+    if (result != errSecSuccess) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInsufficientSigningError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to create designated requirement string with Developer ID requirement with team identifier '%@' and error %d", teamIdentifier, result] }];
+        }
+        
+        goto finally;
+    }
+    
+    result = SecStaticCodeCreateWithPath((__bridge CFURLRef)downloadURL, kSecCSDefaultFlags, &downloadStaticCode);
+    if (result != errSecSuccess) {
+        NSString *message = [NSString stringWithFormat:@"Failed to get static code %d", result];
+        
+        SULog(SULogLevelError, @"%@", message);
+        
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInsufficientSigningError userInfo:@{ NSLocalizedDescriptionKey: message }];
+        }
+        
+        goto finally;
+    }
+    
+    SecCSFlags flags = (SecCSFlags)kSecCSDefaultFlags;
+    CFErrorRef cfError = NULL;
+    result = SecStaticCodeCheckValidityWithErrors(downloadStaticCode, flags, requirement, &cfError);
+    if (result != errSecSuccess) {
+        NSError *underlyingError;
+        if (cfError != NULL) {
+            NSError *tmpError = CFBridgingRelease(cfError);
+            underlyingError = tmpError;
+        } else {
+            underlyingError = nil;
+        }
+        
+        NSMutableDictionary *userInfo = [NSMutableDictionary dictionary];
+        if (underlyingError != nil) {
+            userInfo[NSUnderlyingErrorKey] = underlyingError;
+        }
+        
+        if (result == errSecCSUnsigned) {
+            NSString *message = [NSString stringWithFormat:@"The download archive (%@) is not Apple code signed", downloadURL.lastPathComponent];
+            
+            SULog(SULogLevelError, @"%@", message);
+            
+            if (error != NULL) {
+                userInfo[NSLocalizedDescriptionKey] = message;
+                
+                *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInsufficientSigningError userInfo:[userInfo copy]];
+            }
+        } else if (result == errSecCSReqFailed) {
+            NSString *initialMessage = @"Code signature of new downloaded archive doesn't match the old app version. Please ensure that the archive and app are signed using the same Developer ID certificate.";
+            
+            NSDictionary *oldInfo = [self logSigningInfoForCode:oldStaticCode label:@"old info"];
+            NSDictionary *newInfo = [self logSigningInfoForCode:downloadStaticCode label:@"new info"];
+            
+            if (error != NULL) {
+                userInfo[NSLocalizedDescriptionKey] = [NSString stringWithFormat:@"%@ old info: %@. new info: %@", initialMessage, oldInfo, newInfo];
+                
+                *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInsufficientSigningError userInfo:[userInfo copy]];
+            }
+        } else {
+            if (error != NULL) {
+                userInfo[NSLocalizedDescriptionKey] = @"Error: Old app bundle code signing signature failed to match new downloaded archive code signing signature";
+                
+                *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInsufficientSigningError userInfo:[userInfo copy]];
+            }
+        }
+        
+        goto finally;
+    }
+    
+finally:
+    
+    if (oldStaticCode != NULL) {
+        CFRelease(oldStaticCode);
+    }
+    
+    if (requirement != NULL) {
+        CFRelease(requirement);
+    }
+    
+    if (downloadStaticCode != NULL) {
+        CFRelease(downloadStaticCode);
+    }
+    
+    return (result == errSecSuccess);
 }
 
 @end

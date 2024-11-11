@@ -28,7 +28,7 @@
     return [[path pathExtension] isEqualToString:@"delta"];
 }
 
-+ (BOOL)mustValidateBeforeExtractionWithArchivePath:(NSString *)archivePath
++ (BOOL)mustValidateBeforeExtraction
 {
     return YES;
 }
@@ -81,6 +81,11 @@ SPU_OBJC_DIRECT
         _extractionDirectory = [extractionDirectory copy];
     }
     return self;
+}
+
+- (BOOL)needsRequiresSignedArchivesKey
+{
+    return NO;
 }
 
 - (void)unarchiveWithCompletionBlock:(void (^)(NSError * _Nullable))completionBlock progressBlock:(void (^ _Nullable)(double))progressBlock waitForCleanup:(BOOL)__unused waitForCleanup

@@ -81,9 +81,9 @@ static NSArray<NSString *> * _Nullable _argumentsConformingToTypeOfPath(NSString
     return _argumentsConformingToTypeOfPath(path, YES, NULL) != nil;
 }
 
-+ (BOOL)mustValidateBeforeExtractionWithArchivePath:(NSString *)archivePath
++ (BOOL)mustValidateBeforeExtraction
 {
-    return ([archivePath hasSuffix:@".aar"] || [archivePath hasSuffix:@".yaa"]);
+    return NO;
 }
 
 - (instancetype)initWithArchivePath:(NSString *)archivePath extractionDirectory:(NSString *)extractionDirectory
@@ -94,6 +94,11 @@ static NSArray<NSString *> * _Nullable _argumentsConformingToTypeOfPath(NSString
         _extractionDirectory = [extractionDirectory copy];
     }
     return self;
+}
+
+- (BOOL)needsRequiresSignedArchivesKey
+{
+    return ([_archivePath hasSuffix:@".aar"] || [_archivePath hasSuffix:@".yaa"]);
 }
 
 - (void)unarchiveWithCompletionBlock:(void (^)(NSError * _Nullable))completionBlock progressBlock:(void (^ _Nullable)(double))progressBlock waitForCleanup:(BOOL)__unused waitForCleanup

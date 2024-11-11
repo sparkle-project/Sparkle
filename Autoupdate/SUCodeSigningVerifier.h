@@ -29,6 +29,8 @@ SUCodeSigningVerifierDefinitionAttribute
 // Same as above except does not check for nested code. This method should be used by the framework.
 + (BOOL)codeSignatureIsValidAtBundleURL:(NSURL *)bundleURL error:(NSError *__autoreleasing *)error;
 
++ (BOOL)codeSignatureIsValidAtDownloadURL:(NSURL *)downloadURL andMatchesDeveloperIDTeamFromOldBundleURL:(NSURL *)oldBundleURL error:(NSError * __autoreleasing *)error;
+
 + (BOOL)bundleAtURLIsCodeSigned:(NSURL *)bundleURL;
 
 + (NSString * _Nullable)teamIdentifierAtURL:(NSURL *)url;

@@ -117,7 +117,7 @@ class SUUpdateValidatorTest: XCTestCase {
         let signatures = self.signatures(signatureConfig)
         let validator = SUUpdateValidator(downloadPath: self.signedTestFilePath, signatures: signatures, host: host, verifierInformation: nil)
 
-        let result = (try? validator.validateDownloadPath()) != nil
+        let result = (try? validator.validateHostHasPublicKeys()) != nil && (try? validator.validateDownloadPathWithFallback(onCodeSigning: false)) != nil
         XCTAssertEqual(result, expectedResult, "bundle: \(bundleConfig), signatures: \(signatureConfig)", line: line)
     }
 
