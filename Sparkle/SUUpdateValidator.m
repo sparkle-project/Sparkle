@@ -68,7 +68,9 @@
     }
     
     NSMutableArray<NSError *> *underlyingErrors = [[NSMutableArray alloc] init];
-    [underlyingErrors addObject:dsaVerificationError];
+    if (dsaVerificationError != nil) {
+        [underlyingErrors addObject:dsaVerificationError];
+    }
     
     if (fallbackOnCodeSigning) {
         SULog(SULogLevelError, @"Failed to validate update archive with (Ed)DSA signing. Trying fallback with Apple Developer ID code signing verification: %@", dsaVerificationError);
@@ -81,7 +83,9 @@
         if (![SUCodeSigningVerifier codeSignatureIsValidAtDownloadURL:downloadURL andMatchesDeveloperIDTeamFromOldBundleURL:_host.bundle.bundleURL error:&codeSignError]) {
             SULog(SULogLevelError, @"Failed to validate update archive with Developer ID code signing fallback: %@", codeSignError);
             
-            [underlyingErrors addObject:codeSignError];
+            if (codeSignError != nil) {
+                [underlyingErrors addObject:codeSignError];
+            }
         } else {
             _prevalidatedSignature = YES;
             return YES;
@@ -92,8 +96,10 @@
         NSMutableDictionary<NSString *, id> *userInfo = [[NSMutableDictionary alloc] init];
         userInfo[NSLocalizedDescriptionKey] = [NSString stringWithFormat:@"(Ed)DSA signature validation before unarchiving failed for update %@", _downloadPath];
         
-        // This is the primary error
-        userInfo[NSUnderlyingErrorKey] = dsaVerificationError;
+        if (dsaVerificationError != nil) {
+            // This is the primary error
+            userInfo[NSUnderlyingErrorKey] = dsaVerificationError;
+        }
         
         if (underlyingErrors.count > 1) {
             if (@available(macOS 11.3, *)) {
