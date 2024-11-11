@@ -58,6 +58,7 @@ static NSString *const SUUpdateAlertTouchBarIdentifier = @"" SPARKLE_BUNDLE_IDEN
     void(^_completionBlock)(SPUUserUpdateChoice, NSRect, BOOL);
     
     BOOL _allowsAutomaticUpdates;
+    BOOL _windowLoadedAndShowsReleaseNotes;
 }
 
 - (instancetype)initWithAppcastItem:(SUAppcastItem *)item state:(SPUUserUpdateState *)state host:(SUHost *)aHost versionDisplayer:(id<SUVersionDisplay>)versionDisplayer completionBlock:(void (^)(SPUUserUpdateChoice, NSRect, BOOL))completionBlock didBecomeKeyBlock:(void (^)(void))didBecomeKeyBlock
@@ -184,8 +185,13 @@ static NSString *const SUUpdateAlertTouchBarIdentifier = @"" SPARKLE_BUNDLE_IDEN
 
 - (void)showUpdateReleaseNotesWithDownloadData:(SPUDownloadData *)downloadData
 {
-    if (![self showsReleaseNotes]) {
-        if ([_host.bundle isEqual:NSBundle.mainBundle]) {
+    if (!_windowLoadedAndShowsReleaseNotes) {
+        if (self.window == nil) {
+            // Window was not properly loaded.
+            // This can happen if the app moves and the update alert nib fails to load
+            // This puts Sparkle in an unsupported state but we will try to avoid crashing
+            SULog(SULogLevelError, @"Error: SUUpdateAlert window is nil and failed to load, which may mean the app was moved. Sparkle is running in an unsupported state.");
+        } else if ([_host.bundle isEqual:NSBundle.mainBundle]) {
             SULog(SULogLevelError, @"Warning: '%@' is configured to not show release notes but release notes for version %@ were downloaded. Consider either removing release notes from your appcast or implementing -[SPUUpdaterDelegate updater:shouldDownloadReleaseNotesForUpdate:]", _host.name, _updateItem.displayVersionString);
         }
         return;
@@ -344,6 +350,7 @@ static NSString *const SUUpdateAlertTouchBarIdentifier = @"" SPARKLE_BUNDLE_IDEN
         // Update alert should not be resizable when no release notes are available
         window.styleMask &= ~NSWindowStyleMaskResizable;
     }
+    _windowLoadedAndShowsReleaseNotes = showReleaseNotes;
 
     if (_updateItem.informationOnlyUpdate) {
         [_installButton setTitle:SULocalizedStringFromTableInBundle(@"Learn More…", SPARKLE_TABLE, SUSparkleBundle(), @"Alternate title for 'Install Update' button when there's no download in RSS feed.")];
