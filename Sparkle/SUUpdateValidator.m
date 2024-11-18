@@ -217,12 +217,16 @@
             NSError *validateInnerError = nil;
             BOOL validationCheckSuccess = [SUSignatureVerifier validatePath:downloadPath withSignatures:signatures withPublicKeys:newPublicKeys verifierInformation:_verifierInformation error:&validateInnerError];
             if (!validationCheckSuccess) {
-                NSMutableDictionary *userInfo = [NSMutableDictionary dictionary];
-                
-                userInfo[NSLocalizedDescriptionKey] = @"(Ed)DSA signature validation failed after using Apple code signing to validate the update archive. The update has a public (Ed)DSA key, but the public key shipped with the update doesn't match the signature. To prevent future problems, the update will be rejected.";
-                
-                if (validateInnerError != nil) {
-                    userInfo[NSUnderlyingErrorKey] = validateInnerError;
+                if (error != NULL) {
+                    NSMutableDictionary *userInfo = [NSMutableDictionary dictionary];
+                    
+                    userInfo[NSLocalizedDescriptionKey] = @"(Ed)DSA signature validation failed after using Apple code signing to validate the update archive. The update has a public (Ed)DSA key, but the public key shipped with the update doesn't match the signature. To prevent future problems, the update will be rejected.";
+                    
+                    if (validateInnerError != nil) {
+                        userInfo[NSUnderlyingErrorKey] = validateInnerError;
+                    }
+                    
+                    *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUValidationError userInfo:userInfo];
                 }
                 
                 return NO;
