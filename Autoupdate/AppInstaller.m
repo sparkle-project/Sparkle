@@ -196,7 +196,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
         // More uncommon archives types (.aar, .yaa) require SURequireSignedArchives
         BOOL requiresSignedAchives = [_host boolForInfoDictionaryKey:SURequireSignedArchivesKey];
         if (!requiresSignedAchives && unarchiver.needsRequiresSignedArchivesKey) {
-            prevalidationError = [NSError errorWithDomain:SUSparkleErrorDomain code:SUValidationError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"%@ archives require setting %@ as YES in the old app. Please visit https://sparkle-project.org/documentation/customization/ for more information.", archivePath.pathExtension, SURequireSignedArchivesKey] }];
+            prevalidationError = [NSError errorWithDomain:SUSparkleErrorDomain code:SUValidationError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Extracting %@ archives require setting %@ Info.plist key to YES in the old app. Please visit https://sparkle-project.org/documentation/customization/ for more information.", archivePath.pathExtension, SURequireSignedArchivesKey] }];
             
             success = NO;
         } else {
