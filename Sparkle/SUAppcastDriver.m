@@ -434,7 +434,10 @@ SPU_OBJC_DIRECT
     // Give the delegate a chance to provide a custom version comparator
     id<SPUUpdaterDelegate> updaterDelegate = _updaterDelegate;
     if ([updaterDelegate respondsToSelector:@selector((versionComparatorForUpdater:))]) {
-        comparator = [updaterDelegate versionComparatorForUpdater:_updater];
+        id updater = _updater;
+        if (updater != nil) {
+            comparator = [updaterDelegate versionComparatorForUpdater:updater];
+        }
     }
 #pragma clang diagnostic pop
     
