@@ -426,7 +426,7 @@ finally:
         CFRelease(downloadStaticCode);
     }
     
-    return (result == errSecSuccess);
+    return (teamIdentifier != nil && result == errSecSuccess);
 }
 
 @end
