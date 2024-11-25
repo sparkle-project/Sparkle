@@ -346,9 +346,9 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
             }
             return NO;
         } else {
-            BOOL requireSignedArchives = [_host boolForInfoDictionaryKey:SUVerifyUpdateBeforeExtractionKey];
+            BOOL verifyBeforeExtraction = [_host boolForInfoDictionaryKey:SUVerifyUpdateBeforeExtractionKey];
             
-            if (requireSignedArchives) {
+            if (verifyBeforeExtraction) {
                 if (error != NULL) {
                     *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUNoPublicDSAFoundError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"For security reasons, updates need to be signed with an EdDSA key because %@ is specified for %@. Visit Sparkle's documentation for more information.", SUVerifyUpdateBeforeExtractionKey, hostName] }];
                 }
