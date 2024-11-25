@@ -165,7 +165,7 @@ class SUUnarchiverTest: XCTestCase
     
     func testUnarchivingAPFSAdhocSignedDMGWithAuxFiles()
     {
-        self.unarchiveTestAppWithExtension("dmg", resourceName: "SparkleTestCodeSign_apfs_lzma_aux_files")
+        self.unarchiveTestAppWithExtension("dmg", resourceName: "SparkleTestCodeSign_apfs_lzma_aux_files_adhoc")
     }
     
     func testUnarchivingAPFSDMGWithPackage()

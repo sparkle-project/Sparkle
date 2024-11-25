@@ -25,6 +25,7 @@
     NSURL *_devInvalidSignedAppURL;
     NSURL *_devSignedDiskImageURL;
     NSURL *_unsignedDiskImageURL;
+    NSURL *_adhocSignedDiskImageURL;
 }
 
 - (void)setUp
@@ -35,6 +36,7 @@
     
     _devSignedDiskImageURL = [unitTestBundle URLForResource:@"DevSignedAppVersion2" withExtension:@"dmg"];
     _unsignedDiskImageURL = [unitTestBundle URLForResource:@"SparkleTestCodeSign_apfs" withExtension:@"dmg"];
+    _adhocSignedDiskImageURL = [unitTestBundle URLForResource:@"SparkleTestCodeSign_apfs_lzma_aux_files_adhoc" withExtension:@"dmg"];
     
     NSString *zippedAppURL = [unitTestBundle pathForResource:@"SparkleTestCodeSignApp" ofType:@"zip"];
 
@@ -279,6 +281,13 @@
 {
     NSError *error = nil;
     XCTAssertFalse([SUCodeSigningVerifier codeSignatureIsValidAtDownloadURL:_unsignedDiskImageURL andMatchesDeveloperIDTeamFromOldBundleURL:_validSignedAppURL error:&error]);
+    XCTAssertNotNil(error);
+}
+
+- (void)testInvalidMatchWithAdhocSignedDiskImage
+{
+    NSError *error = nil;
+    XCTAssertFalse([SUCodeSigningVerifier codeSignatureIsValidAtDownloadURL:_adhocSignedDiskImageURL andMatchesDeveloperIDTeamFromOldBundleURL:_devSignedAppURL error:&error]);
     XCTAssertNotNil(error);
 }
 

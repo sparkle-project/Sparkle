@@ -223,7 +223,7 @@
 		724BB3AA1D3347C2005D534A /* SUInstallerStatus.m in Sources */ = {isa = PBXBuildFile; fileRef = 724BB3971D333832005D534A /* SUInstallerStatus.m */; };
 		724BB3B71D35ABA8005D534A /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 61B5F8F609C4CEB300B25A18 /* Security.framework */; };
 		724F76F91D6EAD0D00ECD062 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 525A278F133D6AE900FD8D70 /* Cocoa.framework */; };
-		725453552C04DB3700362123 /* SparkleTestCodeSign_apfs_lzma_aux_files.dmg in Resources */ = {isa = PBXBuildFile; fileRef = 725453542C04DB3700362123 /* SparkleTestCodeSign_apfs_lzma_aux_files.dmg */; };
+		725453552C04DB3700362123 /* SparkleTestCodeSign_apfs_lzma_aux_files_adhoc.dmg in Resources */ = {isa = PBXBuildFile; fileRef = 725453542C04DB3700362123 /* SparkleTestCodeSign_apfs_lzma_aux_files_adhoc.dmg */; };
 		725602D51C83551C00DAA70E /* SUApplicationInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 725602D31C83551C00DAA70E /* SUApplicationInfo.h */; };
 		725602D61C83551C00DAA70E /* SUApplicationInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 725602D41C83551C00DAA70E /* SUApplicationInfo.m */; };
 		725B3A82263FBF0C0041AB8E /* testappcast_minimumAutoupdateVersion.xml in Resources */ = {isa = PBXBuildFile; fileRef = 725B3A81263FBF0C0041AB8E /* testappcast_minimumAutoupdateVersion.xml */; };
@@ -1231,7 +1231,7 @@
 		724BB3A61D33461B005D534A /* SUXPCInstallerStatus.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUXPCInstallerStatus.h; sourceTree = "<group>"; };
 		724BB3A71D33461B005D534A /* SUXPCInstallerStatus.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUXPCInstallerStatus.m; sourceTree = "<group>"; };
 		724BB3B51D35AAC3005D534A /* ServiceManagement.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ServiceManagement.framework; path = System/Library/Frameworks/ServiceManagement.framework; sourceTree = SDKROOT; };
-		725453542C04DB3700362123 /* SparkleTestCodeSign_apfs_lzma_aux_files.dmg */ = {isa = PBXFileReference; lastKnownFileType = file; path = SparkleTestCodeSign_apfs_lzma_aux_files.dmg; sourceTree = "<group>"; };
+		725453542C04DB3700362123 /* SparkleTestCodeSign_apfs_lzma_aux_files_adhoc.dmg */ = {isa = PBXFileReference; lastKnownFileType = file; path = SparkleTestCodeSign_apfs_lzma_aux_files_adhoc.dmg; sourceTree = "<group>"; };
 		725602D31C83551C00DAA70E /* SUApplicationInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUApplicationInfo.h; sourceTree = "<group>"; };
 		725602D41C83551C00DAA70E /* SUApplicationInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUApplicationInfo.m; sourceTree = "<group>"; };
 		72563CA9272E1C5400AF39F0 /* .github */ = {isa = PBXFileReference; lastKnownFileType = folder; path = .github; sourceTree = "<group>"; };
@@ -1869,7 +1869,7 @@
 				72E6D9722C0526DC005496E4 /* SparkleTestCodeSignApp.enc.nolicense.dmg */,
 				72AC6B271B9AAD6700F62325 /* SparkleTestCodeSignApp.tar */,
 				72BC6C3C275027BF0083F14B /* SparkleTestCodeSign_apfs.dmg */,
-				725453542C04DB3700362123 /* SparkleTestCodeSign_apfs_lzma_aux_files.dmg */,
+				725453542C04DB3700362123 /* SparkleTestCodeSign_apfs_lzma_aux_files_adhoc.dmg */,
 				72E6D9702C04DE19005496E4 /* SparkleTestCodeSign_pkg.dmg */,
 				72AC6B291B9AAF3A00F62325 /* SparkleTestCodeSignApp.tar.bz2 */,
 				72AC6B251B9AAC8800F62325 /* SparkleTestCodeSignApp.tar.gz */,
@@ -3195,7 +3195,7 @@
 				72AC6B261B9AAC8800F62325 /* SparkleTestCodeSignApp.tar.gz in Resources */,
 				72AC6B2C1B9AB0EE00F62325 /* SparkleTestCodeSignApp.tar.xz in Resources */,
 				729F7ECE27409077004592DC /* SparkleTestCodeSignApp_bad_extraneous.zip in Resources */,
-				725453552C04DB3700362123 /* SparkleTestCodeSign_apfs_lzma_aux_files.dmg in Resources */,
+				725453552C04DB3700362123 /* SparkleTestCodeSign_apfs_lzma_aux_files_adhoc.dmg in Resources */,
 				5A5DD41D249F116E0045EB3E /* test-relative-urls.xml in Resources */,
 				F8761EB31ADC50EB000C9034 /* SparkleTestCodeSignApp.zip in Resources */,
 				5A5DD40424958B000045EB3E /* SUUpdateValidatorTest in Resources */,
