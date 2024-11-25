@@ -383,7 +383,7 @@ static NSString * _Nullable SUTeamIdentifierFromStaticCode(SecStaticCodeRef stat
             
             resultError = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInsufficientSigningError userInfo:[userInfo copy]];
         } else if (result == errSecCSReqFailed) {
-            NSString *initialMessage = [NSString stringWithFormat:@"%@. The Apple code signature of new downloaded archive doesn't match the old app version. Please ensure that the archive and app are signed using the same Developer ID certificate.", commonErrorMessage];
+            NSString *initialMessage = [NSString stringWithFormat:@"%@. The Apple code signature of new downloaded archive is either not Developer ID code signed, or doesn't have a Team ID that matches the old app version (%@). Please ensure that the archive and app are signed using the same Developer ID certificate.", commonErrorMessage, teamIdentifier];
             
             NSDictionary *oldInfo = [self logSigningInfoForCode:oldStaticCode label:@"old info"];
             NSDictionary *newInfo = [self logSigningInfoForCode:downloadStaticCode label:@"new info"];
@@ -392,7 +392,7 @@ static NSString * _Nullable SUTeamIdentifierFromStaticCode(SecStaticCodeRef stat
             
             resultError = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInsufficientSigningError userInfo:[userInfo copy]];
         } else {
-            userInfo[NSLocalizedDescriptionKey] = [NSString stringWithFormat:@"%@. The old app bundle code signing signature failed to match new downloaded archive code signing signature with an unknown error (%d).", commonErrorMessage, result];
+            userInfo[NSLocalizedDescriptionKey] = [NSString stringWithFormat:@"%@. The downloaded archive code signing signature failed to validate with an unknown error (%d).", commonErrorMessage, result];
             
             resultError = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInsufficientSigningError userInfo:[userInfo copy]];
         }
