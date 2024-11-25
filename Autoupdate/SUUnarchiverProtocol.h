@@ -16,7 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)unarchiveWithCompletionBlock:(void (^)(NSError * _Nullable))completionBlock progressBlock:(void (^ _Nullable)(double))progressBlock waitForCleanup:(BOOL)waitForCleanup;
 
-@property (nonatomic, readonly) BOOL needsRequiresSignedArchivesKey;
+@property (nonatomic, readonly) BOOL needsVerifyBeforeExtractionKey;
 
 - (NSString *)description;
 

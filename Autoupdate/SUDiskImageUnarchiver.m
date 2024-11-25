@@ -51,7 +51,7 @@
     return self;
 }
 
-- (BOOL)needsRequiresSignedArchivesKey
+- (BOOL)needsVerifyBeforeExtractionKey
 {
     return NO;
 }

@@ -342,15 +342,15 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     if (!hasAnyPublicKey) {
         if ((feedURL != nil && !servingOverHttps) || ![SUCodeSigningVerifier bundleAtURLIsCodeSigned:[[self hostBundle] bundleURL]]) {
             if (error != NULL) {
-                *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUNoPublicDSAFoundError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"For security reasons, updates need to be signed with an EdDSA key for %@. See Sparkle's documentation for more information.", hostName] }];
+                *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUNoPublicDSAFoundError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"For security reasons, updates need to be signed with an EdDSA key for %@. Visit Sparkle's documentation for more information.", hostName] }];
             }
             return NO;
         } else {
-            BOOL requireSignedArchives = [_host boolForInfoDictionaryKey:SURequireSignedArchivesKey];
+            BOOL requireSignedArchives = [_host boolForInfoDictionaryKey:SUVerifyUpdateBeforeExtractionKey];
             
             if (requireSignedArchives) {
                 if (error != NULL) {
-                    *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUNoPublicDSAFoundError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"For security reasons, because %@ is specified, updates need to be signed with an EdDSA key for %@. See Sparkle's documentation for more information.", SURequireSignedArchivesKey, hostName] }];
+                    *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUNoPublicDSAFoundError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"For security reasons, updates need to be signed with an EdDSA key because %@ is specified for %@. Visit Sparkle's documentation for more information.", SUVerifyUpdateBeforeExtractionKey, hostName] }];
                 }
                 return NO;
             } else if (_updatingMainBundle && !_loggedNoSecureKeyWarning) {

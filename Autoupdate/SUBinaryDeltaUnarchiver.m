@@ -83,7 +83,7 @@ SPU_OBJC_DIRECT
     return self;
 }
 
-- (BOOL)needsRequiresSignedArchivesKey
+- (BOOL)needsVerifyBeforeExtractionKey
 {
     return NO;
 }

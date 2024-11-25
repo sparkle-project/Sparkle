@@ -193,26 +193,26 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
         
         _updateValidator = [[SUUpdateValidator alloc] initWithDownloadPath:archivePath signatures:_signatures host:_host verifierInformation:_verifierInformation];
         
-        // More uncommon archives types (.aar, .yaa) require SURequireSignedArchives
-        BOOL requiresSignedAchives = [_host boolForInfoDictionaryKey:SURequireSignedArchivesKey];
-        if (!requiresSignedAchives && unarchiver.needsRequiresSignedArchivesKey) {
-            prevalidationError = [NSError errorWithDomain:SUSparkleErrorDomain code:SUValidationError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Extracting %@ archives require setting %@ Info.plist key to YES in the old app. Please visit https://sparkle-project.org/documentation/customization/ for more information.", archivePath.pathExtension, SURequireSignedArchivesKey] }];
+        // More uncommon archives types (.aar, .yaa) need SUVerifyUpdateBeforeExtraction
+        BOOL verifyBeforeExtraction = [_host boolForInfoDictionaryKey:SUVerifyUpdateBeforeExtractionKey];
+        if (!verifyBeforeExtraction && unarchiver.needsVerifyBeforeExtractionKey) {
+            prevalidationError = [NSError errorWithDomain:SUSparkleErrorDomain code:SUValidationError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Extracting %@ archives require setting %@ to YES in the old app. Please visit https://sparkle-project.org/documentation/customization/ for more information.", archivePath.pathExtension, SUVerifyUpdateBeforeExtractionKey] }];
             
             success = NO;
         } else {
-            // Delta, package updates, and apps with SURequireSignedArchives will require validation before extraction
+            // Delta, package updates, and apps with SUVerifyUpdateBeforeExtraction will require validation before extraction
             // Otherwise normal application updates are a bit more lenient allowing developers to change one of apple dev ID or EdDSA keys after extraction
             BOOL archiveTypeMustValidateBeforeExtraction = [[unarchiver class] mustValidateBeforeExtraction];
-            BOOL needsPrevalidation = requiresSignedAchives || archiveTypeMustValidateBeforeExtraction || ![_installationType isEqualToString:SPUInstallationTypeApplication];
+            BOOL needsPrevalidation = verifyBeforeExtraction || archiveTypeMustValidateBeforeExtraction || ![_installationType isEqualToString:SPUInstallationTypeApplication];
 
             if (needsPrevalidation) {
                 // EdDSA signing is required, so host must have public keys
                 if (![_updateValidator validateHostHasPublicKeys:&prevalidationError]) {
                     success = NO;
                 } else {
-                    // Falling back on code signing for prevalidation requires SURequireSignedArchivesKey
+                    // Falling back on code signing for prevalidation requires SUVerifyUpdateBeforeExtraction
                     // and that update is a regular app update, and not a delta update
-                    BOOL fallbackOnCodeSigning = (requiresSignedAchives && !archiveTypeMustValidateBeforeExtraction && [_installationType isEqualToString:SPUInstallationTypeApplication]);
+                    BOOL fallbackOnCodeSigning = (verifyBeforeExtraction && !archiveTypeMustValidateBeforeExtraction && [_installationType isEqualToString:SPUInstallationTypeApplication]);
                     
                     success = [_updateValidator validateDownloadPathWithFallbackOnCodeSigning:fallbackOnCodeSigning error:&prevalidationError];
                 }

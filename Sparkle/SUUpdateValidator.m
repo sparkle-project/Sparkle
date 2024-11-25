@@ -173,7 +173,7 @@
     {
         // We already validated the download archive
         // Let's check if the update passes Sparkle's basic update policy and that the update is properly signed
-        // Currently, this case gets hit for binary delta updates and updates requiring SURequireSignedArchivesKey
+        // Currently, this case gets hit for binary delta updates and updates requiring SUVerifyUpdateBeforeExtraction
         
         NSBundle *newBundle = [NSBundle bundleWithURL:installSourceURL];
         SUHost *newHost = [[SUHost alloc] initWithBundle:newBundle];
@@ -210,7 +210,7 @@
         }
         
         if (_validatedDownloadUsingCodeSigning) {
-            // Old EdDSA key failed on download archive, and Apple Code signing validation was used as a fallback (with SURequireSignedArchives set to YES),
+            // Old EdDSA key failed on download archive, and Apple Code signing validation was used as a fallback (with SUVerifyUpdateBeforeExtraction set to YES),
             // which means the developer may be rotating keys.
             // So we must validate new EdDSA key with the new download.
             // This is a policy to ensure the next update can be updatable with the new EdDSA key (not a security measure).

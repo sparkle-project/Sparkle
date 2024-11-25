@@ -96,7 +96,7 @@ static NSArray<NSString *> * _Nullable _argumentsConformingToTypeOfPath(NSString
     return self;
 }
 
-- (BOOL)needsRequiresSignedArchivesKey
+- (BOOL)needsVerifyBeforeExtractionKey
 {
     return ([_archivePath hasSuffix:@".aar"] || [_archivePath hasSuffix:@".yaa"]);
 }
