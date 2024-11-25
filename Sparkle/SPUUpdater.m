@@ -346,7 +346,14 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
             }
             return NO;
         } else {
-            if (_updatingMainBundle && !_loggedNoSecureKeyWarning) {
+            BOOL requireSignedArchives = [_host boolForInfoDictionaryKey:SURequireSignedArchivesKey];
+            
+            if (requireSignedArchives) {
+                if (error != NULL) {
+                    *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUNoPublicDSAFoundError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"For security reasons, because %@ is specified, updates need to be signed with an EdDSA key for %@. See Sparkle's documentation for more information.", SURequireSignedArchivesKey, hostName] }];
+                }
+                return NO;
+            } else if (_updatingMainBundle && !_loggedNoSecureKeyWarning) {
                 SULog(SULogLevelError, @"Error: Serving updates without an EdDSA key and only using Apple Code Signing is deprecated and may be unsupported in a future release. Visit Sparkle's documentation for more information: https://sparkle-project.org/documentation/#3-segue-for-security-concerns");
                 
                 _loggedNoSecureKeyWarning = YES;
