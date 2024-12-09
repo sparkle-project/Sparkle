@@ -108,7 +108,7 @@ SU_EXPORT extern NSString *const SUSystemProfilerPreferredLanguageKey;
  This feature was added in Sparkle 2.
  
  @return The set of channel names the updater is allowed to find new updates in. An empty set is the default behavior,
-         which means the updater will only look for updates in the default channel.
+         which means the updater will only look for updates in the default channel. The default channel is always included in the allowed set.
  */
 - (NSSet<NSString *> *)allowedChannelsForUpdater:(SPUUpdater *)updater;
 
