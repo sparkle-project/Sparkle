@@ -26,11 +26,11 @@ func loadPrivateKeys(_ account: String, _ privateDSAKey: SecKey?, _ privateEdStr
                 print("Error: specifying private key as the argument is no longer supported.")
                 return nil
             } else {
-                print("Error: Private key not found in decoded argument, which has \(data.count) bytes. Please provide a valid key.")
+                print("Error: Private key not decoded from the argument, which has \(data.count) bytes. Please provide a valid key and confirm the contents of the key are correct.")
                 return nil
             }
         } else {
-            print("Error: Private key not found in the argument. Please provide a valid key.")
+            print("Error: Private key not decoded from the argument because it isn't base64 encoded. Please provide a valid key and confirm the contents of the key are correct.")
             return nil
         }
     }
