@@ -84,7 +84,7 @@ if [ "$ACTION" = "" ] ; then
     find . \! -type d | rev | sort | rev | tar --no-xattrs -cJvf "../Sparkle-$MARKETING_VERSION.tar.xz" --files-from=-
         
     # Copy archived distribution for CI
-    cp -f "../Sparkle-$MARKETING_VERSION.tar.xz" "../sparkle-dist.tar.xz"
+    cp -f "../Sparkle-$MARKETING_VERSION.tar.xz" "../sparkle_dist.tar.xz"
 
     # Extract archive for testing binary validity
     tar -xf "../Sparkle-$MARKETING_VERSION.tar.xz" -C "/tmp/sparkle-extract"

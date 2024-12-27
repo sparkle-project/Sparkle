@@ -104,4 +104,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Sparkle-distribution-${{ matrix.xcode }}.tar.xz
-          path: build/Build/Products/Release/sparkle-dist.tar.xz
+          path: build/Build/Products/Release/sparkle_dist.tar.xz
