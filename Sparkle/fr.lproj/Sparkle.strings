@@ -26,7 +26,7 @@
 "%1$@ can’t be updated if it’s running from the location it was downloaded to." = "%1$@ ne peut pas être mis à jour s’il est exécuté depuis le dossier dans lequel il a été téléchargé.";
 
 /* No comment provided by engineer. */
-"%1$@ can’t be updated, because it was opened from a read-only or a temporary location." = "%1$@ ne peut pas être mis à jour quand il fonctionne à partir d’un volume en lecture seule, comme une image disque ou un lecteur optique.";
+"%1$@ can’t be updated because it was opened from a read-only or a temporary location." = "%1$@ ne peut pas être mis à jour quand il fonctionne à partir d’un volume en lecture seule, comme une image disque ou un lecteur optique.";
 
 /* No comment provided by engineer. */
 "A new version of %@ is available!" = "Une nouvelle version de %@ est disponible !";

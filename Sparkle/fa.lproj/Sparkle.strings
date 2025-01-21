@@ -26,7 +26,7 @@
 "%1$@ can’t be updated if it’s running from the location it was downloaded to." = "%1$@ نمی‌تواند به‌روزرسانی شود، اگر از محلی که در آن بارگیری شده باز شود";
 
 /* No comment provided by engineer. */
-"%1$@ can’t be updated, because it was opened from a read-only or a temporary location." = "%1$@ نمی‌تواند به‌روزرسانی شود، زیرا از محلی با سطح دسترسی فقط-خواندن یا موقت باز شده است";
+"%1$@ can’t be updated because it was opened from a read-only or a temporary location." = "%1$@ نمی‌تواند به‌روزرسانی شود، زیرا از محلی با سطح دسترسی فقط-خواندن یا موقت باز شده است";
 
 /* No comment provided by engineer. */
 "A new version of %@ is available!" = "نسخه‌ای جدید از %@ در دسترس است";

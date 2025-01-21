@@ -17,7 +17,7 @@
 "%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "Το %1$@ %2$@ κατέβηκε. Είναι έτοιμο προς εγκατάσταση! Θέλετε να εγκαταστήσετε και να επανεκκινήσετε το %1$@ τώρα;";
 
 /* No comment provided by engineer. */
-"%1$@ can’t be updated, because it was opened from a read-only or a temporary location." = "Το %1$@ δεν μπορεί να ενημερωθεί όσο τρέχει από έναν δίσκο ανάγνωσης-μόνο ή έναν οπτικό δίσκο.";
+"%1$@ can’t be updated because it was opened from a read-only or a temporary location." = "Το %1$@ δεν μπορεί να ενημερωθεί όσο τρέχει από έναν δίσκο ανάγνωσης-μόνο ή έναν οπτικό δίσκο.";
 
 /* No comment provided by engineer. */
 "A new version of %@ is available!" = "Μία νέα έκδοση του %@ είναι διαθέσιμη!";

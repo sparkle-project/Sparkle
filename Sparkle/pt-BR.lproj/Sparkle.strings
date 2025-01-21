@@ -38,7 +38,7 @@
 "%1$@ can’t be updated if it’s running from the location it was downloaded to." = "O app %1$@ não pode ser atualizado se ele estiver aberto do local onde foi baixado.";
 
 /* No comment provided by engineer. */
-"%1$@ can’t be updated, because it was opened from a read-only or a temporary location." = "O app %1$@ não pode ser atualizado porque foi aberto de um volume somente leitura ou local temporário.";
+"%1$@ can’t be updated because it was opened from a read-only or a temporary location." = "O app %1$@ não pode ser atualizado porque foi aberto de um volume somente leitura ou local temporário.";
 
 /* No comment provided by engineer. */
 "A new version of %@ is available!" = "Uma nova versão do app %@ está disponível!";

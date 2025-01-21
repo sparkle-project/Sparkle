@@ -14,7 +14,7 @@
 "%1$@ can’t be updated if it’s running from the location it was downloaded to." = "如果從下載位置運行 %1$@，則無法進行更新。";
 
 /* No comment provided by engineer. */
-"%1$@ can’t be updated, because it was opened from a read-only or a temporary location." = "無法更新 %1$@，因爲佢運行於一個只讀或臨時位置。";
+"%1$@ can’t be updated because it was opened from a read-only or a temporary location." = "無法更新 %1$@，因爲佢運行於一個只讀或臨時位置。";
 
 /* No comment provided by engineer. */
 "%@ %@ is currently the newest version available." = "%1$@ %2$@ 已係目前最新版本。";

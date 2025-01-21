@@ -23,7 +23,7 @@
 "%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ je preuzeta i spremna za upotrebu! Želiš li je sada instalirati, te ponovo pokrenuti %1$@?";
 
 /* No comment provided by engineer. */
-"%1$@ can’t be updated, because it was opened from a read-only or a temporary location." = "%1$@ nije moguće aktualizirati, jer je pokrenuta s lokacije bez korisničkih prava pisanja, npr. dmg.";
+"%1$@ can’t be updated because it was opened from a read-only or a temporary location." = "%1$@ nije moguće aktualizirati, jer je pokrenuta s lokacije bez korisničkih prava pisanja, npr. dmg.";
 
 /* No comment provided by engineer. */
 "A new version of %@ is available!" = "Dostupna je nova verzija za %@!";

@@ -11,7 +11,7 @@
 "%@ of %@" = "%1$@ de %2$@";
 
 /* No comment provided by engineer. */
-"%1$@ can’t be updated, because it was opened from a read-only or a temporary location." = "%1$@ no es pot actualitzar quan funciona des d'un disc d'imatge.";
+"%1$@ can’t be updated because it was opened from a read-only or a temporary location." = "%1$@ no es pot actualitzar quan funciona des d'un disc d'imatge.";
 
 /* No comment provided by engineer. */
 "A new version of %@ is available!" = "Hi ha una nova versió de %@ disponible!";

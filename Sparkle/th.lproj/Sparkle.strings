@@ -17,7 +17,7 @@
 "%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ ได้ถูกดาวน์โหลดและพร้อมใช้งานแล้ว คุณต้องการติดตั้งและเริ่ม %1$@ ใหม่เดี๋ยวนี้หรือไม่";
 
 /* No comment provided by engineer. */
-"%1$@ can’t be updated, because it was opened from a read-only or a temporary location." = "%1$@ ไม่สามารถรับการอัพเดทได้เมื่อถูกเรียกจากดิสก์แบบอ่านอย่างเดียวหรือซีดีรอม ย้าย";
+"%1$@ can’t be updated because it was opened from a read-only or a temporary location." = "%1$@ ไม่สามารถรับการอัพเดทได้เมื่อถูกเรียกจากดิสก์แบบอ่านอย่างเดียวหรือซีดีรอม ย้าย";
 
 /* No comment provided by engineer. */
 "A new version of %@ is available!" = "%@ มีเวอร์ชั่นใหม่!";

@@ -41,7 +41,7 @@
 "%1$@ can’t be updated if it’s running from the location it was downloaded to." = "„%1$@“ kann nicht aktualisiert werden, wenn das Programm von dem Ort ausgeführt wird, an den es heruntergeladen wurde.";
 
 /* No comment provided by engineer. */
-"%1$@ can’t be updated, because it was opened from a read-only or a temporary location." = "%1$@ kann nicht aktualisiert werden, da es aus dem Downloads-Order, oder von einer DMG-Datei oder einem Laufwerk ohne Schreibzugriff gestartet wurde.";
+"%1$@ can’t be updated because it was opened from a read-only or a temporary location." = "%1$@ kann nicht aktualisiert werden, da es aus dem Downloads-Order, oder von einer DMG-Datei oder einem Laufwerk ohne Schreibzugriff gestartet wurde.";
 
 /* No comment provided by engineer. */
 "A new version of %@ is available!" = "Eine neue Version von %@ ist verfügbar!";

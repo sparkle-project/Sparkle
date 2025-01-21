@@ -23,7 +23,7 @@
 "%1$@ can’t be updated if it’s running from the location it was downloaded to." = "如果在下载位置运行此程序，则无法对 %1$@ 进行更新。";
 
 /* No comment provided by engineer. */
-"%1$@ can’t be updated, because it was opened from a read-only or a temporary location." = "无法更新 %1$@，因为它运行于一个只读或临时位置。";
+"%1$@ can’t be updated because it was opened from a read-only or a temporary location." = "无法更新 %1$@，因为它运行于一个只读或临时位置。";
 
 /* No comment provided by engineer. */
 "A new version of %@ is available!" = "新版本的 %@ 已经发布";

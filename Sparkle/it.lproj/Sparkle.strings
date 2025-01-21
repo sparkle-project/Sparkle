@@ -14,7 +14,7 @@
 "%1$@ can’t be updated if it’s running from the location it was downloaded to." = "%1$@ non può essere aggiornata se è in esecuzione dalla posizione in cui è stato scaricata.";
 
 /* No comment provided by engineer. */
-"%1$@ can’t be updated, because it was opened from a read-only or a temporary location." = "%1$@ non può essere aggiornata perché è stata aperta da una posizione di sola lettura o temporanea.";
+"%1$@ can’t be updated because it was opened from a read-only or a temporary location." = "%1$@ non può essere aggiornata perché è stata aperta da una posizione di sola lettura o temporanea.";
 
 /* No comment provided by engineer. */
 "%@ %@ is currently the newest version available." = "%1$@ %2$@ è la versione più recente attualmente disponibile.";

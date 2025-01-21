@@ -17,7 +17,7 @@
 "%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "Aplikácia %1$@ %2$@ bola prevzatá a je pripravená na použitie! Chcete teraz nainštalovať a následne znovu spustiť %1$@?";
 
 /* No comment provided by engineer. */
-"%1$@ can’t be updated, because it was opened from a read-only or a temporary location." = "Aplikáciu %1$@ nemožno aktualizovať, ak je spustená zo zväzku s právami len na čítanie (napríklad z obrazu disku alebo optického disku).";
+"%1$@ can’t be updated because it was opened from a read-only or a temporary location." = "Aplikáciu %1$@ nemožno aktualizovať, ak je spustená zo zväzku s právami len na čítanie (napríklad z obrazu disku alebo optického disku).";
 
 /* No comment provided by engineer. */
 "A new version of %@ is available!" = "Je dostupná nová verzia aplikácie %@!";

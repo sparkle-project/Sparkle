@@ -23,7 +23,7 @@
 "%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "¡%1$@ %2$@ se ha descargado y está lista para usarse! ¿Te gustaría instalarla y volver a abrir %1$@ ahora?";
 
 /* No comment provided by engineer. */
-"%1$@ can’t be updated, because it was opened from a read-only or a temporary location." = "%1$@ no se puede actualizar porque fue abierta desde una ubicación temporal o de solo lectura.";
+"%1$@ can’t be updated because it was opened from a read-only or a temporary location." = "%1$@ no se puede actualizar porque fue abierta desde una ubicación temporal o de solo lectura.";
 
 /* No comment provided by engineer. */
 "A new version of %@ is available!" = "¡Una nueva versión de %@ está disponible!";

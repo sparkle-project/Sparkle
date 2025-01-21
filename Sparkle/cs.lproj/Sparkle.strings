@@ -41,7 +41,7 @@
 "%1$@ can’t be updated if it’s running from the location it was downloaded to." = "Aplikace %1$@ nemůže být aktualizována pokud je spuštěna z umístění, ve kterém je stažena.";
 
 /* No comment provided by engineer. */
-"%1$@ can’t be updated, because it was opened from a read-only or a temporary location." = "Aplikace %1$@ nemůže být aktualizována, protože je spuštěna z dočasného umístění nebo z umístění, na které nelze zapisovat.";
+"%1$@ can’t be updated because it was opened from a read-only or a temporary location." = "Aplikace %1$@ nemůže být aktualizována, protože je spuštěna z dočasného umístění nebo z umístění, na které nelze zapisovat.";
 
 /* No comment provided by engineer. */
 "A new version of %@ is available!" = "Je dostupná nová verze aplikace %@!";

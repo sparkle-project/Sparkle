@@ -41,7 +41,7 @@
 "%1$@ can’t be updated if it’s running from the location it was downloaded to." = "%1$@ kan niet worden bijgewerkt als het is geopend vanuit de downloadlocatie.";
 
 /* No comment provided by engineer. */
-"%1$@ can’t be updated, because it was opened from a read-only or a temporary location." = "%1$@ kan niet worden bijgewerkt, omdat het vanuit een alleen-lezen- of tijdelijke locatie is geopend.";
+"%1$@ can’t be updated because it was opened from a read-only or a temporary location." = "%1$@ kan niet worden bijgewerkt, omdat het vanuit een alleen-lezen- of tijdelijke locatie is geopend.";
 
 /* No comment provided by engineer. */
 "A new version of %@ is available!" = "Een nieuwe versie van %@ is beschikbaar!";

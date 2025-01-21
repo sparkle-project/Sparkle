@@ -41,7 +41,7 @@
 "%1$@ can’t be updated if it’s running from the location it was downloaded to." = "この場所ではダウンロードされたアップデートを%1$@に適用できません。";
 
 /* No comment provided by engineer. */
-"%1$@ can’t be updated, because it was opened from a read-only or a temporary location." = "%1$@は読み出し専用または一時的な場所で開かれているためアップデートできません。";
+"%1$@ can’t be updated because it was opened from a read-only or a temporary location." = "%1$@は読み出し専用または一時的な場所で開かれているためアップデートできません。";
 
 /* No comment provided by engineer. */
 "A new version of %@ is available!" = "新しいバージョンの%@が入手できます!";

@@ -20,7 +20,7 @@
 "%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ a fost descărcată și este gata de utilizare! Dorești să o instalezi și să relansați %1$@ acum?";
 
 /* No comment provided by engineer. */
-"%1$@ can’t be updated, because it was opened from a read-only or a temporary location." = "%1$@ nu poate fi actualizată atunci când a fost pornită de pe un volum read-only ca o imagine disc sau o unitate optică.";
+"%1$@ can’t be updated because it was opened from a read-only or a temporary location." = "%1$@ nu poate fi actualizată atunci când a fost pornită de pe un volum read-only ca o imagine disc sau o unitate optică.";
 
 /* No comment provided by engineer. */
 "A new version of %@ is available!" = "O nouă versiune pentru %@ este disponibilă!";

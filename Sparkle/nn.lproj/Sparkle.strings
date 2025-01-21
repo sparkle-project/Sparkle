@@ -20,7 +20,7 @@
 "%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ er lasta ned og er klar til bruk! Ynskjer du å installera og starta om att %1$@ no?";
 
 /* No comment provided by engineer. */
-"%1$@ can’t be updated, because it was opened from a read-only or a temporary location." = "%1$@ kan ikkje oppdaterast frå ei eining som berre kan lesast, t.d. frå ein cd";
+"%1$@ can’t be updated because it was opened from a read-only or a temporary location." = "%1$@ kan ikkje oppdaterast frå ei eining som berre kan lesast, t.d. frå ein cd";
 
 /* No comment provided by engineer. */
 "A new version of %@ is available!" = "Ein ny versjon av %@ er tilgjengeleg!";
