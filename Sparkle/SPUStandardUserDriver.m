@@ -586,9 +586,21 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
     NSBundle *sparkleBundle = SUSparkleBundle();
 #endif
     
+    // Ideally we should use -[NSAlert alertWithError:] however
+    // unfortunately Sparkle may return error messages with descriptions that contain
+    // recovery suggestions. So we will check if an explicit recovery suggestion exists,
+    // and set the mesage and informative text appropriately.
+    // In the future we should audit potential error messages and make them consistent.
     NSAlert *alert = [[NSAlert alloc] init];
-    alert.messageText = SULocalizedStringFromTableInBundle(@"Update Error!", SPARKLE_TABLE, sparkleBundle, nil);
-    alert.informativeText = [NSString stringWithFormat:@"%@", [error localizedDescription]];
+    NSString *recoverySuggestion = [error localizedRecoverySuggestion];
+    if (recoverySuggestion != nil) {
+        alert.messageText = error.localizedDescription;
+        alert.informativeText = recoverySuggestion;
+    } else {
+        alert.messageText = SULocalizedStringFromTableInBundle(@"Update Error!", SPARKLE_TABLE, sparkleBundle, nil);
+        alert.informativeText = error.localizedDescription;
+    }
+    
     [alert addButtonWithTitle:SULocalizedStringFromTableInBundle(@"Cancel Update", SPARKLE_TABLE, sparkleBundle, nil)];
     [self showAlert:alert secondaryAction:nil];
     
