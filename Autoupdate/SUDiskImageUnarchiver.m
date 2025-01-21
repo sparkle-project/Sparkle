@@ -6,8 +6,6 @@
 //  Copyright 2008 Andy Matuschak. All rights reserved.
 //
 
-#if SPARKLE_BUILD_DMG_SUPPORT
-
 #import "SUDiskImageUnarchiver.h"
 #import "SUUnarchiverNotifier.h"
 #import "SULog.h"
@@ -324,5 +322,3 @@ static NSUInteger fileCountForDirectory(NSFileManager *fileManager, NSString *it
 - (NSString *)description { return [NSString stringWithFormat:@"%@ <%@>", [self class], _archivePath]; }
 
 @end
-
-#endif

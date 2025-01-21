@@ -23,11 +23,9 @@
     if ([SUPipedUnarchiver canUnarchivePath:path]) {
         return [[SUPipedUnarchiver alloc] initWithArchivePath:path extractionDirectory:extractionDirectory];
     }
-#if SPARKLE_BUILD_DMG_SUPPORT
     else if ([SUDiskImageUnarchiver canUnarchivePath:path]) {
         return [[SUDiskImageUnarchiver alloc] initWithArchivePath:path extractionDirectory:extractionDirectory decryptionPassword:decryptionPassword];
     }
-#endif
     else if ([SUBinaryDeltaUnarchiver canUnarchivePath:path]) {
         assert(hostPath != nil);
         NSString *nonNullHostPath = hostPath;

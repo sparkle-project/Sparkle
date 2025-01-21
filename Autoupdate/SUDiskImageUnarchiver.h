@@ -6,8 +6,6 @@
 //  Copyright 2008 Andy Matuschak. All rights reserved.
 //
 
-#if SPARKLE_BUILD_DMG_SUPPORT
-
 #ifndef SUDISKIMAGEUNARCHIVER_H
 #define SUDISKIMAGEUNARCHIVER_H
 
@@ -25,7 +23,5 @@ SPU_OBJC_DIRECT_MEMBERS @interface SUDiskImageUnarchiver : NSObject <SUUnarchive
 @end
 
 NS_ASSUME_NONNULL_END
-
-#endif
 
 #endif
