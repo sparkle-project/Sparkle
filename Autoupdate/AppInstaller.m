@@ -28,6 +28,7 @@
 #import "SPUInstallationType.h"
 #import "SPULocalCacheDirectory.h"
 #import "SPUVerifierInformation.h"
+#import "SUConstants.h"
 
 
 #include "AppKitPrevention.h"
