@@ -32,6 +32,10 @@ void SULog(SULogLevel level, NSString *format, ...)
     // Note we don't take advantage of info like the source line number because we wrap this macro inside our own function
     // And we don't really leverage of os_log's deferred formatting processing because we format the string before passing it in
     switch (level) {
+#pragma clang diagnostic push
+#if __has_warning("-Wpre-c11-compat")
+#pragma clang diagnostic ignored "-Wpre-c11-compat"
+#endif
         case SULogLevelDefault:
             // See docs for OS_LOG_TYPE_DEFAULT
             // By default, OS_LOG_TYPE_DEFAULT seems to be more noticeable than OS_LOG_TYPE_INFO
@@ -41,5 +45,6 @@ void SULog(SULogLevel level, NSString *format, ...)
             // See docs for OS_LOG_TYPE_ERROR
             os_log_error(logger, "%{public}@", logMessage);
             break;
+#pragma clang diagnostic pop
     }
 }
