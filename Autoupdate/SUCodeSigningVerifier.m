@@ -68,7 +68,7 @@
     // See https://github.com/sparkle-project/Sparkle/issues/376#issuecomment-48824267 and https://developer.apple.com/library/mac/technotes/tn2206
     // Additionally, there are several reasons to stay away from deep verification and to prefer EdDSA signing the download archive instead.
     // See https://github.com/sparkle-project/Sparkle/pull/523#commitcomment-17549302 and https://github.com/sparkle-project/Sparkle/issues/543
-    SecCSFlags flags = (SecCSFlags) (kSecCSDefaultFlags | kSecCSCheckAllArchitectures);
+    SecCSFlags flags = kSecCSCheckAllArchitectures;
     result = SecStaticCodeCheckValidityWithErrors(staticCode, flags, requirement, &cfError);
     
     if (result != errSecSuccess) {
@@ -154,7 +154,7 @@ finally:
     }
 
     // See in -codeSignatureIsValidAtBundleURL:andMatchesSignatureAtBundleURL:error: for why kSecCSCheckNestedCode is not always passed
-    SecCSFlags flags = (SecCSFlags) (kSecCSDefaultFlags | kSecCSCheckAllArchitectures);
+    SecCSFlags flags = kSecCSCheckAllArchitectures;
     if (checkNestedCode) {
         flags |= kSecCSCheckNestedCode;
     }

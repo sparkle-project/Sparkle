@@ -477,7 +477,7 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
                     fprintf(stderr, "\n");
                 }
                 if (error != NULL) {
-                    *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Permissions for Sparkle executable must be 0%o (found 0%o) on file %@", VALID_SPARKLE_EXECUTABLE_PERMISSIONS, permissions, @(ent->fts_path)] }];
+                    *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Permissions for Sparkle executable must be 0%o (found 0%o) on file %@", (unsigned int)VALID_SPARKLE_EXECUTABLE_PERMISSIONS, permissions, @(ent->fts_path)] }];
                 }
                 return NO;
             }
@@ -591,7 +591,7 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
                     fprintf(stderr, "\n");
                 }
                 if (error != NULL) {
-                    *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Permissions for Sparkle executable must be 0%o (found 0%o) on file %@", VALID_SPARKLE_EXECUTABLE_PERMISSIONS, permissions, @(ent->fts_path)] }];
+                    *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Permissions for Sparkle executable must be 0%o (found 0%o) on file %@", (unsigned int)VALID_SPARKLE_EXECUTABLE_PERMISSIONS, permissions, @(ent->fts_path)] }];
                 }
                 return NO;
             }

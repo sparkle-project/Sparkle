@@ -1141,7 +1141,7 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
             } else if (S_ISLNK(extractMode)) {
                 off_t fileSize = itemFileInfo.st_size;
                 if (fileSize > UINT16_MAX) {
-                    _error = [NSError errorWithDomain:SPARKLE_DELTA_ARCHIVE_ERROR_DOMAIN code:SPARKLE_DELTA_ARCHIVE_ERROR_CODE_LINK_TOO_LONG userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Link path has a destination that is too long: %llu bytes", fileSize] }];
+                    _error = [NSError errorWithDomain:SPARKLE_DELTA_ARCHIVE_ERROR_DOMAIN code:SPARKLE_DELTA_ARCHIVE_ERROR_CODE_LINK_TOO_LONG userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Link path has a destination that is too long: %lld bytes", fileSize] }];
                     break;
                 }
                 

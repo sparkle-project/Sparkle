@@ -163,7 +163,7 @@
                         if (fileSize != nil && ![deltaItem.deltaFromSparkleExecutableSize isEqualToNumber:fileSize]) {
                             sparkleExecutableIsOK = NO;
                             
-                            SULog(SULogLevelDefault, @"Expected file size (%lld) of Sparkle's executable does not match actual file size (%lld). Skipping delta update.", deltaItem.deltaFromSparkleExecutableSize.unsignedLongLongValue, fileSize.unsignedLongLongValue);
+                            SULog(SULogLevelDefault, @"Expected file size (%llu) of Sparkle's executable does not match actual file size (%llu). Skipping delta update.", deltaItem.deltaFromSparkleExecutableSize.unsignedLongLongValue, fileSize.unsignedLongLongValue);
                         } else {
                             sparkleExecutableIsOK = YES;
                         }

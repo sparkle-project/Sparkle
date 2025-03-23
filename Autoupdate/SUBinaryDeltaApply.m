@@ -389,7 +389,7 @@ BOOL applyBinaryDelta(NSString *source, NSString *finalDestination, NSString *pa
             }
 
             if (verbose) {
-                fprintf(stderr, "\n👮  %s %s (0%o)", VERBOSE_MODIFIED, [relativePath fileSystemRepresentation], mode & PERMISSION_FLAGS);
+                fprintf(stderr, "\n👮  %s %s (0%o)", VERBOSE_MODIFIED, [relativePath fileSystemRepresentation], (unsigned int)(mode & PERMISSION_FLAGS));
             }
         }
     }];
