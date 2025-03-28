@@ -698,6 +698,7 @@ class SUAppcastTest: XCTestCase {
         
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "E, dd MMM yyyy HH:mm:ss Z"
+        dateFormatter.locale = Locale(identifier: "en_US")
         
         do {
             let testData = try Data(contentsOf: testURL)
