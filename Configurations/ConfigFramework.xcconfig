@@ -18,6 +18,7 @@ GCC_PREPROCESSOR_DEFINITIONS = $(inherited) BUILDING_SPARKLE=1
 SKIP_INSTALL = YES
 DEFINES_MODULE = YES
 PRODUCT_BUNDLE_IDENTIFIER = ${SPARKLE_BUNDLE_IDENTIFIER}
+STRINGS_FILE_OUTPUT_ENCODING = binary
 
 // As long as we don't ourselves depend upon any Frameworks that are incompatible
 // with Application Extensions, then we should allow frameworks that require
