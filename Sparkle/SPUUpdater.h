@@ -96,7 +96,8 @@ SU_EXPORT @interface SPUUpdater : NSObject
  
  If an update hasn't started, the user may be shown that a new check for updates is occurring.
  If an update has already been downloaded or begun installing from a previous session, the user may be presented to install that update.
- If the user is already being presented with an update, that update will be shown to the user in active focus.
+ If the user is already being presented with an update or update permission prompt, that notice may be shown to the user in active focus
+ (as long as the user driver is the standard `SPUStandardUserDriver` or if it implements `-[SPUUserDriver showUpdateInFocus]`).
  
  This will find updates that the user has previously opted into skipping.
  
@@ -150,7 +151,10 @@ SU_EXPORT @interface SPUUpdater : NSObject
 /**
  A property indicating whether or not updates can be checked by the user.
  
- An update check can be made by the user when an update session isn't in progress, or when an update or its progress is being shown to the user.
+ An update check can be made by the user when an update session isn't in progress.
+ An update check can also be made when an update or its progress is being shown to the user
+ (as long as the user driver is the standard `SPUStandardUserDriver` or if it implements `-[SPUUserDriver showUpdateInFocus]`).
+ 
  A user cannot check for updates when data (such as the feed or an update) is still being downloaded automatically in the background.
  
  This property is suitable to use for menu item validation for seeing if `-checkForUpdates` can be invoked.

@@ -257,14 +257,6 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
 - (void)showUpdateInstalledAndRelaunched:(BOOL)relaunched acknowledgement:(void (^)(void))acknowledgement;
 
 /**
- * Show the user the current presented update or its progress in utmost focus
- *
- * The user wishes to check for updates while the user is being shown update progress.
- * Bring whatever is on screen to frontmost focus (permission request, update information, downloading or extraction status, choice to install update, etc).
- */
-- (void)showUpdateInFocus;
-
-/**
  * Dismiss the current update installation
  *
  * Stop and tear down everything.
@@ -273,12 +265,22 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  */
 - (void)dismissUpdateInstallation;
 
+@optional
+
+/**
+ * Show the user the current presented update or its progress in utmost focus
+ *
+ * The user wishes to check for updates while the user is being shown update progress.
+ * Bring whatever is on screen to frontmost focus (permission request, update information, downloading or extraction status, choice to install update, etc).
+ * Implementing this method is optional.
+ */
+- (void)showUpdateInFocus;
+
 /*
  * Below are deprecated methods that have been replaced by better alternatives.
  * The deprecated methods will be used if the alternatives have not been implemented yet.
  * In the future support for using these deprecated methods may be removed however.
  */
-@optional
 
 // Clients should move to non-deprecated methods
 // Deprecated methods are only (temporarily) kept around for compatibility reasons

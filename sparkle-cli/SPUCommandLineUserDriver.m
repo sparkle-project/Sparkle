@@ -121,10 +121,6 @@
     }
 }
 
-- (void)showUpdateInFocus
-{
-}
-
 - (void)showUpdateReleaseNotesWithDownloadData:(SPUDownloadData *)downloadData
 {
     if (_verbose) {
