@@ -24,3 +24,6 @@ STRINGS_FILE_OUTPUT_ENCODING = binary
 // with Application Extensions, then we should allow frameworks that require
 // compatibility to be able to link with us.
 APPLICATION_EXTENSION_API_ONLY = YES
+
+ENABLE_MODULE_VERIFIER = YES
+MODULEMAP_PRIVATE_FILE = Sparkle/Sparkle.private.modulemap

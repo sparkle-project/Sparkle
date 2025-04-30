@@ -1,0 +1,19 @@
+//
+//  Sparkle.private.modulemap
+//  Sparkle
+//
+//  Created on 4/30/25.
+//  Copyright © 2025 Sparkle Project. All rights reserved.
+//
+
+framework module Sparkle_Private {
+    header "SPUStandardUserDriver+Private.h"
+    header "SPUGentleUserDriverReminders.h"
+    header "SPUUserAgent+Private.h"
+    header "SPUInstallationType.h"
+    header "SPUAppcastItemStateResolver.h"
+    header "SUAppcastItem+Private.h"
+    header "SUInstallerLauncher+Private.h"
+    
+    export *
+}
