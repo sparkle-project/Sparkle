@@ -109,7 +109,7 @@ static NSUInteger fileCountForDirectory(NSFileManager *fileManager, NSString *it
         // Note: this check does not follow symbolic links, which is what we want
         while ([[NSURL fileURLWithPath:mountPoint] checkResourceIsReachableAndReturnError:NULL]);
         
-        NSMutableData *inputData = [NSMutableData data];
+        NSMutableData *inputData = [NSMutableData data];  
         
         // Prepare stdin data for passwords and license agreements
         {
@@ -133,7 +133,7 @@ static NSUInteger fileCountForDirectory(NSFileManager *fileManager, NSString *it
         // Finder doesn't verify disk images anymore beyond the code signing signature (if available)
         // Opt out of the old CRC checksum checks
         // Also always pass -stdinpass so we gracefully handle password protected disk images even if we aren't expecting them
-        NSArray *arguments = @[@"attach", _archivePath, @"-mountpoint", mountPoint, @"-noverify", @"-nobrowse", @"-noautoopen", @"-stdinpass"];                              
+        NSArray *arguments = @[@"attach", _archivePath, @"-mountpoint", mountPoint, @"-noverify", @"-nobrowse", @"-noautoopen", @"-stdinpass"];
         
         NSData *output = nil;
         NSInteger taskResult = -1;
