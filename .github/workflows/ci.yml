@@ -79,7 +79,11 @@ jobs:
         if: ${{ success() && matrix.run-analyzer && github.event_name == 'pull_request' && steps.findwarnings.outputs.analyzestatus == '0' }}
         id: warnings
         run: |
-            echo ::set-output name=content::$(cat analyze_output.txt)
+            {
+                echo 'content<<EOF'
+                cat analyze_output.txt
+                echo 'EOF'
+            } >> $GITHUB_OUTPUT
       
       - name: Post Analyzed Warnings
         if: ${{ success() && matrix.run-analyzer && github.event_name == 'pull_request' && steps.findwarnings.outputs.analyzestatus == '0' }}
