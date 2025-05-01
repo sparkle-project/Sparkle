@@ -20,7 +20,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)downloadDriverWillBeginDownload;
 
-// For persitent update downloads
+// For persistent update downloads
 - (void)downloadDriverDidDownloadUpdate:(SPUDownloadedUpdate *)downloadedUpdate;
 
 // For temporary downloads

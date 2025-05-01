@@ -11,12 +11,37 @@
 
 #include "AppKitPrevention.h"
 
+static void _SULogErrors(NSArray<NSError *> *errors, int recursionLimit)
+{
+    if (recursionLimit == 0) {
+        return;
+    }
+    
+    for (NSError *error in errors) {
+        SULog(SULogLevelError, @"Error: %@ %@ (URL %@)", error.localizedDescription, error.localizedFailureReason, error.userInfo[NSURLErrorFailingURLErrorKey]);
+        
+        NSDictionary<NSErrorUserInfoKey, id> *userInfo = error.userInfo;
+        
+        if (@available(macOS 11.3, *)) {
+            NSArray<NSError *> *underlyingErrors = userInfo[NSMultipleUnderlyingErrorsKey];
+            if (underlyingErrors != nil) {
+                _SULogErrors(underlyingErrors, recursionLimit - 1);
+                continue;
+            }
+        }
+        
+        NSError *underlyingError = userInfo[NSUnderlyingErrorKey];
+        if (underlyingError != nil) {
+            _SULogErrors(@[underlyingError], recursionLimit - 1);
+        }
+    }
+}
+
 void SULogError(NSError *error)
 {
-    NSError *errorToDisplay = error;
-    int finiteRecursion = 5;
-    do {
-        SULog(SULogLevelError, @"Error: %@ %@ (URL %@)", errorToDisplay.localizedDescription, errorToDisplay.localizedFailureReason, errorToDisplay.userInfo[NSURLErrorFailingURLErrorKey]);
-        errorToDisplay = errorToDisplay.userInfo[NSUnderlyingErrorKey];
-    } while(--finiteRecursion && errorToDisplay);
+    if (error == nil) {
+        return;
+    }
+    
+    _SULogErrors(@[error], 7);
 }

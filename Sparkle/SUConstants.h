@@ -48,6 +48,7 @@ extern NSString *const SULastCheckTimeKey;
 extern NSString *const SUPublicDSAKeyKey;
 extern NSString *const SUPublicDSAKeyFileKey;
 extern NSString *const SUPublicEDKeyKey;
+extern NSString *const SUVerifyUpdateBeforeExtractionKey;
 extern NSString *const SUAutomaticallyUpdateKey;
 extern NSString *const SUAllowsAutomaticUpdatesKey;
 extern NSString *const SUEnableAutomaticChecksKey;

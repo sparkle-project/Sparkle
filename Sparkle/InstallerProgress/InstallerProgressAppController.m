@@ -29,6 +29,12 @@
  */
 static const NSTimeInterval SUTerminationTimeDelay = 0.3;
 
+#if __MAC_OS_X_VERSION_MAX_ALLOWED < 140000
+@interface NSApplication (ActivationAPIs)
+- (void)activate;
+@end
+#endif
+
 @interface InstallerProgressAppController () <NSApplicationDelegate, SPUInstallerAgentProtocol>
 @end
 
@@ -37,6 +43,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
 @implementation InstallerProgressAppController
 {
     NSApplication *_application;
+    NSRunningApplication *_targetRunningApplication;
     NSXPCConnection *_connection;
     SUHost *_oldHost;
     NSString *_oldHostBundlePath;
@@ -45,6 +52,8 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
     NSString *_normalizedPath;
     
     __weak id<InstallerProgressDelegate> _delegate;
+    
+    void (^_terminationCompletionHandler)(void);
     
     BOOL _connected;
     BOOL _repliedToRegistration;
@@ -248,10 +257,14 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
     return [matchedRunningApplications copy];
 }
 
-- (void)registerApplicationBundlePath:(NSString *)applicationBundlePath reply:(void (^)(NSNumber *))reply
+- (void)registerApplicationBundlePath:(NSString *)applicationBundlePath reply:(void (^)(BOOL))reply
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        if (applicationBundlePath != nil && !self->_willTerminate) {
+#pragma clang diagnostic push
+#if __has_warning("-Wcompletion-handler")
+#pragma clang diagnostic ignored "-Wcompletion-handler"
+#endif
+        if (applicationBundlePath != nil && !self->_willTerminate && self->_targetRunningApplication == nil) {
             NSBundle *applicationBundle = [NSBundle bundleWithPath:applicationBundlePath];
             if (applicationBundle == nil) {
                 [self cleanupAndExitWithStatus:EXIT_FAILURE error:[NSError errorWithDomain:SUSparkleErrorDomain code:SUAgentInvalidationError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Error: Encountered invalid path for waiting termination: %@", applicationBundlePath] }]];
@@ -274,20 +287,58 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
             // We're just picking the first running application to send..
             // Ideally we'd send them all and have the installer monitor all of them but I don't want to deal with that complexity at the moment
             // Although that would still have the issue if another instance of the application launched during that duration
-            // At the same time we don't want the installer to be over-reliant on us (the agent tool) in a way that could leave the installer as a zombie by accident
-            // In other words, the installer should be monitoring for dead processes, not us
             // Lastly we don't handle monitoring or terminating processes from logged in users
             NSRunningApplication *firstRunningApplication = runningApplications.firstObject;
-            NSNumber *processIdentifier = (firstRunningApplication == nil || firstRunningApplication.terminated) ? nil : @(firstRunningApplication.processIdentifier);
             
-            reply(processIdentifier);
+            BOOL targetDead = (firstRunningApplication == nil || firstRunningApplication.terminated);
+            reply(targetDead);
             
             self->_repliedToRegistration = YES;
             self->_applicationBundle = applicationBundle;
-            self->_applicationInitiallyAlive = (processIdentifier != nil);
+            self->_applicationInitiallyAlive = !targetDead;
+            self->_targetRunningApplication = firstRunningApplication;
         } else {
-            assert(false);
+            SULog(SULogLevelError, @"Error: -registerApplicationBundlePath:reply: called in unexpected state");
         }
+#pragma clang diagnostic pop
+    });
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey,id> *)change context:(void *)context
+{
+    NSString *isTerminatedKeyPath = NSStringFromSelector(@selector(isTerminated));
+    if ([keyPath isEqualToString:isTerminatedKeyPath]) {
+        if (_targetRunningApplication.terminated && _terminationCompletionHandler != nil) {
+            _terminationCompletionHandler();
+            
+            [_targetRunningApplication removeObserver:self forKeyPath:isTerminatedKeyPath];
+            _terminationCompletionHandler = nil;
+            _targetRunningApplication = nil;
+        }
+    } else {
+        [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
+    }
+}
+
+- (void)listenForTerminationWithCompletion:(void (^)(void))completionHandler
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+#pragma clang diagnostic push
+#if __has_warning("-Wcompletion-handler")
+#pragma clang diagnostic ignored "-Wcompletion-handler"
+#endif
+        if (self->_targetRunningApplication != nil && self->_terminationCompletionHandler == nil) {
+            if (self->_targetRunningApplication.terminated) {
+                completionHandler();
+            } else {
+                self->_terminationCompletionHandler = [completionHandler copy];
+                
+                [self->_targetRunningApplication addObserver:self forKeyPath:NSStringFromSelector(@selector(isTerminated)) options:NSKeyValueObservingOptionNew context:NULL];
+            }
+        } else {
+            SULog(SULogLevelError, @"Error: -listenForTerminationWithCompletion: called in unexpected state");
+        }
+#pragma clang diagnostic pop
     });
 }
 
@@ -367,7 +418,11 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
             self->_application.applicationIconImage = [SUApplicationInfo bestIconForHost:self->_oldHost];
             
             // Activate ourselves otherwise we will probably be in the background
-            [self->_application activateIgnoringOtherApps:YES];
+            if (@available(macOS 14, *)) {
+                [self->_application activate];
+            } else {
+                [self->_application activateIgnoringOtherApps:YES];
+            }
             
             [self->_delegate installerProgressShouldDisplayWithHost:self->_oldHost];
         }

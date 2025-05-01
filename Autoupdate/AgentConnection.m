@@ -104,7 +104,6 @@
         self->_connected = YES;
         
         [self->_delegate agentConnectionDidInitiate];
-        self->_delegate = nil;
     });
     
     acknowledgement();

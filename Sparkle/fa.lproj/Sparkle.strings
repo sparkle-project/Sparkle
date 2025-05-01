@@ -26,7 +26,7 @@
 "%1$@ can’t be updated if it’s running from the location it was downloaded to." = "%1$@ نمی‌تواند به‌روزرسانی شود، اگر از محلی که در آن بارگیری شده باز شود";
 
 /* No comment provided by engineer. */
-"%1$@ can’t be updated, because it was opened from a read-only or a temporary location." = "%1$@ نمی‌تواند به‌روزرسانی شود، زیرا از محلی با سطح دسترسی فقط-خواندن یا موقت باز شده است";
+"%1$@ can’t be updated because it was opened from a read-only or a temporary location." = "%1$@ نمی‌تواند به‌روزرسانی شود، زیرا از محلی با سطح دسترسی فقط-خواندن یا موقت باز شده است";
 
 /* No comment provided by engineer. */
 "A new version of %@ is available!" = "نسخه‌ای جدید از %@ در دسترس است";
@@ -95,4 +95,4 @@
 "Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "از Finder برای کپی کردن %1$@ به پوشهٔ برنامه استفاده کنید، سپس %1$@ را دوباره باز کرده و مجدداً امتحان کنید.";
 
 /* Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates. */
-"You’re up-to-date!" = "برنامهٔ شما به‌روز است";
+"You’re up to date!" = "برنامهٔ شما به‌روز است";

@@ -62,7 +62,6 @@ static SUSigningInputStatus decode(NSString *str, NSData * __strong *outData) {
             NSData *data = nil;
             _ed25519SignatureStatus = decode(maybeEd25519, &data);
             if (data) {
-                assert(64 == sizeof(_ed25519_signature));
                 if ([data length] == sizeof(_ed25519_signature)) {
                     [data getBytes:_ed25519_signature length:sizeof(_ed25519_signature)];
                 } else {
@@ -163,7 +162,6 @@ static BOOL decodeStatus(NSCoder *decoder, NSString *key, SUSigningInputStatus *
             NSData *ed = nil;
             _ed25519PubKeyStatus = decode(maybeEd25519, &ed);
             if (ed) {
-                assert(32 == sizeof(_ed25519_public_key));
                 if ([ed length] == sizeof(_ed25519_public_key)) {
                     [ed getBytes:_ed25519_public_key length:sizeof(_ed25519_public_key)];
                 } else {

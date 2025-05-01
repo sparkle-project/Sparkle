@@ -92,7 +92,7 @@ BOOL applyBinaryDelta(NSString *source, NSString *finalDestination, NSString *pa
 
     progressCallback(1/7.0);
     
-    unsigned char beforeHash[CC_SHA1_DIGEST_LENGTH] = {0};
+    unsigned char beforeHash[BINARY_DELTA_HASH_LENGTH] = {0};
     if (!getRawHashOfTreeWithVersion(beforeHash, source, majorDiffVersion)) {
         if (verbose) {
             fprintf(stderr, "\n");
@@ -102,8 +102,8 @@ BOOL applyBinaryDelta(NSString *source, NSString *finalDestination, NSString *pa
         }
         return NO;
     }
-
-    if (memcmp(beforeHash, expectedBeforeHash, CC_SHA1_DIGEST_LENGTH) != 0) {
+    
+    if (memcmp(beforeHash, expectedBeforeHash, BINARY_DELTA_HASH_LENGTH) != 0) {
         if (verbose) {
             fprintf(stderr, "\n");
         }
@@ -141,7 +141,9 @@ BOOL applyBinaryDelta(NSString *source, NSString *finalDestination, NSString *pa
 
     progressCallback(3/7.0);
 
-    if (!copyTree(source, destination)) {
+    NSFileManager *fileManager = [[NSFileManager alloc] init];
+    
+    if (!copyTree(fileManager, source, destination)) {
         if (verbose) {
             fprintf(stderr, "\n");
         }
@@ -150,13 +152,22 @@ BOOL applyBinaryDelta(NSString *source, NSString *finalDestination, NSString *pa
         }
         return NO;
     }
+    
+    // Preserve file creation date only for the root item if the date is recorded
+    // (requires major version 4 or later)
+    NSDate *bundleCreationDate = header.bundleCreationDate;
+    if (bundleCreationDate != nil) {
+        NSError *setFileCreationDateError = nil;
+        if (![fileManager setAttributes:@{NSFileCreationDate: bundleCreationDate} ofItemAtPath:destination error:&setFileCreationDateError]) {
+            fprintf(stderr, "\nWarning: failed to set file creation date: %s", setFileCreationDateError.localizedDescription.UTF8String);
+        }
+    }
 
     progressCallback(4/7.0);
 
     if (verbose) {
         fprintf(stderr, "\nPatching...");
     }
-    NSFileManager *fileManager = [[NSFileManager alloc] init];
     
     // Ensure error is cleared out in advance
     if (error != NULL) {
@@ -291,7 +302,7 @@ BOOL applyBinaryDelta(NSString *source, NSString *finalDestination, NSString *pa
                 // Remove the file non-writable we're patching that may cause issues
                 [fileManager removeItemAtPath:destinationFilePath error:NULL];
                 
-                // We will need to preserve permissons if there is no need to make permission changes later on
+                // We will need to preserve permissions if there is no need to make permission changes later on
                 needsToCopyFilePermissions = (commands & SPUDeltaItemCommandModifyPermissions) == 0;
             } else {
                 needsToCopyFilePermissions = ((commands & SPUDeltaItemCommandClone) != 0) && ((commands & SPUDeltaItemCommandModifyPermissions) == 0);
@@ -378,7 +389,7 @@ BOOL applyBinaryDelta(NSString *source, NSString *finalDestination, NSString *pa
             }
 
             if (verbose) {
-                fprintf(stderr, "\n👮  %s %s (0%o)", VERBOSE_MODIFIED, [relativePath fileSystemRepresentation], mode & PERMISSION_FLAGS);
+                fprintf(stderr, "\n👮  %s %s (0%o)", VERBOSE_MODIFIED, [relativePath fileSystemRepresentation], (unsigned int)(mode & PERMISSION_FLAGS));
             }
         }
     }];
@@ -449,7 +460,7 @@ BOOL applyBinaryDelta(NSString *source, NSString *finalDestination, NSString *pa
         fprintf(stderr, "\nVerifying destination...");
     }
     
-    unsigned char afterHash[CC_SHA1_DIGEST_LENGTH] = {0};
+    unsigned char afterHash[BINARY_DELTA_HASH_LENGTH] = {0};
     if (!getRawHashOfTreeWithVersion(afterHash, finalDestination, majorDiffVersion)) {
         if (verbose) {
             fprintf(stderr, "\n");
@@ -460,8 +471,8 @@ BOOL applyBinaryDelta(NSString *source, NSString *finalDestination, NSString *pa
         removeTree(finalDestination);
         return NO;
     }
-
-    if (memcmp(afterHash, expectedAfterHash, CC_SHA1_DIGEST_LENGTH) != 0) {
+    
+    if (memcmp(afterHash, expectedAfterHash, BINARY_DELTA_HASH_LENGTH) != 0) {
         if (verbose) {
             fprintf(stderr, "\n");
         }

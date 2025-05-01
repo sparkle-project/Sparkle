@@ -57,7 +57,7 @@ After extraction starts, one or more `SPUExtractedArchiveWithProgress` messages 
 ### Post Validation
 If the unarchiving succeeds, a `SPUValidationStarted` message is sent back to the updater, and the installer begins post validating the update.
 
-If validation was already done before extraction, just the code signature is checked on the extracted bundle to make sure it's valid (if there's a code signature on the bundle). This is just a consistency check to make sure the developer didn't make a careless erorr.
+If validation was already done before extraction, just the code signature is checked on the extracted bundle to make sure it's valid (if there's a code signature on the bundle). This is just a consistency check to make sure the developer didn't make a careless error.
 
 If validation fails, the installer aborts, causing the updater to abort the update as well. Otherwise, the installer sends a message `SPUInstallationStartedStage1` to the updater and begins the installation.
 
@@ -73,7 +73,7 @@ The installer figures out what kind of installer to use (regular, guided pkg, in
 
 Once the type of installer is found, the first stage of installation is performed:
 
-* Regular application installer 1st stage: Makes sure this update is not a downgrade.
+* Regular application installer 1st stage: Makes sure this update is not a downgrade and do all initial installation work if possible (such as clearing quarantine, changing owner/group, updating modification date, invoking GateKeeper scan). This initial work is not done if the bundle has to transfer to another volume; in this case, this work will be done in a later stage.
 * Guided Package installer 1st stage: Does nothing.
 * Interactive Package installer (deprecated) 1st stage: Makes sure /usr/bin/open utility is available.
 
@@ -92,7 +92,7 @@ For automatic based drivers, if the update is not going to be installed immediat
 
 Otherwise if the updater delegate doesn't handle immediate installation for automatic based drivers (assuming still the update is not going to be installed immediately), the update driver is aborted; the installer will still wait for the target to terminate however. If the update cannot be silently installed or if the update is marked as critical from the appcast, the update procedure is actually 'resumed' as a scheduled UI based update driver immediately. The update driver can also be 'resumed' later when the user initiates for an update manually or when a long duration (I think a week) has passed by without the user terminating the application. Note automatic based drivers are unable to do a resume, so only UI based ones can.
 
-If an update driver is resumed (which cannot happen if the target applicaton is already terminated by the way), then the updater first requests the installer for the appcast item data that the installer received before. The updater does this by creating a temporary distinct connection for the purpose of querying for the installation status. The connection will give up if a short timeout passes. If the updater fails to retrieve resume data, it assumes that there's no update to resume and will start back from the beginning. The updater can use this data for showing release notes, etc. Note the updater and target application don't have to live in the same process, and the updater could choose to terminate and resume later as a new process - so having the installer keep the appcast item data is nice.
+If an update driver is resumed (which cannot happen if the target application is already terminated by the way), then the updater first requests the installer for the appcast item data that the installer received before. The updater does this by creating a temporary distinct connection for the purpose of querying for the installation status. The connection will give up if a short timeout passes. If the updater fails to retrieve resume data, it assumes that there's no update to resume and will start back from the beginning. The updater can use this data for showing release notes, etc. Note the updater and target application don't have to live in the same process, and the updater could choose to terminate and resume later as a new process - so having the installer keep the appcast item data is nice.
 
 Afterwards the resumed update driver then allows the user driver to decide whether to a) install the update now, b) install & relaunch the update, or to c) delay the update installation and abort the update driver. Note we are now back to the same options discussed earlier.
 
@@ -111,7 +111,7 @@ In the case termination of the application is delayed or canceled, the user driv
 
 When the target application is terminated, if the updater allowed the installer to show UI progress and the installation type doesn't show progress on its own (only interactive package installer shows progress on its own), then the installer sends a `SPUUpdaterAlivePing` message to the updater. If the updater is still alive by now and receives the message, the updater will then send back a `SPUUpdaterAlivePong` message. This lets the installer know that the updater is still active after the target application is terminated, and whether the installer should later be responsible for displaying updater progress or not if a short time passes by, and the installation is still not finished. If the updater is still not alive, then the installer should be responsible for showing progress if otherwise allowed.
 
-If the installer decides to show progress, it sends a message to the progress agent to show progress UI. Under most circumstances, the installation will finish faster than this point is reached however (exceptions may be potentially large updates with many scattered files, guided package installers, and updates over a remote network mount). If the connection to the updater is still connected after this short time passes (eg: like with sparkle-cli), then it's the updater's job to show progress instead.
+If the installer decides to show progress, it sends a message to the progress agent to show progress UI. Under most circumstances, the installation will finish faster than this point is reached however (exceptions may be guided package installers and updates over a remote network mount). If the connection to the updater is still connected after this short time passes (eg: like with sparkle-cli), then it's the updater's job to show progress instead.
 
 ### Finishing the Installation
 The installer starts stage 3 of the installation after the target application is terminated as well. The third stage does the final installation for updating and replacing the new updated bundle.
@@ -134,4 +134,4 @@ When the progress agent exits, it cleans up by removing itself from disk. The in
 
 * When we terminate the application before doing final installation work, we send an Apple quit event to all running application instances we find under the agent's GUI login session. This does not include running instances from other logged in sessions -- that may require authenticating all the time, so trade off is not worthwhile. Also currently the installer only handles a single process identifier to watch for until termination, and certainly doesn't handle the case if more instances are launched afterwards. Note all of this only applies to instances being launched from the same bundle path, and the consequence may rarely be updating a bundle when a running instance is still left alive.
 
-* SMJobBless() would be interesting to explore and perhaps more suitable for sparkle-cli than ordinary application updaters because using this API is less approriate for one-off installations. Furthermore, the installer would have to change to persist rather than be a one-time install, and may have to handle mutliple connections for installing multiple bundles simutaneously.
+* SMJobBless() would be interesting to explore and perhaps more suitable for sparkle-cli than ordinary application updaters because using this API is less appropriate for one-off installations. Furthermore, the installer would have to change to persist rather than be a one-time install, and may have to handle multiple connections for installing multiple bundles simultaneously.

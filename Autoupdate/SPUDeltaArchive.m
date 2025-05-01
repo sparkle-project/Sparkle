@@ -10,7 +10,7 @@
 #import "SPUDeltaArchiveProtocol.h"
 #import "SPUSparkleDeltaArchive.h"
 #import "SPUXarDeltaArchive.h"
-#import <CommonCrypto/CommonDigest.h>
+#import "SUBinaryDeltaCommon.h"
 
 
 #include "AppKitPrevention.h"
@@ -80,8 +80,8 @@ id<SPUDeltaArchiveProtocol> SPUDeltaArchiveReadPatchAndHeader(NSString *patchFil
 
 @implementation SPUDeltaArchiveHeader
 {
-    unsigned char _beforeTreeHash[CC_SHA1_DIGEST_LENGTH];
-    unsigned char _afterTreeHash[CC_SHA1_DIGEST_LENGTH];
+    unsigned char _beforeTreeHash[BINARY_DELTA_HASH_LENGTH];
+    unsigned char _afterTreeHash[BINARY_DELTA_HASH_LENGTH];
 }
 
 @synthesize compression = _compression;
@@ -89,8 +89,9 @@ id<SPUDeltaArchiveProtocol> SPUDeltaArchiveReadPatchAndHeader(NSString *patchFil
 @synthesize fileSystemCompression = _fileSystemCompression;
 @synthesize majorVersion = _majorVersion;
 @synthesize minorVersion = _minorVersion;
+@synthesize bundleCreationDate = _bundleCreationDate;
 
-- (instancetype)initWithCompression:(SPUDeltaCompressionMode)compression compressionLevel:(uint8_t)compressionLevel fileSystemCompression:(bool)fileSystemCompression majorVersion:(uint16_t)majorVersion minorVersion:(uint16_t)minorVersion beforeTreeHash:(const unsigned char *)beforeTreeHash afterTreeHash:(const unsigned char *)afterTreeHash
+- (instancetype)initWithCompression:(SPUDeltaCompressionMode)compression compressionLevel:(uint8_t)compressionLevel fileSystemCompression:(bool)fileSystemCompression majorVersion:(uint16_t)majorVersion minorVersion:(uint16_t)minorVersion beforeTreeHash:(const unsigned char *)beforeTreeHash afterTreeHash:(const unsigned char *)afterTreeHash bundleCreationDate:(nullable NSDate *)bundleCreationDate
 {
     self = [super init];
     if (self != nil)
@@ -104,6 +105,8 @@ id<SPUDeltaArchiveProtocol> SPUDeltaArchiveReadPatchAndHeader(NSString *patchFil
         
         memcpy(_beforeTreeHash, beforeTreeHash, sizeof(_beforeTreeHash));
         memcpy(_afterTreeHash, afterTreeHash, sizeof(_afterTreeHash));
+        
+        _bundleCreationDate = bundleCreationDate;
     }
     return self;
 }

@@ -16,6 +16,7 @@
 #import "SUVersionComparisonProtocol.h"
 #import "SUStandardVersionComparator.h"
 #import "SUUpdateValidator.h"
+#import "SPUVerifierInformation.h"
 #import "SUHost.h"
 #import "SPUSkippedUpdate.h"
 #import "SUSignatures.h"

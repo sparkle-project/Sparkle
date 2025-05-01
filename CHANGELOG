@@ -1,3 +1,107 @@
+# 2.7.0
+
+* Unarchiver / validation improvements (Zorg)
+  * Remove old checksum verification checks for dmg archives to improve extraction speed (#2568) (Zorg)
+  * Skip extracting auxiliary files and improve extraction progress for disk images (#2569) (Zorg)
+  * Improve robustness around extracting dmg's with passwords (#2627, #2571) (Zorg)
+  * Randomize the download archive name the installer extracts/executes (#2584) (Zorg)
+  * Retry extracting zip file without piping if extraction fails to workaround bug prior to macOS 15 (#2616) (Zorg)
+  * Add opt-in SUVerifyUpdateBeforeExtraction option to force verification of updates before extraction (#2667) (Zorg)
+  * Add support for extracting Apple Archives (.aar files; requires SUVerifyUpdateBeforeExtraction, macOS 10.15+) (#2586, #2588, #2590) (Zorg)
+  * Don't allow removal of signing keys more strictly (#2647) (Zorg)
+  * Remove SPARKLE_BUILD_DMG_SUPPORT option (#2690) (Zorg)
+* Add new BinaryDelta format (version 4) (Zorg)
+  * Preserve bundle creation date when creating and applying delta updates (#2583) (Zorg)
+  * Use faster crc32 hashes for binary delta version 4 (#2638) (Zorg)
+  * Make binary delta version 4 the default (#2668) (Zorg)
+* Language / layout improvements
+  * Fix recovery error suggestion not shown when app is translocated or on read-only mount (#2689) (Zorg)
+  * Fix typo in Dutch localisation (#2642) (Eitot)
+  * Add baseline alignment to status text in SUStatus dialog (#2587) (Eitot)
+  * Make horizontal hugging priority required for status text field (#2614) (Zorg)
+  * Adjust the layout of anonymous system profile info to align better with the rest of the panel's UI (#2564) (Daniel Jalkut)
+  * Fix typo in Dutch localisation (#2642) (Eitot)
+  * Internationalize system profile display keys (#2577) (Zorg)
+  * Update hebrew locale and add right-to-left characters (#2573, #2576, #2578, #2579) (Shlomo)
+  * Update localisations for Dutch and German (#2582) (Eitot)
+  * Add unlocalized strings in Japanese (#2589) (1024jp)
+  * Fix typo in LICENSE (#2648) (fujisoft)
+* Deprecate custom version comparators  (#2639) (Zorg)
+* Skip preflight update check in sparkle-cli if user is root (#2645) (Zorg)
+* Avoid assert/crash when app is moved before update alert shows (#2658) (Zorg)
+* Use default NSURLRequest timeoutInterval for the downloader (currently 60s) (#2673) (Zorg)
+* Fix process substitution failing to work for providing the private key as file argument (#2615) (Zorg)
+* Improve unable decode private key error messages in generate_appcast (#2675) (Zorg)
+* Clarify that default channel must be in allowed channels set in API documentation (#2676) (Zorg)
+* Call update permission prompt delegate method only when needed (#2622) (Zorg)
+* Resolve duplicate class definitions from BinaryDelta, Sparkle Test App, and unit tests (#2570, #2629) (Zorg)
+
+# 2.6.4
+
+* Fix app modification prompt from appearing when downloaded update overrides NSUpdateSecurityPolicy (#2593)
+
+# 2.6.3
+
+* Guard update timer update check against sessionInProgress to fix rare crash when checking for updates (#2561)
+* Remove extra writeData: call when unarchiving disk images (#2562)
+* Ignore crashes due to SIGPIPE in generate_appcast when failing to extract zip files (#2563)
+
+# 2.6.2
+
+* Create and use temp extraction directory in generate_appcast again (#2555) (Zorg)
+
+# 2.6.1
+
+* Extract archives in a separate directory from the input archive (#2550) (Zorg)
+* Fix the release notes WebKit view not updating background when transitioning from light to dark mode (#2542) (Zorg)
+* Add NN (Norwegian Nynorsk) locale (#2532) (Sjur N Moshagen, Zorg)
+* Create tar.xz files with built-in tar and remove bzip2 fallback for creating a release distribution (#2535) (Zorg)
+* Add fallback in case SULocalizedStringFromTableInBundle() fails (#2533) (Zorg)
+* Remove assert on download response being available fixing rare crash (#2547) (Zorg)
+* Clarify when authoriation prompt may show in SPUUserDriver documentation (#2531, #2534) (Zorg)
+* Fix typos in codebase (#2537) (Viktor Szépe)
+
+# 2.6.0
+
+* Perform Gatekeeper scan to pre-warm app launch (#2505) (Zorg)
+* Disable sandboxing for the Downloader XPC service by default to fix downloader prompt warnings (#2511) (Zorg)
+* Store private seed as the secret for newly generated keys (#2472) (Zorg)
+* Improve signing error message to developers if they serve the wrong update file (#2471) (Zorg)
+* Prevent app modification warnings from external updaters (like sparkli-cli) by improving installation (#2516) (Zorg)
+* Update Korean localization (#2504) (CheolHyun Mun)
+* Use $PROJECT_DIR instead of $SRCROOT (#2489) (Zorg)
+* Set Package.swift minimum deployment to macOS 10.13 (#2481) (Eitot)
+* Fix false positive analyzer warning about resumableUpdate type (#2454) (Zorg)
+
+# 2.5.2
+
+* Don't clean up update directory when Autoupdate receives SIGTERM (#2479) (Zorg)
+* Update Japanese localization (#2475) (1024jp)
+* Improve Turkish translations (#2464) (Emir SARI)
+* Update Spanish translation for 'You are currently running version %@.' and 'Version History' (#2463) (Billy Gray)
+
+# 2.5.1
+
+* Default to English for XML nodes when no xml:lang is present (#2440) (Zorg)
+* Filter for archive files in generate_appcast more intelligently (#2448) (Zorg)
+* Use correct entitlements and dsym files when using custom bundle id and XPC names in ConfigCommon (#2446) (floorish)
+
+# 2.5.0
+
+* Add ability to adapt release notes based on the currently installed version (#2373) (Nathan Manceaux-Panot)
+* Allow developers to use custom URL schemes in the release notes view (#2393) (Zorg)
+* Adopt cooperative app activation APIs in macOS 14 Sonoma (#2409) (Zorg)
+* Improve permission prompt layout (#2420) (Zorg)
+* Remove hyphenation in "You're up to date" message (#2425) (Zorg, Dom Neill)
+* Pre-warm installs before relaunch and resolve sporadic failures in CI (#2421) (Zorg)
+* Fix make release not building distribution successfully (#2430) (Zorg)
+* Fix Updater app not starting when running Sparkle as root (e.g. from CLI with sudo or a daemon) on macOS 14 Sonoma (#2432) (Zorg)
+* Fix KVO usage for updaterController.updater.* (#2404) (Zorg)
+* Replace CFUUID* with NSUUID (#2395) (Eitot)
+* Report an error when detecting duplicate updates in generate_appcast (#2407) (Zorg)
+* Improve error for rejecting xattr based code signing for delta updates (#2408) (Zorg)
+* Fail gracefully when auxiliary tool cannot be located (#2436) (Zorg)
+
 # 2.4.2
 
 * Ignore release notes download when we shouldn't show release notes (#2381) (Zorg)
@@ -201,6 +305,15 @@ Please visit [Sparkle's website](http://sparkle-project.org) for more informatio
 
 If you are migrating from earlier beta versions of Sparkle 2 and use sandboxing, please re-familiarize yourself with the [Sandboxing guide](https://sparkle-project.org/documentation/sandboxing/). Some of the XPC Services are now optional and integration with XPC Services and code signing have been simplified. The SPUUserDriver protocol for custom user interfaces has been greatly simplified too.
 
+# 1.27.3
+
+ * Create and use temp extraction directory in generate_appcast again (#2556) (Zorg)
+
+# 1.27.2
+
+ * Extract archives in a separate directory from the input archive (#2552) (Zorg)
+ * Fix incorrect xz log warning in make release (#2044) (trss)
+
 # 1.27.1
 
  * Use px instead of pt when specifying font size to fix default font size in WebView from #1962 (regressed in 1.25.0 with WKWebView adoption) (Daniel Jalkut)
@@ -359,7 +472,7 @@ If you are migrating from earlier beta versions of Sparkle 2 and use sandboxing,
 # 1.20.0
 
  * `generate_appcast` option to read private key directly from the keychain (Tamás Lustyik)
- * Add delegate callbacks for fininshed download and extraction related events (Csaba Horony)
+ * Add delegate callbacks for finished download and extraction related events (Csaba Horony)
  * Don't check for updates if Do Not Disturb is on (Kornel)
  * Expose `CodesigningVerifier`, add codesign info API (sunuslee)
  * Threading fixes:
@@ -709,7 +822,7 @@ Important security fixes:
  * All the user defaults keys are now private; instead, SUUpdater is KVC-compliant for automaticallyChecksForUpdates, updateCheckInterval, and feedURL.
 * Reduced the size of the English-only framework by 25%.
 * System profiling information is now only submitted to the server once per week; this will help normalize your statistics across users with different interval preferences.
-* The feedParamatersForUpdater: delegate method now requires "displayKey" and "displayVersion" keys so that it can inform the user what's being sent.
+* The feedParametersForUpdater: delegate method now requires "displayKey" and "displayVersion" keys so that it can inform the user what's being sent.
 * Added a delegate method called pathToRelaunchForUpdater: which can be used for plugins to provide the path which should be used when relaunching the client after installing an update.
 * Added support for xml:lang to pick localized nodes in appcasts (for release notes, etc).
 * Fixed a bug which would cause the "checking for updates" window to not disappear in certain extraordinary error conditions.

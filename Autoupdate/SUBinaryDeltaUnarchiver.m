@@ -20,6 +20,7 @@
 {
     NSString *_archivePath;
     NSString *_updateHostBundlePath;
+    NSString *_extractionDirectory;
 }
 
 + (BOOL)canUnarchivePath:(NSString *)path
@@ -71,17 +72,23 @@ SPU_OBJC_DIRECT
     }
 }
 
-- (instancetype)initWithArchivePath:(NSString *)archivePath updateHostBundlePath:(NSString *)updateHostBundlePath
+- (instancetype)initWithArchivePath:(NSString *)archivePath extractionDirectory:(NSString *)extractionDirectory updateHostBundlePath:(NSString *)updateHostBundlePath
 {
     self = [super init];
     if (self != nil) {
         _archivePath = [archivePath copy];
         _updateHostBundlePath = [updateHostBundlePath copy];
+        _extractionDirectory = [extractionDirectory copy];
     }
     return self;
 }
 
-- (void)unarchiveWithCompletionBlock:(void (^)(NSError * _Nullable))completionBlock progressBlock:(void (^ _Nullable)(double))progressBlock
+- (BOOL)needsVerifyBeforeExtractionKey
+{
+    return NO;
+}
+
+- (void)unarchiveWithCompletionBlock:(void (^)(NSError * _Nullable))completionBlock progressBlock:(void (^ _Nullable)(double))progressBlock waitForCleanup:(BOOL)__unused waitForCleanup
 {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         @autoreleasepool {
@@ -94,7 +101,7 @@ SPU_OBJC_DIRECT
 - (void)extractDeltaWithNotifier:(SUUnarchiverNotifier *)notifier
 {
     NSString *sourcePath = _updateHostBundlePath;
-    NSString *targetPath = [[_archivePath stringByDeletingLastPathComponent] stringByAppendingPathComponent:[sourcePath lastPathComponent]];
+    NSString *targetPath = [_extractionDirectory stringByAppendingPathComponent:[sourcePath lastPathComponent]];
     
     NSError *applyDiffError = nil;
     BOOL success = applyBinaryDelta(sourcePath, targetPath, _archivePath, NO, ^(double progress){

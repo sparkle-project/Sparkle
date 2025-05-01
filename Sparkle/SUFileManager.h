@@ -11,14 +11,18 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+#ifndef BUILDING_SPARKLE_TESTS
+#define SUFileManagerDefinitionAttribute SPU_OBJC_DIRECT_MEMBERS
+#else
+#define SUFileManagerDefinitionAttribute __attribute__((objc_runtime_name("SUTestFileManager")))
+#endif
+
 /**
  * A class used for performing file operations more suitable than NSFileManager for performing installation work.
  * All operations on this class may be used on thread other than the main thread.
  * This class provides just basic file operations and stays away from including much application-level logic.
  */
-#ifndef BUILDING_SPARKLE_TESTS
-SPU_OBJC_DIRECT_MEMBERS
-#endif
+SUFileManagerDefinitionAttribute
 @interface SUFileManager : NSObject
 
 /**
@@ -66,6 +70,16 @@ SPU_OBJC_DIRECT_MEMBERS
  * Both originalItemURL and newItemURL must exist.
  */
 - (BOOL)swapItemAtURL:(NSURL *)originalItemURL withItemAtURL:(NSURL *)newItemURL error:(NSError **)error;
+
+/**
+ * Checks if two URLs are on the same volume.
+ * @param url1 A URL pointing to the first item
+ * @param url2 A URL pointing to the second item
+ * @return YES if both URLs are on the same volume, otherwise NO
+ *
+ * If any volume retrieval error occurs during the process, this method assumes both items are on the same volume (which is the common case).
+ */
+- (BOOL)itemAtURL:(NSURL *)url1 isOnSameVolumeItemAsURL:(NSURL *)url2;
 
 /**
  * Copies an item from a source to a destination

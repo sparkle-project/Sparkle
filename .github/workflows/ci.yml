@@ -10,25 +10,28 @@ jobs:
   build:
     strategy:
       matrix:
-        xcode: ['xcode14.3.1', 'xcode15']
+        xcode: ['xcode16.1', 'xcode15.4']
         include:
-            - xcode: 'xcode15'
-              xcode-path: '/Applications/Xcode_15.0.app/Contents/Developer'
+            - xcode: 'xcode15.4'
+              xcode-path: '/Applications/Xcode_15.4.app/Contents/Developer'
               upload-dist: false
-              run-analyzer: true
-              macos: 'macos-13'
-            - xcode: 'xcode14.3.1'
-              xcode-path: '/Applications/Xcode_14.3.1.app/Contents/Developer'
-              upload-dist: true
               run-analyzer: false
-              macos: 'macos-13'
+              macos: 'macos-14'
+            - xcode: 'xcode16.1'
+              xcode-path: '/Applications/Xcode_16.1.app'
+              upload-dist: true
+              run-analyzer: true
+              macos: 'macos-15'
             
     name: Build and Test Sparkle
     runs-on: ${{ matrix.macos }}
 
+    permissions:
+      pull-requests: write
+
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           submodules: true
           fetch-depth: 0
@@ -80,11 +83,9 @@ jobs:
       
       - name: Post Analyzed Warnings
         if: ${{ success() && matrix.run-analyzer && github.event_name == 'pull_request' && steps.findwarnings.outputs.analyzestatus == '0' }}
-        uses: mshick/add-pr-comment@v1
+        uses: mshick/add-pr-comment@v2
         with:
             allow-repeats: false
-            repo-token: ${{ secrets.BOT_PERSONAL_ACCESS_TOKEN }}
-            repo-token-user-login: 'Sparkle-Bot'
             message: "``` ${{ steps.warnings.outputs.content }} ```"
         
       - name: Build Release Distribution
@@ -94,13 +95,13 @@ jobs:
           xcodebuild build -project Sparkle.xcodeproj -scheme Distribution -configuration Release -derivedDataPath build
       - name: Archive Test Results
         if: failure()
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: build-logs
           path: build/Logs
       - name: Upload Distribution
         if: ${{ success() && matrix.upload-dist }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: Sparkle-distribution-${{ matrix.xcode }}.tar.xz
-          path: build/Build/Products/Release/sparkle-dist.tar.xz
+          path: build/Build/Products/Release/sparkle_dist.tar.xz

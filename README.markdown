@@ -29,7 +29,7 @@ Please visit [Sparkle's website](http://sparkle-project.org) for up to date docu
 
 ## Requirements
 
-* Runtime: macOS 10.13 or greater for 2.3, macOS 10.11 or greater for 2.2.x
+* Runtime: macOS 10.13 or later.
 * Build: Latest major Xcode (stable or beta, whichever is latest) and one major version less.
 * HTTPS server for serving updates (see [App Transport Security](http://sparkle-project.org/documentation/app-transport-security/))
 
@@ -54,7 +54,7 @@ If you are adding a symbol to the public API you must decorate the declaration w
 
 You do not usually need to build a Sparkle distribution unless you're making changes to Sparkle itself.
 
-To build a Sparkle distribution, `cd` to the root of the Sparkle source tree and run `make release`. Sparkle-*VERSION*.tar.xz (or .bz2) will be created in a temporary directory and revealed in Finder after the build has completed.
+To build a Sparkle distribution, `cd` to the root of the Sparkle source tree and run `make release`. Sparkle-*VERSION*.tar.xz will be created and revealed in Finder after the build has completed.
 
 Alternatively, build the Distribution scheme in the Xcode UI.
 

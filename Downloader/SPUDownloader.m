@@ -249,7 +249,6 @@ static NSString *SUDownloadingReason = @"Downloading update related file";
         NSData *data = [NSData dataWithContentsOfFile:_downloadFilename];
         if (data != nil) {
             NSURLResponse *response = _download.response;
-            assert(response != nil);
 
             NSURL *responseURL = response.URL;
             if (responseURL == nil) {
@@ -290,7 +289,7 @@ static NSString *SUDownloadingReason = @"Downloading update related file";
     }
 }
 
-// NSURLDownload has a [downlaod:shouldDecodeSourceDataOfMIMEType:] to determine if the data should be decoded.
+// NSURLDownload has a [download:shouldDecodeSourceDataOfMIMEType:] to determine if the data should be decoded.
 // This does not exist for NSURLSessionDownloadTask and appears unnecessary. Data tasks will decode data, but not download tasks.
 
 @end

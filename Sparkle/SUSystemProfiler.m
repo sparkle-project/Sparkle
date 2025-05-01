@@ -12,6 +12,7 @@
 #import "SUOperatingSystem.h"
 #include <sys/sysctl.h>
 #import "SPUUpdaterDelegate.h"
+#import "SULocalizations.h"
 
 
 #include "AppKitPrevention.h"
@@ -32,6 +33,10 @@ NSString *const SUSystemProfilerPreferredLanguageKey = @"lang";
 
 + (NSArray<NSDictionary<NSString *, NSString *> *> *)systemProfileArrayForHost:(SUHost *)host
 {
+#if SPARKLE_COPY_LOCALIZATIONS
+    NSBundle *sparkleBundle = SUSparkleBundle();
+#endif
+    
     // Gather profile information and append it to the URL.
     NSMutableArray<NSDictionary<NSString *, NSString *> *> *profileArray = [NSMutableArray array];
     NSArray *profileDictKeys = @[@"key", @"displayKey", @"value", @"displayValue"];
@@ -42,7 +47,7 @@ NSString *const SUSystemProfilerPreferredLanguageKey = @"lang";
     // OS version
     NSString *currentSystemVersion = [SUOperatingSystem systemVersionString];
     if (currentSystemVersion != nil) {
-        [profileArray addObject:[NSDictionary dictionaryWithObjects:@[SUSystemProfilerOperatingSystemVersionKey, @"OS Version", currentSystemVersion, currentSystemVersion] forKeys:profileDictKeys]];
+        [profileArray addObject:[NSDictionary dictionaryWithObjects:@[SUSystemProfilerOperatingSystemVersionKey, SULocalizedStringFromTableInBundle(@"OS Version", SPARKLE_TABLE, sparkleBundle, nil), currentSystemVersion, currentSystemVersion] forKeys:profileDictKeys]];
     }
 
     // CPU type (decoder info for values found here is in mach/machine.h)
@@ -58,7 +63,7 @@ NSString *const SUSystemProfilerPreferredLanguageKey = @"lang";
             case CPU_TYPE_POWERPC:  visibleCPUType = @"PowerPC";    break;
             default:                visibleCPUType = @"Other";      break;
         }
-        [profileArray addObject:[NSDictionary dictionaryWithObjects:@[SUSystemProfilerCPUTypeKey, @"CPU Type", [NSString stringWithFormat:@"%d", value], visibleCPUType] forKeys:profileDictKeys]];
+        [profileArray addObject:[NSDictionary dictionaryWithObjects:@[SUSystemProfilerCPUTypeKey, SULocalizedStringFromTableInBundle(@"CPU Type", SPARKLE_TABLE, sparkleBundle, nil), [NSString stringWithFormat:@"%d", value], visibleCPUType] forKeys:profileDictKeys]];
     }
     error = sysctlbyname("hw.cpu64bit_capable", &value, &length, NULL, 0);
     if (error != 0) {
@@ -72,7 +77,7 @@ NSString *const SUSystemProfilerPreferredLanguageKey = @"lang";
 
     if (error == 0) {
         is64bit = value == 1;
-        [profileArray addObject:[NSDictionary dictionaryWithObjects:@[SUSystemProfilerCPU64bitKey, @"CPU is 64-Bit?", [NSString stringWithFormat:@"%d", is64bit], is64bit ? @"Yes" : @"No"] forKeys:profileDictKeys]];
+        [profileArray addObject:[NSDictionary dictionaryWithObjects:@[SUSystemProfilerCPU64bitKey, SULocalizedStringFromTableInBundle(@"CPU is 64-Bit?", SPARKLE_TABLE, sparkleBundle, nil), [NSString stringWithFormat:@"%d", is64bit], is64bit ? SULocalizedStringFromTableInBundle(@"Yes", SPARKLE_TABLE, sparkleBundle, nil) : SULocalizedStringFromTableInBundle(@"No", SPARKLE_TABLE, sparkleBundle, nil)] forKeys:profileDictKeys]];
     }
     error = sysctlbyname("hw.cpusubtype", &value, &length, NULL, 0);
     if (error == 0) {
@@ -97,7 +102,7 @@ NSString *const SUSystemProfilerPreferredLanguageKey = @"lang";
         } else {
             visibleCPUSubType = @"Other";
         }
-        [profileArray addObject:[NSDictionary dictionaryWithObjects:@[SUSystemProfilerCPUSubtypeKey, @"CPU Subtype", [NSString stringWithFormat:@"%d", value], visibleCPUSubType] forKeys:profileDictKeys]];
+        [profileArray addObject:[NSDictionary dictionaryWithObjects:@[SUSystemProfilerCPUSubtypeKey, SULocalizedStringFromTableInBundle(@"CPU Subtype", SPARKLE_TABLE, sparkleBundle, nil), [NSString stringWithFormat:@"%d", value], visibleCPUSubType] forKeys:profileDictKeys]];
     }
     error = sysctlbyname("hw.model", NULL, &length, NULL, 0);
     if (error == 0) {
@@ -107,7 +112,7 @@ NSString *const SUSystemProfilerPreferredLanguageKey = @"lang";
             if (error == 0) {
                 NSString *rawModelName = @(cpuModel);
                 NSString *visibleModelName = rawModelName;
-                [profileArray addObject:[NSDictionary dictionaryWithObjects:@[SUSystemProfilerHardwareModelKey, @"Mac Model", rawModelName, visibleModelName] forKeys:profileDictKeys]];
+                [profileArray addObject:[NSDictionary dictionaryWithObjects:@[SUSystemProfilerHardwareModelKey, SULocalizedStringFromTableInBundle(@"Mac Model", SPARKLE_TABLE, sparkleBundle, nil), rawModelName, visibleModelName] forKeys:profileDictKeys]];
             }
             free(cpuModel);
         }
@@ -117,24 +122,24 @@ NSString *const SUSystemProfilerPreferredLanguageKey = @"lang";
     error = sysctlbyname("hw.ncpu", &value, &length, NULL, 0);
     if (error == 0) {
         NSString *stringValue = [NSString stringWithFormat:@"%d", value];
-        [profileArray addObject:[NSDictionary dictionaryWithObjects:@[SUSystemProfilerCPUCountKey, @"Number of CPUs", stringValue, stringValue] forKeys:profileDictKeys]];
+        [profileArray addObject:[NSDictionary dictionaryWithObjects:@[SUSystemProfilerCPUCountKey, SULocalizedStringFromTableInBundle(@"Number of CPUs", SPARKLE_TABLE, sparkleBundle, nil), stringValue, stringValue] forKeys:profileDictKeys]];
     }
 
     // User preferred language
     NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
     NSArray *languages = [defs objectForKey:@"AppleLanguages"];
     if ([languages count] > 0) {
-        [profileArray addObject:[NSDictionary dictionaryWithObjects:@[SUSystemProfilerPreferredLanguageKey, @"Preferred Language", [languages objectAtIndex:0], [languages objectAtIndex:0]] forKeys:profileDictKeys]];
+        [profileArray addObject:[NSDictionary dictionaryWithObjects:@[SUSystemProfilerPreferredLanguageKey, SULocalizedStringFromTableInBundle(@"Preferred Language", SPARKLE_TABLE, sparkleBundle, nil), [languages objectAtIndex:0], [languages objectAtIndex:0]] forKeys:profileDictKeys]];
     }
 
     // Application sending the request
     NSString *appName = [host name];
     if (appName) {
-        [profileArray addObject:[NSDictionary dictionaryWithObjects:@[SUSystemProfilerApplicationNameKey, @"Application Name", appName, appName] forKeys:profileDictKeys]];
+        [profileArray addObject:[NSDictionary dictionaryWithObjects:@[SUSystemProfilerApplicationNameKey, SULocalizedStringFromTableInBundle(@"Application Name", SPARKLE_TABLE, sparkleBundle, nil), appName, appName] forKeys:profileDictKeys]];
     }
     NSString *appVersion = [host version];
     if (appVersion) {
-        [profileArray addObject:[NSDictionary dictionaryWithObjects:@[SUSystemProfilerApplicationVersionKey, @"Application Version", appVersion, appVersion] forKeys:profileDictKeys]];
+        [profileArray addObject:[NSDictionary dictionaryWithObjects:@[SUSystemProfilerApplicationVersionKey, SULocalizedStringFromTableInBundle(@"Application Version", SPARKLE_TABLE, sparkleBundle, nil), appVersion, appVersion] forKeys:profileDictKeys]];
     }
 
     // Number of displays?
@@ -145,7 +150,7 @@ NSString *const SUSystemProfilerPreferredLanguageKey = @"lang";
     if (sysctlbyname("hw.cpufrequency", &hz, &hz_size, NULL, 0) == 0) {
         unsigned long mhz = hz / 1000000;
         NSString *stringValue = [NSString stringWithFormat:@"%lu", mhz];
-        [profileArray addObject:[NSDictionary dictionaryWithObjects:@[SUSystemProfilerCPUFrequencyKey, @"CPU Speed (MHz)", stringValue, stringValue] forKeys:profileDictKeys]];
+        [profileArray addObject:[NSDictionary dictionaryWithObjects:@[SUSystemProfilerCPUFrequencyKey, SULocalizedStringFromTableInBundle(@"CPU Speed (MHz)", SPARKLE_TABLE, sparkleBundle, nil), stringValue, stringValue] forKeys:profileDictKeys]];
     }
 
     // amount of RAM
@@ -154,7 +159,7 @@ NSString *const SUSystemProfilerPreferredLanguageKey = @"lang";
     if (sysctlbyname("hw.memsize", &bytes, &bytes_size, NULL, 0) == 0) {
         double megabytes = bytes / (1024. * 1024.);
         NSString *stringValue = [NSString stringWithFormat:@"%lu", (unsigned long)megabytes];
-        [profileArray addObject:[NSDictionary dictionaryWithObjects:@[SUSystemProfilerMemoryKey, @"Memory (MB)", stringValue, stringValue] forKeys:profileDictKeys]];
+        [profileArray addObject:[NSDictionary dictionaryWithObjects:@[SUSystemProfilerMemoryKey, SULocalizedStringFromTableInBundle(@"Memory (MB)", SPARKLE_TABLE, sparkleBundle, nil), stringValue, stringValue] forKeys:profileDictKeys]];
     }
 
     return [profileArray copy];

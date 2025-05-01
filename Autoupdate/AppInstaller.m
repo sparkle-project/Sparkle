@@ -7,7 +7,6 @@
 //
 
 #import "AppInstaller.h"
-#import "TerminationListener.h"
 #import "SUInstaller.h"
 #import "SUUpdateValidator.h"
 #import "SULog.h"
@@ -28,6 +27,8 @@
 #import "SPUInstallerAgentProtocol.h"
 #import "SPUInstallationType.h"
 #import "SPULocalCacheDirectory.h"
+#import "SPUVerifierInformation.h"
+#import "SUConstants.h"
 
 
 #include "AppKitPrevention.h"
@@ -52,8 +53,6 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     id<SUInstallerCommunicationProtocol> _communicator;
     AgentConnection *_agentConnection;
 
-    TerminationListener *_terminationListener;
-
     SUUpdateValidator *_updateValidator;
 
     NSString *_hostBundleIdentifier;
@@ -61,11 +60,13 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     NSString *_userName;
     SUHost *_host;
     NSString *_updateDirectoryPath;
+    NSString *_extractionDirectory;
     NSString *_downloadName;
     NSString *_decryptionPassword;
     SUSignatures *_signatures;
     NSString *_relaunchPath;
     NSString *_installationType;
+    SPUVerifierInformation *_verifierInformation;
 
     id<SUInstallerProtocol> _installer;
 
@@ -84,6 +85,8 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     BOOL _performedStage1Installation;
     BOOL _performedStage2Installation;
     BOOL _performedStage3Installation;
+    
+    BOOL _targetTerminated;
 }
 
 - (instancetype)initWithHostBundleIdentifier:(NSString *)hostBundleIdentifier homeDirectory:(NSString *)homeDirectory userName:(NSString *)userName
@@ -171,30 +174,57 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     [_communicator handleMessageWithIdentifier:SPUExtractionStarted data:[NSData data]];
     
     NSString *archivePath = [_updateDirectoryPath stringByAppendingPathComponent:_downloadName];
-    id<SUUnarchiverProtocol> unarchiver = [SUUnarchiver unarchiverForPath:archivePath updatingHostBundlePath:_host.bundlePath decryptionPassword:_decryptionPassword expectingInstallationType:_installationType];
     
-    NSError *unarchiverError = nil;
+    id<SUUnarchiverProtocol> unarchiver = [SUUnarchiver unarchiverForPath:archivePath extractionDirectory:_extractionDirectory updatingHostBundlePath:_host.bundlePath decryptionPassword:_decryptionPassword expectingInstallationType:_installationType];
+    
+    NSError *prevalidationError = nil;
     BOOL success = NO;
     if (!unarchiver) {
-        unarchiverError = [NSError errorWithDomain:SUSparkleErrorDomain code:SUUnarchivingError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"No valid unarchiver was found for %@", archivePath] }];
+        prevalidationError = [NSError errorWithDomain:SUSparkleErrorDomain code:SUUnarchivingError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"No valid unarchiver was found for %@", archivePath] }];
         
         success = NO;
     } else {
-        _updateValidator = [[SUUpdateValidator alloc] initWithDownloadPath:archivePath signatures:_signatures host:_host];
-
-        // Delta & package updates will require validation before extraction
-        // Normal application updates are a bit more lenient allowing developers to change one of apple dev ID or EdDSA keys
-        BOOL needsPrevalidation = [[unarchiver class] mustValidateBeforeExtraction] || ![_installationType isEqualToString:SPUInstallationTypeApplication];
-
-        if (needsPrevalidation) {
-            success = [_updateValidator validateDownloadPathWithError:&unarchiverError];
+        NSError *fileAttributesError = nil;
+        NSDictionary<NSFileAttributeKey, id> *archiveFileAttributes = [NSFileManager.defaultManager attributesOfItemAtPath:archivePath error:&fileAttributesError];
+        if (archiveFileAttributes == nil) {
+            SULog(SULogLevelError, @"Failed to retrieve file attributes from archive: %@.", fileAttributesError);
         } else {
-            success = YES;
+            _verifierInformation.actualContentLength = (uint64_t)(archiveFileAttributes.fileSize);
+        }
+        
+        _updateValidator = [[SUUpdateValidator alloc] initWithDownloadPath:archivePath signatures:_signatures host:_host verifierInformation:_verifierInformation];
+        
+        // More uncommon archives types (.aar, .yaa) need SUVerifyUpdateBeforeExtraction
+        BOOL verifyBeforeExtraction = [_host boolForInfoDictionaryKey:SUVerifyUpdateBeforeExtractionKey];
+        if (!verifyBeforeExtraction && unarchiver.needsVerifyBeforeExtractionKey) {
+            prevalidationError = [NSError errorWithDomain:SUSparkleErrorDomain code:SUValidationError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Extracting %@ archives require setting %@ to YES in the old app. Please visit https://sparkle-project.org/documentation/customization/ for more information.", archivePath.pathExtension, SUVerifyUpdateBeforeExtractionKey] }];
+            
+            success = NO;
+        } else {
+            // Delta, package updates, and apps with SUVerifyUpdateBeforeExtraction will require validation before extraction
+            // Otherwise normal application updates are a bit more lenient allowing developers to change one of apple dev ID or EdDSA keys after extraction
+            BOOL archiveTypeMustValidateBeforeExtraction = [[unarchiver class] mustValidateBeforeExtraction];
+            BOOL needsPrevalidation = verifyBeforeExtraction || archiveTypeMustValidateBeforeExtraction || ![_installationType isEqualToString:SPUInstallationTypeApplication];
+
+            if (needsPrevalidation) {
+                // EdDSA signing is required, so host must have public keys
+                if (![_updateValidator validateHostHasPublicKeys:&prevalidationError]) {
+                    success = NO;
+                } else {
+                    // Falling back on code signing for prevalidation requires SUVerifyUpdateBeforeExtraction
+                    // and that update is a regular app update, and not a delta update
+                    BOOL fallbackOnCodeSigning = (verifyBeforeExtraction && !archiveTypeMustValidateBeforeExtraction && [_installationType isEqualToString:SPUInstallationTypeApplication]);
+                    
+                    success = [_updateValidator validateDownloadPathWithFallbackOnCodeSigning:fallbackOnCodeSigning error:&prevalidationError];
+                }
+            } else {
+                success = YES;
+            }
         }
     }
     
     if (!success) {
-        [self unarchiverDidFailWithError:unarchiverError];
+        [self unarchiverDidFailWithError:prevalidationError];
     } else {
         [unarchiver
          unarchiveWithCompletionBlock:^(NSError * _Nullable error) {
@@ -204,7 +234,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
                  [self->_communicator handleMessageWithIdentifier:SPUValidationStarted data:[NSData data]];
                  
                  NSError *validationError = nil;
-                 BOOL validationSuccess = [self->_updateValidator validateWithUpdateDirectory:self->_updateDirectoryPath error:&validationError];
+                 BOOL validationSuccess = [self->_updateValidator validateWithUpdateDirectory:self->_extractionDirectory error:&validationError];
                  
                  if (!validationSuccess) {
                      [self cleanupAndExitWithStatus:EXIT_FAILURE error:[NSError errorWithDomain:SUSparkleErrorDomain code:SPUInstallerError userInfo:@{ NSLocalizedDescriptionKey: @"Update validation was a failure", NSUnderlyingErrorKey: validationError }]];
@@ -225,7 +255,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
                  
                  [self->_communicator handleMessageWithIdentifier:SPUExtractedArchiveWithProgress data:data];
              }
-         }];
+         } waitForCleanup:NO];
     }
 }
 
@@ -254,6 +284,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     // but may as well set other fields to nil too
     [self clearUpdateDirectory];
     _downloadName = nil;
+    _extractionDirectory = nil;
     _decryptionPassword = nil;
     _signatures = nil;
     _relaunchPath = nil;
@@ -273,7 +304,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 
 - (void)agentConnectionDidInvalidate
 {
-    if (!_finishedValidation || !_agentInitiatedConnection) {
+    if (!_finishedValidation || !_agentInitiatedConnection || !_targetTerminated) {
         NSMutableDictionary *userInfo = [NSMutableDictionary dictionaryWithDictionary:@{ NSLocalizedDescriptionKey: @"Error: Agent connection invalidated before installation began" }];
         
         NSError *agentError = _agentConnection.invalidationError;
@@ -291,16 +322,32 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     // For a plug-in this makes a big difference; we want to wait until the app hosting the plug-in terminates
     // Otherwise for an app, the relaunch path and host path should be identical
     
-    [_agentConnection.agent registerApplicationBundlePath:_relaunchPath reply:^(NSNumber * _Nullable processIdentifier) {
+    __block BOOL receivedResponse = NO;
+    [_agentConnection.agent registerApplicationBundlePath:_relaunchPath reply:^(BOOL targetTerminated) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            self->_terminationListener = [[TerminationListener alloc] initWithProcessIdentifier:processIdentifier];
+            receivedResponse = YES;
+            
+            if (!targetTerminated) {
+                [self->_agentConnection.agent listenForTerminationWithCompletion:^{
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        self->_targetTerminated = YES;
+                        
+                        if (self->_performedStage1Installation) {
+                            [self finishInstallationAfterHostTermination];
+                        }
+                    });
+                }];
+            } else {
+                self->_targetTerminated = YES;
+            }
+            
             [self startInstallation];
         });
     }];
     
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(RETRIEVE_PROCESS_IDENTIFIER_TIMEOUT * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        if (self->_terminationListener == nil) {
-            [self cleanupAndExitWithStatus:EXIT_FAILURE error:[NSError errorWithDomain:SUSparkleErrorDomain code:SPUInstallerError userInfo:@{ NSLocalizedDescriptionKey: @"Timeout error: failed to retreive process identifier from agent" }]];
+        if (!receivedResponse) {
+            [self cleanupAndExitWithStatus:EXIT_FAILURE error:[NSError errorWithDomain:SUSparkleErrorDomain code:SPUInstallerError userInfo:@{ NSLocalizedDescriptionKey: @"Timeout error: failed to retrieve process identifier from agent" }]];
         }
     });
 }
@@ -351,7 +398,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
             }
             
             // Resolve the bookmark data for the downloaded update
-            
+            // See "Share file access between processes with URL bookmarks" in https://developer.apple.com/documentation/security/app_sandbox/accessing_files_from_the_macos_app_sandbox
             BOOL isStale = NO;
             NSError *bookmarkError = nil;
             NSURL *downloadURL = [NSURL URLByResolvingBookmarkData:installationData.updateURLBookmarkData options:NSURLBookmarkResolutionWithoutUI relativeToURL:nil bookmarkDataIsStale:&isStale error:&bookmarkError];
@@ -387,11 +434,39 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
                 SULog(SULogLevelError, @"Error: bookmark data for update download is stale.. but still continuing.");
             }
             
-            NSString *downloadName = downloadURL.lastPathComponent;
-            if (downloadName == nil) {
+            NSString *originalDownloadName = downloadURL.lastPathComponent;
+            if (originalDownloadName == nil) {
                 [self cleanupAndExitWithStatus:EXIT_FAILURE error:[NSError errorWithDomain:SUSparkleErrorDomain code:SPUInstallerError userInfo:@{ NSLocalizedDescriptionKey: @"Error: Failed to retrieve download name from download URL" }]];
                 
                 return;
+            }
+            
+            // Randomize the download name if possible
+            // This adds better security if there are any vulnerabilities in extracting/executing archives
+            // which allow writing in unexpected locations. For zip/tar/dmg archives we may also extract them before
+            // performing signing validation (due to key rotation).
+            NSString *downloadName;
+            NSString *randomizedUUIDString = [[NSUUID UUID] UUIDString];
+            if (randomizedUUIDString != nil) {
+                // Find the real path extension of the download name
+                // We cannot use -[NSString pathExtension] because it may not give us the full path extension
+                // E.g. for "foo.tar.xz" we need "tar.xz", not "xz"
+                NSString *downloadPathExtension;
+                NSRange pathExtensionDelimiterRange = [originalDownloadName rangeOfString:@"."];
+                if (pathExtensionDelimiterRange.location == NSNotFound) {
+                    downloadPathExtension = @"";
+                } else {
+                    downloadPathExtension = [originalDownloadName substringFromIndex:pathExtensionDelimiterRange.location + 1];
+                }
+                
+                NSString *randomizedDownloadName = [randomizedUUIDString stringByAppendingPathExtension:downloadPathExtension];
+                if (randomizedDownloadName != nil) {
+                    downloadName = randomizedDownloadName;
+                } else {
+                    downloadName = originalDownloadName;
+                }
+            } else {
+                downloadName = originalDownloadName;
             }
             
             // Move the download archive to somewhere where probably only we will be touching it
@@ -428,14 +503,24 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
                 return;
             }
             
-            // Carry these properities separately rather than using the SUInstallationInputData object
+            NSString *extractionDirectory = [SPULocalCacheDirectory createUniqueDirectoryInDirectory:cacheInstallationPath];
+            if (extractionDirectory == nil) {
+                [self cleanupAndExitWithStatus:EXIT_FAILURE error:[NSError errorWithDomain:SUSparkleErrorDomain code:SPUInstallerError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Error: Failed to create installation extraction directory in %@", cacheInstallationPath] }]];
+                
+                return;
+            }
+            
+            // Carry these properties separately rather than using the SUInstallationInputData object
             // Some of our properties may slightly differ than our input and we don't want to make the mistake of using one of those
             self->_installationType = installationType;
             self->_relaunchPath = installationData.relaunchPath;
             self->_downloadName = downloadName;
             self->_signatures = installationData.signatures;
             self->_updateDirectoryPath = cacheInstallationPath;
+            self->_extractionDirectory = extractionDirectory;
+            self->_decryptionPassword = installationData.decryptionPassword;
             self->_host = [[SUHost alloc] initWithBundle:hostBundle];
+            self->_verifierInformation = [[SPUVerifierInformation alloc] initWithExpectedVersion:installationData.expectedVersion expectedContentLength:installationData.expectedContentLength];
             
             [self extractAndInstallUpdate];
         });
@@ -489,11 +574,13 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 {
     _willCompleteInstallation = YES;
     
-    _installerQueue = dispatch_queue_create("org.sparkle-project.sparkle.installer", DISPATCH_QUEUE_SERIAL);
+    dispatch_queue_attr_t queuePriority = dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL, QOS_CLASS_USER_INITIATED, 0);
+    
+    _installerQueue = dispatch_queue_create("org.sparkle-project.sparkle.installer", queuePriority);
     
     dispatch_async(_installerQueue, ^{
         NSError *installerError = nil;
-        id <SUInstallerProtocol> installer = [SUInstaller installerForHost:self->_host expectedInstallationType:self->_installationType updateDirectory:self->_updateDirectoryPath homeDirectory:self->_homeDirectory userName:self->_userName error:&installerError];
+        id <SUInstallerProtocol> installer = [SUInstaller installerForHost:self->_host expectedInstallationType:self->_installationType updateDirectory:self->_extractionDirectory homeDirectory:self->_homeDirectory userName:self->_userName error:&installerError];
         
         if (installer == nil) {
             dispatch_async(dispatch_get_main_queue(), ^{
@@ -517,9 +604,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
         dispatch_async(dispatch_get_main_queue(), ^{
             self->_installer = installer;
             
-            uint8_t targetTerminated = (uint8_t)self->_terminationListener.terminated;
-            
-            uint8_t sendInformation[] = {canPerformSilentInstall, targetTerminated};
+            uint8_t sendInformation[] = {canPerformSilentInstall, (uint8_t)self->_targetTerminated};
             
             NSData *sendData = [NSData dataWithBytes:sendInformation length:sizeof(sendInformation)];
             
@@ -527,9 +612,11 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
             
             self->_performedStage1Installation = YES;
             
-            // Stage 2 can still be run before we finish installation
-            // if the updater requests for it before the app is terminated
-            [self finishInstallationAfterHostTermination];
+            if (self->_targetTerminated) {
+                // Stage 2 can still be run before we finish installation
+                // if the updater requests for it before the app is terminated
+                [self finishInstallationAfterHostTermination];
+            }
         });
     });
 }
@@ -541,7 +628,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
         _performedStage2Installation = YES;
         
         dispatch_async(dispatch_get_main_queue(), ^{
-            uint8_t targetTerminated = (uint8_t)self->_terminationListener.terminated;
+            uint8_t targetTerminated = (uint8_t)self->_targetTerminated;
             
             NSData *sendData = [NSData dataWithBytes:&targetTerminated length:sizeof(targetTerminated)];
             [self->_communicator handleMessageWithIdentifier:SPUInstallationFinishedStage2 data:sendData];
@@ -561,76 +648,71 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 
 - (void)finishInstallationAfterHostTermination SPU_OBJC_DIRECT
 {
-    [_terminationListener startListeningWithCompletion:^(BOOL success) {
-        if (!success) {
-            [self cleanupAndExitWithStatus:EXIT_FAILURE error:[NSError errorWithDomain:SUSparkleErrorDomain code:SPUInstallerError userInfo:@{ NSLocalizedDescriptionKey: @"Failed to listen for application termination" }]];
+    assert(self->_targetTerminated);
+    
+    // Show our installer progress UI tool if only after a certain amount of time passes,
+    // and if our installer is silent (i.e, doesn't show progress on its own)
+    __block BOOL shouldShowUIProgress = YES;
+    if (self->_shouldShowUI && [self->_installer canInstallSilently]) {
+        // Ask the updater if it is still alive
+        // If they are, we will receive a pong response back
+        // Reset if we received a pong just to be on the safe side
+        self->_receivedUpdaterPong = NO;
+        [self->_communicator handleMessageWithIdentifier:SPUUpdaterAlivePing data:[NSData data]];
+        
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(SUDisplayProgressTimeDelay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            // Make sure we're still eligible for showing the installer progress
+            // Also if the updater process is still alive, showing the progress should not be our duty
+            // if the communicator object is nil, the updater definitely isn't alive. However, if it is not nil,
+            // this does not necessarily mean the updater is alive, so we should also check if we got a recent response back from the updater
+            if (shouldShowUIProgress && (!self->_receivedUpdaterPong || self->_communicator == nil)) {
+                [self->_agentConnection.agent showProgress];
+            }
+        });
+    }
+        
+    dispatch_async(self->_installerQueue, ^{
+        if (!self->_performedStage2Installation) {
+            [self performStage2Installation];
+        }
+        
+        if (!self->_performedStage2Installation) {
+            // We failed and we're going to exit shortly
             return;
         }
         
-        // Show our installer progress UI tool if only after a certain amount of time passes,
-        // and if our installer is silent (i.e, doesn't show progress on its own)
-        __block BOOL shouldShowUIProgress = YES;
-        if (self->_shouldShowUI && [self->_installer canInstallSilently]) {
-            // Ask the updater if it is still alive
-            // If they are, we will receive a pong response back
-            // Reset if we received a pong just to be on the safe side
-            self->_receivedUpdaterPong = NO;
-            [self->_communicator handleMessageWithIdentifier:SPUUpdaterAlivePing data:[NSData data]];
-            
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(SUDisplayProgressTimeDelay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                // Make sure we're still eligible for showing the installer progress
-                // Also if the updater process is still alive, showing the progress should not be our duty
-                // if the communicator object is nil, the updater definitely isn't alive. However, if it is not nil,
-                // this does not necessarily mean the updater is alive, so we should also check if we got a recent response back from the updater
-                if (shouldShowUIProgress && (!self->_receivedUpdaterPong || self->_communicator == nil)) {
-                    [self->_agentConnection.agent showProgress];
-                }
-            });
-        }
-        
-        dispatch_async(self->_installerQueue, ^{
-            if (!self->_performedStage2Installation) {
-                [self performStage2Installation];
-            }
-            
-            if (!self->_performedStage2Installation) {
-                // We failed and we're going to exit shortly
-                return;
-            }
-            
-            NSError *thirdStageError = nil;
-            if (![self->_installer performFinalInstallationProgressBlock:nil error:&thirdStageError]) {
-                [self->_installer performCleanup];
-                self->_installer = nil;
-                
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [self cleanupAndExitWithStatus:EXIT_FAILURE error:[NSError errorWithDomain:SUSparkleErrorDomain code:SPUInstallerError userInfo:@{ NSLocalizedDescriptionKey: @"Failed to finalize installation", NSUnderlyingErrorKey: thirdStageError }]];
-                });
-                return;
-            }
-            
-            self->_performedStage3Installation = YES;
+        NSError *thirdStageError = nil;
+        if (![self->_installer performFinalInstallationProgressBlock:nil error:&thirdStageError]) {
+            [self->_installer performCleanup];
+            self->_installer = nil;
             
             dispatch_async(dispatch_get_main_queue(), ^{
-                // Make sure to stop our displayed progress before we move onto cleanup & relaunch
-                // This will also stop the agent from broadcasting the status info service, which we want to do before
-                // we relaunch the app because the relaunched app could check the service upon launch..
-                [self->_agentConnection.agent stopProgress];
-                shouldShowUIProgress = NO;
-                
-                [self->_communicator handleMessageWithIdentifier:SPUInstallationFinishedStage3 data:[NSData data]];
-                
-                if (self->_shouldRelaunch) {
-                    // This will also signal to the agent that it will terminate soon
-                    [self->_agentConnection.agent relaunchApplication];
-                }
-                
-                [self->_installer performCleanup];
-                
-                [self cleanupAndExitWithStatus:EXIT_SUCCESS error:nil];
+                [self cleanupAndExitWithStatus:EXIT_FAILURE error:[NSError errorWithDomain:SUSparkleErrorDomain code:SPUInstallerError userInfo:@{ NSLocalizedDescriptionKey: @"Failed to finalize installation", NSUnderlyingErrorKey: thirdStageError }]];
             });
+            return;
+        }
+        
+        self->_performedStage3Installation = YES;
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            // Make sure to stop our displayed progress before we move onto cleanup & relaunch
+            // This will also stop the agent from broadcasting the status info service, which we want to do before
+            // we relaunch the app because the relaunched app could check the service upon launch..
+            [self->_agentConnection.agent stopProgress];
+            shouldShowUIProgress = NO;
+            
+            [self->_communicator handleMessageWithIdentifier:SPUInstallationFinishedStage3 data:[NSData data]];
+            
+            if (self->_shouldRelaunch) {
+                // This will also signal to the agent that it will terminate soon
+                [self->_agentConnection.agent relaunchApplication];
+            }
+            
+            [self->_installer performCleanup];
+            
+            [self cleanupAndExitWithStatus:EXIT_SUCCESS error:nil];
         });
-    }];
+    });
 }
 
 - (void)cleanupAndExitWithStatus:(int)status error:(NSError * _Nullable)error __attribute__((noreturn))

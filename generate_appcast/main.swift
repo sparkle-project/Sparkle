@@ -9,18 +9,29 @@
 import Foundation
 import ArgumentParser
 
-func loadPrivateKeys(_ account: String, _ privateDSAKey: SecKey?, _ privateEdString: String?) -> PrivateKeys {
+func loadPrivateKeys(_ account: String, _ privateDSAKey: SecKey?, _ privateEdString: String?, allowNewPrivateKey: Bool) -> PrivateKeys? {
     var privateEdKey: Data?
     var publicEdKey: Data?
     var item: CFTypeRef?
-    var keys: Data?
+    var secret: Data?
 
-    // private + public key is provided as argument
-    if let privateEdString = privateEdString {
-        if privateEdString.count == 128, let data = Data(base64Encoded: privateEdString) {
-            keys = data
+    // private + public key is provided as argument (for older format)
+    if let privateEdString {
+        if let data = Data(base64Encoded: privateEdString) {
+            if allowNewPrivateKey || secretUsesOldHashedSeed(secret: data) {
+                // We always allow the old format without private seed
+                secret = data
+            } else if !allowNewPrivateKey && secretUsesRegularSeed(secret: data) {
+                // Don't support deprecated option for newly generated keys
+                print("Error: specifying private key as the argument is no longer supported.")
+                return nil
+            } else {
+                print("Error: Private key not decoded from the argument, which has \(data.count) bytes. Please provide a valid key and confirm the contents of the key are correct.")
+                return nil
+            }
         } else {
-            print("Warning: Private key not found in the argument. Please provide a valid key.")
+            print("Error: Private key not decoded from the argument because it isn't base64 encoded. Please provide a valid key and confirm the contents of the key are correct.")
+            return nil
         }
     }
     // get keys from kechain instead
@@ -32,16 +43,25 @@ func loadPrivateKeys(_ account: String, _ privateDSAKey: SecKey?, _ privateEdStr
             kSecAttrProtocol as String: kSecAttrProtocolSSH,
             kSecReturnData as String: kCFBooleanTrue!,
         ] as CFDictionary, &item)
-        if res == errSecSuccess, let encoded = item as? Data, let data = Data(base64Encoded: encoded) {
-            keys = data
+        if res == errSecSuccess, let encoded = item as? Data {
+            if let data = Data(base64Encoded: encoded) {
+                secret = data
+            } else {
+                print("Error: Failed to base64 decode secret data from keychain")
+                return nil
+            }
         } else {
             print("Warning: Private key for account \(account) not found in the Keychain (\(res)). Please run the generate_keys tool")
         }
     }
 
-    if let keys = keys {
-        privateEdKey = keys[0..<64]
-        publicEdKey = keys[64...]
+    if let secret {
+        guard let (privateKey, publicKey) = decodePrivateAndPublicKeys(secret: secret) else {
+            print("Error: Failed to decode private and public keys from secret data")
+            return nil
+        }
+        privateEdKey = privateKey
+        publicEdKey = publicKey
     }
     return PrivateKeys(privateDSAKey: privateDSAKey, privateEdKey: privateEdKey, publicEdKey: publicEdKey)
 }
@@ -71,7 +91,7 @@ struct GenerateAppcast: ParsableCommand {
     var privateDSAKeyName: String?
 #endif
     
-    @Option(name: .customShort("s"), help: ArgumentHelp("(DEPRECATED): The private EdDSA string (128 characters). This option is deprecated. Please use the Keychain, or pass the key as standard input when using the --ed-key-file - option instead.", valueName: "private-EdDSA-key"))
+    @Option(name: .customShort("s"), help: ArgumentHelp("(DEPRECATED): The private EdDSA string (128 characters). This option is deprecated. Please use the Keychain, or pass the key as standard input when using the --ed-key-file - option instead. This option is no longer supported for newly generated keys.", valueName: "private-EdDSA-key"))
     var privateEdString : String?
     
 #if GENERATE_APPCAST_BUILD_LEGACY_DSA_SUPPORT
@@ -228,6 +248,10 @@ struct GenerateAppcast: ParsableCommand {
     }
     
     func run() throws {
+        // Ignore SIGPIPE because we won't want read or write failures due to broken pipe to unexpectably
+        // terminate the process, when extracting archives
+        signal(SIGPIPE, SIG_IGN)
+        
         // Extract the keys
         let privateDSAKey : SecKey?
     #if GENERATE_APPCAST_BUILD_LEGACY_DSA_SUPPORT
@@ -252,35 +276,44 @@ struct GenerateAppcast: ParsableCommand {
         privateDSAKey = nil
     #endif
         
+        let allowNewPrivateKey: Bool
         let privateEdKeyString: String?
         if let privateEdString = privateEdString {
             privateEdKeyString = privateEdString
             
             print("Warning: The -s option for passing the private EdDSA key is insecure and deprecated. Please see its help usage for more information.")
+            allowNewPrivateKey = false
         } else if let privateEdKeyPath = privateEdKeyPath {
             do {
-                let privateKeyString: String
                 if privateEdKeyPath == "-" && !FileManager.default.fileExists(atPath: privateEdKeyPath) {
                     if let line = readLine(strippingNewline: true) {
-                        privateKeyString = line
+                        privateEdKeyString = line
                     } else {
                         print("Unable to read EdDSA private key from standard input")
                         throw ExitCode(1)
                     }
                 } else {
-                    privateKeyString = try String(contentsOf: URL(fileURLWithPath: privateEdKeyPath))
+                    do {
+                        privateEdKeyString = try decodeSecretString(filePath: privateEdKeyPath)
+                    } catch {
+                        print(error.localizedDescription)
+                        throw ExitCode(1)
+                    }
                 }
                 
-                privateEdKeyString = privateKeyString
+                allowNewPrivateKey = true
             } catch {
                 print("Unable to load EdDSA private key from", privateEdKeyPath, "\n", error)
                 throw ExitCode(1)
             }
         } else {
             privateEdKeyString = nil
+            allowNewPrivateKey = true
         }
         
-        let keys = loadPrivateKeys(account, privateDSAKey, privateEdKeyString)
+        guard let keys = loadPrivateKeys(account, privateDSAKey, privateEdKeyString, allowNewPrivateKey: allowNewPrivateKey) else {
+            throw ExitCode(1)
+        }
         
         do {
             let appcastsByFeed = try makeAppcasts(archivesSourceDir: archivesSourceDir, outputPathURL: outputPathURL, cacheDirectory: GenerateAppcast.cacheDirectory, keys: keys, versions: versions, maxVersionsPerBranchInFeed: maxVersionsPerBranchInFeed, newChannel: channel, majorVersion: majorVersion, maximumDeltas: maximumDeltas, deltaCompressionModeDescription: deltaCompression, deltaCompressionLevel: deltaCompressionLevel, disableNestedCodeCheck: disableNestedCodeCheck, downloadURLPrefix: downloadURLPrefix, releaseNotesURLPrefix: releaseNotesURLPrefix, verbose: verbose)

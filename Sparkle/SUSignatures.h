@@ -23,8 +23,12 @@ typedef NS_ENUM(uint8_t, SUSigningInputStatus) {
 };
 
 #ifndef BUILDING_SPARKLE_TESTS
-SPU_OBJC_DIRECT_MEMBERS
+#define SUSignaturesDefinitionAttribute SPU_OBJC_DIRECT_MEMBERS
+#else
+#define SUSignaturesDefinitionAttribute __attribute__((objc_runtime_name("SUTestSignatures")))
 #endif
+
+SUSignaturesDefinitionAttribute
 @interface SUSignatures : NSObject <NSSecureCoding>
 #if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
 @property (nonatomic, readonly, nullable) NSData *dsaSignature;
@@ -41,10 +45,13 @@ SPU_OBJC_DIRECT_MEMBERS
 ;
 @end
 
-
 #ifndef BUILDING_SPARKLE_TESTS
-SPU_OBJC_DIRECT_MEMBERS
+#define SUPublicKeysDefinitionAttribute SPU_OBJC_DIRECT_MEMBERS
+#else
+#define SUPublicKeysDefinitionAttribute __attribute__((objc_runtime_name("SUTestPublicKeys")))
 #endif
+
+SUPublicKeysDefinitionAttribute
 @interface SUPublicKeys : NSObject
 
 @property (nonatomic, readonly, nullable) NSString *dsaPubKey;

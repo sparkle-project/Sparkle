@@ -18,6 +18,8 @@ static NSString *SUUpdateURLBookmarkDataKey = @"SUUpdateURLBookmarkData";
 static NSString *SUSignaturesKey = @"SUSignatures";
 static NSString *SUDecryptionPasswordKey = @"SUDecryptionPassword";
 static NSString *SUInstallationTypeKey = @"SUInstallationType";
+static NSString *SUExpectedVersionKey = @"SUExpectedVersion";
+static NSString *SUExpectedContentLength = @"SUExpectedContentLength";
 
 @implementation SPUInstallationInputData
 
@@ -27,8 +29,10 @@ static NSString *SUInstallationTypeKey = @"SUInstallationType";
 @synthesize signatures = _signatures;
 @synthesize decryptionPassword = _decryptionPassword;
 @synthesize installationType = _installationType;
+@synthesize expectedVersion = _expectedVersion;
+@synthesize expectedContentLength = _expectedContentLength;
 
-- (instancetype)initWithRelaunchPath:(NSString *)relaunchPath hostBundlePath:(NSString *)hostBundlePath updateURLBookmarkData:(NSData *)updateURLBookmarkData installationType:(NSString *)installationType signatures:(SUSignatures * _Nullable)signatures decryptionPassword:(nullable NSString *)decryptionPassword
+- (instancetype)initWithRelaunchPath:(NSString *)relaunchPath hostBundlePath:(NSString *)hostBundlePath updateURLBookmarkData:(NSData *)updateURLBookmarkData installationType:(NSString *)installationType signatures:(SUSignatures * _Nullable)signatures decryptionPassword:(nullable NSString *)decryptionPassword expectedVersion:(nonnull NSString *)expectedVersion expectedContentLength:(uint64_t)expectedContentLength
 {
     self = [super init];
     if (self != nil) {
@@ -41,6 +45,9 @@ static NSString *SUInstallationTypeKey = @"SUInstallationType";
         
         _signatures = signatures;
         _decryptionPassword = [decryptionPassword copy];
+        
+        _expectedVersion = [expectedVersion copy];
+        _expectedContentLength = expectedContentLength;
     }
     return self;
 }
@@ -74,7 +81,10 @@ static NSString *SUInstallationTypeKey = @"SUInstallationType";
     
     NSString *decryptionPassword = [decoder decodeObjectOfClass:[NSString class] forKey:SUDecryptionPasswordKey];
     
-    return [self initWithRelaunchPath:relaunchPath hostBundlePath:hostBundlePath updateURLBookmarkData:updateURLBookmarkData installationType:installationType signatures:signatures decryptionPassword:decryptionPassword];
+    NSString *expectedVersion = [decoder decodeObjectOfClass:[NSString class] forKey:SUExpectedVersionKey];
+    uint64_t expectedContentLength = (uint64_t)[decoder decodeInt64ForKey:SUExpectedContentLength];
+    
+    return [self initWithRelaunchPath:relaunchPath hostBundlePath:hostBundlePath updateURLBookmarkData:updateURLBookmarkData installationType:installationType signatures:signatures decryptionPassword:decryptionPassword expectedVersion:expectedVersion expectedContentLength:expectedContentLength];
 }
 
 - (void)encodeWithCoder:(NSCoder *)coder
@@ -87,6 +97,10 @@ static NSString *SUInstallationTypeKey = @"SUInstallationType";
     if (_decryptionPassword != nil) {
         [coder encodeObject:_decryptionPassword forKey:SUDecryptionPasswordKey];
     }
+    if (_expectedVersion != nil) {
+        [coder encodeObject:_expectedVersion forKey:SUExpectedVersionKey];
+    }
+    [coder encodeInt64:(int64_t)_expectedContentLength forKey:SUExpectedContentLength];
 }
 
 + (BOOL)supportsSecureCoding

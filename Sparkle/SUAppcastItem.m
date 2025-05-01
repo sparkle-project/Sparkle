@@ -49,7 +49,7 @@ static NSString *SUAppcastItemDeltaFromSparkleLocalesKey = @"SUAppcastItemDeltaF
 
 @implementation SUAppcastItem
 {
-    // Auxillary appcast item state that needs to be evaluated based on the host state
+    // Auxiliary appcast item state that needs to be evaluated based on the host state
     // This may be nil if the client creates an SUAppcastItem with a deprecated initializer
     // In that case we will need to fallback to safe behavior
     SPUAppcastItemState *_state;

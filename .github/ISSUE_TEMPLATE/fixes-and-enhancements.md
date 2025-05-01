@@ -29,4 +29,4 @@ https://github.com/sparkle-project/Sparkle#troubleshooting
 
 ## Version
 
-[please specify versions of Sparkle this is applicable to; note the old 1.x (master) branch is only taking fixes to regressions and security fixes now.]
+[please specify versions of Sparkle this is applicable to]

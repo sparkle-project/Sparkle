@@ -16,6 +16,8 @@
 #import "SULog.h"
 #import "SUSignatures.h"
 #import "SUErrors.h"
+#import "SPUVerifierInformation.h"
+#import "SUConstants.h"
 #if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
 #include <CommonCrypto/CommonDigest.h>
 #endif
@@ -29,7 +31,7 @@
     SUPublicKeys *_pubKeys;
 }
 
-+ (BOOL)validatePath:(NSString *)path withSignatures:(SUSignatures *)signatures withPublicKeys:(SUPublicKeys *)pkeys error:(NSError * __autoreleasing *)error
++ (BOOL)validatePath:(NSString *)path withSignatures:(SUSignatures *)signatures withPublicKeys:(SUPublicKeys *)pkeys verifierInformation:(SPUVerifierInformation * _Nullable)verifierInformation error:(NSError * __autoreleasing *)error
 {
     SUSignatureVerifier *verifier = [(SUSignatureVerifier *)[self alloc] initWithPublicKeys:pkeys];
 
@@ -40,7 +42,7 @@
         return NO;
     }
 
-    return [verifier verifyFileAtPath:path signatures:signatures error:error];
+    return [verifier verifyFileAtPath:path signatures:signatures verifierInformation:verifierInformation error:error];
 }
 
 - (instancetype)initWithPublicKeys:(SUPublicKeys *)pubkeys
@@ -90,7 +92,7 @@
 }
 #endif
 
-- (BOOL)verifyFileAtPath:(NSString *)path signatures:(SUSignatures *)signatures error:(NSError * __autoreleasing *)error
+- (BOOL)verifyFileAtPath:(NSString *)path signatures:(SUSignatures *)signatures verifierInformation:(SPUVerifierInformation * _Nullable)verifierInformation error:(NSError * __autoreleasing *)error
 {
     if (!path || !path.length) {
         if (error != NULL) {
@@ -176,9 +178,31 @@
                     return YES;
                 }
             } else {
-                NSString *message = @"EdDSA signature does not match. Data of the update file being checked is different than data that has been signed, or the public key and the private key are not from the same set.";
+                NSMutableString *message = [NSMutableString stringWithString:@"EdDSA signature does not match. Data of the update file being checked is different than data that has been signed, or the public key and the private key are not from the same set."];
                 
-                SULog(SULogLevelError, @"%@", message);
+                // Elaborate on the error message if we have more information about the download archive
+                if (verifierInformation != nil) {
+                    BOOL reportedDiscrepancy = NO;
+                    
+                    if (verifierInformation.expectedContentLength > 0 && verifierInformation.actualContentLength > 0) {
+                        if (verifierInformation.expectedContentLength != verifierInformation.actualContentLength) {
+                            [message appendFormat:@" The downloaded update (%@) is likely different than the signed archive because the expected content length from the appcast item (%llu bytes) differs from the downloaded archive length (%llu bytes).", path.lastPathComponent, verifierInformation.expectedContentLength, verifierInformation.actualContentLength];
+                            reportedDiscrepancy = YES;
+                        }
+                    }
+                    
+                    NSString *actualVersion = verifierInformation.actualVersion;
+                    if (actualVersion != nil && ![verifierInformation.expectedVersion isEqualToString:actualVersion]) {
+                        [message appendFormat:@" The downloaded update (%@) also has a CFBundleVersion (%@) which differs from the %@ in the appcast item (%@).", path.lastPathComponent, actualVersion, SUAppcastAttributeVersion, verifierInformation.expectedVersion];
+                        reportedDiscrepancy = YES;
+                    }
+                    
+                    if (!reportedDiscrepancy && verifierInformation.expectedContentLength > 0) {
+                        [message appendFormat:@" The downloaded update (%@) is likely not signed correctly because the archive has the expected content length (%llu bytes)%@ which matches the appcast item.", path.lastPathComponent, verifierInformation.actualContentLength, (actualVersion == nil ? @"" : [NSString stringWithFormat:@" and CFBundleVersion (%@)", actualVersion])];
+                    }
+                }
+                
+                SULog(SULogLevelError, @"%@", [message copy]);
                 
 #if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
                 if (signatures.dsaSignatureStatus != SUSigningInputStatusAbsent) {

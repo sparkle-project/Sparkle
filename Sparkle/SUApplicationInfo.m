@@ -34,7 +34,7 @@
     
     // Use a default icon if none is defined.
     if (!icon) {
-        // this asumption may not be correct (eg. even though we're not the main bundle, it could be still be a regular app)
+        // this assumption may not be correct (eg. even though we're not the main bundle, it could be still be a regular app)
         // but still better than nothing if no icon was included
         BOOL isMainBundle = [host.bundle isEqualTo:[NSBundle mainBundle]];
 

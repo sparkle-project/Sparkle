@@ -112,7 +112,8 @@
         _delegate = delegate;
         _inBackground = background;
         
-        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:requestURL cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30.0];
+        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:requestURL];
+        request.cachePolicy = NSURLRequestReloadIgnoringLocalCacheData;
         
         if (userAgent != nil) {
             [request setValue:(NSString * _Nonnull)userAgent forHTTPHeaderField:@"User-Agent"];

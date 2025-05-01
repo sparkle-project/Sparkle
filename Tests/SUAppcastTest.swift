@@ -71,10 +71,10 @@ class SUAppcastTest: XCTestCase {
             XCTAssertEqual(latestDeltaItem!.fileURL!.lastPathComponent, "3.0_from_2.0.patch")
 
             // Test a delta item that does not exist
-            var nonexistantDeltaItem: SUAppcastItem?
-            SUAppcastDriver.bestItem(fromAppcastItems: supportedAppcastItems, getDeltaItem: &nonexistantDeltaItem, withHostVersion: "2.1", comparator: SUStandardVersionComparator())
+            var nonexistentDeltaItem: SUAppcastItem?
+            SUAppcastDriver.bestItem(fromAppcastItems: supportedAppcastItems, getDeltaItem: &nonexistentDeltaItem, withHostVersion: "2.1", comparator: SUStandardVersionComparator())
 
-            XCTAssertNil(nonexistantDeltaItem)
+            XCTAssertNil(nonexistentDeltaItem)
         } catch let err as NSError {
             NSLog("%@", err)
             XCTFail(err.localizedDescription)
@@ -698,6 +698,7 @@ class SUAppcastTest: XCTestCase {
         
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "E, dd MMM yyyy HH:mm:ss Z"
+        dateFormatter.locale = Locale(identifier: "en_US")
         
         do {
             let testData = try Data(contentsOf: testURL)
@@ -869,15 +870,51 @@ class SUAppcastTest: XCTestCase {
                                                             ofType: "xml")!
         let testFileUrl = URL(fileURLWithPath: testFile)
         XCTAssertNotNil(testFileUrl)
+        
+        let preferredLanguage = Bundle.preferredLocalizations(from: ["en", "es"])[0]
+        
+        NSLog("Using preferred locale %@", preferredLanguage)
+        
+        let expectedReleaseNotesLink = (preferredLanguage == "es") ? "https://sparkle-project.org/notes.es.html" : "https://sparkle-project.org/notes.en.html"
 
         do {
             let testFileData = try Data(contentsOf: testFileUrl)
             
             let stateResolver = SPUAppcastItemStateResolver(hostVersion: "1.0", applicationVersionComparator: SUStandardVersionComparator.default, standardVersionComparator: SUStandardVersionComparator.default)
             
-            let appcast = try SUAppcast(xmlData: testFileData, relativeTo: testFileUrl, stateResolver: stateResolver)
-            let items = appcast.items
-            XCTAssertEqual("https://sparkle-project.org/#localized_notes_link_works", items[0].releaseNotesURL!.absoluteString)
+            let fullAppcast = try SUAppcast(xmlData: testFileData, relativeTo: testFileUrl, stateResolver: stateResolver)
+            
+            do {
+                let appcast = SUAppcastDriver.filterAppcast(fullAppcast, forMacOSAndAllowedChannels: ["english-later"])
+                let items = appcast.items
+                XCTAssertEqual(items.count, 1)
+                XCTAssertEqual(items[0].versionString, "6.0")
+                XCTAssertEqual(expectedReleaseNotesLink, items[0].releaseNotesURL!.absoluteString)
+            }
+            
+            do {
+                let appcast = SUAppcastDriver.filterAppcast(fullAppcast, forMacOSAndAllowedChannels: ["english-first"])
+                let items = appcast.items
+                XCTAssertEqual(items.count, 1)
+                XCTAssertEqual(items[0].versionString, "6.1")
+                XCTAssertEqual(expectedReleaseNotesLink, items[0].releaseNotesURL!.absoluteString)
+            }
+            
+            do {
+                let appcast = SUAppcastDriver.filterAppcast(fullAppcast, forMacOSAndAllowedChannels: ["english-first-implicit"])
+                let items = appcast.items
+                XCTAssertEqual(items.count, 1)
+                XCTAssertEqual(items[0].versionString, "6.2")
+                XCTAssertEqual(expectedReleaseNotesLink, items[0].releaseNotesURL!.absoluteString)
+            }
+            
+            do {
+                let appcast = SUAppcastDriver.filterAppcast(fullAppcast, forMacOSAndAllowedChannels: ["english-later-implicit"])
+                let items = appcast.items
+                XCTAssertEqual(items.count, 1)
+                XCTAssertEqual(items[0].versionString, "6.3")
+                XCTAssertEqual(expectedReleaseNotesLink, items[0].releaseNotesURL!.absoluteString)
+            }
         } catch let err as NSError {
             NSLog("%@", err)
             XCTFail(err.localizedDescription)

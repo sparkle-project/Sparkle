@@ -23,6 +23,9 @@
     NSURL *_devSignedAppURL;
     NSURL *_devSignedVersion2AppURL;
     NSURL *_devInvalidSignedAppURL;
+    NSURL *_devSignedDiskImageURL;
+    NSURL *_unsignedDiskImageURL;
+    NSURL *_adhocSignedDiskImageURL;
 }
 
 - (void)setUp
@@ -30,6 +33,11 @@
     [super setUp];
 
     NSBundle *unitTestBundle = [NSBundle bundleForClass:[self class]];
+    
+    _devSignedDiskImageURL = [unitTestBundle URLForResource:@"DevSignedAppVersion2" withExtension:@"dmg"];
+    _unsignedDiskImageURL = [unitTestBundle URLForResource:@"SparkleTestCodeSign_apfs" withExtension:@"dmg"];
+    _adhocSignedDiskImageURL = [unitTestBundle URLForResource:@"SparkleTestCodeSign_apfs_lzma_aux_files_adhoc" withExtension:@"dmg"];
+    
     NSString *zippedAppURL = [unitTestBundle pathForResource:@"SparkleTestCodeSignApp" ofType:@"zip"];
 
     SUFileManager *fileManager = [[SUFileManager alloc] init];
@@ -246,6 +254,41 @@
         XCTAssertTrue([SUCodeSigningVerifier codeSignatureIsValidAtBundleURL:_devSignedVersion2AppURL andMatchesSignatureAtBundleURL:_devSignedAppURL error:&error], @"The dev ID signed app is expected to have a matching identity signature to an older version");
         XCTAssertNil(error);
     }
+}
+
+- (void)testValidMatchingDevIdDiskImage
+{
+    NSError *error = nil;
+    XCTAssertTrue([SUCodeSigningVerifier codeSignatureIsValidAtDownloadURL:_devSignedDiskImageURL andMatchesDeveloperIDTeamFromOldBundleURL:_devSignedAppURL error:&error]);
+    XCTAssertNil(error);
+}
+
+- (void)testInvalidMatchingDevIdDiskImageWithAppNoSigning
+{
+    NSError *error = nil;
+    XCTAssertFalse([SUCodeSigningVerifier codeSignatureIsValidAtDownloadURL:_devSignedDiskImageURL andMatchesDeveloperIDTeamFromOldBundleURL:_notSignedAppURL error:&error]);
+    XCTAssertNotNil(error);
+}
+
+- (void)testInvalidMatchingDevIdDiskImageWithAppAdhocSigning
+{
+    NSError *error = nil;
+    XCTAssertFalse([SUCodeSigningVerifier codeSignatureIsValidAtDownloadURL:_devSignedDiskImageURL andMatchesDeveloperIDTeamFromOldBundleURL:_validSignedAppURL error:&error]);
+    XCTAssertNotNil(error);
+}
+
+- (void)testInvalidMatchWithNoDiskImageSigning
+{
+    NSError *error = nil;
+    XCTAssertFalse([SUCodeSigningVerifier codeSignatureIsValidAtDownloadURL:_unsignedDiskImageURL andMatchesDeveloperIDTeamFromOldBundleURL:_validSignedAppURL error:&error]);
+    XCTAssertNotNil(error);
+}
+
+- (void)testInvalidMatchWithAdhocSignedDiskImage
+{
+    NSError *error = nil;
+    XCTAssertFalse([SUCodeSigningVerifier codeSignatureIsValidAtDownloadURL:_adhocSignedDiskImageURL andMatchesDeveloperIDTeamFromOldBundleURL:_devSignedAppURL error:&error]);
+    XCTAssertNotNil(error);
 }
 
 - (void)testInvalidMatchingWithBrokenBundle

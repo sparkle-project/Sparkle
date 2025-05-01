@@ -34,9 +34,9 @@ if [ "$ACTION" = "" ] ; then
 
     mkdir -p "$CONFIGURATION_BUILD_DIR/staging"
     mkdir -p "$CONFIGURATION_BUILD_DIR/staging-spm"
-    cp "$SRCROOT/CHANGELOG" "$SRCROOT/LICENSE" "$SRCROOT/INSTALL" "$SRCROOT/Resources/SampleAppcast.xml" "$CONFIGURATION_BUILD_DIR/staging"
-    cp "$SRCROOT/CHANGELOG" "$SRCROOT/LICENSE" "$SRCROOT/INSTALL" "$SRCROOT/Resources/SampleAppcast.xml" "$CONFIGURATION_BUILD_DIR/staging-spm"
-    cp -R "$SRCROOT/bin" "$CONFIGURATION_BUILD_DIR/staging"
+    cp "$PROJECT_DIR/CHANGELOG" "$PROJECT_DIR/LICENSE" "$PROJECT_DIR/INSTALL" "$PROJECT_DIR/Resources/SampleAppcast.xml" "$CONFIGURATION_BUILD_DIR/staging"
+    cp "$PROJECT_DIR/CHANGELOG" "$PROJECT_DIR/LICENSE" "$PROJECT_DIR/INSTALL" "$PROJECT_DIR/Resources/SampleAppcast.xml" "$CONFIGURATION_BUILD_DIR/staging-spm"
+    cp -R "$PROJECT_DIR/bin" "$CONFIGURATION_BUILD_DIR/staging"
     cp "$CONFIGURATION_BUILD_DIR/BinaryDelta" "$CONFIGURATION_BUILD_DIR/staging/bin"
     cp "$CONFIGURATION_BUILD_DIR/generate_appcast" "$CONFIGURATION_BUILD_DIR/staging/bin"
     cp "$CONFIGURATION_BUILD_DIR/generate_keys" "$CONFIGURATION_BUILD_DIR/staging/bin"
@@ -45,14 +45,6 @@ if [ "$ACTION" = "" ] ; then
     cp -R "$CONFIGURATION_BUILD_DIR/sparkle.app" "$CONFIGURATION_BUILD_DIR/staging"
     cp -R "$CONFIGURATION_BUILD_DIR/Sparkle.framework" "$CONFIGURATION_BUILD_DIR/staging"
     cp -R "$CONFIGURATION_BUILD_DIR/Sparkle.xcframework" "$CONFIGURATION_BUILD_DIR/staging-spm"
-    
-    if [[ "$SPARKLE_EMBED_DOWNLOADER_XPC_SERVICE" -eq 1 ]]; then
-        mkdir -p "$CONFIGURATION_BUILD_DIR/staging/Entitlements"
-        mkdir -p "$CONFIGURATION_BUILD_DIR/staging-spm/Entitlements"
-        
-        cp -R "$SRCROOT/Downloader/org.sparkle-project.Downloader.entitlements" "$CONFIGURATION_BUILD_DIR/staging/Entitlements/$DOWNLOADER_NAME.entitlements"
-        cp -R "$SRCROOT/Downloader/org.sparkle-project.Downloader.entitlements" "$CONFIGURATION_BUILD_DIR/staging-spm/Entitlements/$DOWNLOADER_NAME.entitlements"
-    fi
 
     mkdir -p "$CONFIGURATION_BUILD_DIR/staging/Symbols"
 
@@ -85,31 +77,17 @@ if [ "$ACTION" = "" ] ; then
 
     cd "$CONFIGURATION_BUILD_DIR/staging"
 
-    if [ -x "$(command -v xz)" ]; then
-        XZ_EXISTS=1
-    else
-        XZ_EXISTS=0
-    fi
-
     rm -rf "/tmp/sparkle-extract"
     mkdir -p "/tmp/sparkle-extract"
 
     # Sorted file list groups similar files together, which improves tar compression
-    if [ "$XZ_EXISTS" -eq 1 ] ; then
-        find . \! -type d | rev | sort | rev | tar cv --files-from=- | xz -9 > "../Sparkle-$MARKETING_VERSION.tar.xz"
+    find . \! -type d | rev | sort | rev | tar --no-xattrs -cJvf "../Sparkle-$MARKETING_VERSION.tar.xz" --files-from=-
+        
+    # Copy archived distribution for CI
+    cp -f "../Sparkle-$MARKETING_VERSION.tar.xz" "../sparkle_dist.tar.xz"
 
-        # Copy archived distribution for CI
-        cp -f "../Sparkle-$MARKETING_VERSION.tar.xz" "../sparkle-dist.tar.xz"
-
-        # Extract archive for testing binary validity
-        tar -xf "../Sparkle-$MARKETING_VERSION.tar.xz" -C "/tmp/sparkle-extract"
-    else
-        # Fallback to bz2 compression if xz utility is not available
-        find . \! -type d | rev | sort | rev | tar cjvf "../Sparkle-$MARKETING_VERSION.tar.bz2" --files-from=-
-
-        # Extract archive for testing binary validity
-        tar -xf "../Sparkle-$MARKETING_VERSION.tar.bz2" -C "/tmp/sparkle-extract"
-    fi
+    # Extract archive for testing binary validity
+    tar -xf "../Sparkle-$MARKETING_VERSION.tar.xz" -C "/tmp/sparkle-extract"
 
     # Test code signing validity of the extracted products
     # This guards against our archives being corrupt / created incorrectly
@@ -119,7 +97,7 @@ if [ "$ACTION" = "" ] ; then
     rm -rf "$CONFIGURATION_BUILD_DIR/staging"
 
     # Get latest git tag
-    cd "$SRCROOT"
+    cd "$PROJECT_DIR"
     latest_git_tag=$( git describe --tags --abbrev=0 || true )
 
     if [ -n "$latest_git_tag" ] ; then
@@ -138,7 +116,7 @@ if [ "$ACTION" = "" ] ; then
         rm -rf "/tmp/sparkle-spm-extract"
         rm -rf "$CONFIGURATION_BUILD_DIR/staging-spm"
         
-        cd "$SRCROOT"
+        cd "$PROJECT_DIR"
     
         # Check semantic versioning
         if [[ $latest_git_tag =~ ^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-((0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*)(\.(0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*))*))?(\\+([0-9a-zA-Z-]+(\.[0-9a-zA-Z-]+)*))?$ ]]; then
@@ -150,9 +128,9 @@ if [ "$ACTION" = "" ] ; then
         
             # Generate new Package manifest, podspec, and carthage files
         cd "$CONFIGURATION_BUILD_DIR"
-        cp "$SRCROOT/Package.swift" "$CONFIGURATION_BUILD_DIR"
-        cp "$SRCROOT/Sparkle.podspec" "$CONFIGURATION_BUILD_DIR"
-        cp "$SRCROOT/Carthage-dev.json" "$CONFIGURATION_BUILD_DIR"
+        cp "$PROJECT_DIR/Package.swift" "$CONFIGURATION_BUILD_DIR"
+        cp "$PROJECT_DIR/Sparkle.podspec" "$CONFIGURATION_BUILD_DIR"
+        cp "$PROJECT_DIR/Carthage-dev.json" "$CONFIGURATION_BUILD_DIR"
     fi
     
     if [ -z "$latest_git_tag" ] ; then
@@ -162,7 +140,7 @@ if [ "$ACTION" = "" ] ; then
         spm_checksum=$(swift package compute-checksum "Sparkle-for-Swift-Package-Manager.zip")
         rm -rf ".build"
         sed -E -i '' -e "/let tag/ s/\".+\"/\"$latest_git_tag\"/" -e "/let version/ s/\".+\"/\"$MARKETING_VERSION\"/" -e "/let checksum/ s/[[:xdigit:]]{64}/$spm_checksum/" "Package.swift"
-        cp "Package.swift" "$SRCROOT"
+        cp "Package.swift" "$PROJECT_DIR"
         echo "Package.swift updated with the following values:"
         echo "Version: $MARKETING_VERSION"
         echo "Tag: $latest_git_tag"
@@ -170,18 +148,14 @@ if [ "$ACTION" = "" ] ; then
 
         sed -E -i '' -e "/s\.version.+=/ s/\".+\"/\"$MARKETING_VERSION\"/" "Sparkle.podspec"
         
-        "$SRCROOT/Configurations/update-carthage.py" "Carthage-dev.json" "$MARKETING_VERSION"
-        cp "Sparkle.podspec" "$SRCROOT"
+        "$PROJECT_DIR/Configurations/update-carthage.py" "Carthage-dev.json" "$MARKETING_VERSION"
+        cp "Sparkle.podspec" "$PROJECT_DIR"
         # Note the Carthage-dev.json file will finally be copied to the website repo in Carthage/Sparkle.json in the end
-        cp "Carthage-dev.json" "$SRCROOT"
+        cp "Carthage-dev.json" "$PROJECT_DIR"
         echo "Sparkle.podspec and Carthage-dev.json updated with following values:"
         echo "Version: $MARKETING_VERSION"
     else
         echo "warning: Xcode version $XCODE_VERSION_ACTUAL does not support computing checksums for Swift Packages. Please update the Package manifest manually."
-    fi
-
-    if [ "$XZ_EXISTS" -ne 1 ] ; then
-        echo "WARNING: xz compression is used for official releases but bz2 is being used instead because xz tool is not installed on your system."
     fi
 
     rm -rf "$CONFIGURATION_BUILD_DIR/staging-spm"

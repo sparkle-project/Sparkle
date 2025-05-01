@@ -46,7 +46,7 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
 - (void)showUpdatePermissionRequest:(SPUUpdatePermissionRequest *)request reply:(void (^)(SUUpdatePermissionResponse *))reply;
 
 /**
- * Show the user initating an update check
+ * Show the user initiating an update check
  *
  * Respond to the user initiating an update check. Sparkle uses this to show the user a window with an indeterminate progress bar.
  *
@@ -64,11 +64,11 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  *
  *  `SPUUpdateStateNotDownloaded` - Update has not been downloaded yet.
  *
- *  `SPUUpdateStateDownloaded` - Update has already been downloaded but not started installing yet.
+ *  `SPUUpdateStateDownloaded` - Update has already been downloaded in the background automatically (via `SUAutomaticallyUpdate`) but not started installing yet.
  *
  *  `SPUUpdateStateInstalling` - Update has been downloaded and already started installing.
  *
- *  The `userIntiated` property on the @c state indicates if the update was initiated by the user or if it was automatically scheduled in the background.
+ *  The `userInitiated` property on the @c state indicates if the update was initiated by the user or if it was automatically scheduled in the background.
  *
  *  Additionally, these properties on the @c appcastItem are of importance:
  *
@@ -78,9 +78,10 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  *
  *  @c appcastItem.criticalUpdate indicates if the update is a critical update.
  *
- * A reply of `SPUUserUpdateChoiceInstall` begins or resumes downloading or installing the update.
+ * A reply of `SPUUserUpdateChoiceInstall` begins or resumes downloading, extracting, or installing the update.
  * If the state.stage is `SPUUserUpdateStateInstalling`, this may send a quit event to the application and relaunch it immediately (in this state, this behaves as a fast "install and Relaunch").
- * Do not use this reply if @c appcastItem.informationOnlyUpdate is YES.
+ * If the state.stage is `SPUUpdateStateNotDownloaded` or `SPUUpdateStateDownloaded` the user may be presented an authorization prompt to install the update after `-showDownloadDidStartExtractingUpdate` is called if authorization is required for installation. For example, this may occur if the update on disk is owned by a different user (e.g. root or admin for non-admin users), or if the update is a package install.
+ * Do not use a reply of `SPUUserUpdateChoiceInstall` if @c appcastItem.informationOnlyUpdate is YES.
  *
  * A reply of `SPUUserUpdateChoiceDismiss` dismisses the update for the time being. The user may be reminded of the update at a later point.
  * If the state.stage is `SPUUserUpdateStateDownloaded`, the downloaded update is kept after dismissing until the next time an update is shown to the user.
@@ -183,8 +184,11 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  *
  * Sparkle uses this to show an indeterminate progress bar.
  *
- * Note that an update can resume at this point after having been downloaded before,
- * so this may be called without any of the download callbacks being invoked prior.
+ * Before this point, `showDownloadDidReceiveDataOfLength:` or `showUpdateFoundWithAppcastItem:state:reply:` may be called.
+ * An update can potentially resume at this point after having been automatically downloaded in the background (without the user driver)  before.
+ *
+ * After extraction starts, the user may be shown an authorization prompt to install the update if authorization is required for installation.
+ * For example, this may occur if the update on disk is owned by a different user (e.g. root or admin for non-admin users), or if the update is a package install.
  */
 - (void)showDownloadDidStartExtractingUpdate;
 
@@ -253,14 +257,6 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
 - (void)showUpdateInstalledAndRelaunched:(BOOL)relaunched acknowledgement:(void (^)(void))acknowledgement;
 
 /**
- * Show the user the current presented update or its progress in utmost focus
- *
- * The user wishes to check for updates while the user is being shown update progress.
- * Bring whatever is on screen to frontmost focus (permission request, update information, downloading or extraction status, choice to install update, etc).
- */
-- (void)showUpdateInFocus;
-
-/**
  * Dismiss the current update installation
  *
  * Stop and tear down everything.
@@ -269,12 +265,22 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  */
 - (void)dismissUpdateInstallation;
 
+@optional
+
+/**
+ * Show the user the current presented update or its progress in utmost focus
+ *
+ * The user wishes to check for updates while the user is being shown update progress.
+ * Bring whatever is on screen to frontmost focus (permission request, update information, downloading or extraction status, choice to install update, etc).
+ * Implementing this method is optional.
+ */
+- (void)showUpdateInFocus;
+
 /*
  * Below are deprecated methods that have been replaced by better alternatives.
  * The deprecated methods will be used if the alternatives have not been implemented yet.
  * In the future support for using these deprecated methods may be removed however.
  */
-@optional
 
 // Clients should move to non-deprecated methods
 // Deprecated methods are only (temporarily) kept around for compatibility reasons

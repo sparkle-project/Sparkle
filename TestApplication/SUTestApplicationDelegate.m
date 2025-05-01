@@ -8,7 +8,6 @@
 
 #import "SUTestApplicationDelegate.h"
 #import "SUUpdateSettingsWindowController.h"
-#import "SUFileManager.h"
 #import "SUTestWebServer.h"
 #import "TestAppHelperProtocol.h"
 #import "ed25519.h"
@@ -57,15 +56,8 @@
     // Detect as early as possible if the shift key is held down
     BOOL shiftKeyHeldDown = ([NSEvent modifierFlags] & NSEventModifierFlagShift) != 0;
 #endif
-    
-    // Apple's file manager may not work well over the network (on macOS 10.11.4 as of writing this), but at the same time
-    // I don't want to have to export SUFileManager in release mode. The test app is primarily
-    // aimed to be used in debug mode, so I think this is a good compromise
-#if DEBUG
-    SUFileManager *fileManager = [[SUFileManager alloc] init];
-#else
+
     NSFileManager *fileManager = [NSFileManager defaultManager];
-#endif
     
     // Locate user's cache directory
     NSError *cacheError = nil;

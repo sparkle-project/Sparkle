@@ -14,7 +14,7 @@
 "%1$@ can’t be updated if it’s running from the location it was downloaded to." = "當從下載位置執行 %1$@ 時，無法進行更新。";
 
 /* No comment provided by engineer. */
-"%1$@ can’t be updated, because it was opened from a read-only or a temporary location." = "當 %1$@ 正從唯讀卷宗（如磁碟映像檔或光碟機）執行時，無法進行更新。";
+"%1$@ can’t be updated because it was opened from a read-only or a temporary location." = "當 %1$@ 正從唯讀卷宗（如磁碟映像檔或光碟機）執行時，無法進行更新。";
 
 /* No comment provided by engineer. */
 "%@ %@ is currently the newest version available." = "%1$@ %2$@ 已是目前最新的版本。";
@@ -149,4 +149,4 @@
 "Your macOS version is too old" = "您的 macOS 版本過舊";
 
 /* Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates. */
-"You’re up-to-date!" = "您已有最新版本！";
+"You’re up to date!" = "您已有最新版本！";

@@ -24,38 +24,40 @@ class SUUnarchiverTest: XCTestCase
         let unarchivedSuccessExpectation = super.expectation(description: "Unarchived Success (format: \(archiveExtension))")
         let unarchivedFailureExpectation = super.expectation(description: "Unarchived Failure (format: \(archiveExtension))")
 
-        let tempArchiveURL = tempDirectoryURL.appendingPathComponent(archiveResourceURL.lastPathComponent)
-        let extractedAppURL = tempDirectoryURL.appendingPathComponent(extractedAppName).appendingPathExtension("app")
-
-        self.unarchiveTestAppWithExtension(archiveExtension, appName: appName, tempDirectoryURL: tempDirectoryURL, tempArchiveURL: tempArchiveURL, archiveResourceURL: archiveResourceURL, password: password, expectingInstallationType: installationType, expectingSuccess: expectingSuccess, testExpectation: unarchivedSuccessExpectation)
+        self.unarchiveTestAppWithExtension(archiveExtension, appName: appName, tempDirectoryURL: tempDirectoryURL, archiveResourceURL: archiveResourceURL, password: password, expectingInstallationType: installationType, expectingSuccess: expectingSuccess, testExpectation: unarchivedSuccessExpectation)
         self.unarchiveNonExistentFileTestFailureAppWithExtension(archiveExtension, tempDirectoryURL: tempDirectoryURL, password: password, expectingInstallationType: installationType, testExpectation: unarchivedFailureExpectation)
 
         super.waitForExpectations(timeout: 30.0, handler: nil)
 
-        if !archiveExtension.hasSuffix("pkg") && expectingSuccess {
-            XCTAssertTrue(fileManager.fileExists(atPath: extractedAppURL.path))
-            XCTAssertEqual("6a60ab31430cfca8fb499a884f4a29f73e59b472", hashOfTree(extractedAppURL.path))
+        if expectingSuccess {
+            if installationType == SPUInstallationTypeApplication {
+                let extractedAppURL = tempDirectoryURL.appendingPathComponent(extractedAppName).appendingPathExtension("app")
+                
+                XCTAssertTrue(fileManager.fileExists(atPath: extractedAppURL.path))
+                XCTAssertEqual("6a60ab31430cfca8fb499a884f4a29f73e59b472", hashOfTreeWithVersion(extractedAppURL.path, 3))
+                XCTAssertEqual("52111bc200000000000000000000000000000000", hashOfTree(extractedAppURL.path))
+            } else if archiveExtension != "pkg" {
+                let extractedPackageURL = tempDirectoryURL.appendingPathComponent(extractedAppName).appendingPathExtension("pkg")
+                XCTAssertTrue(fileManager.fileExists(atPath: extractedPackageURL.path))
+            }
         }
     }
 
     func unarchiveNonExistentFileTestFailureAppWithExtension(_ archiveExtension: String, tempDirectoryURL: URL, password: String?, expectingInstallationType installationType: String, testExpectation: XCTestExpectation) {
-        let tempArchiveURL = tempDirectoryURL.appendingPathComponent("error-invalid").appendingPathExtension(archiveExtension)
-        let unarchiver = SUUnarchiver.unarchiver(forPath: tempArchiveURL.path, updatingHostBundlePath: nil, decryptionPassword: password, expectingInstallationType: installationType)!
+        let tempArchiveURL = tempDirectoryURL.deletingLastPathComponent().appendingPathComponent("error-invalid").appendingPathExtension(archiveExtension)
+        
+        let unarchiver = SUUnarchiver.unarchiver(forPath: tempArchiveURL.path, extractionDirectory: tempDirectoryURL.path, updatingHostBundlePath: nil, decryptionPassword: password, expectingInstallationType: installationType)!
 
         unarchiver.unarchive(completionBlock: {(error: Error?) -> Void in
             XCTAssertNotNil(error)
             testExpectation.fulfill()
-        }, progressBlock: nil)
+        }, progressBlock: nil, waitForCleanup: true)
     }
 
     // swiftlint:disable function_parameter_count
-    func unarchiveTestAppWithExtension(_ archiveExtension: String, appName: String, tempDirectoryURL: URL, tempArchiveURL: URL, archiveResourceURL: URL, password: String?, expectingInstallationType installationType: String, expectingSuccess: Bool, testExpectation: XCTestExpectation) {
-
-        let fileManager = FileManager.default
-
-        try! fileManager.copyItem(at: archiveResourceURL, to: tempArchiveURL)
-
-        let unarchiver = SUUnarchiver.unarchiver(forPath: tempArchiveURL.path, updatingHostBundlePath: nil, decryptionPassword: password, expectingInstallationType: installationType)!
+    func unarchiveTestAppWithExtension(_ archiveExtension: String, appName: String, tempDirectoryURL: URL, archiveResourceURL: URL, password: String?, expectingInstallationType installationType: String, expectingSuccess: Bool, testExpectation: XCTestExpectation) {
+        
+        let unarchiver = SUUnarchiver.unarchiver(forPath: archiveResourceURL.path, extractionDirectory: tempDirectoryURL.path, updatingHostBundlePath: nil, decryptionPassword: password, expectingInstallationType: installationType)!
 
         unarchiver.unarchive(completionBlock: {(error: Error?) -> Void in
             if expectingSuccess {
@@ -64,7 +66,7 @@ class SUUnarchiverTest: XCTestCase
                 XCTAssertNotNil(error)
             }
             testExpectation.fulfill()
-        }, progressBlock: nil)
+        }, progressBlock: nil, waitForCleanup: true)
     }
 
     func testUnarchivingZip()
@@ -115,7 +117,6 @@ class SUUnarchiverTest: XCTestCase
         self.unarchiveTestAppWithExtension("tar.xz")
     }
 
-#if SPARKLE_BUILD_DMG_SUPPORT
     func testUnarchivingHFSDmgWithLicenseAgreement()
     {
         self.unarchiveTestAppWithExtension("dmg")
@@ -126,14 +127,53 @@ class SUUnarchiverTest: XCTestCase
         self.unarchiveTestAppWithExtension("enc.dmg", password: "testpass")
     }
     
+    func testUnarchivingEncryptedDmgWithoutLicenseAgreement()
+    {
+        self.unarchiveTestAppWithExtension("enc.nolicense.dmg", password: "testpass")
+    }
+    
+    func testUnarchivingEncryptedDmgWithLicenseAndWithIncorrectPassword()
+    {
+        self.unarchiveTestAppWithExtension("enc.dmg", password: "moo", expectingSuccess: false)
+    }
+    
+    func testUnarchivingEncryptedDmgWithLicenseAndWithoutPassword()
+    {
+        self.unarchiveTestAppWithExtension("enc.dmg", expectingSuccess: false)
+    }
+    
+    func testUnarchivingEncryptedDmgWithoutLicenseAndWithIncorrectPassword()
+    {
+        self.unarchiveTestAppWithExtension("enc.nolicense.dmg", password: "moo", expectingSuccess: false)
+    }
+    
+    func testUnarchivingEncryptedDmgWithoutLicenseAndWithoutPassword()
+    {
+        self.unarchiveTestAppWithExtension("enc.nolicense.dmg", expectingSuccess: false)
+    }
+    
     func testUnarchivingAPFSDMG()
     {
         self.unarchiveTestAppWithExtension("dmg", resourceName: "SparkleTestCodeSign_apfs")
     }
-#endif
+    
+    func testUnarchivingAPFSDMGWithBogusPassword()
+    {
+        self.unarchiveTestAppWithExtension("dmg", password: "moo", resourceName: "SparkleTestCodeSign_apfs")
+    }
+    
+    func testUnarchivingAPFSAdhocSignedDMGWithAuxFiles()
+    {
+        self.unarchiveTestAppWithExtension("dmg", resourceName: "SparkleTestCodeSign_apfs_lzma_aux_files_adhoc")
+    }
+    
+    func testUnarchivingAPFSDMGWithPackage()
+    {
+        self.unarchiveTestAppWithExtension("dmg", resourceName: "SparkleTestCodeSign_pkg", expectingInstallationType: SPUInstallationTypeGuidedPackage)
+    }
     
 #if SPARKLE_BUILD_PACKAGE_SUPPORT
-    func testUnarchivingFlatPackage()
+    func testUnarchivingBarePackage()
     {
         self.unarchiveTestAppWithExtension("pkg", resourceName: "test", expectingInstallationType: SPUInstallationTypeGuidedPackage)
         
@@ -142,4 +182,18 @@ class SUUnarchiverTest: XCTestCase
         self.unarchiveTestAppWithExtension("pkg", resourceName: "test", expectingInstallationType: SPUInstallationTypeApplication, expectingSuccess: false)
     }
 #endif
+    
+    func testUnarchivingAppleArchive() {
+        self.unarchiveTestAppWithExtension("aar", resourceName: "SparkleTestCodeSignApp")
+    }
+    
+    // If we support encrypted archives one day we will use "aea" file extension
+    // Password to this archive is whatisgoingonforeveroneday!
+    func testUnarchivingEncryptedAppleArchiveWithoutPassword() {
+        signal(SIGPIPE, SIG_IGN)
+        
+        self.unarchiveTestAppWithExtension("enc.aar", resourceName: "SparkleTestCodeSignApp", expectingSuccess: false)
+        
+        signal(SIGPIPE, SIG_DFL)
+    }
 }

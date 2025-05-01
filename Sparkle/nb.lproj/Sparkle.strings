@@ -20,7 +20,7 @@
 "%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ er lastet ned og er klar til bruk! Ønsker du å installere og restarte %1$@ nå?";
 
 /* No comment provided by engineer. */
-"%1$@ can’t be updated, because it was opened from a read-only or a temporary location." = "%1$@ kan ikke oppdateres fra en 'bare lesbar' enhet som f.eks. en cd";
+"%1$@ can’t be updated because it was opened from a read-only or a temporary location." = "%1$@ kan ikke oppdateres fra en 'bare lesbar' enhet som f.eks. en cd";
 
 /* No comment provided by engineer. */
 "A new version of %@ is available!" = "En ny versjon av %@ er tilgjengelig!";
@@ -86,5 +86,5 @@
 "Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "Flytt %1$@ til Programmer-katalogen, start på ny og prøv igjen.";
 
 /* Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates. */
-"You’re up-to-date!" = "Ingen nye oppdateringer";
+"You’re up to date!" = "Ingen nye oppdateringer";
 

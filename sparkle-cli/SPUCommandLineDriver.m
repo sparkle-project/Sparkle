@@ -139,7 +139,17 @@ typedef NS_ENUM(int, CLIErrorExitStatus) {
     switch (updateCheck) {
         case SPUUpdateCheckUpdates:
         case SPUUpdateCheckUpdatesInBackground:
-            if (_interactive || !SPUSystemNeedsAuthorizationAccessForBundlePath(_updater.hostBundle.bundlePath)) {
+        {
+            if (_interactive) {
+                return YES;
+            }
+            
+            BOOL rootUser = (geteuid() == 0);
+            if (rootUser) {
+                return YES;
+            }
+            
+            if (!SPUSystemNeedsAuthorizationAccessForBundlePath(_updater.hostBundle.bundlePath)) {
                 return YES;
             }
             
@@ -148,6 +158,7 @@ typedef NS_ENUM(int, CLIErrorExitStatus) {
             }
             
             return NO;
+        }
         case SPUUpdateCheckUpdateInformation:
             return YES;
     }

@@ -190,8 +190,9 @@
 
 - (void)extractDownloadedUpdate
 {
-    assert(_resumableUpdate != nil);
-    [self extractUpdate:_resumableUpdate];
+    id<SPUResumableUpdate> resumableUpdate = _resumableUpdate;
+    assert(resumableUpdate != nil && [resumableUpdate isKindOfClass:[SPUDownloadedUpdate class]]);
+    [self extractUpdate:(SPUDownloadedUpdate *)resumableUpdate];
 }
 
 - (void)clearDownloadedUpdate

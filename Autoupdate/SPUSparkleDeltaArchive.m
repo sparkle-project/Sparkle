@@ -338,17 +338,29 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
         return nil;
     }
     
-    unsigned char beforeTreeHash[CC_SHA1_DIGEST_LENGTH] = {0};
+    unsigned char beforeTreeHash[BINARY_DELTA_HASH_LENGTH] = {0};
     if (![self _readBuffer:beforeTreeHash length:sizeof(beforeTreeHash)]) {
         return nil;
     }
     
-    unsigned char afterTreeHash[CC_SHA1_DIGEST_LENGTH] = {0};
+    unsigned char afterTreeHash[BINARY_DELTA_HASH_LENGTH] = {0};
     if (![self _readBuffer:afterTreeHash length:sizeof(afterTreeHash)]) {
         return nil;
     }
     
-    return [[SPUDeltaArchiveHeader alloc] initWithCompression:compression compressionLevel:metadata.compressionLevel fileSystemCompression:metadata.fileSystemCompression majorVersion:majorVersion minorVersion:minorVersion beforeTreeHash:beforeTreeHash afterTreeHash:afterTreeHash];
+    NSDate *bundleCreationDate;
+    if (majorVersion >= SUBinaryDeltaMajorVersion4) {
+        double bundleCreationTimeInterval = 0;
+        if (![self _readBuffer:&bundleCreationTimeInterval length:sizeof(bundleCreationTimeInterval)]) {
+            return nil;
+        }
+        
+        bundleCreationDate = (bundleCreationTimeInterval != 0.0) ? [NSDate dateWithTimeIntervalSinceReferenceDate:bundleCreationTimeInterval] : nil;
+    } else {
+        bundleCreationDate = nil;
+    }
+    
+    return [[SPUDeltaArchiveHeader alloc] initWithCompression:compression compressionLevel:metadata.compressionLevel fileSystemCompression:metadata.fileSystemCompression majorVersion:majorVersion minorVersion:minorVersion beforeTreeHash:beforeTreeHash afterTreeHash:afterTreeHash bundleCreationDate:bundleCreationDate];
 }
 
 - (NSArray<NSString *> *)_readRelativeFilePaths SPU_OBJC_DIRECT
@@ -853,8 +865,16 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
     uint16_t minorVersion = header.minorVersion;
     [self _writeBuffer:&minorVersion length:sizeof(minorVersion)];
     
-    [self _writeBuffer:header.beforeTreeHash length:CC_SHA1_DIGEST_LENGTH];
-    [self _writeBuffer:header.afterTreeHash length:CC_SHA1_DIGEST_LENGTH];
+    [self _writeBuffer:header.beforeTreeHash length:BINARY_DELTA_HASH_LENGTH];
+    [self _writeBuffer:header.afterTreeHash length:BINARY_DELTA_HASH_LENGTH];
+    
+    if (majorVersion >= SUBinaryDeltaMajorVersion4) {
+        NSDate *bundleCreationDate = header.bundleCreationDate;
+        
+        // If bundleCreationDate == nil, we will write out a 0 time interval
+        double timeInterval = bundleCreationDate.timeIntervalSinceReferenceDate;
+        [self _writeBuffer:&timeInterval length:sizeof(timeInterval)];
+    }
 }
 
 - (void)addItem:(SPUDeltaArchiveItem *)item
@@ -883,7 +903,7 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
     
     // Clone commands reference relative file paths in this table but sometimes there may not
     // be an entry if extraction for an original item was skipped. Fill out any missing file path entries.
-    // For example, if A.app has Contents/A and B.app has Contents/A and Contents/A and Contents/B,
+    // For example, if A.app has Contents/A and B.app has Contents/A and Contents/B,
     // where A and B's contents are the same and A is the same in both apps, normally we would not record Contents/A because its extraction was skipped. However now B is a clone of A so we need a record for A.
     NSMutableArray<NSString *> *newClonedPathEntries = [NSMutableArray array];
     for (SPUDeltaArchiveItem *item in writableItems) {
@@ -1121,7 +1141,7 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
             } else if (S_ISLNK(extractMode)) {
                 off_t fileSize = itemFileInfo.st_size;
                 if (fileSize > UINT16_MAX) {
-                    _error = [NSError errorWithDomain:SPARKLE_DELTA_ARCHIVE_ERROR_DOMAIN code:SPARKLE_DELTA_ARCHIVE_ERROR_CODE_LINK_TOO_LONG userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Link path has a destination that is too long: %llu bytes", fileSize] }];
+                    _error = [NSError errorWithDomain:SPARKLE_DELTA_ARCHIVE_ERROR_DOMAIN code:SPARKLE_DELTA_ARCHIVE_ERROR_CODE_LINK_TOO_LONG userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Link path has a destination that is too long: %lld bytes", fileSize] }];
                     break;
                 }
                 

@@ -103,7 +103,7 @@ extern char *xar_get_safe_path(xar_file_t f) __attribute__((weak_import));
     NSString *patchFile = _patchFile;
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
-    // Sparkle's XAR delta archives have been superceded by Sparkle's own format
+    // Sparkle's XAR delta archives have been superseded by Sparkle's own format
     xar_t x = xar_open(patchFile.fileSystemRepresentation, READ);
 #pragma clang diagnostic pop
     if (x == NULL) {
@@ -159,15 +159,15 @@ extern char *xar_get_safe_path(xar_file_t f) __attribute__((weak_import));
         }
     }
     
-    unsigned char rawExpectedBeforeHash[CC_SHA1_DIGEST_LENGTH] = {0};
+    unsigned char rawExpectedBeforeHash[BINARY_DELTA_HASH_LENGTH] = {0};
     getRawHashFromDisplayHash(rawExpectedBeforeHash, expectedBeforeHash);
     
-    unsigned char rawExpectedAfterHash[CC_SHA1_DIGEST_LENGTH] = {0};
+    unsigned char rawExpectedAfterHash[BINARY_DELTA_HASH_LENGTH] = {0};
     getRawHashFromDisplayHash(rawExpectedAfterHash, expectedAfterHash);
     
     // I wasn't able to figure out how to retrieve the compression options from xar,
     // so we will use default flags to indicate the info isn't available
-    return [[SPUDeltaArchiveHeader alloc] initWithCompression:SPUDeltaCompressionModeDefault compressionLevel:0 fileSystemCompression:false majorVersion:majorDiffVersion minorVersion:minorDiffVersion beforeTreeHash:rawExpectedBeforeHash afterTreeHash:rawExpectedAfterHash];
+    return [[SPUDeltaArchiveHeader alloc] initWithCompression:SPUDeltaCompressionModeDefault compressionLevel:0 fileSystemCompression:false majorVersion:majorDiffVersion minorVersion:minorDiffVersion beforeTreeHash:rawExpectedBeforeHash afterTreeHash:rawExpectedAfterHash bundleCreationDate:nil];
 }
 
 - (void)writeHeader:(SPUDeltaArchiveHeader *)header
@@ -176,7 +176,7 @@ extern char *xar_get_safe_path(xar_file_t f) __attribute__((weak_import));
     
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
-    // Sparkle's XAR delta archives have been superceded by Sparkle's own format
+    // Sparkle's XAR delta archives have been superseded by Sparkle's own format
     xar_t x = xar_open(patchFile.fileSystemRepresentation, WRITE);
 #pragma clang diagnostic pop
     if (x == NULL) {
@@ -246,7 +246,7 @@ static xar_file_t _xarAddFile(NSMutableDictionary<NSString *, NSValue *> *fileTa
     // We store every file we add into a fileTable for easy referencing
     // Note if a diff has Contents/Resources/foo/ and Contents/Resources/foo/bar.txt,
     // due to sorting order we will add the foo directory first and won't end up with
-    // mis-ordering bugs
+    // misordering bugs
     xar_file_t lastParent = NULL;
     for (NSUInteger componentIndex = 0; componentIndex < relativePathComponentsCount; componentIndex++) {
         NSArray<NSString *> *subpathComponents = [relativePathComponents subarrayWithRange:NSMakeRange(0, componentIndex + 1)];

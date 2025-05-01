@@ -76,6 +76,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     BOOL _showingPermissionRequest;
     BOOL _loggedATSWarning;
     BOOL _loggedNoSecureKeyWarning;
+    BOOL _loggedUpdateSecurityPolicyWarning;
     BOOL _updatingMainBundle;
 }
 
@@ -341,11 +342,18 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     if (!hasAnyPublicKey) {
         if ((feedURL != nil && !servingOverHttps) || ![SUCodeSigningVerifier bundleAtURLIsCodeSigned:[[self hostBundle] bundleURL]]) {
             if (error != NULL) {
-                *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUNoPublicDSAFoundError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"For security reasons, updates need to be signed with an EdDSA key for %@. See Sparkle's documentation for more information.", hostName] }];
+                *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUNoPublicDSAFoundError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"For security reasons, updates need to be signed with an EdDSA key for %@. Visit Sparkle's documentation for more information.", hostName] }];
             }
             return NO;
         } else {
-            if (_updatingMainBundle && !_loggedNoSecureKeyWarning) {
+            BOOL verifyBeforeExtraction = [_host boolForInfoDictionaryKey:SUVerifyUpdateBeforeExtractionKey];
+            
+            if (verifyBeforeExtraction) {
+                if (error != NULL) {
+                    *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUNoPublicDSAFoundError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"For security reasons, updates need to be signed with an EdDSA key because %@ is specified for %@. Visit Sparkle's documentation for more information.", SUVerifyUpdateBeforeExtractionKey, hostName] }];
+                }
+                return NO;
+            } else if (_updatingMainBundle && !_loggedNoSecureKeyWarning) {
                 SULog(SULogLevelError, @"Error: Serving updates without an EdDSA key and only using Apple Code Signing is deprecated and may be unsupported in a future release. Visit Sparkle's documentation for more information: https://sparkle-project.org/documentation/#3-segue-for-security-concerns");
                 
                 _loggedNoSecureKeyWarning = YES;
@@ -361,6 +369,14 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         }
     }
     
+    if (_updatingMainBundle) {
+        if (!_loggedUpdateSecurityPolicyWarning && mainBundleHost.hasUpdateSecurityPolicy) {
+            SULog(SULogLevelDefault, @"Warning: %@ has a custom NSUpdateSecurityPolicy in its Info.plist. This may cause issues when installing updates. Please consider removing this key for your builds using Sparkle if you do not really require a custom update security policy.", hostName);
+            
+            _loggedUpdateSecurityPolicyWarning = YES;
+        }
+    }
+    
     return YES;
 }
 
@@ -373,19 +389,18 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 
     id<SPUUpdaterDelegate> delegate = _delegate;
     
-    // If the user has been asked about automatic checks, don't bother prompting
+    // If the user has been asked about automatic checks or the developer has overridden the setting, don't bother prompting
     // When the user answers to the permission prompt, this will be set to either @YES or @NO instead of nil
-    if ([_host objectForUserDefaultsKey:SUEnableAutomaticChecksKey] != nil) {
+    if ([_host objectForKey:SUEnableAutomaticChecksKey] != nil) {
         shouldPrompt = NO;
     }
     // Does the delegate want to take care of the logic for when we should ask permission to update?
     else if ([delegate respondsToSelector:@selector((updaterShouldPromptForPermissionToCheckForUpdates:))]) {
         shouldPrompt = [delegate updaterShouldPromptForPermissionToCheckForUpdates:self];
     }
-    // Has the user been asked already? And don't ask if the host has a default value set in its Info.plist.
-    else if ([_host objectForKey:SUEnableAutomaticChecksKey] == nil) {
+    else {
         // We wait until the second launch of the updater for this host bundle, unless explicitly overridden via SUPromptUserOnFirstLaunchKey.
-        shouldPrompt = [_host objectForKey:SUPromptUserOnFirstLaunchKey] || hasLaunchedBefore;
+        shouldPrompt = hasLaunchedBefore || [_host boolForInfoDictionaryKey:SUPromptUserOnFirstLaunchKey];
     }
     
     if (!hasLaunchedBefore) {
@@ -406,7 +421,9 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         
         _showingPermissionRequest = YES;
         [self setSessionInProgress:YES];
-        [self setCanCheckForUpdates:YES];
+        
+        BOOL canShowUserDriverInFocusDuringPermissionPrompt = [_userDriver respondsToSelector:@selector(showUpdateInFocus)];
+        [self setCanCheckForUpdates:canShowUserDriverInFocusDuringPermissionPrompt];
         
         __weak __typeof__(self) weakSelf = self;
         [_userDriver showUpdatePermissionRequest:updatePermissionRequest reply:^(SUUpdatePermissionResponse *response) {
@@ -417,6 +434,11 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
                     strongSelf->_showingPermissionRequest = NO;
                     
                     [strongSelf updatePermissionRequestFinishedWithResponse:response];
+                    
+                    if (!canShowUserDriverInFocusDuringPermissionPrompt) {
+                        [strongSelf setCanCheckForUpdates:YES];
+                    }
+                    
                     // Schedule checks, but make sure we ignore the delayed call from KVO
                     [strongSelf resetUpdateCycle];
                 }
@@ -549,7 +571,11 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 
 - (void)updaterTimerDidFire
 {
-    [self _checkForUpdatesInBackground];
+    // User can perform a checkForUpdates check around the same time the timer is ready to fire
+    if (!_sessionInProgress)
+    {
+        [self _checkForUpdatesInBackground];
+    }
 }
 
 - (void)_checkForUpdatesInBackground SPU_OBJC_DIRECT
@@ -628,6 +654,10 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     if (_showingPermissionRequest || _driver.showingUpdate) {
         if ([_userDriver respondsToSelector:@selector(showUpdateInFocus)]) {
             [_userDriver showUpdateInFocus];
+        } else {
+            NSString *noticeType = _showingPermissionRequest ? @"permission request" : @"update";
+            
+            SULog(SULogLevelError, @"Error: checkForUpdates called but %@ is being shown and %@ does not implement -[SPUUserDriver showUpdateInFocus]", noticeType, _userDriver);
         }
         return;
     }
@@ -695,8 +725,8 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 
 - (void)checkForUpdatesWithDriver:(id <SPUUpdateDriver> )d updateCheck:(SPUUpdateCheck)updateCheck installerInProgress:(BOOL)installerInProgress SPU_OBJC_DIRECT
 {
-    assert(_driver == nil);
     if (_driver != nil) {
+        SULog(SULogLevelError, @"Error: checkForUpdatesWithDriver:updateCheck:installerInProgress: called when _driver != nil");
         return;
     }
     
@@ -722,7 +752,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         }
         
         // Notify host app that update driver has finished
-        // As long as we're not going to immmediately kick off a new check
+        // As long as we're not going to immediately kick off a new check
         if (!shouldShowUpdateImmediately && [delegate respondsToSelector:@selector((updater:didFinishUpdateCycleForUpdateCheck:error:))]) {
             [delegate updater:self didFinishUpdateCycleForUpdateCheck:updateCheck error:error];
         }
@@ -802,9 +832,11 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         }
     }];
     
-    [_driver setUpdateShownHandler:^{
-        weakSelf.canCheckForUpdates = YES;
-    }];
+    if ([_userDriver respondsToSelector:@selector(showUpdateInFocus)]) {
+        [_driver setUpdateShownHandler:^{
+            weakSelf.canCheckForUpdates = YES;
+        }];
+    }
     
     [_driver setUpdateWillInstallHandler:^{
         [weakSelf updateLastUpdateCheckDate];
@@ -977,7 +1009,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     if (![NSThread isMainThread]) {
         SULog(SULogLevelError, @"Error: -[SPUUpdater retrieveFeedURL:error:] must be called on the main thread.");
         if (error != NULL) {
-            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUIncorrectAPIUsageError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"SUUpdater -retriveFeedURL:error: must be called on the main thread for %@", hostName]}];
+            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUIncorrectAPIUsageError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"SUUpdater -retrieveFeedURL:error: must be called on the main thread for %@", hostName]}];
         }
         return nil;
     }
@@ -1062,12 +1094,17 @@ static NSString *escapeURLComponent(NSString *str) {
     BOOL sendingSystemProfile = [self sendsSystemProfile];
 
     // Let's only send the system profiling information once per week at most, so we normalize daily-checkers vs. biweekly-checkers and the such.
-    NSDate *lastSubmitDate = [_host objectForUserDefaultsKey:SULastProfileSubmitDateKey];
-    if (!lastSubmitDate) {
-        lastSubmitDate = [NSDate distantPast];
+    if (sendingSystemProfile) {
+        NSDate *lastSubmitDate = [_host objectForUserDefaultsKey:SULastProfileSubmitDateKey];
+        if (!lastSubmitDate) {
+            lastSubmitDate = [NSDate distantPast];
+        }
+        const NSTimeInterval oneWeek = 60 * 60 * 24 * 7;
+        NSTimeInterval timeSinceLastSubmission = [lastSubmitDate timeIntervalSinceNow] * -1;
+        if (timeSinceLastSubmission < oneWeek) {
+            sendingSystemProfile = NO;
+        }
     }
-    const NSTimeInterval oneWeek = 60 * 60 * 24 * 7;
-    sendingSystemProfile &= (-[lastSubmitDate timeIntervalSinceNow] >= oneWeek);
 
     id<SPUUpdaterDelegate> delegate = _delegate;
     NSArray<NSDictionary<NSString *, NSString *> *> *parameters = @[];

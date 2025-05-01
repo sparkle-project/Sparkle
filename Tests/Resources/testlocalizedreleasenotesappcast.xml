@@ -2,16 +2,53 @@
 <rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
   <channel>
     <title>For unit test only</title>
-    <!-- A release testing localized release notes -->
+    <!-- Releases testing localized release notes -->
+    
+    <!-- test other localization before implicit English !-->
+    <item>
+        <title>Version 6.3</title>
+        <sparkle:version>6.3</sparkle:version>
+        <sparkle:channel>english-later-implicit</sparkle:channel>
+        <pubDate>Sat, 26 Jul 2019 15:20:13 +0000</pubDate>
+        <enclosure url="http://localhost:1337/Sparkle_Test_App.zip" />
+        <sparkle:releaseNotesLink xml:lang="es">https://sparkle-project.org/notes.es.html</sparkle:releaseNotesLink>
+        <sparkle:releaseNotesLink>https://sparkle-project.org/notes.en.html</sparkle:releaseNotesLink>
+        <sparkle:minimumSystemVersion>2.0.0</sparkle:minimumSystemVersion>
+    </item>
+    
+    <!-- test implicit English before other localization !-->
+    <item>
+        <title>Version 6.2</title>
+        <sparkle:version>6.2</sparkle:version>
+        <sparkle:channel>english-first-implicit</sparkle:channel>
+        <pubDate>Sat, 26 Jul 2019 15:20:13 +0000</pubDate>
+        <enclosure url="http://localhost:1337/Sparkle_Test_App.zip" />
+        <sparkle:releaseNotesLink>https://sparkle-project.org/notes.en.html</sparkle:releaseNotesLink>
+        <sparkle:releaseNotesLink xml:lang="es">https://sparkle-project.org/notes.es.html</sparkle:releaseNotesLink>
+        <sparkle:minimumSystemVersion>2.0.0</sparkle:minimumSystemVersion>
+    </item>
+    
+    <!-- test English before other localization !-->
+    <item>
+        <title>Version 6.1</title>
+        <sparkle:version>6.1</sparkle:version>
+        <sparkle:channel>english-first</sparkle:channel>
+        <pubDate>Sat, 26 Jul 2019 15:20:13 +0000</pubDate>
+        <enclosure url="http://localhost:1337/Sparkle_Test_App.zip" />
+        <sparkle:releaseNotesLink xml:lang="en">https://sparkle-project.org/notes.en.html</sparkle:releaseNotesLink>
+        <sparkle:releaseNotesLink xml:lang="es">https://sparkle-project.org/notes.es.html</sparkle:releaseNotesLink>
+        <sparkle:minimumSystemVersion>2.0.0</sparkle:minimumSystemVersion>
+    </item>
+    
+    <!-- test other localization before English !-->
     <item>
         <title>Version 6.0</title>
         <sparkle:version>6.0</sparkle:version>
+        <sparkle:channel>english-later</sparkle:channel>
         <pubDate>Sat, 26 Jul 2019 15:20:13 +0000</pubDate>
         <enclosure url="http://localhost:1337/Sparkle_Test_App.zip" />
-        <sparkle:releaseNotesLink>https://sparkle-project.org/#works</sparkle:releaseNotesLink>
-        <sparkle:releaseNotesLink xml:lang='en'>
-            https://sparkle-project.org/#localized_notes_link_works
-        </sparkle:releaseNotesLink>
+        <sparkle:releaseNotesLink xml:lang="es">https://sparkle-project.org/notes.es.html</sparkle:releaseNotesLink>
+        <sparkle:releaseNotesLink xml:lang="en">https://sparkle-project.org/notes.en.html</sparkle:releaseNotesLink>
         <sparkle:minimumSystemVersion>2.0.0</sparkle:minimumSystemVersion>
     </item>
   </channel>

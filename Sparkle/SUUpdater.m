@@ -196,7 +196,7 @@ static NSMutableDictionary *sharedUpdaters = nil;
 {
     if (_delayShowingUserUpdate) {
         // We don't know if SUUpdater delegate will call checkForUpdates: or checkForUpdatesInBackground
-        // to bring a deffered update alert back in 1.x.
+        // to bring a deferred update alert back in 1.x.
         // So if checkForUpdatesInBackground is called we will bring the update back in focus
         [self checkForUpdates:nil];
     } else {
@@ -292,7 +292,7 @@ static NSMutableDictionary *sharedUpdaters = nil;
 - (BOOL)updaterShouldPromptForPermissionToCheckForUpdates:(SPUUpdater *)__unused updater
 {
     BOOL shouldPrompt = YES;
-    if ([_delegate respondsToSelector:@selector(updater:didFinishLoadingAppcast:)]) {
+    if ([_delegate respondsToSelector:@selector(updaterShouldPromptForPermissionToCheckForUpdates:)]) {
         shouldPrompt = [_delegate updaterShouldPromptForPermissionToCheckForUpdates:self];
     }
     return shouldPrompt;
@@ -460,6 +460,8 @@ static NSMutableDictionary *sharedUpdaters = nil;
     }
 }
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-implementations"
 - (id<SUVersionComparison>)versionComparatorForUpdater:(SPUUpdater *)__unused updater
 {
     id<SUVersionComparison> versionComparator;
@@ -468,6 +470,7 @@ static NSMutableDictionary *sharedUpdaters = nil;
     }
     return versionComparator;
 }
+#pragma clang diagnostic pop
 
 // Private SPUUpdater API that allows us to defer providing an application path to relaunch
 - (NSString * _Nullable)_pathToRelaunchForUpdater:(SPUUpdater *)__unused updater

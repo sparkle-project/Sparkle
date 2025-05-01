@@ -19,7 +19,7 @@ SPU_OBJC_DIRECT_MEMBERS
 #endif
 @interface SUBinaryDeltaUnarchiver : NSObject <SUUnarchiverProtocol>
 
-- (instancetype)initWithArchivePath:(NSString *)archivePath updateHostBundlePath:(NSString *)updateHostBundlePath;
+- (instancetype)initWithArchivePath:(NSString *)archivePath extractionDirectory:(NSString *)extractionDirectory updateHostBundlePath:(NSString *)updateHostBundlePath;
 
 + (BOOL)canUnarchivePath:(NSString *)path;
 

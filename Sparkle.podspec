@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name        = "Sparkle"
-  s.version     = "2.4.2"
+  s.version     = "2.7.0"
   s.summary     = "A software update framework for macOS"
   s.description = "Sparkle is an easy-to-use software update framework for macOS."
   s.homepage    = "https://sparkle-project.org"
@@ -22,7 +22,7 @@ Pod::Spec.new do |s|
   s.source   = { :http => "https://github.com/sparkle-project/Sparkle/releases/download/#{s.version}/Sparkle-#{s.version}.tar.xz" }
   s.source_files = 'Sparkle.framework/Versions/B/Headers/*.h'
 
-  s.preserve_paths = ['bin/*', 'Entitlements', 'Symbols']
+  s.preserve_paths = ['bin/*', 'Symbols']
   s.public_header_files = 'Sparkle.framework/Versions/B/Headers/*.h'
   s.vendored_frameworks  = 'Sparkle.framework'
   s.xcconfig            = {

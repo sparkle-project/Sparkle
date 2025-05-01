@@ -283,13 +283,20 @@ func makeAppcasts(archivesSourceDir: URL, outputPathURL: URL?, cacheDirectory ca
                         // Decide the most appropriate delta version
                         let deltaVersion: SUBinaryDeltaMajorVersion
                         if let frameworkVersion = item.frameworkVersion {
-                            switch standardComparator.compareVersion(frameworkVersion, toVersion: "2010") {
+                            switch standardComparator.compareVersion(frameworkVersion, toVersion: "2041") {
                             case .orderedSame:
                                 fallthrough
                             case .orderedDescending:
-                                deltaVersion = .version3
+                                deltaVersion = .version4
                             case .orderedAscending:
-                                deltaVersion = .version2
+                                switch standardComparator.compareVersion(frameworkVersion, toVersion: "2010") {
+                                case .orderedSame:
+                                    fallthrough
+                                case .orderedDescending:
+                                    deltaVersion = .version3
+                                case .orderedAscending:
+                                    deltaVersion = .version2
+                                }
                             }
                         } else {
                             deltaVersion = SUBinaryDeltaMajorVersionDefault
