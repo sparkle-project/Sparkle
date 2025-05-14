@@ -224,6 +224,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
     NSMutableArray<NSRunningApplication *> *matchedRunningApplications = [[NSMutableArray alloc] init];
     
     if (bundleIdentifier != nil && bundlePathComponents != nil) {
+        NSFileManager *fileManager = [NSFileManager defaultManager];
         NSArray *runningApplications = [NSRunningApplication runningApplicationsWithBundleIdentifier:bundleIdentifier];
         
         // If we find any running application that is translocated and looks like the bundle, we should record those too
@@ -235,6 +236,20 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
             NSString *candidatePath = runningApplication.bundleURL.URLByResolvingSymlinksInPath.path;
             if (candidatePath != nil) {
                 NSArray<NSString *> *candidatePathComponents = candidatePath.pathComponents;
+                NSUInteger candidatePathComponentsCount = candidatePathComponents.count;
+
+                // Workaround cases where macOS appends Contents/MacOS/<executable> to the bundle path which can happen in corner cases (eg: mishandled bundles or helper executables).
+                // https://github.com/sparkle-project/Sparkle/issues/2725
+                BOOL candidatePathIsDir = YES;
+                if ([fileManager fileExistsAtPath:candidatePath isDirectory:&candidatePathIsDir] && !candidatePathIsDir) {
+                    if (candidatePathComponentsCount > 3 && [candidatePathComponents[candidatePathComponentsCount - 3] isEqualToString:@"Contents"] && [candidatePathComponents[candidatePathComponentsCount - 2] isEqualToString:@"MacOS"]) {
+                        NSMutableArray<NSString *> *trimmedBundlePath = [candidatePathComponents mutableCopy];
+                        [trimmedBundlePath removeObjectsInRange:NSMakeRange(candidatePathComponentsCount - 3, 3)];
+                        candidatePathComponents = trimmedBundlePath;
+                        candidatePathComponentsCount -= 3;
+                    }
+                }
+
                 if ([candidatePathComponents isEqualToArray:bundlePathComponents]) {
                     [matchedRunningApplications addObject:runningApplication];
                 } else if (matchedRunningApplications.count == 0 && candidatePathComponents.count > 0 && bundlePathComponents.count > 0) {
