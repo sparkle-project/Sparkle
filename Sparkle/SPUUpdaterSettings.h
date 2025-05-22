@@ -57,7 +57,7 @@ SU_EXPORT @interface SPUUpdaterSettings : NSObject
  * Note this does not indicate whether or not automatic downloading of updates is allowable.
  * See `-allowsAutomaticUpdates` property for that.
  */
-@property (readonly, nonatomic) BOOL automaticallyDownloadsUpdates;
+@property (nonatomic) BOOL automaticallyDownloadsUpdates;
 
 /**
  * Indicates whether or not anonymous system profile information is sent when checking for updates.

@@ -38,6 +38,7 @@ static NSString *const SUUpdateAlertTouchBarIdentifier = @"" SPARKLE_BUNDLE_IDEN
 
 @implementation SUUpdateAlert
 {
+    SPUUpdaterSettings *_updaterSettings;
     SUAppcastItem *_updateItem;
     SUHost *_host;
     SPUUserUpdateState *_state;
@@ -73,14 +74,14 @@ static NSString *const SUUpdateAlertTouchBarIdentifier = @"" SPARKLE_BUNDLE_IDEN
         _completionBlock = [completionBlock copy];
         _didBecomeKeyBlock = [didBecomeKeyBlock copy];
         
-        SPUUpdaterSettings *updaterSettings = [[SPUUpdaterSettings alloc] initWithHostBundle:aHost.bundle];
+        _updaterSettings = [[SPUUpdaterSettings alloc] initWithHostBundle:aHost.bundle];
         
         BOOL allowsAutomaticUpdates;
-        NSNumber *allowsAutomaticUpdatesOption = updaterSettings.allowsAutomaticUpdatesOption;
+        NSNumber *allowsAutomaticUpdatesOption = _updaterSettings.allowsAutomaticUpdatesOption;
         if (item.informationOnlyUpdate) {
             allowsAutomaticUpdates = NO;
         } else if (allowsAutomaticUpdatesOption == nil) {
-            allowsAutomaticUpdates = updaterSettings.automaticallyChecksForUpdates;
+            allowsAutomaticUpdates = _updaterSettings.automaticallyChecksForUpdates;
         } else {
             allowsAutomaticUpdates = allowsAutomaticUpdatesOption.boolValue;
         }

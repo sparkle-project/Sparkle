@@ -64,6 +64,11 @@
     return [_host boolForKey:SUAutomaticallyUpdateKey];
 }
 
+- (void)setAutomaticallyDownloadsUpdates:(BOOL)automaticallyDownloadsUpdates
+{
+    [_host setBool:automaticallyDownloadsUpdates forUserDefaultsKey:SUAutomaticallyUpdateKey];
+}
+
 - (BOOL)sendsSystemProfile
 {
     return [_host boolForKey:SUSendProfileInfoKey];
