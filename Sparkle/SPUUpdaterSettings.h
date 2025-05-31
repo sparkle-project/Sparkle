@@ -21,7 +21,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- This class can be used for reading certain updater settings.
+ This class can be used for reading and updating updater settings.
  
  It retrieves the settings by first looking into the host's user defaults.
  If the setting is not found in there, then the host's Info.plist file is looked at.
@@ -32,13 +32,17 @@ SU_EXPORT @interface SPUUpdaterSettings : NSObject
 
 /**
  * Indicates whether or not automatic update checks are enabled.
+ *
+ * This property is KVO observable.
  */
-@property (readonly, nonatomic) BOOL automaticallyChecksForUpdates;
+@property (nonatomic) BOOL automaticallyChecksForUpdates;
 
 /**
  * The regular update check interval.
+ *
+ * This property is KVO observable.
  */
-@property (readonly, nonatomic) NSTimeInterval updateCheckInterval;
+@property (nonatomic) NSTimeInterval updateCheckInterval;
 
 /**
  * Indicates whether or not automatically downloading updates is allowed to be turned on by the user.
@@ -56,13 +60,17 @@ SU_EXPORT @interface SPUUpdaterSettings : NSObject
  *
  * Note this does not indicate whether or not automatic downloading of updates is allowable.
  * See `-allowsAutomaticUpdates` property for that.
+ *
+ * This property is KVO observable.
  */
 @property (nonatomic) BOOL automaticallyDownloadsUpdates;
 
 /**
  * Indicates whether or not anonymous system profile information is sent when checking for updates.
+ *
+ * This property is KVO observable.
  */
-@property (readonly, nonatomic) BOOL sendsSystemProfile;
+@property (nonatomic) BOOL sendsSystemProfile;
 
 @end
 
