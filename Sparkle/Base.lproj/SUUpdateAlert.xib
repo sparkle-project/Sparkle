@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21701" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="24093.7" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21701"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="24093.7"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -25,11 +25,11 @@
             <windowCollectionBehavior key="collectionBehavior" fullScreenAuxiliary="YES"/>
             <windowPositionMask key="initialPositionMask" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="746" y="229" width="620" height="370"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="875"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1409"/>
             <value key="minSize" type="size" width="550" height="150"/>
             <view key="contentView" id="6">
                 <rect key="frame" x="0.0" y="0.0" width="620" height="370"/>
-                <autoresizingMask key="autoresizingMask"/>
+                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                 <subviews>
                     <imageView translatesAutoresizingMaskIntoConstraints="NO" id="7" userLabel="Program icon">
                         <rect key="frame" x="22" y="286" width="64" height="64"/>
@@ -43,7 +43,7 @@
                             <binding destination="-2" name="value" keyPath="applicationIcon" id="9"/>
                         </connections>
                     </imageView>
-                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="10" userLabel="Version text field">
+                    <textField focusRingType="none" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="10" userLabel="Version text field">
                         <rect key="frame" x="106" y="338" width="494" height="17"/>
                         <constraints>
                             <constraint firstAttribute="height" priority="777" constant="17" id="n8w-DR-XEM"/>
@@ -57,7 +57,7 @@
                             <binding destination="-2" name="value" keyPath="titleText" id="11"/>
                         </connections>
                     </textField>
-                    <textField horizontalHuggingPriority="350" verticalHuggingPriority="999" horizontalCompressionResistancePriority="100" verticalCompressionResistancePriority="1000" preferredMaxLayoutWidth="490" translatesAutoresizingMaskIntoConstraints="NO" id="101" userLabel="Question text field">
+                    <textField focusRingType="none" horizontalHuggingPriority="350" verticalHuggingPriority="999" horizontalCompressionResistancePriority="100" verticalCompressionResistancePriority="1000" preferredMaxLayoutWidth="490" translatesAutoresizingMaskIntoConstraints="NO" id="101" userLabel="Question text field">
                         <rect key="frame" x="106" y="316" width="494" height="14"/>
                         <constraints>
                             <constraint firstAttribute="height" relation="lessThanOrEqual" priority="300" constant="28" id="H6E-te-Fog"/>
@@ -73,12 +73,12 @@
                         </connections>
                     </textField>
                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="fKC-QA-GZa" userLabel="Container to hide release notes">
-                        <rect key="frame" x="108" y="73" width="492" height="235"/>
+                        <rect key="frame" x="108" y="77" width="492" height="231"/>
                         <subviews>
                             <box boxType="oldStyle" borderType="line" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="89">
-                                <rect key="frame" x="0.0" y="0.0" width="492" height="215"/>
+                                <rect key="frame" x="0.0" y="0.0" width="492" height="211"/>
                                 <view key="contentView" id="hbB-V1-Bf6">
-                                    <rect key="frame" x="1" y="1" width="490" height="213"/>
+                                    <rect key="frame" x="1" y="1" width="490" height="209"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 </view>
                                 <constraints>
@@ -93,8 +93,8 @@
                                     </binding>
                                 </connections>
                             </box>
-                            <textField verticalHuggingPriority="1000" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="17">
-                                <rect key="frame" x="-2" y="221" width="88" height="14"/>
+                            <textField focusRingType="none" verticalHuggingPriority="1000" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="17">
+                                <rect key="frame" x="-2" y="217" width="88" height="14"/>
                                 <constraints>
                                     <constraint firstAttribute="width" relation="greaterThanOrEqual" priority="100" constant="100" id="gkn-FW-9aC"/>
                                 </constraints>
@@ -123,10 +123,7 @@
                         </constraints>
                     </customView>
                     <button horizontalHuggingPriority="150" verticalHuggingPriority="750" horizontalCompressionResistancePriority="997" translatesAutoresizingMaskIntoConstraints="NO" id="22">
-                        <rect key="frame" x="338" y="12" width="137" height="32"/>
-                        <constraints>
-                            <constraint firstAttribute="width" relation="greaterThanOrEqual" priority="222" constant="90" id="2Zy-5G-GBj"/>
-                        </constraints>
+                        <rect key="frame" x="342" y="19" width="126" height="24"/>
                         <buttonCell key="cell" type="push" title="Remind Me Later" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="171">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
@@ -139,7 +136,7 @@ Gw
                         </connections>
                     </button>
                     <button verticalHuggingPriority="750" horizontalCompressionResistancePriority="998" translatesAutoresizingMaskIntoConstraints="NO" id="23">
-                        <rect key="frame" x="102" y="12" width="139" height="32"/>
+                        <rect key="frame" x="109" y="19" width="129" height="24"/>
                         <buttonCell key="cell" type="push" title="Skip This Version" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="172">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
@@ -149,10 +146,7 @@ Gw
                         </connections>
                     </button>
                     <button horizontalHuggingPriority="20" verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="76">
-                        <rect key="frame" x="473" y="12" width="134" height="32"/>
-                        <constraints>
-                            <constraint firstAttribute="width" relation="greaterThanOrEqual" priority="222" constant="120" id="N94-uf-6oP"/>
-                        </constraints>
+                        <rect key="frame" x="480" y="19" width="120" height="24"/>
                         <buttonCell key="cell" type="push" title="Install Update" bezelStyle="rounded" alignment="center" state="on" borderStyle="border" inset="2" id="173">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
@@ -160,20 +154,23 @@ Gw
 DQ
 </string>
                         </buttonCell>
+                        <constraints>
+                            <constraint firstAttribute="width" relation="greaterThanOrEqual" priority="222" constant="120" id="N94-uf-6oP"/>
+                        </constraints>
                         <connections>
                             <action selector="installUpdate:" target="-2" id="77"/>
                         </connections>
                     </button>
                     <button translatesAutoresizingMaskIntoConstraints="NO" id="117">
-                        <rect key="frame" x="108" y="50" width="491" height="16"/>
-                        <constraints>
-                            <constraint firstAttribute="height" relation="lessThanOrEqual" constant="28" id="0AI-ue-a0r"/>
-                            <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="14" id="yM1-TA-HfP"/>
-                        </constraints>
+                        <rect key="frame" x="109" y="55" width="313" height="14"/>
                         <buttonCell key="cell" type="check" title="Automatically download and install updates in the future" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="175">
                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                             <font key="font" metaFont="smallSystem"/>
                         </buttonCell>
+                        <constraints>
+                            <constraint firstAttribute="height" relation="lessThanOrEqual" constant="28" id="0AI-ue-a0r"/>
+                            <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="14" id="yM1-TA-HfP"/>
+                        </constraints>
                         <connections>
                             <binding destination="93" name="value" keyPath="values.SUAutomaticallyUpdate" id="135"/>
                         </connections>
@@ -204,7 +201,6 @@ DQ
                     <constraint firstItem="fKC-QA-GZa" firstAttribute="leading" secondItem="10" secondAttribute="leading" id="qQ9-OJ-06z"/>
                     <constraint firstItem="101" firstAttribute="top" secondItem="10" secondAttribute="bottom" constant="8" id="r7Q-z5-jkx"/>
                     <constraint firstItem="10" firstAttribute="top" secondItem="6" secondAttribute="top" constant="15" id="rXd-o0-WQQ"/>
-                    <constraint firstAttribute="trailing" secondItem="117" secondAttribute="trailing" constant="21" id="sHI-Hm-eSA"/>
                     <constraint firstItem="7" firstAttribute="leading" secondItem="6" secondAttribute="leading" constant="22" id="zSE-lw-Ggj"/>
                 </constraints>
             </view>
