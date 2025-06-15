@@ -1202,7 +1202,9 @@ static NSString *escapeURLComponent(NSString *str) {
 
 - (void)dealloc
 {
-    [NSNotificationCenter.defaultCenter removeObserver:self name:SUUpdateAutomaticCheckSettingChangedNotification object:nil];
+    if (_startedUpdater) {
+        [NSNotificationCenter.defaultCenter removeObserver:self name:SUUpdateAutomaticCheckSettingChangedNotification object:nil];
+    }
     
     // Stop checking for updates
     [self cancelNextUpdateCycle];
