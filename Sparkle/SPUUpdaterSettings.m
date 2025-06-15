@@ -163,6 +163,11 @@ static NSString *SUSendsSystemProfileKeyPath = @"sendsSystemProfile";
     }
 }
 
++ (BOOL)automaticallyNotifiesObserversOfAutomaticallyChecksForUpdates
+{
+    return NO;
+}
+
 - (NSTimeInterval)currentUpdateCheckInterval SPU_OBJC_DIRECT
 {
     // Find the stored check interval. User defaults override Info.plist.
@@ -187,6 +192,11 @@ static NSString *SUSendsSystemProfileKeyPath = @"sendsSystemProfile";
     } else {
         [NSNotificationCenter.defaultCenter postNotificationName:SUUpdateAutomaticCheckSettingChangedNotification object:nil userInfo:@{SUUpdateBundlePathUserInfoKey: _host.bundlePath}];
     }
+}
+
++ (BOOL)automaticallyNotifiesObserversOfUpdateCheckInterval
+{
+    return NO;
 }
 
 // For allowing automatic downloaded updates to be turned on or off
@@ -221,6 +231,11 @@ static NSString *SUSendsSystemProfileKeyPath = @"sendsSystemProfile";
     [self didChangeValueForKey:SUAutomaticallyDownloadsUpdatesKeyPath];
 }
 
++ (BOOL)automaticallyNotifiesObserversOfAutomaticallyDownloadsUpdates
+{
+    return NO;
+}
+
 - (BOOL)currentSendsSystemProfile SPU_OBJC_DIRECT
 {
     return [_host boolForKey:SUSendProfileInfoKey];
@@ -234,6 +249,11 @@ static NSString *SUSendsSystemProfileKeyPath = @"sendsSystemProfile";
     [_host setBool:sendsSystemProfile forUserDefaultsKey:SUSendProfileInfoKey];
     
     [self didChangeValueForKey:SUSendsSystemProfileKeyPath];
+}
+
++ (BOOL)automaticallyNotifiesObserversOfSendsSystemProfile
+{
+    return NO;
 }
 
 @end

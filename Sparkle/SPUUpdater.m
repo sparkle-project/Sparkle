@@ -958,6 +958,11 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     return [NSSet setWithObject:@"updaterSettings.automaticallyChecksForUpdates"];
 }
 
++ (BOOL)automaticallyNotifiesObserversOfAutomaticallyChecksForUpdates
+{
+    return NO;
+}
+
 - (void)setAutomaticallyDownloadsUpdates:(BOOL)automaticallyUpdates
 {
     _updaterSettings.automaticallyDownloadsUpdates = automaticallyUpdates;
@@ -971,6 +976,11 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 + (NSSet<NSString *> *)keyPathsForValuesAffectingAutomaticallyDownloadsUpdates
 {
     return [NSSet setWithObject:@"updaterSettings.automaticallyDownloadsUpdates"];
+}
+
++ (BOOL)automaticallyNotifiesObserversOfAutomaticallyDownloadsUpdates
+{
+    return NO;
 }
 
 - (void)setFeedURL:(NSURL * _Nullable)feedURL
@@ -1100,6 +1110,11 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     return [NSSet setWithObject:@"updaterSettings.sendsSystemProfile"];
 }
 
++ (BOOL)automaticallyNotifiesObserversOfSendsSystemProfile
+{
+    return NO;
+}
+
 static NSString *escapeURLComponent(NSString *str) {
     NSString *escapedString = [str stringByAddingPercentEncodingWithAllowedCharacters:NSCharacterSet.URLQueryAllowedCharacterSet];
     
@@ -1198,6 +1213,11 @@ static NSString *escapeURLComponent(NSString *str) {
 + (NSSet<NSString *> *)keyPathsForValuesAffectingUpdateCheckInterval
 {
     return [NSSet setWithObject:@"updaterSettings.updateCheckInterval"];
+}
+
++ (BOOL)automaticallyNotifiesObserversOfUpdateCheckInterval
+{
+    return NO;
 }
 
 - (void)dealloc
