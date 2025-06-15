@@ -84,6 +84,9 @@ static NSString *SUSendsSystemProfileKeyPath = @"sendsSystemProfile";
 
 - (void)processUpdateCheckInterval SPU_OBJC_DIRECT
 {
+    // Note: not doing a check to see if the time interval differs from the current one
+    // due to avoiding comparisons with floating-point
+    
     NSString *updatedKeyPath = SUUpdateCheckIntervalKeyPath;
     
     [self willChangeValueForKey:updatedKeyPath];
