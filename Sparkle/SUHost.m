@@ -23,6 +23,8 @@ NS_ASSUME_NONNULL_BEGIN
 // if the process is sandboxed or not; eg: finding the user's caches directory. Or code that depends
 // on compilation flags and if other files exist relative to the host bundle.
 
+static void *SUHostObservableContext = &SUHostObservableContext;
+
 @implementation SUHost
 {
     NSUserDefaults *_userDefaults;
@@ -72,7 +74,7 @@ NS_ASSUME_NONNULL_BEGIN
     _modifyingKeyPaths = [NSMutableSet set];
     
     for (NSString *keyPath in keyPaths) {
-        [_userDefaults addObserver:self forKeyPath:keyPath options:NSKeyValueObservingOptionNew context:NULL];
+        [_userDefaults addObserver:self forKeyPath:keyPath options:NSKeyValueObservingOptionNew context:SUHostObservableContext];
     }
     
     _observedUserDefaultKeyPaths = keyPaths;
@@ -81,6 +83,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)observeValueForKeyPath:(nullable NSString *)keyPath ofObject:(nullable id)object change:(nullable NSDictionary<NSKeyValueChangeKey,id> *)change context:(nullable void *)context
 {
+    if (context != SUHostObservableContext)
+    {
+        [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
+        return;
+    }
+    
     if (keyPath == nil || [_modifyingKeyPaths containsObject:(NSString * _Nonnull)keyPath]) {
         return;
     }
