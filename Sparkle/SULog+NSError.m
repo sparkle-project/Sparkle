@@ -11,7 +11,7 @@
 
 #include "AppKitPrevention.h"
 
-static void _SULogErrors(NSArray<NSError *> *errors, int recursionLimit)
+static void SULogErrors(NSArray<NSError *> *errors, int recursionLimit)
 {
     if (recursionLimit == 0) {
         return;
@@ -25,14 +25,14 @@ static void _SULogErrors(NSArray<NSError *> *errors, int recursionLimit)
         if (@available(macOS 11.3, *)) {
             NSArray<NSError *> *underlyingErrors = userInfo[NSMultipleUnderlyingErrorsKey];
             if (underlyingErrors != nil) {
-                _SULogErrors(underlyingErrors, recursionLimit - 1);
+                SULogErrors(underlyingErrors, recursionLimit - 1);
                 continue;
             }
         }
         
         NSError *underlyingError = userInfo[NSUnderlyingErrorKey];
         if (underlyingError != nil) {
-            _SULogErrors(@[underlyingError], recursionLimit - 1);
+            SULogErrors(@[underlyingError], recursionLimit - 1);
         }
     }
 }
@@ -43,5 +43,5 @@ void SULogError(NSError *error)
         return;
     }
     
-    _SULogErrors(@[error], 7);
+    SULogErrors(@[error], 7);
 }

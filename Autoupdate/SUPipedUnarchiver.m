@@ -21,7 +21,7 @@
 }
 
 // pipingData == NO is only supported for zip archives
-static NSArray<NSString *> * _Nullable _argumentsConformingToTypeOfPath(NSString *path, BOOL pipingData, NSString * __autoreleasing *outCommand)
+static NSArray<NSString *> * _Nullable argumentsConformingToTypeOfPath(NSString *path, BOOL pipingData, NSString * __autoreleasing *outCommand)
 {
     NSArray <NSString *> *extractTGZ = @[@"/usr/bin/tar", @"-zxC"];
     NSArray <NSString *> *extractTBZ = @[@"/usr/bin/tar", @"-jxC"];
@@ -78,7 +78,7 @@ static NSArray<NSString *> * _Nullable _argumentsConformingToTypeOfPath(NSString
 
 + (BOOL)canUnarchivePath:(NSString *)path
 {
-    return _argumentsConformingToTypeOfPath(path, YES, NULL) != nil;
+    return argumentsConformingToTypeOfPath(path, YES, NULL) != nil;
 }
 
 + (BOOL)mustValidateBeforeExtraction
@@ -104,7 +104,7 @@ static NSArray<NSString *> * _Nullable _argumentsConformingToTypeOfPath(NSString
 - (void)unarchiveWithCompletionBlock:(void (^)(NSError * _Nullable))completionBlock progressBlock:(void (^ _Nullable)(double))progressBlock waitForCleanup:(BOOL)__unused waitForCleanup
 {
     NSString *command = nil;
-    NSArray<NSString *> *arguments = _argumentsConformingToTypeOfPath(_archivePath, YES, &command);
+    NSArray<NSString *> *arguments = argumentsConformingToTypeOfPath(_archivePath, YES, &command);
     assert(arguments != nil);
     assert(command != nil);
     
@@ -153,7 +153,7 @@ static NSArray<NSString *> * _Nullable _argumentsConformingToTypeOfPath(NSString
                             [notifier notifyFailureWithError:extractError];
                         } else {
                             // The ditto command will be the same so no need to fetch it again
-                            NSArray<NSString *> *nonPipingArguments = _argumentsConformingToTypeOfPath(self->_archivePath, NO, NULL);
+                            NSArray<NSString *> *nonPipingArguments = argumentsConformingToTypeOfPath(self->_archivePath, NO, NULL);
                             assert(nonPipingArguments != nil);
                             
                             NSError *nonPipingExtractError = nil;

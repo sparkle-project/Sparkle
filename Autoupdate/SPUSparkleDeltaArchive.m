@@ -216,7 +216,7 @@ typedef struct
     }
 }
 
-static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMode compressionMode)
+static compression_algorithm compressionAlgorithmForMode(SPUDeltaCompressionMode compressionMode)
 {
     switch (compressionMode) {
     case SPUDeltaCompressionModeLZMA:
@@ -310,7 +310,7 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
         case SPUDeltaCompressionModeLZFSE:
         case SPUDeltaCompressionModeLZ4:
         case SPUDeltaCompressionModeZLIB: {
-            if (compression_stream_init(&_compressionStream, COMPRESSION_STREAM_DECODE, _compressionAlgorithmForMode(compression)) != COMPRESSION_STATUS_OK) {
+            if (compression_stream_init(&_compressionStream, COMPRESSION_STREAM_DECODE, compressionAlgorithmForMode(compression)) != COMPRESSION_STATUS_OK) {
                 _error = [NSError errorWithDomain:SPARKLE_COMPRESSION_ERROR_DOMAIN code:COMPRESSION_STATUS_ERROR userInfo:@{ NSLocalizedDescriptionKey: @"Failed to open compression stream for reading" }];
                 return nil;
             }
@@ -844,7 +844,7 @@ static compression_algorithm _compressionAlgorithmForMode(SPUDeltaCompressionMod
         case SPUDeltaCompressionModeLZFSE:
         case SPUDeltaCompressionModeLZ4:
         case SPUDeltaCompressionModeZLIB: {
-            if (compression_stream_init(&_compressionStream, COMPRESSION_STREAM_ENCODE, _compressionAlgorithmForMode(compression)) != COMPRESSION_STATUS_OK) {
+            if (compression_stream_init(&_compressionStream, COMPRESSION_STREAM_ENCODE, compressionAlgorithmForMode(compression)) != COMPRESSION_STATUS_OK) {
                 _error = [NSError errorWithDomain:SPARKLE_COMPRESSION_ERROR_DOMAIN code:COMPRESSION_STATUS_ERROR userInfo:@{ NSLocalizedDescriptionKey: @"Failed to open compression stream for writing" }];
                 
                 return;

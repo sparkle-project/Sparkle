@@ -35,7 +35,7 @@
     BOOL _drawsWebViewBackground;
 }
 
-static WKUserScript *_userScriptWithInjectedStyleSource(NSString *styleSource)
+static WKUserScript *makeUserScriptWithInjectedStyleSource(NSString *styleSource)
 {
     // We must remove newlines when inserting the style source in this interpolated string below
     NSString *strippedStyleSource = [styleSource stringByReplacingOccurrencesOfString:@"\n" withString:@""];
@@ -53,7 +53,7 @@ static WKUserScript *_userScriptWithInjectedStyleSource(NSString *styleSource)
     return [[WKUserScript alloc] initWithSource:scriptSource injectionTime:WKUserScriptInjectionTimeAtDocumentEnd forMainFrameOnly:YES];
 }
 
-static WKUserScript *_userScriptForExposingCurrentRelease(NSString *releaseString)
+static WKUserScript *makeUserScriptForExposingCurrentRelease(NSString *releaseString)
 {
     // Check that release string can be safely injected
     NSMutableCharacterSet *allowedCharacterSet = [NSMutableCharacterSet alphanumericCharacterSet];
@@ -112,14 +112,14 @@ static WKUserScript *_userScriptForExposingCurrentRelease(NSString *releaseStrin
         // In fact, we must execute javascript to properly inject our default CSS style into the DOM
         // Legacy WebView has exposed methods for custom stylesheets and default fonts,
         // but WKWebView seems to forgo that type of API surface in favor of user scripts like this
-        WKUserScript *userScriptWithInjectedStyleSource = _userScriptWithInjectedStyleSource(finalStyleContents);
+        WKUserScript *userScriptWithInjectedStyleSource = makeUserScriptWithInjectedStyleSource(finalStyleContents);
         if (userScriptWithInjectedStyleSource == nil) {
             SULog(SULogLevelError, @"Failed to create script for injecting style");
         } else {
             [userContentController addUserScript:userScriptWithInjectedStyleSource];
         }
         
-        WKUserScript *userScriptForExposingCurrentRelease = _userScriptForExposingCurrentRelease(installedVersion);
+        WKUserScript *userScriptForExposingCurrentRelease = makeUserScriptForExposingCurrentRelease(installedVersion);
         if (userScriptForExposingCurrentRelease == nil) {
             SULog(SULogLevelDefault, @"warning: Failed to create script for injecting version %@", installedVersion);
         } else {
