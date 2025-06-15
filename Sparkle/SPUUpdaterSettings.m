@@ -84,16 +84,17 @@ static NSString *SUSendsSystemProfileKeyPath = @"sendsSystemProfile";
 
 - (void)processUpdateCheckInterval SPU_OBJC_DIRECT
 {
-    // Note: not doing a check to see if the time interval differs from the current one
-    // due to avoiding comparisons with floating-point
+    NSTimeInterval currentValue = [self currentUpdateCheckInterval];
     
-    NSString *updatedKeyPath = SUUpdateCheckIntervalKeyPath;
-    
-    [self willChangeValueForKey:updatedKeyPath];
-    
-    _updateCheckInterval = [self currentUpdateCheckInterval];
-    
-    [self didChangeValueForKey:updatedKeyPath];
+    if (fabs(currentValue - _updateCheckInterval) >= 0.001) {
+        NSString *updatedKeyPath = SUUpdateCheckIntervalKeyPath;
+        
+        [self willChangeValueForKey:updatedKeyPath];
+        
+        _updateCheckInterval = currentValue;
+        
+        [self didChangeValueForKey:updatedKeyPath];
+    }
 }
 
 - (void)processAutomaticallyDownloadsUpdates SPU_OBJC_DIRECT
@@ -174,11 +175,12 @@ static NSString *SUSendsSystemProfileKeyPath = @"sendsSystemProfile";
 - (NSTimeInterval)currentUpdateCheckInterval SPU_OBJC_DIRECT
 {
     // Find the stored check interval. User defaults override Info.plist.
-    NSNumber *intervalValue = [_host objectForKey:SUScheduledCheckIntervalKey];
-    if (intervalValue)
-        return [intervalValue doubleValue];
-    else
+    id intervalValue = [_host objectForKey:SUScheduledCheckIntervalKey];
+    if (intervalValue == nil || ![(NSObject *)intervalValue isKindOfClass:[NSNumber class]]) {
         return SUDefaultUpdateCheckInterval;
+    }
+    
+    return [(NSNumber *)intervalValue doubleValue];
 }
 
 - (void)setUpdateCheckInterval:(NSTimeInterval)updateCheckInterval
