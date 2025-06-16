@@ -50,11 +50,22 @@ static void *SUHostObservableContext = &SUHostObservableContext;
         
         _isMainBundle = [aBundle isEqualTo:[NSBundle mainBundle]];
 
-        NSString *defaultsDomain = [self objectForInfoDictionaryKey:SUDefaultsDomainKey];
-        if (defaultsDomain == nil) {
+        NSString *domainIdentifier;
+        {
+            NSString *defaultsDomain = [self objectForInfoDictionaryKey:SUDefaultsDomainKey];
+            if (defaultsDomain != nil) {
+                domainIdentifier = defaultsDomain;
+            } else if (!_isMainBundle) {
+                domainIdentifier = aBundle.bundleIdentifier;
+            } else {
+                domainIdentifier = nil;
+            }
+        }
+        
+        if (domainIdentifier == nil) {
             _userDefaults = [NSUserDefaults standardUserDefaults];
         } else {
-            _userDefaults = [[NSUserDefaults alloc] initWithSuiteName:defaultsDomain];
+            _userDefaults = [[NSUserDefaults alloc] initWithSuiteName:domainIdentifier];
         }
     }
     return self;
