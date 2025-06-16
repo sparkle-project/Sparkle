@@ -825,7 +825,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
             [strongSelf setSessionInProgress:NO];
             [strongSelf setCanCheckForUpdates:YES];
             
-            if (!strongSelf->_updatingMainBundle && error == nil) {
+            if (!strongSelf->_updatingMainBundle && error == nil && !shouldShowUpdateImmediately) {
                 // If we're not updating the main bundle, a potentially new bundle may have different info
                 [NSNotificationCenter.defaultCenter postNotificationName:SUUpdateSettingsNeedsSynchronizationNotification object:nil userInfo:@{SUUpdateBundlePathUserInfoKey: strongSelf->_host.bundlePath}];
             }
