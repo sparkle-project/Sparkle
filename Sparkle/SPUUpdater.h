@@ -200,7 +200,7 @@ SU_EXPORT @interface SPUUpdater : NSObject
  The update schedule cycle will be reset in a short delay after the property's new value is set.
  This is to allow reverting this property without kicking off a schedule change immediately.
  
- This property is KVO compliant.
+ This property is KVO compliant. This property must be called on the main thread.
  */
 @property (nonatomic) BOOL automaticallyChecksForUpdates;
 
@@ -217,7 +217,7 @@ SU_EXPORT @interface SPUUpdater : NSObject
  The update schedule cycle will be reset in a short delay after the property's new value is set.
  This is to allow reverting this property without kicking off a schedule change immediately.
  
- This property is KVO compliant.
+ This property is KVO compliant. This property must be called on the main thread.
  */
 @property (nonatomic) NSTimeInterval updateCheckInterval;
 
@@ -240,7 +240,7 @@ SU_EXPORT @interface SPUUpdater : NSObject
  Only set this property if the user wants to change the default via a user settings option.
  Do not always set it on launch unless you want to ignore the user's preference.
  
- This property is KVO compliant.
+ This property is KVO compliant. This property must be called on the main thread.
  */
 @property (nonatomic) BOOL automaticallyDownloadsUpdates;
 
@@ -333,7 +333,7 @@ SU_EXPORT @interface SPUUpdater : NSObject
 
  Setting this property will persist in the host bundle's user defaults.
  
- This property is KVO compliant.
+ This property is KVO compliant. This property must be called on the main thread.
  */
 @property (nonatomic) BOOL sendsSystemProfile;
 

@@ -35,14 +35,14 @@ SU_EXPORT @interface SPUUpdaterSettings : NSObject
 /**
  * Indicates whether or not automatic update checks are enabled.
  *
- * This property is KVO compliant.
+ * This property is KVO compliant. This property must be called on the main thread.
  */
 @property (nonatomic) BOOL automaticallyChecksForUpdates;
 
 /**
  * The regular update check interval.
  *
- * This property is KVO compliant.
+ * This property is KVO compliant. This property must be called on the main thread.
  */
 @property (nonatomic) NSTimeInterval updateCheckInterval;
 
@@ -63,14 +63,14 @@ SU_EXPORT @interface SPUUpdaterSettings : NSObject
  * Note this does not indicate whether or not automatic downloading of updates is allowable.
  * See `-allowsAutomaticUpdates` property for that.
  *
- * This property is KVO compliant.
+ * This property is KVO compliant. This property must be called on the main thread.
  */
 @property (nonatomic) BOOL automaticallyDownloadsUpdates;
 
 /**
  * Indicates whether or not anonymous system profile information is sent when checking for updates.
  *
- * This property is KVO compliant.
+ * This property is KVO compliant. This property must be called on the main thread.
  */
 @property (nonatomic) BOOL sendsSystemProfile;
 
