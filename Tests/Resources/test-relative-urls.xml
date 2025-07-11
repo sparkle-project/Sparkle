@@ -7,6 +7,10 @@
         <pubDate>Sat, 26 Jul 2014 15:20:12 +0000</pubDate>
         <sparkle:releaseNotesLink>notes/relnote-3.0.txt</sparkle:releaseNotesLink>
         <enclosure url="release-3.0.zip" sparkle:version="3.0" length="1346234" />
+        <sparkle:deltas>
+            <enclosure url="3.0_from_2.0.delta" sparkle:deltaFrom="2.0" length="1235" type="application/octet-stream" />
+            <enclosure url="3.0_from_1.0.delta" sparkle:deltaFrom="1.0" length="5222" type="application/octet-stream" />
+        </sparkle:deltas>
     </item>
     <item>
         <title>Version 2.0</title>
