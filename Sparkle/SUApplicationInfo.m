@@ -23,21 +23,33 @@
 
 + (NSImage *)bestIconForHost:(SUHost *)host
 {
-    NSURL *iconURL = [SUBundleIcon iconURLForHost:host];
+    BOOL isMainBundle = [host.bundle isEqualTo:[NSBundle mainBundle]];
+ 
+    // First try NSImageNameApplicationIcon. This image can be dynamically updated if the user's system icon settings change.
+    NSImage *icon = isMainBundle ? [NSImage imageNamed:NSImageNameApplicationIcon] : nil;
     
-    NSImage *icon = (iconURL == nil) ? nil : [[NSImage alloc] initWithContentsOfURL:iconURL];
+    // Next try asking NSWorkspace for icon of the bundle
+    if (icon == nil) {
+        icon = [[NSWorkspace sharedWorkspace] iconForFile:host.bundlePath];
+    }
     
-    // Get icon from asset catalog if no explicit filename is provided.
+    // I don't think any of the further fallbacks are needed but keeping them in case
+    
+    // Next try a specified icon URL to load the icon from
+    if (icon == nil) {
+        NSURL *iconURL = [SUBundleIcon iconURLForHost:host];
+        icon = (iconURL == nil) ? nil : [[NSImage alloc] initWithContentsOfURL:iconURL];
+    }
+    
+    // Next try standard app icon from asset catalog
     if (!icon) {
         icon = [host.bundle imageForResource:@SPARKLE_ICON_NAME];
     }
     
-    // Use a default icon if none is defined.
+    // Use a default generic icon if none is defined.
     if (!icon) {
         // this assumption may not be correct (eg. even though we're not the main bundle, it could be still be a regular app)
         // but still better than nothing if no icon was included
-        BOOL isMainBundle = [host.bundle isEqualTo:[NSBundle mainBundle]];
-
         if (@available(macOS 11, *)) {
             UTType *contentType = isMainBundle ? UTTypeApplication : UTTypeBundle;
             icon = [[NSWorkspace sharedWorkspace] iconForContentType:contentType];
