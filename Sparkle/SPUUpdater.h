@@ -100,8 +100,9 @@ SU_EXPORT @interface SPUUpdater : NSObject
  (as long as the user driver is the standard `SPUStandardUserDriver` or if it implements `-[SPUUserDriver showUpdateInFocus]`).
  
  This will find updates that the user has previously opted into skipping.
- 
  See `canCheckForUpdates` property which can determine when this method may be invoked.
+
+ This must be called on the main thread.
  */
 - (void)checkForUpdates;
 
@@ -127,6 +128,8 @@ SU_EXPORT @interface SPUUpdater : NSObject
  This will not find updates that the user has opted into skipping.
  
  This method does not do anything if there is a `sessionInProgress`.
+
+ This must be called on the main thread.
  */
 - (void)checkForUpdatesInBackground;
 
@@ -145,6 +148,8 @@ SU_EXPORT @interface SPUUpdater : NSObject
  Updates that have been skipped by the user will not be found.
  
  This method does not do anything if there is a `sessionInProgress`.
+
+ This must be called on the main thread.
  */
 - (void)checkForUpdateInformation;
 

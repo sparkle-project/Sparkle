@@ -626,6 +626,11 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 // Sparkle internally uses _checkForUpdatesInBackground
 - (void)checkForUpdatesInBackground
 {
+    if (![NSThread isMainThread]) {
+        SULog(SULogLevelError, @"Error: -checkForUpdatesInBackground can only be called on the main thread");
+        return;
+    }
+
     if (!_startedUpdater) {
         SULog(SULogLevelError, @"Error: checkForUpdatesInBackground - updater hasn't been started yet. Please call -startUpdater: first");
         return;
@@ -653,6 +658,11 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 
 - (void)checkForUpdates
 {
+    if (![NSThread isMainThread]) {
+        SULog(SULogLevelError, @"Error: -checkForUpdates can only be called on the main thread");
+        return;
+    }
+
     if (_showingPermissionRequest || _driver.showingUpdate) {
         if ([_userDriver respondsToSelector:@selector(showUpdateInFocus)]) {
             [_userDriver showUpdateInFocus];
@@ -699,6 +709,11 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 
 - (void)checkForUpdateInformation
 {
+    if (![NSThread isMainThread]) {
+        SULog(SULogLevelError, @"Error: -checkForUpdateInformation can only be called on the main thread");
+        return;
+    }
+
     __weak __typeof__(self) weakSelf = self;
     if (!_startedUpdater) {
         SULog(SULogLevelError, @"Error: checkForUpdateInformation - updater hasn't been started yet. Please call -startUpdater: first");
