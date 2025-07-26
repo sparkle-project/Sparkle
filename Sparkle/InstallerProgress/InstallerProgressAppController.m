@@ -224,7 +224,6 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
     NSMutableArray<NSRunningApplication *> *matchedRunningApplications = [[NSMutableArray alloc] init];
     
     if (bundleIdentifier != nil && bundlePathComponents != nil) {
-        NSFileManager *fileManager = [NSFileManager defaultManager];
         NSArray *runningApplications = [NSRunningApplication runningApplicationsWithBundleIdentifier:bundleIdentifier];
         
         // If we find any running application that is translocated and looks like the bundle, we should record those too
@@ -257,7 +256,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
                         // Note the IO check is the last check for this corner case
                         // This ensures it's not an ordinary helper app that happens to be inside another app bundle.
                         BOOL candidatePathIsDir = YES;
-                        if ([fileManager fileExistsAtPath:candidatePath isDirectory:&candidatePathIsDir] && !candidatePathIsDir) {
+                        if ([[NSFileManager defaultManager] fileExistsAtPath:candidatePath isDirectory:&candidatePathIsDir] && !candidatePathIsDir) {
                             NSMutableArray<NSString *> *trimmedBundlePath = [candidatePathComponents mutableCopy];
                             [trimmedBundlePath removeObjectsInRange:NSMakeRange(candidatePathComponentsCount - 3, 3)];
                             candidatePathComponents = trimmedBundlePath;
