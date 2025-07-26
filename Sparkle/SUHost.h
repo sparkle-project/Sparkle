@@ -47,6 +47,9 @@ SUHostDefinitionAttribute
 - (void)setBool:(BOOL)value forUserDefaultsKey:(NSString *)defaultName;
 - (nullable id)objectForKey:(NSString *)key;
 - (BOOL)boolForKey:(NSString *)key;
+
+- (void)observeChangesFromUserDefaultKeys:(NSSet<NSString *> *)keyPaths changeHandler:(void (^)(NSString *))changeHandler;
+
 @end
 
 NS_ASSUME_NONNULL_END

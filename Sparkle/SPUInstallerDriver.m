@@ -468,7 +468,9 @@
         mainBundleIdentifier = (bundleIdentifier == nil) ? mainBundleName : bundleIdentifier;
     }
     
-    [installerLauncher launchInstallerWithHostBundlePath:hostBundlePath updaterIdentifier:mainBundleIdentifier authorizationPrompt:authorizationPrompt installationType:installationType allowingDriverInteraction:driverAllowsInteraction completion:^(SUInstallerLauncherStatus result, BOOL systemDomain) {
+    NSString *iconBundlePath = mainBundleHost.bundlePath;
+    
+    [installerLauncher launchInstallerWithHostBundlePath:hostBundlePath iconBundlePath:iconBundlePath updaterIdentifier:mainBundleIdentifier authorizationPrompt:authorizationPrompt installationType:installationType allowingDriverInteraction:driverAllowsInteraction completion:^(SUInstallerLauncherStatus result, BOOL systemDomain) {
         dispatch_async(dispatch_get_main_queue(), ^{
 #if INSTALLER_LAUNCHER_XPC_SERVICE_EMBEDDED
             retrievedLaunchStatus = YES;

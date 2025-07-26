@@ -10,17 +10,17 @@ jobs:
   build:
     strategy:
       matrix:
-        xcode: ['xcode16.1', 'xcode15.4']
+        xcode: ['xcode26', 'xcode16.4']
         include:
-            - xcode: 'xcode15.4'
-              xcode-path: '/Applications/Xcode_15.4.app/Contents/Developer'
-              upload-dist: false
-              run-analyzer: false
-              macos: 'macos-14'
-            - xcode: 'xcode16.1'
-              xcode-path: '/Applications/Xcode_16.1.app'
+            - xcode: 'xcode16.4'
+              xcode-path: '/Applications/Xcode_16.4.app/Contents/Developer'
               upload-dist: true
               run-analyzer: true
+              macos: 'macos-15'
+            - xcode: 'xcode26'
+              xcode-path: '/Applications/Xcode_26.0.app'
+              upload-dist: false
+              run-analyzer: false
               macos: 'macos-15'
             
     name: Build and Test Sparkle
@@ -69,7 +69,7 @@ jobs:
         env:
           DEVELOPER_DIR: ${{ matrix.xcode-path }}
         run: |
-            if grep -q "warning:" analyze_output.txt; then
+            if grep "warning:" analyze_output.txt | grep -q -v "dependency scan of"; then
                 echo "analyzestatus=0" >> $GITHUB_OUTPUT
             else
                 echo "analyzestatus=1" >> $GITHUB_OUTPUT

@@ -11,17 +11,24 @@
 #import "SUFileManager.h"
 #import "SULog.h"
 #import "SPUMessageTypes.h"
-#import "SUBundleIcon.h"
 #import "SPULocalCacheDirectory.h"
 #import "SPUInstallationType.h"
 #import "SUHost.h"
-#import <ImageIO/ImageIO.h>
 #import <ServiceManagement/ServiceManagement.h>
-#import <UniformTypeIdentifiers/UniformTypeIdentifiers.h>
 #import <SystemConfiguration/SystemConfiguration.h>
 
+// We only fetch bundle icon for Installer Launcher XPC Service
+#if defined(BUILDING_SPARKLE_SOURCES_EXTERNALLY) && BUILDING_SPARKLE_SOURCES_EXTERNALLY
+#define FETCH_BUNDLE_ICON_FOR_AUTH 1
+#else
+#define FETCH_BUNDLE_ICON_FOR_AUTH 0
+#endif
 
+#if FETCH_BUNDLE_ICON_FOR_AUTH
+#import <AppKit/AppKit.h>
+#else
 #include "AppKitPrevention.h"
+#endif
 
 @implementation SUInstallerLauncher
 
@@ -106,10 +113,8 @@
     return (submittedJob == true);
 }
 
-- (SUInstallerLauncherStatus)submitInstallerAtPath:(NSString *)installerPath withHostBundle:(NSBundle *)hostBundle updaterIdentifier:(NSString *)updaterIdentifier userName:(NSString *)userName homeDirectory:(NSString *)homeDirectory authorizationPrompt:(NSString *)authorizationPrompt inSystemDomain:(BOOL)systemDomain rootUser:(BOOL)rootUser SPU_OBJC_DIRECT
+- (SUInstallerLauncherStatus)submitInstallerAtPath:(NSString *)installerPath withHostBundle:(NSBundle *)hostBundle iconBundlePath:(NSString *)iconBundlePath updaterIdentifier:(NSString *)updaterIdentifier userName:(NSString *)userName homeDirectory:(NSString *)homeDirectory authorizationPrompt:(NSString *)authorizationPrompt inSystemDomain:(BOOL)systemDomain rootUser:(BOOL)rootUser SPU_OBJC_DIRECT
 {
-    SUFileManager *fileManager = [[SUFileManager alloc] init];
-    
     // No need to release the quarantine for this utility
     // In fact, we shouldn't because the tool may be located at a path we should not be writing too.
     
@@ -164,81 +169,68 @@
         AuthorizationRights rights = { .count = 1, .items = &right };
         
         AuthorizationFlags flags = (AuthorizationFlags)(kAuthorizationFlagExtendRights | kAuthorizationFlagInteractionAllowed);
-        
-        AuthorizationItem iconAuthorizationItem = {.name = kAuthorizationEnvironmentIcon, .valueLength = 0, .value = NULL, .flags = 0};
         AuthorizationEnvironment authorizationEnvironment = {.count = 0, .items = NULL};
         
-        // Find a 32x32 image representation of the icon, and write out a PNG version of it to a temporary location
-        // Then use the icon (if one is available) for the authorization prompt
-        // NSImage is not used because it relies on AppKit
-        NSURL *tempIconDestinationURL = nil;
-        NSURL *iconURL = [SUBundleIcon iconURLForHost:[[SUHost alloc] initWithBundle:hostBundle]];
-        if (iconURL != nil) {
-            CGImageSourceRef imageSource = CGImageSourceCreateWithURL((CFURLRef)iconURL, (CFDictionaryRef)@{});
-            if (imageSource != NULL) {
-                size_t imageCount = CGImageSourceGetCount(imageSource);
-                for (size_t imageIndex = 0; imageIndex < imageCount; imageIndex++) {
-                    CFDictionaryRef cfProperties = CGImageSourceCopyPropertiesAtIndex(imageSource, imageIndex, (CFDictionaryRef)@{});
-                    NSDictionary *properties = CFBridgingRelease(cfProperties);
+#if FETCH_BUNDLE_ICON_FOR_AUTH
+        NSString *tempIconDestinationPath = nil;
+        AuthorizationItem iconAuthorizationItem = {.name = kAuthorizationEnvironmentIcon, .valueLength = 0, .value = NULL, .flags = 0};
+        char iconPathBuffer[] = "/tmp/XXXXXX.png";
+        
+        // If an icon bundle path is specified, write out a representation of the icon's data to a temporary file.
+        // Then use that image data for the authorization prompt
+        if (iconBundlePath != nil) {
+            NSImage *icon = [[NSWorkspace sharedWorkspace] iconForFile:iconBundlePath];
+            
+            // Creating a bitmap representation at a specific size is much cheaper than asking for icon's TIFFRepresentation
+            // On older OS's we must create a 32x32 image otherwise it won't be scaled correctly in the dialog
+            // On newer OS's we can use a slightly higher resolution image
+            NSInteger imageDimensions;
+            if (@available(macOS 10.15, *)) {
+                imageDimensions = 64;
+            } else {
+                imageDimensions = 32;
+            }
+            
+            NSBitmapImageRep *iconBitmapRep = [[NSBitmapImageRep alloc] initWithBitmapDataPlanes:NULL pixelsWide:imageDimensions pixelsHigh:imageDimensions bitsPerSample:8 samplesPerPixel:4 hasAlpha:YES isPlanar:NO colorSpaceName:NSCalibratedRGBColorSpace bytesPerRow:0 bitsPerPixel:0];
+            
+            [NSGraphicsContext saveGraphicsState];
+            
+            NSGraphicsContext.currentContext = [NSGraphicsContext graphicsContextWithBitmapImageRep:iconBitmapRep];
+            [icon drawInRect:NSMakeRect(0, 0, imageDimensions, imageDimensions)];
+            
+            [NSGraphicsContext restoreGraphicsState];
+            
+            NSData *pngData = [iconBitmapRep representationUsingType:NSBitmapImageFileTypePNG properties:@{}];
+            
+            if (pngData != nil) {
+                // Use /tmp rather than NSTemporaryDirectory() or SUFileManager's temp directory function because we want:
+                // a) no spaces in the path (SU/NSFileManager fails here)
+                // b) short file path that does not exceed a small threshold (NSTemporaryDirectory() fails here) only apply to older systems (eg: macOS 10.8)
+                // The file also needs to be placed in a system readable place such as /tmp
+                // See https://github.com/sparkle-project/Sparkle/issues/347#issuecomment-149523848 for more info
+                int tempIconFile = mkstemps(iconPathBuffer, strlen(".png"));
+                if (tempIconFile == -1) {
+                    SULog(SULogLevelError, @"Failed to open temp icon from path buffer with error: %d", errno);
+                } else {
+                    close(tempIconFile);
                     
-                    NSNumber *pixelWidth = properties[(const NSString *)kCGImagePropertyPixelWidth];
-                    NSNumber *pixelHeight = properties[(const NSString *)kCGImagePropertyPixelHeight];
+                    tempIconDestinationPath = [[NSFileManager defaultManager] stringWithFileSystemRepresentation:iconPathBuffer length:strlen(iconPathBuffer)];
                     
-                    // If we don't find a 32x32 image representation, then we don't provide an icon
-                    // Don't try to make up with it by eg: converting an image representation to this size
-                    // The app developer should be providing the icon representation.
-                    // The authorization API may not take other size dimensions.
-                    NSNumber *targetDimension = @32;
-                    if ([pixelWidth isKindOfClass:[NSNumber class]] && [pixelHeight isKindOfClass:[NSNumber class]]  && [pixelWidth isEqualToNumber:targetDimension] && [pixelHeight isEqualToNumber:targetDimension]) {
-                        
-                        // Use /tmp rather than NSTemporaryDirectory() or SUFileManager's temp directory function because we want:
-                        // a) no spaces in the path (SU/NSFileManager fails here)
-                        // b) short file path that does not exceed a small threshold (NSTemporaryDirectory() fails here)
-                        // These limitations only apply to older systems (eg: macOS 10.8)
-                        // The file also needs to be placed in a system readable place such as /tmp
-                        // See https://github.com/sparkle-project/Sparkle/issues/347#issuecomment-149523848 for more info
-                        char pathBuffer[] = "/tmp/XXXXXX.png";
-                        int tempIconFile = mkstemps(pathBuffer, strlen(".png"));
-                        if (tempIconFile == -1) {
-                            SULog(SULogLevelError, @"Failed to open temp icon from path buffer with error: %d", errno);
+                    if (tempIconDestinationPath != nil) {
+                        if (![pngData writeToFile:tempIconDestinationPath atomically:NO]) {
+                            SULog(SULogLevelError, @"Failed to write icon image data to %@", tempIconDestinationPath);
                         } else {
-                            close(tempIconFile);
+                            iconAuthorizationItem.valueLength = strlen(iconPathBuffer);
+                            iconAuthorizationItem.value = iconPathBuffer;
                             
-                            NSString *path = [[NSString alloc] initWithUTF8String:pathBuffer];
-                            tempIconDestinationURL = [NSURL fileURLWithPath:path];
-                            
-                            CGImageDestinationRef imageDestination = NULL;
-                            if (@available(macOS 11, *)) {
-                                CFStringRef uti = (__bridge CFStringRef)[UTTypePNG identifier];
-                                imageDestination = CGImageDestinationCreateWithURL((CFURLRef)tempIconDestinationURL, uti, 1, NULL);
-                            }
-#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_VERSION_11_0
-                            else
-                            {
-                                imageDestination = CGImageDestinationCreateWithURL((CFURLRef)tempIconDestinationURL, kUTTypePNG, 1, NULL);
-                            }
-#endif
-                            if (imageDestination != NULL) {
-                                CGImageDestinationAddImageFromSource(imageDestination, imageSource, imageIndex, (CFDictionaryRef)@{});
-                                if (CGImageDestinationFinalize(imageDestination)) {
-                                    iconAuthorizationItem.valueLength = strlen(pathBuffer);
-                                    iconAuthorizationItem.value = pathBuffer;
-                                    
-                                    authorizationEnvironment.count = 1;
-                                    authorizationEnvironment.items = &iconAuthorizationItem;
-                                }
-                                
-                                CFRelease(imageDestination);
-                            }
+                            authorizationEnvironment.count = 1;
+                            authorizationEnvironment.items = &iconAuthorizationItem;
                         }
-                        
-                        break;
                     }
                 }
-                
-                CFRelease(imageSource);
             }
         }
+#endif
         
         // This should prompt up the authorization dialog if necessary
         OSStatus copyStatus = AuthorizationCopyRights(auth, &rights, &authorizationEnvironment, flags, NULL);
@@ -252,9 +244,11 @@
             }
         }
         
-        if (tempIconDestinationURL != nil) {
-            [fileManager removeItemAtURL:tempIconDestinationURL error:NULL];
+#if FETCH_BUNDLE_ICON_FOR_AUTH
+        if (tempIconDestinationPath != nil) {
+            [[NSFileManager defaultManager] removeItemAtPath:tempIconDestinationPath error:NULL];
         }
+#endif
     }
     
     Boolean submittedJob = false;
@@ -403,7 +397,7 @@ static BOOL SPUUsesSystemDomainForBundlePath(NSString *path, BOOL rootUser
 }
 
 // Note: do not pass untrusted information such as paths to the installer and progress agent tools, when we can find them ourselves here
-- (void)launchInstallerWithHostBundlePath:(NSString *)hostBundlePath updaterIdentifier:(NSString *)updaterIdentifier authorizationPrompt:(NSString *)authorizationPrompt installationType:(NSString *)installationType allowingDriverInteraction:(BOOL)allowingDriverInteraction completion:(void (^)(SUInstallerLauncherStatus, BOOL))completionHandler
+- (void)launchInstallerWithHostBundlePath:(NSString *)hostBundlePath iconBundlePath:(NSString *)iconBundlePath updaterIdentifier:(NSString *)updaterIdentifier authorizationPrompt:(NSString *)authorizationPrompt installationType:(NSString *)installationType allowingDriverInteraction:(BOOL)allowingDriverInteraction completion:(void (^)(SUInstallerLauncherStatus, BOOL))completionHandler
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         // We could do a sort of preflight Authorization test instead of testing if we are running as root,
@@ -535,7 +529,7 @@ static BOOL SPUUsesSystemDomainForBundlePath(NSString *path, BOOL rootUser
             return;
         }
         
-        SUInstallerLauncherStatus installerStatus = [self submitInstallerAtPath:installerPath withHostBundle:hostBundle updaterIdentifier:updaterIdentifier userName:userName homeDirectory:homeDirectory authorizationPrompt:authorizationPrompt inSystemDomain:inSystemDomain rootUser:rootUser];
+        SUInstallerLauncherStatus installerStatus = [self submitInstallerAtPath:installerPath withHostBundle:hostBundle iconBundlePath:iconBundlePath updaterIdentifier:updaterIdentifier userName:userName homeDirectory:homeDirectory authorizationPrompt:authorizationPrompt inSystemDomain:inSystemDomain rootUser:rootUser];
         
         BOOL submittedProgressTool = NO;
         if (installerStatus == SUInstallerLauncherSuccess) {

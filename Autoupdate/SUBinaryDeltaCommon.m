@@ -159,7 +159,7 @@ NSString *temporaryDirectory(NSString *base)
     return stringWithFileSystemRepresentation(templateResult);
 }
 
-static void _sha1HashOfBuffer(unsigned char *hash, const char *buffer, ssize_t bufferLength)
+static void sha1HashOfBuffer(unsigned char *hash, const char *buffer, ssize_t bufferLength)
 {
     assert(bufferLength >= 0 && bufferLength <= UINT32_MAX);
     CC_SHA1_CTX hashContext;
@@ -168,7 +168,7 @@ static void _sha1HashOfBuffer(unsigned char *hash, const char *buffer, ssize_t b
     CC_SHA1_Final(hash, &hashContext);
 }
 
-static BOOL _crc32HashOfFileContents(uLong *outChecksum, FTSENT *ent, void *tempBuffer, size_t tempBufferSize)
+static BOOL crc32HashOfFileContents(uLong *outChecksum, FTSENT *ent, void *tempBuffer, size_t tempBufferSize)
 {
     uLong checksum = *outChecksum;
     
@@ -220,7 +220,7 @@ static BOOL _crc32HashOfFileContents(uLong *outChecksum, FTSENT *ent, void *temp
     return YES;
 }
 
-static BOOL _sha1HashOfFileContents(unsigned char *hash, FTSENT *ent, void *tempBuffer, size_t tempBufferSize)
+static BOOL sha1HashOfFileContents(unsigned char *hash, FTSENT *ent, void *tempBuffer, size_t tempBufferSize)
 {
     if (ent->fts_info == FTS_SL) {
         char linkDestination[MAXPATHLEN + 1];
@@ -230,11 +230,11 @@ static BOOL _sha1HashOfFileContents(unsigned char *hash, FTSENT *ent, void *temp
             return NO;
         }
 
-        _sha1HashOfBuffer(hash, linkDestination, linkDestinationLength);
+        sha1HashOfBuffer(hash, linkDestination, linkDestinationLength);
     } else if (ent->fts_info == FTS_F) {
         ssize_t fileSize = ent->fts_statp->st_size;
         if (fileSize <= 0) {
-            _sha1HashOfBuffer(hash, NULL, 0);
+            sha1HashOfBuffer(hash, NULL, 0);
         } else {
             FILE *file = fopen(ent->fts_path, "rb");
             if (file == NULL) {
@@ -329,7 +329,7 @@ BOOL getRawHashOfTreeAndFileTablesWithVersion(void *hashBuffer, NSString *path, 
                 fileHashKey = nil;
             } else {
                 uLong fileContentsChecksum = initialCrc32Value;
-                if (!_crc32HashOfFileContents(&fileContentsChecksum, ent, tempBuffer, tempBufferSize)) {
+                if (!crc32HashOfFileContents(&fileContentsChecksum, ent, tempBuffer, tempBufferSize)) {
                     fts_close(fts);
                     free(tempBuffer);
                     return NO;
@@ -347,7 +347,7 @@ BOOL getRawHashOfTreeAndFileTablesWithVersion(void *hashBuffer, NSString *path, 
             }
         } else {
             unsigned char fileHash[CC_SHA1_DIGEST_LENGTH];
-            if (!_sha1HashOfFileContents(fileHash, ent, tempBuffer, tempBufferSize)) {
+            if (!sha1HashOfFileContents(fileHash, ent, tempBuffer, tempBufferSize)) {
                 fts_close(fts);
                 free(tempBuffer);
                 return NO;

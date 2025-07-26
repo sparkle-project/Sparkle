@@ -23,11 +23,16 @@ NS_ASSUME_NONNULL_BEGIN
 // if the process is sandboxed or not; eg: finding the user's caches directory. Or code that depends
 // on compilation flags and if other files exist relative to the host bundle.
 
+static void *SUHostObservableContext = &SUHostObservableContext;
+
 @implementation SUHost
 {
-    NSString *_defaultsDomain;
+    NSUserDefaults *_userDefaults;
+    NSSet<NSString *> *_observedUserDefaultKeyPaths;
+    NSMutableSet<NSString *> *_modifyingKeyPaths;
     
-    BOOL _usesStandardUserDefaults;
+    void (^_changeObservationHandler)(NSString *);
+    
     BOOL _isMainBundle;
 }
 
@@ -45,16 +50,65 @@ NS_ASSUME_NONNULL_BEGIN
         
         _isMainBundle = [aBundle isEqualTo:[NSBundle mainBundle]];
 
-        _defaultsDomain = [self objectForInfoDictionaryKey:SUDefaultsDomainKey];
-        if (_defaultsDomain == nil) {
-            _defaultsDomain = [_bundle bundleIdentifier];
+        NSString *domainIdentifier;
+        {
+            NSString *defaultsDomain = [self objectForInfoDictionaryKey:SUDefaultsDomainKey];
+            if (defaultsDomain != nil) {
+                domainIdentifier = defaultsDomain;
+            } else if (!_isMainBundle) {
+                domainIdentifier = aBundle.bundleIdentifier;
+            } else {
+                domainIdentifier = nil;
+            }
         }
-
-        // If we're using the main bundle's defaults we'll use the standard user defaults mechanism, otherwise we have to get CF-y.
-        NSString *mainBundleIdentifier = NSBundle.mainBundle.bundleIdentifier;
-        _usesStandardUserDefaults = _defaultsDomain == nil || [_defaultsDomain isEqualToString:mainBundleIdentifier];
+        
+        if (domainIdentifier == nil) {
+            _userDefaults = [NSUserDefaults standardUserDefaults];
+        } else {
+            _userDefaults = [[NSUserDefaults alloc] initWithSuiteName:domainIdentifier];
+        }
     }
     return self;
+}
+
+- (void)dealloc
+{
+    if (_observedUserDefaultKeyPaths != nil) {
+        for (NSString *keyPath in _observedUserDefaultKeyPaths) {
+            [_userDefaults removeObserver:self forKeyPath:keyPath];
+        }
+    }
+}
+
+- (void)observeChangesFromUserDefaultKeys:(NSSet<NSString *> *)keyPaths changeHandler:(void (^)(NSString *))changeHandler
+{
+    _modifyingKeyPaths = [NSMutableSet set];
+    
+    for (NSString *keyPath in keyPaths) {
+        [_userDefaults addObserver:self forKeyPath:keyPath options:NSKeyValueObservingOptionNew context:SUHostObservableContext];
+    }
+    
+    _observedUserDefaultKeyPaths = keyPaths;
+    _changeObservationHandler = [changeHandler copy];
+}
+
+- (void)observeValueForKeyPath:(nullable NSString *)keyPath ofObject:(nullable id)object change:(nullable NSDictionary<NSKeyValueChangeKey,id> *)change context:(nullable void *)context
+{
+    if (context != SUHostObservableContext)
+    {
+        [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
+        return;
+    }
+    
+    if (keyPath == nil || [_modifyingKeyPaths containsObject:(NSString * _Nonnull)keyPath]) {
+        return;
+    }
+    
+    if (_changeObservationHandler == nil) {
+        return;
+    }
+    
+    _changeObservationHandler((NSString * _Nonnull)keyPath);
 }
 
 - (NSString *)description { return [NSString stringWithFormat:@"%@ <%@>", [self class], [self bundlePath]]; }
@@ -120,7 +174,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)isRunningOnReadOnlyVolume
 {
     struct statfs statfs_info;
-    statfs(_bundle.bundlePath.fileSystemRepresentation, &statfs_info);
+    if (statfs(_bundle.bundlePath.fileSystemRepresentation, &statfs_info) != 0)
+    {
+        return NO;
+    }
+    
     return (statfs_info.f_flags & MNT_RDONLY) != 0;
 }
 
@@ -205,65 +263,35 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (nullable id)objectForUserDefaultsKey:(NSString *)defaultName
 {
-    if (!defaultName || _defaultsDomain == nil) {
+    if (defaultName == nil || _userDefaults == nil) {
         return nil;
     }
 
-    // Under Tiger, CFPreferencesCopyAppValue doesn't get values from NSRegistrationDomain, so anything
-    // passed into -[NSUserDefaults registerDefaults:] is ignored.  The following line falls
-    // back to using NSUserDefaults, but only if the host bundle is the main bundle.
-    if (_usesStandardUserDefaults) {
-        return [[NSUserDefaults standardUserDefaults] objectForKey:defaultName];
-    }
-
-    CFPropertyListRef obj = CFPreferencesCopyAppValue((__bridge CFStringRef)defaultName, (__bridge CFStringRef)_defaultsDomain);
-    return CFBridgingRelease(obj);
+    return [_userDefaults objectForKey:defaultName];
 }
 
 // Note this handles nil being passed for defaultName, in which case the user default will be removed
 - (void)setObject:(nullable id)value forUserDefaultsKey:(NSString *)defaultName
 {
-	if (_usesStandardUserDefaults)
-	{
-        [[NSUserDefaults standardUserDefaults] setObject:value forKey:defaultName];
-	}
-	else
-	{
-        CFPreferencesSetValue((__bridge CFStringRef)defaultName, (__bridge CFPropertyListRef)(value), (__bridge CFStringRef)_defaultsDomain, kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
-        CFPreferencesSynchronize((__bridge CFStringRef)_defaultsDomain, kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
-    }
+    [_modifyingKeyPaths addObject:defaultName];
+    
+    [_userDefaults setObject:value forKey:defaultName];
+    
+    [_modifyingKeyPaths removeObject:defaultName];
 }
 
 - (BOOL)boolForUserDefaultsKey:(NSString *)defaultName
 {
-    if (_usesStandardUserDefaults) {
-        return [[NSUserDefaults standardUserDefaults] boolForKey:defaultName];
-    }
-
-    BOOL value;
-    CFPropertyListRef plr = CFPreferencesCopyAppValue((__bridge CFStringRef)defaultName, (__bridge CFStringRef)_defaultsDomain);
-    if (plr == NULL) {
-        value = NO;
-	}
-	else
-	{
-        value = CFBooleanGetValue((CFBooleanRef)plr) ? YES : NO;
-        CFRelease(plr);
-    }
-    return value;
+    return [_userDefaults boolForKey:defaultName];
 }
 
 - (void)setBool:(BOOL)value forUserDefaultsKey:(NSString *)defaultName
 {
-	if (_usesStandardUserDefaults)
-	{
-        [[NSUserDefaults standardUserDefaults] setBool:value forKey:defaultName];
-	}
-	else
-	{
-        CFPreferencesSetValue((__bridge CFStringRef)defaultName, (__bridge CFBooleanRef) @(value), (__bridge CFStringRef)_defaultsDomain, kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
-        CFPreferencesSynchronize((__bridge CFStringRef)_defaultsDomain, kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
-    }
+    [_modifyingKeyPaths addObject:defaultName];
+    
+    [_userDefaults setBool:value forKey:defaultName];
+    
+    [_modifyingKeyPaths removeObject:defaultName];
 }
 
 - (nullable id)objectForKey:(NSString *)key {

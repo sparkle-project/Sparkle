@@ -228,7 +228,7 @@ extern char *xar_get_safe_path(xar_file_t f) __attribute__((weak_import));
     xar_subdoc_prop_set(attributes, AFTER_TREE_SHA1_KEY, [displayHashFromRawHash(header.afterTreeHash) UTF8String]);
 }
 
-static xar_file_t _xarAddFile(NSMutableDictionary<NSString *, NSValue *> *fileTable, xar_t x, NSString *relativePath, NSString *filePath)
+static xar_file_t xarAddFile(NSMutableDictionary<NSString *, NSValue *> *fileTable, xar_t x, NSString *relativePath, NSString *filePath)
 {
     NSArray<NSString *> *rootRelativePathComponents = relativePath.pathComponents;
     // Relative path must at least have starting "/" component and one more path component
@@ -285,7 +285,7 @@ static xar_file_t _xarAddFile(NSMutableDictionary<NSString *, NSValue *> *fileTa
     SPUDeltaItemCommands commands = item.commands;
     uint16_t mode = item.mode;
     
-    xar_file_t newFile = _xarAddFile(_fileTable, _x, relativeFilePath, filePath);
+    xar_file_t newFile = xarAddFile(_fileTable, _x, relativeFilePath, filePath);
     if (newFile == NULL) {
         _error = [NSError errorWithDomain:SPARKLE_DELTA_XAR_ARCHIVE_ERROR_DOMAIN code:SPARKLE_DELTA_XAR_ARCHIVE_ERROR_CODE_ADD_FAILURE userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to add xar file entry: %@", relativeFilePath] }];
         return;
