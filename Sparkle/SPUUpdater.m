@@ -156,6 +156,13 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 
 - (BOOL)startUpdater:(NSError * __autoreleasing *)error
 {
+    if (![NSThread isMainThread]) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInvalidUpdaterError userInfo:@{ NSLocalizedDescriptionKey: @"-[SPUUpdater must be called on the main thread]"}];
+        }
+        return NO;
+    }
+    
     if (_startedUpdater) {
         return YES;
     }
@@ -627,7 +634,12 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 - (void)checkForUpdatesInBackground
 {
     if (![NSThread isMainThread]) {
-        SULog(SULogLevelError, @"Error: -checkForUpdatesInBackground can only be called on the main thread");
+        SULog(SULogLevelError, @"Error: -[SPUUpdater checkForUpdatesInBackground] can only be called on the main thread");
+        
+        // Try to be nice and dispatch on main thread anyway
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self checkForUpdatesInBackground];
+        });
         return;
     }
 
@@ -659,7 +671,13 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 - (void)checkForUpdates
 {
     if (![NSThread isMainThread]) {
-        SULog(SULogLevelError, @"Error: -checkForUpdates can only be called on the main thread");
+        SULog(SULogLevelError, @"Error: -[SPUUpdater checkForUpdates] can only be called on the main thread");
+        
+        // Try to be nice and dispatch on main thread anyway
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self checkForUpdates];
+        });
+        
         return;
     }
 
@@ -710,7 +728,13 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 - (void)checkForUpdateInformation
 {
     if (![NSThread isMainThread]) {
-        SULog(SULogLevelError, @"Error: -checkForUpdateInformation can only be called on the main thread");
+        SULog(SULogLevelError, @"Error: -[SPUUpdater checkForUpdateInformation] can only be called on the main thread");
+        
+        // Try to be nice and dispatch on main thread anyway
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self checkForUpdateInformation];
+        });
+        
         return;
     }
 

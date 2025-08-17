@@ -42,6 +42,8 @@ NS_ASSUME_NONNULL_BEGIN
  - `feedURL`
  
  Please view the documentation on each of these properties for more detail if you are to configure them dynamically.
+ 
+ This class must be used on the main thread.
  */
 SU_EXPORT @interface SPUUpdater : NSObject
 
