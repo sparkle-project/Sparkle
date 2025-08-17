@@ -474,6 +474,10 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 
 - (NSDate *)lastUpdateCheckDate
 {
+    if (![NSThread isMainThread]) {
+        SULog(SULogLevelError, @"Error: -[SPUUpdater lastUpdateCheckDate] must be called on the main thread.");
+    }
+    
     if (_updateLastCheckedDate == nil)
     {
         _updateLastCheckedDate = [_host objectForUserDefaultsKey:SULastCheckTimeKey];
@@ -927,6 +931,16 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 
 - (void)resetUpdateCycle
 {
+    if (![NSThread isMainThread]) {
+        SULog(SULogLevelError, @"Error: -[SPUUpdater resetUpdateCycle] must be called on the main thread.");
+        
+        // Try to be nice and dispatch on main thread anyway
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self resetUpdateCycle];
+        });
+        return;
+    }
+    
     if (!_startedUpdater) {
         SULog(SULogLevelError, @"Error: resetUpdateCycle - updater hasn't been started yet. Please call -startUpdater: first");
         return; // not even ready yet
@@ -965,17 +979,35 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 
 - (void)resetUpdateCycleAfterShortDelay
 {
+    if (![NSThread isMainThread]) {
+        SULog(SULogLevelError, @"Error: -[SPUUpdater resetUpdateCycleAfterShortDelay] must be called on the main thread.");
+        
+        // Try to be nice and dispatch on main thread anyway
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self resetUpdateCycleAfterShortDelay];
+        });
+        return;
+    }
+    
     [self cancelNextUpdateCycle];
     [_updaterCycle resetUpdateCycleAfterDelay];
 }
 
 - (void)setAutomaticallyChecksForUpdates:(BOOL)automaticallyCheckForUpdates
 {
+    if (![NSThread isMainThread]) {
+        SULog(SULogLevelError, @"Error: -[SPUUpdater setAutomaticallyChecksForUpdates:] must be called on the main thread.");
+    }
+    
     _updaterSettings.automaticallyChecksForUpdates = automaticallyCheckForUpdates;
 }
 
 - (BOOL)automaticallyChecksForUpdates
 {
+    if (![NSThread isMainThread]) {
+        SULog(SULogLevelError, @"Error: -[SPUUpdater automaticallyChecksForUpdates] must be called on the main thread.");
+    }
+    
     return [_updaterSettings automaticallyChecksForUpdates];
 }
 
@@ -1004,11 +1036,19 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 
 - (void)setAutomaticallyDownloadsUpdates:(BOOL)automaticallyUpdates
 {
+    if (![NSThread isMainThread]) {
+        SULog(SULogLevelError, @"Error: -[SPUUpdater setAutomaticallyDownloadsUpdates:] must be called on the main thread.");
+    }
+    
     _updaterSettings.automaticallyDownloadsUpdates = automaticallyUpdates;
 }
 
 - (BOOL)automaticallyDownloadsUpdates
 {
+    if (![NSThread isMainThread]) {
+        SULog(SULogLevelError, @"Error: -[SPUUpdater automaticallyDownloadsUpdates] must be called on the main thread.");
+    }
+    
     return [_updaterSettings automaticallyDownloadsUpdates];
 }
 
@@ -1136,11 +1176,19 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 
 - (void)setSendsSystemProfile:(BOOL)sendsSystemProfile
 {
+    if (![NSThread isMainThread]) {
+        SULog(SULogLevelError, @"Error: -[SPUUpdater setSendsSystemProfile:] must be called on the main thread.");
+    }
+    
     _updaterSettings.sendsSystemProfile = sendsSystemProfile;
 }
 
 - (BOOL)sendsSystemProfile
 {
+    if (![NSThread isMainThread]) {
+        SULog(SULogLevelError, @"Error: -[SPUUpdater sendsSystemProfile] must be called on the main thread.");
+    }
+    
     return [_updaterSettings sendsSystemProfile];
 }
 
@@ -1241,11 +1289,19 @@ static NSString *escapeURLComponent(NSString *str) {
 
 - (void)setUpdateCheckInterval:(NSTimeInterval)updateCheckInterval
 {
+    if (![NSThread isMainThread]) {
+        SULog(SULogLevelError, @"Error: -[SPUUpdater setUpdateCheckInterval:] must be called on the main thread.");
+    }
+    
     _updaterSettings.updateCheckInterval = updateCheckInterval;
 }
 
 - (NSTimeInterval)updateCheckInterval
 {
+    if (![NSThread isMainThread]) {
+        SULog(SULogLevelError, @"Error: -[SPUUpdater updateCheckInterval] must be called on the main thread.");
+    }
+    
     return [_updaterSettings updateCheckInterval];
 }
 
