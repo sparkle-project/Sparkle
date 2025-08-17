@@ -345,7 +345,12 @@ static NSString *cloneableRelativePath(NSDictionary<NSString *, NSData *> *after
         if (oldCloneInfo == nil) {
             continue;
         }
-        
+
+        // The old file must have the same type as the new one
+        if ([(NSNumber *)oldCloneInfo[INFO_TYPE_KEY] unsignedShortValue] != FTS_F) {
+            continue;
+        }
+
         NSNumber *newPermissions = newInfo[INFO_PERMISSIONS_KEY];
         if (outNewPermissions != NULL) {
             *outNewPermissions = newPermissions;
