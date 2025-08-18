@@ -705,6 +705,7 @@ class SUAppcastTest: XCTestCase {
             
             let versionComparator = SUStandardVersionComparator()
             
+            
             // Because 3.0 has minimum autoupdate version of 2.0, we should be offered 2.0
             do {
                 let hostVersion = "1.0"
