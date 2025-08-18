@@ -88,10 +88,6 @@ static NSString *const SUStatusControllerTouchBarIdentifier = @"" SPARKLE_BUNDLE
     [_progressBar setUsesThreadedAnimation:YES];
     [_statusTextField setFont:[NSFont monospacedDigitSystemFontOfSize:0 weight:NSFontWeightRegular]];
     
-    if (@available(macOS 16, *)) {
-        _actionButton.controlSize = NSControlSizeLarge;
-    }
-    
     window.title = _windowTitle;
 }
 
@@ -108,10 +104,9 @@ static NSString *const SUStatusControllerTouchBarIdentifier = @"" SPARKLE_BUNDLE
     self.statusText = aStatusText;
 }
 
-- (void)setButtonTitle:(NSString *)aButtonTitle target:(id)target action:(SEL)action isDefault:(BOOL)isDefault accessibilityIdentifier:(NSString *)accessibilityIdentifier
+- (void)setButtonTitle:(NSString *)aButtonTitle target:(id)target action:(SEL)action isDefault:(BOOL)isDefault
 {
     self.buttonTitle = aButtonTitle;
-    _actionButton.accessibilityIdentifier = [accessibilityIdentifier copy];
 
     [self window];
     [_actionButton sizeToFit];

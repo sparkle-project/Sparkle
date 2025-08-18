@@ -26,6 +26,8 @@ class SUTestApplicationTest: XCTestCase
     func runTestApplication(testMode: String, automatic: Bool, expectedFinalVersion: String, launchSleep: UInt32, extractSleep: UInt32) {
         let app = XCUIApplication()
         app.launchArguments = [
+            "-AppleLanguages",
+            "(en)",
             "-SUHasLaunchedBefore",
             automatic ? "YES" : "NO",
             "-SUEnableAutomaticChecks",
@@ -59,14 +61,14 @@ class SUTestApplicationTest: XCTestCase
         }
         
         if !automatic {
-            app.windows["SUUpdateAlert"].buttons["SPUUserUpdateChoiceInstall"].click()
+            app.windows["SUUpdateAlert"].buttons["Install Update"].click()
         
             // Give some time for the update to finish downloading / extracting
             sleep(extractSleep)
             
-            app.windows["SUStatus"].buttons["SUStatusInstallAndRelaunch"].click()
+            app.windows["SUStatus"].buttons["Install and Relaunch"].click()
         } else {
-            XCTAssertTrue(app.windows["SUUpdateAlert"].buttons["SPUUserUpdateChoiceInstall"].exists)
+            XCTAssertTrue(app.windows["SUUpdateAlert"].buttons["Install and Relaunch"].exists)
             
             // The app should install automatically on termination
             app.terminate()
