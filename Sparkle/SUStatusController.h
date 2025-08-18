@@ -30,7 +30,7 @@
 - (void)beginActionWithTitle:(NSString *)title maxProgressValue:(double)maxProgressValue statusText:(NSString *)statusText SPU_OBJC_DIRECT;
 
 // If isDefault is YES, the button's key equivalent will be \r.
-- (void)setButtonTitle:(NSString *)buttonTitle target:(id)target action:(SEL)action isDefault:(BOOL)isDefault SPU_OBJC_DIRECT;
+- (void)setButtonTitle:(NSString *)buttonTitle target:(id)target action:(SEL)action isDefault:(BOOL)isDefault accessibilityIdentifier:(NSString *)accessibilityIdentifier SPU_OBJC_DIRECT;
 
 @end
 

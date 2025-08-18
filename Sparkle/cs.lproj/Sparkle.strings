@@ -151,3 +151,5 @@
 /* No comment provided by engineer. */
 "Your macOS version is too old" = "Vaše verze macOS je příliš stará";
 
+/* Software Update title/label */
+"Software Update" = "Aktualizace aplikace";

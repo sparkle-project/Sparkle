@@ -497,7 +497,7 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
     [_statusController beginActionWithTitle:SULocalizedStringFromTableInBundle(@"Ready to Install", SPARKLE_TABLE, sparkleBundle, nil) maxProgressValue:1.0 statusText:nil];
     [_statusController setProgressValue:1.0]; // Fill the bar.
     [_statusController setButtonEnabled:YES];
-    [_statusController setButtonTitle:SULocalizedStringFromTableInBundle(@"Install and Relaunch", SPARKLE_TABLE, sparkleBundle, nil) target:self action:selector isDefault:YES];
+    [_statusController setButtonTitle:SULocalizedStringFromTableInBundle(@"Install and Relaunch", SPARKLE_TABLE, sparkleBundle, nil) target:self action:selector isDefault:YES accessibilityIdentifier:@"SUStatusInstallAndRelaunch"];
 }
 
 - (void)showReadyToInstallAndRelaunch:(void (^)(SPUUserUpdateChoice))installUpdateHandler
@@ -538,10 +538,10 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
     NSBundle *sparkleBundle = SUSparkleBundle();
 #endif
     
-    _checkingController = [[SUStatusController alloc] initWithHost:_host windowTitle:[NSString stringWithFormat:SULocalizedStringFromTableInBundle(@"Updating %@", SPARKLE_TABLE, sparkleBundle, nil), [_host name]] centerPointValue:nil minimizable:NO closable:NO];
+    _checkingController = [[SUStatusController alloc] initWithHost:_host windowTitle:SULocalizedStringFromTableInBundle(@"Software Update", SPARKLE_TABLE, sparkleBundle, nil) centerPointValue:nil minimizable:NO closable:NO];
     [[_checkingController window] center]; // Force the checking controller to load its window.
     [_checkingController beginActionWithTitle:SULocalizedStringFromTableInBundle(@"Checking for updates…", SPARKLE_TABLE, sparkleBundle, nil) maxProgressValue:0.0 statusText:nil];
-    [_checkingController setButtonTitle:SULocalizedStringFromTableInBundle(@"Cancel", SPARKLE_TABLE, sparkleBundle, nil) target:self action:@selector(cancelCheckForUpdates:) isDefault:NO];
+    [_checkingController setButtonTitle:SULocalizedStringFromTableInBundle(@"Cancel", SPARKLE_TABLE, sparkleBundle, nil) target:self action:@selector(cancelCheckForUpdates:) isDefault:NO accessibilityIdentifier:@"SUStatusCancel"];
     
     // For background applications, obtain focus.
     // Useful if the update check is requested from another app like System Preferences.
@@ -781,7 +781,7 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
     
     [_statusController beginActionWithTitle:SULocalizedStringFromTableInBundle(@"Downloading update…", SPARKLE_TABLE, sparkleBundle, @"Take care not to overflow the status window.") maxProgressValue:1.0 statusText:nil];
     [_statusController setProgressValue:0.0];
-    [_statusController setButtonTitle:SULocalizedStringFromTableInBundle(@"Cancel", SPARKLE_TABLE, sparkleBundle, nil) target:self action:@selector(cancelDownload:) isDefault:NO];
+    [_statusController setButtonTitle:SULocalizedStringFromTableInBundle(@"Cancel", SPARKLE_TABLE, sparkleBundle, nil) target:self action:@selector(cancelDownload:) isDefault:NO accessibilityIdentifier:@"SUStatusCancel"];
     
     _bytesDownloaded = 0;
 }
@@ -841,7 +841,7 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
     
     [_statusController beginActionWithTitle:SULocalizedStringFromTableInBundle(@"Extracting update…", SPARKLE_TABLE, sparkleBundle, @"Take care not to overflow the status window.") maxProgressValue:1.0 statusText:nil];
     [_statusController setProgressValue:0.0];
-    [_statusController setButtonTitle:SULocalizedStringFromTableInBundle(@"Cancel", SPARKLE_TABLE, sparkleBundle, nil) target:nil action:nil isDefault:NO];
+    [_statusController setButtonTitle:SULocalizedStringFromTableInBundle(@"Cancel", SPARKLE_TABLE, sparkleBundle, nil) target:nil action:nil isDefault:NO accessibilityIdentifier:@"SUStatusCancel"];
     [_statusController setButtonEnabled:NO];
 }
 

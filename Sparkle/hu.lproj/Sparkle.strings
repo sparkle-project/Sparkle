@@ -60,3 +60,6 @@
 
 /* No comment provided by engineer. */
 "Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "Mozgassa a %1$@ alkalmazást az Alkalmazások mappába, indítsa újra onnan, majd próbálja újra a frissítést.";
+
+/* Software Update title/label */
+"Software Update" = "Szoftverfrissítés";

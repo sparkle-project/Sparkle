@@ -1,17 +1,11 @@
-/* Class = "NSWindow"; title = "Software Update"; ObjectID = "5"; */
-"5.title" = "محدث البرنامج";
+/* Class = "NSButtonCell"; title = "Remind Me Later"; ObjectID = "G8s-oM-9gf"; */
+"G8s-oM-9gf.title" = "تذكيري لاحقًا";
 
-/* Class = "NSTextFieldCell"; title = "Release Notes:"; ObjectID = "170"; */
-"170.title" = "معلومات عن الإصدار:";
+/* Class = "NSButtonCell"; title = "Skip This Version"; ObjectID = "kVE-pO-gl0"; */
+"kVE-pO-gl0.title" = "تخطي هذا الإصدار";
 
-/* Class = "NSButtonCell"; title = "Remind Me Later"; ObjectID = "171"; */
-"171.title" = "تذكيري لاحقًا";
+/* Class = "NSButtonCell"; title = "Install Update"; ObjectID = "IIY-s3-hkz"; */
+"IIY-s3-hkz.title" = "تثبيت التحديث";
 
-/* Class = "NSButtonCell"; title = "Skip This Version"; ObjectID = "172"; */
-"172.title" = "تخطي هذا الإصدار";
-
-/* Class = "NSButtonCell"; title = "Install Update"; ObjectID = "173"; */
-"173.title" = "تثبيت التحديث";
-
-/* Class = "NSButtonCell"; title = "Automatically download and install updates in the future"; ObjectID = "175"; */
-"175.title" = "تنزيل التحديثات وتثبيتها تلقائيًا في المستقبل";
+/* Class = "NSButtonCell"; title = "Automatically download and install updates in the future"; ObjectID = "fPh-Q9-vLr"; */
+"fPh-Q9-vLr.title" = "تنزيل التحديثات وتثبيتها تلقائيًا في المستقبل";

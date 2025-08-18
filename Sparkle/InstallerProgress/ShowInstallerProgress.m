@@ -96,7 +96,7 @@
 {
     _statusController = [[SUStatusController alloc] initWithHost:host windowTitle:_updatingString centerPointValue:nil minimizable:NO closable:NO];
     
-    [_statusController setButtonTitle:_cancelUpdateTitle target:nil action:nil isDefault:NO];
+    [_statusController setButtonTitle:_cancelUpdateTitle target:nil action:nil isDefault:NO accessibilityIdentifier:@"SUStatusCancel"];
     
     [_statusController beginActionWithTitle:_installingUpdateTitle maxProgressValue:0 statusText:@""];
     

@@ -54,3 +54,6 @@
 
 /* No comment provided by engineer. */
 "Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "انقل %1$@ إلى مجلد التطبيقات وأعد تشغيله من هناك ثم حاول مجددًا.";
+
+/* Software Update title/label */
+"Software Update" = "محدث البرنامج";

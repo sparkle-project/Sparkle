@@ -198,3 +198,6 @@
 
 /* No comment provided by engineer. */
 "Your macOS version is too old" = "Je versie van macOS is te oud";
+
+/* Software Update title/label */
+"Software Update" = "Software-update";

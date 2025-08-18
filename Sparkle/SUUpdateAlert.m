@@ -33,6 +33,8 @@
 
 static NSString *const SUUpdateAlertTouchBarIdentifier = @"" SPARKLE_BUNDLE_IDENTIFIER ".SUUpdateAlert";
 
+static const CGFloat SUUpdateAlertGroupElementSpacing = 12.0;
+
 @interface SUUpdateAlert () <NSTouchBarDelegate>
 @end
 
@@ -43,17 +45,17 @@ static NSString *const SUUpdateAlertTouchBarIdentifier = @"" SPARKLE_BUNDLE_IDEN
     SUHost *_host;
     SPUUserUpdateState *_state;
     NSProgressIndicator *_releaseNotesSpinner;
-    NSBox *_backgroundView;
     id<SUReleaseNotesView> _releaseNotesView;
     id<SUVersionDisplay> _versionDisplayer;
     
+    IBOutlet NSStackView *_stackView;
     IBOutlet NSButton *_installButton;
     IBOutlet NSButton *_laterButton;
     IBOutlet NSButton *_skipButton;
     IBOutlet NSBox *_releaseNotesBoxView;
-    IBOutlet NSTextField *_descriptionField;
-    IBOutlet NSView *_releaseNotesContainerView;
+    IBOutlet NSView *_releaseNotesContentView;
     IBOutlet NSButton *_automaticallyInstallUpdatesButton;
+    IBOutlet NSView *_titleView;
     
     void (^_didBecomeKeyBlock)(void);
     void(^_completionBlock)(SPUUserUpdateChoice, NSRect, BOOL);
@@ -153,12 +155,20 @@ static NSString *const SUUpdateAlertTouchBarIdentifier = @"" SPARKLE_BUNDLE_IDEN
 - (void)displayReleaseNotesSpinner SPU_OBJC_DIRECT
 {
     // Stick a nice big spinner in the middle of the web view until the page is loaded.
-    NSView *boxContentView = _releaseNotesBoxView.contentView;
-    NSRect frame = boxContentView.frame;
-    _releaseNotesSpinner = [[NSProgressIndicator alloc] initWithFrame:NSMakeRect(NSMidX(frame) - 16, NSMidY(frame) - 16, 32, 32)];
+    _releaseNotesSpinner = [[NSProgressIndicator alloc] init];
+    _releaseNotesSpinner.controlSize = NSControlSizeRegular;
     [_releaseNotesSpinner setStyle:NSProgressIndicatorStyleSpinning];
+    
+    [_releaseNotesContentView addSubview:_releaseNotesSpinner];
+    
+    _releaseNotesSpinner.translatesAutoresizingMaskIntoConstraints = NO;
+    [NSLayoutConstraint activateConstraints:@[
+        [_releaseNotesSpinner.centerXAnchor constraintEqualToAnchor:_releaseNotesContentView.centerXAnchor],
+        [_releaseNotesSpinner.centerYAnchor constraintEqualToAnchor:_releaseNotesContentView.centerYAnchor]
+    ]];
+    
+    _releaseNotesSpinner.displayedWhenStopped = NO;
     [_releaseNotesSpinner startAnimation:self];
-    [boxContentView addSubview:_releaseNotesSpinner];
     
     // If there's no release notes URL, just stick the contents of the description into the web view
     // Otherwise we'll wait until the client wants us to show release notes
@@ -234,7 +244,6 @@ static NSString *const SUUpdateAlertTouchBarIdentifier = @"" SPARKLE_BUNDLE_IDEN
 - (void)stopReleaseNotesSpinner SPU_OBJC_DIRECT
 {
     [_releaseNotesSpinner stopAnimation:self];
-    [_releaseNotesSpinner setHidden:YES];
 }
 
 - (BOOL)showsReleaseNotes
@@ -315,11 +324,10 @@ static NSString *const SUUpdateAlertTouchBarIdentifier = @"" SPARKLE_BUNDLE_IDEN
         }
     }
     
-    NSView *boxContentView = _releaseNotesBoxView.contentView;
     assert(_releaseNotesSpinner != nil);
-    [boxContentView addSubview:_releaseNotesView.view positioned:NSWindowBelow relativeTo:_releaseNotesSpinner];
+    [_releaseNotesContentView addSubview:_releaseNotesView.view positioned:NSWindowBelow relativeTo:_releaseNotesSpinner];
     
-    _releaseNotesView.view.frame = boxContentView.bounds;
+    _releaseNotesView.view.frame = _releaseNotesContentView.bounds;
     _releaseNotesView.view.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
     
     if (@available(macOS 10.14, *)) {
@@ -327,16 +335,6 @@ static NSString *const SUUpdateAlertTouchBarIdentifier = @"" SPARKLE_BUNDLE_IDEN
         // This avoids a "white flash" that may be present when the webview initially loads in dark mode
         // This also is necessary for macOS 10.14, otherwise the background may stay white on 10.14 (but not in later OS's)
         [_releaseNotesView setDrawsBackground:NO];
-        
-        // Use NSBox to get the proper dynamically colored background behind the release notes view when
-        // the release notes view background is transparent
-        _backgroundView = [[NSBox alloc] initWithFrame:_releaseNotesView.view.frame];
-        _backgroundView.boxType = NSBoxCustom;
-        _backgroundView.fillColor = [NSColor textBackgroundColor];
-        _backgroundView.borderColor = [NSColor clearColor];
-        // Using auto-resizing mask instead of constraints works well enough
-        _backgroundView.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
-        [_releaseNotesView.view.superview addSubview:_backgroundView positioned:NSWindowBelow relativeTo:_releaseNotesView.view];
     }
 }
 
@@ -344,9 +342,44 @@ static NSString *const SUUpdateAlertTouchBarIdentifier = @"" SPARKLE_BUNDLE_IDEN
 {
     NSWindow *window = self.window;
     
+    window.movableByWindowBackground = YES;
+    
+#if SPARKLE_COPY_LOCALIZATIONS
+    NSBundle *sparkleBundle = SUSparkleBundle();
+#endif
+    
+    [_stackView setCustomSpacing:SUUpdateAlertGroupElementSpacing afterView:_titleView];
+    
+    // Customize custom NSBox
+    {
+        CGFloat boxCornerRadius = 6.0;
+        CGFloat boxBorderWidth = 1.0;
+        
+        _releaseNotesBoxView.boxType = NSBoxCustom;
+        _releaseNotesBoxView.cornerRadius = boxCornerRadius;
+        if (@available(macOS 10.14, *)) {
+            _releaseNotesBoxView.borderColor = NSColor.separatorColor;
+        } else {
+            _releaseNotesBoxView.borderColor = [NSColor colorWithCalibratedWhite:0.84 alpha:1.0];
+        }
+        _releaseNotesBoxView.borderWidth = boxBorderWidth;
+        _releaseNotesBoxView.fillColor = NSColor.textBackgroundColor;
+        
+        // Needed so we don't clip the corners if the CSS uses a custom background
+        _releaseNotesBoxView.contentView.wantsLayer = YES;
+        _releaseNotesBoxView.contentView.layer.masksToBounds = YES;
+        _releaseNotesBoxView.contentView.layer.cornerRadius = boxCornerRadius - boxBorderWidth;
+    }
+    
+    if (@available(macOS 16, *)) {
+        _skipButton.controlSize = NSControlSizeLarge;
+        _laterButton.controlSize = NSControlSizeLarge;
+        _installButton.controlSize = NSControlSizeLarge;
+    }
+    
     BOOL showReleaseNotes = [self showsReleaseNotes];
     if (showReleaseNotes) {
-        window.frameAutosaveName = @"SUUpdateAlert";
+        window.frameAutosaveName = @"SUUpdateAlert2";
     } else {
         // Update alert should not be resizable when no release notes are available
         window.styleMask &= ~NSWindowStyleMaskResizable;
@@ -354,7 +387,7 @@ static NSString *const SUUpdateAlertTouchBarIdentifier = @"" SPARKLE_BUNDLE_IDEN
     _windowLoadedAndShowsReleaseNotes = showReleaseNotes;
 
     if (_updateItem.informationOnlyUpdate) {
-        [_installButton setTitle:SULocalizedStringFromTableInBundle(@"Learn More…", SPARKLE_TABLE, SUSparkleBundle(), @"Alternate title for 'Install Update' button when there's no download in RSS feed.")];
+        [_installButton setTitle:SULocalizedStringFromTableInBundle(@"Learn More…", SPARKLE_TABLE, sparkleBundle, @"Alternate title for 'Install Update' button when there's no download in RSS feed.")];
         [_installButton setAction:@selector(openInfoURL:)];
     }
 
@@ -362,41 +395,20 @@ static NSString *const SUUpdateAlertTouchBarIdentifier = @"" SPARKLE_BUNDLE_IDEN
     
     if (showReleaseNotes) {
         [self displayReleaseNotesSpinner];
-    } else {
-        // When automatic updates aren't allowed we won't show the automatic install updates button
-        // This button is removed later below
-        if (allowsAutomaticUpdates) {
-            NSLayoutConstraint *automaticallyInstallUpdatesButtonToDescriptionFieldConstraint = [NSLayoutConstraint constraintWithItem:_automaticallyInstallUpdatesButton attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:_descriptionField attribute:NSLayoutAttributeBottom multiplier:1.0 constant:8.0];
-            
-            [window.contentView addConstraint:automaticallyInstallUpdatesButtonToDescriptionFieldConstraint];
-        }
         
-        [_releaseNotesContainerView removeFromSuperview];
+        // Add more spacing to give choices and automatic installs checkbox better grouping
+        [_stackView setCustomSpacing:SUUpdateAlertGroupElementSpacing afterView:_releaseNotesBoxView];
+    } else {
+        _releaseNotesBoxView.hidden = YES;
     }
     
     // NOTE: The code below for deciding what buttons to hide is complex! Due to array of feature configurations :)
     
-    // When we show release notes, it looks ugly if the install buttons are not closer to the release notes view
-    // However when we don't show release notes, it looks ugly if the install buttons are too close to the description field. Shrugs.
     if (!allowsAutomaticUpdates) {
-        if (showReleaseNotes) {
-            // Fix constraints so that buttons aren't far away from web view when we hide the automatic updates check box
-            NSLayoutConstraint *skipButtonToReleaseNotesContainerConstraint = [NSLayoutConstraint constraintWithItem:_skipButton attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:_releaseNotesContainerView attribute:NSLayoutAttributeBottom multiplier:1.0 constant:12.0];
-            
-            [window.contentView addConstraint:skipButtonToReleaseNotesContainerConstraint];
-        } else {
-            NSLayoutConstraint *skipButtonToDescriptionConstraint = [NSLayoutConstraint constraintWithItem:_skipButton attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:_descriptionField attribute:NSLayoutAttributeBottom multiplier:1.0 constant:20.0];
-
-            [window.contentView addConstraint:skipButtonToDescriptionConstraint];
-        }
-        [_automaticallyInstallUpdatesButton removeFromSuperview];
+        _automaticallyInstallUpdatesButton.superview.hidden = YES;
     }
     
     if (_state.stage == SPUUserUpdateStageInstalling) {
-#if SPARKLE_COPY_LOCALIZATIONS
-        NSBundle *sparkleBundle = SUSparkleBundle();
-#endif
-        
         // We're going to be relaunching pretty instantaneously
         _installButton.title = SULocalizedStringFromTableInBundle(@"Install and Relaunch", SPARKLE_TABLE, sparkleBundle, nil);
         

@@ -37,7 +37,6 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
-		1420DF50196247F900203BB0 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1420DF4F196247F900203BB0 /* Images.xcassets */; };
 		142E0E0019A6954400E4312B /* Sparkle.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		142E0E0219A6A14700E4312B /* Sparkle.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		142E0E0919A83AAC00E4312B /* SUBinaryDeltaTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 142E0E0819A83AAC00E4312B /* SUBinaryDeltaTest.m */; };
@@ -178,6 +177,7 @@
 		722C9539286EA68C0033908A /* SPUGentleUserDriverReminders.h in Headers */ = {isa = PBXBuildFile; fileRef = 722C9538286EA54A0033908A /* SPUGentleUserDriverReminders.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		722FB7E5260EE53F00EB571C /* SUNormalization.m in Sources */ = {isa = PBXBuildFile; fileRef = 722FB7E4260EE53F00EB571C /* SUNormalization.m */; };
 		722FB7E6260EE53F00EB571C /* SUNormalization.m in Sources */ = {isa = PBXBuildFile; fileRef = 722FB7E4260EE53F00EB571C /* SUNormalization.m */; };
+		7230BCDE2E22E2BC00B71297 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7230BCDD2E22E2BC00B71297 /* Images.xcassets */; };
 		72316BD31E0DA8430039EFD9 /* SUUnarchiverNotifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 72316BD21E0DA8430039EFD9 /* SUUnarchiverNotifier.m */; };
 		72316BD41E0DB37E0039EFD9 /* SUUnarchiverNotifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 72316BD21E0DA8430039EFD9 /* SUUnarchiverNotifier.m */; };
 		723ABD38259A9BA500BDB4FA /* SUUpdateAlert.xib in Resources */ = {isa = PBXBuildFile; fileRef = 723ABD36259A9BA500BDB4FA /* SUUpdateAlert.xib */; };
@@ -408,6 +408,7 @@
 		72E45CF81B640DAE005C701A /* SUUpdateSettingsWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 72E45CF61B640DAE005C701A /* SUUpdateSettingsWindowController.xib */; };
 		72E45CFC1B641961005C701A /* sparkletestcast.xml in Resources */ = {isa = PBXBuildFile; fileRef = 72E45CFB1B641961005C701A /* sparkletestcast.xml */; };
 		72E539121D68C3FA0092CE5E /* SPUDownloadData.m in Sources */ = {isa = PBXBuildFile; fileRef = 72F9EC431D5E9ED8004AC8B6 /* SPUDownloadData.m */; };
+		72E55AFA2E22DEB8007C55B1 /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = 72E55AF92E22DEB8007C55B1 /* AppIcon.icon */; };
 		72E6D9712C04DE1A005496E4 /* SparkleTestCodeSign_pkg.dmg in Resources */ = {isa = PBXBuildFile; fileRef = 72E6D9702C04DE19005496E4 /* SparkleTestCodeSign_pkg.dmg */; };
 		72E6D9732C0526DC005496E4 /* SparkleTestCodeSignApp.enc.nolicense.dmg in Resources */ = {isa = PBXBuildFile; fileRef = 72E6D9722C0526DC005496E4 /* SparkleTestCodeSignApp.enc.nolicense.dmg */; };
 		72EB735F29BE981300FBCEE7 /* DevSignedApp.zip in Resources */ = {isa = PBXBuildFile; fileRef = 72EB735E29BE981300FBCEE7 /* DevSignedApp.zip */; };
@@ -916,7 +917,6 @@
 		0580A0572C0D3B9200FE836A /* he */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = he; path = he.lproj/SUUpdatePermissionPrompt.strings; sourceTree = "<group>"; };
 		0867D69BFE84028FC02AAC07 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		0867D6A5FE840307C02AAC07 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
-		1420DF4F196247F900203BB0 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		142E0E0819A83AAC00E4312B /* SUBinaryDeltaTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUBinaryDeltaTest.m; sourceTree = "<group>"; };
 		14652F7919A93E5F00959E44 /* set-git-version-info.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "set-git-version-info.sh"; sourceTree = "<group>"; };
 		14652F8319A9759F00959E44 /* SUExport.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SUExport.h; sourceTree = "<group>"; };
@@ -1082,6 +1082,7 @@
 		722FB7CA1DD69897001D40CE /* ConfigSwift.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigSwift.xcconfig; sourceTree = "<group>"; };
 		722FB7E3260EE53F00EB571C /* SUNormalization.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SUNormalization.h; sourceTree = "<group>"; };
 		722FB7E4260EE53F00EB571C /* SUNormalization.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SUNormalization.m; sourceTree = "<group>"; };
+		7230BCDD2E22E2BC00B71297 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		72316BD11E0DA8430039EFD9 /* SUUnarchiverNotifier.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SUUnarchiverNotifier.h; path = Autoupdate/SUUnarchiverNotifier.h; sourceTree = SOURCE_ROOT; };
 		72316BD21E0DA8430039EFD9 /* SUUnarchiverNotifier.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SUUnarchiverNotifier.m; path = Autoupdate/SUUnarchiverNotifier.m; sourceTree = SOURCE_ROOT; };
 		7235B75E29DFC0120081FE4E /* make-xcframework.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "make-xcframework.sh"; sourceTree = "<group>"; };
@@ -1423,6 +1424,7 @@
 		72E45CF51B640DAE005C701A /* SUUpdateSettingsWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUUpdateSettingsWindowController.m; sourceTree = "<group>"; };
 		72E45CF61B640DAE005C701A /* SUUpdateSettingsWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SUUpdateSettingsWindowController.xib; sourceTree = "<group>"; };
 		72E45CFB1B641961005C701A /* sparkletestcast.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = sparkletestcast.xml; sourceTree = "<group>"; };
+		72E55AF92E22DEB8007C55B1 /* AppIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = AppIcon.icon; sourceTree = "<group>"; };
 		72E6D9702C04DE19005496E4 /* SparkleTestCodeSign_pkg.dmg */ = {isa = PBXFileReference; lastKnownFileType = file; path = SparkleTestCodeSign_pkg.dmg; sourceTree = "<group>"; };
 		72E6D9722C0526DC005496E4 /* SparkleTestCodeSignApp.enc.nolicense.dmg */ = {isa = PBXFileReference; lastKnownFileType = file; path = SparkleTestCodeSignApp.enc.nolicense.dmg; sourceTree = "<group>"; };
 		72EB735E29BE981300FBCEE7 /* DevSignedApp.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = DevSignedApp.zip; sourceTree = "<group>"; };
@@ -1815,10 +1817,10 @@
 				61C268090E2DB5D000175E6C /* LICENSE */,
 				14732BC11960F3B200593899 /* Makefile */,
 				147D6D9E1B66DC3C006607AB /* CheckLocalizations.swift */,
-				1420DF4F196247F900203BB0 /* Images.xcassets */,
 				14732BBC1960EFB500593899 /* README.markdown */,
 				14732BB91960EEEE00593899 /* SampleAppcast.xml */,
 				1EAA4C8A2132C7BF00604473 /* ReleaseNotesColorStyle.css */,
+				7230BCDD2E22E2BC00B71297 /* Images.xcassets */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -2105,6 +2107,7 @@
 				72E45CF61B640DAE005C701A /* SUUpdateSettingsWindowController.xib */,
 				61B5F90409C4CEE200B25A18 /* TestApplication-Info.plist */,
 				72F0EC44278A55CA002A876A /* screenshot.png */,
+				72E55AF92E22DEB8007C55B1 /* AppIcon.icon */,
 			);
 			name = "Test Application";
 			path = TestApplication;
@@ -3210,10 +3213,11 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1420DF50196247F900203BB0 /* Images.xcassets in Resources */,
 				723ABDDB259A9E8600BDB4FA /* InfoPlist.strings in Resources */,
+				7230BCDE2E22E2BC00B71297 /* Images.xcassets in Resources */,
 				72E45CFC1B641961005C701A /* sparkletestcast.xml in Resources */,
 				725F97A61C8B304D00265BE4 /* SUInstallUpdateViewController.xib in Resources */,
+				72E55AFA2E22DEB8007C55B1 /* AppIcon.icon in Resources */,
 				723ABE02259A9E9E00BDB4FA /* MainMenu.xib in Resources */,
 				72F0EC45278A55CA002A876A /* screenshot.png in Resources */,
 				72E45CF81B640DAE005C701A /* SUUpdateSettingsWindowController.xib in Resources */,
@@ -4165,6 +4169,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 72F94EDA1CC36C37002DEE68 /* ConfigTestAppDebug.xcconfig */;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 			};
 			name = Coverage;
 		};
@@ -4254,6 +4259,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 72F94EDA1CC36C37002DEE68 /* ConfigTestAppDebug.xcconfig */;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 			};
 			name = Debug;
 		};
@@ -4261,6 +4267,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941CD0D94A70100DD942E /* ConfigTestApp.xcconfig */;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 			};
 			name = Release;
 		};

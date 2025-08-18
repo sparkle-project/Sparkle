@@ -189,3 +189,6 @@
 
 /* System profile key for Memory (MB) */
 "Memory (MB)" = "זיכרון (MB)";
+
+/* Software Update title/label */
+"Software Update" = "עדכון תוכנה";

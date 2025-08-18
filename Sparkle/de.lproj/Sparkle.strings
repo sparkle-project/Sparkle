@@ -198,3 +198,6 @@
 
 /* No comment provided by engineer. */
 "Your macOS version is too old" = "Deine Version von macOS ist zu alt";
+
+/* Software Update title/label */
+"Software Update" = "Softwareupdate";
