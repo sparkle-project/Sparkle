@@ -408,7 +408,6 @@
 		72E45CF81B640DAE005C701A /* SUUpdateSettingsWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 72E45CF61B640DAE005C701A /* SUUpdateSettingsWindowController.xib */; };
 		72E45CFC1B641961005C701A /* sparkletestcast.xml in Resources */ = {isa = PBXBuildFile; fileRef = 72E45CFB1B641961005C701A /* sparkletestcast.xml */; };
 		72E539121D68C3FA0092CE5E /* SPUDownloadData.m in Sources */ = {isa = PBXBuildFile; fileRef = 72F9EC431D5E9ED8004AC8B6 /* SPUDownloadData.m */; };
-		72E55AFA2E22DEB8007C55B1 /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = 72E55AF92E22DEB8007C55B1 /* AppIcon.icon */; };
 		72E6D9712C04DE1A005496E4 /* SparkleTestCodeSign_pkg.dmg in Resources */ = {isa = PBXBuildFile; fileRef = 72E6D9702C04DE19005496E4 /* SparkleTestCodeSign_pkg.dmg */; };
 		72E6D9732C0526DC005496E4 /* SparkleTestCodeSignApp.enc.nolicense.dmg in Resources */ = {isa = PBXBuildFile; fileRef = 72E6D9722C0526DC005496E4 /* SparkleTestCodeSignApp.enc.nolicense.dmg */; };
 		72EB735F29BE981300FBCEE7 /* DevSignedApp.zip in Resources */ = {isa = PBXBuildFile; fileRef = 72EB735E29BE981300FBCEE7 /* DevSignedApp.zip */; };
@@ -1424,7 +1423,6 @@
 		72E45CF51B640DAE005C701A /* SUUpdateSettingsWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUUpdateSettingsWindowController.m; sourceTree = "<group>"; };
 		72E45CF61B640DAE005C701A /* SUUpdateSettingsWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SUUpdateSettingsWindowController.xib; sourceTree = "<group>"; };
 		72E45CFB1B641961005C701A /* sparkletestcast.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = sparkletestcast.xml; sourceTree = "<group>"; };
-		72E55AF92E22DEB8007C55B1 /* AppIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = AppIcon.icon; sourceTree = "<group>"; };
 		72E6D9702C04DE19005496E4 /* SparkleTestCodeSign_pkg.dmg */ = {isa = PBXFileReference; lastKnownFileType = file; path = SparkleTestCodeSign_pkg.dmg; sourceTree = "<group>"; };
 		72E6D9722C0526DC005496E4 /* SparkleTestCodeSignApp.enc.nolicense.dmg */ = {isa = PBXFileReference; lastKnownFileType = file; path = SparkleTestCodeSignApp.enc.nolicense.dmg; sourceTree = "<group>"; };
 		72EB735E29BE981300FBCEE7 /* DevSignedApp.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = DevSignedApp.zip; sourceTree = "<group>"; };
@@ -2107,7 +2105,6 @@
 				72E45CF61B640DAE005C701A /* SUUpdateSettingsWindowController.xib */,
 				61B5F90409C4CEE200B25A18 /* TestApplication-Info.plist */,
 				72F0EC44278A55CA002A876A /* screenshot.png */,
-				72E55AF92E22DEB8007C55B1 /* AppIcon.icon */,
 			);
 			name = "Test Application";
 			path = TestApplication;
@@ -3217,7 +3214,6 @@
 				7230BCDE2E22E2BC00B71297 /* Images.xcassets in Resources */,
 				72E45CFC1B641961005C701A /* sparkletestcast.xml in Resources */,
 				725F97A61C8B304D00265BE4 /* SUInstallUpdateViewController.xib in Resources */,
-				72E55AFA2E22DEB8007C55B1 /* AppIcon.icon in Resources */,
 				723ABE02259A9E9E00BDB4FA /* MainMenu.xib in Resources */,
 				72F0EC45278A55CA002A876A /* screenshot.png in Resources */,
 				72E45CF81B640DAE005C701A /* SUUpdateSettingsWindowController.xib in Resources */,
