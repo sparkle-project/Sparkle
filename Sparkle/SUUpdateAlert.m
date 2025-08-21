@@ -413,34 +413,35 @@ static const CGFloat SUUpdateAlertGroupElementSpacing = 12.0; /// TODO: Remove (
         _skipButton.controlSize = NSControlSizeLarge;
         _laterButton.controlSize = NSControlSizeLarge;
         _installButton.controlSize = NSControlSizeLarge;
-        
-        if ((0)) { /// Match Tahoe Beta 7 NSAlert (everything larger)
-            GET_CONSTRAINT_OF_SPACER_VIEW(_spacer_after_releaseNotesBox).constant = 18; //25;
-            GET_CONSTRAINT_OF_SPACER_VIEW(_spacer_after_optionsView).constant = 18;
-            _automaticallyInstallUpdatesButton.controlSize = NSControlSizeRegular;
-            NSFont *oldFont = _automaticallyInstallUpdatesButton.font;
-            if (oldFont) _automaticallyInstallUpdatesButton.font = [NSFont fontWithDescriptor: oldFont.fontDescriptor size: NSFont.systemFontSize];
-        }
-        if ((0)) { /// Everything larger, but not as large
-            GET_CONSTRAINT_OF_SPACER_VIEW(_spacer_after_releaseNotesBox).constant = 15;
-            GET_CONSTRAINT_OF_SPACER_VIEW(_spacer_after_optionsView).constant = 10;
-            _automaticallyInstallUpdatesButton.controlSize = NSControlSizeRegular;
-            NSFont *oldFont = _automaticallyInstallUpdatesButton.font;
-            if (oldFont) _automaticallyInstallUpdatesButton.font = [NSFont fontWithDescriptor: oldFont.fontDescriptor size: NSFont.systemFontSize];
-        }
-        
-        if ((1)) { /// Match the reduced bottom/side margins on Tahoe of the choicesView
-            GET_CONSTRAINT_OF_SPACER_VIEW(_spacer_after_releaseNotesBox).constant = 15;
-        }
-        
+            
+        _constraint_choices_leading.constant = 15; /// 15 instead of 20, as seen in NSAlerts on Tahoe
+        _constraint_choices_trailing.constant = 15;
+        _constraint_choices_bottom.constant = 15;
+            
+        /// Change scale/margins around the `_automaticallyInstallUpdatesButton` checkbox
         {
-            _constraint_choices_leading.constant = 15; /// 15 instead of 20, as seen in NSAlerts on Tahoe
-            _constraint_choices_trailing.constant = 15;
-            _constraint_choices_bottom.constant = 15;
+            if ((1)) { /// Match the reduced bottom/side margins on Tahoe of the choicesView
+                GET_CONSTRAINT_OF_SPACER_VIEW(_spacer_after_releaseNotesBox).constant = 15;
+            }
+            else if ((0)) { /// Larger checkbox
+                GET_CONSTRAINT_OF_SPACER_VIEW(_spacer_after_releaseNotesBox).constant = 15;
+                GET_CONSTRAINT_OF_SPACER_VIEW(_spacer_after_optionsView).constant = 8;
+                _automaticallyInstallUpdatesButton.controlSize = NSControlSizeRegular;
+                NSFont *oldFont = _automaticallyInstallUpdatesButton.font;
+                if (oldFont) _automaticallyInstallUpdatesButton.font = [NSFont fontWithDescriptor: oldFont.fontDescriptor size: NSFont.systemFontSize];
+            }
+            else if ((0)) { /// Match Tahoe Beta 7 NSAlert (everything larger)
+                GET_CONSTRAINT_OF_SPACER_VIEW(_spacer_after_releaseNotesBox).constant = 18; //25;
+                GET_CONSTRAINT_OF_SPACER_VIEW(_spacer_after_optionsView).constant = 18;
+                _automaticallyInstallUpdatesButton.controlSize = NSControlSizeRegular;
+                NSFont *oldFont = _automaticallyInstallUpdatesButton.font;
+                if (oldFont) _automaticallyInstallUpdatesButton.font = [NSFont fontWithDescriptor: oldFont.fontDescriptor size: NSFont.systemFontSize];
+            }
+            else assert(false);
         }
         
-        { /// Make title section larger on Tahoe to fit with larger buttons and stuff
-        
+        /// Scale up title section to balance the larger buttons
+        {
             int newSize = 60;
             _constraint_programIcon_width.constant            = newSize;
             _constraint_programIcon_inset_top.constant       = -(newSize / 10); /// This compensates the empty space / shadow area around the icon, so we can do the rest of the layout based on where the icon actually appears visually
@@ -451,7 +452,6 @@ static const CGFloat SUUpdateAlertGroupElementSpacing = 12.0; /// TODO: Remove (
             _constraint_versionAndQuestion_vertical.constant = 10;
             _constraint_versionAndQuestion_leading.constant  = 12;
         }
-        
     }
     
     if ((1)) { /// Make titlebar non-transparent
