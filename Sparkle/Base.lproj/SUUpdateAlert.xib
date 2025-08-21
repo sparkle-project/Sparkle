@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="24123.1" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="24118.1" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="24123.1"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="24118.1"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="SUUpdateAlert">
             <connections>
                 <outlet property="_automaticallyInstallUpdatesButton" destination="xYY-q8-ZyN" id="yjl-z6-hNj"/>
-                <outlet property="_choicesView" destination="iUh-Md-dRX" id="Kjs-MT-pZ0"/>
                 <outlet property="_constraint_choices_bottom" destination="hi9-TB-2I7" id="Hkf-Xu-hiP"/>
                 <outlet property="_constraint_choices_leading" destination="z77-Ds-Apc" id="KZE-QB-gHa"/>
                 <outlet property="_constraint_choices_mainButtonSpacing" destination="GNV-C1-iwM" id="nY5-Q4-8lL"/>
@@ -29,7 +28,6 @@
                 <outlet property="_skipButton" destination="nRH-TL-zdL" id="1wh-qo-iMh"/>
                 <outlet property="_spacer_after_optionsView" destination="CZN-96-fBZ" id="s8F-9F-j4x"/>
                 <outlet property="_spacer_after_releaseNotesBox" destination="aWT-Rm-qcx" id="Owi-ww-anw"/>
-                <outlet property="_spacer_optionsView_top" destination="aWT-Rm-qcx" id="Xyl-Z3-E6f"/>
                 <outlet property="_spacer_underneath_trafficLights" destination="tKj-Tp-ogI" id="ksE-iw-7wI"/>
                 <outlet property="_stackView" destination="61v-5k-OXp" id="1rj-X0-yNf"/>
                 <outlet property="_titleView" destination="cGD-9V-Gym" id="4EE-yh-bV0"/>
@@ -43,29 +41,29 @@
             <windowCollectionBehavior key="collectionBehavior" fullScreenAuxiliary="YES"/>
             <windowPositionMask key="initialPositionMask" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="746" y="229" width="532" height="370"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="869"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1415"/>
             <value key="minSize" type="size" width="462" height="150"/>
             <view key="contentView" misplaced="YES" id="6">
                 <rect key="frame" x="0.0" y="0.0" width="532" height="370"/>
                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                 <subviews>
                     <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="0.0" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="61v-5k-OXp">
-                        <rect key="frame" x="0.0" y="0.0" width="680" height="433"/>
+                        <rect key="frame" x="0.0" y="0.0" width="680" height="429"/>
                         <subviews>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="tKj-Tp-ogI" userLabel="Spacer Under Traffic Lights">
-                                <rect key="frame" x="0.0" y="411" width="157" height="22"/>
+                                <rect key="frame" x="0.0" y="407" width="157" height="22"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="22" id="hZi-8c-meI"/>
                                 </constraints>
                             </customView>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="tZs-ms-xZa" userLabel="Spacer Before &quot;Title View&quot;">
-                                <rect key="frame" x="0.0" y="391" width="157" height="20"/>
+                                <rect key="frame" x="0.0" y="387" width="157" height="20"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="20" id="Axv-7V-O21"/>
                                 </constraints>
                             </customView>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="cGD-9V-Gym" userLabel="Title View">
-                                <rect key="frame" x="0.0" y="341" width="680" height="50"/>
+                                <rect key="frame" x="0.0" y="337" width="680" height="50"/>
                                 <subviews>
                                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="6Hv-XB-VNW" userLabel="Icon Container">
                                         <rect key="frame" x="20" y="0.0" width="50" height="50"/>
@@ -134,13 +132,13 @@
                                 </constraints>
                             </customView>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="ZTZ-5A-ukb" userLabel="Spacer After &quot;Title View&quot;">
-                                <rect key="frame" x="0.0" y="321" width="157" height="20"/>
+                                <rect key="frame" x="0.0" y="317" width="157" height="20"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="20" id="Y8O-Wy-4S2"/>
                                 </constraints>
                             </customView>
                             <box boxType="custom" cornerRadius="5" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="ikY-gb-bgB" userLabel="Release Notes Box">
-                                <rect key="frame" x="20" y="86" width="640" height="235"/>
+                                <rect key="frame" x="20" y="82" width="640" height="235"/>
                                 <view key="contentView" id="YbC-Ky-Aam" userLabel="Release Notes Content View">
                                     <rect key="frame" x="1" y="1" width="638" height="233"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -151,16 +149,16 @@
                                 </constraints>
                             </box>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="aWT-Rm-qcx" userLabel="Spacer After &quot;Release Notes Box&quot;">
-                                <rect key="frame" x="0.0" y="66" width="157" height="20"/>
+                                <rect key="frame" x="0.0" y="62" width="157" height="20"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="20" id="F2o-JH-B4Z"/>
                                 </constraints>
                             </customView>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="Dg5-0U-d14" userLabel="Options view">
-                                <rect key="frame" x="0.0" y="52" width="680" height="14"/>
+                                <rect key="frame" x="0.0" y="48" width="680" height="14"/>
                                 <subviews>
                                     <button verticalHuggingPriority="1000" verticalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="xYY-q8-ZyN">
-                                        <rect key="frame" x="20" y="0.0" width="313" height="14"/>
+                                        <rect key="frame" x="19" y="-1" width="316" height="16"/>
                                         <buttonCell key="cell" type="check" title="Automatically download and install updates in the future" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="fPh-Q9-vLr">
                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                             <font key="font" metaFont="smallSystem"/>
@@ -178,16 +176,16 @@
                                 </constraints>
                             </customView>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="CZN-96-fBZ" userLabel="Spacer After &quot;Options view&quot;">
-                                <rect key="frame" x="0.0" y="44" width="157" height="8"/>
+                                <rect key="frame" x="0.0" y="40" width="157" height="8"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="8" id="wcg-Wi-5EB"/>
                                 </constraints>
                             </customView>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="iUh-Md-dRX" userLabel="Choices view">
-                                <rect key="frame" x="0.0" y="0.0" width="680" height="44"/>
+                                <rect key="frame" x="0.0" y="0.0" width="680" height="40"/>
                                 <subviews>
                                     <button horizontalHuggingPriority="150" verticalHuggingPriority="750" horizontalCompressionResistancePriority="997" translatesAutoresizingMaskIntoConstraints="NO" id="uGk-Ks-HQR">
-                                        <rect key="frame" x="395" y="20" width="127" height="24"/>
+                                        <rect key="frame" x="395" y="13" width="137" height="32"/>
                                         <buttonCell key="cell" type="push" title="Remind Me Later" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="G8s-oM-9gf">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
@@ -204,7 +202,7 @@ Gw
                                         </connections>
                                     </button>
                                     <button horizontalHuggingPriority="20" verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="sUq-y0-gA3">
-                                        <rect key="frame" x="534" y="20" width="126" height="24"/>
+                                        <rect key="frame" x="530" y="13" width="137" height="32"/>
                                         <buttonCell key="cell" type="push" title="Install Update" bezelStyle="rounded" alignment="center" state="on" borderStyle="border" inset="2" id="IIY-s3-hkz">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
@@ -221,7 +219,7 @@ DQ
                                         </connections>
                                     </button>
                                     <button verticalHuggingPriority="750" horizontalCompressionResistancePriority="998" translatesAutoresizingMaskIntoConstraints="NO" id="nRH-TL-zdL">
-                                        <rect key="frame" x="20" y="20" width="129" height="24"/>
+                                        <rect key="frame" x="13" y="13" width="139" height="32"/>
                                         <buttonCell key="cell" type="push" title="Skip This Version" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="kVE-pO-gl0">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
