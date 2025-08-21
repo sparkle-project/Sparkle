@@ -65,7 +65,7 @@ static NSString *const SUUpdateAlertTouchBarIdentifier = @"" SPARKLE_BUNDLE_IDEN
     IBOutlet NSView *_releaseNotesContentView;
     IBOutlet NSButton *_automaticallyInstallUpdatesButton;
     IBOutlet NSView *_titleView;
-    IBOutlet NSView *_optionsView; /// NOTE: Xcode makes this outlet `__weak` by default? Does it matter? (Same question for all the outlets below)
+    IBOutlet NSView *_optionsView; /// NOTE: [Aug 2025] Xcode makes this outlet `__weak` by default? Does it matter? (Same question for all the other outlets)
     
     IBOutlet NSView *_spacer_after_releaseNotesBox;
     IBOutlet NSView *_spacer_after_optionsView;
@@ -83,6 +83,7 @@ static NSString *const SUUpdateAlertTouchBarIdentifier = @"" SPARKLE_BUNDLE_IDEN
     IBOutlet NSLayoutConstraint *_constraint_choices_leading;
     IBOutlet NSLayoutConstraint *_constraint_choices_bottom;
     IBOutlet NSLayoutConstraint *_constraint_choices_trailing;
+    IBOutlet NSLayoutConstraint *_constraint_choices_mainButtonSpacing;
     
     
     void (^_didBecomeKeyBlock)(void);
@@ -406,6 +407,8 @@ static NSString *const SUUpdateAlertTouchBarIdentifier = @"" SPARKLE_BUNDLE_IDEN
         _constraint_choices_leading.constant = 15; /// Buttons have a 15 px distance to the window edge instead of 20, as seen in NSAlerts on Tahoe
         _constraint_choices_trailing.constant = 15;
         _constraint_choices_bottom.constant = 15;
+            
+        _constraint_choices_mainButtonSpacing.constant = 8; /// Reduce spacing 12 -> 8. Matches NSAlert
             
         _releaseNotesBoxView.fillColor = /// [Aug 2025] Make the release notes background very slighly transparent to tint it a little. This should only have a visible effect if the window is colored by wallpaper tinting, translucency, or liquid glass. (Cause otherwise the .textBackgroundColor is the same as the window background color under tahoe – pure black/white)
             [NSColor colorWithName: @"_releaseNotesBoxView.fillColor" dynamicProvider:^NSColor * _Nonnull(NSAppearance * _Nonnull __unused appearance) {
