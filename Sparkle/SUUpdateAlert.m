@@ -56,6 +56,7 @@ static const CGFloat SUUpdateAlertGroupElementSpacing = 12.0;
     IBOutlet NSView *_releaseNotesContentView;
     IBOutlet NSButton *_automaticallyInstallUpdatesButton;
     IBOutlet NSView *_titleView;
+    IBOutlet NSView *_choicesView; /// NOTE: Xcode makes this outlet `__weak` by default? Does it matter?
     
     void (^_didBecomeKeyBlock)(void);
     void(^_completionBlock)(SPUUserUpdateChoice, NSRect, BOOL);
@@ -248,6 +249,10 @@ static const CGFloat SUUpdateAlertGroupElementSpacing = 12.0;
 
 - (BOOL)showsReleaseNotes
 {
+
+    /// TESTING
+    if ((0)) return NO;
+
     NSNumber *shouldShowReleaseNotes = [_host objectForInfoDictionaryKey:SUShowReleaseNotesKey];
     if (shouldShowReleaseNotes == nil) {
         // Don't show release notes if RSS item contains no description and no release notes URL:
@@ -348,7 +353,8 @@ static const CGFloat SUUpdateAlertGroupElementSpacing = 12.0;
     NSBundle *sparkleBundle = SUSparkleBundle();
 #endif
     
-    [_stackView setCustomSpacing:SUUpdateAlertGroupElementSpacing afterView:_titleView];
+    if ((0))
+        [_stackView setCustomSpacing:SUUpdateAlertGroupElementSpacing afterView:_titleView];
     
     // Customize custom NSBox
     {
@@ -375,6 +381,11 @@ static const CGFloat SUUpdateAlertGroupElementSpacing = 12.0;
         _skipButton.controlSize = NSControlSizeLarge;
         _laterButton.controlSize = NSControlSizeLarge;
         _installButton.controlSize = NSControlSizeLarge;
+        for (NSLayoutConstraint *constraint in [_choicesView constraints]) {
+            if ([constraint.identifier isEqual: @"choices.leading"])    constraint.constant -= 5; /// 15 instead of 20, as seen in NSAlerts on Tahoe
+            if ([constraint.identifier isEqual: @"choices.trailing"])   constraint.constant -= 5;
+            if ([constraint.identifier isEqual: @"choices.bottom"])     constraint.constant -= 5;
+        }
     }
     
     BOOL showReleaseNotes = [self showsReleaseNotes];
@@ -397,9 +408,11 @@ static const CGFloat SUUpdateAlertGroupElementSpacing = 12.0;
         [self displayReleaseNotesSpinner];
         
         // Add more spacing to give choices and automatic installs checkbox better grouping
-        [_stackView setCustomSpacing:SUUpdateAlertGroupElementSpacing afterView:_releaseNotesBoxView];
+        if ((0)) /// TESTING
+            [_stackView setCustomSpacing:SUUpdateAlertGroupElementSpacing afterView:_releaseNotesBoxView];
     } else {
-        _releaseNotesBoxView.hidden = YES;
+        _releaseNotesBoxView.hidden = YES; /// [Aug 2025] The spacers above and below will stack up making for a very large space of 40 px. But I think that looks good?
+        
     }
     
     // NOTE: The code below for deciding what buttons to hide is complex! Due to array of feature configurations :)

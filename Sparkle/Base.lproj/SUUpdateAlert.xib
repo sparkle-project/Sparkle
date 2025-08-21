@@ -9,6 +9,7 @@
         <customObject id="-2" userLabel="File's Owner" customClass="SUUpdateAlert">
             <connections>
                 <outlet property="_automaticallyInstallUpdatesButton" destination="xYY-q8-ZyN" id="yjl-z6-hNj"/>
+                <outlet property="_choicesView" destination="iUh-Md-dRX" id="Kjs-MT-pZ0"/>
                 <outlet property="_installButton" destination="sUq-y0-gA3" id="hQ1-WX-CFo"/>
                 <outlet property="_laterButton" destination="uGk-Ks-HQR" id="QLX-rC-OVd"/>
                 <outlet property="_releaseNotesBoxView" destination="ikY-gb-bgB" id="8ep-uz-XVh"/>
@@ -65,10 +66,10 @@
                                         </constraints>
                                     </customView>
                                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="UU2-7C-LCJ" userLabel="Version &amp; Question view">
-                                        <rect key="frame" x="85" y="6" width="575" height="38"/>
+                                        <rect key="frame" x="80" y="7" width="580" height="37"/>
                                         <subviews>
                                             <textField focusRingType="none" verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="Nvn-Dp-hAH" userLabel="Version text field">
-                                                <rect key="frame" x="-2" y="22" width="579" height="16"/>
+                                                <rect key="frame" x="-2" y="21" width="584" height="16"/>
                                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" allowsUndo="NO" sendsActionOnEndEditing="YES" title="Version title" usesSingleLineMode="YES" id="f6r-wP-EYG">
                                                     <font key="font" metaFont="systemBold"/>
                                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -79,7 +80,7 @@
                                                 </connections>
                                             </textField>
                                             <textField focusRingType="none" verticalHuggingPriority="999" horizontalCompressionResistancePriority="1000" verticalCompressionResistancePriority="1000" preferredMaxLayoutWidth="490" translatesAutoresizingMaskIntoConstraints="NO" id="WdU-eY-Ta9" userLabel="Question text field">
-                                                <rect key="frame" x="-2" y="0.0" width="579" height="14"/>
+                                                <rect key="frame" x="-2" y="0.0" width="584" height="14"/>
                                                 <textFieldCell key="cell" allowsUndo="NO" sendsActionOnEndEditing="YES" title="Question" id="Jsa-P1-mWz">
                                                     <font key="font" metaFont="smallSystem"/>
                                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -92,7 +93,7 @@
                                         </subviews>
                                         <constraints>
                                             <constraint firstItem="Nvn-Dp-hAH" firstAttribute="leading" secondItem="UU2-7C-LCJ" secondAttribute="leading" id="25L-Ag-aFU"/>
-                                            <constraint firstItem="WdU-eY-Ta9" firstAttribute="top" secondItem="Nvn-Dp-hAH" secondAttribute="bottom" constant="8" id="9M6-6n-Bro"/>
+                                            <constraint firstItem="WdU-eY-Ta9" firstAttribute="top" secondItem="Nvn-Dp-hAH" secondAttribute="bottom" constant="7" id="9M6-6n-Bro"/>
                                             <constraint firstAttribute="bottom" secondItem="WdU-eY-Ta9" secondAttribute="bottom" id="CZX-9a-gJl"/>
                                             <constraint firstAttribute="trailing" secondItem="WdU-eY-Ta9" secondAttribute="trailing" id="WZm-Si-7IJ"/>
                                             <constraint firstAttribute="trailing" secondItem="Nvn-Dp-hAH" secondAttribute="trailing" id="aGK-sK-0uf"/>
@@ -104,8 +105,8 @@
                                 <constraints>
                                     <constraint firstItem="6Hv-XB-VNW" firstAttribute="leading" secondItem="cGD-9V-Gym" secondAttribute="leading" constant="20" symbolic="YES" id="2bF-K2-CwX"/>
                                     <constraint firstAttribute="bottom" secondItem="6Hv-XB-VNW" secondAttribute="bottom" id="JL6-vG-SS4"/>
-                                    <constraint firstItem="UU2-7C-LCJ" firstAttribute="leading" secondItem="F1L-zh-U8Z" secondAttribute="trailing" constant="10" id="LiI-Bw-qsD"/>
                                     <constraint firstAttribute="trailing" secondItem="UU2-7C-LCJ" secondAttribute="trailing" constant="20" symbolic="YES" id="eyz-xg-wVZ"/>
+                                    <constraint firstItem="UU2-7C-LCJ" firstAttribute="leading" secondItem="6Hv-XB-VNW" secondAttribute="trailing" constant="10" id="nEc-ic-3ZD"/>
                                     <constraint firstItem="6Hv-XB-VNW" firstAttribute="top" secondItem="cGD-9V-Gym" secondAttribute="top" id="qTV-vd-doT"/>
                                     <constraint firstItem="UU2-7C-LCJ" firstAttribute="centerY" secondItem="6Hv-XB-VNW" secondAttribute="centerY" id="sKc-pD-WS1"/>
                                 </constraints>
@@ -116,7 +117,7 @@
                                     <constraint firstAttribute="height" constant="20" id="Y8O-Wy-4S2"/>
                                 </constraints>
                             </customView>
-                            <box boxType="custom" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="ikY-gb-bgB" userLabel="Release Notes Box">
+                            <box boxType="custom" cornerRadius="5" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="ikY-gb-bgB" userLabel="Release Notes Box">
                                 <rect key="frame" x="20" y="86" width="640" height="235"/>
                                 <view key="contentView" id="YbC-Ky-Aam" userLabel="Release Notes Content View">
                                     <rect key="frame" x="1" y="1" width="638" height="233"/>
@@ -134,10 +135,10 @@
                                 </constraints>
                             </customView>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="Dg5-0U-d14" userLabel="Options view">
-                                <rect key="frame" x="0.0" y="52" width="680" height="14"/>
+                                <rect key="frame" x="0.0" y="44" width="680" height="22"/>
                                 <subviews>
                                     <button verticalHuggingPriority="1000" verticalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="xYY-q8-ZyN">
-                                        <rect key="frame" x="20" y="0.0" width="313" height="14"/>
+                                        <rect key="frame" x="20" y="8" width="313" height="14"/>
                                         <buttonCell key="cell" type="check" title="Automatically download and install updates in the future" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="fPh-Q9-vLr">
                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                             <font key="font" metaFont="smallSystem"/>
@@ -150,21 +151,15 @@
                                 <constraints>
                                     <constraint firstItem="xYY-q8-ZyN" firstAttribute="top" secondItem="Dg5-0U-d14" secondAttribute="top" id="9SN-p3-BTb"/>
                                     <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="xYY-q8-ZyN" secondAttribute="trailing" constant="20" symbolic="YES" id="CQ6-qx-HSc"/>
-                                    <constraint firstAttribute="bottom" secondItem="xYY-q8-ZyN" secondAttribute="bottom" id="PoC-Dx-8Jc"/>
+                                    <constraint firstAttribute="bottom" secondItem="xYY-q8-ZyN" secondAttribute="bottom" constant="8" id="PoC-Dx-8Jc"/>
                                     <constraint firstItem="xYY-q8-ZyN" firstAttribute="leading" secondItem="Dg5-0U-d14" secondAttribute="leading" constant="20" symbolic="YES" id="wWK-qz-vla"/>
-                                </constraints>
-                            </customView>
-                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="Uwt-xo-ddX" userLabel="Spacer">
-                                <rect key="frame" x="0.0" y="44" width="157" height="8"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="8" id="JLo-Ih-W4i"/>
                                 </constraints>
                             </customView>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="iUh-Md-dRX" userLabel="Choices view">
                                 <rect key="frame" x="0.0" y="0.0" width="680" height="44"/>
                                 <subviews>
                                     <button horizontalHuggingPriority="150" verticalHuggingPriority="750" horizontalCompressionResistancePriority="997" translatesAutoresizingMaskIntoConstraints="NO" id="uGk-Ks-HQR">
-                                        <rect key="frame" x="395" y="20" width="127" height="24"/>
+                                        <rect key="frame" x="399" y="20" width="127" height="24"/>
                                         <buttonCell key="cell" type="push" title="Remind Me Later" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="G8s-oM-9gf">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
@@ -213,13 +208,13 @@ DQ
                                     <constraint firstItem="uGk-Ks-HQR" firstAttribute="baseline" secondItem="sUq-y0-gA3" secondAttribute="baseline" id="7hK-NU-1pL"/>
                                     <constraint firstItem="nRH-TL-zdL" firstAttribute="top" secondItem="iUh-Md-dRX" secondAttribute="top" id="Cwv-ha-SRC"/>
                                     <constraint firstItem="uGk-Ks-HQR" firstAttribute="width" secondItem="sUq-y0-gA3" secondAttribute="width" id="EWD-pD-s8E"/>
-                                    <constraint firstItem="sUq-y0-gA3" firstAttribute="leading" secondItem="uGk-Ks-HQR" secondAttribute="trailing" constant="12" symbolic="YES" id="GNV-C1-iwM"/>
+                                    <constraint firstItem="sUq-y0-gA3" firstAttribute="leading" secondItem="uGk-Ks-HQR" secondAttribute="trailing" constant="8" id="GNV-C1-iwM"/>
                                     <constraint firstItem="uGk-Ks-HQR" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="nRH-TL-zdL" secondAttribute="trailing" constant="12" symbolic="YES" id="JIK-Ix-vKz"/>
                                     <constraint firstItem="nRH-TL-zdL" firstAttribute="width" relation="greaterThanOrEqual" secondItem="sUq-y0-gA3" secondAttribute="width" id="ZG6-hO-ueO"/>
-                                    <constraint firstAttribute="bottom" secondItem="nRH-TL-zdL" secondAttribute="bottom" constant="20" symbolic="YES" id="hi9-TB-2I7"/>
-                                    <constraint firstAttribute="trailing" secondItem="sUq-y0-gA3" secondAttribute="trailing" constant="20" symbolic="YES" id="qFp-Lz-Zct"/>
+                                    <constraint firstAttribute="bottom" secondItem="nRH-TL-zdL" secondAttribute="bottom" constant="20" symbolic="YES" identifier="choices.bottom" id="hi9-TB-2I7"/>
+                                    <constraint firstAttribute="trailing" secondItem="sUq-y0-gA3" secondAttribute="trailing" constant="20" symbolic="YES" identifier="choices.trailing" id="qFp-Lz-Zct"/>
                                     <constraint firstItem="nRH-TL-zdL" firstAttribute="baseline" secondItem="uGk-Ks-HQR" secondAttribute="baseline" id="u6y-Qc-AKF"/>
-                                    <constraint firstItem="nRH-TL-zdL" firstAttribute="leading" secondItem="iUh-Md-dRX" secondAttribute="leading" constant="20" symbolic="YES" id="z77-Ds-Apc"/>
+                                    <constraint firstItem="nRH-TL-zdL" firstAttribute="leading" secondItem="iUh-Md-dRX" secondAttribute="leading" constant="20" symbolic="YES" identifier="choices.trailing" id="z77-Ds-Apc"/>
                                 </constraints>
                             </customView>
                         </subviews>
@@ -241,10 +236,8 @@ DQ
                             <integer value="1000"/>
                             <integer value="1000"/>
                             <integer value="1000"/>
-                            <integer value="1000"/>
                         </visibilityPriorities>
                         <customSpacing>
-                            <real value="3.4028234663852886e+38"/>
                             <real value="3.4028234663852886e+38"/>
                             <real value="3.4028234663852886e+38"/>
                             <real value="3.4028234663852886e+38"/>
