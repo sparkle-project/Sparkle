@@ -33,9 +33,10 @@
 
 static NSString *const SUUpdateAlertTouchBarIdentifier = @"" SPARKLE_BUNDLE_IDENTIFIER ".SUUpdateAlert";
 
-static const CGFloat SUUpdateAlertGroupElementSpacing = 12.0; /// TODO: Remove (unused now)
-
-#define GET_CONSTRAINT_OF_SPACER_VIEW(v) ({        /** [Aug 2025] We're inserting views with exactly one width/height constraint into our stackView to serve as spacers. This lets us easily inspect/manipulate the size of a spacer */\
+/** [Aug 2025] We're inserting views with exactly one height constraint into our stackView to serve as spacers. This macro lets us easily inspect/manipulate the size of a spacer
+    Open question: I did the spacer thing before I knew that you could create outlets for NSLayoutContstraints directly. Maybe we should do that instead.
+ */
+#define SUGetConstraintForSpacer(v) ({ \
         NSArray <NSLayoutConstraint *> *constraints = v.constraints;        \
         assert(constraints.count == 1);                                     \
         [constraints firstObject];                                          \
@@ -64,8 +65,7 @@ static const CGFloat SUUpdateAlertGroupElementSpacing = 12.0; /// TODO: Remove (
     IBOutlet NSView *_releaseNotesContentView;
     IBOutlet NSButton *_automaticallyInstallUpdatesButton;
     IBOutlet NSView *_titleView;
-    IBOutlet NSView *_choicesView; /// NOTE: Xcode makes this outlet `__weak` by default? Does it matter? (Same question for all the outlets below)
-    IBOutlet NSView *_optionsView;
+    IBOutlet NSView *_optionsView; /// NOTE: Xcode makes this outlet `__weak` by default? Does it matter? (Same question for all the outlets below)
     
     IBOutlet NSView *_spacer_after_releaseNotesBox;
     IBOutlet NSView *_spacer_after_optionsView;
@@ -86,7 +86,7 @@ static const CGFloat SUUpdateAlertGroupElementSpacing = 12.0; /// TODO: Remove (
     
     
     void (^_didBecomeKeyBlock)(void);
-    void (^_completionBlock)(SPUUserUpdateChoice, NSRect, BOOL);
+    void(^_completionBlock)(SPUUserUpdateChoice, NSRect, BOOL);
     
     BOOL _allowsAutomaticUpdates;
     BOOL _windowLoadedAndShowsReleaseNotes;
@@ -276,10 +276,6 @@ static const CGFloat SUUpdateAlertGroupElementSpacing = 12.0; /// TODO: Remove (
 
 - (BOOL)showsReleaseNotes
 {
-
-    /// TESTING
-    if ((0)) return NO;
-
     NSNumber *shouldShowReleaseNotes = [_host objectForInfoDictionaryKey:SUShowReleaseNotesKey];
     if (shouldShowReleaseNotes == nil) {
         // Don't show release notes if RSS item contains no description and no release notes URL:
@@ -380,9 +376,6 @@ static const CGFloat SUUpdateAlertGroupElementSpacing = 12.0; /// TODO: Remove (
     NSBundle *sparkleBundle = SUSparkleBundle();
 #endif
     
-    if ((0))
-        [_stackView setCustomSpacing:SUUpdateAlertGroupElementSpacing afterView:_titleView];
-    
     // Customize custom NSBox
     {
         CGFloat boxCornerRadius = 6.0;
@@ -396,13 +389,7 @@ static const CGFloat SUUpdateAlertGroupElementSpacing = 12.0; /// TODO: Remove (
             _releaseNotesBoxView.borderColor = [NSColor colorWithCalibratedWhite:0.84 alpha:1.0];
         }
         _releaseNotesBoxView.borderWidth = boxBorderWidth;
-        if ((0)) /// TESTING
-            _releaseNotesBoxView.fillColor = NSColor.textBackgroundColor;
-        else
-            _releaseNotesBoxView.fillColor =
-                [NSColor colorWithName: @"dynamicBoxColor" dynamicProvider:^NSColor * _Nonnull(NSAppearance * _Nonnull) {
-                    return [NSColor.textBackgroundColor colorWithAlphaComponent: 0.66];
-                }];
+        _releaseNotesBoxView.fillColor = NSColor.textBackgroundColor;
         
         // Needed so we don't clip the corners if the CSS uses a custom background
         _releaseNotesBoxView.contentView.wantsLayer = YES;
@@ -410,31 +397,36 @@ static const CGFloat SUUpdateAlertGroupElementSpacing = 12.0; /// TODO: Remove (
         _releaseNotesBoxView.contentView.layer.cornerRadius = boxCornerRadius - boxBorderWidth;
     }
     
-    if (@available(macOS 26.0, *)) {
+    if (@available(macOS 16, *)) {
     
         _skipButton.controlSize = NSControlSizeLarge;
         _laterButton.controlSize = NSControlSizeLarge;
         _installButton.controlSize = NSControlSizeLarge;
             
-        _constraint_choices_leading.constant = 15; /// 15 instead of 20, as seen in NSAlerts on Tahoe
+        _constraint_choices_leading.constant = 15; /// Buttons have a 15 px distance to the window edge instead of 20, as seen in NSAlerts on Tahoe
         _constraint_choices_trailing.constant = 15;
         _constraint_choices_bottom.constant = 15;
             
+        _releaseNotesBoxView.fillColor = /// [Aug 2025] Make the release notes background very slighly transparent to tint it a little. This should only have a visible effect if the window is colored by wallpaper tinting, translucency, or liquid glass. (Cause otherwise the .textBackgroundColor is the same as the window background color under tahoe – pure black/white)
+            [NSColor colorWithName: @"_releaseNotesBoxView.fillColor" dynamicProvider:^NSColor * _Nonnull(NSAppearance * _Nonnull __unused appearance) {
+                return [NSColor.textBackgroundColor colorWithAlphaComponent: 0.66];
+            }];
+            
         /// Change scale/margins around the `_automaticallyInstallUpdatesButton` checkbox
         {
-            if ((1)) { /// Match the reduced bottom/side margins on Tahoe of the choicesView
-                GET_CONSTRAINT_OF_SPACER_VIEW(_spacer_after_releaseNotesBox).constant = 15;
+            if      ((1)) { /// Match the reduced bottom/side margins of the buttons in the choicesView
+                SUGetConstraintForSpacer(_spacer_after_releaseNotesBox).constant = 15;
             }
-            else if ((0)) { /// Larger checkbox
-                GET_CONSTRAINT_OF_SPACER_VIEW(_spacer_after_releaseNotesBox).constant = 15;
-                GET_CONSTRAINT_OF_SPACER_VIEW(_spacer_after_optionsView).constant = 8;
+            else if ((0)) { /// Checkbox larger
+                SUGetConstraintForSpacer(_spacer_after_releaseNotesBox).constant = 15;
+                SUGetConstraintForSpacer(_spacer_after_optionsView).constant = 8;
                 _automaticallyInstallUpdatesButton.controlSize = NSControlSizeRegular;
                 NSFont *oldFont = _automaticallyInstallUpdatesButton.font;
                 if (oldFont) _automaticallyInstallUpdatesButton.font = [NSFont fontWithDescriptor: oldFont.fontDescriptor size: NSFont.systemFontSize];
             }
             else if ((0)) { /// Match Tahoe Beta 7 NSAlert (everything larger)
-                GET_CONSTRAINT_OF_SPACER_VIEW(_spacer_after_releaseNotesBox).constant = 18; //25;
-                GET_CONSTRAINT_OF_SPACER_VIEW(_spacer_after_optionsView).constant = 18;
+                SUGetConstraintForSpacer(_spacer_after_releaseNotesBox).constant = 18;
+                SUGetConstraintForSpacer(_spacer_after_optionsView).constant = 18;
                 _automaticallyInstallUpdatesButton.controlSize = NSControlSizeRegular;
                 NSFont *oldFont = _automaticallyInstallUpdatesButton.font;
                 if (oldFont) _automaticallyInstallUpdatesButton.font = [NSFont fontWithDescriptor: oldFont.fontDescriptor size: NSFont.systemFontSize];
@@ -456,24 +448,27 @@ static const CGFloat SUUpdateAlertGroupElementSpacing = 12.0; /// TODO: Remove (
         }
         
         /// Put liquid glass behind the content
-        if ((1)) { /// [Aug 2025] macOS 'shines' light on this from surrounding windows but this is not the translucent glass effect where things shine through from behind (which you see on NSAlert.)
+        if ((0)) {
+            /// [Aug 2025]
+            ///     - macOS 'shines' light on this from surrounding windows but this is not the translucent glass effect where things shine through from behind (which you see on NSAlert.)
+            ///     - This looks slightly broken in darkmode with non-transparent titlebar
             NSGlassEffectView *glassView = [[NSGlassEffectView alloc] init];
             glassView.contentView = window.contentView;
             window.contentView = glassView;
-            glassView.style = NSGlassEffectViewStyleRegular; /// [Aug 2025] Don't we have to copy over the layout constraints? It seems to work without that.
+            glassView.style = NSGlassEffectViewStyleRegular; /// [Aug 2025] Don't we have to copy over the layout constraints? It seems to unexpectedly work without that.
         }
         
     }
     
-    if ((0)) {  /// Transparent titlebar
+    if ((0)) {  /// Transparent titlebar – align content along the bottom of the traffic lights
         window.titlebarAppearsTransparent = YES;
-        if (@available(macOS 26.0, *)) GET_CONSTRAINT_OF_SPACER_VIEW(_spacer_underneath_trafficLights).constant = 22;
-        else                           GET_CONSTRAINT_OF_SPACER_VIEW(_spacer_underneath_trafficLights).constant = 20;
+        if (@available(macOS 16, *))   SUGetConstraintForSpacer(_spacer_underneath_trafficLights).constant = 22;
+        else                           SUGetConstraintForSpacer(_spacer_underneath_trafficLights).constant = 20;
     }
-    else {      /// Non-transparent titlebar
+    else {      /// Non-transparent titlebar – align content along the bottom of the titlebar.
         window.titlebarAppearsTransparent = NO;
-        if (@available(macOS 26.0, *))  GET_CONSTRAINT_OF_SPACER_VIEW(_spacer_underneath_trafficLights).constant = 31; /// Not sure if there are differences depending on the .titlebarSeparatorStyle
-        else                            GET_CONSTRAINT_OF_SPACER_VIEW(_spacer_underneath_trafficLights).constant = 29;
+        if (@available(macOS 16, *))   SUGetConstraintForSpacer(_spacer_underneath_trafficLights).constant = 31; /// Not sure if there are pixel differences depending on the .titlebarSeparatorStyle
+        else                           SUGetConstraintForSpacer(_spacer_underneath_trafficLights).constant = 29;
     }
     
     BOOL showReleaseNotes = [self showsReleaseNotes];
@@ -494,23 +489,16 @@ static const CGFloat SUUpdateAlertGroupElementSpacing = 12.0; /// TODO: Remove (
     
     if (showReleaseNotes) {
         [self displayReleaseNotesSpinner];
-        
-        // Add more spacing to give choices and automatic installs checkbox better grouping
-        if ((0)) /// TESTING
-            [_stackView setCustomSpacing:SUUpdateAlertGroupElementSpacing afterView:_releaseNotesBoxView];
     } else {
-        _releaseNotesBoxView.hidden = YES; /// [Aug 2025] The spacers above and below will stack up making for a very large space of 40 px. But I think that looks good?
+        _releaseNotesBoxView.hidden = YES;
         _spacer_after_releaseNotesBox.hidden = YES;
     }
     
     // NOTE: The code below for deciding what buttons to hide is complex! Due to array of feature configurations :)
     
     if (!allowsAutomaticUpdates) {
-        
-        _spacer_after_optionsView.hidden = YES;
         _optionsView.hidden = YES;
-    
-        if ((NO)) _automaticallyInstallUpdatesButton.superview.hidden = YES;
+        _spacer_after_optionsView.hidden = YES;
     }
     
     if (_state.stage == SPUUserUpdateStageInstalling) {
