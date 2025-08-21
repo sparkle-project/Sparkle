@@ -18,6 +18,7 @@
                 <outlet property="_skipButton" destination="nRH-TL-zdL" id="1wh-qo-iMh"/>
                 <outlet property="_spacerAfter_optionsView" destination="CZN-96-fBZ" id="s8F-9F-j4x"/>
                 <outlet property="_spacerAfter_releaseNotesBoxView" destination="aWT-Rm-qcx" id="Owi-ww-anw"/>
+                <outlet property="_spacerUnder_trafficLights" destination="tKj-Tp-ogI" id="ksE-iw-7wI"/>
                 <outlet property="_spacer_optionsView_bottom" destination="CZN-96-fBZ" id="jLn-8F-ctW"/>
                 <outlet property="_spacer_optionsView_top" destination="aWT-Rm-qcx" id="Xyl-Z3-E6f"/>
                 <outlet property="_stackView" destination="61v-5k-OXp" id="1rj-X0-yNf"/>
@@ -27,8 +28,8 @@
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
-        <window identifier="SUUpdateAlert" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="5" userLabel="Update Alert (release notes)">
-            <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
+        <window identifier="SUUpdateAlert" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" titlebarAppearsTransparent="YES" id="5" userLabel="Update Alert (release notes)">
+            <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES" fullSizeContentView="YES"/>
             <windowCollectionBehavior key="collectionBehavior" fullScreenAuxiliary="YES"/>
             <windowPositionMask key="initialPositionMask" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="746" y="229" width="532" height="370"/>
@@ -39,12 +40,18 @@
                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                 <subviews>
                     <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="0.0" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="61v-5k-OXp">
-                        <rect key="frame" x="0.0" y="0.0" width="680" height="411"/>
+                        <rect key="frame" x="0.0" y="0.0" width="680" height="433"/>
                         <subviews>
-                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="tKj-Tp-ogI" userLabel="Spacer Before &quot;Title View&quot;">
+                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="tKj-Tp-ogI" userLabel="Spacer Under Traffic Lights">
+                                <rect key="frame" x="0.0" y="411" width="157" height="22"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="22" id="hZi-8c-meI"/>
+                                </constraints>
+                            </customView>
+                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="tZs-ms-xZa" userLabel="Spacer Before &quot;Title View&quot;">
                                 <rect key="frame" x="0.0" y="391" width="157" height="20"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="20" id="hZi-8c-meI"/>
+                                    <constraint firstAttribute="height" constant="20" id="Axv-7V-O21"/>
                                 </constraints>
                             </customView>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="cGD-9V-Gym" userLabel="Title View">
@@ -248,8 +255,10 @@ DQ
                             <integer value="1000"/>
                             <integer value="1000"/>
                             <integer value="1000"/>
+                            <integer value="1000"/>
                         </visibilityPriorities>
                         <customSpacing>
+                            <real value="3.4028234663852886e+38"/>
                             <real value="3.4028234663852886e+38"/>
                             <real value="3.4028234663852886e+38"/>
                             <real value="3.4028234663852886e+38"/>

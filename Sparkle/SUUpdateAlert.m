@@ -65,7 +65,8 @@ static const CGFloat SUUpdateAlertGroupElementSpacing = 12.0; /// TODO: Remove (
     IBOutlet NSView *_choicesView; /// NOTE: Xcode makes this outlet `__weak` by default? Does it matter?
     IBOutlet NSView *_optionsView; /// NOTE: Should it be `__weak`?
     IBOutlet NSView *_spacerAfter_releaseNotesBoxView;  /// NOTE: Should it be `__weak`?
-    IBOutlet NSView *_spacerAfter_optionsView;      /// NOTE: Should it be `__weak`?
+    IBOutlet NSView *_spacerAfter_optionsView;          /// NOTE: Should it be `__weak`?
+    IBOutlet NSView *_spacerUnder_trafficLights;        /// NOTE: Should it be `__weak`?
     
     void (^_didBecomeKeyBlock)(void);
     void(^_completionBlock)(SPUUserUpdateChoice, NSRect, BOOL);
@@ -421,6 +422,11 @@ static const CGFloat SUUpdateAlertGroupElementSpacing = 12.0; /// TODO: Remove (
             if ([constraint.identifier isEqual: @"choices.trailing"])   constraint.constant = 15;
             if ([constraint.identifier isEqual: @"choices.bottom"])     constraint.constant = 15;
         }
+    }
+    
+    if ((1)) { /// Make titlebar non-transparent
+        GET_CONSTRAINT_OF_SPACER_VIEW(_spacerUnder_trafficLights).constant = 31;
+        window.titlebarAppearsTransparent = NO;
     }
     
     BOOL showReleaseNotes = [self showsReleaseNotes];
