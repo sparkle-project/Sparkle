@@ -33,7 +33,7 @@
 
 static NSString *const SUUpdateAlertTouchBarIdentifier = @"" SPARKLE_BUNDLE_IDENTIFIER ".SUUpdateAlert";
 
-static const CGFloat SUUpdateAlertGroupElementSpacing = 12.0;
+static const CGFloat SUUpdateAlertGroupElementSpacing = 12.0; /// TODO: Remove (unused now)
 
 @interface SUUpdateAlert () <NSTouchBarDelegate>
 @end
@@ -57,6 +57,11 @@ static const CGFloat SUUpdateAlertGroupElementSpacing = 12.0;
     IBOutlet NSButton *_automaticallyInstallUpdatesButton;
     IBOutlet NSView *_titleView;
     IBOutlet NSView *_choicesView; /// NOTE: Xcode makes this outlet `__weak` by default? Does it matter?
+    IBOutlet NSView *_optionsView; /// NOTE: Should it be `__weak`?
+    IBOutlet NSView *_spacer_optionsView_top; /// NOTE: Should it be `__weak`?
+    IBOutlet NSView *_spacer_optionsView_bottom; /// NOTE: Should it be `__weak`?
+    
+    
     
     void (^_didBecomeKeyBlock)(void);
     void(^_completionBlock)(SPUUserUpdateChoice, NSRect, BOOL);
@@ -418,7 +423,11 @@ static const CGFloat SUUpdateAlertGroupElementSpacing = 12.0;
     // NOTE: The code below for deciding what buttons to hide is complex! Due to array of feature configurations :)
     
     if (!allowsAutomaticUpdates) {
-        _automaticallyInstallUpdatesButton.superview.hidden = YES;
+        _spacer_optionsView_bottom.hidden = YES;
+        _spacer_optionsView_top.hidden = YES;
+        _optionsView.hidden = YES;
+    
+        if ((NO)) _automaticallyInstallUpdatesButton.superview.hidden = YES;
     }
     
     if (_state.stage == SPUUserUpdateStageInstalling) {
