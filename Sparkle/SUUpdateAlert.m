@@ -454,9 +454,15 @@ static const CGFloat SUUpdateAlertGroupElementSpacing = 12.0; /// TODO: Remove (
         }
     }
     
-    if ((1)) { /// Make titlebar non-transparent
-        GET_CONSTRAINT_OF_SPACER_VIEW(_spacer_underneath_trafficLights).constant = 31;
+    if ((1)) {  /// Transparent titlebar
+        window.titlebarAppearsTransparent = YES;
+        if (@available(macOS 26.0, *)) GET_CONSTRAINT_OF_SPACER_VIEW(_spacer_underneath_trafficLights).constant = 22;
+        else                           GET_CONSTRAINT_OF_SPACER_VIEW(_spacer_underneath_trafficLights).constant = 20;
+    }
+    else {      /// Non-transparent titlebar
         window.titlebarAppearsTransparent = NO;
+        if (@available(macOS 26.0, *))  GET_CONSTRAINT_OF_SPACER_VIEW(_spacer_underneath_trafficLights).constant = 31; /// Not sure if there are differences depending on the .titlebarSeparatorStyle
+        else                            GET_CONSTRAINT_OF_SPACER_VIEW(_spacer_underneath_trafficLights).constant = 29;
     }
     
     BOOL showReleaseNotes = [self showsReleaseNotes];
