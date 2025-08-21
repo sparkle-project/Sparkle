@@ -62,11 +62,18 @@ static const CGFloat SUUpdateAlertGroupElementSpacing = 12.0; /// TODO: Remove (
     IBOutlet NSView *_releaseNotesContentView;
     IBOutlet NSButton *_automaticallyInstallUpdatesButton;
     IBOutlet NSView *_titleView;
-    IBOutlet NSView *_choicesView; /// NOTE: Xcode makes this outlet `__weak` by default? Does it matter?
-    IBOutlet NSView *_optionsView; /// NOTE: Should it be `__weak`?
-    IBOutlet NSView *_spacerAfter_releaseNotesBoxView;  /// NOTE: Should it be `__weak`?
-    IBOutlet NSView *_spacerAfter_optionsView;          /// NOTE: Should it be `__weak`?
-    IBOutlet NSView *_spacerUnder_trafficLights;        /// NOTE: Should it be `__weak`?
+    IBOutlet NSView *_choicesView; /// NOTE: Xcode makes this outlet `__weak` by default? Does it matter? (Same question for all the outlets below)
+    IBOutlet NSView *_optionsView;
+    IBOutlet NSView *_spacerAfter_releaseNotesBoxView;
+    IBOutlet NSView *_spacerAfter_optionsView;
+    IBOutlet NSView *_spacerUnder_trafficLights;
+    IBOutlet NSLayoutConstraint *_constraintForProgramIcon_width;
+    IBOutlet NSLayoutConstraint *_constraintForProgramIcon_trailingPadding;
+    IBOutlet NSLayoutConstraint *_constraintForProgramIcon_leadingPadding;
+    IBOutlet NSLayoutConstraint *_constraintForProgramIcon_bottomPadding;
+    IBOutlet NSLayoutConstraint *_constraintForProgramIcon_topPadding;
+    IBOutlet NSLayoutConstraint *_constraintForVersionAndQuestion_leading; /// Horizontal space to programIcon
+    IBOutlet NSLayoutConstraint *_constraintForVersionAndQuestion_verticalSpace; /// Space between the two textFields
     
     void (^_didBecomeKeyBlock)(void);
     void(^_completionBlock)(SPUUserUpdateChoice, NSRect, BOOL);
@@ -427,6 +434,19 @@ static const CGFloat SUUpdateAlertGroupElementSpacing = 12.0; /// TODO: Remove (
     if ((1)) { /// Make titlebar non-transparent
         GET_CONSTRAINT_OF_SPACER_VIEW(_spacerUnder_trafficLights).constant = 31;
         window.titlebarAppearsTransparent = NO;
+    }
+    
+    if (@available(macOS 16, *)) { /// Make title section larger on Tahoe to fit with larger buttons and stuff
+        
+        int newSize = 60;
+        _constraintForProgramIcon_width.constant            = newSize;
+        _constraintForProgramIcon_topPadding.constant       = -(newSize / 10); /// This compensates the empty space / shadow area around the icon, so we can do the rest of the layout more precisely.
+        _constraintForProgramIcon_bottomPadding.constant    = -(newSize / 10);
+        _constraintForProgramIcon_leadingPadding.constant   = -(newSize / 10);
+        _constraintForProgramIcon_trailingPadding.constant  = -(newSize / 10);
+        
+        _constraintForVersionAndQuestion_verticalSpace.constant = 12;
+        _constraintForVersionAndQuestion_leading.constant = 15;
     }
     
     BOOL showReleaseNotes = [self showsReleaseNotes];
