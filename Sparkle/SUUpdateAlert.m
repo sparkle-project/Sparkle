@@ -438,24 +438,25 @@ static const CGFloat SUUpdateAlertGroupElementSpacing = 12.0; /// TODO: Remove (
             _constraint_choices_trailing.constant = 15;
             _constraint_choices_bottom.constant = 15;
         }
+        
+        { /// Make title section larger on Tahoe to fit with larger buttons and stuff
+        
+            int newSize = 60;
+            _constraint_programIcon_width.constant            = newSize;
+            _constraint_programIcon_inset_top.constant       = -(newSize / 10); /// This compensates the empty space / shadow area around the icon, so we can do the rest of the layout based on where the icon actually appears visually
+            _constraint_programIcon_inset_bottom.constant    = -(newSize / 10);
+            _constraint_programIcon_inset_leading.constant   = -(newSize / 10);
+            _constraint_programIcon_inset_trailing.constant  = -(newSize / 10);
+            
+            _constraint_versionAndQuestion_vertical.constant = 10;
+            _constraint_versionAndQuestion_leading.constant  = 12;
+        }
+        
     }
     
     if ((1)) { /// Make titlebar non-transparent
         GET_CONSTRAINT_OF_SPACER_VIEW(_spacer_underneath_trafficLights).constant = 31;
         window.titlebarAppearsTransparent = NO;
-    }
-    
-    if (@available(macOS 16, *)) { /// Make title section larger on Tahoe to fit with larger buttons and stuff
-        
-        int newSize = 60;
-        _constraint_programIcon_width.constant            = newSize;
-        _constraint_programIcon_inset_top.constant       = -(newSize / 10); /// This compensates the empty space / shadow area around the icon, so we can do the rest of the layout based on where the icon actually appears visually
-        _constraint_programIcon_inset_bottom.constant    = -(newSize / 10);
-        _constraint_programIcon_inset_leading.constant   = -(newSize / 10);
-        _constraint_programIcon_inset_trailing.constant  = -(newSize / 10);
-        
-        _constraint_versionAndQuestion_vertical.constant = 12;
-        _constraint_versionAndQuestion_leading.constant = 15;
     }
     
     BOOL showReleaseNotes = [self showsReleaseNotes];
