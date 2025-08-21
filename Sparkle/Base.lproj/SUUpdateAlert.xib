@@ -36,7 +36,7 @@
             <rect key="screenRect" x="0.0" y="0.0" width="1440" height="869"/>
             <value key="minSize" type="size" width="462" height="150"/>
             <view key="contentView" misplaced="YES" id="6">
-                <rect key="frame" x="0.0" y="0.0" width="532" height="370"/>
+                <rect key="frame" x="0.0" y="0.0" width="680" height="433"/>
                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                 <subviews>
                     <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="0.0" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="61v-5k-OXp">
