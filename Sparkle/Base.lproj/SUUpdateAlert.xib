@@ -16,6 +16,8 @@
                 <outlet property="_releaseNotesBoxView" destination="ikY-gb-bgB" id="8ep-uz-XVh"/>
                 <outlet property="_releaseNotesContentView" destination="YbC-Ky-Aam" id="nng-CZ-Hwe"/>
                 <outlet property="_skipButton" destination="nRH-TL-zdL" id="1wh-qo-iMh"/>
+                <outlet property="_spacerAfter_optionsView" destination="CZN-96-fBZ" id="s8F-9F-j4x"/>
+                <outlet property="_spacerAfter_releaseNotesBoxView" destination="aWT-Rm-qcx" id="Owi-ww-anw"/>
                 <outlet property="_spacer_optionsView_bottom" destination="CZN-96-fBZ" id="jLn-8F-ctW"/>
                 <outlet property="_spacer_optionsView_top" destination="aWT-Rm-qcx" id="Xyl-Z3-E6f"/>
                 <outlet property="_stackView" destination="61v-5k-OXp" id="1rj-X0-yNf"/>
@@ -33,13 +35,13 @@
             <rect key="screenRect" x="0.0" y="0.0" width="1440" height="869"/>
             <value key="minSize" type="size" width="462" height="150"/>
             <view key="contentView" misplaced="YES" id="6">
-                <rect key="frame" x="0.0" y="0.0" width="680" height="411"/>
+                <rect key="frame" x="0.0" y="0.0" width="532" height="370"/>
                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                 <subviews>
                     <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="0.0" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="61v-5k-OXp">
                         <rect key="frame" x="0.0" y="0.0" width="680" height="411"/>
                         <subviews>
-                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="tKj-Tp-ogI" userLabel="Spacer - Title View - Top">
+                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="tKj-Tp-ogI" userLabel="Spacer Before &quot;Title View&quot;">
                                 <rect key="frame" x="0.0" y="391" width="157" height="20"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="20" id="hZi-8c-meI"/>
@@ -114,7 +116,7 @@
                                     <constraint firstItem="UU2-7C-LCJ" firstAttribute="centerY" secondItem="6Hv-XB-VNW" secondAttribute="centerY" id="sKc-pD-WS1"/>
                                 </constraints>
                             </customView>
-                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="ZTZ-5A-ukb" userLabel="Spacer - Title View - Bottom">
+                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="ZTZ-5A-ukb" userLabel="Spacer After &quot;Title View&quot;">
                                 <rect key="frame" x="0.0" y="321" width="157" height="20"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="20" id="Y8O-Wy-4S2"/>
@@ -131,16 +133,10 @@
                                     <constraint firstAttribute="height" relation="greaterThanOrEqual" priority="999" constant="200" id="g5s-9E-8SF"/>
                                 </constraints>
                             </box>
-                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="M7M-fi-22h" userLabel="Spacer - Release Notes Box - Bottom">
-                                <rect key="frame" x="0.0" y="71" width="157" height="15"/>
+                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="aWT-Rm-qcx" userLabel="Spacer After &quot;Release Notes Box&quot;">
+                                <rect key="frame" x="0.0" y="66" width="157" height="20"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="15" id="7Ul-Ck-Mly"/>
-                                </constraints>
-                            </customView>
-                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="aWT-Rm-qcx" userLabel="Spacer - Options view - Top">
-                                <rect key="frame" x="0.0" y="66" width="157" height="5"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="5" id="F2o-JH-B4Z"/>
+                                    <constraint firstAttribute="height" constant="20" id="F2o-JH-B4Z"/>
                                 </constraints>
                             </customView>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="Dg5-0U-d14" userLabel="Options view">
@@ -164,7 +160,7 @@
                                     <constraint firstItem="xYY-q8-ZyN" firstAttribute="leading" secondItem="Dg5-0U-d14" secondAttribute="leading" constant="20" symbolic="YES" id="wWK-qz-vla"/>
                                 </constraints>
                             </customView>
-                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="CZN-96-fBZ" userLabel="Spacer - Options view - Bottom">
+                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="CZN-96-fBZ" userLabel="Spacer After &quot;Options view&quot;">
                                 <rect key="frame" x="0.0" y="44" width="157" height="8"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="8" id="wcg-Wi-5EB"/>
@@ -252,10 +248,8 @@ DQ
                             <integer value="1000"/>
                             <integer value="1000"/>
                             <integer value="1000"/>
-                            <integer value="1000"/>
                         </visibilityPriorities>
                         <customSpacing>
-                            <real value="3.4028234663852886e+38"/>
                             <real value="3.4028234663852886e+38"/>
                             <real value="3.4028234663852886e+38"/>
                             <real value="3.4028234663852886e+38"/>
