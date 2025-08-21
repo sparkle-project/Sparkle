@@ -35,6 +35,12 @@ static NSString *const SUUpdateAlertTouchBarIdentifier = @"" SPARKLE_BUNDLE_IDEN
 
 static const CGFloat SUUpdateAlertGroupElementSpacing = 12.0; /// TODO: Remove (unused now)
 
+#define GET_CONSTRAINT_OF_SPACER_VIEW(v) ({        /** [Aug 2025] We're inserting views with exactly one width/height constraint into our stackView to serve as spacers. This lets us easily inspect/manipulate the size of a spacer */\
+        NSArray <NSLayoutConstraint *> *constraints = v.constraints;        \
+        assert(constraints.count == 1);                                     \
+        [constraints firstObject];                                          \
+})
+
 @interface SUUpdateAlert () <NSTouchBarDelegate>
 @end
 
@@ -58,10 +64,8 @@ static const CGFloat SUUpdateAlertGroupElementSpacing = 12.0; /// TODO: Remove (
     IBOutlet NSView *_titleView;
     IBOutlet NSView *_choicesView; /// NOTE: Xcode makes this outlet `__weak` by default? Does it matter?
     IBOutlet NSView *_optionsView; /// NOTE: Should it be `__weak`?
-    IBOutlet NSView *_spacer_optionsView_top; /// NOTE: Should it be `__weak`?
-    IBOutlet NSView *_spacer_optionsView_bottom; /// NOTE: Should it be `__weak`?
-    
-    
+    IBOutlet NSView *_spacerAfter_releaseNotesBoxView;  /// NOTE: Should it be `__weak`?
+    IBOutlet NSView *_spacerAfter_optionsView;      /// NOTE: Should it be `__weak`?
     
     void (^_didBecomeKeyBlock)(void);
     void(^_completionBlock)(SPUUserUpdateChoice, NSRect, BOOL);
@@ -374,7 +378,13 @@ static const CGFloat SUUpdateAlertGroupElementSpacing = 12.0; /// TODO: Remove (
             _releaseNotesBoxView.borderColor = [NSColor colorWithCalibratedWhite:0.84 alpha:1.0];
         }
         _releaseNotesBoxView.borderWidth = boxBorderWidth;
-        _releaseNotesBoxView.fillColor = NSColor.textBackgroundColor;
+        if ((0)) /// TESTING
+            _releaseNotesBoxView.fillColor = NSColor.textBackgroundColor;
+        else
+            _releaseNotesBoxView.fillColor =
+                [NSColor colorWithName: @"dynamicBoxColor" dynamicProvider:^NSColor * _Nonnull(NSAppearance * _Nonnull) {
+                    return [NSColor.textBackgroundColor colorWithAlphaComponent: 0.66];
+                }];
         
         // Needed so we don't clip the corners if the CSS uses a custom background
         _releaseNotesBoxView.contentView.wantsLayer = YES;
@@ -382,14 +392,34 @@ static const CGFloat SUUpdateAlertGroupElementSpacing = 12.0; /// TODO: Remove (
         _releaseNotesBoxView.contentView.layer.cornerRadius = boxCornerRadius - boxBorderWidth;
     }
     
-    if (@available(macOS 16, *)) {
+    if (@available(macOS 26.0, *)) {
         _skipButton.controlSize = NSControlSizeLarge;
         _laterButton.controlSize = NSControlSizeLarge;
         _installButton.controlSize = NSControlSizeLarge;
+        
+        if ((0)) { /// Match Tahoe Beta 7 NSAlert (everything larger)
+            GET_CONSTRAINT_OF_SPACER_VIEW(_spacerAfter_releaseNotesBoxView).constant = 18; //25;
+            GET_CONSTRAINT_OF_SPACER_VIEW(_spacerAfter_optionsView).constant = 18;
+            _automaticallyInstallUpdatesButton.controlSize = NSControlSizeRegular;
+            NSFont *oldFont = _automaticallyInstallUpdatesButton.font;
+            if (oldFont) _automaticallyInstallUpdatesButton.font = [NSFont fontWithDescriptor: oldFont.fontDescriptor size: NSFont.systemFontSize];
+        }
+        if ((0)) { /// Everything larger, but not as large
+            GET_CONSTRAINT_OF_SPACER_VIEW(_spacerAfter_releaseNotesBoxView).constant = 15;
+            GET_CONSTRAINT_OF_SPACER_VIEW(_spacerAfter_optionsView).constant = 10;
+            _automaticallyInstallUpdatesButton.controlSize = NSControlSizeRegular;
+            NSFont *oldFont = _automaticallyInstallUpdatesButton.font;
+            if (oldFont) _automaticallyInstallUpdatesButton.font = [NSFont fontWithDescriptor: oldFont.fontDescriptor size: NSFont.systemFontSize];
+        }
+        
+        if ((1)) { /// Match the reduced bottom/side margins on Tahoe of the choicesView
+            GET_CONSTRAINT_OF_SPACER_VIEW(_spacerAfter_releaseNotesBoxView).constant = 15;
+        }
+        
         for (NSLayoutConstraint *constraint in [_choicesView constraints]) {
-            if ([constraint.identifier isEqual: @"choices.leading"])    constraint.constant -= 5; /// 15 instead of 20, as seen in NSAlerts on Tahoe
-            if ([constraint.identifier isEqual: @"choices.trailing"])   constraint.constant -= 5;
-            if ([constraint.identifier isEqual: @"choices.bottom"])     constraint.constant -= 5;
+            if ([constraint.identifier isEqual: @"choices.leading"])    constraint.constant = 15; /// 15 instead of 20, as seen in NSAlerts on Tahoe
+            if ([constraint.identifier isEqual: @"choices.trailing"])   constraint.constant = 15;
+            if ([constraint.identifier isEqual: @"choices.bottom"])     constraint.constant = 15;
         }
     }
     
@@ -417,14 +447,14 @@ static const CGFloat SUUpdateAlertGroupElementSpacing = 12.0; /// TODO: Remove (
             [_stackView setCustomSpacing:SUUpdateAlertGroupElementSpacing afterView:_releaseNotesBoxView];
     } else {
         _releaseNotesBoxView.hidden = YES; /// [Aug 2025] The spacers above and below will stack up making for a very large space of 40 px. But I think that looks good?
-        
+        _spacerAfter_releaseNotesBoxView.hidden = YES;
     }
     
     // NOTE: The code below for deciding what buttons to hide is complex! Due to array of feature configurations :)
     
     if (!allowsAutomaticUpdates) {
-        _spacer_optionsView_bottom.hidden = YES;
-        _spacer_optionsView_top.hidden = YES;
+        
+        _spacerAfter_optionsView.hidden = YES;
         _optionsView.hidden = YES;
     
         if ((NO)) _automaticallyInstallUpdatesButton.superview.hidden = YES;
