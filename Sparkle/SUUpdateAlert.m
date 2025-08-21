@@ -54,6 +54,8 @@ static const CGFloat SUUpdateAlertGroupElementSpacing = 12.0; /// TODO: Remove (
     id<SUReleaseNotesView> _releaseNotesView;
     id<SUVersionDisplay> _versionDisplayer;
     
+    IBOutlet NSView *_contentView;
+    
     IBOutlet NSStackView *_stackView;
     IBOutlet NSButton *_installButton;
     IBOutlet NSButton *_laterButton;
@@ -452,9 +454,18 @@ static const CGFloat SUUpdateAlertGroupElementSpacing = 12.0; /// TODO: Remove (
             _constraint_versionAndQuestion_vertical.constant = 10;
             _constraint_versionAndQuestion_leading.constant  = 12;
         }
+        
+        /// Put liquid glass behind the content
+        if ((1)) { /// [Aug 2025] macOS 'shines' light on this from surrounding windows but this is not the translucent glass effect where things shine through from behind (which you see on NSAlert.)
+            NSGlassEffectView *glassView = [[NSGlassEffectView alloc] init];
+            glassView.contentView = window.contentView;
+            window.contentView = glassView;
+            glassView.style = NSGlassEffectViewStyleRegular; /// [Aug 2025] Don't we have to copy over the layout constraints? It seems to work without that.
+        }
+        
     }
     
-    if ((1)) {  /// Transparent titlebar
+    if ((0)) {  /// Transparent titlebar
         window.titlebarAppearsTransparent = YES;
         if (@available(macOS 26.0, *)) GET_CONSTRAINT_OF_SPACER_VIEW(_spacer_underneath_trafficLights).constant = 22;
         else                           GET_CONSTRAINT_OF_SPACER_VIEW(_spacer_underneath_trafficLights).constant = 20;
