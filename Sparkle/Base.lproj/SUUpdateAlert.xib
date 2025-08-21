@@ -10,24 +10,26 @@
             <connections>
                 <outlet property="_automaticallyInstallUpdatesButton" destination="xYY-q8-ZyN" id="yjl-z6-hNj"/>
                 <outlet property="_choicesView" destination="iUh-Md-dRX" id="Kjs-MT-pZ0"/>
-                <outlet property="_constraintForProgramIcon_bottomPadding" destination="Feo-UG-piV" id="HZf-nD-WZX"/>
-                <outlet property="_constraintForProgramIcon_leadingPadding" destination="Zpd-EE-fNw" id="3m0-1c-VDO"/>
-                <outlet property="_constraintForProgramIcon_topPadding" destination="0P2-HC-AcN" id="JJQ-fR-RNN"/>
-                <outlet property="_constraintForProgramIcon_trailingPadding" destination="l92-re-NHB" id="H96-1m-yot"/>
-                <outlet property="_constraintForProgramIcon_width" destination="dFg-Az-lxC" id="l2g-xv-Bnf"/>
-                <outlet property="_constraintForVersionAndQuestion_leading" destination="nEc-ic-3ZD" id="GTf-aZ-3Vk"/>
-                <outlet property="_constraintForVersionAndQuestion_verticalSpace" destination="9M6-6n-Bro" id="5fc-f0-FFv"/>
+                <outlet property="_constraint_choices_bottom" destination="hi9-TB-2I7" id="Hkf-Xu-hiP"/>
+                <outlet property="_constraint_choices_leading" destination="z77-Ds-Apc" id="KZE-QB-gHa"/>
+                <outlet property="_constraint_choices_trailing" destination="qFp-Lz-Zct" id="RYa-Lz-mt9"/>
+                <outlet property="_constraint_programIcon_inset_bottom" destination="Feo-UG-piV" id="HZf-nD-WZX"/>
+                <outlet property="_constraint_programIcon_inset_leading" destination="Zpd-EE-fNw" id="3m0-1c-VDO"/>
+                <outlet property="_constraint_programIcon_inset_top" destination="0P2-HC-AcN" id="JJQ-fR-RNN"/>
+                <outlet property="_constraint_programIcon_inset_trailing" destination="l92-re-NHB" id="H96-1m-yot"/>
+                <outlet property="_constraint_programIcon_width" destination="dFg-Az-lxC" id="l2g-xv-Bnf"/>
+                <outlet property="_constraint_versionAndQuestion_leading" destination="nEc-ic-3ZD" id="GTf-aZ-3Vk"/>
+                <outlet property="_constraint_versionAndQuestion_vertical" destination="9M6-6n-Bro" id="5fc-f0-FFv"/>
                 <outlet property="_installButton" destination="sUq-y0-gA3" id="hQ1-WX-CFo"/>
                 <outlet property="_laterButton" destination="uGk-Ks-HQR" id="QLX-rC-OVd"/>
                 <outlet property="_optionsView" destination="Dg5-0U-d14" id="wWh-XE-prn"/>
                 <outlet property="_releaseNotesBoxView" destination="ikY-gb-bgB" id="8ep-uz-XVh"/>
                 <outlet property="_releaseNotesContentView" destination="YbC-Ky-Aam" id="nng-CZ-Hwe"/>
                 <outlet property="_skipButton" destination="nRH-TL-zdL" id="1wh-qo-iMh"/>
-                <outlet property="_spacerAfter_optionsView" destination="CZN-96-fBZ" id="s8F-9F-j4x"/>
-                <outlet property="_spacerAfter_releaseNotesBoxView" destination="aWT-Rm-qcx" id="Owi-ww-anw"/>
-                <outlet property="_spacerUnder_trafficLights" destination="tKj-Tp-ogI" id="ksE-iw-7wI"/>
-                <outlet property="_spacer_optionsView_bottom" destination="CZN-96-fBZ" id="jLn-8F-ctW"/>
+                <outlet property="_spacer_after_optionsView" destination="CZN-96-fBZ" id="s8F-9F-j4x"/>
+                <outlet property="_spacer_after_releaseNotesBox" destination="aWT-Rm-qcx" id="Owi-ww-anw"/>
                 <outlet property="_spacer_optionsView_top" destination="aWT-Rm-qcx" id="Xyl-Z3-E6f"/>
+                <outlet property="_spacer_underneath_trafficLights" destination="tKj-Tp-ogI" id="ksE-iw-7wI"/>
                 <outlet property="_stackView" destination="61v-5k-OXp" id="1rj-X0-yNf"/>
                 <outlet property="_titleView" destination="cGD-9V-Gym" id="4EE-yh-bV0"/>
                 <outlet property="window" destination="5" id="69"/>
@@ -236,10 +238,10 @@ DQ
                                     <constraint firstItem="sUq-y0-gA3" firstAttribute="leading" secondItem="uGk-Ks-HQR" secondAttribute="trailing" constant="8" id="GNV-C1-iwM"/>
                                     <constraint firstItem="uGk-Ks-HQR" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="nRH-TL-zdL" secondAttribute="trailing" constant="12" symbolic="YES" id="JIK-Ix-vKz"/>
                                     <constraint firstItem="nRH-TL-zdL" firstAttribute="width" relation="greaterThanOrEqual" secondItem="sUq-y0-gA3" secondAttribute="width" id="ZG6-hO-ueO"/>
-                                    <constraint firstAttribute="bottom" secondItem="nRH-TL-zdL" secondAttribute="bottom" constant="20" symbolic="YES" identifier="choices.bottom" id="hi9-TB-2I7"/>
-                                    <constraint firstAttribute="trailing" secondItem="sUq-y0-gA3" secondAttribute="trailing" constant="20" symbolic="YES" identifier="choices.trailing" id="qFp-Lz-Zct"/>
+                                    <constraint firstAttribute="bottom" secondItem="nRH-TL-zdL" secondAttribute="bottom" constant="20" symbolic="YES" id="hi9-TB-2I7"/>
+                                    <constraint firstAttribute="trailing" secondItem="sUq-y0-gA3" secondAttribute="trailing" constant="20" symbolic="YES" id="qFp-Lz-Zct"/>
                                     <constraint firstItem="nRH-TL-zdL" firstAttribute="baseline" secondItem="uGk-Ks-HQR" secondAttribute="baseline" id="u6y-Qc-AKF"/>
-                                    <constraint firstItem="nRH-TL-zdL" firstAttribute="leading" secondItem="iUh-Md-dRX" secondAttribute="leading" constant="20" symbolic="YES" identifier="choices.trailing" id="z77-Ds-Apc"/>
+                                    <constraint firstItem="nRH-TL-zdL" firstAttribute="leading" secondItem="iUh-Md-dRX" secondAttribute="leading" constant="20" symbolic="YES" id="z77-Ds-Apc"/>
                                 </constraints>
                             </customView>
                         </subviews>

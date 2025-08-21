@@ -64,19 +64,27 @@ static const CGFloat SUUpdateAlertGroupElementSpacing = 12.0; /// TODO: Remove (
     IBOutlet NSView *_titleView;
     IBOutlet NSView *_choicesView; /// NOTE: Xcode makes this outlet `__weak` by default? Does it matter? (Same question for all the outlets below)
     IBOutlet NSView *_optionsView;
-    IBOutlet NSView *_spacerAfter_releaseNotesBoxView;
-    IBOutlet NSView *_spacerAfter_optionsView;
-    IBOutlet NSView *_spacerUnder_trafficLights;
-    IBOutlet NSLayoutConstraint *_constraintForProgramIcon_width;
-    IBOutlet NSLayoutConstraint *_constraintForProgramIcon_trailingPadding;
-    IBOutlet NSLayoutConstraint *_constraintForProgramIcon_leadingPadding;
-    IBOutlet NSLayoutConstraint *_constraintForProgramIcon_bottomPadding;
-    IBOutlet NSLayoutConstraint *_constraintForProgramIcon_topPadding;
-    IBOutlet NSLayoutConstraint *_constraintForVersionAndQuestion_leading; /// Horizontal space to programIcon
-    IBOutlet NSLayoutConstraint *_constraintForVersionAndQuestion_verticalSpace; /// Space between the two textFields
+    
+    IBOutlet NSView *_spacer_after_releaseNotesBox;
+    IBOutlet NSView *_spacer_after_optionsView;
+    IBOutlet NSView *_spacer_underneath_trafficLights;
+    
+    IBOutlet NSLayoutConstraint *_constraint_programIcon_width;
+    IBOutlet NSLayoutConstraint *_constraint_programIcon_inset_trailing;
+    IBOutlet NSLayoutConstraint *_constraint_programIcon_inset_leading;
+    IBOutlet NSLayoutConstraint *_constraint_programIcon_inset_bottom;
+    IBOutlet NSLayoutConstraint *_constraint_programIcon_inset_top;
+    
+    IBOutlet NSLayoutConstraint *_constraint_versionAndQuestion_leading; /// Horizontal space to programIcon
+    IBOutlet NSLayoutConstraint *_constraint_versionAndQuestion_vertical; /// Space between the two textFields
+    
+    IBOutlet NSLayoutConstraint *_constraint_choices_leading;
+    IBOutlet NSLayoutConstraint *_constraint_choices_bottom;
+    IBOutlet NSLayoutConstraint *_constraint_choices_trailing;
+    
     
     void (^_didBecomeKeyBlock)(void);
-    void(^_completionBlock)(SPUUserUpdateChoice, NSRect, BOOL);
+    void (^_completionBlock)(SPUUserUpdateChoice, NSRect, BOOL);
     
     BOOL _allowsAutomaticUpdates;
     BOOL _windowLoadedAndShowsReleaseNotes;
@@ -401,52 +409,53 @@ static const CGFloat SUUpdateAlertGroupElementSpacing = 12.0; /// TODO: Remove (
     }
     
     if (@available(macOS 26.0, *)) {
+    
         _skipButton.controlSize = NSControlSizeLarge;
         _laterButton.controlSize = NSControlSizeLarge;
         _installButton.controlSize = NSControlSizeLarge;
         
         if ((0)) { /// Match Tahoe Beta 7 NSAlert (everything larger)
-            GET_CONSTRAINT_OF_SPACER_VIEW(_spacerAfter_releaseNotesBoxView).constant = 18; //25;
-            GET_CONSTRAINT_OF_SPACER_VIEW(_spacerAfter_optionsView).constant = 18;
+            GET_CONSTRAINT_OF_SPACER_VIEW(_spacer_after_releaseNotesBox).constant = 18; //25;
+            GET_CONSTRAINT_OF_SPACER_VIEW(_spacer_after_optionsView).constant = 18;
             _automaticallyInstallUpdatesButton.controlSize = NSControlSizeRegular;
             NSFont *oldFont = _automaticallyInstallUpdatesButton.font;
             if (oldFont) _automaticallyInstallUpdatesButton.font = [NSFont fontWithDescriptor: oldFont.fontDescriptor size: NSFont.systemFontSize];
         }
         if ((0)) { /// Everything larger, but not as large
-            GET_CONSTRAINT_OF_SPACER_VIEW(_spacerAfter_releaseNotesBoxView).constant = 15;
-            GET_CONSTRAINT_OF_SPACER_VIEW(_spacerAfter_optionsView).constant = 10;
+            GET_CONSTRAINT_OF_SPACER_VIEW(_spacer_after_releaseNotesBox).constant = 15;
+            GET_CONSTRAINT_OF_SPACER_VIEW(_spacer_after_optionsView).constant = 10;
             _automaticallyInstallUpdatesButton.controlSize = NSControlSizeRegular;
             NSFont *oldFont = _automaticallyInstallUpdatesButton.font;
             if (oldFont) _automaticallyInstallUpdatesButton.font = [NSFont fontWithDescriptor: oldFont.fontDescriptor size: NSFont.systemFontSize];
         }
         
         if ((1)) { /// Match the reduced bottom/side margins on Tahoe of the choicesView
-            GET_CONSTRAINT_OF_SPACER_VIEW(_spacerAfter_releaseNotesBoxView).constant = 15;
+            GET_CONSTRAINT_OF_SPACER_VIEW(_spacer_after_releaseNotesBox).constant = 15;
         }
         
-        for (NSLayoutConstraint *constraint in [_choicesView constraints]) {
-            if ([constraint.identifier isEqual: @"choices.leading"])    constraint.constant = 15; /// 15 instead of 20, as seen in NSAlerts on Tahoe
-            if ([constraint.identifier isEqual: @"choices.trailing"])   constraint.constant = 15;
-            if ([constraint.identifier isEqual: @"choices.bottom"])     constraint.constant = 15;
+        {
+            _constraint_choices_leading.constant = 15; /// 15 instead of 20, as seen in NSAlerts on Tahoe
+            _constraint_choices_trailing.constant = 15;
+            _constraint_choices_bottom.constant = 15;
         }
     }
     
     if ((1)) { /// Make titlebar non-transparent
-        GET_CONSTRAINT_OF_SPACER_VIEW(_spacerUnder_trafficLights).constant = 31;
+        GET_CONSTRAINT_OF_SPACER_VIEW(_spacer_underneath_trafficLights).constant = 31;
         window.titlebarAppearsTransparent = NO;
     }
     
     if (@available(macOS 16, *)) { /// Make title section larger on Tahoe to fit with larger buttons and stuff
         
         int newSize = 60;
-        _constraintForProgramIcon_width.constant            = newSize;
-        _constraintForProgramIcon_topPadding.constant       = -(newSize / 10); /// This compensates the empty space / shadow area around the icon, so we can do the rest of the layout more precisely.
-        _constraintForProgramIcon_bottomPadding.constant    = -(newSize / 10);
-        _constraintForProgramIcon_leadingPadding.constant   = -(newSize / 10);
-        _constraintForProgramIcon_trailingPadding.constant  = -(newSize / 10);
+        _constraint_programIcon_width.constant            = newSize;
+        _constraint_programIcon_inset_top.constant       = -(newSize / 10); /// This compensates the empty space / shadow area around the icon, so we can do the rest of the layout based on where the icon actually appears visually
+        _constraint_programIcon_inset_bottom.constant    = -(newSize / 10);
+        _constraint_programIcon_inset_leading.constant   = -(newSize / 10);
+        _constraint_programIcon_inset_trailing.constant  = -(newSize / 10);
         
-        _constraintForVersionAndQuestion_verticalSpace.constant = 12;
-        _constraintForVersionAndQuestion_leading.constant = 15;
+        _constraint_versionAndQuestion_vertical.constant = 12;
+        _constraint_versionAndQuestion_leading.constant = 15;
     }
     
     BOOL showReleaseNotes = [self showsReleaseNotes];
@@ -473,14 +482,14 @@ static const CGFloat SUUpdateAlertGroupElementSpacing = 12.0; /// TODO: Remove (
             [_stackView setCustomSpacing:SUUpdateAlertGroupElementSpacing afterView:_releaseNotesBoxView];
     } else {
         _releaseNotesBoxView.hidden = YES; /// [Aug 2025] The spacers above and below will stack up making for a very large space of 40 px. But I think that looks good?
-        _spacerAfter_releaseNotesBoxView.hidden = YES;
+        _spacer_after_releaseNotesBox.hidden = YES;
     }
     
     // NOTE: The code below for deciding what buttons to hide is complex! Due to array of feature configurations :)
     
     if (!allowsAutomaticUpdates) {
         
-        _spacerAfter_optionsView.hidden = YES;
+        _spacer_after_optionsView.hidden = YES;
         _optionsView.hidden = YES;
     
         if ((NO)) _automaticallyInstallUpdatesButton.superview.hidden = YES;
