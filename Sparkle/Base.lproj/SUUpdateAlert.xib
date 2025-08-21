@@ -36,32 +36,32 @@
             <rect key="screenRect" x="0.0" y="0.0" width="1440" height="869"/>
             <value key="minSize" type="size" width="462" height="150"/>
             <view key="contentView" misplaced="YES" id="6">
-                <rect key="frame" x="0.0" y="0.0" width="680" height="433"/>
+                <rect key="frame" x="0.0" y="0.0" width="680" height="453"/>
                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                 <subviews>
                     <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="0.0" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="61v-5k-OXp">
-                        <rect key="frame" x="0.0" y="0.0" width="680" height="433"/>
+                        <rect key="frame" x="0.0" y="0.0" width="680" height="443"/>
                         <subviews>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="tKj-Tp-ogI" userLabel="Spacer Under Traffic Lights">
-                                <rect key="frame" x="0.0" y="411" width="157" height="22"/>
+                                <rect key="frame" x="0.0" y="421" width="157" height="22"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="22" id="hZi-8c-meI"/>
                                 </constraints>
                             </customView>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="tZs-ms-xZa" userLabel="Spacer Before &quot;Title View&quot;">
-                                <rect key="frame" x="0.0" y="391" width="157" height="20"/>
+                                <rect key="frame" x="0.0" y="401" width="157" height="20"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="20" id="Axv-7V-O21"/>
                                 </constraints>
                             </customView>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="cGD-9V-Gym" userLabel="Title View">
-                                <rect key="frame" x="0.0" y="341" width="680" height="50"/>
+                                <rect key="frame" x="0.0" y="341" width="680" height="60"/>
                                 <subviews>
                                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="6Hv-XB-VNW" userLabel="Icon Container">
-                                        <rect key="frame" x="20" y="0.0" width="50" height="50"/>
+                                        <rect key="frame" x="20" y="0.0" width="60" height="60"/>
                                         <subviews>
                                             <imageView translatesAutoresizingMaskIntoConstraints="NO" id="F1L-zh-U8Z" userLabel="Program icon">
-                                                <rect key="frame" x="-5" y="-5" width="60" height="60"/>
+                                                <rect key="frame" x="-6" y="-6" width="72" height="72"/>
                                                 <imageCell key="cell" refusesFirstResponder="YES" alignment="left" animates="YES" imageScaling="proportionallyUpOrDown" image="NSApplicationIcon" id="k4f-D1-7oF"/>
                                                 <connections>
                                                     <binding destination="-2" name="value" keyPath="applicationIcon" id="DAK-U8-9cN"/>
@@ -69,19 +69,19 @@
                                             </imageView>
                                         </subviews>
                                         <constraints>
-                                            <constraint firstItem="F1L-zh-U8Z" firstAttribute="top" secondItem="6Hv-XB-VNW" secondAttribute="top" constant="-5" id="0P2-HC-AcN"/>
-                                            <constraint firstAttribute="bottom" secondItem="F1L-zh-U8Z" secondAttribute="bottom" constant="-5" id="Feo-UG-piV"/>
-                                            <constraint firstItem="F1L-zh-U8Z" firstAttribute="leading" secondItem="6Hv-XB-VNW" secondAttribute="leading" constant="-5" id="Zpd-EE-fNw"/>
-                                            <constraint firstAttribute="width" constant="50" id="dFg-Az-lxC"/>
-                                            <constraint firstAttribute="trailing" secondItem="F1L-zh-U8Z" secondAttribute="trailing" constant="-5" id="l92-re-NHB"/>
+                                            <constraint firstItem="F1L-zh-U8Z" firstAttribute="top" secondItem="6Hv-XB-VNW" secondAttribute="top" constant="-6" id="0P2-HC-AcN"/>
+                                            <constraint firstAttribute="bottom" secondItem="F1L-zh-U8Z" secondAttribute="bottom" constant="-6" id="Feo-UG-piV"/>
+                                            <constraint firstItem="F1L-zh-U8Z" firstAttribute="leading" secondItem="6Hv-XB-VNW" secondAttribute="leading" constant="-6" id="Zpd-EE-fNw"/>
+                                            <constraint firstAttribute="width" constant="60" id="dFg-Az-lxC"/>
+                                            <constraint firstAttribute="trailing" secondItem="F1L-zh-U8Z" secondAttribute="trailing" constant="-6" id="l92-re-NHB"/>
                                             <constraint firstAttribute="width" secondItem="6Hv-XB-VNW" secondAttribute="height" multiplier="1:1" id="vEu-QU-SaW"/>
                                         </constraints>
                                     </customView>
                                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="UU2-7C-LCJ" userLabel="Version &amp; Question view">
-                                        <rect key="frame" x="80" y="7" width="580" height="37"/>
+                                        <rect key="frame" x="95" y="9" width="565" height="42"/>
                                         <subviews>
                                             <textField focusRingType="none" verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="Nvn-Dp-hAH" userLabel="Version text field">
-                                                <rect key="frame" x="-2" y="21" width="584" height="16"/>
+                                                <rect key="frame" x="-2" y="26" width="569" height="16"/>
                                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" allowsUndo="NO" sendsActionOnEndEditing="YES" title="Version title" usesSingleLineMode="YES" id="f6r-wP-EYG">
                                                     <font key="font" metaFont="systemBold"/>
                                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -92,7 +92,7 @@
                                                 </connections>
                                             </textField>
                                             <textField focusRingType="none" verticalHuggingPriority="999" horizontalCompressionResistancePriority="1000" verticalCompressionResistancePriority="1000" preferredMaxLayoutWidth="490" translatesAutoresizingMaskIntoConstraints="NO" id="WdU-eY-Ta9" userLabel="Question text field">
-                                                <rect key="frame" x="-2" y="0.0" width="584" height="14"/>
+                                                <rect key="frame" x="-2" y="0.0" width="569" height="14"/>
                                                 <textFieldCell key="cell" allowsUndo="NO" sendsActionOnEndEditing="YES" title="Question" id="Jsa-P1-mWz">
                                                     <font key="font" metaFont="smallSystem"/>
                                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -105,7 +105,7 @@
                                         </subviews>
                                         <constraints>
                                             <constraint firstItem="Nvn-Dp-hAH" firstAttribute="leading" secondItem="UU2-7C-LCJ" secondAttribute="leading" id="25L-Ag-aFU"/>
-                                            <constraint firstItem="WdU-eY-Ta9" firstAttribute="top" secondItem="Nvn-Dp-hAH" secondAttribute="bottom" constant="7" id="9M6-6n-Bro"/>
+                                            <constraint firstItem="WdU-eY-Ta9" firstAttribute="top" secondItem="Nvn-Dp-hAH" secondAttribute="bottom" constant="12" id="9M6-6n-Bro"/>
                                             <constraint firstAttribute="bottom" secondItem="WdU-eY-Ta9" secondAttribute="bottom" id="CZX-9a-gJl"/>
                                             <constraint firstAttribute="trailing" secondItem="WdU-eY-Ta9" secondAttribute="trailing" id="WZm-Si-7IJ"/>
                                             <constraint firstAttribute="trailing" secondItem="Nvn-Dp-hAH" secondAttribute="trailing" id="aGK-sK-0uf"/>
@@ -118,7 +118,7 @@
                                     <constraint firstItem="6Hv-XB-VNW" firstAttribute="leading" secondItem="cGD-9V-Gym" secondAttribute="leading" constant="20" symbolic="YES" id="2bF-K2-CwX"/>
                                     <constraint firstAttribute="bottom" secondItem="6Hv-XB-VNW" secondAttribute="bottom" id="JL6-vG-SS4"/>
                                     <constraint firstAttribute="trailing" secondItem="UU2-7C-LCJ" secondAttribute="trailing" constant="20" symbolic="YES" id="eyz-xg-wVZ"/>
-                                    <constraint firstItem="UU2-7C-LCJ" firstAttribute="leading" secondItem="6Hv-XB-VNW" secondAttribute="trailing" constant="10" id="nEc-ic-3ZD"/>
+                                    <constraint firstItem="UU2-7C-LCJ" firstAttribute="leading" secondItem="6Hv-XB-VNW" secondAttribute="trailing" constant="15" id="nEc-ic-3ZD"/>
                                     <constraint firstItem="6Hv-XB-VNW" firstAttribute="top" secondItem="cGD-9V-Gym" secondAttribute="top" id="qTV-vd-doT"/>
                                     <constraint firstItem="UU2-7C-LCJ" firstAttribute="centerY" secondItem="6Hv-XB-VNW" secondAttribute="centerY" id="sKc-pD-WS1"/>
                                 </constraints>
