@@ -93,3 +93,15 @@
 
 /* Software Update title/label */
 "Software Update" = "Aktualiziranje softvera";
+
+/* Remind Me Later choice for update alert */
+"Remind Me Later" = "Podsjeti me kasnije";
+
+/* Skip This Version choice for update alert */
+"Skip This Version" = "Zanemari ovu verziju";
+
+/* Install Update choice for update alert */
+"Install Update" = "Instaliraj nadogradnju";
+
+/* Automatically download and install updates in the future option for update alert */
+"Automatically download and install updates in the future" = "Ubuduće preuzmi i instaliraj nadogradnje automatski";

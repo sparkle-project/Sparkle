@@ -90,3 +90,15 @@
 
 /* Software Update title/label; */
 "Software Update" = "Programoppdatering";
+
+/* Remind Me Later choice for update alert */
+"Remind Me Later" = "Utsett";
+
+/* Skip This Version choice for update alert */
+"Skip This Version" = "Hopp over";
+
+/* Install Update choice for update alert */
+"Install Update" = "Installer";
+
+/* Automatically download and install updates in the future option for update alert */
+"Automatically download and install updates in the future" = "Last ned og installer automatisk i framtida";

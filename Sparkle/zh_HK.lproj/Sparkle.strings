@@ -153,3 +153,15 @@
 
 /* Software Update title/label */
 "Software Update" = "軟體更新";
+
+/* Remind Me Later choice for update alert */
+"Remind Me Later" = "稍後提醒我";
+
+/* Skip This Version choice for update alert */
+"Skip This Version" = "跳過此版本";
+
+/* Install Update choice for update alert */
+"Install Update" = "安裝更新";
+
+/* Automatically download and install updates in the future option for update alert */
+"Automatically download and install updates in the future" = "以後自動下載並安裝更新";

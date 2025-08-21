@@ -90,3 +90,15 @@
 
 /* Software Update title/label */
 "Software Update" = "Actualizarea aplicației";
+
+/* Remind Me Later choice for update alert */
+"Remind Me Later" = "Amintește-mi mai târziu";
+
+/* Skip This Version choice for update alert */
+"Skip This Version" = "Sari peste…";
+
+/* Install Update choice for update alert */
+"Install Update" = "Instalează actualizarea";
+
+/* Automatically download and install updates in the future option for update alert */
+"Automatically download and install updates in the future" = "În viitor descarcă și instalează în automat actualizările";

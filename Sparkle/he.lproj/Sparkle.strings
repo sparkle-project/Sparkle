@@ -192,3 +192,15 @@
 
 /* Software Update title/label */
 "Software Update" = "עדכון תוכנה";
+
+/* Remind Me Later choice for update alert */
+"Remind Me Later" = "הזכר לי מאוחר יותר";
+
+/* Skip This Version choice for update alert */
+"Skip This Version" = "דלג על גרסה זו";
+
+/* Install Update choice for update alert */
+"Install Update" = "התקן את העדכון";
+
+/* Automatically download and install updates in the future option for update alert */
+"Automatically download and install updates in the future" = "הורד והתקן עדכונים בעתיד באופן אוטומטי";

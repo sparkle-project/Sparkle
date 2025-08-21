@@ -153,3 +153,15 @@
 
 /* Software Update title/label */
 "Software Update" = "Aggiornamento Software";
+
+/* Remind Me Later choice for update alert */
+"Remind Me Later" = "Ricordamelo più tardi";
+
+/* Skip This Version choice for update alert */
+"Skip This Version" = "Ignora questa versione";
+
+/* Install Update choice for update alert */
+"Install Update" = "Installa";
+
+/* Automatically download and install updates in the future option for update alert */
+"Automatically download and install updates in the future" = "In futuro scarica e installa automaticamente gli aggiornamenti";

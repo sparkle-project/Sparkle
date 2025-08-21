@@ -96,3 +96,15 @@
 
 /* Software Update title/label */
 "Software Update" = "软件更新";
+
+/* Remind Me Later choice for update alert */
+"Remind Me Later" = "稍后提示我";
+
+/*Skip This Version choice for update alert */
+"Skip This Version" = "跳过这个版本";
+
+/* Install Update choice for update alert */
+"Install Update" = "安装更新";
+
+/* Automatically download and install updates in the future option for update alert */
+"Automatically download and install updates in the future" = "以后自动下载并安装更新";

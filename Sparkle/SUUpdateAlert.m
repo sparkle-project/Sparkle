@@ -371,6 +371,11 @@ static const CGFloat SUUpdateAlertGroupElementSpacing = 12.0;
         _releaseNotesBoxView.contentView.layer.cornerRadius = boxCornerRadius - boxBorderWidth;
     }
     
+    _laterButton.title = SULocalizedStringFromTableInBundle(@"Remind Me Later", SPARKLE_TABLE, sparkleBundle, @"");
+    _skipButton.title = SULocalizedStringFromTableInBundle(@"Skip This Version", SPARKLE_TABLE, sparkleBundle, @"");
+    _installButton.title = SULocalizedStringFromTableInBundle(@"Install Update", SPARKLE_TABLE, sparkleBundle, @"");
+    _automaticallyInstallUpdatesButton.title = SULocalizedStringFromTableInBundle(@"Automatically download and install updates in the future", SPARKLE_TABLE, sparkleBundle, @"");
+    
     if (@available(macOS 16, *)) {
         _skipButton.controlSize = NSControlSizeLarge;
         _laterButton.controlSize = NSControlSizeLarge;

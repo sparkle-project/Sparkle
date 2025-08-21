@@ -81,3 +81,15 @@
 
 /* Software Update title/label */
 "Software Update" = "Programuppdatering";
+
+/* Remind Me Later choice for update alert */
+"Remind Me Later" = "Påminn mig senare";
+
+/* Skip This Version choice for update alert */
+"Skip This Version" = "Hoppa över denna version";
+
+/* Install Update choice for update alert */
+"Install Update" = "Installera uppdatering";
+
+/* Automatically download and install updates in the future option for update alert */
+"Automatically download and install updates in the future" = "Hämta och installera nya uppdateringar automatiskt i framtiden.";

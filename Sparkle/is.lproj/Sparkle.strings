@@ -54,3 +54,15 @@
 
 /* Software Update title/label */
 "Software Update" = "Hugbúnaðaruppfærsla";
+
+/* Remind Me Later choice for update alert */
+"Remind Me Later" = "Áminntu mig síðar";
+
+/* Skip This Version choice for update alert */
+"Skip This Version" = "Sleppa þessari útgáfu";
+
+/* Install Update choice for update alert */
+"Install Update" = "Innsetja";
+
+/* Automatically download and install updates in the future option for update alert */
+"Automatically download and install updates in the future" = "Sækja og innsetja uppfærslur sjálfkrafa framvegis";

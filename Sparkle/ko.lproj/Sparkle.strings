@@ -153,3 +153,15 @@
 
 /* Software Update title/label */
 "Software Update" = "소프트웨어 업데이트";
+
+/* Remind Me Later choice for update alert */
+"Remind Me Later" = "나중에";
+
+/* Skip This Version choice for update alert */
+"Skip This Version" = "이 버전 건너뛰기";
+
+/* Install Update choice for update alert */
+"Install Update" = "업데이트 설치";
+
+/* Automatically download and install updates in the future option for update alert */
+"Automatically download and install updates in the future" = "향후 업데이트 자동 다운로드 및 설치";

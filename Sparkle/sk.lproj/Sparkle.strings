@@ -81,3 +81,15 @@
 
 /* Software Update title/label */
 "Software Update" = "Aktualizácia softvéru";
+
+/* Remind Me Later choice for update alert */
+"Remind Me Later" = "Pripomenúť neskôr";
+
+/* Skip This Version choice for update alert */
+"Skip This Version" = "Vynechať túto verziu";
+
+/* Install Update choice for update alert */
+"Install Update" = "Nainštalovať";
+
+/* Automatically download and install updates in the future option for update alert */
+"Automatically download and install updates in the future" = "V budúcnosti aktualizácie preberať a inštalovať automaticky";

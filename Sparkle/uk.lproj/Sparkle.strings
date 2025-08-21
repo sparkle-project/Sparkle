@@ -84,3 +84,15 @@
 
 /* Software Update title/label */
 "Software Update" = "Оновлення програмного забезпечення";
+
+/* Remind Me Later choice for update alert */
+"Remind Me Later" = "Нагадати пізніше";
+
+/* Skip This Version choice for update alert */
+"Skip This Version" = "Пропустити цю версію";
+
+/* Install Update choice for update alert */
+"Install Update" = "Встановити оновлення";
+
+/* Automatically download and install updates in the future option for update alert */
+"Automatically download and install updates in the future" = "Автоматично завантажувати та встановлювати оновлення у майбутньому";

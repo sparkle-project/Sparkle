@@ -201,3 +201,15 @@
 
 /* Software Update title/label */
 "Software Update" = "Software Update";
+
+/* Remind Me Later choice for update alert */
+"Remind Me Later" = "Remind Me Later";
+
+/*Skip This Version choice for update alert */
+"Skip This Version" = "Skip This Version";
+
+/* Install Update choice for update alert */
+"Install Update" = "Install Update";
+
+/* Automatically download and install updates in the future option for update alert */
+"Automatically download and install updates in the future" = "Automatically download and install updates in the future";

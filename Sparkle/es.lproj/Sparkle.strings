@@ -96,3 +96,15 @@
 
 /* Software Update title/label */
 "Software Update" = "Actualización de software";
+
+/* Remind Me Later choice for update alert */
+"Remind Me Later" = "Recordármelo";
+
+/* Skip This Version choice for update alert */
+"Skip This Version" = "No instalar esta versión";
+
+/* Install Update choice for update alert */
+"Install Update" = "Instalar actualización";
+
+/* Automatically download and install updates in the future option for update alert */
+"Automatically download and install updates in the future" = "Descargar e instalar actualizaciones automáticamente";

@@ -63,3 +63,15 @@
 
 /* Software Update title/label */
 "Software Update" = "Szoftverfrissítés";
+
+/* Remind Me Later choice for update alert */
+"Remind Me Later" = "Emlékeztessen később";
+
+/* Skip This Version choice for update alert */
+"Skip This Version" = "Verzió kihagyása";
+
+/* Install Update choice for update alert */
+"Install Update" = "Telepítés";
+
+/* Automatically download and install updates in the future option for update alert */
+"Automatically download and install updates in the future" = "A jövőben automatikusan töltse le és telepítse a frissítéseket";

@@ -57,3 +57,15 @@
 
 /* Software Update title/label */
 "Software Update" = "Ohjelmiston pävitys";
+
+/* Remind Me Later choice for update alert */
+"Remind Me Later" = "Muistuta myöhemmin";
+
+/*Skip This Version choice for update alert */
+"Skip This Version" = "Ohita tämä versio";
+
+/* Install Update choice for update alert */
+"Install Update" = "Asenna päivitys";
+
+/* Automatically download and install updates in the future option for update alert */
+"Automatically download and install updates in the future" = "Hae ja asenna päivitykset jatkossa automaattisesti";

@@ -81,3 +81,15 @@
 
 /* Software Update title/label */
 "Software Update" = "Ενημέρωση προγράμματος";
+
+/* Remind Me Later choice for update alert */
+"Remind Me Later" = "Υπενθύμιση Αργότερα";
+
+/*Skip This Version choice for update alert */
+"Skip This Version" = "Παράλειψη Έκδοσης";
+
+/* Install Update choice for update alert */
+"Install Update" = "Εγκατάσταση Ενημέρωσης";
+
+/* Automatically download and install updates in the future option for update alert */
+"Automatically download and install updates in the future" = "Αυτόματη λήψη και εγκατάσταση ενημερώσεων στο μέλλον";

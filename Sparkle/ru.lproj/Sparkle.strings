@@ -84,3 +84,15 @@
 
 /* Software Update title/label */
 "Software Update" = "Обновление программного обеспечения";
+
+/* Remind Me Later choice for update alert */
+"Remind Me Later" = "Напоминать позже";
+
+/* Skip This Version choice for update alert */
+"Skip This Version" = "Пропустить эту версию";
+
+/* Install Update choice for update alert */
+"Install Update" = "Установить обновление";
+
+/* Automatically download and install updates in the future option for update alert */
+"Automatically download and install updates in the future" = "Автоматически загружать и устанавливать обновления в будущем";

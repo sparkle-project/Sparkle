@@ -153,3 +153,15 @@
 
 /* Software Update title/label */
 "Software Update" = "Aktualizace aplikace";
+
+/* Remind Me Later choice for update alert */
+"Remind Me Later" = "Připomenout později";
+
+/*Skip This Version choice for update alert */
+"Skip This Version" = "Přeskočit tuto verzi";
+
+/* Install Update choice for update alert */
+"Install Update" = "Instalovat aktualizaci";
+
+/* Automatically download and install updates in the future option for update alert */
+"Automatically download and install updates in the future" = "V budoucnu stahovat a instalovat aktualizace automaticky";
