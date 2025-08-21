@@ -65,7 +65,7 @@ static NSString *const SUUpdateAlertTouchBarIdentifier = @"" SPARKLE_BUNDLE_IDEN
     IBOutlet NSView *_releaseNotesContentView;
     IBOutlet NSButton *_automaticallyInstallUpdatesButton;
     IBOutlet NSView *_titleView;
-    IBOutlet NSView *_optionsView; /// NOTE: [Aug 2025] Xcode makes this outlet `__weak` by default? Does it matter? (Same question for all the other outlets)
+    IBOutlet NSView *_optionsView;
     
     IBOutlet NSView *_spacer_after_releaseNotesBox;
     IBOutlet NSView *_spacer_after_optionsView;
@@ -371,7 +371,7 @@ static NSString *const SUUpdateAlertTouchBarIdentifier = @"" SPARKLE_BUNDLE_IDEN
 {
     NSWindow *window = self.window;
     
-    window.movableByWindowBackground = YES;
+    window.movableByWindowBackground = YES; /// Should this depend on .titlebarAppearsTransparent?
     
 #if SPARKLE_COPY_LOCALIZATIONS
     NSBundle *sparkleBundle = SUSparkleBundle();
