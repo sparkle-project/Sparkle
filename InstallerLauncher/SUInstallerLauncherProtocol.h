@@ -11,6 +11,6 @@
 
 @protocol SUInstallerLauncherProtocol
 
-- (void)launchInstallerWithHostBundlePath:(NSString *)hostBundlePath iconBundlePath:(NSString *)iconBundlePath updaterIdentifier:(NSString *)updaterBundleIdentifier authorizationPrompt:(NSString *)authorizationPrompt installationType:(NSString *)installationType allowingDriverInteraction:(BOOL)allowingDriverInteraction completion:(void (^)(SUInstallerLauncherStatus, BOOL))completionHandler;
+- (void)launchInstallerWithHostBundlePath:(NSString *)hostBundlePath mainBundlePath:(NSString *)mainBundlePath installationType:(NSString *)installationType allowingDriverInteraction:(BOOL)allowingDriverInteraction completion:(void (^)(SUInstallerLauncherStatus, BOOL))completionHandler;
     
 @end

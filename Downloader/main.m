@@ -9,6 +9,8 @@
 #import <Foundation/Foundation.h>
 #import "SPUDownloader.h"
 #import "SPUDownloaderDelegate.h"
+#import "SULog.h"
+#import "SUCodeSigningVerifier.h"
 
 @interface ServiceDelegate : NSObject <NSXPCListenerDelegate>
 @end
@@ -17,6 +19,30 @@
 
 - (BOOL)listener:(NSXPCListener *)__unused listener shouldAcceptNewConnection:(NSXPCConnection *)newConnection {
     // This method is where the NSXPCListener configures, accepts, and resumes a new incoming NSXPCConnection.
+    
+    // Validate connection of clients to avoid any client from using the service.
+    // Ideally we would also prevent clients connecting that have an outgoing network connection enabled,
+    // but this is not easy to enforce.
+    // This is a policy, not a security critical enforcement.
+    {
+        NSError *validationError = nil;
+        SUValidateConnectionStatus validationStatus = [SUCodeSigningVerifier validateConnection:newConnection options:SUValidateConnectionOptionRequireSandboxEntitlement error:&validationError];
+        switch (validationStatus) {
+            case SUValidateConnectionStatusSetCodeSigningRequirementSuccess:
+                break;
+            case SUValidateConnectionStatusSetNoRequirementSuccess:
+                assert(false);
+                break;
+            case SUValidateConnectionStatusAPIFailure:
+            case SUValidateConnectionStatusCodeSigningRequirementFailure:
+            case SUValidateConectionNoSupportedValidationMethodFailure:
+                SULog(SULogLevelError, @"Error: Downloader XPC Service is rejecting new connection due to failing validation of XPC connection with status %lu and error: %@", validationStatus, validationError.localizedDescription);
+                
+                [newConnection invalidate];
+                
+                return NO;
+        }
+    }
     
     // Configure the connection.
     // First, set the interface that the exported object implements.

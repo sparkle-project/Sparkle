@@ -150,7 +150,7 @@
     return newAppDownloadPath;
 }
 
-+ (nullable id<SUInstallerProtocol>)installerForHost:(SUHost *)host expectedInstallationType:(NSString *)expectedInstallationType updateDirectory:(NSString *)updateDirectory homeDirectory:(NSString *)homeDirectory userName:(NSString *)userName error:(NSError * __autoreleasing *)error
++ (nullable id<SUInstallerProtocol>)installerForHost:(SUHost *)host expectedInstallationType:(NSString *)expectedInstallationType updateDirectory:(NSString *)updateDirectory connectionCodeSigningValidationSkipped:(BOOL)connectionCodeSigningValidationSkipped homeDirectory:(NSString *)homeDirectory userName:(NSString *)userName error:(NSError * __autoreleasing *)error
 {
 #if SPARKLE_BUILD_PACKAGE_SUPPORT
     BOOL isPackage = NO;
@@ -169,6 +169,83 @@
         }
         return nil;
     }
+    
+#if SPARKLE_BUILD_PACKAGE_SUPPORT
+    if (isPackage && connectionCodeSigningValidationSkipped) {
+        // Package updates cannot update arbitrary bundles if code signing validation on the connection was skipped
+        // (This means our helper is not code signed with an Apple issued certificate).
+        // In this case, the main executable must be owned by root and the host must contain our installer tool
+        
+        NSString *installerExecutablePath = NSBundle.mainBundle.executableURL.URLByResolvingSymlinksInPath.path;
+        if (installerExecutablePath == nil) {
+            if (error != NULL) {
+                *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUMissingUpdateError userInfo:@{ NSLocalizedDescriptionKey: @"The "@SPARKLE_RELAUNCH_TOOL_NAME" executable path failed to be retrieved, which is an internal error that shouldn't happen. Please try to update using a production build of your app." }];
+            }
+            
+            return nil;
+        }
+        
+        NSString *hostBundlePath = host.bundle.bundleURL.URLByResolvingSymlinksInPath.path;
+        if (hostBundlePath == nil) {
+            if (error != NULL) {
+                *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUMissingUpdateError userInfo:@{ NSLocalizedDescriptionKey: @"The host bundle path to update to be retrieved, which is an internal error that shouldn't happen. Please try to update using a production build of your app." }];
+            }
+            
+            return nil;
+        }
+        
+        NSError *attributesError = nil;
+        NSDictionary<NSFileAttributeKey, id> *fileAttributes = [NSFileManager.defaultManager attributesOfItemAtPath:installerExecutablePath error:&attributesError];
+        
+        if (fileAttributes == nil) {
+            if (error != NULL) {
+                *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUMissingUpdateError userInfo:@{ NSLocalizedDescriptionKey: @"File attributes failed to be retrieved from the "@SPARKLE_RELAUNCH_TOOL_NAME" executable, which is an internal error that shouldn't happen. Please try to update using a production build of your app." }];
+            }
+            
+            return nil;
+        }
+        
+        NSNumber *installerOwnerID = fileAttributes[NSFileOwnerAccountID];
+        if (installerOwnerID == nil) {
+            if (error != NULL) {
+                *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUMissingUpdateError userInfo:@{ NSLocalizedDescriptionKey: @"File owner ID failed to be retrieved from the "@SPARKLE_RELAUNCH_TOOL_NAME" executable, which is an internal error that shouldn't happen. Please try to update using a production build of your app." }];
+            }
+            
+            return nil;
+        }
+        
+        // Check our helper is owned by root
+        if (![installerOwnerID isEqual:@(0)]) {
+            if (error != NULL) {
+                *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUMissingUpdateError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Due to security, updating apps with package installers is disabled when '%@' is not signed with the same Team ID as your app, and "@SPARKLE_RELAUNCH_TOOL_NAME" is not owned by root (this specific case) or not residing in '%@'. Please either test an exported & production build of your app, or for development, code sign your app and Sparkle's embedded helpers with the same team: https://sparkle-project.org/documentation/sandboxing#code-signing", installerExecutablePath, hostBundlePath] }];
+            }
+            
+            return nil;
+        }
+        
+        NSArray<NSString *> *installerExecutablePathComponents = installerExecutablePath.pathComponents;
+        NSArray<NSString *> *hostBundlePathComponents = hostBundlePath.pathComponents;
+        
+        if (installerExecutablePathComponents.count <= hostBundlePathComponents.count) {
+            if (error != NULL) {
+                *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUMissingUpdateError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Due to security, updating apps with package installers is disabled when '%@' is not signed with the same Team ID as your app, and "@SPARKLE_RELAUNCH_TOOL_NAME" is not owned by root or not residing in '%@' (this specific case). Please either test an exported & production build of your app, or for development, code sign your app and Sparkle's embedded helpers with the same team: https://sparkle-project.org/documentation/sandboxing#code-signing", installerExecutablePath, hostBundlePath] }];
+            }
+            
+            return nil;
+        }
+        
+        // Check out helper resides inside the host app to be updated
+        if (![[installerExecutablePathComponents subarrayWithRange:NSMakeRange(0, hostBundlePathComponents.count)] isEqualToArray:hostBundlePathComponents]) {
+            if (error != NULL) {
+                *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUMissingUpdateError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Due to security, updating apps with package installers is disabled when '%@' is not signed with the same Team ID as your app, and "@SPARKLE_RELAUNCH_TOOL_NAME" is not owned by root or not residing in '%@' (this specific case). Please either test an exported & production build of your app, or for development, code sign your app and Sparkle's embedded helpers with the same team: https://sparkle-project.org/documentation/sandboxing#code-signing", installerExecutablePath, hostBundlePath] }];
+            }
+            
+            return nil;
+        }
+    }
+#else
+    (void)connectionCodeSigningValidationSkipped;
+#endif
     
     // Make sure we find the type of installer that we were expecting to find
     // We shouldn't implicitly trust the installation type fed into here from the appcast because the installation type helps us determine

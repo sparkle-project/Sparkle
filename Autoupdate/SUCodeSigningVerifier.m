@@ -15,6 +15,12 @@
 
 #include "AppKitPrevention.h"
 
+@interface NSXPCConnection (Private)
+
+@property (nonatomic, readonly) audit_token_t auditToken;
+
+@end
+
 @implementation SUCodeSigningVerifier
 
 + (BOOL)codeSignatureIsValidAtBundleURL:(NSURL *)newBundleURL andMatchesSignatureAtBundleURL:(NSURL *)oldBundleURL error:(NSError * __autoreleasing *)error
@@ -263,7 +269,7 @@ static id valueOrNSNull(id value) {
     return (result == 0);
 }
 
-static NSString * _Nullable SUTeamIdentifierFromStaticCode(SecStaticCodeRef staticCode)
+static NSString * _Nullable SUTeamIdentifierFromCode(SecStaticCodeRef staticCode)
 {
     CFDictionaryRef cfSigningInformation = NULL;
     OSStatus copySigningInfoCode = SecCodeCopySigningInformation(staticCode, kSecCSSigningInformation,
@@ -284,16 +290,32 @@ static NSString * _Nullable SUTeamIdentifierFromStaticCode(SecStaticCodeRef stat
 {
     SecStaticCodeRef staticCode = NULL;
     OSStatus staticCodeResult = SecStaticCodeCreateWithPath((__bridge CFURLRef)url, kSecCSDefaultFlags, &staticCode);
-    if (staticCodeResult != noErr) {
+    if (staticCodeResult != errSecSuccess) {
         SULog(SULogLevelError, @"Failed to get static code for retrieving team identifier: %d", staticCodeResult);
         return nil;
     }
     
-    NSString *teamIdentifier = SUTeamIdentifierFromStaticCode(staticCode);
+    NSString *teamIdentifier = SUTeamIdentifierFromCode(staticCode);
     
     if (staticCode != NULL) {
         CFRelease(staticCode);
     }
+    
+    return teamIdentifier;
+}
+
++ (NSString * _Nullable)teamIdentifierFromMainExecutable
+{
+    SecCodeRef code = NULL;
+    OSStatus result = SecCodeCopySelf(kSecCSDefaultFlags, &code);
+    if (result != errSecSuccess) {
+        SULog(SULogLevelError, @"Failed to get code for retrieving team identifier of main executable: %d", result);
+        return nil;
+    }
+    
+    NSString *teamIdentifier = SUTeamIdentifierFromCode(code);
+    
+    CFRelease(code);
     
     return teamIdentifier;
 }
@@ -323,7 +345,7 @@ static NSString * _Nullable SUTeamIdentifierFromStaticCode(SecStaticCodeRef stat
         goto finally;
     }
     
-    teamIdentifier = SUTeamIdentifierFromStaticCode(oldStaticCode);
+    teamIdentifier = SUTeamIdentifierFromCode(oldStaticCode);
     if (teamIdentifier == nil) {
         resultError = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInsufficientSigningError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"%@. The team identifier could not be retrieved from the original app: %@", commonErrorMessage, oldBundleURL.path] }];
         
@@ -419,6 +441,102 @@ finally:
     }
     
     return (resultError == nil);
+}
+
++ (SUValidateConnectionStatus)validateConnection:(NSXPCConnection *)connection options:(SUValidateConnectionOptions)options error:(NSError * __autoreleasing *)error
+{
+    NSMutableArray<NSString *> *codeSigningRequirementComponents = [NSMutableArray array];
+    
+    // Build the default team ID signing requirement
+    NSString *hostTeamIdentifier = [self teamIdentifierFromMainExecutable];
+    if (hostTeamIdentifier != nil) {
+        NSString *teamIdentifierRequirement = [NSString stringWithFormat:@"(anchor apple generic and certificate leaf[subject.OU] = %@)", hostTeamIdentifier];
+        [codeSigningRequirementComponents addObject:teamIdentifierRequirement];
+    }
+    
+    // Build the sandboxing requirement
+    if ((options & SUValidateConnectionOptionRequireSandboxEntitlement) != 0) {
+        // This ensures the entitlement is set to true too
+        NSString *sandboxingRequirement = @"(entitlement [\"com.apple.security.app-sandbox\"] exists)";
+        [codeSigningRequirementComponents addObject:sandboxingRequirement];
+    }
+    
+    // Check if no requirement is required
+    if (codeSigningRequirementComponents.count == 0) {
+        return SUValidateConnectionStatusSetNoRequirementSuccess;
+    }
+    
+    NSString *codeSigningRequirement = [codeSigningRequirementComponents componentsJoinedByString:@" and "];
+    
+    if (@available(macOS 13.0, *)) {
+        [connection setCodeSigningRequirement:codeSigningRequirement];
+        
+        return SUValidateConnectionStatusSetCodeSigningRequirementSuccess;
+    }
+    
+    // Fall back to audit token on older OS's
+    if ([connection respondsToSelector:@selector(auditToken)]) {
+        audit_token_t auditToken = [connection auditToken];
+        NSData *auditTokenData = [NSData dataWithBytes:&auditToken length:sizeof(auditToken)];
+        
+        NSDictionary *attributes = @{
+            (NSString *)kSecGuestAttributeAudit: auditTokenData
+        };
+        
+        SecCodeRef code = NULL;
+        OSStatus result = SecCodeCopyGuestWithAttributes(NULL, (__bridge CFDictionaryRef _Nullable)(attributes), kSecCSDefaultFlags, &code);
+        if (result != errSecSuccess) {
+            CFRelease(code);
+            
+            if (error != NULL) {
+                *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInsufficientSigningError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"The client connection could not be validated because SecCodeCopyGuestWithAttributes() failed with error %d", result] }];
+            }
+            
+            return SUValidateConnectionStatusAPIFailure;
+        }
+        
+        // Check if the client is code signed with our signing requirement
+        
+        SecRequirementRef requirement = NULL;
+        result = SecRequirementCreateWithString((__bridge CFStringRef)codeSigningRequirement, kSecCSDefaultFlags, &requirement);
+        
+        if (result != errSecSuccess) {
+            CFRelease(code);
+            
+            if (error != NULL) {
+                *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInsufficientSigningError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"The client connection could not be validated because SecRequirementCreateWithString() failed with error %d", result] }];
+            }
+            
+            return SUValidateConnectionStatusAPIFailure;
+        }
+        
+        CFErrorRef cfError = NULL;
+        // This is not a static code, so we don't pass kSecCSCheckAllArchitectures
+        result = SecCodeCheckValidityWithErrors(code, kSecCSDefaultFlags, requirement, &cfError);
+        
+        CFRelease(requirement);
+        requirement = NULL;
+        
+        if (result != errSecSuccess) {
+            NSError *cfBridgedError = (NSError *)CFBridgingRelease(cfError);
+            if (error != NULL) {
+                *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInsufficientSigningError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"The client connection could not be validated because validating the code signature failed with error %d (%@). Does the app meet the designated requirement: %@", result, cfBridgedError.localizedDescription, codeSigningRequirement] }];
+            }
+            
+            [self logSigningInfoForCode:code label:@"Client"];
+            
+            CFRelease(code);
+            
+            return SUValidateConnectionStatusCodeSigningRequirementFailure;
+        }
+        
+        CFRelease(code);
+        
+        return SUValidateConnectionStatusSetCodeSigningRequirementSuccess;
+    }
+    
+    // Not much we can do if auditToken is not supported. This code should not be reached though.
+    return SUValidateConectionNoSupportedValidationMethodFailure;
 }
 
 @end

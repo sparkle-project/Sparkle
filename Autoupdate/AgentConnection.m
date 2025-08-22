@@ -10,6 +10,8 @@
 #import "SPUMessageTypes.h"
 #import "SPUInstallerAgentProtocol.h"
 #import "SUInstallerAgentInitiationProtocol.h"
+#import "SUCodeSigningVerifier.h"
+#import "SULog.h"
 
 
 #include "AppKitPrevention.h"
@@ -52,7 +54,7 @@
     _delegate = nil;
     
     [_activeConnection invalidate];
-    _activeConnection = nil;
+    // Don't need to set _activeConnection to nil, we don't expect new connections
     
     [_xpcListener invalidate];
     _xpcListener = nil;
@@ -61,8 +63,27 @@
 - (BOOL)listener:(NSXPCListener *)__unused listener shouldAcceptNewConnection:(NSXPCConnection *)newConnection
 {
     if (_activeConnection != nil) {
+        SULog(SULogLevelError, @"Error: Rejecting new connection for agent due already having an active connection");
+        
         [newConnection invalidate];
         return NO;
+    }
+    
+    // Hardening but not critical for security
+    NSError *validationError = nil;
+    SUValidateConnectionStatus validationStatus = [SUCodeSigningVerifier validateConnection:newConnection options:SUValidateConnectionOptionDefault error:&validationError];
+    switch (validationStatus) {
+        case SUValidateConnectionStatusSetCodeSigningRequirementSuccess:
+            break;
+        case SUValidateConnectionStatusSetNoRequirementSuccess:
+            break;
+        case SUValidateConnectionStatusAPIFailure:
+        case SUValidateConnectionStatusCodeSigningRequirementFailure:
+        case SUValidateConectionNoSupportedValidationMethodFailure:
+            SULog(SULogLevelError, @"Error: Rejecting new connection for agent due to failing validation of XPC connection with status %lu and error: %@", validationStatus, validationError.localizedDescription);
+            
+            [newConnection invalidate];
+            return NO;
     }
     
     newConnection.exportedInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SUInstallerAgentInitiationProtocol)];
@@ -91,9 +112,8 @@
         });
     };
     
-    [newConnection resume];
-    
     _agent = newConnection.remoteObjectProxy;
+    [newConnection resume];
     
     return YES;
 }
@@ -106,7 +126,9 @@
         [self->_delegate agentConnectionDidInitiate];
     });
     
-    acknowledgement();
+    if (acknowledgement != NULL) {
+        acknowledgement();
+    }
 }
 
 - (void)connectionWillInvalidateWithError:(NSError *)error

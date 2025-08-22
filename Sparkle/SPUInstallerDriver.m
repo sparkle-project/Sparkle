@@ -167,13 +167,16 @@
     NSString *hostBundleIdentifier = _host.bundle.bundleIdentifier;
     assert(hostBundleIdentifier != nil);
     
+    BOOL usingInstallerService;
 #if INSTALLER_CONNECTION_XPC_SERVICE_EMBEDDED
     if (SPUXPCServiceIsEnabled(SUEnableInstallerConnectionServiceKey)) {
         _installerConnection = [[SUXPCInstallerConnection alloc] initWithDelegate:self];
+        usingInstallerService = YES;
     } else
 #endif
     {
         _installerConnection = [[SUInstallerConnection alloc] initWithDelegate:self remote:NO];
+        usingInstallerService = NO;
     }
     
     __weak __typeof__(self) weakSelf = self;
@@ -181,9 +184,11 @@
         dispatch_async(dispatch_get_main_queue(), ^{
             __typeof__(self) strongSelf = weakSelf;
             if (strongSelf != nil && strongSelf->_installerConnection != nil && !strongSelf->_aborted) {
+                NSString *impactedTools = usingInstallerService ? (@SPARKLE_RELAUNCH_TOOL_NAME" and "@INSTALLER_LAUNCHER_NAME) : @SPARKLE_RELAUNCH_TOOL_NAME;
+                
                 NSDictionary *genericUserInfo = @{
                     NSLocalizedDescriptionKey: SULocalizedStringFromTableInBundle(@"An error occurred while running the updater. Please try again later.", SPARKLE_TABLE, SUSparkleBundle(), nil),
-                    NSLocalizedFailureReasonErrorKey:@"The remote port connection was invalidated from the updater. For additional details, please check Console logs for "@SPARKLE_RELAUNCH_TOOL_NAME". If your application is sandboxed, please also ensure Installer Connection & Status entitlements are correctly set up: https://sparkle-project.org/documentation/sandboxing/"
+                    NSLocalizedFailureReasonErrorKey:[NSString stringWithFormat:@"The remote port connection was invalidated from the updater. If your application is sandboxed, please ensure Installer Connection & Status entitlements are correctly set up: https://sparkle-project.org/documentation/sandboxing/ . Otherwise if %@ %@ not adhoc signed, your app must be signed with a matching team ID. For additional details, check Console logs for %@", impactedTools, (usingInstallerService ? @"are" : @"is"), impactedTools]
                 };
                 
                 [strongSelf _reportInstallerError:strongSelf->_installerError genericErrorCode:SUInstallationError genericUserInfo:genericUserInfo];
@@ -408,7 +413,8 @@
                 if (!retrievedLaunchStatus) {
 #pragma clang diagnostic pop
                     NSError *error =
-                    [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey:SULocalizedStringFromTableInBundle(@"An error occurred while connecting to the installer. Please try again later.", SPARKLE_TABLE, SUSparkleBundle(), nil) }];
+                    [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey:SULocalizedStringFromTableInBundle(@"An error occurred while connecting to the installer. Please try again later.", SPARKLE_TABLE, SUSparkleBundle(), nil),
+                        NSLocalizedFailureReasonErrorKey: [NSString stringWithFormat:@"If your app is not sandboxed, please remove or disable %@ in your app's Info.plist. Otherwise please check Console logs for "@INSTALLER_LAUNCHER_NAME" and "@SPARKLE_RELAUNCH_TOOL_NAME" processes if there are additional details.", SUEnableInstallerLauncherServiceKey]}];
                     
                     completionHandler(error);
                     
@@ -441,36 +447,7 @@
     NSString *installationType = _updateItem.installationType;
     assert(installationType != nil);
     
-    // The installer launcher could be in a XPC service, so we don't want to do localization in there
-    // Make sure the authorization prompt reflects whether or not the updater is updating itself, or
-    // if the updater is updating another application. We use SUHost.name property, so an application
-    // or Sparkle helper application can override its name with SUBundleName key
-    
-    SUHost *mainBundleHost = [[SUHost alloc] initWithBundle:[NSBundle mainBundle]];
-    NSString *mainBundleName = mainBundleHost.name;
-    NSString *hostName = _host.name;
-    
-    // Changing this authorization prompt is a little complicated because the
-    // Auth database retains and caches the right we use, and there isn't a good way
-    // of updating the prompt. See code in SUInstallerLauncher.m
-    // For this reason, we don't provide localized strings for this prompt yet
-    // (and I believe, the authorization framework has a different way of specifying localizations..)
-    NSString *authorizationPrompt;
-    if ([mainBundleName isEqualToString:hostName]) {
-        authorizationPrompt = [NSString stringWithFormat:@"%1$@ wants permission to update.", hostName];
-    } else {
-        authorizationPrompt = [NSString stringWithFormat:@"%1$@ wants permission to update %2$@.", mainBundleName, hostName];
-    }
-    
-    NSString *mainBundleIdentifier;
-    {
-        NSString *bundleIdentifier = mainBundleHost.bundle.bundleIdentifier;
-        mainBundleIdentifier = (bundleIdentifier == nil) ? mainBundleName : bundleIdentifier;
-    }
-    
-    NSString *iconBundlePath = mainBundleHost.bundlePath;
-    
-    [installerLauncher launchInstallerWithHostBundlePath:hostBundlePath iconBundlePath:iconBundlePath updaterIdentifier:mainBundleIdentifier authorizationPrompt:authorizationPrompt installationType:installationType allowingDriverInteraction:driverAllowsInteraction completion:^(SUInstallerLauncherStatus result, BOOL systemDomain) {
+    [installerLauncher launchInstallerWithHostBundlePath:hostBundlePath mainBundlePath:NSBundle.mainBundle.bundlePath installationType:installationType allowingDriverInteraction:driverAllowsInteraction completion:^(SUInstallerLauncherStatus result, BOOL systemDomain) {
         dispatch_async(dispatch_get_main_queue(), ^{
 #if INSTALLER_LAUNCHER_XPC_SERVICE_EMBEDDED
             retrievedLaunchStatus = YES;

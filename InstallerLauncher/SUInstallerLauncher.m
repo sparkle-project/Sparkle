@@ -113,7 +113,7 @@
     return (submittedJob == true);
 }
 
-- (SUInstallerLauncherStatus)submitInstallerAtPath:(NSString *)installerPath withHostBundle:(NSBundle *)hostBundle iconBundlePath:(NSString *)iconBundlePath updaterIdentifier:(NSString *)updaterIdentifier userName:(NSString *)userName homeDirectory:(NSString *)homeDirectory authorizationPrompt:(NSString *)authorizationPrompt inSystemDomain:(BOOL)systemDomain rootUser:(BOOL)rootUser SPU_OBJC_DIRECT
+- (SUInstallerLauncherStatus)submitInstallerAtPath:(NSString *)installerPath withHostBundle:(NSBundle *)hostBundle iconBundlePath:(NSString *)iconBundlePath updaterIdentifier:(NSString *)updaterIdentifier userName:(NSString *)userName homeDirectory:(NSString *)homeDirectory mainBundleName:(NSString *)mainBundleName inSystemDomain:(BOOL)systemDomain rootUser:(BOOL)rootUser SPU_OBJC_DIRECT
 {
     // No need to release the quarantine for this utility
     // In fact, we shouldn't because the tool may be located at a path we should not be writing too.
@@ -145,14 +145,25 @@
         // Using this right rather than using something like kSMRightModifySystemDaemons allows us to present a better worded prompt
         // Note the right name is cached, so if we want to change the authorization
         // prompt, we may need to change the right name. I have found no good way around this :|
+        
+        SUHost *host = [[SUHost alloc] initWithBundle:hostBundle];
+        NSString *hostName = host.name;
+        
+        // Figure out the authorization prompt and right name
+        // We create the authorization prompt here so that a bad client cannot pass in a completely arbitrary prompt message
+        // We also forgo localization for this prompt at the moment because with the right name being cached, updating localizations will be undesirable.
+        // Furthermore, we can avoid adding localization files to the Installer XPC Service (if that one is being used).
         NSString *sparkleAuthTag = @"sparkle2-auth"; // this needs to change if auth wording changes
         NSString *rightNameString;
+        NSString *authorizationPrompt;
         if ([hostBundleIdentifier isEqualToString:updaterIdentifier]) {
             // Application bundle is likely updating itself
             rightNameString = [NSString stringWithFormat:@"%@.%@", hostBundleIdentifier, sparkleAuthTag];
+            authorizationPrompt = [NSString stringWithFormat:@"%1$@ wants permission to update.", hostName];
         } else {
             // Updater is likely updating a bundle that is not itself
             rightNameString = [NSString stringWithFormat:@"%@.%@.%@", updaterIdentifier, hostBundleIdentifier, sparkleAuthTag];
+            authorizationPrompt = [NSString stringWithFormat:@"%1$@ wants permission to update %2$@.", mainBundleName, hostName];
         }
         
         const char *rightName = rightNameString.UTF8String;
@@ -396,10 +407,56 @@ static BOOL SPUUsesSystemDomainForBundlePath(NSString *path, BOOL rootUser
     }
 }
 
-// Note: do not pass untrusted information such as paths to the installer and progress agent tools, when we can find them ourselves here
-- (void)launchInstallerWithHostBundlePath:(NSString *)hostBundlePath iconBundlePath:(NSString *)iconBundlePath updaterIdentifier:(NSString *)updaterIdentifier authorizationPrompt:(NSString *)authorizationPrompt installationType:(NSString *)installationType allowingDriverInteraction:(BOOL)allowingDriverInteraction completion:(void (^)(SUInstallerLauncherStatus, BOOL))completionHandler
+// Note: do not pass information which can we compute ourselves here, such as paths to the installer and progress agent tools
+- (void)launchInstallerWithHostBundlePath:(NSString *)hostBundlePath mainBundlePath:(NSString *)mainBundlePath installationType:(NSString *)installationType allowingDriverInteraction:(BOOL)allowingDriverInteraction completion:(void (^)(SUInstallerLauncherStatus, BOOL))completionHandler
 {
     dispatch_async(dispatch_get_main_queue(), ^{
+        if (completionHandler == NULL) {
+            SULog(SULogLevelError, @"Error: Failed to retrieve completionHandler (nil)");
+            return;
+        }
+        
+        if (hostBundlePath == nil) {
+            SULog(SULogLevelError, @"Error: Failed to retrieve hostBundlePath (nil)");
+            completionHandler(SUInstallerLauncherFailure, NO);
+            return;
+        }
+        
+        if (mainBundlePath == nil) {
+            SULog(SULogLevelError, @"Error: Failed to retrieve mainBundlePath (nil)");
+            completionHandler(SUInstallerLauncherFailure, NO);
+            return;
+        }
+        
+        NSBundle *mainBundle = [NSBundle bundleWithPath:mainBundlePath];
+        if (mainBundle == nil) {
+            SULog(SULogLevelError, @"Error: Failed to retrieve mainBundle from path: %@", mainBundlePath);
+            completionHandler(SUInstallerLauncherFailure, NO);
+            return;
+        }
+        
+        SUHost *mainBundleHost = [[SUHost alloc] initWithBundle:mainBundle];
+        
+        // We use SUHost.name property, so an application
+        // or Sparkle helper application can override its name with SUBundleName key
+        NSString *mainBundleName = mainBundleHost.name;
+        
+        // This updaterIdentifier is just used for authorization prompt
+        NSString *updaterIdentifier;
+        NSString *mainBundleIdentifier = mainBundle.bundleIdentifier;
+        if (mainBundleIdentifier != nil) {
+            updaterIdentifier = mainBundleIdentifier;
+        } else {
+            // Should be unlikely
+            updaterIdentifier = mainBundleHost.name;
+        }
+        
+        if (installationType == nil) {
+            SULog(SULogLevelError, @"Error: Failed to retrieve installationType (nil)");
+            completionHandler(SUInstallerLauncherFailure, NO);
+            return;
+        }
+        
         // We could do a sort of preflight Authorization test instead of testing if we are running as root,
         // but I think this is not necessarily a better approach. We have to chown() the launcher cache directory later on,
         // and that is not necessarily related to a preflight test. It's more related to being ran under a root / different user from the active GUI session
@@ -529,7 +586,7 @@ static BOOL SPUUsesSystemDomainForBundlePath(NSString *path, BOOL rootUser
             return;
         }
         
-        SUInstallerLauncherStatus installerStatus = [self submitInstallerAtPath:installerPath withHostBundle:hostBundle iconBundlePath:iconBundlePath updaterIdentifier:updaterIdentifier userName:userName homeDirectory:homeDirectory authorizationPrompt:authorizationPrompt inSystemDomain:inSystemDomain rootUser:rootUser];
+        SUInstallerLauncherStatus installerStatus = [self submitInstallerAtPath:installerPath withHostBundle:hostBundle iconBundlePath:mainBundle.bundlePath updaterIdentifier:updaterIdentifier userName:userName homeDirectory:homeDirectory mainBundleName:mainBundleName inSystemDomain:inSystemDomain rootUser:rootUser];
         
         BOOL submittedProgressTool = NO;
         if (installerStatus == SUInstallerLauncherSuccess) {

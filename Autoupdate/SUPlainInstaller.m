@@ -353,22 +353,16 @@
         // If the update has a custom update security policy, the same team ID policy may not apply,
         // so in that case we will also skip performing an atomic swap
         
-        NSURL *mainExecutableURL = NSBundle.mainBundle.executableURL;
-        if (mainExecutableURL == nil) {
-            // This shouldn't happen
+        updateHasCustomUpdateSecurityPolicy = updateHost.hasUpdateSecurityPolicy;
+        if (updateHasCustomUpdateSecurityPolicy) {
+            // We don't handle working around a custom update security policy
             _canPerformSafeAtomicSwap = NO;
         } else {
-            updateHasCustomUpdateSecurityPolicy = updateHost.hasUpdateSecurityPolicy;
-            if (updateHasCustomUpdateSecurityPolicy) {
-                // We don't handle working around a custom update security policy
-                _canPerformSafeAtomicSwap = NO;
-            } else {
-                NSString *installerTeamIdentifier = [SUCodeSigningVerifier teamIdentifierAtURL:mainExecutableURL];
-                NSString *bundleTeamIdentifier = [SUCodeSigningVerifier teamIdentifierAtURL:bundle.bundleURL];
-                
-                // If bundleTeamIdentifier is nil, then the update isn't code signed so atomic swap is okay
-                _canPerformSafeAtomicSwap = (bundleTeamIdentifier == nil || (installerTeamIdentifier != nil && [installerTeamIdentifier isEqualToString:bundleTeamIdentifier]));
-            }
+            NSString *installerTeamIdentifier = [SUCodeSigningVerifier teamIdentifierFromMainExecutable];
+            NSString *bundleTeamIdentifier = [SUCodeSigningVerifier teamIdentifierAtURL:bundle.bundleURL];
+            
+            // If bundleTeamIdentifier is nil, then the update isn't code signed so atomic swap is okay
+            _canPerformSafeAtomicSwap = (bundleTeamIdentifier == nil || (installerTeamIdentifier != nil && [installerTeamIdentifier isEqualToString:bundleTeamIdentifier]));
         }
     } else {
         _canPerformSafeAtomicSwap = YES;

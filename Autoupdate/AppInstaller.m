@@ -29,6 +29,8 @@
 #import "SPULocalCacheDirectory.h"
 #import "SPUVerifierInformation.h"
 #import "SUConstants.h"
+#import "SUCodeSigningVerifier.h"
+#import <os/lock.h>
 
 
 #include "AppKitPrevention.h"
@@ -49,7 +51,10 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 @implementation AppInstaller
 {
     NSXPCListener* _xpcListener;
+    // Must be synchronized with _newConnectionLock
+    // Set from new connection handler, and also set/read from main thread
     NSXPCConnection *_activeConnection;
+    
     id<SUInstallerCommunicationProtocol> _communicator;
     AgentConnection *_agentConnection;
 
@@ -72,6 +77,14 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 
     dispatch_queue_t _installerQueue;
     
+    os_unfair_lock _newConnectionLock;
+    
+#if SPARKLE_BUILD_PACKAGE_SUPPORT
+    // Must be synchronized with _newConnectionLock
+    // Set from new connection handler, read from main thread
+    BOOL _connectionCodeSigningValidationSkipped;
+#endif
+    
     BOOL _shouldRelaunch;
     BOOL _shouldShowUI;
     
@@ -82,7 +95,9 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     BOOL _finishedValidation;
     BOOL _agentInitiatedConnection;
     
+    // Setting _performedStage1Installation on main thread must be synchronzied with reading it from new connection handler
     BOOL _performedStage1Installation;
+    
     BOOL _performedStage2Installation;
     BOOL _performedStage3Installation;
     
@@ -94,6 +109,8 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     if (!(self = [super init])) {
         return nil;
     }
+    
+    _newConnectionLock = OS_UNFAIR_LOCK_INIT;
     
     _hostBundleIdentifier = [hostBundleIdentifier copy];
     
@@ -110,13 +127,59 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 
 - (BOOL)listener:(NSXPCListener *)__unused listener shouldAcceptNewConnection:(NSXPCConnection *)newConnection
 {
-    if (_activeConnection != nil) {
-        SULog(SULogLevelDefault, @"Rejecting multiple connections...");
-        [newConnection invalidate];
-        return NO;
+    os_unfair_lock_lock(&_newConnectionLock);
+    {
+        if (_activeConnection != nil) {
+            os_unfair_lock_unlock(&_newConnectionLock);
+            
+            SULog(SULogLevelError, @"Error: Rejecting multiple XPC connections for installer...");
+            
+            [newConnection invalidate];
+            return NO;
+        }
+        
+    #if SPARKLE_BUILD_PACKAGE_SUPPORT
+        BOOL connectionCodeSigningValidationSkipped = NO;
+    #endif
+        
+        // It's safe to allow any connections once stage 1 installation is complete
+        // This is to allow general updaters to resume the installation.
+        if (!_performedStage1Installation) {
+            BOOL passesValidation;
+            NSError *validationError = nil;
+            SUValidateConnectionStatus status = [SUCodeSigningVerifier validateConnection:newConnection options:SUValidateConnectionOptionDefault error:&validationError];
+            switch (status) {
+                case SUValidateConnectionStatusSetCodeSigningRequirementSuccess:
+                    passesValidation = YES;
+                    break;
+                case SUValidateConnectionStatusSetNoRequirementSuccess:
+                    passesValidation = YES;
+#if SPARKLE_BUILD_PACKAGE_SUPPORT
+                    connectionCodeSigningValidationSkipped = YES;
+#endif
+                    break;
+                case SUValidateConnectionStatusAPIFailure:
+                case SUValidateConnectionStatusCodeSigningRequirementFailure:
+                case SUValidateConectionNoSupportedValidationMethodFailure:
+                    passesValidation = NO;
+                    break;
+            }
+            
+            if (!passesValidation) {
+                os_unfair_lock_unlock(&_newConnectionLock);
+                
+                SULog(SULogLevelError, @"Error: Rejecting new connection for installer due to failing validation of XPC connection with status %lu and error: %@", status, validationError.localizedDescription);
+                [newConnection invalidate];
+                return NO;
+            }
+        }
+        
+#if SPARKLE_BUILD_PACKAGE_SUPPORT
+        _connectionCodeSigningValidationSkipped = connectionCodeSigningValidationSkipped;
+#endif
+        _activeConnection = newConnection;
     }
-    
-    _activeConnection = newConnection;
+    os_unfair_lock_unlock(&_newConnectionLock);
     
     newConnection.exportedInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SUInstallerCommunicationProtocol)];
     newConnection.exportedObject = self;
@@ -128,7 +191,11 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
         dispatch_async(dispatch_get_main_queue(), ^{
             __typeof__(self) strongSelf = weakSelf;
             if (strongSelf != nil) {
-                [strongSelf->_activeConnection invalidate];
+                os_unfair_lock_lock(&strongSelf->_newConnectionLock);
+                NSXPCConnection *activeConnection = strongSelf->_activeConnection;
+                os_unfair_lock_unlock(&strongSelf->_newConnectionLock);
+                
+                [activeConnection invalidate];
             }
         });
     };
@@ -141,14 +208,19 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
                     [strongSelf cleanupAndExitWithStatus:EXIT_FAILURE error:[NSError errorWithDomain:SUSparkleErrorDomain code:SPUInstallerError userInfo:@{ NSLocalizedDescriptionKey: @"Invalidation on remote port being called, and installation is not close enough to completion!" }]];
                 }
                 strongSelf->_communicator = nil;
+                
+                os_unfair_lock_lock(&strongSelf->_newConnectionLock);
                 strongSelf->_activeConnection = nil;
+                os_unfair_lock_unlock(&strongSelf->_newConnectionLock);
             }
         });
     };
     
-    [newConnection resume];
-    
-    _communicator = newConnection.remoteObjectProxy;
+    // _communicator is used only on main thread
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self->_communicator = newConnection.remoteObjectProxy;
+        [newConnection resume];
+    });
     
     return YES;
 }
@@ -360,7 +432,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
             // Do not rely on eg: self->_updateDirectoryPath != nil because we may set it to nil again if an early stage fails (i.e, archive extraction)
             self->_receivedInstallationData = YES;
             
-            SPUInstallationInputData *installationData = (SPUInstallationInputData *)SPUUnarchiveRootObjectSecurely(data, [SPUInstallationInputData class]);
+            SPUInstallationInputData *installationData = (data != nil) ? (SPUInstallationInputData *)SPUUnarchiveRootObjectSecurely(data, [SPUInstallationInputData class]) : nil;
             if (installationData == nil) {
                 [self cleanupAndExitWithStatus:EXIT_FAILURE error:[NSError errorWithDomain:SUSparkleErrorDomain code:SPUInstallerError userInfo:@{ NSLocalizedDescriptionKey: @"Error: Failed to unarchive input installation data" }]];
                 return;
@@ -525,7 +597,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
             [self extractAndInstallUpdate];
         });
     } else if (identifier == SPUSentUpdateAppcastItemData) {
-        SUAppcastItem *updateItem = (SUAppcastItem *)SPUUnarchiveRootObjectSecurely(data, [SUAppcastItem class]);
+        SUAppcastItem *updateItem = (data != nil) ? (SUAppcastItem *)SPUUnarchiveRootObjectSecurely(data, [SUAppcastItem class]) : nil;
         if (updateItem != nil) {
             SPUInstallationInfo *installationInfo = [[SPUInstallationInfo alloc] initWithAppcastItem:updateItem canSilentlyInstall:[_installer canInstallSilently]];
             
@@ -578,9 +650,17 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     
     _installerQueue = dispatch_queue_create("org.sparkle-project.sparkle.installer", queuePriority);
     
+#if SPARKLE_BUILD_PACKAGE_SUPPORT
+    os_unfair_lock_lock(&_newConnectionLock);
+    BOOL connectionCodeSigningValidationSkipped = self->_connectionCodeSigningValidationSkipped;
+    os_unfair_lock_unlock(&_newConnectionLock);
+#else
+    BOOL connectionCodeSigningValidationSkipped = NO;
+#endif
+    
     dispatch_async(_installerQueue, ^{
         NSError *installerError = nil;
-        id <SUInstallerProtocol> installer = [SUInstaller installerForHost:self->_host expectedInstallationType:self->_installationType updateDirectory:self->_extractionDirectory homeDirectory:self->_homeDirectory userName:self->_userName error:&installerError];
+        id <SUInstallerProtocol> installer = [SUInstaller installerForHost:self->_host expectedInstallationType:self->_installationType updateDirectory:self->_extractionDirectory connectionCodeSigningValidationSkipped:connectionCodeSigningValidationSkipped homeDirectory:self->_homeDirectory userName:self->_userName error:&installerError];
         
         if (installer == nil) {
             dispatch_async(dispatch_get_main_queue(), ^{
@@ -604,13 +684,15 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
         dispatch_async(dispatch_get_main_queue(), ^{
             self->_installer = installer;
             
+            os_unfair_lock_lock(&self->_newConnectionLock);
+            self->_performedStage1Installation = YES;
+            os_unfair_lock_unlock(&self->_newConnectionLock);
+            
             uint8_t sendInformation[] = {canPerformSilentInstall, (uint8_t)self->_targetTerminated};
             
             NSData *sendData = [NSData dataWithBytes:sendInformation length:sizeof(sendInformation)];
             
             [self->_communicator handleMessageWithIdentifier:SPUInstallationFinishedStage1 data:sendData];
-            
-            self->_performedStage1Installation = YES;
             
             if (self->_targetTerminated) {
                 // Stage 2 can still be run before we finish installation
@@ -728,8 +810,14 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     
     // It's nice to tell the other end we're invalidating
     
-    [_activeConnection invalidate];
+    os_unfair_lock_lock(&_newConnectionLock);
+    
+    NSXPCConnection *activeConnection = _activeConnection;
     _activeConnection = nil;
+    
+    os_unfair_lock_unlock(&_newConnectionLock);
+    
+    [activeConnection invalidate];
     
     [_xpcListener invalidate];
     _xpcListener = nil;

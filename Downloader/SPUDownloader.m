@@ -55,6 +55,32 @@ static NSString *SUDownloadingReason = @"Downloading update related file";
 
 - (void)startDownloadWithRequest:(NSURLRequest *)request SPU_OBJC_DIRECT
 {
+    if (request == nil) {
+        NSString *message = @"The download request must not be nil";
+        NSError *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUDownloadError userInfo:@{ NSLocalizedDescriptionKey: message }];
+        [_delegate downloaderDidFailWithError:error];
+        
+        return;
+    }
+    
+    // Prevent any unwanted URL schemes (e.g. file://)
+    NSString *scheme = request.URL.scheme;
+    if (scheme == nil) {
+        NSString *message = @"The download request scheme must not be nil";
+        NSError *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUDownloadError userInfo:@{ NSLocalizedDescriptionKey: message }];
+        [_delegate downloaderDidFailWithError:error];
+        
+        return;
+    }
+    
+    if ([scheme caseInsensitiveCompare:@"http"] != NSOrderedSame && [scheme caseInsensitiveCompare:@"https"] != NSOrderedSame) {
+        NSString *message = [NSString stringWithFormat:@"The download request URL must use http or https (%@)", request.URL];
+        NSError *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUDownloadError userInfo:@{ NSLocalizedDescriptionKey: message }];
+        [_delegate downloaderDidFailWithError:error];
+        
+        return;
+    }
+    
     _downloadSession = [NSURLSession
         sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]
         delegate:self
@@ -117,12 +143,14 @@ static NSString *SUDownloadingReason = @"Downloading update related file";
     // The downloader instance that creates this temp directory isn't necessarily the same as the one
     // that clears it (eg upon skipping an already downloaded update), so we can't just preserve it here too
     dispatch_async(dispatch_get_main_queue(), ^{
-        NSString *rootPersistentDownloadCachePath = [self rootPersistentDownloadCachePathForBundleIdentifier:bundleIdentifier];
-        if (rootPersistentDownloadCachePath != nil) {
-            NSString *sanitizedDownloadToken = downloadToken.lastPathComponent;
-            NSString *tempDir = [rootPersistentDownloadCachePath stringByAppendingPathComponent:sanitizedDownloadToken];
-            
-            [[NSFileManager defaultManager] removeItemAtPath:tempDir error:NULL];
+        if (bundleIdentifier != nil && downloadToken != nil) {
+            NSString *rootPersistentDownloadCachePath = [self rootPersistentDownloadCachePathForBundleIdentifier:bundleIdentifier];
+            if (rootPersistentDownloadCachePath != nil) {
+                NSString *sanitizedDownloadToken = downloadToken.lastPathComponent;
+                NSString *tempDir = [rootPersistentDownloadCachePath stringByAppendingPathComponent:sanitizedDownloadToken];
+                
+                [[NSFileManager defaultManager] removeItemAtPath:tempDir error:NULL];
+            }
         }
     });
 }
@@ -148,7 +176,9 @@ static NSString *SUDownloadingReason = @"Downloading update related file";
     dispatch_async(dispatch_get_main_queue(), ^{
         [self _cleanup];
         
-        completionHandler();
+        if (completionHandler != NULL) {
+            completionHandler();
+        }
     });
 }
 

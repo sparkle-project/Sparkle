@@ -347,6 +347,9 @@
 		728ED34C277DA23400D9238F /* SPUSparkleDeltaArchive.m in Sources */ = {isa = PBXBuildFile; fileRef = 728ED349277DA23400D9238F /* SPUSparkleDeltaArchive.m */; };
 		728ED34D277DA23400D9238F /* SPUSparkleDeltaArchive.m in Sources */ = {isa = PBXBuildFile; fileRef = 728ED349277DA23400D9238F /* SPUSparkleDeltaArchive.m */; };
 		729051E41DC82AC0003DEA7F /* SUOperatingSystem.m in Sources */ = {isa = PBXBuildFile; fileRef = 726F2CE41BC9C33D001971A4 /* SUOperatingSystem.m */; };
+		7290BF2F2E5A5AFA00D75022 /* SUCodeSigningVerifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5991D3D8A5A00D1BF90 /* SUCodeSigningVerifier.m */; };
+		7290BF302E5A5B0F00D75022 /* SUCodeSigningVerifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5991D3D8A5A00D1BF90 /* SUCodeSigningVerifier.m */; };
+		7290BF312E5A5B2F00D75022 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 61B5F8F609C4CEB300B25A18 /* Security.framework */; };
 		729743AB279D1BD2009910B2 /* SUCodeSigningVerifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5991D3D8A5A00D1BF90 /* SUCodeSigningVerifier.m */; };
 		729924941DF4A45000DBCDF5 /* SUUpdateValidator.m in Sources */ = {isa = PBXBuildFile; fileRef = 729924931DF4A45000DBCDF5 /* SUUpdateValidator.m */; };
 		729C51282E58015600D7365A /* SUUpdatePermissionPrompt.xib in Resources */ = {isa = PBXBuildFile; fileRef = 729C51272E58015600D7365A /* SUUpdatePermissionPrompt.xib */; };
@@ -1546,6 +1549,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7290BF312E5A5B2F00D75022 /* Security.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3462,6 +3466,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7290BF302E5A5B0F00D75022 /* SUCodeSigningVerifier.m in Sources */,
 				72464F7E1E21ED8C00FB341C /* SUHost.m in Sources */,
 				726E07B41CAF08D6001A286B /* main.m in Sources */,
 				721D8A7B1D4963190032E472 /* SPULocalCacheDirectory.m in Sources */,
@@ -3478,6 +3483,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7290BF2F2E5A5AFA00D75022 /* SUCodeSigningVerifier.m in Sources */,
 				723B5DA71CF7AB0100365F95 /* main.m in Sources */,
 				72E539121D68C3FA0092CE5E /* SPUDownloadData.m in Sources */,
 				723B5DA91CF7AB0100365F95 /* SPUDownloader.m in Sources */,
