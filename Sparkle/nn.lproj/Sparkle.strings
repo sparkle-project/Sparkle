@@ -102,3 +102,21 @@
 
 /* Automatically download and install updates in the future option for update alert */
 "Automatically download and install updates in the future" = "Last ned og installer automatisk i framtida";
+
+/* Check for updates automatically response for update permission dialog */
+"Check Automatically" = "Sjå etter automatisk";
+
+/* Don't check for updates automatically response for update permission dialog */
+"Don’t Check" = "Ikkje sjå etter";
+
+/* Title question for update permission dialog */
+"Check for updates automatically?" = "Sjå etter etter oppdateringar automatisk?";
+
+/* Include anonymous system profile choice for update permission dialog */
+"Include anonymous system profile" = "Inkluder anonym systemprofil";
+
+/* Automatically download and install updates choice for update permission dialog */
+"Automatically download and install updates" = "Last ned og installer automatisk";
+
+/* Anonymous system profile information disclosure for update permission dialog */
+"Anonymous system profile information is used to help us plan future development work. Please contact us if you have any questions about this.\n\nThis is the information that would be sent:" = "Den anonyme systemprofilen hjelper oss med å planleggja framtidig utviklingsarbeid. Ta gjerne kontakt med oss om du har spørsmål om dette. \nFølgjande innhald vil bli sendt:";
