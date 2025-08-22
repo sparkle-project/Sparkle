@@ -157,7 +157,7 @@
 /* Remind Me Later choice for update alert */
 "Remind Me Later" = "Připomenout později";
 
-/*Skip This Version choice for update alert */
+/* Skip This Version choice for update alert */
 "Skip This Version" = "Přeskočit tuto verzi";
 
 /* Install Update choice for update alert */

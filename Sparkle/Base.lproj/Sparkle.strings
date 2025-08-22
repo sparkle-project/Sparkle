@@ -205,7 +205,7 @@
 /* Remind Me Later choice for update alert */
 "Remind Me Later" = "Remind Me Later";
 
-/*Skip This Version choice for update alert */
+/* Skip This Version choice for update alert */
 "Skip This Version" = "Skip This Version";
 
 /* Install Update choice for update alert */
