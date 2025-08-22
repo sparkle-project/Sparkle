@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="24118.1" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="23727" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="24118.1"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="23727"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -75,7 +75,7 @@
             <rect key="frame" x="0.0" y="0.0" width="437" height="78"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
-                <textField focusRingType="none" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="IgD-Pj-pc8">
+                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="IgD-Pj-pc8">
                     <rect key="frame" x="104" y="42" width="315" height="16"/>
                     <constraints>
                         <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="16" id="J49-m7-iIa"/>
@@ -86,7 +86,7 @@
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <textField focusRingType="none" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="tgW-Jp-Aia">
+                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="tgW-Jp-Aia">
                     <rect key="frame" x="104" y="0.0" width="315" height="34"/>
                     <constraints>
                         <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="34" id="HfG-Lg-91D"/>
@@ -130,7 +130,7 @@
             <rect key="frame" x="0.0" y="0.0" width="434" height="205"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
-                <textField focusRingType="none" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="46" userLabel="SystemProfileInfo">
+                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="46" userLabel="SystemProfileInfo">
                     <rect key="frame" x="104" y="123" width="312" height="70"/>
                     <constraints>
                         <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="70" id="Csk-S6-dh4"/>
