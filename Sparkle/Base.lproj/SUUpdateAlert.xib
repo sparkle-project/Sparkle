@@ -21,6 +21,7 @@
                 <outlet property="_constraint_programIcon_width" destination="dFg-Az-lxC" id="l2g-xv-Bnf"/>
                 <outlet property="_constraint_versionAndQuestion_leading" destination="nEc-ic-3ZD" id="GTf-aZ-3Vk"/>
                 <outlet property="_constraint_versionAndQuestion_vertical" destination="9M6-6n-Bro" id="5fc-f0-FFv"/>
+                <outlet property="_iconContainer" destination="6Hv-XB-VNW" id="jKq-dy-gc4"/>
                 <outlet property="_installButton" destination="sUq-y0-gA3" id="hQ1-WX-CFo"/>
                 <outlet property="_laterButton" destination="uGk-Ks-HQR" id="QLX-rC-OVd"/>
                 <outlet property="_optionsView" destination="Dg5-0U-d14" id="wWh-XE-prn"/>
