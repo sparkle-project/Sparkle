@@ -474,17 +474,23 @@ static NSString *const SUUpdateAlertTouchBarIdentifier = @"" SPARKLE_BUNDLE_IDEN
         
     }
     
-    if ((0)) {  /// Transparent titlebar – align content along the bottom of the traffic lights
-        window.titlebarAppearsTransparent = YES;
+    if ((1)) {  /// Transparent titlebar – align content along the bottom of the traffic lights
         if      (@available(macOS 16, *)) SUGetConstraintForSpacer(_spacer_underneath_trafficLights).constant = 22;
         else if (@available(macOS 11, *)) SUGetConstraintForSpacer(_spacer_underneath_trafficLights).constant = 20;
         else                              SUGetConstraintForSpacer(_spacer_underneath_trafficLights).constant = 17;
     }
     else {      /// Non-transparent titlebar – align content along the bottom of the titlebar.
-        window.titlebarAppearsTransparent = NO;
-        if      (@available(macOS 16, *)) SUGetConstraintForSpacer(_spacer_underneath_trafficLights).constant = 31; /// Not sure if there are pixel differences depending on the .titlebarSeparatorStyle
-        else if (@available(macOS 11, *)) SUGetConstraintForSpacer(_spacer_underneath_trafficLights).constant = 29;
-        else                              SUGetConstraintForSpacer(_spacer_underneath_trafficLights).constant = 22;
+        if ((1)) { /// New solution
+            window.titlebarAppearsTransparent = NO;
+            window.styleMask &= ~NSWindowStyleMaskFullSizeContentView;
+            _spacer_underneath_trafficLights.hidden = YES;
+        }
+        else { /// Old solution: This causes super weird bug on Mojave and Catalina, where the *release notes text* is always scrolled halfway down. (Didn't test Big Sur, but the new solution works there as well)
+            window.titlebarAppearsTransparent = NO;
+            if      (@available(macOS 16, *)) SUGetConstraintForSpacer(_spacer_underneath_trafficLights).constant = 31; /// Not sure if there are pixel differences depending on the .titlebarSeparatorStyle
+            else if (@available(macOS 11, *)) SUGetConstraintForSpacer(_spacer_underneath_trafficLights).constant = 29;
+            else                              SUGetConstraintForSpacer(_spacer_underneath_trafficLights).constant = 22;
+        }
     }
     
     BOOL showReleaseNotes = [self showsReleaseNotes];
