@@ -81,3 +81,33 @@
 
 /* Software Update title/label */
 "Software Update" = "Actualização de Software";
+
+/* Remind Me Later choice for update alert */
+"Remind Me Later" = "Lembrar mais tarde";
+
+/* Skip This Version choice for update alert */
+"Skip This Version" = "Saltar esta versão";
+
+/* Install Update choice for update alert */
+"Install Update" = "Instalar actualização";
+
+/* Automatically download and install updates in the future option for update alert */
+"Automatically download and install updates in the future" = "No futuro, transferir e instalar actualizações automaticamente";
+
+/* Check for updates automatically response for update permission dialog */
+"Check Automatically" = "Procurar automaticamente";
+
+/* Don't check for updates automatically response for update permission dialog */
+"Don’t Check" = "Não procurar";
+
+/* Title question for update permission dialog */
+"Check for updates automatically?" = "Procurar actualizações automaticamente?";
+
+/* Include anonymous system profile choice for update permission dialog */
+"Include anonymous system profile" = "Incluir perfil de sistema anónimo";
+
+/* Automatically download and install updates choice for update permission dialog */
+"Automatically download and install updates" = "Transferir e instalar actualizações automaticamente";
+
+/* Anonymous system profile information disclosure for update permission dialog */
+"Anonymous system profile information is used to help us plan future development work. Please contact us if you have any questions about this.\n\nThis is the information that would be sent:" = "A informação anónima do perfil de sistema é usada para no futuro nos ajudar a planear o trabalho de desenvolvimento. Por favor contacte-nos se tiver alguma questão acerca deste assunto.\n\nEsta é a informação que seria enviada:";

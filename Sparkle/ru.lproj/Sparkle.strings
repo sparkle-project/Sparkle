@@ -84,3 +84,33 @@
 
 /* Software Update title/label */
 "Software Update" = "Обновление программного обеспечения";
+
+/* Remind Me Later choice for update alert */
+"Remind Me Later" = "Напоминать позже";
+
+/* Skip This Version choice for update alert */
+"Skip This Version" = "Пропустить эту версию";
+
+/* Install Update choice for update alert */
+"Install Update" = "Установить обновление";
+
+/* Automatically download and install updates in the future option for update alert */
+"Automatically download and install updates in the future" = "Автоматически загружать и устанавливать обновления в будущем";
+
+/* Check for updates automatically response for update permission dialog */
+"Check Automatically" = "Проверять автоматически";
+
+/* Don't check for updates automatically response for update permission dialog */
+"Don’t Check" = "Не проверять";
+
+/* Title question for update permission dialog */
+"Check for updates automatically?" = "Выполнять автоматическую проверку наличия обновлений?";
+
+/* Include anonymous system profile choice for update permission dialog */
+"Include anonymous system profile" = "Включить анонимный профиль системы";
+
+/* Automatically download and install updates choice for update permission dialog */
+"Automatically download and install updates" = "Автоматически загружать и устанавливать обновления";
+
+/* Anonymous system profile information disclosure for update permission dialog */
+"Anonymous system profile information is used to help us plan future development work. Please contact us if you have any questions about this.\n\nThis is the information that would be sent:" = "Использование анонимного профиля системы помогает нам в планировании будущей работы по разработке. Если у вас есть какие-либо вопросы по этой теме, обращайтесь к нам.\n\nЭто информация, предназначенная для отправления:";

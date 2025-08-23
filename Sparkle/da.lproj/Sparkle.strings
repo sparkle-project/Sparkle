@@ -87,3 +87,33 @@
 
 /* Software Update title/label */
 "Software Update" = "Software Update";
+
+/* Remind Me Later choice for update alert */
+"Remind Me Later" = "Påmind mig senere";
+
+/* Skip This Version choice for update alert */
+"Skip This Version" = "Spring over";
+
+/* Install Update choice for update alert */
+"Install Update" = "Installer";
+
+/* Automatically download and install updates in the future option for update alert */
+"Automatically download and install updates in the future" = "Hent og installer opdateringer automatisk i fremtiden";
+
+/* Check for updates automatically response for update permission dialog */
+"Check Automatically" = "Søg automatisk";
+
+/* Don't check for updates automatically response for update permission dialog */
+"Don’t Check" = "Søg ikke";
+
+/* Title question for update permission dialog */
+"Check for updates automatically?" = "Søg efter opdateringer automatisk?";
+
+/* Include anonymous system profile choice for update permission dialog */
+"Include anonymous system profile" = "Vedhæft anonym systemprofil";
+
+/* Automatically download and install updates choice for update permission dialog */
+"Automatically download and install updates" = "Hent og installer opdateringer automatisk";
+
+/* Anonymous system profile information disclosure for update permission dialog */
+"Anonymous system profile information is used to help us plan future development work. Please contact us if you have any questions about this.\n\nThis is the information that would be sent:" = "Anonymous system profile information is used to help us plan future development work. Please contact us if you have any questions about this.\n\nThis is the information that would be sent:";

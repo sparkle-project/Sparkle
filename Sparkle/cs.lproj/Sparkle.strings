@@ -153,3 +153,33 @@
 
 /* Software Update title/label */
 "Software Update" = "Aktualizace aplikace";
+
+/* Remind Me Later choice for update alert */
+"Remind Me Later" = "Připomenout později";
+
+/* Skip This Version choice for update alert */
+"Skip This Version" = "Přeskočit tuto verzi";
+
+/* Install Update choice for update alert */
+"Install Update" = "Instalovat aktualizaci";
+
+/* Automatically download and install updates in the future option for update alert */
+"Automatically download and install updates in the future" = "V budoucnu stahovat a instalovat aktualizace automaticky";
+
+/* Check for updates automatically response for update permission dialog */
+"Check Automatically" = "Automaticky vyhledávat";
+
+/* Don't check for updates automatically response for update permission dialog */
+"Don’t Check" = "Nevyhledávat";
+
+/* Title question for update permission dialog */
+"Check for updates automatically?" = "Vyhledávat aktualizace automaticky?";
+
+/* Include anonymous system profile choice for update permission dialog */
+"Include anonymous system profile" = "Odeslat anonymní systémový profil";
+
+/* Automatically download and install updates choice for update permission dialog */
+"Automatically download and install updates" = "Stahovat a instalovat aktualizace automaticky";
+
+/* Anonymous system profile information disclosure for update permission dialog */
+"Anonymous system profile information is used to help us plan future development work. Please contact us if you have any questions about this.\n\nThis is the information that would be sent:" = "Informace z anonymního systémového profilu pomáhají vývojářům lépe plánovat budoucí vývoj aplikace.\nBudete-li mít nějaký dotaz, obraťte se na nás.\n\nToto jsou informace, které budou odeslány:";

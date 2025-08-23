@@ -201,3 +201,33 @@
 
 /* Software Update title/label */
 "Software Update" = "Software Update";
+
+/* Remind Me Later choice for update alert */
+"Remind Me Later" = "Remind Me Later";
+
+/* Skip This Version choice for update alert */
+"Skip This Version" = "Skip This Version";
+
+/* Install Update choice for update alert */
+"Install Update" = "Install Update";
+
+/* Automatically download and install updates in the future option for update alert */
+"Automatically download and install updates in the future" = "Automatically download and install updates in the future";
+
+/* Check for updates automatically response for update permission dialog */
+"Check Automatically" = "Check Automatically";
+
+/* Don't check for updates automatically response for update permission dialog */
+"Don’t Check" = "Don’t Check";
+
+/* Title question for update permission dialog */
+"Check for updates automatically?" = "Check for updates automatically?";
+
+/* Include anonymous system profile choice for update permission dialog */
+"Include anonymous system profile" = "Include anonymous system profile";
+
+/* Automatically download and install updates choice for update permission dialog */
+"Automatically download and install updates" = "Automatically download and install updates";
+
+/* Anonymous system profile information disclosure for update permission dialog */
+"Anonymous system profile information is used to help us plan future development work. Please contact us if you have any questions about this.\n\nThis is the information that would be sent:" = "Anonymous system profile information is used to help us plan future development work. Please contact us if you have any questions about this.\n\nThis is the information that would be sent:";

@@ -81,3 +81,33 @@
 
 /* Software Update title/label */
 "Software Update" = "Ενημέρωση προγράμματος";
+
+/* Remind Me Later choice for update alert */
+"Remind Me Later" = "Υπενθύμιση Αργότερα";
+
+/* Skip This Version choice for update alert */
+"Skip This Version" = "Παράλειψη Έκδοσης";
+
+/* Install Update choice for update alert */
+"Install Update" = "Εγκατάσταση Ενημέρωσης";
+
+/* Automatically download and install updates in the future option for update alert */
+"Automatically download and install updates in the future" = "Αυτόματη λήψη και εγκατάσταση ενημερώσεων στο μέλλον";
+
+/* Check for updates automatically response for update permission dialog */
+"Check Automatically" = "Αυτόματος Ελεγχος";
+
+/* Don't check for updates automatically response for update permission dialog */
+"Don’t Check" = "Κανένας έλεγχος";
+
+/* Title question for update permission dialog */
+"Check for updates automatically?" = "Αυτόματος έλεγχος για ενημερώσεις;";
+
+/* Include anonymous system profile choice for update permission dialog */
+"Include anonymous system profile" = "Συμπερίληψη του ανώνυμου προφίλ του συστήματός σας";
+
+/* Automatically download and install updates choice for update permission dialog */
+"Automatically download and install updates" = "Αυτόματη λήψη και εγκατάσταση ενημερώσεων";
+
+/* Anonymous system profile information disclosure for update permission dialog */
+"Anonymous system profile information is used to help us plan future development work. Please contact us if you have any questions about this.\n\nThis is the information that would be sent:" = "Οι ανώνυμες πληροφορίες του προφίλ του συστήματός σας, μας βοηθούν στο σχεδιασμό της μελλοντικής ανάπτυξης του προγράμματος. Παρακαλώ επικοινωνήστε μαζί μας άν έχετε ερωτήσεις.\n\nΑυτές είναι οι πληροφορίες που θα σταλούν σε εμάς:";

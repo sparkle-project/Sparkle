@@ -81,3 +81,33 @@
 
 /* Software Update title/label */
 "Software Update" = "Programuppdatering";
+
+/* Remind Me Later choice for update alert */
+"Remind Me Later" = "Påminn mig senare";
+
+/* Skip This Version choice for update alert */
+"Skip This Version" = "Hoppa över denna version";
+
+/* Install Update choice for update alert */
+"Install Update" = "Installera uppdatering";
+
+/* Automatically download and install updates in the future option for update alert */
+"Automatically download and install updates in the future" = "Hämta och installera nya uppdateringar automatiskt i framtiden.";
+
+/* Check for updates automatically response for update permission dialog */
+"Check Automatically" = "Kontrollera automatiskt";
+
+/* Don't check for updates automatically response for update permission dialog */
+"Don’t Check" = "Kontrollera inte";
+
+/* Title question for update permission dialog */
+"Check for updates automatically?" = "Leta efter uppdateringar automatiskt?\n";
+
+/* Include anonymous system profile choice for update permission dialog */
+"Include anonymous system profile" = "Inkludera anonym systemprofil";
+
+/* Automatically download and install updates choice for update permission dialog */
+"Automatically download and install updates" = "Hämta och installera nya uppdateringar automatiskt.";
+
+/* Anonymous system profile information disclosure for update permission dialog */
+"Anonymous system profile information is used to help us plan future development work. Please contact us if you have any questions about this.\n\nThis is the information that would be sent:" = "Anonym systemprofilinformation används för att hjälpa oss att planera framtida utvecklingsarbete. Vänligen kontakta oss ifall du har några frågot om detta.\n\nDetta är informationen som skulle sändas:";

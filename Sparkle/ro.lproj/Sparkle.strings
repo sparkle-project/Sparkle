@@ -90,3 +90,33 @@
 
 /* Software Update title/label */
 "Software Update" = "Actualizarea aplicației";
+
+/* Remind Me Later choice for update alert */
+"Remind Me Later" = "Amintește-mi mai târziu";
+
+/* Skip This Version choice for update alert */
+"Skip This Version" = "Sari peste…";
+
+/* Install Update choice for update alert */
+"Install Update" = "Instalează actualizarea";
+
+/* Automatically download and install updates in the future option for update alert */
+"Automatically download and install updates in the future" = "În viitor descarcă și instalează în automat actualizările";
+
+/* Check for updates automatically response for update permission dialog */
+"Check Automatically" = "Verifică în mod automat";
+
+/* Don't check for updates automatically response for update permission dialog */
+"Don’t Check" = "Nu verifica";
+
+/* Title question for update permission dialog */
+"Check for updates automatically?" = "Verifică pentru actualizări în mod automat";
+
+/* Include anonymous system profile choice for update permission dialog */
+"Include anonymous system profile" = "Include profil anomin de sistem";
+
+/* Automatically download and install updates choice for update permission dialog */
+"Automatically download and install updates" = "Descarcă și instalează în automat actualizările";
+
+/* Anonymous system profile information disclosure for update permission dialog */
+"Anonymous system profile information is used to help us plan future development work. Please contact us if you have any questions about this.\n\nThis is the information that would be sent:" = "Anonymous system profile information is used to help us plan future development work. Please contact us if you have any questions about this.\n\nThis is the information that would be sent:";

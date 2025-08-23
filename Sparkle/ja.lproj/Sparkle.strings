@@ -201,3 +201,33 @@
 
 /* Software Update title/label */
 "Software Update" = "ソフトウェア・アップデート";
+
+/* Remind Me Later choice for update alert */
+"Remind Me Later" = "あとで通知";
+
+/* Skip This Version choice for update alert */
+"Skip This Version" = "このバージョンはスキップ";
+
+/* Install Update choice for update alert */
+"Install Update" = "アップデートをインストール";
+
+/* Automatically download and install updates in the future option for update alert */
+"Automatically download and install updates in the future" = "今後はアップデートのダウンロードとインストールを自動で行う";
+
+/* Check for updates automatically response for update permission dialog */
+"Check Automatically" = "自動で確認";
+
+/* Don't check for updates automatically response for update permission dialog */
+"Don’t Check" = "確認しない";
+
+/* Title question for update permission dialog */
+"Check for updates automatically?" = "アップデートを自動で確認しますか?";
+
+/* Include anonymous system profile choice for update permission dialog */
+"Include anonymous system profile" = "匿名のシステム情報を含める";
+
+/* Automatically download and install updates choice for update permission dialog */
+"Automatically download and install updates" = "アップデートを自動でダウンロードしてインストール";
+
+/* Anonymous system profile information disclosure for update permission dialog */
+"Anonymous system profile information is used to help us plan future development work. Please contact us if you have any questions about this.\n\nThis is the information that would be sent:" = "匿名のシステムプロファイル情報は、今後の開発の参考にさせていただきます。この件に関してご質問があればご連絡下さい。\n\n以下の情報が送信されます:";

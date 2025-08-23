@@ -63,3 +63,15 @@
 
 /* Software Update title/label */
 "Software Update" = "Actualització del programari";
+
+/* Remind Me Later choice for update alert */
+"Remind Me Later" = "Recorda-m'ho més tard";
+
+/* Skip This Version choice for update alert */
+"Skip This Version" = "Omet aquesta versió";
+
+/* Install Update choice for update alert */
+"Install Update" = "Instal·la l'actualització";
+
+/* Automatically download and install updates in the future option for update alert */
+"Automatically download and install updates in the future" = "Descarrega i instal·la les actualitzacions automàticament en el futur";

@@ -400,6 +400,11 @@ static NSString *const SUUpdateAlertTouchBarIdentifier = @"" SPARKLE_BUNDLE_IDEN
         _releaseNotesBoxView.contentView.layer.cornerRadius = boxCornerRadius - boxBorderWidth;
     }
     
+    _laterButton.title = SULocalizedStringFromTableInBundle(@"Remind Me Later", SPARKLE_TABLE, sparkleBundle, @"");
+    _skipButton.title = SULocalizedStringFromTableInBundle(@"Skip This Version", SPARKLE_TABLE, sparkleBundle, @"");
+    _installButton.title = SULocalizedStringFromTableInBundle(@"Install Update", SPARKLE_TABLE, sparkleBundle, @"");
+    _automaticallyInstallUpdatesButton.title = SULocalizedStringFromTableInBundle(@"Automatically download and install updates in the future", SPARKLE_TABLE, sparkleBundle, @"");
+    
     /// Prevent icon clipping macOS Mojave (probably Catalina too. Big Sur?)
     {
         _iconContainer.wantsLayer = YES;
@@ -474,7 +479,7 @@ static NSString *const SUUpdateAlertTouchBarIdentifier = @"" SPARKLE_BUNDLE_IDEN
         
     }
     
-    if ((1)) {  /// Transparent titlebar – align content along the bottom of the traffic lights
+    if ((0)) {  /// Transparent titlebar – align content along the bottom of the traffic lights
         if      (@available(macOS 16, *)) SUGetConstraintForSpacer(_spacer_underneath_trafficLights).constant = 22;
         else if (@available(macOS 11, *)) SUGetConstraintForSpacer(_spacer_underneath_trafficLights).constant = 20;
         else                              SUGetConstraintForSpacer(_spacer_underneath_trafficLights).constant = 17;

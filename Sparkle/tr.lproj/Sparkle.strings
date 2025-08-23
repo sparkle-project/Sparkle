@@ -84,3 +84,33 @@
 
 /* Software Update title/label */
 "Software Update" = "Yazılım Güncelleme";
+
+/* Remind Me Later choice for update alert */
+"Remind Me Later" = "Daha Sonra Anımsat";
+
+/* Skip This Version choice for update alert */
+"Skip This Version" = "Bu Sürümü Atla";
+
+/* Install Update choice for update alert */
+"Install Update" = "Yükle";
+
+/* Automatically download and install updates in the future option for update alert */
+"Automatically download and install updates in the future" = "Gelecekte güncellemeleri otomatik olarak indir ve yükle";
+
+/* Check for updates automatically response for update permission dialog */
+"Check Automatically" = "Otomatik Olarak Denetle";
+
+/* Don't check for updates automatically response for update permission dialog */
+"Don’t Check" = "Denetleme";
+
+/* Title question for update permission dialog */
+"Check for updates automatically?" = "Güncellemeler otomatik olarak denetlensin mi?";
+
+/* Include anonymous system profile choice for update permission dialog */
+"Include anonymous system profile" = "Anonim sistem profilini içer";
+
+/* Automatically download and install updates choice for update permission dialog */
+"Automatically download and install updates" = "Güncellemeleri otomatik olarak indir ve yükle";
+
+/* Anonymous system profile information disclosure for update permission dialog */
+"Anonymous system profile information is used to help us plan future development work. Please contact us if you have any questions about this.\n\nThis is the information that would be sent:" = "Gönderdiğiniz anonim sistem bilgileri bu yazılımın geliştirilmesi için kullanılacaktır. Konu ile ilgili ayrıntılı bilgi için lütfen bizimle iletişime geçin. Gönderilecek bilgiler:";

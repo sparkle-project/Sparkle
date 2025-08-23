@@ -192,3 +192,33 @@
 
 /* Software Update title/label */
 "Software Update" = "עדכון תוכנה";
+
+/* Remind Me Later choice for update alert */
+"Remind Me Later" = "הזכר לי מאוחר יותר";
+
+/* Skip This Version choice for update alert */
+"Skip This Version" = "דלג על גרסה זו";
+
+/* Install Update choice for update alert */
+"Install Update" = "התקן את העדכון";
+
+/* Automatically download and install updates in the future option for update alert */
+"Automatically download and install updates in the future" = "הורד והתקן עדכונים בעתיד באופן אוטומטי";
+
+/* Check for updates automatically response for update permission dialog */
+"Check Automatically" = "חפש עדכונים אוטומטית";
+
+/* Don't check for updates automatically response for update permission dialog */
+"Don’t Check" = "אל תחפש";
+
+/* Title question for update permission dialog */
+"Check for updates automatically?" = "לחפש עדכונים באופן אוטומטי?";
+
+/* Include anonymous system profile choice for update permission dialog */
+"Include anonymous system profile" = "כלול מידע מערכת אנונימי";
+
+/* Automatically download and install updates choice for update permission dialog */
+"Automatically download and install updates" = "הורד והתקן עדכונים באופן אוטומטי";
+
+/* Anonymous system profile information disclosure for update permission dialog */
+"Anonymous system profile information is used to help us plan future development work. Please contact us if you have any questions about this.\n\nThis is the information that would be sent:" = "מידע מערכת אנונימי משמש כדי לעזור לנו לתכנן את עבודת הפיתוח העתידית. אנא צור איתנו קשר אם יש לך שאלות בנושא.\n\nזהו המידע שיישלח:";

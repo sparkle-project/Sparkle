@@ -153,3 +153,33 @@
 
 /* Software Update title/label */
 "Software Update" = "소프트웨어 업데이트";
+
+/* Remind Me Later choice for update alert */
+"Remind Me Later" = "나중에";
+
+/* Skip This Version choice for update alert */
+"Skip This Version" = "이 버전 건너뛰기";
+
+/* Install Update choice for update alert */
+"Install Update" = "업데이트 설치";
+
+/* Automatically download and install updates in the future option for update alert */
+"Automatically download and install updates in the future" = "향후 업데이트 자동 다운로드 및 설치";
+
+/* Check for updates automatically response for update permission dialog */
+"Check Automatically" = "자동으로 확인";
+
+/* Don't check for updates automatically response for update permission dialog */
+"Don’t Check" = "취소";
+
+/* Title question for update permission dialog */
+"Check for updates automatically?" = "업데이트를 자동으로 확인할까요?";
+
+/* Include anonymous system profile choice for update permission dialog */
+"Include anonymous system profile" = "익명 시스템 정보 포함";
+
+/* Automatically download and install updates choice for update permission dialog */
+"Automatically download and install updates" = "업데이트 자동 다운로드 및 설치";
+
+/* Anonymous system profile information disclosure for update permission dialog */
+"Anonymous system profile information is used to help us plan future development work. Please contact us if you have any questions about this.\n\nThis is the information that would be sent:" = "익명으로 보내지는 시스템 정보로 차후 프로그램 개발에 도움이 될 수 있습니다. 질문이 있으시면 연락 주십시오.\n\n아래 정보가 전송될 것입니다.";

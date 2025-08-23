@@ -54,3 +54,33 @@
 
 /* Software Update title/label */
 "Software Update" = "Hugbúnaðaruppfærsla";
+
+/* Remind Me Later choice for update alert */
+"Remind Me Later" = "Áminntu mig síðar";
+
+/* Skip This Version choice for update alert */
+"Skip This Version" = "Sleppa þessari útgáfu";
+
+/* Install Update choice for update alert */
+"Install Update" = "Innsetja";
+
+/* Automatically download and install updates in the future option for update alert */
+"Automatically download and install updates in the future" = "Sækja og innsetja uppfærslur sjálfkrafa framvegis";
+
+/* Check for updates automatically response for update permission dialog */
+"Check Automatically" = "Kanna sjálfkrafa";
+
+/* Don't check for updates automatically response for update permission dialog */
+"Don’t Check" = "Ekki kanna";
+
+/* Title question for update permission dialog */
+"Check for updates automatically?" = "Athuga sjálfkrafa með uppfærslur?";
+
+/* Include anonymous system profile choice for update permission dialog */
+"Include anonymous system profile" = "Innifela nafnlausa kerfisskýrslu";
+
+/* Automatically download and install updates choice for update permission dialog */
+"Automatically download and install updates" = "Sækja og innsetja uppfærslur sjálfkrafa";
+
+/* Anonymous system profile information disclosure for update permission dialog */
+"Anonymous system profile information is used to help us plan future development work. Please contact us if you have any questions about this.\n\nThis is the information that would be sent:" = "Upplýsingar úr nafnlausum kerfisskýrslum eru notaðar til að hjálpa okkur við framtíðarþróun hugbúnaðarins. Ekki hika við að hafa samband ef spurningar vakna um þetta.\n\nÞetta eru upplýsingarnar sem yrðu sendar:";

@@ -57,3 +57,33 @@
 
 /* Software Update title/label */
 "Software Update" = "محدث البرنامج";
+
+/* Remind Me Later choice for update alert */
+"Remind Me Later" = "تذكيري لاحقًا";
+
+/* Skip This Version choice for update alert */
+"Skip This Version" = "تخطي هذا الإصدار";
+
+/* Install Update choice for update alert */
+"Install Update" = "تثبيت التحديث";
+
+/* Automatically download and install updates in the future option for update alert */
+"Automatically download and install updates in the future" = "تنزيل التحديثات وتثبيتها تلقائيًا في المستقبل";
+
+/* Check for updates automatically response for update permission dialog */
+"Check Automatically" = "التحقق تلقائيًا";
+
+/* Don't check for updates automatically response for update permission dialog */
+"Don’t Check" = "عدم التحقق";
+
+/* Title question for update permission dialog */
+"Check for updates automatically?" = "هل تريد أن يتم التحقق من وجود تحديثات تلقائيًا؟";
+
+/* Include anonymous system profile choice for update permission dialog */
+"Include anonymous system profile" = "تضمين تقرير عن النظام دون ذكر معلومات عن المستخدم";
+
+/* Automatically download and install updates choice for update permission dialog */
+"Automatically download and install updates" = "تنزيل التحديثات وتثبيتها تلقائيًا في المست";
+
+/* Anonymous system profile information disclosure for update permission dialog */
+"Anonymous system profile information is used to help us plan future development work. Please contact us if you have any questions about this.\n\nThis is the information that would be sent:" = "Anonymous system profile information is used to help us plan future development work. Please contact us if you have any questions about this.\n\nThis is the information that would be sent:";

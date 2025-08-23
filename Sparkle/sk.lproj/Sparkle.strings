@@ -81,3 +81,33 @@
 
 /* Software Update title/label */
 "Software Update" = "Aktualizácia softvéru";
+
+/* Remind Me Later choice for update alert */
+"Remind Me Later" = "Pripomenúť neskôr";
+
+/* Skip This Version choice for update alert */
+"Skip This Version" = "Vynechať túto verziu";
+
+/* Install Update choice for update alert */
+"Install Update" = "Nainštalovať";
+
+/* Automatically download and install updates in the future option for update alert */
+"Automatically download and install updates in the future" = "V budúcnosti aktualizácie preberať a inštalovať automaticky";
+
+/* Check for updates automatically response for update permission dialog */
+"Check Automatically" = "Kontrolovať automaticky";
+
+/* Don't check for updates automatically response for update permission dialog */
+"Don’t Check" = "Nekontrolovať";
+
+/* Title question for update permission dialog */
+"Check for updates automatically?" = "Kontrolovať aktualizácie automaticky?";
+
+/* Include anonymous system profile choice for update permission dialog */
+"Include anonymous system profile" = "Zahrnúť anonymný profil systému";
+
+/* Automatically download and install updates choice for update permission dialog */
+"Automatically download and install updates" = "Automatically download and install updates";
+
+/* Anonymous system profile information disclosure for update permission dialog */
+"Anonymous system profile information is used to help us plan future development work. Please contact us if you have any questions about this.\n\nThis is the information that would be sent:" = "Anonymný profil systému nám umožní zlepšiť plánovanie budúceho vývoja aplikácie. Ak máte ohľadom tohto akékoľvek otázky, neváhajte a kontaktujte nás.\n\nOdosielané budú nasledujúce informácie:";

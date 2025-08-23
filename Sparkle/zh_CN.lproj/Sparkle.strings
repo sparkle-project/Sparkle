@@ -96,3 +96,33 @@
 
 /* Software Update title/label */
 "Software Update" = "软件更新";
+
+/* Remind Me Later choice for update alert */
+"Remind Me Later" = "稍后提示我";
+
+/* Skip This Version choice for update alert */
+"Skip This Version" = "跳过这个版本";
+
+/* Install Update choice for update alert */
+"Install Update" = "安装更新";
+
+/* Automatically download and install updates in the future option for update alert */
+"Automatically download and install updates in the future" = "以后自动下载并安装更新";
+
+/* Check for updates automatically response for update permission dialog */
+"Check Automatically" = "自动核查";
+
+/* Don't check for updates automatically response for update permission dialog */
+"Don’t Check" = "不核查";
+
+/* Title question for update permission dialog */
+"Check for updates automatically?" = "自动核查更新？";
+
+/* Include anonymous system profile choice for update permission dialog */
+"Include anonymous system profile" = "包括无记名系统概况";
+
+/* Automatically download and install updates choice for update permission dialog */
+"Automatically download and install updates" = "自动下载并安装更新";
+
+/* Anonymous system profile information disclosure for update permission dialog */
+"Anonymous system profile information is used to help us plan future development work. Please contact us if you have any questions about this.\n\nThis is the information that would be sent:" = "无记名系统概况信息被用于帮助我们安排将来的开发工作。如果对此存在疑问请联系我们。\n\n这是将要被发送的信息：:";

@@ -153,3 +153,33 @@
 
 /* Software Update title/label */
 "Software Update" = "軟體更新";
+
+/* Remind Me Later choice for update alert */
+"Remind Me Later" = "稍後提醒我";
+
+/* Skip This Version choice for update alert */
+"Skip This Version" = "跳過此版本";
+
+/* Install Update choice for update alert */
+"Install Update" = "安裝更新";
+
+/* Automatically download and install updates in the future option for update alert */
+"Automatically download and install updates in the future" = "以後自動下載並安裝更新";
+
+/* Check for updates automatically response for update permission dialog */
+"Check Automatically" = "自動檢查";
+
+/* Don't check for updates automatically response for update permission dialog */
+"Don’t Check" = "毋檢查";
+
+/* Title question for update permission dialog */
+"Check for updates automatically?" = "自動檢查更新？";
+
+/* Include anonymous system profile choice for update permission dialog */
+"Include anonymous system profile" = "包含匿名系統概況";
+
+/* Automatically download and install updates choice for update permission dialog */
+"Automatically download and install updates" = "自動下載並安裝更新";
+
+/* Anonymous system profile information disclosure for update permission dialog */
+"Anonymous system profile information is used to help us plan future development work. Please contact us if you have any questions about this.\n\nThis is the information that would be sent:" = "匿名系統概況資訊可用來協助我等計畫未來開發工作。若對此有任何疑問，請聯繫我等。\n\n以下係會傳送嘅資訊：";

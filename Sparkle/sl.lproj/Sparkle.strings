@@ -81,3 +81,33 @@
 
 /* Software Update title/label */
 "Software Update" = "Posodabljanje programske opreme";
+
+/* Remind Me Later choice for update alert */
+"Remind Me Later" = "Spomni me kasneje";
+
+/* Skip This Version choice for update alert */
+"Skip This Version" = "Preskoči to verzijo";
+
+/* Install Update choice for update alert */
+"Install Update" = "Namesti posodobitev";
+
+/* Automatically download and install updates in the future option for update alert */
+"Automatically download and install updates in the future" = "V prihodnje samodejno nameščaj posodobitve";
+
+/* Check for updates automatically response for update permission dialog */
+"Check Automatically" = "Samodejno preverjaj";
+
+/* Don't check for updates automatically response for update permission dialog */
+"Don’t Check" = "Ne preverjaj";
+
+/* Title question for update permission dialog */
+"Check for updates automatically?" = "Naj občasno preverjam, če so na voljo posodobitve?";
+
+/* Include anonymous system profile choice for update permission dialog */
+"Include anonymous system profile" = "Vključi anonimni profil sistema";
+
+/* Automatically download and install updates choice for update permission dialog */
+"Automatically download and install updates" = "Samodejno namestite posodobitve";
+
+/* Anonymous system profile information disclosure for update permission dialog */
+"Anonymous system profile information is used to help us plan future development work. Please contact us if you have any questions about this.\n\nThis is the information that would be sent:" = "Anonimni profil sistema se uporablja za načrtovanje nadaljnega razvoja programa. V primeru vprašanj nas lahko kontaktirate.\n\nPošljejo se sledeče informacije:";

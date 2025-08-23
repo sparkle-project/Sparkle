@@ -1,17 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="23727" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="22690"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="23727"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="SUUpdatePermissionPrompt">
             <connections>
                 <outlet property="_anonymousInfoDisclosureButton" destination="JW6-0z-Ud3" id="grm-Uj-KJs"/>
+                <outlet property="_anonymousSystemProfileDisclosureInformation" destination="46" id="Ctt-KG-z3I"/>
+                <outlet property="_automaticallyDownloadAndInstallUpdatesButton" destination="BId-kb-eYW" id="FLp-cT-Pth"/>
                 <outlet property="_automaticallyDownloadUpdatesView" destination="37T-Ef-DtX" id="Ojd-zE-6Kd"/>
                 <outlet property="_cancelButton" destination="cFC-wV-H3j" id="B1o-H0-cr1"/>
                 <outlet property="_checkButton" destination="sMh-ha-r7R" id="2Oc-EC-EcG"/>
+                <outlet property="_checkForUpdatesAutomaticallyTextField" destination="IgD-Pj-pc8" id="h2Y-hw-KHf"/>
+                <outlet property="_includeAnonymousSystemProfileButton" destination="a90-Iq-FgS" id="v0L-n4-sGt"/>
                 <outlet property="_infoChoiceView" destination="ov1-yV-Uol" id="RSd-bn-7bu"/>
                 <outlet property="_moreInfoView" destination="39" id="ceJ-4H-FHd"/>
                 <outlet property="_placeholderHeightLayoutConstraint" destination="yis-HR-OIe" id="npL-hg-wRq"/>
@@ -29,7 +33,7 @@
             <windowCollectionBehavior key="collectionBehavior" fullScreenAuxiliary="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="83" y="492" width="488" height="379"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="2304" height="1271"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1470" height="918"/>
             <view key="contentView" id="6">
                 <rect key="frame" x="0.0" y="0.0" width="437" height="379"/>
                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -71,7 +75,7 @@
             <rect key="frame" x="0.0" y="0.0" width="437" height="78"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
-                <textField focusRingType="none" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="IgD-Pj-pc8">
+                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="IgD-Pj-pc8">
                     <rect key="frame" x="104" y="42" width="315" height="16"/>
                     <constraints>
                         <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="16" id="J49-m7-iIa"/>
@@ -82,7 +86,7 @@
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <textField focusRingType="none" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="tgW-Jp-Aia">
+                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="tgW-Jp-Aia">
                     <rect key="frame" x="104" y="0.0" width="315" height="34"/>
                     <constraints>
                         <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="34" id="HfG-Lg-91D"/>
@@ -126,7 +130,7 @@
             <rect key="frame" x="0.0" y="0.0" width="434" height="205"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
-                <textField focusRingType="none" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="46" userLabel="SystemProfileInfo">
+                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="46" userLabel="SystemProfileInfo">
                     <rect key="frame" x="104" y="123" width="312" height="70"/>
                     <constraints>
                         <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="70" id="Csk-S6-dh4"/>

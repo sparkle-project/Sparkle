@@ -57,3 +57,33 @@
 
 /* Software Update title/label */
 "Software Update" = "Ohjelmiston pävitys";
+
+/* Remind Me Later choice for update alert */
+"Remind Me Later" = "Muistuta myöhemmin";
+
+/* Skip This Version choice for update alert */
+"Skip This Version" = "Ohita tämä versio";
+
+/* Install Update choice for update alert */
+"Install Update" = "Asenna päivitys";
+
+/* Automatically download and install updates in the future option for update alert */
+"Automatically download and install updates in the future" = "Hae ja asenna päivitykset jatkossa automaattisesti";
+
+/* Check for updates automatically response for update permission dialog */
+"Check Automatically" = "Tarkista automaattisesti";
+
+/* Don't check for updates automatically response for update permission dialog */
+"Don’t Check" = "Älä tarkista";
+
+/* Title question for update permission dialog */
+"Check for updates automatically?" = "Tarkista päivitykset käynnistyksen yhteydessä?";
+
+/* Include anonymous system profile choice for update permission dialog */
+"Include anonymous system profile" = "Sisällytä nimetön järjestelmäprofiili";
+
+/* Automatically download and install updates choice for update permission dialog */
+"Automatically download and install updates" = "Hae ja asenna päivitykset automaattisesti";
+
+/* Anonymous system profile information disclosure for update permission dialog */
+"Anonymous system profile information is used to help us plan future development work. Please contact us if you have any questions about this.\n\nThis is the information that would be sent:" = "Anonymous system profile information is used to help us plan future development work. Please contact us if you have any questions about this.\n\nThis is the information that would be sent:";
