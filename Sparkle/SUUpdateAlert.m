@@ -84,6 +84,7 @@ static NSString *const SUUpdateAlertTouchBarIdentifier = @"" SPARKLE_BUNDLE_IDEN
     IBOutlet NSLayoutConstraint *_constraint_choices_bottom;
     IBOutlet NSLayoutConstraint *_constraint_choices_trailing;
     IBOutlet NSLayoutConstraint *_constraint_choices_mainButtonSpacing;
+    IBOutlet NSLayoutConstraint *_constraint_choices_secondaryButtonSpacing;
     
     
     void (^_didBecomeKeyBlock)(void);
@@ -409,6 +410,7 @@ static NSString *const SUUpdateAlertTouchBarIdentifier = @"" SPARKLE_BUNDLE_IDEN
         _constraint_choices_bottom.constant = 15;
             
         _constraint_choices_mainButtonSpacing.constant = 8; /// Reduce spacing 12 -> 8. Matches NSAlert
+        _constraint_choices_secondaryButtonSpacing.constant = 8;
             
         _releaseNotesBoxView.fillColor = /// [Aug 2025] Make the release notes background very slighly transparent to tint it a little. This should only have a visible effect if the window is colored by wallpaper tinting, translucency, or liquid glass. (Cause otherwise the .textBackgroundColor is the same as the window background color under tahoe – pure black/white)
             [NSColor colorWithName: @"_releaseNotesBoxView.fillColor" dynamicProvider:^NSColor * _Nonnull(NSAppearance * _Nonnull __unused appearance) {
