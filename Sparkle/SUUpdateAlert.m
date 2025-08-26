@@ -78,8 +78,8 @@ static NSString *const SUUpdateAlertTouchBarIdentifier = @"" SPARKLE_BUNDLE_IDEN
     IBOutlet NSLayoutConstraint *_constraint_programIcon_inset_bottom;
     IBOutlet NSLayoutConstraint *_constraint_programIcon_inset_top;
     
-    IBOutlet NSLayoutConstraint *_constraint_versionAndQuestion_leading; /// Horizontal space to programIcon
-    IBOutlet NSLayoutConstraint *_constraint_versionAndQuestion_vertical; /// Space between the two textFields
+    IBOutlet NSLayoutConstraint *_constraint_versionAndQuestion_leading; // Horizontal space to programIcon
+    IBOutlet NSLayoutConstraint *_constraint_versionAndQuestion_vertical; // Space between the two textFields
     
     IBOutlet NSLayoutConstraint *_constraint_choices_leading;
     IBOutlet NSLayoutConstraint *_constraint_choices_bottom;
@@ -373,7 +373,7 @@ static NSString *const SUUpdateAlertTouchBarIdentifier = @"" SPARKLE_BUNDLE_IDEN
 {
     NSWindow *window = self.window;
     
-    window.movableByWindowBackground = YES; /// Should this depend on .titlebarAppearsTransparent?
+    window.movableByWindowBackground = YES; // Noah: Should this be disabled if .titlebarAppearsTransparent=NO?
     
 #if SPARKLE_COPY_LOCALIZATIONS
     NSBundle *sparkleBundle = SUSparkleBundle();
@@ -405,7 +405,7 @@ static NSString *const SUUpdateAlertTouchBarIdentifier = @"" SPARKLE_BUNDLE_IDEN
     _installButton.title = SULocalizedStringFromTableInBundle(@"Install Update", SPARKLE_TABLE, sparkleBundle, @"");
     _automaticallyInstallUpdatesButton.title = SULocalizedStringFromTableInBundle(@"Automatically download and install updates in the future", SPARKLE_TABLE, sparkleBundle, @"");
     
-    /// Prevent icon clipping macOS Mojave (probably Catalina too. Big Sur?)
+    // Prevent icon clipping macOS Mojave (probably Catalina too. Big Sur?)
     {
         _iconContainer.wantsLayer = YES;
         _iconContainer.layer.masksToBounds = NO;
@@ -419,19 +419,19 @@ static NSString *const SUUpdateAlertTouchBarIdentifier = @"" SPARKLE_BUNDLE_IDEN
         _laterButton.controlSize    = NSControlSizeLarge;
         _installButton.controlSize  = NSControlSizeLarge;
             
-        _constraint_choices_leading.constant = 15; /// Buttons have a 15 px distance to the window edge instead of 20, as seen in NSAlerts on Tahoe
+        _constraint_choices_leading.constant = 15; // Buttons have a 15 px distance to the window edge instead of 20, as seen in NSAlerts on Tahoe
         _constraint_choices_trailing.constant = 15;
         _constraint_choices_bottom.constant = 15;
         
-        _constraint_choices_mainButtonSpacing.constant = 8; /// Reduce spacing 12 -> 8. Matches NSAlert
+        _constraint_choices_mainButtonSpacing.constant = 8; // Reduce spacing 12 -> 8. Matches NSAlert
         _constraint_choices_secondaryButtonSpacing.constant = 8;
         
-        SUGetConstraintForSpacer(_spacer_after_releaseNotesBox).constant = 15; /// Match the reduced bottom/side margins of the buttons in the choicesView
+        SUGetConstraintForSpacer(_spacer_after_releaseNotesBox).constant = 15; // Match the reduced bottom/side margins of the buttons in the choicesView
         
-        /// Scale up title section to balance the larger buttons
+        // Scale up title section to balance the larger buttons
         {
             double newIconSize = 58.0;
-            double newInsetSize = newIconSize / 10.0; /// Size of the  empty space / shadow area around the icon – we compensate for this so we can do the rest of the layout based on where the icon actually appears visually
+            double newInsetSize = newIconSize / 10.0; // Size of the  empty space / shadow area around the icon – we compensate for this so we can do the rest of the layout based on where the icon actually appears visually
             _constraint_programIcon_width.constant           = newIconSize;
             _constraint_programIcon_inset_top.constant       = -newInsetSize;
             _constraint_programIcon_inset_bottom.constant    = -newInsetSize;
@@ -439,17 +439,17 @@ static NSString *const SUUpdateAlertTouchBarIdentifier = @"" SPARKLE_BUNDLE_IDEN
             _constraint_programIcon_inset_trailing.constant  = -newInsetSize;
             
             double versionAndQuestionSpacing = newInsetSize * 2;
-            _constraint_versionAndQuestion_vertical.constant = versionAndQuestionSpacing - 3; /// -3 makes the horizontal and vertical margins appear visually equal
+            _constraint_versionAndQuestion_vertical.constant = versionAndQuestionSpacing - 3; // -3 makes the horizontal and vertical margins appear visually equal
             _constraint_versionAndQuestion_leading.constant  = versionAndQuestionSpacing;
         }
     }
     
-    if ((1)) {  /// Transparent titlebar – align content along the bottom of the traffic lights
+    if ((1)) {  // Transparent titlebar – align content along the bottom of the traffic lights
         if      (@available(macOS 16, *)) SUGetConstraintForSpacer(_spacer_underneath_trafficLights).constant = 22;
         else if (@available(macOS 11, *)) SUGetConstraintForSpacer(_spacer_underneath_trafficLights).constant = 20;
         else                              SUGetConstraintForSpacer(_spacer_underneath_trafficLights).constant = 17;
     }
-    else {      /// Non-transparent titlebar – align content along the bottom of the titlebar.
+    else {      // Non-transparent titlebar – align content along the bottom of the titlebar.
         window.titlebarAppearsTransparent = NO;
         window.styleMask &= ~NSWindowStyleMaskFullSizeContentView;
         _spacer_underneath_trafficLights.hidden = YES;
