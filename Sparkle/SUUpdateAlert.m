@@ -414,17 +414,20 @@ static NSString *const SUUpdateAlertTouchBarIdentifier = @"" SPARKLE_BUNDLE_IDEN
     }
     
     if (@available(macOS 16, *)) {
-    
-        _skipButton.controlSize = NSControlSizeLarge;
-        _laterButton.controlSize = NSControlSizeLarge;
-        _installButton.controlSize = NSControlSizeLarge;
+        
+        if ((1))
+        {
+            _skipButton.controlSize     = NSControlSizeLarge;
+            _laterButton.controlSize    = NSControlSizeLarge;
+            _installButton.controlSize  = NSControlSizeLarge;
+                
+            _constraint_choices_leading.constant = 15; /// Buttons have a 15 px distance to the window edge instead of 20, as seen in NSAlerts on Tahoe
+            _constraint_choices_trailing.constant = 15;
+            _constraint_choices_bottom.constant = 15;
             
-        _constraint_choices_leading.constant = 15; /// Buttons have a 15 px distance to the window edge instead of 20, as seen in NSAlerts on Tahoe
-        _constraint_choices_trailing.constant = 15;
-        _constraint_choices_bottom.constant = 15;
-            
-        _constraint_choices_mainButtonSpacing.constant = 8; /// Reduce spacing 12 -> 8. Matches NSAlert
-        _constraint_choices_secondaryButtonSpacing.constant = 8;
+            _constraint_choices_mainButtonSpacing.constant = 8; /// Reduce spacing 12 -> 8. Matches NSAlert
+            _constraint_choices_secondaryButtonSpacing.constant = 8;
+        }
             
         _releaseNotesBoxView.fillColor = /// [Aug 2025] Make the release notes background very slighly transparent to tint it a little. This should only have a visible effect if the window is colored by wallpaper tinting, translucency, or liquid glass. (Cause otherwise the .textBackgroundColor is the same as the window background color under tahoe – pure black/white)
             [NSColor colorWithName: @"_releaseNotesBoxView.fillColor" dynamicProvider:^NSColor * _Nonnull(NSAppearance * _Nonnull __unused appearance) {
@@ -450,20 +453,21 @@ static NSString *const SUUpdateAlertTouchBarIdentifier = @"" SPARKLE_BUNDLE_IDEN
                 NSFont *oldFont = _automaticallyInstallUpdatesButton.font;
                 if (oldFont) _automaticallyInstallUpdatesButton.font = [NSFont fontWithDescriptor: oldFont.fontDescriptor size: NSFont.systemFontSize];
             }
-            else assert(false);
         }
         
         /// Scale up title section to balance the larger buttons
         {
-            int newSize = 60;
-            _constraint_programIcon_width.constant            = newSize;
-            _constraint_programIcon_inset_top.constant       = -(newSize / 10); /// This compensates the empty space / shadow area around the icon, so we can do the rest of the layout based on where the icon actually appears visually
-            _constraint_programIcon_inset_bottom.constant    = -(newSize / 10);
-            _constraint_programIcon_inset_leading.constant   = -(newSize / 10);
-            _constraint_programIcon_inset_trailing.constant  = -(newSize / 10);
+            double newIconSize = 58.0;
+            double newInsetSize = newIconSize / 10.0; /// Size of the  empty space / shadow area around the icon – we compensate for this so we can do the rest of the layout based on where the icon actually appears visually
+            _constraint_programIcon_width.constant           = newIconSize;
+            _constraint_programIcon_inset_top.constant       = -newInsetSize;
+            _constraint_programIcon_inset_bottom.constant    = -newInsetSize;
+            _constraint_programIcon_inset_leading.constant   = -newInsetSize;
+            _constraint_programIcon_inset_trailing.constant  = -newInsetSize;
             
-            _constraint_versionAndQuestion_vertical.constant = 10;
-            _constraint_versionAndQuestion_leading.constant  = 12;
+            double versionAndQuestionSpacing = newInsetSize * 2;
+            _constraint_versionAndQuestion_vertical.constant = versionAndQuestionSpacing - 3; /// -3 makes the horizontal and vertical margins appear visually equal
+            _constraint_versionAndQuestion_leading.constant  = versionAndQuestionSpacing;
         }
         
         /// Put liquid glass behind the content

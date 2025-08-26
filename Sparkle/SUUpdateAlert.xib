@@ -130,7 +130,7 @@
                                     <constraint firstAttribute="trailing" secondItem="UU2-7C-LCJ" secondAttribute="trailing" constant="20" symbolic="YES" id="eyz-xg-wVZ"/>
                                     <constraint firstItem="UU2-7C-LCJ" firstAttribute="leading" secondItem="6Hv-XB-VNW" secondAttribute="trailing" constant="10" id="nEc-ic-3ZD"/>
                                     <constraint firstItem="6Hv-XB-VNW" firstAttribute="top" secondItem="cGD-9V-Gym" secondAttribute="top" id="qTV-vd-doT"/>
-                                    <constraint firstItem="UU2-7C-LCJ" firstAttribute="centerY" secondItem="6Hv-XB-VNW" secondAttribute="centerY" id="sKc-pD-WS1"/>
+                                    <constraint firstItem="UU2-7C-LCJ" firstAttribute="centerY" secondItem="6Hv-XB-VNW" secondAttribute="centerY" constant="-0.5" id="sKc-pD-WS1"/>
                                 </constraints>
                             </customView>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="ZTZ-5A-ukb" userLabel="Spacer After &quot;Title View&quot;">
