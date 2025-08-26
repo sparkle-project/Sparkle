@@ -414,46 +414,19 @@ static NSString *const SUUpdateAlertTouchBarIdentifier = @"" SPARKLE_BUNDLE_IDEN
     }
     
     if (@available(macOS 16, *)) {
+    
+        _skipButton.controlSize     = NSControlSizeLarge;
+        _laterButton.controlSize    = NSControlSizeLarge;
+        _installButton.controlSize  = NSControlSizeLarge;
+            
+        _constraint_choices_leading.constant = 15; /// Buttons have a 15 px distance to the window edge instead of 20, as seen in NSAlerts on Tahoe
+        _constraint_choices_trailing.constant = 15;
+        _constraint_choices_bottom.constant = 15;
         
-        if ((1))
-        {
-            _skipButton.controlSize     = NSControlSizeLarge;
-            _laterButton.controlSize    = NSControlSizeLarge;
-            _installButton.controlSize  = NSControlSizeLarge;
-                
-            _constraint_choices_leading.constant = 15; /// Buttons have a 15 px distance to the window edge instead of 20, as seen in NSAlerts on Tahoe
-            _constraint_choices_trailing.constant = 15;
-            _constraint_choices_bottom.constant = 15;
-            
-            _constraint_choices_mainButtonSpacing.constant = 8; /// Reduce spacing 12 -> 8. Matches NSAlert
-            _constraint_choices_secondaryButtonSpacing.constant = 8;
-        }
-            
-        _releaseNotesBoxView.fillColor = /// [Aug 2025] Make the release notes background very slighly transparent to tint it a little. This should only have a visible effect if the window is colored by wallpaper tinting, translucency, or liquid glass. (Cause otherwise the .textBackgroundColor is the same as the window background color under tahoe – pure black/white)
-            [NSColor colorWithName: @"_releaseNotesBoxView.fillColor" dynamicProvider:^NSColor * _Nonnull(NSAppearance * _Nonnull __unused appearance) {
-                return [NSColor.textBackgroundColor colorWithAlphaComponent: 0.66];
-            }];
-            
-        /// Change scale/margins around the `_automaticallyInstallUpdatesButton` checkbox
-        {
-            if      ((1)) { /// Match the reduced bottom/side margins of the buttons in the choicesView
-                SUGetConstraintForSpacer(_spacer_after_releaseNotesBox).constant = 15;
-            }
-            else if ((0)) { /// Checkbox larger
-                SUGetConstraintForSpacer(_spacer_after_releaseNotesBox).constant = 15;
-                SUGetConstraintForSpacer(_spacer_after_optionsView).constant = 8;
-                _automaticallyInstallUpdatesButton.controlSize = NSControlSizeRegular;
-                NSFont *oldFont = _automaticallyInstallUpdatesButton.font;
-                if (oldFont) _automaticallyInstallUpdatesButton.font = [NSFont fontWithDescriptor: oldFont.fontDescriptor size: NSFont.systemFontSize];
-            }
-            else if ((0)) { /// Match Tahoe Beta 7 NSAlert (everything larger)
-                SUGetConstraintForSpacer(_spacer_after_releaseNotesBox).constant = 18;
-                SUGetConstraintForSpacer(_spacer_after_optionsView).constant = 18;
-                _automaticallyInstallUpdatesButton.controlSize = NSControlSizeRegular;
-                NSFont *oldFont = _automaticallyInstallUpdatesButton.font;
-                if (oldFont) _automaticallyInstallUpdatesButton.font = [NSFont fontWithDescriptor: oldFont.fontDescriptor size: NSFont.systemFontSize];
-            }
-        }
+        _constraint_choices_mainButtonSpacing.constant = 8; /// Reduce spacing 12 -> 8. Matches NSAlert
+        _constraint_choices_secondaryButtonSpacing.constant = 8;
+        
+        SUGetConstraintForSpacer(_spacer_after_releaseNotesBox).constant = 15; /// Match the reduced bottom/side margins of the buttons in the choicesView
         
         /// Scale up title section to balance the larger buttons
         {
@@ -469,37 +442,17 @@ static NSString *const SUUpdateAlertTouchBarIdentifier = @"" SPARKLE_BUNDLE_IDEN
             _constraint_versionAndQuestion_vertical.constant = versionAndQuestionSpacing - 3; /// -3 makes the horizontal and vertical margins appear visually equal
             _constraint_versionAndQuestion_leading.constant  = versionAndQuestionSpacing;
         }
-        
-        /// Put liquid glass behind the content
-        if ((0)) {
-            /// [Aug 2025]
-            ///     - macOS 'shines' light on this from surrounding windows but this is not the translucent glass effect where things shine through from behind (which you see on NSAlert.)
-            ///     - This looks slightly broken in darkmode with non-transparent titlebar
-            NSGlassEffectView *glassView = [[NSGlassEffectView alloc] init];
-            glassView.contentView = window.contentView;
-            window.contentView = glassView;
-            glassView.style = NSGlassEffectViewStyleRegular; /// [Aug 2025] Don't we have to copy over the layout constraints? It seems to unexpectedly work without that.
-        }
-        
     }
     
-    if ((0)) {  /// Transparent titlebar – align content along the bottom of the traffic lights
+    if ((1)) {  /// Transparent titlebar – align content along the bottom of the traffic lights
         if      (@available(macOS 16, *)) SUGetConstraintForSpacer(_spacer_underneath_trafficLights).constant = 22;
         else if (@available(macOS 11, *)) SUGetConstraintForSpacer(_spacer_underneath_trafficLights).constant = 20;
         else                              SUGetConstraintForSpacer(_spacer_underneath_trafficLights).constant = 17;
     }
     else {      /// Non-transparent titlebar – align content along the bottom of the titlebar.
-        if ((1)) { /// New solution
-            window.titlebarAppearsTransparent = NO;
-            window.styleMask &= ~NSWindowStyleMaskFullSizeContentView;
-            _spacer_underneath_trafficLights.hidden = YES;
-        }
-        else { /// Old solution: This causes super weird bug on Mojave and Catalina, where the *release notes text* is always scrolled halfway down. (Didn't test Big Sur, but the new solution works there as well)
-            window.titlebarAppearsTransparent = NO;
-            if      (@available(macOS 16, *)) SUGetConstraintForSpacer(_spacer_underneath_trafficLights).constant = 31; /// Not sure if there are pixel differences depending on the .titlebarSeparatorStyle
-            else if (@available(macOS 11, *)) SUGetConstraintForSpacer(_spacer_underneath_trafficLights).constant = 29;
-            else                              SUGetConstraintForSpacer(_spacer_underneath_trafficLights).constant = 22;
-        }
+        window.titlebarAppearsTransparent = NO;
+        window.styleMask &= ~NSWindowStyleMaskFullSizeContentView;
+        _spacer_underneath_trafficLights.hidden = YES;
     }
     
     BOOL showReleaseNotes = [self showsReleaseNotes];
