@@ -26,7 +26,7 @@
     // This is a policy, not a security critical enforcement.
     {
         NSError *validationError = nil;
-        SUValidateConnectionStatus validationStatus = [SUCodeSigningVerifier validateConnection:newConnection options:SUValidateConnectionOptionRequireSandboxEntitlement error:&validationError];
+        SUValidateConnectionStatus validationStatus = [SUCodeSigningVerifier validateConnection:newConnection options:SUValidateConnectionOptionDefault error:&validationError];
         switch (validationStatus) {
             case SUValidateConnectionStatusSetCodeSigningRequirementSuccess:
                 break;
