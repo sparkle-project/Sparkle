@@ -28,7 +28,6 @@
             case SUValidateConnectionStatusSetCodeSigningRequirementSuccess:
                 break;
             case SUValidateConnectionStatusSetNoRequirementSuccess:
-                assert(false);
                 break;
             case SUValidateConnectionStatusAPIFailure:
             case SUValidateConnectionStatusCodeSigningRequirementFailure:
