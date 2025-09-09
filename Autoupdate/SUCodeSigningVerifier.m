@@ -359,7 +359,7 @@ static NSString * _Nullable SUTeamIdentifierFromCode(SecStaticCodeRef staticCode
     // LeafIsDeveloperIDApp = certificate leaf[field.1.2.840.113635.100.6.1.13]
     // DeveloperIDTeamID = certificate leaf[subject.OU]
     // https://developer.apple.com/documentation/technotes/tn3127-inside-code-signing-requirements#Xcode-designated-requirement-for-Developer-ID-code
-    requirementString = [NSString stringWithFormat:@"anchor apple generic and certificate 1[field.1.2.840.113635.100.6.2.6] and certificate leaf[field.1.2.840.113635.100.6.1.13] and certificate leaf[subject.OU] = %@", teamIdentifier];
+    requirementString = [NSString stringWithFormat:@"anchor apple generic and certificate 1[field.1.2.840.113635.100.6.2.6] and certificate leaf[field.1.2.840.113635.100.6.1.13] and certificate leaf[subject.OU] = \"%@\"", teamIdentifier];
     
     result = SecRequirementCreateWithString((__bridge CFStringRef)requirementString, kSecCSDefaultFlags, &requirement);
     if (result != errSecSuccess) {
@@ -450,7 +450,7 @@ finally:
     // Build the default team ID signing requirement
     NSString *hostTeamIdentifier = [self teamIdentifierFromMainExecutable];
     if (hostTeamIdentifier != nil) {
-        NSString *teamIdentifierRequirement = [NSString stringWithFormat:@"(anchor apple generic and certificate leaf[subject.OU] = %@)", hostTeamIdentifier];
+        NSString *teamIdentifierRequirement = [NSString stringWithFormat:@"(anchor apple generic and certificate leaf[subject.OU] = \"%@\")", hostTeamIdentifier];
         [codeSigningRequirementComponents addObject:teamIdentifierRequirement];
     }
     
