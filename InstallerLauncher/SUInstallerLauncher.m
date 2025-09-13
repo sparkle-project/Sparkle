@@ -393,8 +393,6 @@ static BOOL SPUUsesSystemDomainForBundlePath(NSString *path, BOOL rootUser
 #if SPARKLE_BUILD_PACKAGE_SUPPORT
         if ([installationType isEqualToString:SPUInstallationTypeGuidedPackage]) {
             return YES;
-        } else if ([installationType isEqualToString:SPUInstallationTypeInteractivePackage]) {
-            return NO;
         } else
 #endif
         {

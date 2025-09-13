@@ -608,7 +608,7 @@ static NSString *SUAppcastItemDeltaFromSparkleLocalesKey = @"SUAppcastItemDeltaF
         NSString *attributeInstallationType = [enclosure objectForKey:SUAppcastAttributeInstallationType];
         if (attributeInstallationType == nil) {
             // If we have a flat package, assume installation type is guided
-            // (flat / non-archived interactive packages are not supported)
+            // (flat / non-archived interactive packages are not supported anymore)
             // Otherwise assume we have a normal application inside an archive
             if ([_fileURL.pathExtension isEqualToString:@"pkg"] || [_fileURL.pathExtension isEqualToString:@"mpkg"]) {
                 chosenInstallationType = SPUInstallationTypeGuidedPackage;
@@ -621,10 +621,6 @@ static NSString *SUAppcastItemDeltaFromSparkleLocalesKey = @"SUAppcastItemDeltaF
                 *error = [NSString stringWithFormat:@"Feed item's enclosure lacks valid %@ (found %@)", SUAppcastAttributeInstallationType, attributeInstallationType];
             }
             return nil;
-        } else if ([attributeInstallationType isEqualToString:SPUInstallationTypeInteractivePackage]) {
-            SULog(SULogLevelDefault, @"warning: '%@' for %@ is deprecated. Use '%@' instead.", SPUInstallationTypeInteractivePackage, SUAppcastAttributeInstallationType, SPUInstallationTypeGuidedPackage);
-            
-            chosenInstallationType = attributeInstallationType;
         } else {
             chosenInstallationType = attributeInstallationType;
         }

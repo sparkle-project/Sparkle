@@ -8,7 +8,6 @@
 
 #import "SUInstaller.h"
 #import "SUPlainInstaller.h"
-#import "SUPackageInstaller.h"
 #import "SUGuidedPackageInstaller.h"
 #import "SUHost.h"
 #import "SUConstants.h"
@@ -123,7 +122,7 @@
 
     if (isPackage) {
         // Guided (or now "normal") installs used to be opt-in (i.e, Sparkle would detect foo.sparkle_guided.pkg or foo.sparkle_guided.mpkg),
-        // but to get an interactive (or "unguided") install, the developer now must opt-out of guided installations.
+        // Interactive installs are no longer supported, so isGuided = NO will later turn into an error
         
         // foo.app -> foo.sparkle_interactive.pkg or foo.sparkle_interactive.mpkg
         if ([[[newAppDownloadPath stringByDeletingPathExtension] pathExtension] isEqualToString:@"sparkle_interactive"]) {
@@ -261,12 +260,8 @@
             installer = [[SUGuidedPackageInstaller alloc] initWithPackagePath:newDownloadPath homeDirectory:homeDirectory userName:userName];
         }
     } else if (isPackage) {
-        if (![expectedInstallationType isEqualToString:SPUInstallationTypeInteractivePackage]) {
-            if (error != NULL) {
-                *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Found package installer but '%@=%@' was probably missing in the appcast item enclosure", SUAppcastAttributeInstallationType, SPUInstallationTypeInteractivePackage] }];
-            }
-        } else {
-            installer = [[SUPackageInstaller alloc] initWithPackagePath:newDownloadPath];
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey: @"Found interactive package installer (with 'sparkle_interactive' in the filename) but these are no longer supported. Please remove 'sparkle_interactive' from the filename." }];
         }
     } else
 #endif

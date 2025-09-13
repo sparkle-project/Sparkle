@@ -121,9 +121,6 @@
 /* Take care not to overflow the status window. */
 "Installing update…" = "Update installeren…";
 
-/* No comment provided by engineer. */
-"Interactive based packages cannot be installed as the root user." = "Interactieve Installatieprogramma-pakketen kunnen niet worden geïnstalleerd als de rootgebruiker.";
-
 /* Alternate title for 'Install Update' button when there's no download in RSS feed. */
 "Learn More…" = "Meer informatie…";
 

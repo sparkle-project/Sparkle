@@ -235,8 +235,7 @@ SU_EXPORT @interface SUAppcastItem : NSObject<NSSecureCoding>
  
  This may be:
  - @c application - indicates this is a regular application update.
- - @c package - indicates this is a guided package installer update.
- - @c interactive-package - indicates this is an interactive package installer update (deprecated; use "package" instead)
+ - @c package - indicates this is a package installer update.
  
  This is extracted from the @c sparkle:installationType attribute in the @c <enclosure> element.
  

@@ -26,7 +26,7 @@ typedef NS_ENUM(int, CLIErrorExitStatus) {
     CLIErrorExitStatusUpdateNotFound = 4,
     CLIErrorExitStatusUpdateCancelledAuthorization = 5,
     CLIErrorExitStatusUpdatePermissionRequested = 6,
-    CLIErrorCodeCannotInstallInteractivePackageAsRoot = 7,
+    //CLIErrorCodeCannotInstallInteractivePackageAsRoot = 7,
     CLIErrorExitStatusInstallationWriteNoPermissionError = 8,
 };
 
@@ -247,9 +247,6 @@ typedef NS_ENUM(int, CLIErrorExitStatus) {
             fprintf(stderr, "Update was cancelled.\n");
         }
         exit(CLIErrorExitStatusUpdateCancelledAuthorization);
-    } else if (error.code == SUInstallationRootInteractiveError) {
-        fprintf(stderr, "%s\n", error.localizedDescription.UTF8String);
-        exit(CLIErrorCodeCannotInstallInteractivePackageAsRoot);
     } else if (error.code == SUInstallationWriteNoPermissionError) {
         fprintf(stderr, "Error: %s", error.localizedDescription.UTF8String);
         if (error.localizedRecoverySuggestion != nil) {

@@ -19,7 +19,6 @@ The launcher then looks for the installer and agent application. If we are insid
 
 The installer is first submitted. If it requires root privileges, it will ask for an admin user name and password. How it determines if root privileges are necessary is based on:
 
-* If the installation type from the appcast is an interactive package based installer, then no root privileges are necessary because the package installer will ask for them. Note this type of installation is deprecated however.
 * If the installation type from the appcast is a guided or regular package based installer, then root privileges are necessary because the system installer utility has to run as root.
 * Otherwise the installation type is a normal application update, and root privileges are only needed if write permission or changing the owner is currently insufficient.
 
@@ -69,17 +68,16 @@ When the installer gets the process identifier, it begins the installation. At t
 
 ### Starting the Installation
 
-The installer figures out what kind of installer to use (regular, guided pkg, interactive pkg) based on the type of file inside the archive. If the type of file doesn't match the expected installation type from the input installation data, then the installer aborts causing the updater to abort as well.
+The installer figures out what kind of installer to use (regular, guided pkg) based on the type of file inside the archive. If the type of file doesn't match the expected installation type from the input installation data, then the installer aborts causing the updater to abort as well.
 
 Once the type of installer is found, the first stage of installation is performed:
 
 * Regular application installer 1st stage: Makes sure this update is not a downgrade and do all initial installation work if possible (such as clearing quarantine, changing owner/group, updating modification date, invoking GateKeeper scan). This initial work is not done if the bundle has to transfer to another volume; in this case, this work will be done in a later stage.
 * Guided Package installer 1st stage: Does nothing.
-* Interactive Package installer (deprecated) 1st stage: Makes sure /usr/bin/open utility is available.
 
 If the first stage fails, the installer aborts causing the updater to abort the update.
 
-Otherwise a `SPUInstallationFinishedStage1` message is sent back to the updater along with some data. This data includes whether the application bundle to relaunch is currently terminated, and whether the installation at later stages can be performed silently (that is, with no user interaction allowed). If we reach here, only the interactive package installer can't be performed silently.
+Otherwise a `SPUInstallationFinishedStage1` message is sent back to the updater along with some data. This data includes whether the application bundle to relaunch is currently terminated, and whether the installation at later stages can be performed silently (that is, with no user interaction allowed). If we reach here, only the interactive package installer can't be performed silently (however interactive pkg installer is no longer supported).
 
 The installer then listens and waits for the target application to relaunch terminates. If it is already terminated, then it resumes to stage 2 and 3 of the installation immediately on the assumption that the installer does not have permission to show UI interaction to the user. Thus if the installer has to show user interaction here and hasn't received an OK from the updater (it won't if the target application is already terminated), the install will fail. If the target is already terminated, the installer will also assume that the target should not be relaunched after installation.
 
@@ -99,7 +97,7 @@ Afterwards the resumed update driver then allows the user driver to decide wheth
 ### Continue to Installation
 If the user driver decides to install the update, it sends a `SPUResumeInstallationToStage2` message to the installer and supplies whether the update should be relaunched, and whether user interface can be displayed. The user driver specifies that the user interface can be displayed as long as the updater delegate allows interaction. If the updater's delegate handles immediate installation in the automatic based update driver, UI cannot be displayed there too.
 
-The installer receives `SPUResumeInstallationToStage2` and reads whether it should relaunch the target application and whether it can show UI (thus be allowed to show user interaction). The installer then resumes to stage 2 of the installation if it has not been performed already (that is if the target app already terminated). Note if the installer doesn't receive this message before the target application terminates, then the installer will not relaunch or show UI and resume stage 2 & 3 by itself. Again not displaying UI is only an issue for interactive based package installers which are deprecated.
+The installer receives `SPUResumeInstallationToStage2` and reads whether it should relaunch the target application and whether it can show UI (thus be allowed to show user interaction). The installer then resumes to stage 2 of the installation if it has not been performed already (that is if the target app already terminated). Note if the installer doesn't receive this message before the target application terminates, then the installer will not relaunch or show UI and resume stage 2 & 3 by itself. Again not displaying UI is only an issue for interactive based package installers which are no longer supported.
 
 If the 2nd stage succeeds, the installer sends a `SPUInstallationFinishedStage2` message back to the updater, including if the target application has already terminated at this time. If the target application has not already been terminated, the installer sends a request to the progress agent to *terminate* the application. By *terminate*, we mean sending an Apple quit event, allowing the application or user to possibly cancel or delay termination.
 
@@ -109,7 +107,7 @@ In the case termination of the application is delayed or canceled, the user driv
 
 ### Showing Progress
 
-When the target application is terminated, if the updater allowed the installer to show UI progress and the installation type doesn't show progress on its own (only interactive package installer shows progress on its own), then the installer sends a `SPUUpdaterAlivePing` message to the updater. If the updater is still alive by now and receives the message, the updater will then send back a `SPUUpdaterAlivePong` message. This lets the installer know that the updater is still active after the target application is terminated, and whether the installer should later be responsible for displaying updater progress or not if a short time passes by, and the installation is still not finished. If the updater is still not alive, then the installer should be responsible for showing progress if otherwise allowed.
+When the target application is terminated, if the updater allowed the installer to show UI progress and the installation type doesn't show progress on its own (only interactive package installer shows progress on its own, but these are no longer supported), then the installer sends a `SPUUpdaterAlivePing` message to the updater. If the updater is still alive by now and receives the message, the updater will then send back a `SPUUpdaterAlivePong` message. This lets the installer know that the updater is still active after the target application is terminated, and whether the installer should later be responsible for displaying updater progress or not if a short time passes by, and the installation is still not finished. If the updater is still not alive, then the installer should be responsible for showing progress if otherwise allowed.
 
 If the installer decides to show progress, it sends a message to the progress agent to show progress UI. Under most circumstances, the installation will finish faster than this point is reached however (exceptions may be guided package installers and updates over a remote network mount). If the connection to the updater is still connected after this short time passes (eg: like with sparkle-cli), then it's the updater's job to show progress instead.
 

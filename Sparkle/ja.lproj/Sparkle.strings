@@ -121,9 +121,6 @@
 /* Take care not to overflow the status window. */
 "Installing update…" = "アップデートをインストールしています…";
 
-/* No comment provided by engineer. */
-"Interactive based packages cannot be installed as the root user." = "対話ベースのパッケージはルートユーザではインストールできません。";
-
 /* Alternate title for 'Install Update' button when there's no download in RSS feed. */
 "Learn More…" = "詳しい情報…";
 
