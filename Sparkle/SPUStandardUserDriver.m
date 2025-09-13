@@ -350,6 +350,10 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
     
     [self closeCheckingWindow];
     
+    if (_activeUpdateAlert != nil) {
+        SULog(SULogLevelError, @"Error: -[%@ %@] should not be called when _activeUpdateAlert != nil:\n%@", NSStringFromClass([self class]), NSStringFromSelector(_cmd), NSThread.callStackSymbols);
+    }
+    
     id<SPUStandardUserDriverDelegate> delegate = _delegate;
     id<SUVersionDisplay> customVersionDisplayer = nil;
     

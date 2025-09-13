@@ -150,6 +150,8 @@
 
 - (void)downloadFile
 {
+    assert(NSThread.isMainThread);
+    
     id<SPUDownloadDriverDelegate> delegate = _delegate;
     if ([delegate respondsToSelector:@selector(downloadDriverWillBeginDownload)]) {
         [delegate downloadDriverWillBeginDownload];

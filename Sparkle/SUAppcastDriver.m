@@ -57,6 +57,8 @@
 
 - (void)loadAppcastFromURL:(NSURL *)appcastURL userAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background
 {
+    assert(NSThread.isMainThread);
+    
     NSMutableDictionary *requestHTTPHeaders = [NSMutableDictionary dictionary];
     if (httpHeaders != nil) {
         [requestHTTPHeaders addEntriesFromDictionary:(NSDictionary * _Nonnull)httpHeaders];
