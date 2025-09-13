@@ -102,7 +102,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: build-logs
-          path: build/Logs
+          path: |
+            build/Logs
+            ~/Library/Logs/DiagnosticReports
       - name: Upload Distribution
         if: ${{ success() && matrix.upload-dist }}
         uses: actions/upload-artifact@v4
