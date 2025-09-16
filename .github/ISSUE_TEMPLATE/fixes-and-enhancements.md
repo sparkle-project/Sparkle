@@ -17,6 +17,8 @@ Please use Console.app and search for Sparkle.
 Please try troubleshooting steps:
 https://github.com/sparkle-project/Sparkle#troubleshooting
 
+For security sensitive issues, please file them at https://github.com/sparkle-project/Sparkle/security
+
 -->
 
 ## Summary

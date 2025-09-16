@@ -14,11 +14,11 @@ Sparkle 2.0 puts a huge emphasis on splitting Sparkle into several components to
 * Progress Agent (Application; AppKit permitted)
 * Installer (Agent and Daemon safe)
 
-These achieve privilege separation, because at least theoretically, they can all be placed into different processes from one another, although in practice the user driver and updater framework will likely be in the same process.
+These achieve privilege separation, because at least theoretically, they can all be placed into different processes from one another (except for the user driver & updater scheduler).
 
-For XPC Services, it's significant to understand they can be used independent of sandboxing (although I wouldn't recommend this personally). Besides privilege separation, they also have an impact on fault tolerance and termination.
+For XPC Services, it's significant to understand they can be used independent of sandboxing (but this is strongly discouraged). Besides privilege separation, they also have an impact on fault tolerance and termination.
 
-We have code that detects whether or not XPC services are available and enabled by the main application bundle. This is simpler and more efficient than attempting to create a connection and wait for a timeout. We don't have *any* checks for seeing if the "current process" is sandboxed; doing so is a rather broken behavior. The XPC Services are important, not the sandboxing.
+We have code that detects whether or not XPC services are available and enabled by the main application bundle. This is simpler and more efficient than attempting to create a connection and wait for a timeout. We don't have *any* checks for seeing if the "current process" is sandboxed; doing so is a rather brittle. The XPC Services are important, not the sandboxing.
 
 I said above that XPC services are looked up in the main bundle. One may think this assumption doesn't hold for helpers or plug-ins inside applications. My response to that is they probably don't need the services, and they probably shouldn't be injecting Sparkle inside the host application anyway due to unintended conflicts and other consequences. A more appropriate approach may be to bundle a separate tool such as the sparkle command line utility.
 
@@ -33,3 +33,6 @@ For sending Obj-C objects across the wire, we use `SPUSecureCoding` because Coco
 The installer handles extraction, validation, and installation of the update. This was the main reason why other sandboxed-capable forks were rejected from being secure. The point to be stressed anyway is that these all need to be done in the same process; they can't be handed off by some other process. This is also why removing references to `AuthorizationExecuteWithPrivileges` is crucial as well.
 
 Note that the installer does *not* handle downloading. That is handled by the updater framework. This is ideal because downloading can be done without disrupting the user, allowing it to be done silently without presenting an authorization dialog. The downloading portion of code can also be stuck into a XPC service with just an entitlement for allowing incoming connections. This also means for secure installations the installer cannot know (or trust) what protocol the update was downloaded from (i.e: http vs https). A good installer will not care, which is why applying updates without a EdDSA signature/key is now deprecated (reminder that Apple's code signature checks are not intended for complete integrity).
+
+The XPC Services and Autoupdate, if code signed, also check if the clients are code signed with the same team ID and may reject connections or reject policies if this is not the case. This is a "backup" check because we still do not want endpoints to open up and allow arbitrary operations across different levels of security boundaries, even if apps are not code signed.
+
