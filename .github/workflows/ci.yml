@@ -10,18 +10,18 @@ jobs:
   build:
     strategy:
       matrix:
-        xcode: ['xcode26', 'xcode16.4']
+        xcode: ['xcode26.1', 'xcode16.4']
         include:
             - xcode: 'xcode16.4'
               xcode-path: '/Applications/Xcode_16.4.app/Contents/Developer'
               upload-dist: true
               run-analyzer: true
               macos: 'macos-15'
-            - xcode: 'xcode26'
-              xcode-path: '/Applications/Xcode_26.0.app'
+            - xcode: 'xcode26.1'
+              xcode-path: '/Applications/Xcode_26.1.app'
               upload-dist: false
               run-analyzer: false
-              macos: 'macos-15'
+              macos: 'macos-26'
             
     name: Build and Test Sparkle
     runs-on: ${{ matrix.macos }}
