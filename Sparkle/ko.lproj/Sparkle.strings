@@ -119,9 +119,6 @@
 "Should %1$@ automatically check for updates? You can always check for updates manually from the %1$@ menu." = "%1$@ 업데이트 확인을 자동으로 할까요? %1$@ 메뉴에서 수동으로 변경 할 수 있습니다.";
 
 /* No comment provided by engineer. */
-"The update checker failed to start correctly. You should contact the app developer to report this issue and verify that you have the latest version." = "업데이트 확인 도구가 올바르게 시작되지 않았습니다. 이 문제를 앱 개발자에게 알려주고 사용 중인 버전이 최신 버전인지 확인해주세요.";
-
-/* No comment provided by engineer. */
 "The update is improperly signed and could not be validated. Please try again later or contact the app developer." = "업데이트가 잘못 서명되어 유효성 검사를 할 수 없습니다. 나중에 다시 시도하거나 앱 개발자에게 문의해주세요.";
 
 /* No comment provided by engineer. */

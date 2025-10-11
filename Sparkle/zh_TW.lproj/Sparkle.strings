@@ -119,9 +119,6 @@
 "Should %1$@ automatically check for updates? You can always check for updates manually from the %1$@ menu." = "%1$@ 是否應自動檢查更新項目？您可隨時從 %1$@ 選單手動檢查更新項目。";
 
 /* No comment provided by engineer. */
-"The update checker failed to start correctly. You should contact the app developer to report this issue and verify that you have the latest version." = "更新檢查程式未能正確啟動。您應聯絡軟體開發者以回報此問題並驗證您是否已有最新版本。";
-
-/* No comment provided by engineer. */
 "The update is improperly signed and could not be validated. Please try again later or contact the app developer." = "此更新並未正確簽署且無法驗證。請稍後再試一次或聯絡軟體開發者。";
 
 /* No comment provided by engineer. */

@@ -158,9 +158,6 @@
 "The installation failed due to not having permission to write the new update." = "De installatie is mislukt omdat je geen bevoegdheden hebt om de nieuwe update te schrijven.";
 
 /* No comment provided by engineer. */
-"The update checker failed to start correctly. You should contact the app developer to report this issue and verify that you have the latest version." = "De updatezoeker is niet goed gestart. Je kunt wellicht met de app-ontwikkelaar contact opnemen om de fout te melden en te controleren dat je de nieuwste versie hebt.";
-
-/* No comment provided by engineer. */
 "The update is improperly signed and could not be validated. Please try again later or contact the app developer." = "De update is onjuist gesigneerd en kan niet worden gecontroleerd. Probeer het later opnieuw of neem contact op met de app-ontwikkelaar.";
 
 /* No comment provided by engineer. */

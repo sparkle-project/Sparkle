@@ -116,9 +116,6 @@
 "Should %1$@ automatically check for updates? You can always check for updates manually from the %1$@ menu." = "Deseja que o app %1$@ busque atualizações automaticamente? Você também pode buscar atualizações manualmente no menu %1$@.";
 
 /* No comment provided by engineer. */
-"The update checker failed to start correctly. You should contact the app developer to report this issue and verify that you have the latest version." = "Houve uma falha ao iniciar a busca de atualizações. Contate o desenvolvedor do app para comunicar esse problema e verifique se você tem a versão mais recente.";
-
-/* No comment provided by engineer. */
 "The update is improperly signed and could not be validated. Please try again later or contact the app developer." = "A atualização foi assinada incorretamente e não pôde ser validada. Tente novamente mais tarde ou contate o desenvolvedor do app.";
 
 /* No comment provided by engineer. */

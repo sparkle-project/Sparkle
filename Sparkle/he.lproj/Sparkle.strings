@@ -119,9 +119,6 @@
 "Should %1$@ automatically check for updates? You can always check for updates manually from the %1$@ menu." = "האם %1$@ צריך לבדוק באופן אוטומטי אם יש עדכונים? תוכל תמיד לחפש עדכונים באופן ידני מהתפריט של %1$@.";
 
 /* No comment provided by engineer. */
-"The update checker failed to start correctly. You should contact the app developer to report this issue and verify that you have the latest version." = "בודק העדכונים לא הצליח לפעול כראוי. עליך ליצור קשר עם מפתח היישום כדי לדווח על בעיה זו ולוודא שיש לך את הגרסה העדכנית ביותר.";
-
-/* No comment provided by engineer. */
 "The update is improperly signed and could not be validated. Please try again later or contact the app developer." = "העדכון חתום בצורה לא נכונה ולא ניתן היה לאמת אותו. נסה שוב מאוחר יותר או צור קשר עם מפתח היישום.";
 
 /* No comment provided by engineer. */

@@ -81,15 +81,21 @@
     if (![_updater startUpdater:&updaterError]) {
         SULog(SULogLevelError, @"Fatal updater error (%ld): %@", updaterError.code, updaterError.localizedDescription);
         
-        // Delay the alert four seconds so it doesn't show RIGHT as the app launches, but also doesn't interrupt the user once they really get to work.
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(4 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        // Delay the alert a bit to allow other start-up actions
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            NSBundle *hostBundle = [NSBundle mainBundle];
+            SUHost *host = [[SUHost alloc] initWithBundle:hostBundle];
+            
 #if SPARKLE_COPY_LOCALIZATIONS
             NSBundle *sparkleBundle = SUSparkleBundle();
 #endif
             
+            // This is a developer facing error message which is never actually meant to occur in production
+            // Feel free to provide localizations if you want, but it is not strictly necessary.
+            // Previously, this code path used to be an abort()
             NSAlert *alert = [[NSAlert alloc] init];
             alert.messageText = SULocalizedStringFromTableInBundle(@"Unable to Check For Updates", SPARKLE_TABLE, sparkleBundle, nil);
-            alert.informativeText = SULocalizedStringFromTableInBundle(@"The update checker failed to start correctly. You should contact the app developer to report this issue and verify that you have the latest version.", SPARKLE_TABLE, sparkleBundle, nil);
+            alert.informativeText = [NSString stringWithFormat:SULocalizedStringFromTableInBundle(@"The updater failed to start. Please verify you have the latest version of %@ and contact the app developer if the issue still persists. Check the Console logs for more information.", SPARKLE_TABLE, sparkleBundle, nil), host.name];
             [alert runModal];
         });
     }
