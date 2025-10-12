@@ -69,7 +69,7 @@ jobs:
         env:
           DEVELOPER_DIR: ${{ matrix.xcode-path }}
         run: |
-            if grep "warning:" analyze_output.txt | grep -q -v "dependency scan of"; then
+            if grep -q "warning:" analyze_output.txt; then
                 echo "analyzestatus=0" >> $GITHUB_OUTPUT
             else
                 echo "analyzestatus=1" >> $GITHUB_OUTPUT
