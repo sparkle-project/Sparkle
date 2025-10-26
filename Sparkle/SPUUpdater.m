@@ -318,7 +318,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
             
             if (foundATSPersistentIssue || foundATSMainBundleIssue) {
                 // Just log a warning. Don't outright fail in case we are wrong (eg: app is linked on an old SDK where ATS doesn't take effect)
-                SULog(SULogLevelDefault, @"The feed URL (%@) may need to change to use HTTPS.\nFor more information: https://sparkle-project.org/documentation/app-transport-security", [feedURL absoluteString]);
+                SULog(SULogLevelDefault, @"The feed URL (%@) may need to change to use HTTPS. If the feed URL is using local networking for testing, this warning may be incorrect and ignored however.\nFor more information: https://sparkle-project.org/documentation/app-transport-security", [feedURL absoluteString]);
                 
                 _loggedATSWarning = YES;
             }
