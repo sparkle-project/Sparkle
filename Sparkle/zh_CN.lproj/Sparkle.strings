@@ -20,7 +20,7 @@
 "%@ %@ is currently the newest version available." = "%1$@ %2$@是当前的最新版本。";
 
 /* No comment provided by engineer. */
-"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%1$@ %2$@是当前的最新版本（您正在运行 %3$@）。";
+"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%1$@ %2$@是当前的最新版本\n（您正在运行 %3$@）。";
 
 /* Description text for SUUpdateAlert when the critical update is downloadable. */
 "%@ %@ is now available—you have %@. This is an important update; would you like to download it now?" = "%1$@ %2$@可供下载，您现在的版本是%3$@。这是重要更新，要现在下载吗？";
@@ -185,7 +185,7 @@
 "Yes" = "是";
 
 /* No comment provided by engineer. */
-"You may need to allow modifications from %1$@ in System Settings under Privacy & Security and App Management to install future updates." = "为了正常安装更新，您需要在“系统设置 → 隐私与安全 → App管理”允许%1$@更新应用。";
+"You may need to allow modifications from %1$@ in System Settings under Privacy & Security and App Management to install future updates." = "为了正常安装后续更新，您需要在“系统设置 → 隐私与安全 → App管理”内允许%1$@更新应用。";
 
 /* No comment provided by engineer. */
 "Your macOS version is too new" = "您的macOS版本太新了";
@@ -227,4 +227,4 @@
 "Automatically download and install updates" = "自动下载并安装更新";
 
 /* Anonymous system profile information disclosure for update permission dialog */
-"Anonymous system profile information is used to help us plan future development work. Please contact us if you have any questions about this.\n\nThis is the information that would be sent:" = "匿名的系统概况信息有助于我们安排将来的开发工作。如果对此存在疑问请联系我们。\n\n这是将要被发送的信息：:";
+"Anonymous system profile information is used to help us plan future development work. Please contact us if you have any questions about this.\n\nThis is the information that would be sent:" = "匿名的系统概况信息有助于我们安排将来的开发工作。如果对此存在疑问请联系我们。\n\n这是将要被发送的信息：";
