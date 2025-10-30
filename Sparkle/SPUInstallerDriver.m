@@ -189,7 +189,7 @@
                 NSString *additionalFailureReason;
                 {
                     NSString *executableFailureReason;
-                    if (!SPUHelperHasExecutablePermission(@SPARKLE_RELAUNCH_TOOL_NAME, &executableFailureReason) || !SPUHelperHasExecutablePermission(@SPARKLE_INSTALLER_PROGRESS_TOOL_NAME@".app/Contents/MacOS/Updater", &executableFailureReason)) {
+                    if (!SPUHelperHasExecutablePermission(@SPARKLE_RELAUNCH_TOOL_NAME, &executableFailureReason) || !SPUHelperHasExecutablePermission(@SPARKLE_INSTALLER_PROGRESS_TOOL_NAME@".app/Contents/MacOS/"@SPARKLE_INSTALLER_PROGRESS_TOOL_NAME, &executableFailureReason)) {
                         additionalFailureReason = executableFailureReason;
                     } else {
                         additionalFailureReason = [NSString stringWithFormat:@"If your application is sandboxed, please ensure Installer Connection & Status entitlements are correctly set up: https://sparkle-project.org/documentation/sandboxing/ . Otherwise if %@ %@ not adhoc signed, your app must be signed with a matching team ID", impactedTools, (usingInstallerService ? @"are" : @"is")];
