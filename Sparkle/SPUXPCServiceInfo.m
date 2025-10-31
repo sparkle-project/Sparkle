@@ -26,22 +26,30 @@ BOOL SPUHelperHasExecutablePermission(NSString *component, NSString * _Nullable 
     NSBundle *sparkleBundle = [NSBundle bundleWithIdentifier:SUBundleIdentifier];
     NSURL *helperURL = [[sparkleBundle.bundleURL URLByAppendingPathComponent:component isDirectory:NO] URLByResolvingSymlinksInPath];
     
-    NSNumber *isExecutableFile = nil;
-    NSError *getResourceError = nil;
-    if (![helperURL getResourceValue:&isExecutableFile forKey:NSURLIsExecutableKey error:&getResourceError]) {
+    NSString *helperPath = helperURL.path;
+    
+    NSError *attributesError = nil;
+    NSDictionary<NSFileAttributeKey, id> *attributes = [NSFileManager.defaultManager attributesOfItemAtPath:helperPath error:&attributesError];
+    
+    if (attributes == nil) {
         if (failureReason != NULL) {
-            *failureReason = [NSString stringWithFormat:@"Failed to fetch info from file '%@' -- does this helper exist? %@", helperURL.path, getResourceError.localizedDescription];
+            *failureReason = [NSString stringWithFormat:@"Failed to fetch info from file '%@' -- does this helper exist? %@", helperPath, attributesError.localizedDescription];
         }
         
         return NO;
     }
     
-    if (!isExecutableFile.boolValue) {
-        if (failureReason != NULL) {
-            *failureReason = [NSString stringWithFormat:@"The file '%@' is not considered an executable -- were the executable permissions lost during a bad file copy? Please ensure file permissions and symbolic links for Sparkle framework are preserved.", helperURL.path];
+    NSNumber *posixPermissions = attributes[NSFilePosixPermissions];
+    
+    if (posixPermissions != nil) {
+        mode_t mode = posixPermissions.unsignedShortValue;
+        if (((mode & S_IXUSR) == 0 || (mode & S_IXGRP) == 0 || (mode & S_IXOTH) == 0)) {
+            if (failureReason != NULL) {
+                *failureReason = [NSString stringWithFormat:@"The file '%@' may not have executable permissions -- were they lost during a bad file copy? Please ensure file permissions and symbolic links for Sparkle framework are preserved.", helperPath];
+            }
+            
+            return NO;
         }
-        
-        return NO;
     }
     
     return YES;
