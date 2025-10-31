@@ -86,8 +86,7 @@
         jobDictionary[@"Label"] = label;
         jobDictionary[@"ProgramArguments"] = arguments;
         jobDictionary[@"EnableTransactions"] = @NO;
-        jobDictionary[@"KeepAlive"] = @{@"SuccessfulExit" : @NO};
-        jobDictionary[@"RunAtLoad"] = @NO;
+        jobDictionary[@"RunAtLoad"] = @YES;
         jobDictionary[@"Nice"] = @0;
         jobDictionary[@"ProcessType"] = @"Interactive";
         jobDictionary[@"LaunchOnlyOnce"] = @YES;
@@ -284,7 +283,7 @@
             }
         }
         
-        NSDictionary *jobDictionary = @{@"Label" : label, @"ProgramArguments" : arguments, @"EnableTransactions" : @NO, @"KeepAlive" : @{@"SuccessfulExit" : @NO}, @"RunAtLoad" : @NO, @"Nice" : @0, @"ProcessType": @"Interactive", @"LaunchOnlyOnce": @YES, @"MachServices" : @{SPUInstallerServiceNameForBundleIdentifier(hostBundleIdentifier) : @YES, SPUProgressAgentServiceNameForBundleIdentifier(hostBundleIdentifier) : @YES}};
+        NSDictionary *jobDictionary = @{@"Label" : label, @"ProgramArguments" : arguments, @"EnableTransactions" : @NO, @"RunAtLoad" : @YES, @"Nice" : @0, @"ProcessType": @"Interactive", @"LaunchOnlyOnce": @YES, @"MachServices" : @{SPUInstallerServiceNameForBundleIdentifier(hostBundleIdentifier) : @YES, SPUProgressAgentServiceNameForBundleIdentifier(hostBundleIdentifier) : @YES}};
         
         CFErrorRef submitError = NULL;
 #pragma clang diagnostic push
