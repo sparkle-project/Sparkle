@@ -114,7 +114,7 @@ func makeAppcasts(archivesSourceDir: URL, outputPathURL: URL?, cacheDirectory ca
         do {
             for update in updates {
                 if !ignoredOldVersions.contains(update.version) && !ignoredVersionsToInsert.contains(update.version) && feedUpdateBranches[update.version] == nil {
-                    newUpdateBranches[update.version] = UpdateBranch(minimumSystemVersion: update.minimumSystemVersion, maximumSystemVersion: nil, minimumAutoupdateVersion: majorVersion, channel: newChannel)
+                    newUpdateBranches[update.version] = UpdateBranch(minimumSystemVersion: update.minimumSystemVersion, maximumSystemVersion: nil, minimumAutoupdateVersion: majorVersion, hardwareRequirements: update.hardwareRequirements, channel: newChannel)
                 }
             }
         }
@@ -147,7 +147,7 @@ func makeAppcasts(archivesSourceDir: URL, outputPathURL: URL?, cacheDirectory ca
                         continue
                     }
                     
-                    let defaultChannelBranch = UpdateBranch(minimumSystemVersion: branch.minimumSystemVersion, maximumSystemVersion: branch.maximumSystemVersion, minimumAutoupdateVersion: branch.minimumAutoupdateVersion, channel: nil)
+                    let defaultChannelBranch = UpdateBranch(minimumSystemVersion: branch.minimumSystemVersion, maximumSystemVersion: branch.maximumSystemVersion, minimumAutoupdateVersion: branch.minimumAutoupdateVersion, hardwareRequirements: branch.hardwareRequirements, channel: nil)
                     
                     guard let defaultChannelVersions = updatesGroupedByBranch[defaultChannelBranch] else {
                         continue

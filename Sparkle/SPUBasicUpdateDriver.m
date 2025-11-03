@@ -202,8 +202,13 @@
                     break;
                 case NSOrderedAscending:
                     // A new update is available but cannot be installed
+                    // More detailed recovery suggestions are in SPUNoUpdateFoundRecoverySuggestion()
                     
-                    if (!latestAppcastItem.minimumOperatingSystemVersionIsOK) {
+                    if (!latestAppcastItem.arm64HardwareRequirementIsOK) {
+                        localizedDescription = SULocalizedStringFromTableInBundle(@"Your Mac is too old", SPARKLE_TABLE, sparkleBundle, nil);
+                        
+                        reason = SPUNoUpdateFoundReasonHardwareDoesNotSupportARM64;
+                    } else if (!latestAppcastItem.minimumOperatingSystemVersionIsOK) {
                         localizedDescription = SULocalizedStringFromTableInBundle(@"Your macOS version is too old", SPARKLE_TABLE, sparkleBundle, nil);
                         
                         reason = SPUNoUpdateFoundReasonSystemIsTooOld;

@@ -220,6 +220,22 @@ SU_EXPORT @interface SUAppcastItem : NSObject<NSSecureCoding>
 @property (nonatomic, readonly) BOOL maximumOperatingSystemVersionIsOK;
 
 /**
+ The required hardware requirements for this update if provided.
+ 
+ Example: @c arm64
+ 
+ Use `hardwareRequirementsAreOK` property to test if the current running system passes this requirement.
+ 
+ This is extracted from the @c <sparkle:hardwareRequirements> element, which is a comma-delimited list of hardware requirements.
+ */
+@property (nonatomic, copy, readonly) NSSet<NSString *> *hardwareRequirements;
+
+/**
+ Indicates whether or not the current running system passes the arm64 requirement if specified in the `hardwareRequirements` requirement.
+ */
+@property (nonatomic, readonly) BOOL arm64HardwareRequirementIsOK;
+
+/**
  The channel the update item is on if provided.
  
  An update item may specify a custom channel name (such as @c beta) that can only be found by updaters that filter for that channel.

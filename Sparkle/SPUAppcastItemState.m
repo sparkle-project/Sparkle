@@ -16,6 +16,7 @@
 #define SPUAppcastItemStateInformationalUpdateKey @"SPUAppcastItemStateInformationalUpdate"
 #define SPUAppcastItemStateMinimumOperatingSystemVersionIsOKKey @"SPUAppcastItemStateMinimumOperatingSystemVersionIsOK"
 #define SPUAppcastItemStateMaximumOperatingSystemVersionIsOKKey @"SPUAppcastItemStateMaximumOperatingSystemVersionIsOK"
+#define SPUAppcastItemStateArm64HardwareRequirementIsOKKey @"SPUAppcastItemStateArm64HardwareRequirementIsOK"
 
 @interface SPUAppcastItemState () <NSSecureCoding>
 @end
@@ -27,8 +28,9 @@
 @synthesize informationalUpdate = _informationalUpdate;
 @synthesize minimumOperatingSystemVersionIsOK = _minimumOperatingSystemVersionIsOK;
 @synthesize maximumOperatingSystemVersionIsOK = _maximumOperatingSystemVersionIsOK;
+@synthesize arm64HardwareRequirementIsOK = _arm64HardwareRequirementIsOK;
 
-- (instancetype)initWithMajorUpgrade:(BOOL)majorUpgrade criticalUpdate:(BOOL)criticalUpdate informationalUpdate:(BOOL)informationalUpdate minimumOperatingSystemVersionIsOK:(BOOL)minimumOperatingSystemVersionIsOK maximumOperatingSystemVersionIsOK:(BOOL)maximumOperatingSystemVersionIsOK
+- (instancetype)initWithMajorUpgrade:(BOOL)majorUpgrade criticalUpdate:(BOOL)criticalUpdate informationalUpdate:(BOOL)informationalUpdate minimumOperatingSystemVersionIsOK:(BOOL)minimumOperatingSystemVersionIsOK maximumOperatingSystemVersionIsOK:(BOOL)maximumOperatingSystemVersionIsOK arm64HardwareRequirementIsOK:(BOOL)arm64HardwareRequirementIsOK
 {
     self = [super init];
     if (self != nil) {
@@ -37,6 +39,7 @@
         _informationalUpdate = informationalUpdate;
         _minimumOperatingSystemVersionIsOK = minimumOperatingSystemVersionIsOK;
         _maximumOperatingSystemVersionIsOK = maximumOperatingSystemVersionIsOK;
+        _arm64HardwareRequirementIsOK = arm64HardwareRequirementIsOK;
     }
     return self;
 }
@@ -53,6 +56,7 @@
     [encoder encodeBool:_informationalUpdate forKey:SPUAppcastItemStateInformationalUpdateKey];
     [encoder encodeBool:_minimumOperatingSystemVersionIsOK forKey:SPUAppcastItemStateMinimumOperatingSystemVersionIsOKKey];
     [encoder encodeBool:_maximumOperatingSystemVersionIsOK forKey:SPUAppcastItemStateMaximumOperatingSystemVersionIsOKKey];
+    [encoder encodeBool:_arm64HardwareRequirementIsOK forKey:SPUAppcastItemStateArm64HardwareRequirementIsOKKey];
 }
 
 - (instancetype)initWithCoder:(NSCoder *)decoder
@@ -62,8 +66,9 @@
     BOOL informationalUpdate = [decoder decodeBoolForKey:SPUAppcastItemStateInformationalUpdateKey];
     BOOL minimumOperatingSystemVersionIsOK = [decoder decodeBoolForKey:SPUAppcastItemStateMinimumOperatingSystemVersionIsOKKey];
     BOOL maximumOperatingSystemVersionIsOK = [decoder decodeBoolForKey:SPUAppcastItemStateMaximumOperatingSystemVersionIsOKKey];
+    BOOL arm64HardwareRequirementIsOK = [decoder decodeBoolForKey:SPUAppcastItemStateArm64HardwareRequirementIsOKKey];
     
-    return [self initWithMajorUpgrade:majorUpgrade criticalUpdate:criticalUpdate informationalUpdate:informationalUpdate minimumOperatingSystemVersionIsOK:minimumOperatingSystemVersionIsOK maximumOperatingSystemVersionIsOK:maximumOperatingSystemVersionIsOK];
+    return [self initWithMajorUpgrade:majorUpgrade criticalUpdate:criticalUpdate informationalUpdate:informationalUpdate minimumOperatingSystemVersionIsOK:minimumOperatingSystemVersionIsOK maximumOperatingSystemVersionIsOK:maximumOperatingSystemVersionIsOK arm64HardwareRequirementIsOK:arm64HardwareRequirementIsOK];
 }
 
 @end

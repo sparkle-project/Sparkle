@@ -10,6 +10,7 @@ struct UpdateBranch: Hashable {
     let minimumSystemVersion: String?
     let maximumSystemVersion: String?
     let minimumAutoupdateVersion: String?
+    let hardwareRequirements: String?
     let channel: String?
 }
 
@@ -66,6 +67,7 @@ class ArchiveItem: CustomStringConvertible {
     // swiftlint:disable identifier_name
     let _shortVersion: String?
     let minimumSystemVersion: String
+    let hardwareRequirements: String?
     let frameworkVersion: String?
     let sparkleExecutableFileSize: Int?
     let sparkleLocales: String?
@@ -84,12 +86,99 @@ class ArchiveItem: CustomStringConvertible {
     var downloadUrlPrefix: URL?
     var releaseNotesURLPrefix: URL?
     var signingError: Error?
+    
+    @available(macOS 10.15.4, *)
+    private static func binaryContainsPreARMSlice(_ fileURL: URL) -> Bool? {
+        guard let fileHandle = try? FileHandle(forReadingFrom: fileURL) else {
+            return nil
+        }
+        
+        defer {
+            try? fileHandle.close()
+        }
+        
+        // First, read just enough bytes to determine the magic number (4 bytes)
+        let MAGIC_SIZE = 4
+        guard let magicData = try? fileHandle.read(upToCount: MAGIC_SIZE),
+              magicData.count == MAGIC_SIZE else {
+            return nil
+        }
+        
+        let preARMSlices: [cpu_type_t] = [CPU_TYPE_X86_64, CPU_TYPE_I386, CPU_TYPE_POWERPC, CPU_TYPE_POWERPC64]
+        
+        // Read magic number
+        let magic = magicData.withUnsafeBytes { $0.load(as: UInt32.self) }
+        
+        // Check if this is a fat binary
+        if magic == FAT_CIGAM || magic == FAT_CIGAM_64 {
+            // For fat binaries, we need to read the rest of the fat_header to get the number of architectures
+            guard let remainingHeaderData = try? fileHandle.read(upToCount: MemoryLayout<fat_header>.size - MAGIC_SIZE),
+                  remainingHeaderData.count == MemoryLayout<fat_header>.size - MAGIC_SIZE else {
+                return nil
+            }
+            
+            // Read number of architectures
+            let nfat_arch = remainingHeaderData.withUnsafeBytes {
+                let value = $0.load(fromByteOffset: 0, as: UInt32.self)
+                return value.bigEndian
+            }
+            
+            let is64BitMagic = (magic == FAT_CIGAM_64)
+            
+            let fatArchSize = is64BitMagic ? MemoryLayout<fat_arch_64>.size : MemoryLayout<fat_arch>.size
+            
+            // Read each architecture header
+            for i in 0..<Int(nfat_arch) {
+                let offset = MemoryLayout<fat_header>.size + (i * fatArchSize)
+                
+                // We need to seek from the beginning of the file
+                guard let _ = try? fileHandle.seek(toOffset: UInt64(offset)),
+                      let archHeaderData = try? fileHandle.read(upToCount: fatArchSize),
+                      archHeaderData.count >= fatArchSize else {
+                    continue
+                }
+                
+                let cputype = archHeaderData.withUnsafeBytes {
+                    let value = $0.load(as: Int32.self)
+                    return Int32(bigEndian: value)
+                }
+                
+                if preARMSlices.contains(cputype) {
+                    return true
+                }
+            }
+            
+            return false
+        } else if magic == MH_MAGIC || magic == MH_MAGIC_64 || magic == MH_CIGAM || magic == MH_CIGAM_64 {
+            // For Mach-O binaries, we need to read the rest of the mach_header to get CPU type
+            let is64BitMagic = (magic == MH_MAGIC_64 || magic == MH_CIGAM_64)
+            let machHeaderSize = is64BitMagic ? MemoryLayout<mach_header_64>.size : MemoryLayout<mach_header>.size
+            
+            // Read the rest of the header
+            guard let remainingHeaderData = try? fileHandle.read(upToCount: machHeaderSize - MAGIC_SIZE),
+                  remainingHeaderData.count == machHeaderSize - MAGIC_SIZE else {
+                return nil
+            }
+            
+            let reversedEndian = (magic == MH_CIGAM || magic == MH_CIGAM_64)
+            
+            let cputype = remainingHeaderData.withUnsafeBytes {
+                let value = $0.load(fromByteOffset: 0, as: Int32.self)
+                return reversedEndian ? Int32(bigEndian: value) : Int32(littleEndian: value)
+            }
+            
+            return preARMSlices.contains(cputype)
+        } else {
+            return nil
+        }
+    }
 
-    init(version: String, shortVersion: String?, feedURL: URL?, minimumSystemVersion: String?, frameworkVersion: String?, sparkleExecutableFileSize: Int?, sparkleLocales: String?, publicEdKey: String?, supportsDSA: Bool, appPath: URL, archivePath: URL) throws {
+    init(version: String, shortVersion: String?, feedURL: URL?, minimumSystemVersion: String?, hardwareRequirements: String?, frameworkVersion: String?, sparkleExecutableFileSize: Int?, sparkleLocales: String?, publicEdKey: String?, supportsDSA: Bool, appPath: URL, archivePath: URL) throws {
         self.version = version
         self._shortVersion = shortVersion
         self.feedURL = feedURL
         self.minimumSystemVersion = minimumSystemVersion ?? "10.13"
+        self.hardwareRequirements = hardwareRequirements
         self.frameworkVersion = frameworkVersion
         self.sparkleExecutableFileSize = sparkleExecutableFileSize
         self.sparkleLocales = sparkleLocales
@@ -158,6 +247,29 @@ class ArchiveItem: CustomStringConvertible {
                 if feedURL?.pathExtension == "php" {
                     feedURL = feedURL!.deletingLastPathComponent()
                     feedURL = feedURL!.appendingPathComponent("appcast.xml")
+                }
+            }
+            
+            // Intel Macs shouldn't be supported on macOS 27+ and
+            // we don't have any other hardware requirments except for arm64 right now
+            var mayNeedHardwareRequirement = true
+            let minimumSystemVersion = infoPlist["LSMinimumSystemVersion"] as? String
+            if let minimumSystemVersion {
+                let versionComparator = SUStandardVersionComparator()
+                if versionComparator.compareVersion(minimumSystemVersion, toVersion: "27.0") != .orderedAscending {
+                    mayNeedHardwareRequirement = false
+                }
+            }
+            
+            var hardwareRequirements: String? = nil
+            if mayNeedHardwareRequirement {
+                if #available(macOS 10.15.4, *) {
+                    if let executableName = infoPlist["CFBundleExecutable"] as? String {
+                        let executablePath = appPath.appendingPathComponent("Contents/MacOS/\(executableName)")
+                        if let containsPreARMSlice = Self.binaryContainsPreARMSlice(executablePath), !containsPreARMSlice {
+                            hardwareRequirements = SUAppcastElementHardwareRequirementARM64
+                        }
+                    }
                 }
             }
             
@@ -245,7 +357,8 @@ class ArchiveItem: CustomStringConvertible {
             try self.init(version: version,
                           shortVersion: shortVersion,
                           feedURL: feedURL,
-                          minimumSystemVersion: infoPlist["LSMinimumSystemVersion"] as? String,
+                          minimumSystemVersion: minimumSystemVersion,
+                          hardwareRequirements: hardwareRequirements,
                           frameworkVersion: frameworkVersion,
                           sparkleExecutableFileSize: sparkleExecutableFileSize,
                           sparkleLocales: sparkleLocales,

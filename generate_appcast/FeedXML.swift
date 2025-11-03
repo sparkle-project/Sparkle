@@ -121,6 +121,13 @@ func readAppcast(archives: [String: ArchiveItem], appcastURL: URL) throws -> [St
             minimumAutoupdateVersion = nil
         }
         
+        let hardwareRequirements: String?
+        if let hardwareRequirementsElement = findElement(name: SUAppcastElementHardwareRequirements, parent: item) {
+            hardwareRequirements = hardwareRequirementsElement.stringValue
+        } else {
+            hardwareRequirements = nil
+        }
+        
         let sparkleChannel: String?
         if let sparkleChannelElement = findElement(name: SUAppcastElementChannel, parent: item) {
             sparkleChannel = sparkleChannelElement.stringValue
@@ -128,7 +135,7 @@ func readAppcast(archives: [String: ArchiveItem], appcastURL: URL) throws -> [St
             sparkleChannel = nil
         }
         
-        let updateBranch = UpdateBranch(minimumSystemVersion: minimumSystemVersion, maximumSystemVersion: maximumSystemVersion, minimumAutoupdateVersion: minimumAutoupdateVersion, channel: sparkleChannel)
+        let updateBranch = UpdateBranch(minimumSystemVersion: minimumSystemVersion, maximumSystemVersion: maximumSystemVersion, minimumAutoupdateVersion: minimumAutoupdateVersion, hardwareRequirements: hardwareRequirements, channel: sparkleChannel)
         
         updateBranches[version] = updateBranch
     }
@@ -376,6 +383,16 @@ func writeAppcast(appcastDestPath: URL, appcast: Appcast, fullReleaseNotesLink: 
             minimumSystemVersion = update.minimumSystemVersion
         }
         minVer?.setChildren([text(minimumSystemVersion)])
+        
+        // Override the hardware requirements with requirements from the archive,
+        // only if an existing item doesn't specify one
+        if let hardwareRequirements = update.hardwareRequirements,
+           findElement(name: SUAppcastElementHardwareRequirements, parent: item) == nil {
+            if let hardwareRequirementsElement = XMLElement.element(withName: SUAppcastElementHardwareRequirements, uri: sparkleNS) as? XMLElement {
+                hardwareRequirementsElement.setChildren([text(hardwareRequirements)])
+                item.addChild(hardwareRequirementsElement)
+            }
+        }
         
         // Look for an existing release notes element
         let releaseNotesXpath = "\(SUAppcastElementReleaseNotesLink)"

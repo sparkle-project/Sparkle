@@ -695,6 +695,7 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
             }
             case SPUNoUpdateFoundReasonSystemIsTooOld:
             case SPUNoUpdateFoundReasonSystemIsTooNew:
+            case SPUNoUpdateFoundReasonHardwareDoesNotSupportARM64:
                 if (latestAppcastItem.infoURL != nil) {
                     // Show the user the product's link if available
                     [alert addButtonWithTitle:SULocalizedStringFromTableInBundle(@"Learn More…", SPARKLE_TABLE, sparkleBundle, nil)];

@@ -39,6 +39,7 @@ NSString *SPUNoUpdateFoundRecoverySuggestion(SPUNoUpdateFoundReason reason, SUAp
         case SPUNoUpdateFoundReasonOnNewerThanLatestVersion:
         case SPUNoUpdateFoundReasonSystemIsTooOld:
         case SPUNoUpdateFoundReasonSystemIsTooNew:
+        case SPUNoUpdateFoundReasonHardwareDoesNotSupportARM64:
             assert(latestAppcastItem != nil);
             
             hostDisplayVersion = host.displayVersion;
@@ -67,6 +68,9 @@ NSString *SPUNoUpdateFoundRecoverySuggestion(SPUNoUpdateFoundReason reason, SUAp
             break;
         case SPUNoUpdateFoundReasonSystemIsTooNew:
             recoverySuggestion = [NSString stringWithFormat:SULocalizedStringFromTableInBundle(@"%1$@ %2$@ is available but your macOS version is too new for this update. This update only supports up to macOS %3$@.", SPARKLE_TABLE, sparkleBundle, nil), host.name, latestAppcastItemDisplayVersion, latestAppcastItem.maximumSystemVersion];
+            break;
+        case SPUNoUpdateFoundReasonHardwareDoesNotSupportARM64:
+            recoverySuggestion = [NSString stringWithFormat:SULocalizedStringFromTableInBundle(@"%1$@ %2$@ is available but this update requires a new Apple silicon Mac.", SPARKLE_TABLE, sparkleBundle, nil), host.name, latestAppcastItemDisplayVersion];
             break;
     }
     return recoverySuggestion;

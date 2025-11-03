@@ -31,6 +31,7 @@ static NSString *SUAppcastItemDescriptionKey = @"itemDescription";
 static NSString *SUAppcastItemDescriptionFormatKey = @"itemDescriptionFormat";
 static NSString *SUAppcastItemMaximumSystemVersionKey = @"maximumSystemVersion";
 static NSString *SUAppcastItemMinimumSystemVersionKey = @"minimumSystemVersion";
+static NSString *SUAppcastElementHardwareRequirementsKey = @"hardwareRequirements";
 static NSString *SUAppcastItemReleaseNotesURLKey = @"releaseNotesURL";
 static NSString *SUAppcastItemFullReleaseNotesURLKey = @"fullReleaseNotesURL";
 static NSString *SUAppcastItemTitleKey = @"title";
@@ -72,6 +73,7 @@ static NSString *SUAppcastItemDeltaFromSparkleLocalesKey = @"SUAppcastItemDeltaF
 @synthesize itemDescriptionFormat = _itemDescriptionFormat;
 @synthesize maximumSystemVersion = _maximumSystemVersion;
 @synthesize minimumSystemVersion = _minimumSystemVersion;
+@synthesize hardwareRequirements = _hardwareRequirements;
 @synthesize releaseNotesURL = _releaseNotesURL;
 @synthesize fullReleaseNotesURL = _fullReleaseNotesURL;
 @synthesize title = _title;
@@ -126,6 +128,7 @@ static NSString *SUAppcastItemDeltaFromSparkleLocalesKey = @"SUAppcastItemDeltaF
         _maximumSystemVersion = [(NSString *)[decoder decodeObjectOfClass:[NSString class] forKey:SUAppcastItemMaximumSystemVersionKey] copy];
         _minimumSystemVersion = [(NSString *)[decoder decodeObjectOfClass:[NSString class] forKey:SUAppcastItemMinimumSystemVersionKey] copy];
         _minimumAutoupdateVersion = [(NSString *)[decoder decodeObjectOfClass:[NSString class] forKey:SUAppcastElementMinimumAutoupdateVersion] copy];
+        _hardwareRequirements = [(NSString *)[decoder decodeObjectOfClass:[NSString class] forKey:SUAppcastElementHardwareRequirementsKey] copy];
         _ignoreSkippedUpgradesBelowVersion = [(NSString *)[decoder decodeObjectOfClass:[NSString class] forKey:SUAppcastElementIgnoreSkippedUpgradesBelowVersion] copy];
         _releaseNotesURL = [decoder decodeObjectOfClass:[NSURL class] forKey:SUAppcastItemReleaseNotesURLKey];
         _fullReleaseNotesURL = [decoder decodeObjectOfClass:[NSURL class] forKey:SUAppcastItemFullReleaseNotesURLKey];
@@ -205,6 +208,10 @@ static NSString *SUAppcastItemDeltaFromSparkleLocalesKey = @"SUAppcastItemDeltaF
     
     if (_minimumAutoupdateVersion != nil) {
         [encoder encodeObject:_minimumAutoupdateVersion forKey:SUAppcastElementMinimumAutoupdateVersion];
+    }
+    
+    if (_hardwareRequirements != nil) {
+        [encoder encodeObject:_hardwareRequirements forKey:SUAppcastElementHardwareRequirementsKey];
     }
     
     if (_ignoreSkippedUpgradesBelowVersion != nil) {
@@ -289,6 +296,15 @@ static NSString *SUAppcastItemDeltaFromSparkleLocalesKey = @"SUAppcastItemDeltaF
 {
     if (_state != nil) {
         return _state.maximumOperatingSystemVersionIsOK;
+    } else {
+        return YES;
+    }
+}
+
+- (BOOL)arm64HardwareRequirementIsOK
+{
+    if (_state != nil) {
+        return _state.arm64HardwareRequirementIsOK;
     } else {
         return YES;
     }
@@ -543,6 +559,27 @@ static NSString *SUAppcastItemDeltaFromSparkleLocalesKey = @"SUAppcastItemDeltaF
         _maximumSystemVersion = [(NSString *)[dict objectForKey:SUAppcastElementMaximumSystemVersion] copy];
         _minimumAutoupdateVersion = [(NSString *)[dict objectForKey:SUAppcastElementMinimumAutoupdateVersion] copy];
         
+        {
+            NSString *hardwareRequirementsString = [(NSString *)[dict objectForKey:SUAppcastElementHardwareRequirements] copy];
+            
+            if (hardwareRequirementsString != nil) {
+                NSMutableCharacterSet *characterSet = [NSMutableCharacterSet whitespaceCharacterSet];
+                [characterSet addCharactersInString:@","];
+                NSArray<NSString *> *hardwareRequirementsArray = [hardwareRequirementsString componentsSeparatedByCharactersInSet:characterSet];
+                
+                NSMutableSet<NSString *> *hardwareRequirements = [[NSMutableSet alloc] init];
+                for (NSString *hardwareRequirement in hardwareRequirementsArray) {
+                    if (hardwareRequirement.length > 0) {
+                        [hardwareRequirements addObject:hardwareRequirement.lowercaseString];
+                    }
+                }
+                
+                _hardwareRequirements = [hardwareRequirements copy];
+            } else {
+                _hardwareRequirements = [NSSet set];
+            }
+        }
+        
         _ignoreSkippedUpgradesBelowVersion = [(NSString *)[dict objectForKey:SUAppcastElementIgnoreSkippedUpgradesBelowVersion] copy];
         
         NSString *channel = [dict objectForKey:SUAppcastElementChannel];
@@ -581,7 +618,7 @@ static NSString *SUAppcastItemDeltaFromSparkleLocalesKey = @"SUAppcastItemDeltaF
         _hasCriticalInformation = (criticalUpdateDictionary != nil);
         
         if (stateResolver != nil) {
-            _state = [(SPUAppcastItemStateResolver * _Nonnull)stateResolver resolveStateWithInformationalUpdateVersions:_informationalUpdateVersions minimumOperatingSystemVersion:_minimumSystemVersion maximumOperatingSystemVersion:_maximumSystemVersion minimumAutoupdateVersion:_minimumAutoupdateVersion criticalUpdateDictionary:criticalUpdateDictionary];
+            _state = [(SPUAppcastItemStateResolver * _Nonnull)stateResolver resolveStateWithInformationalUpdateVersions:_informationalUpdateVersions minimumOperatingSystemVersion:_minimumSystemVersion maximumOperatingSystemVersion:_maximumSystemVersion minimumAutoupdateVersion:_minimumAutoupdateVersion criticalUpdateDictionary:criticalUpdateDictionary hardwareRequirements:_hardwareRequirements];
         } else {
             // Note state still may be nil if a deprecated initializer is used
             _state = resolvedState;

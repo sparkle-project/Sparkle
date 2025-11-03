@@ -10,6 +10,9 @@
 /* No comment provided by engineer. */
 "%1$@ %2$@ is available but your macOS version is too old to install it. At least macOS %3$@ is required." = "%1$@ %2$@ is available but your macOS version is too old to install it. At least macOS %3$@ is required.";
 
+/* Mac is too old and update requires Apple silicon Mac */
+"%1$@ %2$@ is available but this update requires a new Apple silicon Mac." = "%1$@ %2$@ is available but this update requires a new Apple silicon Mac.";
+
 /* No comment provided by engineer. */
 "%1$@ can’t be updated if it’s running from the location it was downloaded to." = "%1$@ can’t be updated if it’s running from the location it was downloaded to.";
 
@@ -192,6 +195,9 @@
 
 /* No comment provided by engineer. */
 "Your macOS version is too old" = "Your macOS version is too old";
+
+/* Mac is too old and update requires newer hardware */
+"Your Mac is too old" = "Your Mac is too old";
 
 /* Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates. */
 "You’re up to date!" = "You’re up to date!";

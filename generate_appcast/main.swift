@@ -187,8 +187,7 @@ struct GenerateAppcast: ParsableCommand {
         For HTML release notes, if the contents of these files do not include a DOCTYPE or body tags, they will be treated as embedded CDATA release notes.
         Release notes for new items can be forced to be embedded by passing --embed-release-notes
         
-        For new update entries, Sparkle infers the minimum system OS requirement based on your update's LSMinimumSystemVersion provided
-        by your application's Info.plist. If none is found, \(programName) defaults to Sparkle's own minimum system requirement (macOS 10.13).
+        For new update entries, Sparkle infers the minimum system OS and hardware requirements based on your update's bundle.
         
         An example of an archives directory may look like:
             ./my-app-release-zipfiles/

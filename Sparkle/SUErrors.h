@@ -97,7 +97,11 @@ typedef NS_ENUM(OSStatus, SPUNoUpdateFoundReason) {
     /**
      A new update is unavailable because the user's operating system version is too new for the update.
      */
-    SPUNoUpdateFoundReasonSystemIsTooNew
+    SPUNoUpdateFoundReasonSystemIsTooNew,
+    /**
+     A new update is unavailable because the user's system is an Intel Mac that doesn't support ARM64.
+     */
+    SPUNoUpdateFoundReasonHardwareDoesNotSupportARM64,
 };
 
 SU_EXPORT extern NSString *const SPUNoUpdateFoundReasonKey;
