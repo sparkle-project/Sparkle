@@ -180,6 +180,7 @@
 		7230BCDE2E22E2BC00B71297 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7230BCDD2E22E2BC00B71297 /* Images.xcassets */; };
 		72316BD31E0DA8430039EFD9 /* SUUnarchiverNotifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 72316BD21E0DA8430039EFD9 /* SUUnarchiverNotifier.m */; };
 		72316BD41E0DB37E0039EFD9 /* SUUnarchiverNotifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 72316BD21E0DA8430039EFD9 /* SUUnarchiverNotifier.m */; };
+		723414172EBFB482009727E0 /* testappcast_arm64HardwareRequirement.xml in Resources */ = {isa = PBXBuildFile; fileRef = 723414162EBFB482009727E0 /* testappcast_arm64HardwareRequirement.xml */; };
 		723ABDDB259A9E8600BDB4FA /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 723ABDD9259A9E8600BDB4FA /* InfoPlist.strings */; };
 		723ABE02259A9E9E00BDB4FA /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 723ABE00259A9E9E00BDB4FA /* MainMenu.xib */; };
 		723ABF1B259D055E00BDB4FA /* SUReleaseNotesView.h in Headers */ = {isa = PBXBuildFile; fileRef = 723ABF1A259D055E00BDB4FA /* SUReleaseNotesView.h */; };
@@ -1082,6 +1083,7 @@
 		7230BCDD2E22E2BC00B71297 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		72316BD11E0DA8430039EFD9 /* SUUnarchiverNotifier.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SUUnarchiverNotifier.h; path = Autoupdate/SUUnarchiverNotifier.h; sourceTree = SOURCE_ROOT; };
 		72316BD21E0DA8430039EFD9 /* SUUnarchiverNotifier.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SUUnarchiverNotifier.m; path = Autoupdate/SUUnarchiverNotifier.m; sourceTree = SOURCE_ROOT; };
+		723414162EBFB482009727E0 /* testappcast_arm64HardwareRequirement.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = testappcast_arm64HardwareRequirement.xml; sourceTree = "<group>"; };
 		7235B75E29DFC0120081FE4E /* make-xcframework.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "make-xcframework.sh"; sourceTree = "<group>"; };
 		72366CCC2DC2D1FC003CE62B /* Sparkle.private.modulemap */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.module-map"; path = Sparkle.private.modulemap; sourceTree = "<group>"; };
 		723ABCD7259A9A9D00BDB4FA /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/Sparkle.strings; sourceTree = "<group>"; };
@@ -1814,6 +1816,7 @@
 				725B3A81263FBF0C0041AB8E /* testappcast_minimumAutoupdateVersion.xml */,
 				720DC50327A51A6500DFF3EC /* testappcast_minimumAutoupdateVersionSkipping.xml */,
 				720DC50527A62CDC00DFF3EC /* testappcast_minimumAutoupdateVersionSkipping2.xml */,
+				723414162EBFB482009727E0 /* testappcast_arm64HardwareRequirement.xml */,
 				7202DC99269ABD3500737EC4 /* testappcast_phasedRollout.xml */,
 				722545B526805FF80036465C /* testappcast_info_updates.xml */,
 				5F1510A11C96E591006E1629 /* testnamespaces.xml */,
@@ -3131,6 +3134,7 @@
 				72CCDEBE27421FD500B53718 /* SparkleTestCodeSignApp_bad_header.zip in Resources */,
 				726FC0362C1E787A00177986 /* SparkleTestCodeSignApp.aar in Resources */,
 				722545B626805FF80036465C /* testappcast_info_updates.xml in Resources */,
+				723414172EBFB482009727E0 /* testappcast_arm64HardwareRequirement.xml in Resources */,
 				7202DC9A269ABD3500737EC4 /* testappcast_phasedRollout.xml in Resources */,
 				5F1510A21C96E591006E1629 /* testnamespaces.xml in Resources */,
 				729F7EAC27366353004592DC /* test-links.xml in Resources */,

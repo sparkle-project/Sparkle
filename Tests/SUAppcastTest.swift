@@ -693,6 +693,57 @@ class SUAppcastTest: XCTestCase {
         }
     }
     
+    func testARM64Requirement() throws {
+        let testURL = Bundle(for: SUAppcastTest.self).url(forResource: "testappcast_arm64HardwareRequirement", withExtension: "xml")!
+        
+        do {
+            let testData = try Data(contentsOf: testURL)
+            
+            let versionComparator = SUStandardVersionComparator()
+            
+            do {
+                // Test appcast without a filter
+                
+                let hostVersion = "1.0"
+                
+                let stateResolver = SPUAppcastItemStateResolver(hostVersion: hostVersion, applicationVersionComparator: versionComparator, standardVersionComparator: versionComparator)
+                let appcast = try SUAppcast(xmlData: testData, relativeTo: nil, stateResolver: stateResolver)
+                
+                XCTAssertEqual(6, appcast.items.count)
+            }
+            
+            let currentDate = Date()
+            do {
+                let hostVersion = "1.0"
+                
+                let stateResolver = SPUAppcastItemStateResolver(hostVersion: hostVersion, applicationVersionComparator: versionComparator, standardVersionComparator: versionComparator)
+                let appcast = try SUAppcast(xmlData: testData, relativeTo: nil, stateResolver: stateResolver)
+                
+                let supportedAppcast = SUAppcastDriver.filterSupportedAppcast(appcast, phasedUpdateGroup: nil, skippedUpdate: nil, currentDate: currentDate, hostVersion: hostVersion, versionComparator: versionComparator, testMinimumSystemRequirements: true, testMinimumAutoupdateVersion: false)
+                
+            #if arch(x86_64)
+                // We're assuming this test is not run through Rosetta
+                XCTAssertEqual(2, supportedAppcast.items.count)
+                
+                let bestAppcastItem = SUAppcastDriver.bestItem(fromAppcastItems: supportedAppcast.items, getDeltaItem: nil, withHostVersion: hostVersion, comparator: versionComparator)
+                XCTAssertEqual(bestAppcastItem.versionString, "2.1")
+            #else
+                if #available(macOS 27, *) {
+                    XCTAssertEqual(6, supportedAppcast.items.count)
+                    
+                    let bestAppcastItem = SUAppcastDriver.bestItem(fromAppcastItems: supportedAppcast.items, getDeltaItem: nil, withHostVersion: hostVersion, comparator: versionComparator)
+                    XCTAssertEqual(bestAppcastItem.versionString, "6.0")
+                } else {
+                    XCTAssertEqual(5, supportedAppcast.items.count)
+                    
+                    let bestAppcastItem = SUAppcastDriver.bestItem(fromAppcastItems: supportedAppcast.items, getDeltaItem: nil, withHostVersion: hostVersion, comparator: versionComparator)
+                    XCTAssertEqual(bestAppcastItem.versionString, "5.0")
+                }
+            #endif
+            }
+        }
+    }
+    
     func testPhasedGroupRollouts() {
         let testURL = Bundle(for: SUAppcastTest.self).url(forResource: "testappcast_phasedRollout", withExtension: "xml")!
         
