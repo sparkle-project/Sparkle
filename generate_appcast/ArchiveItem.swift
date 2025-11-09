@@ -251,7 +251,7 @@ class ArchiveItem: CustomStringConvertible {
             }
             
             // Intel Macs shouldn't be supported on macOS 27+ and
-            // we don't have any other hardware requirments except for arm64 right now
+            // we don't have any other hardware requirements except for arm64 right now
             var mayNeedHardwareRequirement = true
             let minimumSystemVersion = infoPlist["LSMinimumSystemVersion"] as? String
             if let minimumSystemVersion {
