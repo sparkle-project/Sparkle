@@ -52,6 +52,9 @@ class SUTestApplicationTest: XCTestCase
         let checkForUpdatesMenuItem = menuBarsQuery.menuItems["Check for Updates…"]
         if checkForUpdatesMenuItem.isEnabled {
             checkForUpdatesMenuItem.click()
+            
+            // Give some time to wait for window to show up
+            sleep(5)
         } else {
             // We haven't checked for updates in a while so an automatic check was already done
             // in this case click the main menu again to deactivate it
