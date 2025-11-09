@@ -224,7 +224,7 @@ SU_EXPORT @interface SUAppcastItem : NSObject<NSSecureCoding>
  
  Example: @c arm64
  
- Use `hardwareRequirementsAreOK` property to test if the current running system passes this requirement.
+ Use `arm64HardwareRequirementIsOK` property to test if the current running system passes the @c arm64 requirement.
  
  This is extracted from the @c <sparkle:hardwareRequirements> element, which is a comma-delimited list of hardware requirements.
  */
