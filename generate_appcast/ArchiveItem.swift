@@ -264,7 +264,7 @@ class ArchiveItem: CustomStringConvertible {
             var hardwareRequirements: String? = nil
             if mayNeedHardwareRequirement {
                 if #available(macOS 10.15.4, *) {
-                    if let executableName = infoPlist["CFBundleExecutable"] as? String {
+                    if let executableName = infoPlist[kCFBundleExecutableKey as String] as? String {
                         let executablePath = appPath.appendingPathComponent("Contents/MacOS/\(executableName)")
                         if let containsPreARMSlice = Self.binaryContainsPreARMSlice(executablePath), !containsPreARMSlice {
                             hardwareRequirements = SUAppcastElementHardwareRequirementARM64
