@@ -47,6 +47,17 @@ SU_EXPORT @interface SPUUpdaterSettings : NSObject
 @property (nonatomic) NSTimeInterval updateCheckInterval;
 
 /**
+ * The impatient update check interval.
+ *
+ * If an update has already been downloaded automatically in the background, Sparkle may not notify users of the update immediately,
+ * and tries to install the update siliently on quit without notifying the user.
+ *
+ * Sparkle uses this long impatient update check interval to decide when to notify the user of the update if they haven't quit the app for a long time.
+ * By default this check interval is set to 1 week (in seconds).
+ */
+@property (nonatomic, readonly) NSTimeInterval impatientUpdateCheckInterval;
+
+/**
  * Indicates whether or not automatically downloading updates is allowed to be turned on by the user.
  * If this value is nil, the developer has not explicitly specified this option.
  */

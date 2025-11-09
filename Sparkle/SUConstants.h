@@ -20,7 +20,7 @@ extern const NSTimeInterval SUDefaultUpdatePermissionPromptInterval;
 extern const NSTimeInterval SUMinimumUpdateCheckInterval;
 extern const NSTimeInterval SUDefaultUpdateCheckInterval;
 extern const uint64_t SULeewayUpdateCheckInterval;
-extern const NSTimeInterval SUImpatientUpdateCheckInterval;
+extern const NSTimeInterval SUDefaultImpatientUpdateCheckInterval;
 
 extern NSString *const SUBundleIdentifier;
 
@@ -47,6 +47,7 @@ extern NSString *const SUSkippedMinorVersionKey;
 extern NSString *const SUSkippedMajorVersionKey;
 extern NSString *const SUSkippedMajorSubreleaseVersionKey;
 extern NSString *const SUScheduledCheckIntervalKey;
+extern NSString *const SUScheduledImpatientCheckIntervalKey;
 extern NSString *const SULastCheckTimeKey;
 extern NSString *const SUPublicDSAKeyKey;
 extern NSString *const SUPublicDSAKeyFileKey;

@@ -15,6 +15,7 @@
 
 static NSString *SUAutomaticallyChecksForUpdatesKeyPath = @"automaticallyChecksForUpdates";
 static NSString *SUUpdateCheckIntervalKeyPath = @"updateCheckInterval";
+static NSString *SUImpatientUpdateCheckIntervalKeyPath = @"impatientUpdateCheckInterval";
 static NSString *SUAutomaticallyDownloadsUpdatesKeyPath = @"automaticallyDownloadsUpdates";
 static NSString *SUSendsSystemProfileKeyPath = @"sendsSystemProfile";
 
@@ -25,6 +26,7 @@ static NSString *SUSendsSystemProfileKeyPath = @"sendsSystemProfile";
 
 @synthesize automaticallyChecksForUpdates = _automaticallyChecksForUpdates;
 @synthesize updateCheckInterval = _updateCheckInterval;
+@synthesize impatientUpdateCheckInterval = _impatientUpdateCheckInterval;
 @synthesize automaticallyDownloadsUpdates = _automaticallyDownloadsUpdates;
 @synthesize sendsSystemProfile = _sendsSystemProfile;
 
@@ -36,6 +38,7 @@ static NSString *SUSendsSystemProfileKeyPath = @"sendsSystemProfile";
         
         _automaticallyChecksForUpdates = [self currentAutomaticallyChecksForUpdates];
         _updateCheckInterval = [self currentUpdateCheckInterval];
+        _impatientUpdateCheckInterval = [self currentImpatientUpdateCheckInterval];
         _automaticallyDownloadsUpdates = [self currentAutomaticallyDownloadsUpdates];
         _sendsSystemProfile = [self currentSendsSystemProfile];
         
@@ -97,6 +100,21 @@ static NSString *SUSendsSystemProfileKeyPath = @"sendsSystemProfile";
     }
 }
 
+- (void)processImpatientUpdateCheckInterval SPU_OBJC_DIRECT
+{
+    NSTimeInterval currentValue = [self currentImpatientUpdateCheckInterval];
+    
+    if (fabs(currentValue - _impatientUpdateCheckInterval) >= 0.001) {
+        NSString *updatedKeyPath = SUImpatientUpdateCheckIntervalKeyPath;
+        
+        [self willChangeValueForKey:updatedKeyPath];
+        
+        _impatientUpdateCheckInterval = currentValue;
+        
+        [self didChangeValueForKey:updatedKeyPath];
+    }
+}
+
 - (void)processAutomaticallyDownloadsUpdates SPU_OBJC_DIRECT
 {
     BOOL currentValue = [self currentAutomaticallyDownloadsUpdates];
@@ -136,6 +154,7 @@ static NSString *SUSendsSystemProfileKeyPath = @"sendsSystemProfile";
     
     [self processCurrentAutomaticallyChecksForUpdates];
     [self processUpdateCheckInterval];
+    [self processImpatientUpdateCheckInterval];
     [self processAutomaticallyDownloadsUpdates];
     [self processSendsSystemProfile];
 }
@@ -199,7 +218,22 @@ static NSString *SUSendsSystemProfileKeyPath = @"sendsSystemProfile";
     }
 }
 
+- (NSTimeInterval)currentImpatientUpdateCheckInterval SPU_OBJC_DIRECT
+{
+    NSNumber *intervalValue = [_host doubleNumberForInfoDictionaryKey:SUScheduledImpatientCheckIntervalKey];
+    if (intervalValue == nil) {
+        return SUDefaultImpatientUpdateCheckInterval;
+    }
+    
+    return intervalValue.doubleValue;
+}
+
 + (BOOL)automaticallyNotifiesObserversOfUpdateCheckInterval
+{
+    return NO;
+}
+
++ (BOOL)automaticallyNotifiesObserversOfImpatientUpdateCheckInterval
 {
     return NO;
 }

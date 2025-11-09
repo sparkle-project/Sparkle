@@ -520,14 +520,15 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
             [SPUProbeInstallStatus probeInstallerUpdateItemForHostBundleIdentifier:hostBundleIdentifier completion:^(SPUInstallationInfo * _Nullable installationInfo) {
                 dispatch_async(dispatch_get_main_queue(), ^{
                     NSTimeInterval regularCheckInterval = [self updateCheckInterval];
+                    NSTimeInterval impatientCheckInterval = [self->_updaterSettings impatientUpdateCheckInterval];
                     if (installationInfo == nil) {
                         // Proceed as normal if there's no resumable updates
                         completionHandler(regularCheckInterval);
                     } else {
                         if ([installationInfo.appcastItem isCriticalUpdate] || [installationInfo.appcastItem isInformationOnlyUpdate]) {
-                            completionHandler(MIN(regularCheckInterval, SUImpatientUpdateCheckInterval));
+                            completionHandler(MIN(regularCheckInterval, impatientCheckInterval));
                         } else {
-                            completionHandler(MAX(regularCheckInterval, SUImpatientUpdateCheckInterval));
+                            completionHandler(MAX(regularCheckInterval, impatientCheckInterval));
                         }
                     }
                 });
