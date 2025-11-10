@@ -57,7 +57,7 @@ SU_EXPORT @interface SPUUpdater : NSObject
  @param hostBundle The bundle that should be targeted for updating.
  @param applicationBundle The application bundle that should be waited for termination and relaunched (unless overridden). Usually this can be the same as hostBundle. This may differ when updating a plug-in or other non-application bundle.
  @param userDriver The user driver that Sparkle uses for user update interaction.
- @param delegate The delegate for `SPUUpdater`.
+ @param delegate The delegate for `SPUUpdater`. Note the updater weakly references the delegate, so you are responsible for keeping it alive.
  */
 - (instancetype)initWithHostBundle:(NSBundle *)hostBundle applicationBundle:(NSBundle *)applicationBundle userDriver:(id <SPUUserDriver>)userDriver delegate:(nullable id<SPUUpdaterDelegate>)delegate;
 

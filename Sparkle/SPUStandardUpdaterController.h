@@ -81,6 +81,8 @@ SU_EXPORT @interface SPUStandardUpdaterController : NSObject
  Create a new `SPUStandardUpdaterController` programmatically.
  
  The updater is started automatically. See `-startUpdater`  for more information.
+ 
+ Note the `updaterDelegate` and `userDriverDelegate` are weakly referenced, so you are responsible for keeping them alive.
  */
 - (instancetype)initWithUpdaterDelegate:(nullable id<SPUUpdaterDelegate>)updaterDelegate userDriverDelegate:(nullable id<SPUStandardUserDriverDelegate>)userDriverDelegate;
 
@@ -89,6 +91,8 @@ SU_EXPORT @interface SPUStandardUpdaterController : NSObject
  
  You can specify whether or not you want to start the updater immediately.
  If you do not start the updater, you must invoke `-startUpdater` at a later time to start it.
+ 
+ Note the `updaterDelegate` and `userDriverDelegate` are weakly referenced, so you are responsible for keeping them alive.
  */
 - (instancetype)initWithStartingUpdater:(BOOL)startUpdater updaterDelegate:(nullable id<SPUUpdaterDelegate>)updaterDelegate userDriverDelegate:(nullable id<SPUStandardUserDriverDelegate>)userDriverDelegate;
 
