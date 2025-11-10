@@ -31,7 +31,7 @@
     __weak id<SPUUserDriver> _userDriver;
     __weak id _updaterDelegate;
     
-    BOOL _willInstallSilently;
+    BOOL _installerDidFinishPreparation;
 }
 
 - (instancetype)initWithHost:(SUHost *)host applicationBundle:(NSBundle *)applicationBundle updater:(id)updater userDriver:(id <SPUUserDriver>)userDriver updaterDelegate:(nullable id <SPUUpdaterDelegate>)updaterDelegate
@@ -95,14 +95,14 @@
     return NO;
 }
 
-- (void)installerDidFinishPreparationAndWillInstallImmediately:(BOOL)willInstallImmediately silently:(BOOL)willInstallSilently
+- (void)installerDidFinishPreparationAndWillInstallImmediately:(BOOL)willInstallImmediately
 {
-    _willInstallSilently = willInstallSilently;
+    _installerDidFinishPreparation = YES;
     
     if (!willInstallImmediately) {
         BOOL installationHandledByDelegate = NO;
         id<SPUUpdaterDelegate> updaterDelegate = _updaterDelegate;
-        if (_willInstallSilently && [updaterDelegate respondsToSelector:@selector(updater:willInstallUpdateOnQuit:immediateInstallationBlock:)]) {
+        if ([updaterDelegate respondsToSelector:@selector(updater:willInstallUpdateOnQuit:immediateInstallationBlock:)]) {
             __weak __typeof__(self) weakSelf = self;
             installationHandledByDelegate = [updaterDelegate updater:_updater willInstallUpdateOnQuit:_updateItem immediateInstallationBlock:^{
                 dispatch_async(dispatch_get_main_queue(), ^{
@@ -139,7 +139,7 @@
 
 - (void)abortUpdateWithError:(NSError *)error
 {
-    BOOL showNextUpdateImmediately = (error == nil || error.code == SUInstallationAuthorizeLaterError) && (!_willInstallSilently || _updateItem.criticalUpdate || _updateItem.isInformationOnlyUpdate);
+    BOOL showNextUpdateImmediately = (error == nil || error.code == SUInstallationAuthorizeLaterError) && (!_installerDidFinishPreparation || _updateItem.criticalUpdate || _updateItem.isInformationOnlyUpdate);
     
     [_coreDriver abortUpdateAndShowNextUpdateImmediately:showNextUpdateImmediately error:error];
 }

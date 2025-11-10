@@ -295,9 +295,9 @@
     }
 }
 
-- (void)installerDidFinishPreparationAndWillInstallImmediately:(BOOL)willInstallImmediately silently:(BOOL)willInstallSilently
+- (void)installerDidFinishPreparationAndWillInstallImmediately:(BOOL)willInstallImmediately
 {
-    [_delegate installerDidFinishPreparationAndWillInstallImmediately:willInstallImmediately silently:willInstallSilently];
+    [_delegate installerDidFinishPreparationAndWillInstallImmediately:willInstallImmediately];
 }
 
 - (void)finishInstallationWithResponse:(SPUUserUpdateChoice)response displayingUserInterface:(BOOL)displayingUserInterface

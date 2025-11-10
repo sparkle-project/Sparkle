@@ -342,17 +342,12 @@
             SULog(SULogLevelError, @"Error: Archived data to send for appcast item is nil");
         }
         
-        BOOL canInstallSilently = NO;
-        if (data.length >= sizeof(uint8_t)) {
-            canInstallSilently = (BOOL)*(const uint8_t *)data.bytes;
-        }
-        
         BOOL hasTargetTerminated = NO;
-        if (data.length >= sizeof(uint8_t) * 2) {
-            hasTargetTerminated = (BOOL)*((const uint8_t *)data.bytes + 1);
+        if (data.length >= sizeof(uint8_t)) {
+            hasTargetTerminated = (BOOL)*((const uint8_t *)data.bytes);
         }
         
-        [delegate installerDidFinishPreparationAndWillInstallImmediately:hasTargetTerminated silently:canInstallSilently];
+        [delegate installerDidFinishPreparationAndWillInstallImmediately:hasTargetTerminated];
     } else if (identifier == SPUInstallationFinishedStage2) {
         _currentStage = identifier;
         

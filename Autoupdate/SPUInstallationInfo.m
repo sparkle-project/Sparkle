@@ -19,23 +19,21 @@ static NSString *SUSystemDomainKey = @"SUSystemDomain";
 @implementation SPUInstallationInfo
 
 @synthesize appcastItem = _appcastItem;
-@synthesize canSilentlyInstall = _canSilentlyInstall;
 @synthesize systemDomain = _systemDomain;
 
-- (instancetype)initWithAppcastItem:(SUAppcastItem *)appcastItem canSilentlyInstall:(BOOL)canSilentlyInstall systemDomain:(BOOL)systemDomain
+- (instancetype)initWithAppcastItem:(SUAppcastItem *)appcastItem systemDomain:(BOOL)systemDomain
 {
     self = [super init];
     if (self != nil) {
         _appcastItem = appcastItem;
-        _canSilentlyInstall = canSilentlyInstall;
         _systemDomain = systemDomain;
     }
     return self;
 }
 
-- (instancetype)initWithAppcastItem:(SUAppcastItem *)appcastItem canSilentlyInstall:(BOOL)canSilentlyInstall
+- (instancetype)initWithAppcastItem:(SUAppcastItem *)appcastItem
 {
-    return [self initWithAppcastItem:appcastItem canSilentlyInstall:canSilentlyInstall systemDomain:NO];
+    return [self initWithAppcastItem:appcastItem systemDomain:NO];
 }
 
 - (nullable instancetype)initWithCoder:(NSCoder *)decoder
@@ -45,16 +43,18 @@ static NSString *SUSystemDomainKey = @"SUSystemDomain";
         return nil;
     }
     
-    BOOL canSilentlyInstall = [decoder decodeBoolForKey:SUCanSilentlyInstallKey];
     BOOL systemDomain = [decoder decodeBoolForKey:SUSystemDomainKey];
-    return [self initWithAppcastItem:appcastItem canSilentlyInstall:canSilentlyInstall systemDomain:systemDomain];
+    return [self initWithAppcastItem:appcastItem systemDomain:systemDomain];
 }
 
 - (void)encodeWithCoder:(NSCoder *)coder
 {
     [coder encodeObject:_appcastItem forKey:SUAppcastItemKey];
-    [coder encodeBool:_canSilentlyInstall forKey:SUCanSilentlyInstallKey];
     [coder encodeBool:_systemDomain forKey:SUSystemDomainKey];
+    
+    // Installation types can always be silently installed for newer versions of Sparkle
+    // Still encode this key to maintain backwards compatibility with older Sparkle clients
+    [coder encodeBool:YES forKey:SUCanSilentlyInstallKey];
 }
 
 + (BOOL)supportsSecureCoding

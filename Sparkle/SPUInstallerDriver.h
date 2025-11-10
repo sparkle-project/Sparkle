@@ -18,7 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)installerDidStartInstallingWithApplicationTerminated:(BOOL)applicationTerminated;
 - (void)installerDidStartExtracting;
 - (void)installerDidExtractUpdateWithProgress:(double)progress;
-- (void)installerDidFinishPreparationAndWillInstallImmediately:(BOOL)willInstallImmediately silently:(BOOL)willInstallSilently;
+- (void)installerDidFinishPreparationAndWillInstallImmediately:(BOOL)willInstallImmediately;
 - (void)installerWillFinishInstallationAndRelaunch:(BOOL)relaunch;
 - (void)installerDidFinishInstallationAndRelaunched:(BOOL)relaunch acknowledgement:(void(^)(void))acknowledgement;
 

@@ -14,10 +14,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 SPU_OBJC_DIRECT_MEMBERS @interface SPUInstallationInfo : NSObject <NSSecureCoding>
 
-- (instancetype)initWithAppcastItem:(SUAppcastItem *)appcastItem canSilentlyInstall:(BOOL)canSilentlyInstall;
+- (instancetype)initWithAppcastItem:(SUAppcastItem *)appcastItem;
 
 @property (nonatomic, readonly) SUAppcastItem *appcastItem;
-@property (nonatomic, readonly) BOOL canSilentlyInstall;
 
 @property (nonatomic) BOOL systemDomain;
 

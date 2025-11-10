@@ -82,11 +82,6 @@
 {
 }
 
-- (BOOL)canInstallSilently
-{
-    return YES;
-}
-
 @end
 
 #endif

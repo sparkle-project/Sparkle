@@ -599,7 +599,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     } else if (identifier == SPUSentUpdateAppcastItemData) {
         SUAppcastItem *updateItem = (data != nil) ? (SUAppcastItem *)SPUUnarchiveRootObjectSecurely(data, [SUAppcastItem class]) : nil;
         if (updateItem != nil) {
-            SPUInstallationInfo *installationInfo = [[SPUInstallationInfo alloc] initWithAppcastItem:updateItem canSilentlyInstall:[_installer canInstallSilently]];
+            SPUInstallationInfo *installationInfo = [[SPUInstallationInfo alloc] initWithAppcastItem:updateItem];
             
             NSData *archivedData = SPUArchiveRootObjectSecurely(installationInfo);
             if (archivedData != nil) {
@@ -612,7 +612,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
         uint8_t showsUI = *((const uint8_t *)data.bytes + 1);
         
         dispatch_async(dispatch_get_main_queue(), ^{
-            // This flag has an impact on interactive type installations and showing UI progress during non-interactive installations
+            // This flag has an impact on showing UI progress during installations
             self->_shouldShowUI = (BOOL)showsUI;
             // Don't test if the application was alive initially, leave that to the progress agent if we decide to relaunch
             self->_shouldRelaunch = (BOOL)relaunch;
@@ -679,8 +679,6 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
             return;
         }
         
-        uint8_t canPerformSilentInstall = (uint8_t)[installer canInstallSilently];
-        
         dispatch_async(dispatch_get_main_queue(), ^{
             self->_installer = installer;
             
@@ -688,9 +686,9 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
             self->_performedStage1Installation = YES;
             os_unfair_lock_unlock(&self->_newConnectionLock);
             
-            uint8_t sendInformation[] = {canPerformSilentInstall, (uint8_t)self->_targetTerminated};
+            uint8_t targetTerminated = (uint8_t)self->_targetTerminated;
             
-            NSData *sendData = [NSData dataWithBytes:sendInformation length:sizeof(sendInformation)];
+            NSData *sendData = [NSData dataWithBytes:&targetTerminated length:sizeof(targetTerminated)];
             
             [self->_communicator handleMessageWithIdentifier:SPUInstallationFinishedStage1 data:sendData];
             
@@ -705,37 +703,27 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 
 - (void)performStage2Installation SPU_OBJC_DIRECT
 {
-    BOOL canPerformSecondStage = _shouldShowUI || [_installer canInstallSilently];
-    if (canPerformSecondStage) {
-        _performedStage2Installation = YES;
+    _performedStage2Installation = YES;
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        uint8_t targetTerminated = (uint8_t)self->_targetTerminated;
         
-        dispatch_async(dispatch_get_main_queue(), ^{
-            uint8_t targetTerminated = (uint8_t)self->_targetTerminated;
-            
-            NSData *sendData = [NSData dataWithBytes:&targetTerminated length:sizeof(targetTerminated)];
-            [self->_communicator handleMessageWithIdentifier:SPUInstallationFinishedStage2 data:sendData];
-            
-            // Don't check if the target is already terminated, leave that to the progress agent
-            // We could be slightly off if there were multiple instances running
-            [self->_agentConnection.agent sendTerminationSignal];
-        });
-    } else {
-        _installer = nil;
+        NSData *sendData = [NSData dataWithBytes:&targetTerminated length:sizeof(targetTerminated)];
+        [self->_communicator handleMessageWithIdentifier:SPUInstallationFinishedStage2 data:sendData];
         
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self cleanupAndExitWithStatus:EXIT_FAILURE error:[NSError errorWithDomain:SUSparkleErrorDomain code:SPUInstallerError userInfo:@{ NSLocalizedDescriptionKey: @"Error: Failed to resume installer on stage 2 because installation cannot be installed silently" }]];
-        });
-    }
+        // Don't check if the target is already terminated, leave that to the progress agent
+        // We could be slightly off if there were multiple instances running
+        [self->_agentConnection.agent sendTerminationSignal];
+    });
 }
 
 - (void)finishInstallationAfterHostTermination SPU_OBJC_DIRECT
 {
     assert(self->_targetTerminated);
     
-    // Show our installer progress UI tool if only after a certain amount of time passes,
-    // and if our installer is silent (i.e, doesn't show progress on its own)
+    // Show our installer progress UI tool if only after a certain amount of time passes
     __block BOOL shouldShowUIProgress = YES;
-    if (self->_shouldShowUI && [self->_installer canInstallSilently]) {
+    if (self->_shouldShowUI) {
         // Ask the updater if it is still alive
         // If they are, we will receive a pong response back
         // Reset if we received a pong just to be on the safe side

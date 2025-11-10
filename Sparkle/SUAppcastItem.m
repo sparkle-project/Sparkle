@@ -607,8 +607,7 @@ static NSString *SUAppcastItemDeltaFromSparkleLocalesKey = @"SUAppcastItemDeltaF
 #if SPARKLE_BUILD_PACKAGE_SUPPORT
         NSString *attributeInstallationType = [enclosure objectForKey:SUAppcastAttributeInstallationType];
         if (attributeInstallationType == nil) {
-            // If we have a flat package, assume installation type is guided
-            // (flat / non-archived interactive packages are not supported anymore)
+            // If we have a bare package, assume installation type is guided package
             // Otherwise assume we have a normal application inside an archive
             if ([_fileURL.pathExtension isEqualToString:@"pkg"] || [_fileURL.pathExtension isEqualToString:@"mpkg"]) {
                 chosenInstallationType = SPUInstallationTypeGuidedPackage;
