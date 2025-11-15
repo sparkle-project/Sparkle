@@ -7,6 +7,7 @@ import os, sys
 
 hit_first_changelog_note = False
 with open("CHANGELOG", "r") as changelog_file:
+    sys.stdout.write("Changes:\n\n")
     for line in changelog_file:
         if line.startswith("#"):
             if hit_first_changelog_note:
