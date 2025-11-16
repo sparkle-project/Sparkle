@@ -25,6 +25,9 @@
 #import "SPUStandardVersionDisplay.h"
 #import "SULog.h"
 #import "SPUNoUpdateFoundInfo.h"
+#import "SPUUpdaterSettings.h"
+#import "SPUUpdaterSettings+Debug.h"
+
 #include <time.h>
 #include <mach/mach_time.h>
 #import <IOKit/pwr_mgt/IOPMLib.h>
@@ -37,9 +40,6 @@
 - (void)activate;
 @end
 #endif
-
-// The amount of time the app is allowed to be idle for us to consider showing an update prompt right away when the app is active
-static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 30.0 : 5 * 60.0;
 
 @interface SPUStandardUserDriver () <SPUGentleUserDriverReminders>
 
@@ -65,6 +65,7 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
     SUStatusController *_checkingController;
     
     SUUpdateAlert *_activeUpdateAlert;
+    SPUUpdaterSettings *_updaterSettings;
     
     SUStatusController *_statusController;
     SUUpdatePermissionPrompt *_permissionPrompt;
@@ -92,6 +93,7 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
     self = [super init];
     if (self != nil) {
         _host = [[SUHost alloc] initWithBundle:hostBundle];
+        _updaterSettings = [[SPUUpdaterSettings alloc] initWithHostBundle:hostBundle];
         _oldHostName = _host.name;
         _oldHostBundleURL = hostBundle.bundleURL;
         _delegate = delegate;
@@ -218,7 +220,9 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
                 if (!appNearUpdaterInitialization && !backgroundApp) {
                     timeSinceLastEvent = CGEventSourceSecondsSinceLastEventType(kCGEventSourceStateHIDSystemState, kCGAnyInputEventType);
                     
-                    if (timeSinceLastEvent >= SUScheduledUpdateIdleEventLeewayInterval) {
+                    NSTimeInterval scheduledUpdateIdleEventLeewayInterval = _updaterSettings.standardUIScheduledUpdateIdleEventLeewayInterval;
+                    
+                    if (timeSinceLastEvent >= scheduledUpdateIdleEventLeewayInterval) {
                         // Make sure there's no active power management assertions preventing
                         // the display from sleeping by the current application.
                         // If there is, then the app may still actively be in use
@@ -367,7 +371,7 @@ static const NSTimeInterval SUScheduledUpdateIdleEventLeewayInterval = DEBUG ? 3
     
     __weak __typeof__(self) weakSelf = self;
     __weak id<SPUStandardUserDriverDelegate> weakDelegate = delegate;
-    _activeUpdateAlert = [[SUUpdateAlert alloc] initWithAppcastItem:appcastItem state:state host:_host versionDisplayer:versionDisplayer completionBlock:^(SPUUserUpdateChoice choice, NSRect windowFrame, BOOL wasKeyWindow) {
+    _activeUpdateAlert = [[SUUpdateAlert alloc] initWithAppcastItem:appcastItem state:state host:_host versionDisplayer:versionDisplayer updaterSettings:_updaterSettings completionBlock:^(SPUUserUpdateChoice choice, NSRect windowFrame, BOOL wasKeyWindow) {
         reply(choice);
         
         __typeof__(self) strongSelf = weakSelf;

@@ -7,6 +7,7 @@
 //
 
 #import "SPUUpdaterSettings.h"
+#import "SPUUpdaterSettings+Debug.h"
 #import "SUHost.h"
 #import "SUConstants.h"
 
@@ -22,6 +23,10 @@ static NSString *SUSendsSystemProfileKeyPath = @"sendsSystemProfile";
 @implementation SPUUpdaterSettings
 {
     SUHost *_host;
+    
+#if DEBUG
+    BOOL _enableDebugUpdateCheckIntervals;
+#endif
 }
 
 @synthesize automaticallyChecksForUpdates = _automaticallyChecksForUpdates;
@@ -35,6 +40,12 @@ static NSString *SUSendsSystemProfileKeyPath = @"sendsSystemProfile";
     self = [super init];
     if (self != nil) {
         _host = [[SUHost alloc] initWithBundle:hostBundle];
+        
+#if DEBUG
+        // This one must be checked first, before checking the other settings,
+        // since the others may rely on this
+        _enableDebugUpdateCheckIntervals = [self currentEnableDebugUpdateCheckIntervals];
+#endif
         
         _automaticallyChecksForUpdates = [self currentAutomaticallyChecksForUpdates];
         _updateCheckInterval = [self currentUpdateCheckInterval];
@@ -152,6 +163,12 @@ static NSString *SUSendsSystemProfileKeyPath = @"sendsSystemProfile";
         return;
     }
     
+#if DEBUG
+    // This one must be checked first, before checking the other settings,
+    // since the others may rely on this
+    _enableDebugUpdateCheckIntervals = [self currentEnableDebugUpdateCheckIntervals];
+#endif
+    
     [self processCurrentAutomaticallyChecksForUpdates];
     [self processUpdateCheckInterval];
     [self processImpatientUpdateCheckInterval];
@@ -180,7 +197,7 @@ static NSString *SUSendsSystemProfileKeyPath = @"sendsSystemProfile";
     // Hack to support backwards compatibility with older Sparkle versions, which supported
     // disabling updates by setting the check interval to 0.
     if (automaticallyCheckForUpdates && (NSInteger)[self currentUpdateCheckInterval] == 0) {
-        [self setUpdateCheckInterval:SUDefaultUpdateCheckInterval];
+        [self setUpdateCheckInterval:[self defaultUpdateCheckInterval]];
     } else {
         [NSNotificationCenter.defaultCenter postNotificationName:SUUpdateAutomaticCheckSettingChangedNotification object:nil userInfo:@{SUUpdateBundlePathUserInfoKey: _host.bundlePath}];
     }
@@ -196,7 +213,7 @@ static NSString *SUSendsSystemProfileKeyPath = @"sendsSystemProfile";
     // Find the stored check interval. User defaults override Info.plist.
     NSNumber *intervalValue = [_host doubleNumberForKey:SUScheduledCheckIntervalKey];
     if (intervalValue == nil) {
-        return SUDefaultUpdateCheckInterval;
+        return [self defaultUpdateCheckInterval];
     }
     
     return intervalValue.doubleValue;
@@ -222,7 +239,7 @@ static NSString *SUSendsSystemProfileKeyPath = @"sendsSystemProfile";
 {
     NSNumber *intervalValue = [_host doubleNumberForInfoDictionaryKey:SUScheduledImpatientCheckIntervalKey];
     if (intervalValue == nil) {
-        return SUDefaultImpatientUpdateCheckInterval;
+        return [self defaultImpatientUpdateCheckInterval];
     }
     
     return intervalValue.doubleValue;
@@ -293,6 +310,81 @@ static NSString *SUSendsSystemProfileKeyPath = @"sendsSystemProfile";
 + (BOOL)automaticallyNotifiesObserversOfSendsSystemProfile
 {
     return NO;
+}
+
+#if DEBUG
+// This is only used in DEBUG and is meant for the Sparkle Test App
+- (BOOL)currentEnableDebugUpdateCheckIntervals
+{
+    return [_host boolForInfoDictionaryKey:@"_SUEnableDebugUpdateCheckIntervals"];
+}
+#endif
+
+- (NSTimeInterval)minimumUpdateCheckInterval
+{
+#if DEBUG
+    if (_enableDebugUpdateCheckIntervals) {
+        // 1 minute
+        return 60;
+    }
+#endif
+    
+    // 1 hour
+    return (60 * 60);
+}
+
+- (uint64_t)leewayUpdateCheckInterval
+{
+#if DEBUG
+    if (_enableDebugUpdateCheckIntervals) {
+        // 1 second
+        return 1;
+    }
+#endif
+    
+    // 15 seconds
+    return 15;
+}
+
+- (NSTimeInterval)defaultUpdateCheckInterval SPU_OBJC_DIRECT
+{
+#if DEBUG
+    if (_enableDebugUpdateCheckIntervals) {
+        // 1 minute
+        return 60;
+    }
+#endif
+    
+    // 1 day
+    return (60 * 60 * 24);
+}
+
+// If the update has already been automatically downloaded, we normally don't want to bug the user about the update
+// However if the user has gone a very long time without quitting an application, we will notify them
+- (NSTimeInterval)defaultImpatientUpdateCheckInterval SPU_OBJC_DIRECT
+{
+#if DEBUG
+    if (_enableDebugUpdateCheckIntervals) {
+        // 2 minutes
+        return (60 * 2);
+    }
+#endif
+    
+    // 1 week
+    return (60 * 60 * 24 * 7);
+}
+
+- (NSTimeInterval)standardUIScheduledUpdateIdleEventLeewayInterval
+{
+#if DEBUG
+    if (_enableDebugUpdateCheckIntervals) {
+        // 30 seconds
+        return 30.0;
+    }
+#endif
+    
+    // 5 minutes
+    return (5 * 60.0);
 }
 
 @end

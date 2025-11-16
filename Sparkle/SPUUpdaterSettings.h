@@ -30,6 +30,8 @@ NS_ASSUME_NONNULL_BEGIN
  */
 SU_EXPORT @interface SPUUpdaterSettings : NSObject
 
+- (instancetype)init NS_UNAVAILABLE;
+
 - (instancetype)initWithHostBundle:(NSBundle *)hostBundle;
 
 /**

@@ -199,6 +199,7 @@
 		723C8A561E2D60DB00C14942 /* SUTouchBarButtonGroup.m in Sources */ = {isa = PBXBuildFile; fileRef = 723C8A531E2D60DB00C14942 /* SUTouchBarButtonGroup.m */; };
 		723EDC3F26885A8E000BCBA4 /* testappcast_channels.xml in Resources */ = {isa = PBXBuildFile; fileRef = 723EDC3E26885A8E000BCBA4 /* testappcast_channels.xml */; };
 		7240852E2CA11C1400ED2FCD /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 7240852D2CA11C1400ED2FCD /* libz.tbd */; };
+		7245495C2ECA648000ABA991 /* SPUUpdaterSettings+Debug.h in Headers */ = {isa = PBXBuildFile; fileRef = 7245495B2ECA648000ABA991 /* SPUUpdaterSettings+Debug.h */; };
 		72464F701E1F31E000FB341C /* SUOperatingSystem.m in Sources */ = {isa = PBXBuildFile; fileRef = 726F2CE41BC9C33D001971A4 /* SUOperatingSystem.m */; };
 		72464F7C1E2097F600FB341C /* SUOperatingSystem.m in Sources */ = {isa = PBXBuildFile; fileRef = 726F2CE41BC9C33D001971A4 /* SUOperatingSystem.m */; };
 		72464F7E1E21ED8C00FB341C /* SUHost.m in Sources */ = {isa = PBXBuildFile; fileRef = 61EF67550E25B58D00F754E0 /* SUHost.m */; };
@@ -1139,6 +1140,7 @@
 		723DFF962B3DFF6E00628E6C /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
 		723EDC3E26885A8E000BCBA4 /* testappcast_channels.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = testappcast_channels.xml; sourceTree = "<group>"; };
 		7240852D2CA11C1400ED2FCD /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
+		7245495B2ECA648000ABA991 /* SPUUpdaterSettings+Debug.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SPUUpdaterSettings+Debug.h"; sourceTree = "<group>"; };
 		7246E0A11C83B685003B4E75 /* SPUStandardUpdaterController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPUStandardUpdaterController.h; sourceTree = "<group>"; };
 		7246E0A21C83B685003B4E75 /* SPUStandardUpdaterController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SPUStandardUpdaterController.m; sourceTree = "<group>"; };
 		724BB36C1D31D0B7005D534A /* InstallerConnection.xpc */ = {isa = PBXFileReference; explicitFileType = "wrapper.xpc-service"; includeInIndex = 0; path = InstallerConnection.xpc; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -2098,6 +2100,7 @@
 				72F9EC471D5EA7D3004AC8B6 /* SPUUpdaterDelegate.h */,
 				72EE181826DAE6E100C58B19 /* SPUUpdateCheck.h */,
 				726E078B1CA891E9001A286B /* SPUUpdaterSettings.h */,
+				7245495B2ECA648000ABA991 /* SPUUpdaterSettings+Debug.h */,
 				726E078C1CA891E9001A286B /* SPUUpdaterSettings.m */,
 				72F9EC3D1D5E823F004AC8B6 /* SPUUpdaterTimer.h */,
 				72F9EC3E1D5E823F004AC8B6 /* SPUUpdaterTimer.m */,
@@ -2482,6 +2485,7 @@
 				7229E1BD1C98EFF200CB50D0 /* SPUDownloadDriver.h in Headers */,
 				7267E5FD1D3DD1B700D1BF90 /* SPUResumableUpdate.h in Headers */,
 				7267E5B61D3D8AEE00D1BF90 /* SPUInstallationInfo.h in Headers */,
+				7245495C2ECA648000ABA991 /* SPUUpdaterSettings+Debug.h in Headers */,
 				72EE181926DAE70900C58B19 /* SPUUpdateCheck.h in Headers */,
 				72B767CE1C9B924900A07552 /* SPUInstallerDriver.h in Headers */,
 				723ABF30259D062F00BDB4FA /* SULegacyWebView.h in Headers */,

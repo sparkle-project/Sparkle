@@ -9,6 +9,7 @@
 #import "SPUUpdater.h"
 #import "SPUUpdaterDelegate.h"
 #import "SPUUpdaterSettings.h"
+#import "SPUUpdaterSettings+Debug.h"
 #import "SUHost.h"
 #import "SPUUpdatePermissionRequest.h"
 #import "SUUpdatePermissionResponse.h"
@@ -84,18 +85,6 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 @synthesize httpHeaders = _httpHeaders;
 @synthesize sessionInProgress = _sessionInProgress;
 @synthesize canCheckForUpdates = _canCheckForUpdates;
-
-#if DEBUG
-+ (void)initialize
-{
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        // We're using NSLog instead of SULog here because we don't want to start Sparkle's logger here,
-        // and because this is not really an error, just a warning notice
-        NSLog(@"WARNING: This is running a Debug build of Sparkle 2; don't use this in production!");
-    });
-}
-#endif
 
 - (instancetype)initWithHostBundle:(NSBundle *)hostBundle applicationBundle:(NSBundle *)applicationBundle userDriver:(id <SPUUserDriver>)userDriver delegate:(id<SPUUpdaterDelegate> _Nullable)delegate
 {
@@ -561,9 +550,11 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
                 intervalSinceCheck = 0;
             }
             
+            NSTimeInterval minimumUpdateCheckInterval = self->_updaterSettings.minimumUpdateCheckInterval;
+            
             // Now we want to figure out how long until we check again.
-            if (updateCheckInterval < SUMinimumUpdateCheckInterval)
-                updateCheckInterval = SUMinimumUpdateCheckInterval;
+            if (updateCheckInterval < minimumUpdateCheckInterval)
+                updateCheckInterval = minimumUpdateCheckInterval;
             if (intervalSinceCheck < updateCheckInterval) {
                 NSTimeInterval delayUntilCheck = (updateCheckInterval - intervalSinceCheck); // It hasn't been long enough.
                 if ([delegate respondsToSelector:@selector(updater:willScheduleUpdateCheckAfterDelay:)]) {
@@ -574,7 +565,9 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
                     [(id<SPUGentleUserDriverReminders>)self->_userDriver logGentleScheduledUpdateReminderWarningIfNeeded];
                 }
                 
-                [self->_updaterTimer startAndFireAfterDelay:delayUntilCheck];
+                uint64_t leewayUpdateCheckInterval = self->_updaterSettings.leewayUpdateCheckInterval;
+                
+                [self->_updaterTimer startAndFireAfterDelay:delayUntilCheck leewayUpdateCheckInterval:leewayUpdateCheckInterval];
             } else {
                 // We're overdue! Run one now.
                 [self _checkForUpdatesInBackground];

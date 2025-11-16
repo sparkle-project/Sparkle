@@ -9,28 +9,12 @@
 #import "SUConstants.h"
 #import "SUErrors.h"
 
-#ifndef DEBUG
-#define DEBUG 0
-#endif
-
 #include "AppKitPrevention.h"
-
-// Define some minimum intervals to avoid DoS-like checking attacks
-const NSTimeInterval SUMinimumUpdateCheckInterval = DEBUG ? 60 : (60 * 60);
-const NSTimeInterval SUDefaultUpdateCheckInterval = DEBUG ? 60 : (60 * 60 * 24);
-// The amount of time the system can defer our update check (for improved performance)
-const uint64_t SULeewayUpdateCheckInterval = DEBUG ? 1 : 15;
-
-// If the update has already been automatically downloaded, we normally don't want to bug the user about the update
-// However if the user has gone a very long time without quitting an application, we will notify them
-// By default this is the time interval for a week
-const NSTimeInterval SUDefaultImpatientUpdateCheckInterval = DEBUG ? (60 * 2) : (60 * 60 * 24 * 7);
 
 NSString *const SUBundleIdentifier = @SPARKLE_BUNDLE_IDENTIFIER;
 
 NSString *const SUAppcastAttributeValueMacOS = @"macos";
 
-NSString *const SUTechnicalErrorInformationKey = @"SUTechnicalErrorInformation";
 NSString *const SUUpdateAutomaticCheckSettingChangedNotification = @"SUUpdateAutomaticCheckSettingChanged";
 NSString *const SUUpdateSettingsNeedsSynchronizationNotification = @"SUUpdateSettingsNeedsSynchronization";
 NSString *const SUUpdateBundlePathUserInfoKey = @"SUBundlePath";
@@ -63,17 +47,11 @@ NSString *const SULastProfileSubmitDateKey = @"SULastProfileSubmissionDate";
 NSString *const SUPromptUserOnFirstLaunchKey = @"SUPromptUserOnFirstLaunch";
 NSString *const SUEnableJavaScriptKey = @"SUEnableJavaScript";
 NSString *const SUAllowedURLSchemesKey = @"SUAllowedURLSchemes";
-NSString *const SUFixedHTMLDisplaySizeKey = @"SUFixedHTMLDisplaySize";
 NSString *const SUDefaultsDomainKey = @"SUDefaultsDomain";
 NSString *const SUSparkleErrorDomain = @"SUSparkleErrorDomain";
 NSString *const SPUNoUpdateFoundReasonKey = @"SUNoUpdateFoundReason";
 NSString *const SPUNoUpdateFoundUserInitiatedKey = @"SPUNoUpdateUserInitiated";
 NSString *const SPULatestAppcastItemFoundKey = @"SULatestAppcastItemFound";
-
-NSString *const SUAppendVersionNumberKey = @"SUAppendVersionNumber";
-NSString *const SUEnableAutomatedDowngradesKey = @"SUEnableAutomatedDowngrades";
-NSString *const SUNormalizeInstalledApplicationNameKey = @"SUNormalizeInstalledApplicationName";
-NSString *const SURelaunchToolNameKey = @"SURelaunchToolName";
 
 NSString *const SUAppcastAttributeDeltaFrom = @"sparkle:deltaFrom";
 NSString *const SUAppcastAttributeDeltaFromSparkleExecutableSize = @"sparkle:deltaFromSparkleExecutableSize";

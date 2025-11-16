@@ -22,7 +22,7 @@ SPU_OBJC_DIRECT_MEMBERS @interface SPUUpdaterTimer : NSObject
 
 - (instancetype)initWithDelegate:(id<SPUUpdaterTimerDelegate>)delegate;
 
-- (void)startAndFireAfterDelay:(NSTimeInterval)delay;
+- (void)startAndFireAfterDelay:(NSTimeInterval)delay leewayUpdateCheckInterval:(uint64_t)leewayUpdateCheckInterval;
 
 - (void)invalidate;
 

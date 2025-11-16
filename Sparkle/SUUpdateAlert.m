@@ -64,7 +64,7 @@ static const CGFloat SUUpdateAlertGroupElementSpacing = 12.0;
     BOOL _windowLoadedAndShowsReleaseNotes;
 }
 
-- (instancetype)initWithAppcastItem:(SUAppcastItem *)item state:(SPUUserUpdateState *)state host:(SUHost *)aHost versionDisplayer:(id<SUVersionDisplay>)versionDisplayer completionBlock:(void (^)(SPUUserUpdateChoice, NSRect, BOOL))completionBlock didBecomeKeyBlock:(void (^)(void))didBecomeKeyBlock
+- (instancetype)initWithAppcastItem:(SUAppcastItem *)item state:(SPUUserUpdateState *)state host:(SUHost *)aHost versionDisplayer:(id<SUVersionDisplay>)versionDisplayer updaterSettings:(SPUUpdaterSettings *)updaterSettings completionBlock:(void (^)(SPUUserUpdateChoice, NSRect, BOOL))completionBlock didBecomeKeyBlock:(void (^)(void))didBecomeKeyBlock
 {
     self = [super initWithWindowNibName:@"SUUpdateAlert"];
     if (self != nil) {
@@ -76,7 +76,7 @@ static const CGFloat SUUpdateAlertGroupElementSpacing = 12.0;
         _completionBlock = [completionBlock copy];
         _didBecomeKeyBlock = [didBecomeKeyBlock copy];
         
-        _updaterSettings = [[SPUUpdaterSettings alloc] initWithHostBundle:aHost.bundle];
+        _updaterSettings = updaterSettings;
         
         BOOL allowsAutomaticUpdates;
         NSNumber *allowsAutomaticUpdatesOption = _updaterSettings.allowsAutomaticUpdatesOption;
