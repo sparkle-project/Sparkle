@@ -1056,6 +1056,25 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     return NO;
 }
 
+- (BOOL)allowsAutomaticUpdates
+{
+    if (![NSThread isMainThread]) {
+        SULog(SULogLevelError, @"Error: -[SPUUpdater allowsAutomaticUpdates] must be called on the main thread.");
+    }
+    
+    return [_updaterSettings allowsAutomaticUpdates];
+}
+
++ (NSSet<NSString *> *)keyPathsForValuesAffectingAllowsAutomaticUpdates
+{
+    return [NSSet setWithObject:@"updaterSettings.allowsAutomaticUpdates"];
+}
+
++ (BOOL)automaticallyNotifiesObserversOfAllowsAutomaticUpdates
+{
+    return NO;
+}
+
 - (void)setFeedURL:(NSURL * _Nullable)feedURL
 {
     if (![NSThread isMainThread]) {

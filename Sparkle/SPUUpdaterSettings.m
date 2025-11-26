@@ -19,6 +19,8 @@ static NSString *SUUpdateCheckIntervalKeyPath = @"updateCheckInterval";
 static NSString *SUImpatientUpdateCheckIntervalKeyPath = @"impatientUpdateCheckInterval";
 static NSString *SUAutomaticallyDownloadsUpdatesKeyPath = @"automaticallyDownloadsUpdates";
 static NSString *SUSendsSystemProfileKeyPath = @"sendsSystemProfile";
+static NSString *SUAllowsAutomaticUpdatesOptionKeyPath = @"allowsAutomaticUpdatesOption";
+static NSString *SUAllowsAutomaticUpdatesKeyPath = @"allowsAutomaticUpdates";
 
 @implementation SPUUpdaterSettings
 {
@@ -34,6 +36,8 @@ static NSString *SUSendsSystemProfileKeyPath = @"sendsSystemProfile";
 @synthesize impatientUpdateCheckInterval = _impatientUpdateCheckInterval;
 @synthesize automaticallyDownloadsUpdates = _automaticallyDownloadsUpdates;
 @synthesize sendsSystemProfile = _sendsSystemProfile;
+@synthesize allowsAutomaticUpdatesOption = _allowsAutomaticUpdatesOption;
+@synthesize allowsAutomaticUpdates = _allowsAutomaticUpdates;
 
 - (instancetype)initWithHostBundle:(NSBundle *)hostBundle
 {
@@ -50,6 +54,8 @@ static NSString *SUSendsSystemProfileKeyPath = @"sendsSystemProfile";
         _automaticallyChecksForUpdates = [self currentAutomaticallyChecksForUpdates];
         _updateCheckInterval = [self currentUpdateCheckInterval];
         _impatientUpdateCheckInterval = [self currentImpatientUpdateCheckInterval];
+        _allowsAutomaticUpdatesOption = [self currentAllowsAutomaticUpdatesOption];
+        _allowsAutomaticUpdates = [self currentAllowsAutomaticUpdates];
         _automaticallyDownloadsUpdates = [self currentAutomaticallyDownloadsUpdates];
         _sendsSystemProfile = [self currentSendsSystemProfile];
         
@@ -93,6 +99,9 @@ static NSString *SUSendsSystemProfileKeyPath = @"sendsSystemProfile";
         _automaticallyChecksForUpdates = currentValue;
         
         [self didChangeValueForKey:updatedKeyPath];
+        
+        [self processAllowsAutomaticUpdates];
+        [self processAutomaticallyDownloadsUpdates];
     }
 }
 
@@ -121,6 +130,36 @@ static NSString *SUSendsSystemProfileKeyPath = @"sendsSystemProfile";
         [self willChangeValueForKey:updatedKeyPath];
         
         _impatientUpdateCheckInterval = currentValue;
+        
+        [self didChangeValueForKey:updatedKeyPath];
+    }
+}
+
+- (void)processAllowsAutomaticUpdatesOption SPU_OBJC_DIRECT
+{
+    NSNumber *currentValue = [self currentAllowsAutomaticUpdatesOption];
+    
+    if (((currentValue != nil) != (_allowsAutomaticUpdatesOption != nil)) || (currentValue.boolValue != _allowsAutomaticUpdatesOption.boolValue)) {
+        NSString *updatedKeyPath = SUAllowsAutomaticUpdatesOptionKeyPath;
+        
+        [self willChangeValueForKey:updatedKeyPath];
+        
+        _allowsAutomaticUpdatesOption = currentValue;
+        
+        [self didChangeValueForKey:updatedKeyPath];
+    }
+}
+
+- (void)processAllowsAutomaticUpdates SPU_OBJC_DIRECT
+{
+    BOOL currentValue = [self currentAllowsAutomaticUpdates];
+    
+    if (currentValue != _allowsAutomaticUpdates) {
+        NSString *updatedKeyPath = SUAllowsAutomaticUpdatesKeyPath;
+        
+        [self willChangeValueForKey:updatedKeyPath];
+        
+        _allowsAutomaticUpdates = currentValue;
         
         [self didChangeValueForKey:updatedKeyPath];
     }
@@ -172,6 +211,8 @@ static NSString *SUSendsSystemProfileKeyPath = @"sendsSystemProfile";
     [self processCurrentAutomaticallyChecksForUpdates];
     [self processUpdateCheckInterval];
     [self processImpatientUpdateCheckInterval];
+    [self processAllowsAutomaticUpdatesOption];
+    [self processAllowsAutomaticUpdates];
     [self processAutomaticallyDownloadsUpdates];
     [self processSendsSystemProfile];
 }
@@ -201,6 +242,9 @@ static NSString *SUSendsSystemProfileKeyPath = @"sendsSystemProfile";
     } else {
         [NSNotificationCenter.defaultCenter postNotificationName:SUUpdateAutomaticCheckSettingChangedNotification object:nil userInfo:@{SUUpdateBundlePathUserInfoKey: _host.bundlePath}];
     }
+    
+    [self processAllowsAutomaticUpdates];
+    [self processAutomaticallyDownloadsUpdates];
 }
 
 + (BOOL)automaticallyNotifiesObserversOfAutomaticallyChecksForUpdates
@@ -255,22 +299,32 @@ static NSString *SUSendsSystemProfileKeyPath = @"sendsSystemProfile";
     return NO;
 }
 
-// For allowing automatic downloaded updates to be turned on or off
-- (NSNumber * _Nullable)allowsAutomaticUpdatesOption
+- (NSNumber * _Nullable)currentAllowsAutomaticUpdatesOption SPU_OBJC_DIRECT
 {
     NSNumber *developerAllowsAutomaticUpdates = [_host boolNumberForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey];
     return developerAllowsAutomaticUpdates;
 }
 
-- (BOOL)allowsAutomaticUpdates
++ (BOOL)automaticallyNotifiesObserversOfAllowsAutomaticUpdatesOption
 {
-    NSNumber *developerAllowsAutomaticUpdates = [self allowsAutomaticUpdatesOption];
-    return (developerAllowsAutomaticUpdates == nil || developerAllowsAutomaticUpdates.boolValue);
+    return NO;
 }
 
+// This depends on currentAllowsAutomaticUpdatesOption and currentAutomaticallyChecksForUpdates and must be processed afterwards
+- (BOOL)currentAllowsAutomaticUpdates
+{
+    return (_allowsAutomaticUpdatesOption == nil) ? _automaticallyChecksForUpdates : _allowsAutomaticUpdatesOption.boolValue;
+}
+
++ (BOOL)automaticallyNotifiesObserversOfAllowsAutomaticUpdates
+{
+    return NO;
+}
+
+// This depends on currentAllowsAutomaticUpdates and must be processed afterwards
 - (BOOL)currentAutomaticallyDownloadsUpdates SPU_OBJC_DIRECT
 {
-    return [self allowsAutomaticUpdates] && [_host boolForKey:SUAutomaticallyUpdateKey];
+    return _allowsAutomaticUpdates && [_host boolForKey:SUAutomaticallyUpdateKey];
 }
 
 - (void)setAutomaticallyDownloadsUpdates:(BOOL)automaticallyDownloadsUpdates

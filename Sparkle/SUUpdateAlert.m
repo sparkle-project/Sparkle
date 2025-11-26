@@ -32,6 +32,7 @@
 #import "SPUUserUpdateState.h"
 
 static NSString *const SUUpdateAlertTouchBarIdentifier = @"" SPARKLE_BUNDLE_IDENTIFIER ".SUUpdateAlert";
+static NSString *const SUAllowsAutomaticUpdatesKeyPath = @"allowsAutomaticUpdates";
 
 static const CGFloat SUUpdateAlertGroupElementSpacing = 12.0;
 
@@ -60,7 +61,6 @@ static const CGFloat SUUpdateAlertGroupElementSpacing = 12.0;
     void (^_didBecomeKeyBlock)(void);
     void(^_completionBlock)(SPUUserUpdateChoice, NSRect, BOOL);
     
-    BOOL _allowsAutomaticUpdates;
     BOOL _windowLoadedAndShowsReleaseNotes;
 }
 
@@ -78,22 +78,18 @@ static const CGFloat SUUpdateAlertGroupElementSpacing = 12.0;
         
         _updaterSettings = updaterSettings;
         
-        BOOL allowsAutomaticUpdates;
-        NSNumber *allowsAutomaticUpdatesOption = _updaterSettings.allowsAutomaticUpdatesOption;
-        if (item.informationOnlyUpdate) {
-            allowsAutomaticUpdates = NO;
-        } else if (allowsAutomaticUpdatesOption == nil) {
-            allowsAutomaticUpdates = _updaterSettings.automaticallyChecksForUpdates;
-        } else {
-            allowsAutomaticUpdates = allowsAutomaticUpdatesOption.boolValue;
-        }
-        _allowsAutomaticUpdates = allowsAutomaticUpdates;
-        
         [self setShouldCascadeWindows:NO];
     } else {
         assert(false);
     }
     return self;
+}
+
+- (void)dealloc
+{
+    if (self.windowLoaded) {
+        [_updaterSettings removeObserver:self forKeyPath:SUAllowsAutomaticUpdatesKeyPath];
+    }
 }
 
 - (NSString *)description
@@ -338,6 +334,15 @@ static const CGFloat SUUpdateAlertGroupElementSpacing = 12.0;
     }
 }
 
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSString *,id> *)change context:(void *)context
+{
+    if ([keyPath isEqualToString:SUAllowsAutomaticUpdatesKeyPath]) {
+        _automaticallyInstallUpdatesButton.superview.hidden = !_updaterSettings.allowsAutomaticUpdates;
+    } else {
+        [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
+    }
+}
+
 - (void)windowDidLoad
 {
     NSWindow *window = self.window;
@@ -395,8 +400,6 @@ static const CGFloat SUUpdateAlertGroupElementSpacing = 12.0;
         [_installButton setTitle:SULocalizedStringFromTableInBundle(@"Learn More…", SPARKLE_TABLE, sparkleBundle, @"Alternate title for 'Install Update' button when there's no download in RSS feed.")];
         [_installButton setAction:@selector(openInfoURL:)];
     }
-
-    BOOL allowsAutomaticUpdates = _allowsAutomaticUpdates;
     
     if (showReleaseNotes) {
         [self displayReleaseNotesSpinner];
@@ -409,9 +412,7 @@ static const CGFloat SUUpdateAlertGroupElementSpacing = 12.0;
     
     // NOTE: The code below for deciding what buttons to hide is complex! Due to array of feature configurations :)
     
-    if (!allowsAutomaticUpdates) {
-        _automaticallyInstallUpdatesButton.superview.hidden = YES;
-    }
+    [_updaterSettings addObserver:self forKeyPath:SUAllowsAutomaticUpdatesKeyPath options:(NSKeyValueObservingOptionInitial | NSKeyValueObservingOptionNew) context:NULL];
     
     if (_state.stage == SPUUserUpdateStageInstalling) {
         // We're going to be relaunching pretty instantaneously

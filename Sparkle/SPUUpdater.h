@@ -252,6 +252,18 @@ SU_EXPORT @interface SPUUpdater : NSObject
 @property (nonatomic) BOOL automaticallyDownloadsUpdates;
 
 /**
+ A property indicating whether or not the *option* to automatically download updates in the background can be turned on.
+ 
+ This property can be used to determine whether an option to automatically download/install updates should be enabled.
+ 
+ Its value depends  on `automaticallyChecksForUpdates`, or the `SUAllowsAutomaticUpdates`in the host bundle's Info.plist if specified.
+ Don't set `SUAllowsAutomaticUpdates` in the Info.plist unless you need custom behavior.
+ 
+ This property is KVO compliant. This property must be called on the main thread.
+ */
+@property (nonatomic, readonly) BOOL allowsAutomaticUpdates;
+
+/**
  The URL of the appcast used to download update information.
  
  If the updater's delegate implements `-[SPUUpdaterDelegate feedURLStringForUpdater:]`, this will return that feed URL.
