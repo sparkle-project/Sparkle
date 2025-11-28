@@ -77,6 +77,43 @@ API_AVAILABLE(macos(12.0))
 
 @end
 
+@interface SPUMarkdownBulletAttachmentCell : NSTextAttachmentCell
+@end
+
+@implementation SPUMarkdownBulletAttachmentCell
+{
+    CGFloat _fontPointSize;
+}
+
+- (instancetype)initWithFont:(NSFont *)font
+{
+    self = [super init];
+    if (self != nil) {
+        _fontPointSize = font.pointSize;
+    }
+    return self;
+}
+
+- (NSSize)cellSize
+{
+    CGFloat cellSize = _fontPointSize * 0.65;
+    return NSMakeSize(cellSize, cellSize);
+}
+
+- (void)drawWithFrame:(NSRect)cellFrame inView:(NSView *)controlView
+{
+    CGFloat diameter = cellFrame.size.height * 0.5;
+    CGFloat x = NSMidX(cellFrame) - diameter / 2.0;
+    CGFloat y = NSMidY(cellFrame) - diameter / 2.0;
+
+    NSBezierPath *circlePath = [NSBezierPath bezierPathWithOvalInRect:NSMakeRect(x, y, diameter, diameter)];
+
+    [NSColor.textColor setFill];
+    [circlePath fill];
+}
+
+@end
+
 @interface SUPlainTextReleaseNotesView () <NSTextViewDelegate>
 @end
 
@@ -323,20 +360,9 @@ static NSAttributedString * _Nullable makeMarkdownAttributedString(NSString *con
     
     NSAttributedString *listBulletAttributedString;
     {
-        // Create a list bullet by using a SF symbol that uses a dynamic color appropriate for switching between light/dark mode,
-        // and we can scale the image to what we need (regular unicode bullet point characters are scaled too small or too big and may not be offsetted right)
-        // Perhaps we could have created a custom attachment cell class instead, but this works
-        NSImageSymbolConfiguration *bulletSymbolConfiguration = [NSImageSymbolConfiguration configurationWithHierarchicalColor:NSColor.textColor];
-        
-        NSImage *bulletSymbol = [NSImage imageWithSystemSymbolName:@"circle.fill" accessibilityDescription:nil];
-        
         NSTextAttachment *attachment = [[NSTextAttachment alloc] init];
-        
-        const CGFloat imageScale = paragraphFont.pointSize / 32.5;
-        const CGFloat yBoundsScaleOffset = 0.25;
-        
-        attachment.bounds = NSMakeRect(0, bulletSymbol.size.height * imageScale * yBoundsScaleOffset, bulletSymbol.size.width * imageScale, bulletSymbol.size.height * imageScale);
-        attachment.image = [bulletSymbol imageWithSymbolConfiguration:bulletSymbolConfiguration];
+        SPUMarkdownBulletAttachmentCell *cell = [[SPUMarkdownBulletAttachmentCell alloc] initWithFont:paragraphFont];
+        attachment.attachmentCell = cell;
         
         listBulletAttributedString = [NSAttributedString attributedStringWithAttachment:attachment];
     }
