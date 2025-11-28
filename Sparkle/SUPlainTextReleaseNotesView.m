@@ -203,14 +203,19 @@ static void processMarkdownFragmentAttributedString(NSAttributedString *fragment
                     if (insertUnorderedBullet) {
                         [outputAttributedSubString appendAttributedString:listBulletAttributedString];
                     } else {
-                        NSString *ordinalStringWithSpacing = [NSString stringWithFormat:@"%ld. ", intent.ordinal];
-                        NSAttributedString *listItemAttributedString = [[NSAttributedString alloc] initWithString:ordinalStringWithSpacing attributes:@{NSFontAttributeName: monospacedParagraphFont}];
+                        NSString *ordinalStringWithSpacing = [NSString stringWithFormat:@"%ld.", intent.ordinal];
+                        NSAttributedString *listItemAttributedString = [[NSAttributedString alloc] initWithString:ordinalStringWithSpacing attributes:@{NSFontAttributeName: font}];
                         
                         [outputAttributedSubString appendAttributedString:listItemAttributedString];
                     }
                     
                     [previousVisitedListItemIntents addObject:intent];
                 }
+                
+                NSAttributedString *tabAttributedString = [[NSAttributedString alloc] initWithString:@"\t" attributes:@{NSFontAttributeName: font}];
+                
+                [outputAttributedSubString appendAttributedString:tabAttributedString];
+                paragraphStyle.defaultTabInterval = font.pointSize * 1.38;
             }
             
             break;
@@ -254,6 +259,8 @@ static void processMarkdownFragmentAttributedString(NSAttributedString *fragment
         
         case NSPresentationIntentKindOrderedList:
         case NSPresentationIntentKindUnorderedList:
+        // Note: TextKit 2 doesn't support NSTextTable
+        // Tables also don't show up in release notes often, so not worthwhile supporting
         case NSPresentationIntentKindTable:
         case NSPresentationIntentKindTableHeaderRow:
         case NSPresentationIntentKindTableRow:
@@ -295,13 +302,7 @@ static NSAttributedString * _Nullable makeMarkdownAttributedString(NSString *con
         attachment.bounds = NSMakeRect(0, bulletSymbol.size.height * imageScale * yBoundsScaleOffset, bulletSymbol.size.width * imageScale, bulletSymbol.size.height * imageScale);
         attachment.image = [bulletSymbol imageWithSymbolConfiguration:bulletSymbolConfiguration];
         
-        NSMutableAttributedString *finalBulletAttributedString = [[NSAttributedString attributedStringWithAttachment:attachment] mutableCopy];
-        
-        NSAttributedString *spaceAttributedString = [[NSAttributedString alloc] initWithString:@"  " attributes:@{NSFontAttributeName: paragraphFont}];
-        
-        [finalBulletAttributedString appendAttributedString:spaceAttributedString];
-        
-        listBulletAttributedString = [finalBulletAttributedString copy];
+        listBulletAttributedString = [NSAttributedString attributedStringWithAttachment:attachment];
     }
     
     NSMutableSet<NSPresentationIntent *> *previousVisitedListItemIntents = [[NSMutableSet alloc] init];
@@ -319,6 +320,8 @@ static NSAttributedString * _Nullable makeMarkdownAttributedString(NSString *con
         paragraphStyle.paragraphSpacing = 0;
         paragraphStyle.headIndent = 0;
         paragraphStyle.firstLineHeadIndent = 0;
+        
+        paragraphStyle.tabStops = @[];
         
         NSMutableAttributedString *fragmentOutputAttributedString = [[NSMutableAttributedString alloc] init];
         
