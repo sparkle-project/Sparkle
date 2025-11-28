@@ -464,12 +464,18 @@ func moveOldUpdatesFromAppcasts(archivesSourceDir: URL, oldFilesDirectory: URL, 
             
             let htmlReleaseNotesFile = archivePath.deletingPathExtension().appendingPathExtension("html")
             let plainTextReleaseNotesFile = archivePath.deletingPathExtension().appendingPathExtension("txt")
+            let markdownReleaseNotesFile = archivePath.deletingPathExtension().appendingPathExtension("md")
+            let markdownSecondaryReleaseNotesFile = archivePath.deletingPathExtension().appendingPathExtension("markdown")
             
             let releaseNotesFile: URL?
             if fileManager.fileExists(atPath: htmlReleaseNotesFile.path) {
                 releaseNotesFile = htmlReleaseNotesFile
             } else if fileManager.fileExists(atPath: plainTextReleaseNotesFile.path) {
                 releaseNotesFile = plainTextReleaseNotesFile
+            } else if fileManager.fileExists(atPath: markdownReleaseNotesFile.path) {
+                releaseNotesFile = markdownReleaseNotesFile
+            } else if fileManager.fileExists(atPath: markdownSecondaryReleaseNotesFile.path) {
+                releaseNotesFile = markdownSecondaryReleaseNotesFile
             } else {
                 releaseNotesFile = nil
             }

@@ -183,7 +183,7 @@ struct GenerateAppcast: ParsableCommand {
         Use the --versions option if you need to insert an update that is older than the latest update in your feed, or
         if you need to insert only a specific new version with certain parameters.
         
-        .html or .txt files that have the same filename as an archive (except for the file extension) will be used for release notes for that item.
+        .html, .md, or .txt files that have the same filename as an archive (except for the file extension) will be used for release notes for that item.
         For HTML release notes, if the contents of these files do not include a DOCTYPE or body tags, they will be treated as embedded CDATA release notes.
         Release notes for new items can be forced to be embedded by passing --embed-release-notes
         
