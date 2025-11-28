@@ -309,14 +309,14 @@ static NSAttributedString * _Nullable makeMarkdownAttributedString(NSString *con
         paragraphStyle.headIndent = 0;
         paragraphStyle.firstLineHeadIndent = 0;
         
-        NSMutableAttributedString *newAttributedSubString = [[NSMutableAttributedString alloc] init];
+        NSMutableAttributedString *fragmentOutputAttributedString = [[NSMutableAttributedString alloc] init];
         
         BOOL canProcessListItem = YES;
-        processMarkdownFragmentAttributedString(fragmentAttributedString, newAttributedSubString, paragraphStyle, canProcessListItem, intent, paragraphFont, monospacedParagraphFont, newlineAttributedString, listBulletAttributedString);
+        processMarkdownFragmentAttributedString(fragmentAttributedString, fragmentOutputAttributedString, paragraphStyle, canProcessListItem, intent, paragraphFont, monospacedParagraphFont, newlineAttributedString, listBulletAttributedString);
         
-        [newAttributedSubString addAttributes:@{NSParagraphStyleAttributeName: paragraphStyle} range:NSMakeRange(0, newAttributedSubString.length)];
+        [fragmentOutputAttributedString addAttributes:@{NSParagraphStyleAttributeName: paragraphStyle} range:NSMakeRange(0, fragmentOutputAttributedString.length)];
         
-        [outputAttributedString appendAttributedString:newAttributedSubString];
+        [outputAttributedString appendAttributedString:fragmentOutputAttributedString];
         [outputAttributedString appendAttributedString:newlineAttributedString];
     }];
     
