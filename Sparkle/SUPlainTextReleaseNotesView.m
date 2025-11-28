@@ -371,14 +371,13 @@ static NSAttributedString * _Nullable makeMarkdownAttributedString(NSString *con
             paragraphStyle.tabStops = @[];
             paragraphStyle.defaultTabInterval = paragraphFont.pointSize * 1.38;
             
-            NSMutableAttributedString *fragmentOutputAttributedString = [[NSMutableAttributedString alloc] init];
+            NSUInteger previousOutputLength = outputAttributedString.length;
             
             BOOL canProcessListItem = YES;
-            processMarkdownFragmentAttributedString(fragmentAttributedString, fragmentOutputAttributedString, paragraphStyle, canProcessListItem, previousVisitedListItemIntents, intent, paragraphFont, monospacedParagraphFont, tabAttributedString, newlineAttributedString, listBulletAttributedString);
+            processMarkdownFragmentAttributedString(fragmentAttributedString, outputAttributedString, paragraphStyle, canProcessListItem, previousVisitedListItemIntents, intent, paragraphFont, monospacedParagraphFont, tabAttributedString, newlineAttributedString, listBulletAttributedString, textContentManager);
             
-            [fragmentOutputAttributedString addAttributes:@{NSParagraphStyleAttributeName: paragraphStyle} range:NSMakeRange(0, fragmentOutputAttributedString.length)];
+            [outputAttributedString addAttributes:@{NSParagraphStyleAttributeName: paragraphStyle} range:NSMakeRange(previousOutputLength, outputAttributedString.length - previousOutputLength)];
             
-            [outputAttributedString appendAttributedString:fragmentOutputAttributedString];
             [outputAttributedString appendAttributedString:newlineAttributedString];
         }];
     }];
