@@ -44,20 +44,25 @@ API_AVAILABLE(macos(10.14))
 @end
 
 // Divider attachment cell used for markdown block quotes
-API_AVAILABLE(macos(10.14))
+API_AVAILABLE(macos(12.0))
 @interface SPUMarkdownVerticalAttachmentCell : NSTextAttachmentCell
 @end
 
 @implementation SPUMarkdownVerticalAttachmentCell
 {
+    NSTextContentManager *_textContentManager;
     NSFont *_font;
+    
+    NSInteger _textOffset;
 }
 
-- (instancetype)initWithFont:(NSFont *)font
+- (instancetype)initWithTextContentManager:(NSTextContentManager *)textContentManager textOffset:(NSInteger)textOffset font:(NSFont *)font
 {
     self = [super init];
     if (self != nil) {
+        _textContentManager = textContentManager;
         _font = font;
+        _textOffset = textOffset;
     }
     return self;
 }
@@ -70,12 +75,30 @@ API_AVAILABLE(macos(10.14))
 
 - (void)drawWithFrame:(NSRect)cellFrame inView:(NSView *)view
 {
+    NSTextLayoutManager *textLayoutManager = _textContentManager.textLayoutManagers.firstObject;
+    
+    id<NSTextLocation> textLocation = [_textContentManager locationFromLocation:_textContentManager.documentRange.location withOffset:_textOffset];
+    
+    NSTextLayoutFragment *textLayoutFragment = [textLayoutManager textLayoutFragmentForLocation:textLocation];
+    CGRect layoutFragmentFrame = textLayoutFragment.layoutFragmentFrame;
+    NSLog(@"Height: %f", layoutFragmentFrame.size.height);
+    
     const CGFloat lineWidth = 2.0;
     CGFloat xPosition = cellFrame.origin.x + lineWidth / 2.0;
     
     NSBezierPath *path = [NSBezierPath bezierPath];
-    [path moveToPoint:NSMakePoint(xPosition, cellFrame.origin.y + cellFrame.size.height - _font.ascender)];
-    [path lineToPoint:NSMakePoint(xPosition, cellFrame.origin.y + cellFrame.size.height + -(_font.descender))];
+    
+    NSPoint beginPoint = NSMakePoint(xPosition, cellFrame.origin.y + cellFrame.size.height - _font.ascender);
+    NSPoint endPoint = NSMakePoint(xPosition, cellFrame.origin.y + cellFrame.size.height + -(_font.descender));
+    
+    //NSLog(@"%f", endPoint.y - beginPoint.y);
+    CGFloat difference = layoutFragmentFrame.size.height - (endPoint.y - beginPoint.y);
+    
+    [path moveToPoint:NSMakePoint(beginPoint.x, beginPoint.y)];
+    [path lineToPoint:NSMakePoint(endPoint.x, endPoint.y)];
+    
+    //[path moveToPoint:NSMakePoint(xPosition, layoutFragmentFrame.origin.y)];
+    //[path lineToPoint:NSMakePoint(xPosition, layoutFragmentFrame.origin.y + layoutFragmentFrame.size.height)];
 
     [[NSColor separatorColor] setStroke];
     [path setLineWidth:lineWidth];
@@ -151,7 +174,7 @@ API_AVAILABLE(macos(10.14))
     return _scrollView;
 }
 
-static void processMarkdownFragmentAttributedString(NSAttributedString *fragmentAttributedString, NSMutableAttributedString *outputAttributedSubString, NSMutableParagraphStyle *paragraphStyle, BOOL canProcessListItem, NSMutableSet<NSPresentationIntent *> *previousVisitedListItemIntents, NSPresentationIntent *intent, NSFont *inputParagraphFont, NSFont *monospacedParagraphFont, NSAttributedString *tabAttributedString, NSAttributedString *newlineAttributedString, NSAttributedString *listBulletAttributedString) API_AVAILABLE(macos(12.0))
+static void processMarkdownFragmentAttributedString(NSAttributedString *fragmentAttributedString, NSMutableAttributedString *outputAttributedSubString, NSMutableParagraphStyle *paragraphStyle, BOOL canProcessListItem, NSMutableSet<NSPresentationIntent *> *previousVisitedListItemIntents, NSPresentationIntent *intent, NSFont *inputParagraphFont, NSFont *monospacedParagraphFont, NSAttributedString *tabAttributedString, NSAttributedString *newlineAttributedString, NSAttributedString *listBulletAttributedString, NSTextContentManager *textContentManager) API_AVAILABLE(macos(12.0))
 {
     // Pre-pass processing of intent
     // This info must be computed before processing parent intent
@@ -195,7 +218,7 @@ static void processMarkdownFragmentAttributedString(NSAttributedString *fragment
     // In these cases, we may pre-append attributed string to the output before processing current intent.
     NSPresentationIntent *parentIntent = intent.parentIntent;
     if (parentIntent != nil) {
-        processMarkdownFragmentAttributedString(fragmentAttributedString, outputAttributedSubString, paragraphStyle, canProcessListItem && !isListItem, previousVisitedListItemIntents, parentIntent, font, monospacedParagraphFont, tabAttributedString, newlineAttributedString, listBulletAttributedString);
+        processMarkdownFragmentAttributedString(fragmentAttributedString, outputAttributedSubString, paragraphStyle, canProcessListItem && !isListItem, previousVisitedListItemIntents, parentIntent, font, monospacedParagraphFont, tabAttributedString, newlineAttributedString, listBulletAttributedString, textContentManager);
     }
     
     // Process the current intent
@@ -270,7 +293,7 @@ static void processMarkdownFragmentAttributedString(NSAttributedString *fragment
             // Multiple levels of block quotes are handled (e.g. parent intent could be another block quote).
             // Each line will get its own preceding vertical line. These lines are not 'connected' which is a limitation for now.
             NSTextAttachment *attachment = [[NSTextAttachment alloc] init];
-            attachment.attachmentCell = [[SPUMarkdownVerticalAttachmentCell alloc] initWithFont:font];
+            attachment.attachmentCell = [[SPUMarkdownVerticalAttachmentCell alloc] initWithTextContentManager:textContentManager textOffset:(NSInteger)outputAttributedSubString.length font:font];
 
             NSAttributedString *dividerAttributedString =
                 [NSAttributedString attributedStringWithAttachment:attachment];
@@ -310,7 +333,7 @@ static void processMarkdownFragmentAttributedString(NSAttributedString *fragment
     }
 }
 
-static NSAttributedString * _Nullable makeMarkdownAttributedString(NSString *contents, CGFloat defaultFontPointSize, NSError * __autoreleasing *outError) API_AVAILABLE(macos(12.0))
+static NSAttributedString * _Nullable makeMarkdownAttributedString(NSString *contents, CGFloat defaultFontPointSize, NSTextContentManager *textContentManager, NSError * __autoreleasing *outError) API_AVAILABLE(macos(12.0))
 {
     NSAttributedString *originalAttributedString = [[NSAttributedString alloc] initWithMarkdownString:contents options:nil baseURL:nil error:outError];
     if (originalAttributedString == nil) {
@@ -390,8 +413,11 @@ static NSAttributedString * _Nullable makeMarkdownAttributedString(NSString *con
     NSAttributedString *attributedString = nil;
     if (_prefersMarkdown) {
         if (@available(macOS 12, *)) {
+            
+            NSTextContentManager *textContentManager = _textView.textLayoutManager.textContentManager;
+            
             NSError *markdownError = nil;
-            attributedString = makeMarkdownAttributedString(contents, (CGFloat)_fontPointSize, &markdownError);
+            attributedString = makeMarkdownAttributedString(contents, (CGFloat)_fontPointSize, textContentManager, &markdownError);
             if (attributedString == nil) {
                 SULog(SULogLevelError, @"Failed to load markdown contents with error: %@. Falling back to plain text.", markdownError.localizedDescription);
             }
