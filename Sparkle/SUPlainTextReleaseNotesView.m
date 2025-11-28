@@ -215,7 +215,6 @@ static void processMarkdownFragmentAttributedString(NSAttributedString *fragment
                 NSAttributedString *tabAttributedString = [[NSAttributedString alloc] initWithString:@"\t" attributes:@{NSFontAttributeName: font}];
                 
                 [outputAttributedSubString appendAttributedString:tabAttributedString];
-                paragraphStyle.defaultTabInterval = font.pointSize * 1.38;
             }
             
             break;
@@ -245,9 +244,12 @@ static void processMarkdownFragmentAttributedString(NSAttributedString *fragment
             break;
         }
         case NSPresentationIntentKindCodeBlock: {
-            paragraphStyle.headIndent += font.pointSize * 0.6;
-            paragraphStyle.firstLineHeadIndent += font.pointSize * 0.6;
             paragraphStyle.paragraphSpacing += font.pointSize * 0.25;
+            
+            // A parent of a code block could be a block quote or list item
+            // It's more correct to use tab rather than leading paragraph indentation in this case
+            NSAttributedString *tabAttributedString = [[NSAttributedString alloc] initWithString:@"\t" attributes:@{NSFontAttributeName: monospacedParagraphFont}];
+            [outputAttributedSubString appendAttributedString:tabAttributedString];
             
             NSMutableAttributedString *blockquoteAttributedString = [fragmentAttributedString mutableCopy];
             [blockquoteAttributedString addAttributes:@{NSFontAttributeName: monospacedParagraphFont, NSForegroundColorAttributeName: NSColor.labelColor} range:NSMakeRange(0, blockquoteAttributedString.length)];
@@ -260,7 +262,7 @@ static void processMarkdownFragmentAttributedString(NSAttributedString *fragment
         case NSPresentationIntentKindOrderedList:
         case NSPresentationIntentKindUnorderedList:
         // Note: TextKit 2 doesn't support NSTextTable
-        // Tables also don't show up in release notes often, so not worthwhile supporting
+        // Tables don't show up in release notes often, so they're not that worthwhile supporting
         case NSPresentationIntentKindTable:
         case NSPresentationIntentKindTableHeaderRow:
         case NSPresentationIntentKindTableRow:
@@ -324,7 +326,9 @@ static NSAttributedString * _Nullable makeMarkdownAttributedString(NSString *con
             paragraphStyle.headIndent = 0;
             paragraphStyle.firstLineHeadIndent = 0;
             
+            // Assume tabs won't be used in headers so we'll just use regular paragraph font size
             paragraphStyle.tabStops = @[];
+            paragraphStyle.defaultTabInterval = paragraphFont.pointSize * 1.38;
             
             NSMutableAttributedString *fragmentOutputAttributedString = [[NSMutableAttributedString alloc] init];
             
