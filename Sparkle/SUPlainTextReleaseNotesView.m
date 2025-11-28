@@ -310,28 +310,32 @@ static NSAttributedString * _Nullable makeMarkdownAttributedString(NSString *con
     // Enumerate through every presentation intent fragment and create a new attributed string that we append to the output
     // Foundation handles formatting some things for us already in the attributed string such as bold/itatlics and hyperlinks,
     // but we need to handle formatting paragraphs, headers, lists, block quotes, etc in the attributed string.
-    [originalAttributedString enumerateAttribute:NSPresentationIntentAttributeName inRange:NSMakeRange(0, originalAttributedString.length) options:0 usingBlock:^(NSPresentationIntent *intent, NSRange range, BOOL * _Nonnull __unused stop) {
+    [originalAttributedString enumerateAttribute:NSPresentationIntentAttributeName inRange:NSMakeRange(0, originalAttributedString.length) options:0 usingBlock:^(NSPresentationIntent *intent, NSRange presentationIntentRange, BOOL * _Nonnull __unused stopPresentationIntentEnumeration) {
         
-        NSAttributedString *fragmentAttributedString = [originalAttributedString attributedSubstringFromRange:range];
-        
-        // Properties of the paragraph start as 0 and later get incremented based on what is processed
-        NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
-        paragraphStyle.paragraphSpacingBefore = 0;
-        paragraphStyle.paragraphSpacing = 0;
-        paragraphStyle.headIndent = 0;
-        paragraphStyle.firstLineHeadIndent = 0;
-        
-        paragraphStyle.tabStops = @[];
-        
-        NSMutableAttributedString *fragmentOutputAttributedString = [[NSMutableAttributedString alloc] init];
-        
-        BOOL canProcessListItem = YES;
-        processMarkdownFragmentAttributedString(fragmentAttributedString, fragmentOutputAttributedString, paragraphStyle, canProcessListItem, previousVisitedListItemIntents, intent, paragraphFont, monospacedParagraphFont, newlineAttributedString, listBulletAttributedString);
-        
-        [fragmentOutputAttributedString addAttributes:@{NSParagraphStyleAttributeName: paragraphStyle} range:NSMakeRange(0, fragmentOutputAttributedString.length)];
-        
-        [outputAttributedString appendAttributedString:fragmentOutputAttributedString];
-        [outputAttributedString appendAttributedString:newlineAttributedString];
+        // Split the presentation intent by lines so we treat every line as a separate paragraph so we present them properly (with correct indentation / tabs)
+        // Normally multiple lines aren't in the same paragraph, but this can happen in some cases like code blocks
+        [originalAttributedString.string enumerateSubstringsInRange:presentationIntentRange options:NSStringEnumerationByLines usingBlock:^(NSString * _Nullable __unused substring, NSRange substringRange, NSRange __unused enclosingRange, BOOL * _Nonnull __unused stopLineEnumeration) {
+            NSAttributedString *fragmentAttributedString = [originalAttributedString attributedSubstringFromRange:substringRange];
+            
+            // Properties of the paragraph start as 0 and later get incremented based on what is processed
+            NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
+            paragraphStyle.paragraphSpacingBefore = 0;
+            paragraphStyle.paragraphSpacing = 0;
+            paragraphStyle.headIndent = 0;
+            paragraphStyle.firstLineHeadIndent = 0;
+            
+            paragraphStyle.tabStops = @[];
+            
+            NSMutableAttributedString *fragmentOutputAttributedString = [[NSMutableAttributedString alloc] init];
+            
+            BOOL canProcessListItem = YES;
+            processMarkdownFragmentAttributedString(fragmentAttributedString, fragmentOutputAttributedString, paragraphStyle, canProcessListItem, previousVisitedListItemIntents, intent, paragraphFont, monospacedParagraphFont, newlineAttributedString, listBulletAttributedString);
+            
+            [fragmentOutputAttributedString addAttributes:@{NSParagraphStyleAttributeName: paragraphStyle} range:NSMakeRange(0, fragmentOutputAttributedString.length)];
+            
+            [outputAttributedString appendAttributedString:fragmentOutputAttributedString];
+            [outputAttributedString appendAttributedString:newlineAttributedString];
+        }];
     }];
     
     return outputAttributedString;
