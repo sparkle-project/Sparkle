@@ -227,13 +227,14 @@ typedef NS_ENUM(NSInteger, SUReleaseNotesFormat)
     NSString *pathExtension = releaseNotesURL.pathExtension;
     
     SUReleaseNotesFormat releaseNotesFormat;
-    if ([chosenMIMEType isEqualToString:@"text/plain"] || [pathExtension caseInsensitiveCompare:@"txt"] == NSOrderedSame) {
-        releaseNotesFormat = SUReleaseNotesFormatPlainText;
-    } else if ([chosenMIMEType isEqualToString:@"text/markdown"] ||
+    // Make sure we test for markdown first because text/plain may be used for MIME type
+    if ([chosenMIMEType isEqualToString:@"text/markdown"] ||
                [chosenMIMEType isEqualToString:@"text/x-markdown"] ||
                [pathExtension caseInsensitiveCompare:@"md"] == NSOrderedSame ||
                [pathExtension caseInsensitiveCompare:@"markdown"] == NSOrderedSame) {
         releaseNotesFormat = SUReleaseNotesFormatMarkdown;
+    } else if ([chosenMIMEType isEqualToString:@"text/plain"] || [pathExtension caseInsensitiveCompare:@"txt"] == NSOrderedSame) {
+        releaseNotesFormat = SUReleaseNotesFormatPlainText;
     } else {
         releaseNotesFormat = SUReleaseNotesFormatHTML;
     }

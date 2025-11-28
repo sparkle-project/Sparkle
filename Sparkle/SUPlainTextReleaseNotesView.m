@@ -16,26 +16,67 @@
 #import <AppKit/AppKit.h>
 
 API_AVAILABLE(macos(10.14))
-@interface SPUMarkdownDividerAttachmentCell : NSTextAttachmentCell
+@interface SPUMarkdownHorizontalDividerAttachmentCell : NSTextAttachmentCell
 @end
 
-@implementation SPUMarkdownDividerAttachmentCell
+@implementation SPUMarkdownHorizontalDividerAttachmentCell
 
 - (NSSize)cellSize
 {
-    return NSMakeSize(0, 10);
+    // Minimum width needs to be at least 1
+    return NSMakeSize(1.0, 10.0);
 }
 
-- (void)drawWithFrame:(NSRect)cellFrame inView:(NSView *)controlView
+- (void)drawWithFrame:(NSRect)cellFrame inView:(NSView *)view
 {
-    CGFloat midY = NSMidY(cellFrame);
-
+    CGFloat yPosition = NSMidY(cellFrame);
+    
     NSBezierPath *path = [NSBezierPath bezierPath];
-    [path moveToPoint:NSMakePoint(0, midY)];
-    [path lineToPoint:NSMakePoint(controlView.bounds.size.width, midY)];
+    [path moveToPoint:NSMakePoint(0.0, yPosition)];
+    [path lineToPoint:NSMakePoint(view.bounds.size.width, yPosition)];
 
     [[NSColor separatorColor] setStroke];
     [path setLineWidth:1.0];
+    [path stroke];
+}
+
+@end
+
+API_AVAILABLE(macos(10.14))
+@interface SPUMarkdownVerticalAttachmentCell : NSTextAttachmentCell
+@end
+
+@implementation SPUMarkdownVerticalAttachmentCell
+{
+    NSFont *_font;
+}
+
+- (instancetype)initWithFont:(NSFont *)font
+{
+    self = [super init];
+    if (self != nil) {
+        _font = font;
+    }
+    return self;
+}
+
+- (NSSize)cellSize
+{
+    // Minimum height needs to be at least 1
+    return NSMakeSize(10.0, 1.0);
+}
+
+- (void)drawWithFrame:(NSRect)cellFrame inView:(NSView *)view
+{
+    const CGFloat lineWidth = 2.0;
+    CGFloat xPosition = cellFrame.origin.x + lineWidth / 2.0;
+    
+    NSBezierPath *path = [NSBezierPath bezierPath];
+    [path moveToPoint:NSMakePoint(xPosition, cellFrame.origin.y + cellFrame.size.height - _font.ascender)];
+    [path lineToPoint:NSMakePoint(xPosition, cellFrame.origin.y + cellFrame.size.height + -(_font.descender))];
+
+    [[NSColor separatorColor] setStroke];
+    [path setLineWidth:lineWidth];
     [path stroke];
 }
 
@@ -74,9 +115,153 @@ API_AVAILABLE(macos(10.14))
     return _scrollView;
 }
 
+static void processMarkdownAttributedSubString(NSAttributedString *subAttributedString, NSMutableAttributedString *newAttributedSubString, NSMutableParagraphStyle *paragraphStyle, BOOL canProcessListItem, NSPresentationIntent *intent, NSFont *inputParagraphFont, NSFont *monospacedParagraphFont, NSAttributedString *newlineAttributedString) API_AVAILABLE(macos(12.0))
+{
+    BOOL isListItem = NO;
+    NSFont *font = inputParagraphFont;
+    switch (intent.intentKind) {
+        case NSPresentationIntentKindHeader:
+            switch (intent.headerLevel) {
+                case 1:
+                    font = [NSFont boldSystemFontOfSize:(CGFloat)inputParagraphFont.pointSize + 7.0];
+                    break;
+                case 2:
+                    font = [NSFont boldSystemFontOfSize:(CGFloat)inputParagraphFont.pointSize + 4.0];
+                    break;
+                case 3:
+                    font = [NSFont boldSystemFontOfSize:(CGFloat)inputParagraphFont.pointSize + 2.0];
+                    break;
+                default:
+                    font = [NSFont boldSystemFontOfSize:(CGFloat)inputParagraphFont.pointSize + 1.0];
+                    break;
+            }
+            break;
+        case NSPresentationIntentKindListItem:
+            isListItem = YES;
+            break;
+        case NSPresentationIntentKindParagraph:
+        case NSPresentationIntentKindThematicBreak:
+        case NSPresentationIntentKindBlockQuote:
+        case NSPresentationIntentKindCodeBlock:
+        case NSPresentationIntentKindOrderedList:
+        case NSPresentationIntentKindUnorderedList:
+        case NSPresentationIntentKindTable:
+        case NSPresentationIntentKindTableHeaderRow:
+        case NSPresentationIntentKindTableRow:
+        case NSPresentationIntentKindTableCell:
+            break;
+    }
+    
+    NSPresentationIntent *parentIntent = intent.parentIntent;
+    if (parentIntent != nil) {
+        processMarkdownAttributedSubString(subAttributedString, newAttributedSubString, paragraphStyle, canProcessListItem && !isListItem, parentIntent, font, monospacedParagraphFont, newlineAttributedString);
+    }
+    
+    switch (intent.intentKind) {
+        case NSPresentationIntentKindHeader: {
+            paragraphStyle.paragraphSpacingBefore += 8.0;
+            paragraphStyle.paragraphSpacing += 4.0;
+            
+            NSMutableAttributedString *headerAttributedString = [subAttributedString mutableCopy];
+            
+            [headerAttributedString addAttributes:@{NSFontAttributeName: font} range:NSMakeRange(0, headerAttributedString.length)];
+            
+            [newAttributedSubString appendAttributedString:headerAttributedString];
+            
+            break;
+        }
+        case NSPresentationIntentKindParagraph: {
+            paragraphStyle.paragraphSpacing += 4.0;
+            
+            NSMutableAttributedString *contentAttributedString = [subAttributedString mutableCopy];
+            [contentAttributedString addAttributes:@{NSFontAttributeName: font} range:NSMakeRange(0, contentAttributedString.length)];
+            
+            [newAttributedSubString appendAttributedString:subAttributedString];
+            
+            break;
+        }
+        case NSPresentationIntentKindListItem: {
+            if (canProcessListItem) {
+                paragraphStyle.firstLineHeadIndent += intent.indentationLevel * 20.0;
+                paragraphStyle.headIndent += intent.indentationLevel * 20.0;
+                
+                BOOL insertUnorderedBullet = (parentIntent == nil || parentIntent.intentKind == NSPresentationIntentKindUnorderedList);
+                
+                if (insertUnorderedBullet) {
+                    NSImageSymbolConfiguration *bulletSymbolConfiguration = [NSImageSymbolConfiguration configurationWithHierarchicalColor:NSColor.textColor];
+                    
+                    NSImage *bulletSymbol = [NSImage imageWithSystemSymbolName:@"circle.fill" accessibilityDescription:nil];
+                    
+                    NSTextAttachment *attachment = [[NSTextAttachment alloc] init];
+                    attachment.image = [bulletSymbol imageWithSymbolConfiguration:bulletSymbolConfiguration];
+                    
+                    const CGFloat imageScale = 0.4;
+                    const CGFloat yBoundsScaleOffset = 0.1;
+                    attachment.bounds = NSMakeRect(0, bulletSymbol.size.height * yBoundsScaleOffset, bulletSymbol.size.width * imageScale, bulletSymbol.size.height * imageScale);
+                    
+                    NSMutableAttributedString *finalBulletAttributedString = [[NSAttributedString attributedStringWithAttachment:attachment] mutableCopy];
+                    
+                    [finalBulletAttributedString appendAttributedString:[[NSAttributedString alloc] initWithString:@"  " attributes:@{NSFontAttributeName: font}]];
+                    
+                    [newAttributedSubString appendAttributedString:finalBulletAttributedString];
+                } else {
+                    NSAttributedString *listItemAttributedString = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"%ld. ", intent.ordinal] attributes:@{NSFontAttributeName: monospacedParagraphFont}];
+                    
+                    [newAttributedSubString appendAttributedString:listItemAttributedString];
+                }
+            }
+            
+            break;
+        }
+        case NSPresentationIntentKindThematicBreak: {
+            NSTextAttachment *attachment = [[NSTextAttachment alloc] init];
+            attachment.attachmentCell = [[SPUMarkdownHorizontalDividerAttachmentCell alloc] init];
+
+            NSAttributedString *dividerAttributedString =
+                [NSAttributedString attributedStringWithAttachment:attachment];
+            
+            [newAttributedSubString appendAttributedString:dividerAttributedString];
+            
+            break;
+        }
+        case NSPresentationIntentKindBlockQuote: {
+            NSTextAttachment *attachment = [[NSTextAttachment alloc] init];
+            attachment.attachmentCell = [[SPUMarkdownVerticalAttachmentCell alloc] initWithFont:font];
+
+            NSAttributedString *dividerAttributedString =
+                [NSAttributedString attributedStringWithAttachment:attachment];
+            
+            [newAttributedSubString appendAttributedString:dividerAttributedString];
+
+            break;
+        }
+        case NSPresentationIntentKindCodeBlock: {
+            paragraphStyle.headIndent += 8;
+            paragraphStyle.firstLineHeadIndent += 8;
+            paragraphStyle.paragraphSpacing += 2;
+            paragraphStyle.paragraphSpacingBefore += 4;
+            
+            NSMutableAttributedString *blockquoteAttributedString = [subAttributedString mutableCopy];
+            [blockquoteAttributedString addAttributes:@{NSFontAttributeName: monospacedParagraphFont, NSForegroundColorAttributeName: NSColor.labelColor} range:NSMakeRange(0, blockquoteAttributedString.length)];
+            
+            [newAttributedSubString appendAttributedString:blockquoteAttributedString];
+            
+            break;
+        }
+        
+        case NSPresentationIntentKindOrderedList:
+        case NSPresentationIntentKindUnorderedList:
+        case NSPresentationIntentKindTable:
+        case NSPresentationIntentKindTableHeaderRow:
+        case NSPresentationIntentKindTableRow:
+        case NSPresentationIntentKindTableCell:
+            break;
+    }
+}
+
 static NSAttributedString * _Nullable makeMarkdownAttributedString(NSString *contents, CGFloat defaultFontPointSize, NSError * __autoreleasing *outError) API_AVAILABLE(macos(12.0))
 {
-    NSFont *paragraphFont = [NSFont systemFontOfSize:defaultFontPointSize];
+    NSFont *paragraphFont = [NSFont systemFontOfSize:defaultFontPointSize + 5];
     NSFont *monospacedParagraphFont = [NSFont monospacedSystemFontOfSize:defaultFontPointSize weight:NSFontWeightRegular];
     
     NSAttributedString *originalAttributedString = [[NSAttributedString alloc] initWithMarkdownString:contents options:nil baseURL:nil error:outError];
@@ -89,124 +274,21 @@ static NSAttributedString * _Nullable makeMarkdownAttributedString(NSString *con
         
         NSAttributedString *subAttributedString = [originalAttributedString attributedSubstringFromRange:range];
         
-        NSLog(@"Parent intent: %@", intent.parentIntent);
+        NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
+        paragraphStyle.paragraphSpacingBefore = 0;
+        paragraphStyle.paragraphSpacing = 0;
+        paragraphStyle.headIndent = 0;
+        paragraphStyle.firstLineHeadIndent = 0;
         
-        NSLog(@"Subattributed string: %@", subAttributedString);
+        NSMutableAttributedString *newAttributedSubString = [[NSMutableAttributedString alloc] init];
         
-        switch (intent.intentKind) {
-            case NSPresentationIntentKindHeader: {
-                NSInteger level = intent.headerLevel;
-                NSFont *font;
-                switch (level) {
-                    case 1:
-                        font = [NSFont boldSystemFontOfSize:(CGFloat)defaultFontPointSize + 7.0];
-                        break;
-                    case 2:
-                        font = [NSFont boldSystemFontOfSize:(CGFloat)defaultFontPointSize + 4.0];
-                        break;
-                    case 3:
-                        font = [NSFont boldSystemFontOfSize:(CGFloat)defaultFontPointSize + 2.0];
-                        break;
-                    default:
-                        font = [NSFont boldSystemFontOfSize:(CGFloat)defaultFontPointSize + 1.0];
-                        break;
-                }
-                
-                NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
-                paragraphStyle.paragraphSpacingBefore = 4.0;
-                paragraphStyle.paragraphSpacing = 8.0;
-                
-                NSMutableAttributedString *headerAttributedString = [subAttributedString mutableCopy];
-                
-                [headerAttributedString addAttributes:@{NSFontAttributeName: font, NSParagraphStyleAttributeName: paragraphStyle} range:NSMakeRange(0, headerAttributedString.length)];
-                
-                [newAttributedString appendAttributedString:headerAttributedString];
-                [newAttributedString appendAttributedString:newlineAttributedString];
-                
-                break;
-            }
-            case NSPresentationIntentKindParagraph: {
-                NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
-                paragraphStyle.paragraphSpacing = 4.0;
-                
-                NSMutableAttributedString *paragraphAttributedString = [[NSMutableAttributedString alloc] init];
-                
-                NSPresentationIntent *parentIntent = intent.parentIntent;
-                if (parentIntent != nil) {
-                    switch (parentIntent.intentKind) {
-                        case NSPresentationIntentKindListItem: {
-                            paragraphStyle.firstLineHeadIndent = 20.0 * parentIntent.indentationLevel;
-                            paragraphStyle.headIndent = 20.0 * parentIntent.indentationLevel;
-                            
-                            NSImage *bulletSymbol = [NSImage imageWithSystemSymbolName:@"circle.fill" accessibilityDescription:nil];
-                            
-                            NSTextAttachment *attachment = [[NSTextAttachment alloc] init];
-                            attachment.image = bulletSymbol;
-                            
-                            const CGFloat imageScale = 0.4;
-                            const CGFloat yBoundsScaleOffset = 0.1;
-                            attachment.bounds = NSMakeRect(0, bulletSymbol.size.height * yBoundsScaleOffset, bulletSymbol.size.width * imageScale, bulletSymbol.size.height * imageScale);
-                            
-                            NSMutableAttributedString *finalBulletAttributedString = [[NSAttributedString attributedStringWithAttachment:attachment] mutableCopy];
-                            
-                            [finalBulletAttributedString appendAttributedString:[[NSAttributedString alloc] initWithString:@"  "]];
-                            
-                            [finalBulletAttributedString addAttributes:@{NSParagraphStyleAttributeName: paragraphStyle} range:NSMakeRange(0, finalBulletAttributedString.length)];
-                            
-                            [paragraphAttributedString appendAttributedString:finalBulletAttributedString];
-                            
-                            break;
-                        }
-                        default:
-                            break;
-                    }
-                }
-                
-                NSMutableAttributedString *contentAttributedString = [subAttributedString mutableCopy];
-                [contentAttributedString addAttributes:@{NSFontAttributeName: paragraphFont, NSParagraphStyleAttributeName: paragraphStyle} range:NSMakeRange(0, contentAttributedString.length)];
-                
-                [paragraphAttributedString appendAttributedString:contentAttributedString];
-                
-                [newAttributedString appendAttributedString:paragraphAttributedString];
-                [newAttributedString appendAttributedString:newlineAttributedString];
-                
-                break;
-            }
-            case NSPresentationIntentKindThematicBreak: {
-                NSTextAttachment *attachment = [[NSTextAttachment alloc] init];
-                attachment.attachmentCell = [[SPUMarkdownDividerAttachmentCell alloc] init];
-
-                NSAttributedString *dividerAttributedString =
-                    [NSAttributedString attributedStringWithAttachment:attachment];
-                
-                [newAttributedString appendAttributedString:dividerAttributedString];
-                [newAttributedString appendAttributedString:newlineAttributedString];
-                break;
-            }
-            case NSPresentationIntentKindCodeBlock: {
-                NSMutableParagraphStyle *style = [[NSMutableParagraphStyle alloc] init];
-                style.headIndent = 6;
-                style.firstLineHeadIndent = 6;
-                style.paragraphSpacing = 2;
-                style.paragraphSpacingBefore = 4;
-
-                NSDictionary *attrs = @{
-                    NSFontAttributeName: monospacedParagraphFont,
-                    NSParagraphStyleAttributeName: style,
-                    NSForegroundColorAttributeName: NSColor.labelColor
-                };
-                
-                NSMutableAttributedString *blockquoteAttributedString = [subAttributedString mutableCopy];
-                [blockquoteAttributedString addAttributes:attrs range:NSMakeRange(0, blockquoteAttributedString.length)];
-                
-                [newAttributedString appendAttributedString:blockquoteAttributedString];
-                [newAttributedString appendAttributedString:newlineAttributedString];
-                
-                break;
-            }
-            default:
-                break;
-        }
+        BOOL canProcessListItem = YES;
+        processMarkdownAttributedSubString(subAttributedString, newAttributedSubString, paragraphStyle, canProcessListItem, intent, paragraphFont, monospacedParagraphFont, newlineAttributedString);
+        
+        [newAttributedSubString addAttributes:@{NSParagraphStyleAttributeName: paragraphStyle} range:NSMakeRange(0, newAttributedSubString.length)];
+        
+        [newAttributedString appendAttributedString:newAttributedSubString];
+        [newAttributedString appendAttributedString:newlineAttributedString];
     }];
     
     return newAttributedString;
@@ -293,8 +375,6 @@ static NSAttributedString * _Nullable makeMarkdownAttributedString(NSString *con
 {
 }
 
-// Links are not insertable yet but this is useful in case we support them in the future
-// This is also a defence in case links are somehow insertable
 - (BOOL)textView:(NSTextView *)textView clickedOnLink:(id)link atIndex:(NSUInteger)charIndex
 {
     NSURL *linkURL;
