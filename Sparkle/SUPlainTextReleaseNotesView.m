@@ -98,6 +98,7 @@ API_AVAILABLE(macos(12.0))
 
 @end
 
+// Attachment cell used for unordered list bullets
 @interface SPUMarkdownBulletAttachmentCell : NSTextAttachmentCell
 @end
 
