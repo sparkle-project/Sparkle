@@ -25,13 +25,16 @@ API_AVAILABLE(macos(10.14))
 @implementation SPUMarkdownHorizontalDividerAttachmentCell
 {
     NSTextView *_textView;
+    
+    CGFloat _headIndent;
 }
 
-- (instancetype)initWithTextView:(NSTextView *)textView
+- (instancetype)initWithTextView:(NSTextView *)textView headIndent:(CGFloat)headIndent
 {
     self = [super init];
     if (self != nil) {
         _textView = textView;
+        _headIndent = headIndent;
     }
     return self;
 }
@@ -47,7 +50,7 @@ API_AVAILABLE(macos(10.14))
     
     NSSize containerInset = _textView.textContainerInset;
     CGFloat lineFragmentPadding = _textView.textContainer.lineFragmentPadding;
-    CGFloat totalWidthPadding = containerInset.width + lineFragmentPadding;
+    CGFloat totalWidthPadding = containerInset.width + lineFragmentPadding + _headIndent;
     
     NSBezierPath *path = [NSBezierPath bezierPath];
     [path moveToPoint:NSMakePoint(view.bounds.origin.x + totalWidthPadding, yPosition)];
@@ -324,7 +327,9 @@ static void processMarkdownFragmentAttributedString(NSAttributedString *fragment
         }
         case NSPresentationIntentKindThematicBreak: {
             NSTextAttachment *attachment = [[NSTextAttachment alloc] init];
-            attachment.attachmentCell = [[SPUMarkdownHorizontalDividerAttachmentCell alloc] initWithTextView:textView];
+            // Account for headIndent if thematic break is inside a blockquote
+            // This may not work well if thematic break is in a list element, oh well
+            attachment.attachmentCell = [[SPUMarkdownHorizontalDividerAttachmentCell alloc] initWithTextView:textView headIndent:paragraphStyle.headIndent];
 
             NSAttributedString *dividerAttributedString =
                 [NSAttributedString attributedStringWithAttachment:attachment];
