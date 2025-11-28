@@ -91,6 +91,9 @@ API_AVAILABLE(macos(10.14))
 {
     NSScrollView *_scrollView;
     NSTextView *_textView;
+#if DEBUG
+    id _textViewSwitchedToTextKit1Observer;
+#endif
     NSArray<NSString *> *_customAllowedURLSchemes;
     int _fontPointSize;
     
@@ -120,6 +123,12 @@ API_AVAILABLE(macos(10.14))
             [textContentStorage addTextLayoutManager:textLayoutManager];
             
             _textView = [[NSTextView alloc] initWithFrame:NSZeroRect textContainer:textLayoutManager.textContainer];
+            
+#if DEBUG
+            _textViewSwitchedToTextKit1Observer = [NSNotificationCenter.defaultCenter addObserverForName:NSTextViewDidSwitchToNSLayoutManagerNotification object:_textView queue:nil usingBlock:^(NSNotification * _Nonnull __unused notification) {
+                SULog(SULogLevelError, @"Error: Plain text release notes text view switched to TextKit 1. This should not happen. Was some TextKit 1 API called that is causing this?");
+            }];
+#endif
         } else {
             _textView = [[NSTextView alloc] initWithFrame:NSZeroRect];
         }
@@ -129,6 +138,13 @@ API_AVAILABLE(macos(10.14))
     }
     return self;
 }
+
+#if DEBUG
+- (void)dealloc
+{
+    [NSNotificationCenter.defaultCenter removeObserver:_textViewSwitchedToTextKit1Observer];
+}
+#endif
 
 - (NSView *)view
 {
