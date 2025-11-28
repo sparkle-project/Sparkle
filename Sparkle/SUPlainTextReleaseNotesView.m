@@ -80,8 +80,6 @@ API_AVAILABLE(macos(12.0))
     id<NSTextLocation> textLocation = [_textContentManager locationFromLocation:_textContentManager.documentRange.location withOffset:_textOffset];
     
     NSTextLayoutFragment *textLayoutFragment = [textLayoutManager textLayoutFragmentForLocation:textLocation];
-    CGRect layoutFragmentFrame = textLayoutFragment.layoutFragmentFrame;
-    NSLog(@"Height: %f", layoutFragmentFrame.size.height);
     
     const CGFloat lineWidth = 2.0;
     CGFloat xPosition = cellFrame.origin.x + lineWidth / 2.0;
@@ -89,16 +87,10 @@ API_AVAILABLE(macos(12.0))
     NSBezierPath *path = [NSBezierPath bezierPath];
     
     NSPoint beginPoint = NSMakePoint(xPosition, cellFrame.origin.y + cellFrame.size.height - _font.ascender);
-    NSPoint endPoint = NSMakePoint(xPosition, cellFrame.origin.y + cellFrame.size.height + -(_font.descender));
-    
-    //NSLog(@"%f", endPoint.y - beginPoint.y);
-    CGFloat difference = layoutFragmentFrame.size.height - (endPoint.y - beginPoint.y);
+    NSPoint endPoint = NSMakePoint(beginPoint.x, beginPoint.y + (_font.ascender + -(_font.descender) + _font.leading) * textLayoutFragment.textLineFragments.count);
     
     [path moveToPoint:NSMakePoint(beginPoint.x, beginPoint.y)];
     [path lineToPoint:NSMakePoint(endPoint.x, endPoint.y)];
-    
-    //[path moveToPoint:NSMakePoint(xPosition, layoutFragmentFrame.origin.y)];
-    //[path lineToPoint:NSMakePoint(xPosition, layoutFragmentFrame.origin.y + layoutFragmentFrame.size.height)];
 
     [[NSColor separatorColor] setStroke];
     [path setLineWidth:lineWidth];
@@ -291,7 +283,7 @@ static void processMarkdownFragmentAttributedString(NSAttributedString *fragment
         }
         case NSPresentationIntentKindBlockQuote: {
             // Multiple levels of block quotes are handled (e.g. parent intent could be another block quote).
-            // Each line will get its own preceding vertical line. These lines are not 'connected' which is a limitation for now.
+            // Each text fragment will get its own preceding vertical line. These lines are not 'connected' which is a limitation for now.
             NSTextAttachment *attachment = [[NSTextAttachment alloc] init];
             attachment.attachmentCell = [[SPUMarkdownVerticalAttachmentCell alloc] initWithTextContentManager:textContentManager textOffset:(NSInteger)outputAttributedSubString.length font:font];
 
@@ -381,6 +373,12 @@ static NSAttributedString * _Nullable makeMarkdownAttributedString(NSString *con
         // Split the presentation intent by lines so we treat every line as a separate paragraph so we present them properly (with correct indentation / tabs)
         // Normally multiple lines aren't in the same paragraph, but this can happen in some cases like code blocks
         [originalAttributedString.string enumerateSubstringsInRange:presentationIntentRange options:NSStringEnumerationByLines usingBlock:^(NSString * _Nullable __unused substring, NSRange substringRange, NSRange __unused enclosingRange, BOOL * _Nonnull __unused stopLineEnumeration) {
+            // Insert newline after outputting previous paragraph
+            // This check ensures an extra newline is not inserted after the last outputted paragraph
+            if (outputAttributedString.length > 0) {
+                [outputAttributedString appendAttributedString:newlineAttributedString];
+            }
+            
             NSAttributedString *fragmentAttributedString = [originalAttributedString attributedSubstringFromRange:substringRange];
             
             // Properties of the paragraph start as 0 and later get incremented based on what is processed
@@ -400,8 +398,6 @@ static NSAttributedString * _Nullable makeMarkdownAttributedString(NSString *con
             processMarkdownFragmentAttributedString(fragmentAttributedString, outputAttributedString, paragraphStyle, canProcessListItem, previousVisitedListItemIntents, intent, paragraphFont, monospacedParagraphFont, tabAttributedString, newlineAttributedString, listBulletAttributedString, textContentManager);
             
             [outputAttributedString addAttributes:@{NSParagraphStyleAttributeName: paragraphStyle} range:NSMakeRange(previousOutputLength, outputAttributedString.length - previousOutputLength)];
-            
-            [outputAttributedString appendAttributedString:newlineAttributedString];
         }];
     }];
     
