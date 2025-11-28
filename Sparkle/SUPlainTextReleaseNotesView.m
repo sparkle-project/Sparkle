@@ -101,13 +101,31 @@ API_AVAILABLE(macos(10.14))
 {
     self = [super init];
     if (self != nil) {
-        _scrollView = [[NSScrollView alloc] initWithFrame:NSZeroRect];
-        _textView = [[NSTextView alloc] initWithFrame:NSZeroRect];
-        _textView.delegate = self;
-        _scrollView.documentView = _textView;
         _fontPointSize = fontPointSize;
         _customAllowedURLSchemes = customAllowedURLSchemes;
         _prefersMarkdown = prefersMarkdown;
+        _scrollView = [[NSScrollView alloc] initWithFrame:NSZeroRect];
+        
+        if (@available(macOS 12, *)) {
+            // Create NSTextView using TextKit 2
+            // https://developer.apple.com/documentation/appkit/nstextview/1449347-initwithframe
+            
+            NSTextContainer *textContainer = [[NSTextContainer alloc] initWithContainerSize:NSMakeSize(0, (CGFloat)FLT_MAX)];
+            textContainer.widthTracksTextView = YES;
+            
+            NSTextLayoutManager *textLayoutManager = [[NSTextLayoutManager alloc] init];
+            textLayoutManager.textContainer = textContainer;
+            
+            NSTextContentStorage *textContentStorage = [[NSTextContentStorage alloc] init];
+            [textContentStorage addTextLayoutManager:textLayoutManager];
+            
+            _textView = [[NSTextView alloc] initWithFrame:NSZeroRect textContainer:textLayoutManager.textContainer];
+        } else {
+            _textView = [[NSTextView alloc] initWithFrame:NSZeroRect];
+        }
+        
+        _textView.delegate = self;
+        _scrollView.documentView = _textView;
     }
     return self;
 }
