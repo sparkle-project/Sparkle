@@ -110,6 +110,8 @@
     NSString *finalUpdatedVersion;
     if ([testMode isEqualToString:@"REGULAR"]) {
         finalUpdatedVersion = @"2.0";
+    } else if ([testMode isEqualToString:@"MARKDOWN"]) {
+        finalUpdatedVersion = @"2.0.1";
     } else if ([testMode isEqualToString:@"DELTA"]) {
         finalUpdatedVersion = @"2.1";
     } else if ([testMode isEqualToString:@"AUTOMATIC"]) {
@@ -250,10 +252,10 @@
                 }
                 
                 NSUInteger numberOfLengthReplacements = [appcastContents replaceOccurrencesOfString:@"$INSERT_ARCHIVE_LENGTH" withString:[NSString stringWithFormat:@"%llu", archiveFileAttributes.fileSize] options:NSLiteralSearch range:NSMakeRange(0, appcastContents.length)];
-                assert(numberOfLengthReplacements == 2);
+                assert(numberOfLengthReplacements == 3);
                 
                 NSUInteger numberOfSignatureReplacements = [appcastContents replaceOccurrencesOfString:@"$INSERT_EDDSA_SIGNATURE" withString:signatureString options:NSLiteralSearch range:NSMakeRange(0, appcastContents.length)];
-                assert(numberOfSignatureReplacements == 2);
+                assert(numberOfSignatureReplacements == 3);
                 
                 NSError *writeAppcastError = nil;
                 if (![appcastContents writeToURL:appcastDestinationURL atomically:NO encoding:NSUTF8StringEncoding error:&writeAppcastError]) {
@@ -320,6 +322,8 @@
         return [NSSet setWithObject:@"delta"];
     } else if ([_testMode isEqualToString:@"AUTOMATIC"]) {
         return [NSSet setWithObject:@"automatic"];
+    } else if ([_testMode isEqualToString:@"MARKDOWN"]) {
+        return [NSSet setWithObject:@"markdown"];
     } else {
         return [NSSet set];
     }
