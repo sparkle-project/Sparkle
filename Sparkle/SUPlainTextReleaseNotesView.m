@@ -117,7 +117,7 @@ API_AVAILABLE(macos(10.14))
     return _scrollView;
 }
 
-static void processMarkdownFragmentAttributedString(NSAttributedString *fragmentAttributedString, NSMutableAttributedString *outputAttributedSubString, NSMutableParagraphStyle *paragraphStyle, BOOL canProcessListItem, NSPresentationIntent *intent, NSFont *inputParagraphFont, NSFont *monospacedParagraphFont, NSAttributedString *newlineAttributedString, NSAttributedString *listBulletAttributedString) API_AVAILABLE(macos(12.0))
+static void processMarkdownFragmentAttributedString(NSAttributedString *fragmentAttributedString, NSMutableAttributedString *outputAttributedSubString, NSMutableParagraphStyle *paragraphStyle, BOOL canProcessListItem, NSMutableSet<NSPresentationIntent *> *previousVisitedListItemIntents, NSPresentationIntent *intent, NSFont *inputParagraphFont, NSFont *monospacedParagraphFont, NSAttributedString *newlineAttributedString, NSAttributedString *listBulletAttributedString) API_AVAILABLE(macos(12.0))
 {
     // Pre-pass processing of intent
     // This info must be computed before processing parent intent
@@ -161,7 +161,7 @@ static void processMarkdownFragmentAttributedString(NSAttributedString *fragment
     // In these cases, we may pre-append attributed string to the output before processing current intent.
     NSPresentationIntent *parentIntent = intent.parentIntent;
     if (parentIntent != nil) {
-        processMarkdownFragmentAttributedString(fragmentAttributedString, outputAttributedSubString, paragraphStyle, canProcessListItem && !isListItem, parentIntent, font, monospacedParagraphFont, newlineAttributedString, listBulletAttributedString);
+        processMarkdownFragmentAttributedString(fragmentAttributedString, outputAttributedSubString, paragraphStyle, canProcessListItem && !isListItem, previousVisitedListItemIntents, parentIntent, font, monospacedParagraphFont, newlineAttributedString, listBulletAttributedString);
     }
     
     // Process the current intent
@@ -191,18 +191,25 @@ static void processMarkdownFragmentAttributedString(NSAttributedString *fragment
         case NSPresentationIntentKindListItem: {
             // We only process (the innermost first) list item once when we encounter nested lists,
             // to avoid outputting multiple list bullets
+            // Also avoid processing list items that were processed from previous passes / fragments
             if (canProcessListItem) {
                 paragraphStyle.firstLineHeadIndent += intent.indentationLevel * (font.pointSize * 1.5);
                 paragraphStyle.headIndent += intent.indentationLevel * (font.pointSize * 1.5);
                 
+                BOOL didVisitListItemFromPreviousPass = [previousVisitedListItemIntents containsObject:intent];
                 BOOL insertUnorderedBullet = (parentIntent == nil || parentIntent.intentKind == NSPresentationIntentKindUnorderedList);
                 
-                if (insertUnorderedBullet) {
-                    [outputAttributedSubString appendAttributedString:listBulletAttributedString];
-                } else {
-                    NSAttributedString *listItemAttributedString = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"%ld. ", intent.ordinal] attributes:@{NSFontAttributeName: monospacedParagraphFont}];
+                if (!didVisitListItemFromPreviousPass) {
+                    if (insertUnorderedBullet) {
+                        [outputAttributedSubString appendAttributedString:listBulletAttributedString];
+                    } else {
+                        NSString *ordinalStringWithSpacing = [NSString stringWithFormat:@"%ld. ", intent.ordinal];
+                        NSAttributedString *listItemAttributedString = [[NSAttributedString alloc] initWithString:ordinalStringWithSpacing attributes:@{NSFontAttributeName: monospacedParagraphFont}];
+                        
+                        [outputAttributedSubString appendAttributedString:listItemAttributedString];
+                    }
                     
-                    [outputAttributedSubString appendAttributedString:listItemAttributedString];
+                    [previousVisitedListItemIntents addObject:intent];
                 }
             }
             
@@ -281,19 +288,23 @@ static NSAttributedString * _Nullable makeMarkdownAttributedString(NSString *con
         NSImage *bulletSymbol = [NSImage imageWithSystemSymbolName:@"circle.fill" accessibilityDescription:nil];
         
         NSTextAttachment *attachment = [[NSTextAttachment alloc] init];
-        attachment.image = [bulletSymbol imageWithSymbolConfiguration:bulletSymbolConfiguration];
         
         const CGFloat imageScale = paragraphFont.pointSize / 32.5;
         const CGFloat yBoundsScaleOffset = 0.25;
         
         attachment.bounds = NSMakeRect(0, bulletSymbol.size.height * imageScale * yBoundsScaleOffset, bulletSymbol.size.width * imageScale, bulletSymbol.size.height * imageScale);
+        attachment.image = [bulletSymbol imageWithSymbolConfiguration:bulletSymbolConfiguration];
         
         NSMutableAttributedString *finalBulletAttributedString = [[NSAttributedString attributedStringWithAttachment:attachment] mutableCopy];
         
-        [finalBulletAttributedString appendAttributedString:[[NSAttributedString alloc] initWithString:@"  " attributes:@{NSFontAttributeName: paragraphFont}]];
+        NSAttributedString *spaceAttributedString = [[NSAttributedString alloc] initWithString:@"  " attributes:@{NSFontAttributeName: paragraphFont}];
+        
+        [finalBulletAttributedString appendAttributedString:spaceAttributedString];
         
         listBulletAttributedString = [finalBulletAttributedString copy];
     }
+    
+    NSMutableSet<NSPresentationIntent *> *previousVisitedListItemIntents = [[NSMutableSet alloc] init];
     
     // Enumerate through every presentation intent fragment and create a new attributed string that we append to the output
     // Foundation handles formatting some things for us already in the attributed string such as bold/itatlics and hyperlinks,
@@ -312,7 +323,7 @@ static NSAttributedString * _Nullable makeMarkdownAttributedString(NSString *con
         NSMutableAttributedString *fragmentOutputAttributedString = [[NSMutableAttributedString alloc] init];
         
         BOOL canProcessListItem = YES;
-        processMarkdownFragmentAttributedString(fragmentAttributedString, fragmentOutputAttributedString, paragraphStyle, canProcessListItem, intent, paragraphFont, monospacedParagraphFont, newlineAttributedString, listBulletAttributedString);
+        processMarkdownFragmentAttributedString(fragmentAttributedString, fragmentOutputAttributedString, paragraphStyle, canProcessListItem, previousVisitedListItemIntents, intent, paragraphFont, monospacedParagraphFont, newlineAttributedString, listBulletAttributedString);
         
         [fragmentOutputAttributedString addAttributes:@{NSParagraphStyleAttributeName: paragraphStyle} range:NSMakeRange(0, fragmentOutputAttributedString.length)];
         
