@@ -50,17 +50,17 @@ API_AVAILABLE(macos(12.0))
 
 @implementation SPUMarkdownVerticalAttachmentCell
 {
-    NSTextContentManager *_textContentManager;
+    NSTextLayoutManager *_textLayoutManager;
     NSFont *_font;
     
     NSInteger _textOffset;
 }
 
-- (instancetype)initWithTextContentManager:(NSTextContentManager *)textContentManager textOffset:(NSInteger)textOffset font:(NSFont *)font
+- (instancetype)initWithTextLayoutManager:(NSTextLayoutManager *)textLayoutManager textOffset:(NSInteger)textOffset font:(NSFont *)font
 {
     self = [super init];
     if (self != nil) {
-        _textContentManager = textContentManager;
+        _textLayoutManager = textLayoutManager;
         _font = font;
         _textOffset = textOffset;
     }
@@ -75,11 +75,10 @@ API_AVAILABLE(macos(12.0))
 
 - (void)drawWithFrame:(NSRect)cellFrame inView:(NSView *)view
 {
-    NSTextLayoutManager *textLayoutManager = _textContentManager.textLayoutManagers.firstObject;
+    NSTextContentManager *textContentManager = _textLayoutManager.textContentManager;
+    id<NSTextLocation> textLocation = [textContentManager locationFromLocation:textContentManager.documentRange.location withOffset:_textOffset];
     
-    id<NSTextLocation> textLocation = [_textContentManager locationFromLocation:_textContentManager.documentRange.location withOffset:_textOffset];
-    
-    NSTextLayoutFragment *textLayoutFragment = [textLayoutManager textLayoutFragmentForLocation:textLocation];
+    NSTextLayoutFragment *textLayoutFragment = [_textLayoutManager textLayoutFragmentForLocation:textLocation];
     
     const CGFloat lineWidth = 2.0;
     CGFloat xPosition = cellFrame.origin.x + lineWidth / 2.0;
@@ -166,7 +165,7 @@ API_AVAILABLE(macos(12.0))
     return _scrollView;
 }
 
-static void processMarkdownFragmentAttributedString(NSAttributedString *fragmentAttributedString, NSMutableAttributedString *outputAttributedSubString, NSMutableParagraphStyle *paragraphStyle, BOOL canProcessListItem, NSMutableSet<NSPresentationIntent *> *previousVisitedListItemIntents, NSPresentationIntent *intent, NSFont *inputParagraphFont, NSFont *monospacedParagraphFont, NSAttributedString *tabAttributedString, NSAttributedString *newlineAttributedString, NSAttributedString *listBulletAttributedString, NSTextContentManager *textContentManager) API_AVAILABLE(macos(12.0))
+static void processMarkdownFragmentAttributedString(NSAttributedString *fragmentAttributedString, NSMutableAttributedString *outputAttributedSubString, NSMutableParagraphStyle *paragraphStyle, BOOL canProcessListItem, NSMutableSet<NSPresentationIntent *> *previousVisitedListItemIntents, NSPresentationIntent *intent, NSFont *inputParagraphFont, NSFont *monospacedParagraphFont, NSAttributedString *tabAttributedString, NSAttributedString *newlineAttributedString, NSAttributedString *listBulletAttributedString, NSTextLayoutManager *textLayoutManager) API_AVAILABLE(macos(12.0))
 {
     // Pre-pass processing of intent
     // This info must be computed before processing parent intent
@@ -210,7 +209,7 @@ static void processMarkdownFragmentAttributedString(NSAttributedString *fragment
     // In these cases, we may pre-append attributed string to the output before processing current intent.
     NSPresentationIntent *parentIntent = intent.parentIntent;
     if (parentIntent != nil) {
-        processMarkdownFragmentAttributedString(fragmentAttributedString, outputAttributedSubString, paragraphStyle, canProcessListItem && !isListItem, previousVisitedListItemIntents, parentIntent, font, monospacedParagraphFont, tabAttributedString, newlineAttributedString, listBulletAttributedString, textContentManager);
+        processMarkdownFragmentAttributedString(fragmentAttributedString, outputAttributedSubString, paragraphStyle, canProcessListItem && !isListItem, previousVisitedListItemIntents, parentIntent, font, monospacedParagraphFont, tabAttributedString, newlineAttributedString, listBulletAttributedString, textLayoutManager);
     }
     
     // Process the current intent
@@ -285,7 +284,7 @@ static void processMarkdownFragmentAttributedString(NSAttributedString *fragment
             // Multiple levels of block quotes are handled (e.g. parent intent could be another block quote).
             // Each text fragment will get its own preceding vertical line. These lines are not 'connected' which is a limitation for now.
             NSTextAttachment *attachment = [[NSTextAttachment alloc] init];
-            attachment.attachmentCell = [[SPUMarkdownVerticalAttachmentCell alloc] initWithTextContentManager:textContentManager textOffset:(NSInteger)outputAttributedSubString.length font:font];
+            attachment.attachmentCell = [[SPUMarkdownVerticalAttachmentCell alloc] initWithTextLayoutManager:textLayoutManager textOffset:(NSInteger)outputAttributedSubString.length font:font];
 
             NSAttributedString *dividerAttributedString =
                 [NSAttributedString attributedStringWithAttachment:attachment];
@@ -325,7 +324,7 @@ static void processMarkdownFragmentAttributedString(NSAttributedString *fragment
     }
 }
 
-static NSAttributedString * _Nullable makeMarkdownAttributedString(NSString *contents, CGFloat defaultFontPointSize, NSTextContentManager *textContentManager, NSError * __autoreleasing *outError) API_AVAILABLE(macos(12.0))
+static NSAttributedString * _Nullable makeMarkdownAttributedString(NSString *contents, CGFloat defaultFontPointSize, NSTextLayoutManager *textLayoutManager, NSError * __autoreleasing *outError) API_AVAILABLE(macos(12.0))
 {
     NSAttributedString *originalAttributedString = [[NSAttributedString alloc] initWithMarkdownString:contents options:nil baseURL:nil error:outError];
     if (originalAttributedString == nil) {
@@ -395,7 +394,7 @@ static NSAttributedString * _Nullable makeMarkdownAttributedString(NSString *con
             NSUInteger previousOutputLength = outputAttributedString.length;
             
             BOOL canProcessListItem = YES;
-            processMarkdownFragmentAttributedString(fragmentAttributedString, outputAttributedString, paragraphStyle, canProcessListItem, previousVisitedListItemIntents, intent, paragraphFont, monospacedParagraphFont, tabAttributedString, newlineAttributedString, listBulletAttributedString, textContentManager);
+            processMarkdownFragmentAttributedString(fragmentAttributedString, outputAttributedString, paragraphStyle, canProcessListItem, previousVisitedListItemIntents, intent, paragraphFont, monospacedParagraphFont, tabAttributedString, newlineAttributedString, listBulletAttributedString, textLayoutManager);
             
             [outputAttributedString addAttributes:@{NSParagraphStyleAttributeName: paragraphStyle} range:NSMakeRange(previousOutputLength, outputAttributedString.length - previousOutputLength)];
         }];
@@ -410,10 +409,10 @@ static NSAttributedString * _Nullable makeMarkdownAttributedString(NSString *con
     if (_prefersMarkdown) {
         if (@available(macOS 12, *)) {
             
-            NSTextContentManager *textContentManager = _textView.textLayoutManager.textContentManager;
+            NSTextLayoutManager *textLayoutManager = _textView.textLayoutManager;
             
             NSError *markdownError = nil;
-            attributedString = makeMarkdownAttributedString(contents, (CGFloat)_fontPointSize, textContentManager, &markdownError);
+            attributedString = makeMarkdownAttributedString(contents, (CGFloat)_fontPointSize, textLayoutManager, &markdownError);
             if (attributedString == nil) {
                 SULog(SULogLevelError, @"Failed to load markdown contents with error: %@. Falling back to plain text.", markdownError.localizedDescription);
             }
