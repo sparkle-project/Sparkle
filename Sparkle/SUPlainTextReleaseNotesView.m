@@ -362,22 +362,11 @@ static NSAttributedString *formatMarkdownAttributedString(NSAttributedString *or
     
     NSAttributedString *listBulletAttributedString;
     {
-        // We use a text attachment for unordered list bullets so we can control the size/offset/padding of the symbol
-        // We don't use a NSTextAttachmentCell because that doesn't work in Catalyst applications
+        // The bullet character looks too small in the system font, so switch to another font where it's bigger at same point size
+        NSFont *listBulletPreferredFont = [NSFont fontWithName:@"Menlo Regular" size:defaultFontPointSize];
+        NSFont *listBulletFont = (listBulletPreferredFont != nil) ? listBulletPreferredFont : paragraphFont;
         
-        NSTextAttachment *attachment = [[NSTextAttachment alloc] init];
-        
-        NSImageSymbolConfiguration *bulletSymbolConfiguration = [NSImageSymbolConfiguration configurationWithHierarchicalColor:NSColor.textColor];
-        
-        NSImage *bulletSymbol = [NSImage imageWithSystemSymbolName:@"circle.fill" accessibilityDescription:nil];
-        
-        const CGFloat imageScale = paragraphFont.pointSize / 40.0;
-        const CGFloat yBoundsScaleOffset = 0.4;
-        
-        attachment.bounds = NSMakeRect(0, bulletSymbol.size.height * imageScale * yBoundsScaleOffset, bulletSymbol.size.width * imageScale, bulletSymbol.size.height * imageScale);
-        attachment.image = [bulletSymbol imageWithSymbolConfiguration:bulletSymbolConfiguration];
-        
-        listBulletAttributedString = [NSAttributedString attributedStringWithAttachment:attachment];
+        listBulletAttributedString = [[NSAttributedString alloc] initWithString:@"•" attributes:@{NSFontAttributeName : listBulletFont}];
     }
     
     NSAttributedString *tabAttributedString = [[NSAttributedString alloc] initWithString:@"\t" attributes:@{NSFontAttributeName: paragraphFont}];
