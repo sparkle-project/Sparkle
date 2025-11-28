@@ -159,8 +159,8 @@ static void processMarkdownAttributedSubString(NSAttributedString *subAttributed
     
     switch (intent.intentKind) {
         case NSPresentationIntentKindHeader: {
-            paragraphStyle.paragraphSpacingBefore += 8.0;
-            paragraphStyle.paragraphSpacing += 4.0;
+            paragraphStyle.paragraphSpacingBefore += font.pointSize * 0.16;
+            paragraphStyle.paragraphSpacing += font.pointSize * 0.25;
             
             NSMutableAttributedString *headerAttributedString = [subAttributedString mutableCopy];
             
@@ -171,19 +171,19 @@ static void processMarkdownAttributedSubString(NSAttributedString *subAttributed
             break;
         }
         case NSPresentationIntentKindParagraph: {
-            paragraphStyle.paragraphSpacing += 4.0;
+            paragraphStyle.paragraphSpacing += font.pointSize * 0.25;
             
             NSMutableAttributedString *contentAttributedString = [subAttributedString mutableCopy];
             [contentAttributedString addAttributes:@{NSFontAttributeName: font} range:NSMakeRange(0, contentAttributedString.length)];
             
-            [newAttributedSubString appendAttributedString:subAttributedString];
+            [newAttributedSubString appendAttributedString:contentAttributedString];
             
             break;
         }
         case NSPresentationIntentKindListItem: {
             if (canProcessListItem) {
-                paragraphStyle.firstLineHeadIndent += intent.indentationLevel * 20.0;
-                paragraphStyle.headIndent += intent.indentationLevel * 20.0;
+                paragraphStyle.firstLineHeadIndent += intent.indentationLevel * (font.pointSize * 1.5);
+                paragraphStyle.headIndent += intent.indentationLevel * (font.pointSize * 1.5);
                 
                 BOOL insertUnorderedBullet = (parentIntent == nil || parentIntent.intentKind == NSPresentationIntentKindUnorderedList);
                 
@@ -195,9 +195,10 @@ static void processMarkdownAttributedSubString(NSAttributedString *subAttributed
                     NSTextAttachment *attachment = [[NSTextAttachment alloc] init];
                     attachment.image = [bulletSymbol imageWithSymbolConfiguration:bulletSymbolConfiguration];
                     
-                    const CGFloat imageScale = 0.4;
-                    const CGFloat yBoundsScaleOffset = 0.1;
-                    attachment.bounds = NSMakeRect(0, bulletSymbol.size.height * yBoundsScaleOffset, bulletSymbol.size.width * imageScale, bulletSymbol.size.height * imageScale);
+                    const CGFloat imageScale = font.pointSize / 32.5;
+                    const CGFloat yBoundsScaleOffset = 0.25;
+                    
+                    attachment.bounds = NSMakeRect(0, bulletSymbol.size.height * imageScale * yBoundsScaleOffset, bulletSymbol.size.width * imageScale, bulletSymbol.size.height * imageScale);
                     
                     NSMutableAttributedString *finalBulletAttributedString = [[NSAttributedString attributedStringWithAttachment:attachment] mutableCopy];
                     
@@ -236,10 +237,9 @@ static void processMarkdownAttributedSubString(NSAttributedString *subAttributed
             break;
         }
         case NSPresentationIntentKindCodeBlock: {
-            paragraphStyle.headIndent += 8;
-            paragraphStyle.firstLineHeadIndent += 8;
-            paragraphStyle.paragraphSpacing += 2;
-            paragraphStyle.paragraphSpacingBefore += 4;
+            paragraphStyle.headIndent += font.pointSize * 0.6;
+            paragraphStyle.firstLineHeadIndent += font.pointSize * 0.6;
+            paragraphStyle.paragraphSpacing += font.pointSize * 0.25;
             
             NSMutableAttributedString *blockquoteAttributedString = [subAttributedString mutableCopy];
             [blockquoteAttributedString addAttributes:@{NSFontAttributeName: monospacedParagraphFont, NSForegroundColorAttributeName: NSColor.labelColor} range:NSMakeRange(0, blockquoteAttributedString.length)];
@@ -261,7 +261,7 @@ static void processMarkdownAttributedSubString(NSAttributedString *subAttributed
 
 static NSAttributedString * _Nullable makeMarkdownAttributedString(NSString *contents, CGFloat defaultFontPointSize, NSError * __autoreleasing *outError) API_AVAILABLE(macos(12.0))
 {
-    NSFont *paragraphFont = [NSFont systemFontOfSize:defaultFontPointSize + 5];
+    NSFont *paragraphFont = [NSFont systemFontOfSize:defaultFontPointSize];
     NSFont *monospacedParagraphFont = [NSFont monospacedSystemFontOfSize:defaultFontPointSize weight:NSFontWeightRegular];
     
     NSAttributedString *originalAttributedString = [[NSAttributedString alloc] initWithMarkdownString:contents options:nil baseURL:nil error:outError];
