@@ -56,6 +56,8 @@ typedef NS_ENUM(NSInteger, SUReleaseNotesFormat)
     id<SUReleaseNotesView> _releaseNotesView;
     id<SUVersionDisplay> _versionDisplayer;
     
+    __weak id<SPUStandardUserDriverDelegate> _delegate;
+    
     IBOutlet NSStackView *_stackView;
     IBOutlet NSButton *_installButton;
     IBOutlet NSButton *_laterButton;
@@ -71,7 +73,7 @@ typedef NS_ENUM(NSInteger, SUReleaseNotesFormat)
     BOOL _windowLoadedAndShowsReleaseNotes;
 }
 
-- (instancetype)initWithAppcastItem:(SUAppcastItem *)item state:(SPUUserUpdateState *)state host:(SUHost *)aHost versionDisplayer:(id<SUVersionDisplay>)versionDisplayer updaterSettings:(SPUUpdaterSettings *)updaterSettings completionBlock:(void (^)(SPUUserUpdateChoice, NSRect, BOOL))completionBlock didBecomeKeyBlock:(void (^)(void))didBecomeKeyBlock
+- (instancetype)initWithAppcastItem:(SUAppcastItem *)item state:(SPUUserUpdateState *)state host:(SUHost *)aHost versionDisplayer:(id<SUVersionDisplay>)versionDisplayer updaterSettings:(SPUUpdaterSettings *)updaterSettings delegate:(id<SPUStandardUserDriverDelegate>)delegate completionBlock:(void (^)(SPUUserUpdateChoice, NSRect, BOOL))completionBlock didBecomeKeyBlock:(void (^)(void))didBecomeKeyBlock
 {
     self = [super initWithWindowNibName:@"SUUpdateAlert"];
     if (self != nil) {
@@ -80,6 +82,7 @@ typedef NS_ENUM(NSInteger, SUReleaseNotesFormat)
         _versionDisplayer = versionDisplayer;
         
         _state = state;
+        _delegate = delegate;
         _completionBlock = [completionBlock copy];
         _didBecomeKeyBlock = [didBecomeKeyBlock copy];
         
@@ -321,12 +324,13 @@ typedef NS_ENUM(NSInteger, SUReleaseNotesFormat)
         customAllowedURLSchemes = [allowedSchemes copy];
     }
     
+    id<SPUStandardUserDriverDelegate> delegate = _delegate;
     switch (usedReleaseNotesFormat) {
         case SUReleaseNotesFormatPlainText:
-            _releaseNotesView = [[SUPlainTextReleaseNotesView alloc] initWithFontPointSize:defaultFontSize prefersMarkdown:NO customAllowedURLSchemes:customAllowedURLSchemes];
+            _releaseNotesView = [[SUPlainTextReleaseNotesView alloc] initWithFontPointSize:defaultFontSize appcastItem:_updateItem host:_host delegate:delegate prefersMarkdown:NO customAllowedURLSchemes:customAllowedURLSchemes];
             break;
         case SUReleaseNotesFormatMarkdown:
-            _releaseNotesView = [[SUPlainTextReleaseNotesView alloc] initWithFontPointSize:defaultFontSize prefersMarkdown:YES customAllowedURLSchemes:customAllowedURLSchemes];
+            _releaseNotesView = [[SUPlainTextReleaseNotesView alloc] initWithFontPointSize:defaultFontSize appcastItem:_updateItem host:_host delegate:delegate prefersMarkdown:YES customAllowedURLSchemes:customAllowedURLSchemes];
             break;
         case SUReleaseNotesFormatHTML:
         {

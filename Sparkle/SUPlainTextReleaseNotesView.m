@@ -10,8 +10,10 @@
 
 #import "SUPlainTextReleaseNotesView.h"
 #import "SUReleaseNotesCommon.h"
+#import "SPUStandardUserDriverDelegate.h"
 #import "SULog.h"
 #import "SUErrors.h"
+#import "SUHost.h"
 
 #import <AppKit/AppKit.h>
 
@@ -51,7 +53,7 @@ API_AVAILABLE(macos(10.14))
     [path moveToPoint:NSMakePoint(view.bounds.origin.x + totalWidthPadding, yPosition)];
     [path lineToPoint:NSMakePoint(view.bounds.origin.x + view.bounds.size.width - totalWidthPadding, yPosition)];
 
-    [[NSColor separatorColor] setStroke];
+    [NSColor.separatorColor setStroke];
     [path setLineWidth:1.0];
     [path stroke];
 }
@@ -86,7 +88,7 @@ API_AVAILABLE(macos(12.0))
     [path moveToPoint:NSMakePoint(beginPoint.x, beginPoint.y)];
     [path lineToPoint:NSMakePoint(endPoint.x, endPoint.y)];
 
-    [[NSColor lightGrayColor] setStroke];
+    [NSColor.lightGrayColor setStroke];
     [path setLineWidth:lineWidth];
     [path stroke];
 }
@@ -142,11 +144,15 @@ API_AVAILABLE(macos(12.0))
 #endif
     NSArray<NSString *> *_customAllowedURLSchemes;
     
+    SUAppcastItem *_updateItem;
+    SUHost *_host;
+    __weak id<SPUStandardUserDriverDelegate> _delegate;
+    
     int _fontPointSize;
     BOOL _prefersMarkdown;
 }
 
-- (instancetype)initWithFontPointSize:(int)fontPointSize prefersMarkdown:(BOOL)prefersMarkdown customAllowedURLSchemes:(NSArray<NSString *> *)customAllowedURLSchemes
+- (instancetype)initWithFontPointSize:(int)fontPointSize appcastItem:(SUAppcastItem *)appcastItem host:(SUHost *)host delegate:(id<SPUStandardUserDriverDelegate>)delegate prefersMarkdown:(BOOL)prefersMarkdown customAllowedURLSchemes:(NSArray<NSString *> *)customAllowedURLSchemes
 {
     self = [super init];
     if (self != nil) {
@@ -154,6 +160,11 @@ API_AVAILABLE(macos(12.0))
         _customAllowedURLSchemes = customAllowedURLSchemes;
         _prefersMarkdown = prefersMarkdown;
         _scrollView = [[NSScrollView alloc] initWithFrame:NSZeroRect];
+        
+        _updateItem = appcastItem;
+        _host = host;
+        
+        _delegate = delegate;
         
         if (@available(macOS 12, *)) {
             // Create NSTextView using TextKit 2
@@ -460,7 +471,21 @@ static NSAttributedString * _Nullable makeMarkdownAttributedString(NSString *con
         return;
     }
     
-    [_textView.textStorage setAttributedString:attributedString];
+    // Give delegate a chance to process and modify the attributed string
+    NSAttributedString *finalAttributedString;
+    id<SPUStandardUserDriverDelegate> delegate = _delegate;
+    if ([(NSObject *)delegate respondsToSelector:@selector(standardUserDriverWillShowReleaseNotesText:forUpdate:withBundleDisplayVersion:bundleVersion:)]) {
+        NSAttributedString *attributedStringFromDelegate = [delegate standardUserDriverWillShowReleaseNotesText:attributedString forUpdate:_updateItem withBundleDisplayVersion:_host.displayVersion bundleVersion:_host.version];
+        if (attributedStringFromDelegate != nil) {
+            finalAttributedString = attributedStringFromDelegate;
+        } else {
+            finalAttributedString = attributedString;
+        }
+    } else {
+        finalAttributedString = attributedString;
+    }
+    
+    [_textView.textStorage setAttributedString:finalAttributedString];
     
     NSSize contentSize = [_scrollView contentSize];
     [_textView setFrame:NSMakeRect(0, 0, contentSize.width, contentSize.height)];

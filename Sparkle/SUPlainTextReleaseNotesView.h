@@ -12,11 +12,15 @@
 
 #import "SUReleaseNotesView.h"
 
+@protocol SPUStandardUserDriverDelegate;
+@class SUAppcastItem;
+@class SUHost;
+
 NS_ASSUME_NONNULL_BEGIN
 
 SPU_OBJC_DIRECT_MEMBERS @interface SUPlainTextReleaseNotesView : NSObject <SUReleaseNotesView>
 
-- (instancetype)initWithFontPointSize:(int)fontPointSize prefersMarkdown:(BOOL)prefersMarkdown customAllowedURLSchemes:(NSArray<NSString *> *)customAllowedURLSchemes;
+- (instancetype)initWithFontPointSize:(int)fontPointSize appcastItem:(SUAppcastItem *)appcastItem host:(SUHost *)host delegate:(id<SPUStandardUserDriverDelegate>)delegate prefersMarkdown:(BOOL)prefersMarkdown customAllowedURLSchemes:(NSArray<NSString *> *)customAllowedURLSchemes;
 
 @end
 
