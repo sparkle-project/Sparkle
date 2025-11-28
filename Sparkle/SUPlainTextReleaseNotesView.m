@@ -193,8 +193,12 @@ static void processMarkdownFragmentAttributedString(NSAttributedString *fragment
             // to avoid outputting multiple list bullets
             // Also avoid processing list items that were processed from previous passes / fragments
             if (canProcessListItem) {
-                paragraphStyle.firstLineHeadIndent += intent.indentationLevel * (font.pointSize * 1.5);
-                paragraphStyle.headIndent += intent.indentationLevel * (font.pointSize * 1.5);
+                CGFloat firstLineIdentation = intent.indentationLevel * (font.pointSize * 1.5);
+                paragraphStyle.firstLineHeadIndent += firstLineIdentation;
+                
+                // Advance subsequent lines and text that wraps to next line by next tab interval past the firstLineIdentation
+                CGFloat defaultTabInterval = paragraphStyle.defaultTabInterval;
+                paragraphStyle.headIndent += ceil(firstLineIdentation / defaultTabInterval) * defaultTabInterval;
                 
                 BOOL didVisitListItemFromPreviousPass = [previousVisitedListItemIntents containsObject:intent];
                 BOOL insertUnorderedBullet = (parentIntent == nil || parentIntent.intentKind == NSPresentationIntentKindUnorderedList);
@@ -238,6 +242,8 @@ static void processMarkdownFragmentAttributedString(NSAttributedString *fragment
                 [NSAttributedString attributedStringWithAttachment:attachment];
             
             [outputAttributedSubString appendAttributedString:dividerAttributedString];
+            // Advance text that wraps to next line by this divider width
+            paragraphStyle.headIndent += dividerAttributedString.size.width;
 
             break;
         }
@@ -247,6 +253,8 @@ static void processMarkdownFragmentAttributedString(NSAttributedString *fragment
             // A parent of a code block could be a block quote or list item
             // It's more correct to use tab rather than leading paragraph indentation in this case
             [outputAttributedSubString appendAttributedString:tabAttributedString];
+            // Advance text that wraps to next line by next tab interval
+            paragraphStyle.headIndent += paragraphStyle.defaultTabInterval;
             
             NSMutableAttributedString *blockquoteAttributedString = [fragmentAttributedString mutableCopy];
             [blockquoteAttributedString addAttributes:@{NSFontAttributeName: monospacedParagraphFont, NSForegroundColorAttributeName: NSColor.labelColor} range:NSMakeRange(0, blockquoteAttributedString.length)];
