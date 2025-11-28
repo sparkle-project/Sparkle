@@ -53,16 +53,16 @@ API_AVAILABLE(macos(12.0))
     NSTextLayoutManager *_textLayoutManager;
     NSFont *_font;
     
-    NSInteger _textOffset;
+    NSMutableOrderedSet<NSNumber *> *_textOffsets;
 }
 
-- (instancetype)initWithTextLayoutManager:(NSTextLayoutManager *)textLayoutManager textOffset:(NSInteger)textOffset font:(NSFont *)font
+- (instancetype)initWithTextLayoutManager:(NSTextLayoutManager *)textLayoutManager textOffsets:(NSMutableOrderedSet<NSNumber *> *)textOffsets font:(NSFont *)font
 {
     self = [super init];
     if (self != nil) {
         _textLayoutManager = textLayoutManager;
         _font = font;
-        _textOffset = textOffset;
+        _textOffsets = textOffsets;
     }
     return self;
 }
@@ -76,22 +76,37 @@ API_AVAILABLE(macos(12.0))
 - (void)drawWithFrame:(NSRect)cellFrame inView:(NSView *)view
 {
     NSTextContentManager *textContentManager = _textLayoutManager.textContentManager;
-    id<NSTextLocation> textLocation = [textContentManager locationFromLocation:textContentManager.documentRange.location withOffset:_textOffset];
     
-    NSTextLayoutFragment *textLayoutFragment = [_textLayoutManager textLayoutFragmentForLocation:textLocation];
+    NSUInteger totalNumberOfTextLineFragments = 0;
+    id<NSTextLocation> textDocumentRangeLocation = textContentManager.documentRange.location;
+    for (NSNumber *textOffset in _textOffsets) {
+        id<NSTextLocation> textLocation = [textContentManager locationFromLocation:textDocumentRangeLocation withOffset:textOffset.integerValue];
+        
+        if (textLocation == nil) {
+            continue;
+        }
+        
+        NSTextLayoutFragment *textLayoutFragment = [_textLayoutManager textLayoutFragmentForLocation:textLocation];
+        if (textLayoutFragment == nil) {
+            continue;
+        }
+        
+        totalNumberOfTextLineFragments += textLayoutFragment.textLineFragments.count;
+    }
     
-    const CGFloat lineWidth = 2.0;
+    const CGFloat lineWidth = 3.0;
     CGFloat xPosition = cellFrame.origin.x + lineWidth / 2.0;
     
     NSBezierPath *path = [NSBezierPath bezierPath];
+    path.lineCapStyle = NSLineCapStyleButt;
     
     NSPoint beginPoint = NSMakePoint(xPosition, cellFrame.origin.y + cellFrame.size.height - _font.ascender);
-    NSPoint endPoint = NSMakePoint(beginPoint.x, beginPoint.y + (_font.ascender + -(_font.descender) + _font.leading) * textLayoutFragment.textLineFragments.count);
+    NSPoint endPoint = NSMakePoint(beginPoint.x, beginPoint.y + (_font.ascender + -(_font.descender) + _font.leading) * totalNumberOfTextLineFragments);
     
     [path moveToPoint:NSMakePoint(beginPoint.x, beginPoint.y)];
     [path lineToPoint:NSMakePoint(endPoint.x, endPoint.y)];
 
-    [[NSColor separatorColor] setStroke];
+    [[NSColor lightGrayColor] setStroke];
     [path setLineWidth:lineWidth];
     [path stroke];
 }
@@ -165,7 +180,7 @@ API_AVAILABLE(macos(12.0))
     return _scrollView;
 }
 
-static void processMarkdownFragmentAttributedString(NSAttributedString *fragmentAttributedString, NSMutableAttributedString *outputAttributedSubString, NSMutableParagraphStyle *paragraphStyle, BOOL canProcessListItem, NSMutableSet<NSPresentationIntent *> *previousVisitedListItemIntents, NSPresentationIntent *intent, NSFont *inputParagraphFont, NSFont *monospacedParagraphFont, NSAttributedString *tabAttributedString, NSAttributedString *newlineAttributedString, NSAttributedString *listBulletAttributedString, NSTextLayoutManager *textLayoutManager) API_AVAILABLE(macos(12.0))
+static void processMarkdownFragmentAttributedString(NSAttributedString *fragmentAttributedString, NSMutableAttributedString *outputAttributedSubString, NSMutableParagraphStyle *paragraphStyle, BOOL canProcessListItem, NSMutableSet<NSNumber *> *previousVisitedListItemIntents, NSMutableDictionary<NSNumber *, NSMutableOrderedSet<NSNumber *> *> *blockquoteToTextOffsetsTable, NSPresentationIntent *intent, NSFont *inputParagraphFont, NSFont *monospacedParagraphFont, NSAttributedString *tabAttributedString, NSAttributedString *newlineAttributedString, NSAttributedString *listBulletAttributedString, NSTextLayoutManager *textLayoutManager) API_AVAILABLE(macos(12.0))
 {
     // Pre-pass processing of intent
     // This info must be computed before processing parent intent
@@ -209,7 +224,7 @@ static void processMarkdownFragmentAttributedString(NSAttributedString *fragment
     // In these cases, we may pre-append attributed string to the output before processing current intent.
     NSPresentationIntent *parentIntent = intent.parentIntent;
     if (parentIntent != nil) {
-        processMarkdownFragmentAttributedString(fragmentAttributedString, outputAttributedSubString, paragraphStyle, canProcessListItem && !isListItem, previousVisitedListItemIntents, parentIntent, font, monospacedParagraphFont, tabAttributedString, newlineAttributedString, listBulletAttributedString, textLayoutManager);
+        processMarkdownFragmentAttributedString(fragmentAttributedString, outputAttributedSubString, paragraphStyle, canProcessListItem && !isListItem, previousVisitedListItemIntents, blockquoteToTextOffsetsTable, parentIntent, font, monospacedParagraphFont, tabAttributedString, newlineAttributedString, listBulletAttributedString, textLayoutManager);
     }
     
     // Process the current intent
@@ -248,7 +263,8 @@ static void processMarkdownFragmentAttributedString(NSAttributedString *fragment
                 CGFloat defaultTabInterval = paragraphStyle.defaultTabInterval;
                 paragraphStyle.headIndent += ceil(firstLineIdentation / defaultTabInterval) * defaultTabInterval;
                 
-                BOOL didVisitListItemFromPreviousPass = [previousVisitedListItemIntents containsObject:intent];
+                NSNumber *intentIdentity = @(intent.identity);
+                BOOL didVisitListItemFromPreviousPass = [previousVisitedListItemIntents containsObject:intentIdentity];
                 BOOL insertUnorderedBullet = (parentIntent == nil || parentIntent.intentKind == NSPresentationIntentKindUnorderedList);
                 
                 if (!didVisitListItemFromPreviousPass) {
@@ -261,7 +277,7 @@ static void processMarkdownFragmentAttributedString(NSAttributedString *fragment
                         [outputAttributedSubString appendAttributedString:listItemAttributedString];
                     }
                     
-                    [previousVisitedListItemIntents addObject:intent];
+                    [previousVisitedListItemIntents addObject:intentIdentity];
                 }
                 
                 [outputAttributedSubString appendAttributedString:tabAttributedString];
@@ -282,16 +298,27 @@ static void processMarkdownFragmentAttributedString(NSAttributedString *fragment
         }
         case NSPresentationIntentKindBlockQuote: {
             // Multiple levels of block quotes are handled (e.g. parent intent could be another block quote).
-            // Each text fragment will get its own preceding vertical line. These lines are not 'connected' which is a limitation for now.
+            
+            NSNumber *intentIdentity = @(intent.identity);
+            NSMutableOrderedSet<NSNumber *> *textOffsetsForBlockquote = blockquoteToTextOffsetsTable[intentIdentity];
+            if (textOffsetsForBlockquote == nil) {
+                textOffsetsForBlockquote = [[NSMutableOrderedSet alloc] init];
+                blockquoteToTextOffsetsTable[intentIdentity] = textOffsetsForBlockquote;
+            }
+            
+            NSInteger textOffset = (NSInteger)outputAttributedSubString.length;
+            [textOffsetsForBlockquote addObject:@(textOffset)];
+            
             NSTextAttachment *attachment = [[NSTextAttachment alloc] init];
-            attachment.attachmentCell = [[SPUMarkdownVerticalAttachmentCell alloc] initWithTextLayoutManager:textLayoutManager textOffset:(NSInteger)outputAttributedSubString.length font:font];
+            attachment.attachmentCell = [[SPUMarkdownVerticalAttachmentCell alloc] initWithTextLayoutManager:textLayoutManager textOffsets:textOffsetsForBlockquote font:font];
 
             NSAttributedString *dividerAttributedString =
                 [NSAttributedString attributedStringWithAttachment:attachment];
             
-            [outputAttributedSubString appendAttributedString:dividerAttributedString];
             // Advance text that wraps to next line by this divider width
             paragraphStyle.headIndent += dividerAttributedString.size.width;
+            
+            [outputAttributedSubString appendAttributedString:dividerAttributedString];
 
             break;
         }
@@ -362,7 +389,9 @@ static NSAttributedString * _Nullable makeMarkdownAttributedString(NSString *con
     
     NSAttributedString *tabAttributedString = [[NSAttributedString alloc] initWithString:@"\t" attributes:@{NSFontAttributeName: paragraphFont}];
     
-    NSMutableSet<NSPresentationIntent *> *previousVisitedListItemIntents = [[NSMutableSet alloc] init];
+    NSMutableSet<NSNumber *> *previousVisitedListItemIntents = [[NSMutableSet alloc] init];
+    
+    NSMutableDictionary<NSNumber *, NSMutableOrderedSet<NSNumber *> *> *blockquoteToTextOffsetsTable = [[NSMutableDictionary alloc] init];
     
     // Enumerate through every presentation intent fragment and create a new attributed string that we append to the output
     // Foundation handles formatting some things for us already in the attributed string such as bold/itatlics and hyperlinks,
@@ -394,7 +423,7 @@ static NSAttributedString * _Nullable makeMarkdownAttributedString(NSString *con
             NSUInteger previousOutputLength = outputAttributedString.length;
             
             BOOL canProcessListItem = YES;
-            processMarkdownFragmentAttributedString(fragmentAttributedString, outputAttributedString, paragraphStyle, canProcessListItem, previousVisitedListItemIntents, intent, paragraphFont, monospacedParagraphFont, tabAttributedString, newlineAttributedString, listBulletAttributedString, textLayoutManager);
+            processMarkdownFragmentAttributedString(fragmentAttributedString, outputAttributedString, paragraphStyle, canProcessListItem, previousVisitedListItemIntents, blockquoteToTextOffsetsTable, intent, paragraphFont, monospacedParagraphFont, tabAttributedString, newlineAttributedString, listBulletAttributedString, textLayoutManager);
             
             [outputAttributedString addAttributes:@{NSParagraphStyleAttributeName: paragraphStyle} range:NSMakeRange(previousOutputLength, outputAttributedString.length - previousOutputLength)];
         }];
