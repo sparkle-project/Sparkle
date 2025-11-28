@@ -469,7 +469,7 @@ static NSAttributedString * _Nullable makeMarkdownAttributedString(NSString *con
     [_textView setVerticallyResizable:YES];
     [_textView setHorizontallyResizable:NO];
     [_textView setAutoresizingMask:NSViewWidthSizable];
-    [_textView setTextContainerInset:NSMakeSize(8, 8)];
+    [_textView setTextContainerInset:NSMakeSize(4, 8)];
     [_textView setContinuousSpellCheckingEnabled:NO];
     _textView.usesFontPanel = NO;
     _textView.editable = NO;
