@@ -231,8 +231,9 @@ static void processMarkdownFragmentAttributedString(NSAttributedString *fragment
     // Process the current intent
     switch (intent.intentKind) {
         case NSPresentationIntentKindHeader: {
-            paragraphStyle.paragraphSpacingBefore += font.pointSize * 0.16;
-            paragraphStyle.paragraphSpacing += font.pointSize * 0.25;
+            CGFloat paragraphSpacing = font.pointSize * 0.8;
+            paragraphStyle.paragraphSpacingBefore += paragraphSpacing;
+            paragraphStyle.paragraphSpacing += paragraphSpacing;
             
             NSMutableAttributedString *headerAttributedString = [fragmentAttributedString mutableCopy];
             
@@ -243,7 +244,15 @@ static void processMarkdownFragmentAttributedString(NSAttributedString *fragment
             break;
         }
         case NSPresentationIntentKindParagraph: {
-            paragraphStyle.paragraphSpacing += font.pointSize * 0.25;
+            if (parentIntent != nil) {
+                // If the parent intent is a list item or a blockquote we don't want to apply paragraphSpacingBefore,
+                // and we'll apply less spacing
+                paragraphStyle.paragraphSpacing += font.pointSize * 0.3;
+            } else {
+                CGFloat paragraphSpacing = font.pointSize * 0.5;
+                paragraphStyle.paragraphSpacing += paragraphSpacing;
+                paragraphStyle.paragraphSpacingBefore += paragraphSpacing;
+            }
             
             NSMutableAttributedString *contentAttributedString = [fragmentAttributedString mutableCopy];
             [contentAttributedString addAttributes:@{NSFontAttributeName: font} range:NSMakeRange(0, contentAttributedString.length)];
