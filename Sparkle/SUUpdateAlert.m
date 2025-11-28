@@ -36,6 +36,13 @@ static NSString *const SUAllowsAutomaticUpdatesKeyPath = @"allowsAutomaticUpdate
 
 static const CGFloat SUUpdateAlertGroupElementSpacing = 12.0;
 
+typedef NS_ENUM(NSInteger, SUReleaseNotesFormat)
+{
+    SUReleaseNotesFormatHTML,
+    SUReleaseNotesFormatPlainText,
+    SUReleaseNotesFormatMarkdown
+};
+
 @interface SUUpdateAlert () <NSTouchBarDelegate>
 @end
 
@@ -172,12 +179,17 @@ static const CGFloat SUUpdateAlertGroupElementSpacing = 12.0;
         NSString *itemDescription = _updateItem.itemDescription;
         if (itemDescription != nil) {
             NSString *itemDescriptionFormat = _updateItem.itemDescriptionFormat;
-            // We don't support markdown but prepare for the future in case we support it one day
-            BOOL prefersPlainText =
-                ([itemDescriptionFormat isEqualToString:@"plain-text"] ||
-                 [itemDescriptionFormat isEqualToString:@"markdown"]);
             
-            [self _createReleaseNotesViewPreferringPlainText:prefersPlainText];
+            SUReleaseNotesFormat releaseNotesFormat;
+            if ([itemDescriptionFormat isEqualToString:@"plain-text"]) {
+                releaseNotesFormat = SUReleaseNotesFormatPlainText;
+            } else if ([itemDescriptionFormat isEqualToString:@"markdown"]) {
+                releaseNotesFormat = SUReleaseNotesFormatMarkdown;
+            } else {
+                releaseNotesFormat = SUReleaseNotesFormatHTML;
+            }
+            
+            [self _createReleaseNotesViewPreferringFormat:releaseNotesFormat];
             
             __weak __typeof__(self) weakSelf = self;
             [_releaseNotesView loadString:itemDescription baseURL:nil completionHandler:^(NSError * _Nullable error) {
@@ -213,15 +225,20 @@ static const CGFloat SUUpdateAlertGroupElementSpacing = 12.0;
     
     // We don't support markdown but prepare for the future in case we support it one day
     NSString *pathExtension = releaseNotesURL.pathExtension;
-    BOOL preferringPlainText =
-        ([chosenMIMEType isEqualToString:@"text/plain"] ||
-         [pathExtension caseInsensitiveCompare:@"txt"] == NSOrderedSame ||
-         [chosenMIMEType isEqualToString:@"text/markdown"] ||
-         [chosenMIMEType isEqualToString:@"text/x-markdown"] ||
-         [pathExtension caseInsensitiveCompare:@"md"] == NSOrderedSame ||
-         [pathExtension caseInsensitiveCompare:@"markdown"] == NSOrderedSame);
     
-    [self _createReleaseNotesViewPreferringPlainText:preferringPlainText];
+    SUReleaseNotesFormat releaseNotesFormat;
+    if ([chosenMIMEType isEqualToString:@"text/plain"] || [pathExtension caseInsensitiveCompare:@"txt"] == NSOrderedSame) {
+        releaseNotesFormat = SUReleaseNotesFormatPlainText;
+    } else if ([chosenMIMEType isEqualToString:@"text/markdown"] ||
+               [chosenMIMEType isEqualToString:@"text/x-markdown"] ||
+               [pathExtension caseInsensitiveCompare:@"md"] == NSOrderedSame ||
+               [pathExtension caseInsensitiveCompare:@"markdown"] == NSOrderedSame) {
+        releaseNotesFormat = SUReleaseNotesFormatMarkdown;
+    } else {
+        releaseNotesFormat = SUReleaseNotesFormatHTML;
+    }
+    
+    [self _createReleaseNotesViewPreferringFormat:releaseNotesFormat];
     
     __weak __typeof__(self) weakSelf = self;
     [_releaseNotesView loadData:downloadData.data MIMEType:chosenMIMEType textEncodingName:chosenTextEncodingName baseURL:baseURL completionHandler:^(NSError * _Nullable error) {
@@ -255,26 +272,32 @@ static const CGFloat SUUpdateAlertGroupElementSpacing = 12.0;
         return [shouldShowReleaseNotes boolValue];
 }
 
-- (void)_createReleaseNotesViewPreferringPlainText:(BOOL)preferringPlainText SPU_OBJC_DIRECT
+- (void)_createReleaseNotesViewPreferringFormat:(SUReleaseNotesFormat)preferredReleaseNotesFormat SPU_OBJC_DIRECT
 {
     // "-apple-system-font" is a reference to the system UI font. "-apple-system" is the new recommended token, but for backward compatibility we can't use it.
     NSString *defaultFontFamily = @"-apple-system-font";
     
     int defaultFontSize = (int)[NSFont systemFontSize];
     
-    BOOL usesPlainText;
-    if (preferringPlainText) {
-        usesPlainText = YES;
-    } else {
-        if (@available(macOS 10.15, *)) {
-            usesPlainText = [[NSProcessInfo processInfo] isMacCatalystApp];
-            
-            if (usesPlainText && !preferringPlainText) {
-                SULog(SULogLevelError, @"Error: Showing HTML release notes for Catalyst apps is not supported. The release notes will be interpreted as plain text. Please serve a plain-text (.txt) release notes file. If you are using a <description> element then please specify the %@=\"plain-text\" attribute in that element.", SUAppcastAttributeFormat);
+    SUReleaseNotesFormat usedReleaseNotesFormat;
+    switch (preferredReleaseNotesFormat) {
+        case SUReleaseNotesFormatPlainText:
+        case SUReleaseNotesFormatMarkdown:
+            usedReleaseNotesFormat = preferredReleaseNotesFormat;
+            break;
+        case SUReleaseNotesFormatHTML:
+            if (@available(macOS 10.15, *)) {
+                if ([[NSProcessInfo processInfo] isMacCatalystApp]) {
+                    usedReleaseNotesFormat = SUReleaseNotesFormatPlainText;
+                    
+                    SULog(SULogLevelError, @"Error: Showing HTML release notes for Catalyst apps is not supported. The release notes will be interpreted as plain text. Please serve a plain-text (.txt) or markdown (.md) release notes file. If you are using a <description> element then please specify the %@=\"plain-text\" or %@=\"markdown\" attribute in that element.", SUAppcastAttributeFormat, SUAppcastAttributeFormat);
+                } else {
+                    usedReleaseNotesFormat = preferredReleaseNotesFormat;
+                }
+            } else {
+                usedReleaseNotesFormat = preferredReleaseNotesFormat;
             }
-        } else {
-            usesPlainText = NO;
-        }
+            break;
     }
     
     NSArray<NSString *> *customAllowedURLSchemes;
@@ -297,26 +320,35 @@ static const CGFloat SUUpdateAlertGroupElementSpacing = 12.0;
         customAllowedURLSchemes = [allowedSchemes copy];
     }
     
-    if (usesPlainText) {
-        _releaseNotesView = [[SUPlainTextReleaseNotesView alloc] initWithFontPointSize:defaultFontSize customAllowedURLSchemes:customAllowedURLSchemes];
-    } else {
-        NSURL *colorStyleURL = [[NSBundle bundleForClass:[self class]] URLForResource:@"ReleaseNotesColorStyle" withExtension:@"css"];
-        
-        BOOL javaScriptEnabled = [_host boolForInfoDictionaryKey:SUEnableJavaScriptKey];
-        
-#if DOWNLOADER_XPC_SERVICE_EMBEDDED
-        // WKWebView has a bug where it won't work in loading local HTML content in sandboxed apps that do not have an outgoing network entitlement
-        // FB6993802: https://twitter.com/sindresorhus/status/1160577243929878528 | https://github.com/feedback-assistant/reports/issues/1
-        // If the developer is using the downloader XPC service, they are very most likely are a) sandboxed b) do not use outgoing network entitlement.
-        // In this case, fall back to legacy WebKit view.
-        // (In theory it is possible for a non-sandboxed app or sandboxed app with outgoing network entitlement to use the XPC service, it's just pretty unlikely. And falling back to a legacy web view would not be too harmful in those cases).
-        BOOL useWKWebView = !SPUXPCServiceIsEnabled(SUEnableDownloaderServiceKey);
-        if (!useWKWebView) {
-            _releaseNotesView = [[SULegacyWebView alloc] initWithColorStyleSheetLocation:colorStyleURL fontFamily:defaultFontFamily fontPointSize:defaultFontSize javaScriptEnabled:javaScriptEnabled customAllowedURLSchemes:customAllowedURLSchemes];
-        } else
-#endif
+    switch (usedReleaseNotesFormat) {
+        case SUReleaseNotesFormatPlainText:
+            _releaseNotesView = [[SUPlainTextReleaseNotesView alloc] initWithFontPointSize:defaultFontSize prefersMarkdown:NO customAllowedURLSchemes:customAllowedURLSchemes];
+            break;
+        case SUReleaseNotesFormatMarkdown:
+            _releaseNotesView = [[SUPlainTextReleaseNotesView alloc] initWithFontPointSize:defaultFontSize prefersMarkdown:YES customAllowedURLSchemes:customAllowedURLSchemes];
+            break;
+        case SUReleaseNotesFormatHTML:
         {
-            _releaseNotesView = [[SUWKWebView alloc] initWithColorStyleSheetLocation:colorStyleURL fontFamily:defaultFontFamily fontPointSize:defaultFontSize javaScriptEnabled:javaScriptEnabled customAllowedURLSchemes:customAllowedURLSchemes installedVersion: _host.version];
+            NSURL *colorStyleURL = [[NSBundle bundleForClass:[self class]] URLForResource:@"ReleaseNotesColorStyle" withExtension:@"css"];
+            
+            BOOL javaScriptEnabled = [_host boolForInfoDictionaryKey:SUEnableJavaScriptKey];
+            
+#if DOWNLOADER_XPC_SERVICE_EMBEDDED
+            // WKWebView has a bug where it won't work in loading local HTML content in sandboxed apps that do not have an outgoing network entitlement
+            // FB6993802: https://twitter.com/sindresorhus/status/1160577243929878528 | https://github.com/feedback-assistant/reports/issues/1
+            // If the developer is using the downloader XPC service, they are very most likely are a) sandboxed b) do not use outgoing network entitlement.
+            // In this case, fall back to legacy WebKit view.
+            // (In theory it is possible for a non-sandboxed app or sandboxed app with outgoing network entitlement to use the XPC service, it's just pretty unlikely. And falling back to a legacy web view would not be too harmful in those cases).
+            BOOL useWKWebView = !SPUXPCServiceIsEnabled(SUEnableDownloaderServiceKey);
+            if (!useWKWebView) {
+                _releaseNotesView = [[SULegacyWebView alloc] initWithColorStyleSheetLocation:colorStyleURL fontFamily:defaultFontFamily fontPointSize:defaultFontSize javaScriptEnabled:javaScriptEnabled customAllowedURLSchemes:customAllowedURLSchemes];
+            } else
+#endif
+            {
+                _releaseNotesView = [[SUWKWebView alloc] initWithColorStyleSheetLocation:colorStyleURL fontFamily:defaultFontFamily fontPointSize:defaultFontSize javaScriptEnabled:javaScriptEnabled customAllowedURLSchemes:customAllowedURLSchemes installedVersion: _host.version];
+            }
+            
+            break;
         }
     }
     
