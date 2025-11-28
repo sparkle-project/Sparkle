@@ -378,13 +378,9 @@ static void processMarkdownFragmentAttributedString(NSAttributedString *fragment
     }
 }
 
-static NSAttributedString * _Nullable makeMarkdownAttributedString(NSString *contents, NSURL * _Nullable baseURL, CGFloat defaultFontPointSize, NSTextView *textView, NSError * __autoreleasing *outError) API_AVAILABLE(macos(12.0))
+// Note: this must be called on main thread
+static NSAttributedString *formatMarkdownAttributedString(NSAttributedString *originalAttributedString, CGFloat defaultFontPointSize, NSTextView *textView) API_AVAILABLE(macos(12.0))
 {
-    NSAttributedString *originalAttributedString = [[NSAttributedString alloc] initWithMarkdownString:contents options:nil baseURL:baseURL error:outError];
-    if (originalAttributedString == nil) {
-        return nil;
-    }
-    
     // Create our fonts and cache some common attributed strings up front (list bullets, newline)
     
     NSFont *paragraphFont = [NSFont systemFontOfSize:defaultFontPointSize];
@@ -446,26 +442,9 @@ static NSAttributedString * _Nullable makeMarkdownAttributedString(NSString *con
     return outputAttributedString;
 }
 
-- (void)_loadString:(NSString *)contents baseURL:(nullable NSURL *)baseURL completionHandler:(void (^)(NSError * _Nullable))completionHandler SPU_OBJC_DIRECT
+
+- (void)_loadAttributedString:(NSAttributedString * _Nullable)attributedString completionHandler:(void (^)(NSError * _Nullable))completionHandler SPU_OBJC_DIRECT
 {
-    NSAttributedString *attributedString = nil;
-    if (_prefersMarkdown) {
-        if (@available(macOS 12, *)) {
-            NSError *markdownError = nil;
-            attributedString = makeMarkdownAttributedString(contents, baseURL, (CGFloat)_fontPointSize, _textView, &markdownError);
-            if (attributedString == nil) {
-                SULog(SULogLevelError, @"Failed to load markdown contents with error: %@. Falling back to plain text.", markdownError.localizedDescription);
-            }
-        } else {
-            SULog(SULogLevelDefault, @"Warning: falling back to plain text because markdown support requires macOS 12 or newer");
-        }
-    }
-    
-    if (attributedString == nil) {
-        // Fall back to plain text
-        attributedString = [[NSAttributedString alloc] initWithString:contents attributes:@{ NSFontAttributeName : [NSFont systemFontOfSize:(CGFloat)_fontPointSize] }];
-    }
-    
     if (attributedString == nil) {
         completionHandler([NSError errorWithDomain:SUSparkleErrorDomain code:SUReleaseNotesError userInfo:@{NSLocalizedDescriptionKey: @"Failed to create attributed string of contents to load"}]);
         return;
@@ -475,7 +454,7 @@ static NSAttributedString * _Nullable makeMarkdownAttributedString(NSString *con
     NSAttributedString *finalAttributedString;
     id<SPUStandardUserDriverDelegate> delegate = _delegate;
     if ([(NSObject *)delegate respondsToSelector:@selector(standardUserDriverWillShowReleaseNotesText:forUpdate:withBundleDisplayVersion:bundleVersion:)]) {
-        NSAttributedString *attributedStringFromDelegate = [delegate standardUserDriverWillShowReleaseNotesText:attributedString forUpdate:_updateItem withBundleDisplayVersion:_host.displayVersion bundleVersion:_host.version];
+        NSAttributedString *attributedStringFromDelegate = [delegate standardUserDriverWillShowReleaseNotesText:(NSAttributedString * _Nonnull)attributedString forUpdate:_updateItem withBundleDisplayVersion:_host.displayVersion bundleVersion:_host.version];
         if (attributedStringFromDelegate != nil) {
             finalAttributedString = attributedStringFromDelegate;
         } else {
@@ -487,6 +466,11 @@ static NSAttributedString * _Nullable makeMarkdownAttributedString(NSString *con
     
     [_textView.textStorage setAttributedString:finalAttributedString];
     
+    completionHandler(nil);
+}
+
+- (void)_loadString:(NSString *)contents baseURL:(nullable NSURL *)baseURL completionHandler:(void (^)(NSError * _Nullable))completionHandler SPU_OBJC_DIRECT
+{
     NSSize contentSize = [_scrollView contentSize];
     [_textView setFrame:NSMakeRect(0, 0, contentSize.width, contentSize.height)];
     [_textView setMinSize:NSMakeSize(0.0, contentSize.height)];
@@ -506,7 +490,42 @@ static NSAttributedString * _Nullable makeMarkdownAttributedString(NSString *con
     [_scrollView setHasVerticalScroller:YES];
     [_scrollView setHasHorizontalScroller:NO];
     
-    completionHandler(nil);
+    if (_prefersMarkdown) {
+        if (@available(macOS 12, *)) {
+            dispatch_queue_attr_t queuePriority = dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL, QOS_CLASS_USER_INITIATED, 0);
+            
+            dispatch_queue_t markdownDispatchQueue = dispatch_queue_create("org.sparkle-project.markdown-loader", queuePriority);
+            
+            dispatch_async(markdownDispatchQueue, ^{
+                NSError *loadMarkdownError = nil;
+                NSAttributedString *originalMarkdownAttributedString = [[NSAttributedString alloc] initWithMarkdownString:contents options:nil baseURL:baseURL error:&loadMarkdownError];
+                
+                if (originalMarkdownAttributedString == nil) {
+                    // Fallback to plain-text
+                    
+                    NSAttributedString *attributedString = [[NSAttributedString alloc] initWithString:contents attributes:@{ NSFontAttributeName : [NSFont systemFontOfSize:(CGFloat)self->_fontPointSize] }];
+                    
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [self _loadAttributedString:attributedString completionHandler:completionHandler];
+                    });
+                } else {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        NSAttributedString *formattedAttributedString = formatMarkdownAttributedString(originalMarkdownAttributedString, (CGFloat)self->_fontPointSize, self->_textView);
+                        
+                        [self _loadAttributedString:formattedAttributedString completionHandler:completionHandler];
+                    });
+                }
+            });
+            
+            return;
+        } else {
+            SULog(SULogLevelDefault, @"Warning: falling back to plain text because markdown support requires macOS 12 or newer");
+        }
+    }
+    
+    NSAttributedString *attributedString = [[NSAttributedString alloc] initWithString:contents attributes:@{ NSFontAttributeName : [NSFont systemFontOfSize:(CGFloat)_fontPointSize] }];
+    
+    [self _loadAttributedString:attributedString completionHandler:completionHandler];
 }
 
 - (void)loadString:(NSString *)contents baseURL:(NSURL * _Nullable)baseURL completionHandler:(void (^)(NSError * _Nullable))completionHandler
