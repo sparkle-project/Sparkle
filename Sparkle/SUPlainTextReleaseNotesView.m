@@ -15,6 +15,7 @@
 
 #import <AppKit/AppKit.h>
 
+// Divider attachment cell used for markdown horizontal line breaks
 API_AVAILABLE(macos(10.14))
 @interface SPUMarkdownHorizontalDividerAttachmentCell : NSTextAttachmentCell
 @end
@@ -42,6 +43,7 @@ API_AVAILABLE(macos(10.14))
 
 @end
 
+// Divider attachment cell used for markdown block quotes
 API_AVAILABLE(macos(10.14))
 @interface SPUMarkdownVerticalAttachmentCell : NSTextAttachmentCell
 @end
@@ -115,8 +117,10 @@ API_AVAILABLE(macos(10.14))
     return _scrollView;
 }
 
-static void processMarkdownAttributedSubString(NSAttributedString *subAttributedString, NSMutableAttributedString *newAttributedSubString, NSMutableParagraphStyle *paragraphStyle, BOOL canProcessListItem, NSPresentationIntent *intent, NSFont *inputParagraphFont, NSFont *monospacedParagraphFont, NSAttributedString *newlineAttributedString) API_AVAILABLE(macos(12.0))
+static void processMarkdownFragmentAttributedString(NSAttributedString *fragmentAttributedString, NSMutableAttributedString *outputAttributedSubString, NSMutableParagraphStyle *paragraphStyle, BOOL canProcessListItem, NSPresentationIntent *intent, NSFont *inputParagraphFont, NSFont *monospacedParagraphFont, NSAttributedString *newlineAttributedString, NSAttributedString *listBulletAttributedString) API_AVAILABLE(macos(12.0))
 {
+    // Pre-pass processing of intent
+    // This info must be computed before processing parent intent
     BOOL isListItem = NO;
     NSFont *font = inputParagraphFont;
     switch (intent.intentKind) {
@@ -152,35 +156,41 @@ static void processMarkdownAttributedSubString(NSAttributedString *subAttributed
             break;
     }
     
+    // Process parent intent if available
+    // A paragraph's intent may be a list item, or a block quote for example. A header's parent intent could be a block quote.
+    // In these cases, we may pre-append attributed string to the output before processing current intent.
     NSPresentationIntent *parentIntent = intent.parentIntent;
     if (parentIntent != nil) {
-        processMarkdownAttributedSubString(subAttributedString, newAttributedSubString, paragraphStyle, canProcessListItem && !isListItem, parentIntent, font, monospacedParagraphFont, newlineAttributedString);
+        processMarkdownFragmentAttributedString(fragmentAttributedString, outputAttributedSubString, paragraphStyle, canProcessListItem && !isListItem, parentIntent, font, monospacedParagraphFont, newlineAttributedString, listBulletAttributedString);
     }
     
+    // Process the current intent
     switch (intent.intentKind) {
         case NSPresentationIntentKindHeader: {
             paragraphStyle.paragraphSpacingBefore += font.pointSize * 0.16;
             paragraphStyle.paragraphSpacing += font.pointSize * 0.25;
             
-            NSMutableAttributedString *headerAttributedString = [subAttributedString mutableCopy];
+            NSMutableAttributedString *headerAttributedString = [fragmentAttributedString mutableCopy];
             
             [headerAttributedString addAttributes:@{NSFontAttributeName: font} range:NSMakeRange(0, headerAttributedString.length)];
             
-            [newAttributedSubString appendAttributedString:headerAttributedString];
+            [outputAttributedSubString appendAttributedString:headerAttributedString];
             
             break;
         }
         case NSPresentationIntentKindParagraph: {
             paragraphStyle.paragraphSpacing += font.pointSize * 0.25;
             
-            NSMutableAttributedString *contentAttributedString = [subAttributedString mutableCopy];
+            NSMutableAttributedString *contentAttributedString = [fragmentAttributedString mutableCopy];
             [contentAttributedString addAttributes:@{NSFontAttributeName: font} range:NSMakeRange(0, contentAttributedString.length)];
             
-            [newAttributedSubString appendAttributedString:contentAttributedString];
+            [outputAttributedSubString appendAttributedString:contentAttributedString];
             
             break;
         }
         case NSPresentationIntentKindListItem: {
+            // We only process (the innermost first) list item once when we encounter nested lists,
+            // to avoid outputting multiple list bullets
             if (canProcessListItem) {
                 paragraphStyle.firstLineHeadIndent += intent.indentationLevel * (font.pointSize * 1.5);
                 paragraphStyle.headIndent += intent.indentationLevel * (font.pointSize * 1.5);
@@ -188,27 +198,11 @@ static void processMarkdownAttributedSubString(NSAttributedString *subAttributed
                 BOOL insertUnorderedBullet = (parentIntent == nil || parentIntent.intentKind == NSPresentationIntentKindUnorderedList);
                 
                 if (insertUnorderedBullet) {
-                    NSImageSymbolConfiguration *bulletSymbolConfiguration = [NSImageSymbolConfiguration configurationWithHierarchicalColor:NSColor.textColor];
-                    
-                    NSImage *bulletSymbol = [NSImage imageWithSystemSymbolName:@"circle.fill" accessibilityDescription:nil];
-                    
-                    NSTextAttachment *attachment = [[NSTextAttachment alloc] init];
-                    attachment.image = [bulletSymbol imageWithSymbolConfiguration:bulletSymbolConfiguration];
-                    
-                    const CGFloat imageScale = font.pointSize / 32.5;
-                    const CGFloat yBoundsScaleOffset = 0.25;
-                    
-                    attachment.bounds = NSMakeRect(0, bulletSymbol.size.height * imageScale * yBoundsScaleOffset, bulletSymbol.size.width * imageScale, bulletSymbol.size.height * imageScale);
-                    
-                    NSMutableAttributedString *finalBulletAttributedString = [[NSAttributedString attributedStringWithAttachment:attachment] mutableCopy];
-                    
-                    [finalBulletAttributedString appendAttributedString:[[NSAttributedString alloc] initWithString:@"  " attributes:@{NSFontAttributeName: font}]];
-                    
-                    [newAttributedSubString appendAttributedString:finalBulletAttributedString];
+                    [outputAttributedSubString appendAttributedString:listBulletAttributedString];
                 } else {
                     NSAttributedString *listItemAttributedString = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"%ld. ", intent.ordinal] attributes:@{NSFontAttributeName: monospacedParagraphFont}];
                     
-                    [newAttributedSubString appendAttributedString:listItemAttributedString];
+                    [outputAttributedSubString appendAttributedString:listItemAttributedString];
                 }
             }
             
@@ -221,18 +215,20 @@ static void processMarkdownAttributedSubString(NSAttributedString *subAttributed
             NSAttributedString *dividerAttributedString =
                 [NSAttributedString attributedStringWithAttachment:attachment];
             
-            [newAttributedSubString appendAttributedString:dividerAttributedString];
+            [outputAttributedSubString appendAttributedString:dividerAttributedString];
             
             break;
         }
         case NSPresentationIntentKindBlockQuote: {
+            // Multiple levels of block quotes are handled (e.g. parent intent could be another block quote).
+            // Each line will get its own preceding vertical line. These lines are not 'connected' which is a limitation for now.
             NSTextAttachment *attachment = [[NSTextAttachment alloc] init];
             attachment.attachmentCell = [[SPUMarkdownVerticalAttachmentCell alloc] initWithFont:font];
 
             NSAttributedString *dividerAttributedString =
                 [NSAttributedString attributedStringWithAttachment:attachment];
             
-            [newAttributedSubString appendAttributedString:dividerAttributedString];
+            [outputAttributedSubString appendAttributedString:dividerAttributedString];
 
             break;
         }
@@ -241,10 +237,10 @@ static void processMarkdownAttributedSubString(NSAttributedString *subAttributed
             paragraphStyle.firstLineHeadIndent += font.pointSize * 0.6;
             paragraphStyle.paragraphSpacing += font.pointSize * 0.25;
             
-            NSMutableAttributedString *blockquoteAttributedString = [subAttributedString mutableCopy];
+            NSMutableAttributedString *blockquoteAttributedString = [fragmentAttributedString mutableCopy];
             [blockquoteAttributedString addAttributes:@{NSFontAttributeName: monospacedParagraphFont, NSForegroundColorAttributeName: NSColor.labelColor} range:NSMakeRange(0, blockquoteAttributedString.length)];
             
-            [newAttributedSubString appendAttributedString:blockquoteAttributedString];
+            [outputAttributedSubString appendAttributedString:blockquoteAttributedString];
             
             break;
         }
@@ -261,19 +257,52 @@ static void processMarkdownAttributedSubString(NSAttributedString *subAttributed
 
 static NSAttributedString * _Nullable makeMarkdownAttributedString(NSString *contents, CGFloat defaultFontPointSize, NSError * __autoreleasing *outError) API_AVAILABLE(macos(12.0))
 {
+    NSAttributedString *originalAttributedString = [[NSAttributedString alloc] initWithMarkdownString:contents options:nil baseURL:nil error:outError];
+    if (originalAttributedString == nil) {
+        return nil;
+    }
+    
+    // Create our fonts and cache some common attributed strings up front (list bullets, newline)
+    
     NSFont *paragraphFont = [NSFont systemFontOfSize:defaultFontPointSize];
     NSFont *monospacedParagraphFont = [NSFont monospacedSystemFontOfSize:defaultFontPointSize weight:NSFontWeightRegular];
     
-    NSAttributedString *originalAttributedString = [[NSAttributedString alloc] initWithMarkdownString:contents options:nil baseURL:nil error:outError];
-    
-    NSMutableAttributedString *newAttributedString = [[NSMutableAttributedString alloc] init];
+    NSMutableAttributedString *outputAttributedString = [[NSMutableAttributedString alloc] init];
     
     NSAttributedString *newlineAttributedString = [[NSAttributedString alloc] initWithString:@"\n"];
     
+    NSAttributedString *listBulletAttributedString;
+    {
+        // Create a list bullet by using a SF symbol that uses a dynamic color appropriate for switching between light/dark mode,
+        // and we can scale the image to what we need (regular unicode bullet point characters are scaled too small or too big and may not be offsetted right)
+        // Perhaps we could have created a custom attachment cell class instead, but this works
+        NSImageSymbolConfiguration *bulletSymbolConfiguration = [NSImageSymbolConfiguration configurationWithHierarchicalColor:NSColor.textColor];
+        
+        NSImage *bulletSymbol = [NSImage imageWithSystemSymbolName:@"circle.fill" accessibilityDescription:nil];
+        
+        NSTextAttachment *attachment = [[NSTextAttachment alloc] init];
+        attachment.image = [bulletSymbol imageWithSymbolConfiguration:bulletSymbolConfiguration];
+        
+        const CGFloat imageScale = paragraphFont.pointSize / 32.5;
+        const CGFloat yBoundsScaleOffset = 0.25;
+        
+        attachment.bounds = NSMakeRect(0, bulletSymbol.size.height * imageScale * yBoundsScaleOffset, bulletSymbol.size.width * imageScale, bulletSymbol.size.height * imageScale);
+        
+        NSMutableAttributedString *finalBulletAttributedString = [[NSAttributedString attributedStringWithAttachment:attachment] mutableCopy];
+        
+        [finalBulletAttributedString appendAttributedString:[[NSAttributedString alloc] initWithString:@"  " attributes:@{NSFontAttributeName: paragraphFont}]];
+        
+        listBulletAttributedString = [finalBulletAttributedString copy];
+    }
+    
+    // Enumerate through every presentation intent fragment and create a new attributed string that we append to the output
+    // Foundation handles formatting some things for us already in the attributed string such as bold/itatlics and hyperlinks,
+    // but we need to handle formatting paragraphs, headers, lists, block quotes, etc in the attributed string.
     [originalAttributedString enumerateAttribute:NSPresentationIntentAttributeName inRange:NSMakeRange(0, originalAttributedString.length) options:0 usingBlock:^(NSPresentationIntent *intent, NSRange range, BOOL * _Nonnull __unused stop) {
         
-        NSAttributedString *subAttributedString = [originalAttributedString attributedSubstringFromRange:range];
+        NSAttributedString *fragmentAttributedString = [originalAttributedString attributedSubstringFromRange:range];
         
+        // Properties of the paragraph start as 0 and later get incremented based on what is processed
         NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
         paragraphStyle.paragraphSpacingBefore = 0;
         paragraphStyle.paragraphSpacing = 0;
@@ -283,15 +312,15 @@ static NSAttributedString * _Nullable makeMarkdownAttributedString(NSString *con
         NSMutableAttributedString *newAttributedSubString = [[NSMutableAttributedString alloc] init];
         
         BOOL canProcessListItem = YES;
-        processMarkdownAttributedSubString(subAttributedString, newAttributedSubString, paragraphStyle, canProcessListItem, intent, paragraphFont, monospacedParagraphFont, newlineAttributedString);
+        processMarkdownFragmentAttributedString(fragmentAttributedString, newAttributedSubString, paragraphStyle, canProcessListItem, intent, paragraphFont, monospacedParagraphFont, newlineAttributedString, listBulletAttributedString);
         
         [newAttributedSubString addAttributes:@{NSParagraphStyleAttributeName: paragraphStyle} range:NSMakeRange(0, newAttributedSubString.length)];
         
-        [newAttributedString appendAttributedString:newAttributedSubString];
-        [newAttributedString appendAttributedString:newlineAttributedString];
+        [outputAttributedString appendAttributedString:newAttributedSubString];
+        [outputAttributedString appendAttributedString:newlineAttributedString];
     }];
     
-    return newAttributedString;
+    return outputAttributedString;
 }
 
 - (void)_loadString:(NSString *)contents completionHandler:(void (^)(NSError * _Nullable))completionHandler SPU_OBJC_DIRECT
@@ -304,6 +333,8 @@ static NSAttributedString * _Nullable makeMarkdownAttributedString(NSString *con
             if (attributedString == nil) {
                 SULog(SULogLevelError, @"Failed to load markdown contents with error: %@. Falling back to plain text.", markdownError.localizedDescription);
             }
+        } else {
+            SULog(SULogLevelDefault, @"Warning: falling back to plain text because markdown support requires macOS 12 or newer");
         }
     }
     
