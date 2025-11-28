@@ -18,6 +18,7 @@
 #import <AppKit/AppKit.h>
 
 // Divider attachment cell used for markdown horizontal line breaks
+// Note: this does not work in Catalyst apps as it's NSTextAttachmentCell based
 API_AVAILABLE(macos(10.14))
 @interface SPUMarkdownHorizontalDividerAttachmentCell : NSTextAttachmentCell
 @end
@@ -64,6 +65,7 @@ API_AVAILABLE(macos(10.14))
 @end
 
 // Divider attachment cell used for markdown block quotes
+// Note: this does not work in Catalyst apps as it's NSTextAttachmentCell based
 API_AVAILABLE(macos(12.0))
 @interface SPUMarkdownVerticalAttachmentCell : NSTextAttachmentCell
 @end
@@ -94,44 +96,6 @@ API_AVAILABLE(macos(12.0))
     [NSColor.lightGrayColor setStroke];
     [path setLineWidth:lineWidth];
     [path stroke];
-}
-
-@end
-
-// Attachment cell used for unordered list bullets
-@interface SPUMarkdownBulletAttachmentCell : NSTextAttachmentCell
-@end
-
-@implementation SPUMarkdownBulletAttachmentCell
-{
-    CGFloat _fontPointSize;
-}
-
-- (instancetype)initWithFont:(NSFont *)font
-{
-    self = [super init];
-    if (self != nil) {
-        _fontPointSize = font.pointSize;
-    }
-    return self;
-}
-
-- (NSSize)cellSize
-{
-    CGFloat cellSize = _fontPointSize * 0.65;
-    return NSMakeSize(cellSize, cellSize);
-}
-
-- (void)drawWithFrame:(NSRect)cellFrame inView:(NSView *)controlView
-{
-    CGFloat diameter = cellFrame.size.height * 0.5;
-    CGFloat x = NSMidX(cellFrame) - diameter / 2.0;
-    CGFloat y = NSMidY(cellFrame) - diameter / 2.0;
-
-    NSBezierPath *circlePath = [NSBezierPath bezierPathWithOvalInRect:NSMakeRect(x, y, diameter, diameter)];
-
-    [NSColor.textColor setFill];
-    [circlePath fill];
 }
 
 @end
@@ -398,9 +362,20 @@ static NSAttributedString *formatMarkdownAttributedString(NSAttributedString *or
     
     NSAttributedString *listBulletAttributedString;
     {
+        // We use a text attachment for unordered list bullets so we can control the size/offset/padding of the symbol
+        // We don't use a NSTextAttachmentCell because that doesn't work in Catalyst applications
+        
         NSTextAttachment *attachment = [[NSTextAttachment alloc] init];
-        SPUMarkdownBulletAttachmentCell *cell = [[SPUMarkdownBulletAttachmentCell alloc] initWithFont:paragraphFont];
-        attachment.attachmentCell = cell;
+        
+        NSImageSymbolConfiguration *bulletSymbolConfiguration = [NSImageSymbolConfiguration configurationWithHierarchicalColor:NSColor.textColor];
+        
+        NSImage *bulletSymbol = [NSImage imageWithSystemSymbolName:@"circle.fill" accessibilityDescription:nil];
+        
+        const CGFloat imageScale = paragraphFont.pointSize / 40.0;
+        const CGFloat yBoundsScaleOffset = 0.4;
+        
+        attachment.bounds = NSMakeRect(0, bulletSymbol.size.height * imageScale * yBoundsScaleOffset, bulletSymbol.size.width * imageScale, bulletSymbol.size.height * imageScale);
+        attachment.image = [bulletSymbol imageWithSymbolConfiguration:bulletSymbolConfiguration];
         
         listBulletAttributedString = [NSAttributedString attributedStringWithAttachment:attachment];
     }
