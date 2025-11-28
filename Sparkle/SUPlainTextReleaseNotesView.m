@@ -117,7 +117,7 @@ API_AVAILABLE(macos(10.14))
     return _scrollView;
 }
 
-static void processMarkdownFragmentAttributedString(NSAttributedString *fragmentAttributedString, NSMutableAttributedString *outputAttributedSubString, NSMutableParagraphStyle *paragraphStyle, BOOL canProcessListItem, NSMutableSet<NSPresentationIntent *> *previousVisitedListItemIntents, NSPresentationIntent *intent, NSFont *inputParagraphFont, NSFont *monospacedParagraphFont, NSAttributedString *newlineAttributedString, NSAttributedString *listBulletAttributedString) API_AVAILABLE(macos(12.0))
+static void processMarkdownFragmentAttributedString(NSAttributedString *fragmentAttributedString, NSMutableAttributedString *outputAttributedSubString, NSMutableParagraphStyle *paragraphStyle, BOOL canProcessListItem, NSMutableSet<NSPresentationIntent *> *previousVisitedListItemIntents, NSPresentationIntent *intent, NSFont *inputParagraphFont, NSFont *monospacedParagraphFont, NSAttributedString *tabAttributedString, NSAttributedString *newlineAttributedString, NSAttributedString *listBulletAttributedString) API_AVAILABLE(macos(12.0))
 {
     // Pre-pass processing of intent
     // This info must be computed before processing parent intent
@@ -161,7 +161,7 @@ static void processMarkdownFragmentAttributedString(NSAttributedString *fragment
     // In these cases, we may pre-append attributed string to the output before processing current intent.
     NSPresentationIntent *parentIntent = intent.parentIntent;
     if (parentIntent != nil) {
-        processMarkdownFragmentAttributedString(fragmentAttributedString, outputAttributedSubString, paragraphStyle, canProcessListItem && !isListItem, previousVisitedListItemIntents, parentIntent, font, monospacedParagraphFont, newlineAttributedString, listBulletAttributedString);
+        processMarkdownFragmentAttributedString(fragmentAttributedString, outputAttributedSubString, paragraphStyle, canProcessListItem && !isListItem, previousVisitedListItemIntents, parentIntent, font, monospacedParagraphFont, tabAttributedString, newlineAttributedString, listBulletAttributedString);
     }
     
     // Process the current intent
@@ -212,8 +212,6 @@ static void processMarkdownFragmentAttributedString(NSAttributedString *fragment
                     [previousVisitedListItemIntents addObject:intent];
                 }
                 
-                NSAttributedString *tabAttributedString = [[NSAttributedString alloc] initWithString:@"\t" attributes:@{NSFontAttributeName: font}];
-                
                 [outputAttributedSubString appendAttributedString:tabAttributedString];
             }
             
@@ -248,7 +246,6 @@ static void processMarkdownFragmentAttributedString(NSAttributedString *fragment
             
             // A parent of a code block could be a block quote or list item
             // It's more correct to use tab rather than leading paragraph indentation in this case
-            NSAttributedString *tabAttributedString = [[NSAttributedString alloc] initWithString:@"\t" attributes:@{NSFontAttributeName: monospacedParagraphFont}];
             [outputAttributedSubString appendAttributedString:tabAttributedString];
             
             NSMutableAttributedString *blockquoteAttributedString = [fragmentAttributedString mutableCopy];
@@ -307,6 +304,8 @@ static NSAttributedString * _Nullable makeMarkdownAttributedString(NSString *con
         listBulletAttributedString = [NSAttributedString attributedStringWithAttachment:attachment];
     }
     
+    NSAttributedString *tabAttributedString = [[NSAttributedString alloc] initWithString:@"\t" attributes:@{NSFontAttributeName: paragraphFont}];
+    
     NSMutableSet<NSPresentationIntent *> *previousVisitedListItemIntents = [[NSMutableSet alloc] init];
     
     // Enumerate through every presentation intent fragment and create a new attributed string that we append to the output
@@ -333,7 +332,7 @@ static NSAttributedString * _Nullable makeMarkdownAttributedString(NSString *con
             NSMutableAttributedString *fragmentOutputAttributedString = [[NSMutableAttributedString alloc] init];
             
             BOOL canProcessListItem = YES;
-            processMarkdownFragmentAttributedString(fragmentAttributedString, fragmentOutputAttributedString, paragraphStyle, canProcessListItem, previousVisitedListItemIntents, intent, paragraphFont, monospacedParagraphFont, newlineAttributedString, listBulletAttributedString);
+            processMarkdownFragmentAttributedString(fragmentAttributedString, fragmentOutputAttributedString, paragraphStyle, canProcessListItem, previousVisitedListItemIntents, intent, paragraphFont, monospacedParagraphFont, tabAttributedString, newlineAttributedString, listBulletAttributedString);
             
             [fragmentOutputAttributedString addAttributes:@{NSParagraphStyleAttributeName: paragraphStyle} range:NSMakeRange(0, fragmentOutputAttributedString.length)];
             
