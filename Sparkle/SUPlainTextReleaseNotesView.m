@@ -367,9 +367,9 @@ static void processMarkdownFragmentAttributedString(NSAttributedString *fragment
     }
 }
 
-static NSAttributedString * _Nullable makeMarkdownAttributedString(NSString *contents, CGFloat defaultFontPointSize, NSTextView *textView, NSError * __autoreleasing *outError) API_AVAILABLE(macos(12.0))
+static NSAttributedString * _Nullable makeMarkdownAttributedString(NSString *contents, NSURL * _Nullable baseURL, CGFloat defaultFontPointSize, NSTextView *textView, NSError * __autoreleasing *outError) API_AVAILABLE(macos(12.0))
 {
-    NSAttributedString *originalAttributedString = [[NSAttributedString alloc] initWithMarkdownString:contents options:nil baseURL:nil error:outError];
+    NSAttributedString *originalAttributedString = [[NSAttributedString alloc] initWithMarkdownString:contents options:nil baseURL:baseURL error:outError];
     if (originalAttributedString == nil) {
         return nil;
     }
@@ -435,13 +435,13 @@ static NSAttributedString * _Nullable makeMarkdownAttributedString(NSString *con
     return outputAttributedString;
 }
 
-- (void)_loadString:(NSString *)contents completionHandler:(void (^)(NSError * _Nullable))completionHandler SPU_OBJC_DIRECT
+- (void)_loadString:(NSString *)contents baseURL:(nullable NSURL *)baseURL completionHandler:(void (^)(NSError * _Nullable))completionHandler SPU_OBJC_DIRECT
 {
     NSAttributedString *attributedString = nil;
     if (_prefersMarkdown) {
         if (@available(macOS 12, *)) {
             NSError *markdownError = nil;
-            attributedString = makeMarkdownAttributedString(contents, (CGFloat)_fontPointSize, _textView, &markdownError);
+            attributedString = makeMarkdownAttributedString(contents, baseURL, (CGFloat)_fontPointSize, _textView, &markdownError);
             if (attributedString == nil) {
                 SULog(SULogLevelError, @"Failed to load markdown contents with error: %@. Falling back to plain text.", markdownError.localizedDescription);
             }
@@ -486,7 +486,7 @@ static NSAttributedString * _Nullable makeMarkdownAttributedString(NSString *con
 
 - (void)loadString:(NSString *)contents baseURL:(NSURL * _Nullable)baseURL completionHandler:(void (^)(NSError * _Nullable))completionHandler
 {
-    [self _loadString:contents completionHandler:completionHandler];
+    [self _loadString:contents baseURL:baseURL completionHandler:completionHandler];
 }
 
 - (void)loadData:(NSData *)data MIMEType:(NSString *)MIMEType textEncodingName:(NSString *)textEncodingName baseURL:(NSURL *)baseURL completionHandler:(void (^)(NSError * _Nullable))completionHandler
@@ -507,7 +507,7 @@ static NSAttributedString * _Nullable makeMarkdownAttributedString(NSString *con
         return;
     }
     
-    [self _loadString:contents completionHandler:completionHandler];
+    [self _loadString:contents baseURL:baseURL completionHandler:completionHandler];
 }
 
 - (void)stopLoading
