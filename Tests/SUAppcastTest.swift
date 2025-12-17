@@ -139,6 +139,33 @@ class SUAppcastTest: XCTestCase {
         }
     }
     
+    func testMinimumUpdateVersion() {
+        let testURL = Bundle(for: SUAppcastTest.self).url(forResource: "testappcast_minimumUpdateVersion", withExtension: "xml")!
+        
+        do {
+            let testData = try Data(contentsOf: testURL)
+            
+            let versionComparator = SUStandardVersionComparator.default
+            let hostVersion = "1.0"
+            let stateResolver = SPUAppcastItemStateResolver(hostVersion: hostVersion, applicationVersionComparator: versionComparator, standardVersionComparator: versionComparator)
+            
+            let appcast = try SUAppcast(xmlData: testData, relativeTo: nil, stateResolver: stateResolver)
+            XCTAssertEqual(4, appcast.items.count)
+            
+            do {
+                let filteredAppcast = SUAppcastDriver.filterAppcast(appcast, forMacOSAndAllowedChannels: [])
+                XCTAssertEqual(3, filteredAppcast.items.count)
+                
+                XCTAssertEqual("2.0", filteredAppcast.items[0].versionString)
+                XCTAssertEqual("3.0", filteredAppcast.items[1].versionString)
+                XCTAssertEqual("4.0", filteredAppcast.items[2].versionString)
+            }
+        } catch let err as NSError {
+            NSLog("%@", err)
+            XCTFail(err.localizedDescription)
+        }
+    }
+    
     func testCriticalUpdateVersion() {
         let testURL = Bundle(for: SUAppcastTest.self).url(forResource: "testappcast", withExtension: "xml")!
         

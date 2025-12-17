@@ -138,6 +138,9 @@ struct GenerateAppcast: ParsableCommand {
     @Option(name: .long, help: ArgumentHelp("The Sparkle channel name that will be used for generating new updates. By default, no channel is used. Old applications need to be using Sparkle 2 to use this feature.", valueName: "channel-name"))
     var channel: String?
     
+    @Option(name: .long, help: ArgumentHelp("The minimum update version requirement that will be used for generating new updates. By default, no minimum update version is used.", valueName: "minimum-update-version"))
+    var minimumUpdateVersion: String?
+    
     @Option(name: .long, help: ArgumentHelp("The last major or minimum autoupdate sparkle:version that will be used for generating new updates. By default, no last major version is used.", valueName: "major-version"))
     var majorVersion: String?
     
@@ -315,7 +318,7 @@ struct GenerateAppcast: ParsableCommand {
         }
         
         do {
-            let appcastsByFeed = try makeAppcasts(archivesSourceDir: archivesSourceDir, outputPathURL: outputPathURL, cacheDirectory: GenerateAppcast.cacheDirectory, keys: keys, versions: versions, maxVersionsPerBranchInFeed: maxVersionsPerBranchInFeed, newChannel: channel, majorVersion: majorVersion, maximumDeltas: maximumDeltas, deltaCompressionModeDescription: deltaCompression, deltaCompressionLevel: deltaCompressionLevel, disableNestedCodeCheck: disableNestedCodeCheck, downloadURLPrefix: downloadURLPrefix, releaseNotesURLPrefix: releaseNotesURLPrefix, verbose: verbose)
+            let appcastsByFeed = try makeAppcasts(archivesSourceDir: archivesSourceDir, outputPathURL: outputPathURL, cacheDirectory: GenerateAppcast.cacheDirectory, keys: keys, versions: versions, maxVersionsPerBranchInFeed: maxVersionsPerBranchInFeed, newChannel: channel, newMinimumUpdateVersion: minimumUpdateVersion, majorVersion: majorVersion, maximumDeltas: maximumDeltas, deltaCompressionModeDescription: deltaCompression, deltaCompressionLevel: deltaCompressionLevel, disableNestedCodeCheck: disableNestedCodeCheck, downloadURLPrefix: downloadURLPrefix, releaseNotesURLPrefix: releaseNotesURLPrefix, verbose: verbose)
             
             let oldFilesDirectory = archivesSourceDir.appendingPathComponent(GenerateAppcast.oldFilesDirectoryName)
             
@@ -328,7 +331,7 @@ struct GenerateAppcast: ParsableCommand {
                                                                 relativeTo: archivesSourceDir)
 
                 // Write the appcast
-                let (numNewUpdates, numExistingUpdates, numUpdatesRemoved) = try writeAppcast(appcastDestPath: appcastDestPath, appcast: appcast, fullReleaseNotesLink: fullReleaseNotesURL, preferToEmbedReleaseNotes: embedReleaseNotes, link: link, newChannel: channel, majorVersion: majorVersion, ignoreSkippedUpgradesBelowVersion: ignoreSkippedUpgradesBelowVersion, phasedRolloutInterval: phasedRolloutInterval, criticalUpdateVersion: criticalUpdateVersion, informationalUpdateVersions: informationalUpdateVersions)
+                let (numNewUpdates, numExistingUpdates, numUpdatesRemoved) = try writeAppcast(appcastDestPath: appcastDestPath, appcast: appcast, fullReleaseNotesLink: fullReleaseNotesURL, preferToEmbedReleaseNotes: embedReleaseNotes, link: link, newChannel: channel, newMinimumUpdateVersion: minimumUpdateVersion, majorVersion: majorVersion, ignoreSkippedUpgradesBelowVersion: ignoreSkippedUpgradesBelowVersion, phasedRolloutInterval: phasedRolloutInterval, criticalUpdateVersion: criticalUpdateVersion, informationalUpdateVersions: informationalUpdateVersions)
 
                 // Inform the user, pluralizing "update" if necessary
                 let pluralizeUpdates = { pluralizeWord($0, "update") }

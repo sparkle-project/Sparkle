@@ -200,6 +200,24 @@ SU_EXPORT @interface SUAppcastItem : NSObject<NSSecureCoding>
 @property (nonatomic, readonly) BOOL minimumOperatingSystemVersionIsOK;
 
 /**
+ This update will be ignored if the application's version precedes this update's minimum version.
+ 
+ This application's version corresponds to the bundle's @c CFBundleVersion
+ 
+ The minimum update version is extracted from the @c <sparkle:minimumUpdateVersion> element.
+ 
+ Use `minimumUpdateVersionIsOK` property to test if the current bundle passes this requirement.
+ 
+ Old applications must be using Sparkle 2.9 or later, otherwise this property will be ignored.
+ */
+@property (nonatomic, copy, readonly, nullable) NSString *minimumUpdateVersion;
+
+/**
+ Indicates whether or not the current bundle passes the `minimumUpdateVersion` requirement.
+ */
+@property (nonatomic, readonly) BOOL minimumUpdateVersionIsOK;
+
+/**
  The required maximum system operating version string for this update if provided.
  
  A maximum system operating version requirement should only be made in unusual scenarios.

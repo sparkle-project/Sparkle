@@ -7,6 +7,7 @@ import Foundation
 import UniformTypeIdentifiers
 
 struct UpdateBranch: Hashable {
+    let minimumUpdateVersion: String?
     let minimumSystemVersion: String?
     let maximumSystemVersion: String?
     let minimumAutoupdateVersion: String?

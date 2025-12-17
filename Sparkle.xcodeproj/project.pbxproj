@@ -217,6 +217,7 @@
 		724BB3AA1D3347C2005D534A /* SUInstallerStatus.m in Sources */ = {isa = PBXBuildFile; fileRef = 724BB3971D333832005D534A /* SUInstallerStatus.m */; };
 		724BB3B71D35ABA8005D534A /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 61B5F8F609C4CEB300B25A18 /* Security.framework */; };
 		724F76F91D6EAD0D00ECD062 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 525A278F133D6AE900FD8D70 /* Cocoa.framework */; };
+		72526BE62EF3349D005791ED /* testappcast_minimumUpdateVersion.xml in Resources */ = {isa = PBXBuildFile; fileRef = 72526BE52EF3349D005791ED /* testappcast_minimumUpdateVersion.xml */; };
 		725453552C04DB3700362123 /* SparkleTestCodeSign_apfs_lzma_aux_files_adhoc.dmg in Resources */ = {isa = PBXBuildFile; fileRef = 725453542C04DB3700362123 /* SparkleTestCodeSign_apfs_lzma_aux_files_adhoc.dmg */; };
 		725602D51C83551C00DAA70E /* SUApplicationInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 725602D31C83551C00DAA70E /* SUApplicationInfo.h */; };
 		725602D61C83551C00DAA70E /* SUApplicationInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 725602D41C83551C00DAA70E /* SUApplicationInfo.m */; };
@@ -1165,6 +1166,7 @@
 		724BB3A61D33461B005D534A /* SUXPCInstallerStatus.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUXPCInstallerStatus.h; sourceTree = "<group>"; };
 		724BB3A71D33461B005D534A /* SUXPCInstallerStatus.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUXPCInstallerStatus.m; sourceTree = "<group>"; };
 		724BB3B51D35AAC3005D534A /* ServiceManagement.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ServiceManagement.framework; path = System/Library/Frameworks/ServiceManagement.framework; sourceTree = SDKROOT; };
+		72526BE52EF3349D005791ED /* testappcast_minimumUpdateVersion.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = testappcast_minimumUpdateVersion.xml; sourceTree = "<group>"; };
 		725453542C04DB3700362123 /* SparkleTestCodeSign_apfs_lzma_aux_files_adhoc.dmg */ = {isa = PBXFileReference; lastKnownFileType = file; path = SparkleTestCodeSign_apfs_lzma_aux_files_adhoc.dmg; sourceTree = "<group>"; };
 		725602D31C83551C00DAA70E /* SUApplicationInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUApplicationInfo.h; sourceTree = "<group>"; };
 		725602D41C83551C00DAA70E /* SUApplicationInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUApplicationInfo.m; sourceTree = "<group>"; };
@@ -1815,6 +1817,7 @@
 				5AF6C74E1AEA46D10014A3AB /* test.pkg */,
 				5AD0FA7E1C73F2E2004BCEFF /* testappcast.xml */,
 				723EDC3E26885A8E000BCBA4 /* testappcast_channels.xml */,
+				72526BE52EF3349D005791ED /* testappcast_minimumUpdateVersion.xml */,
 				725B3A81263FBF0C0041AB8E /* testappcast_minimumAutoupdateVersion.xml */,
 				720DC50327A51A6500DFF3EC /* testappcast_minimumAutoupdateVersionSkipping.xml */,
 				720DC50527A62CDC00DFF3EC /* testappcast_minimumAutoupdateVersionSkipping2.xml */,
@@ -3114,6 +3117,7 @@
 				723EDC3F26885A8E000BCBA4 /* testappcast_channels.xml in Resources */,
 				720DC50427A51A6500DFF3EC /* testappcast_minimumAutoupdateVersionSkipping.xml in Resources */,
 				72E6D9712C04DE1A005496E4 /* SparkleTestCodeSign_pkg.dmg in Resources */,
+				72526BE62EF3349D005791ED /* testappcast_minimumUpdateVersion.xml in Resources */,
 				72AC6B2E1B9B218C00F62325 /* SparkleTestCodeSignApp.dmg in Resources */,
 				C23E885B1BE7B24F0050BB73 /* SparkleTestCodeSignApp.enc.dmg in Resources */,
 				72AC6B281B9AAD6700F62325 /* SparkleTestCodeSignApp.tar in Resources */,

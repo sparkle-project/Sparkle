@@ -39,6 +39,17 @@
     return self;
 }
 
+- (BOOL)isMinimumUpdateVersionOK:(NSString * _Nullable)minimumUpdateVersion SPU_OBJC_DIRECT
+{
+    NSString *hostVersion = _hostVersion;
+    
+    BOOL minimumVersionOK = YES;
+    if (minimumUpdateVersion != nil && ![minimumUpdateVersion isEqualToString:@""]) {
+        minimumVersionOK = [_applicationVersionComparator compareVersion:(NSString * _Nonnull)minimumUpdateVersion toVersion:hostVersion] != NSOrderedDescending;
+    }
+    return minimumVersionOK;
+}
+
 - (BOOL)isMinimumOperatingSystemVersionOK:(NSString * _Nullable)minimumSystemVersion SPU_OBJC_DIRECT
 {
     BOOL minimumVersionOK = YES;
@@ -149,9 +160,11 @@
 #endif
 }
 
-- (SPUAppcastItemState *)resolveStateWithInformationalUpdateVersions:(NSSet<NSString *> * _Nullable)informationalUpdateVersions minimumOperatingSystemVersion:(NSString * _Nullable)minimumOperatingSystemVersion maximumOperatingSystemVersion:(NSString * _Nullable)maximumOperatingSystemVersion minimumAutoupdateVersion:(NSString * _Nullable)minimumAutoupdateVersion criticalUpdateDictionary:(NSDictionary * _Nullable)criticalUpdateDictionary hardwareRequirements:(NSSet<NSString *> *)hardwareRequirements
+- (SPUAppcastItemState *)resolveStateWithInformationalUpdateVersions:(NSSet<NSString *> * _Nullable)informationalUpdateVersions minimumUpdateVersion:(NSString * _Nullable)minimumUpdateVersion minimumOperatingSystemVersion:(NSString * _Nullable)minimumOperatingSystemVersion maximumOperatingSystemVersion:(NSString * _Nullable)maximumOperatingSystemVersion minimumAutoupdateVersion:(NSString * _Nullable)minimumAutoupdateVersion criticalUpdateDictionary:(NSDictionary * _Nullable)criticalUpdateDictionary hardwareRequirements:(NSSet<NSString *> *)hardwareRequirements
 {
     BOOL informationalUpdate = [self isInformationalUpdateWithInformationalUpdateVersions:informationalUpdateVersions];
+    
+    BOOL minimumUpdateVersionIsOK = [self isMinimumUpdateVersionOK:minimumUpdateVersion];
     
     BOOL minimumOperatingSystemVersionIsOK = [self isMinimumOperatingSystemVersionOK:minimumOperatingSystemVersion];
     
@@ -163,7 +176,7 @@
     
     BOOL arm64HardwareRequirementIsOK = [self isArm64HardwareRequirementOK:hardwareRequirements minimumSystemVersion:minimumOperatingSystemVersion];
     
-    return [[SPUAppcastItemState alloc] initWithMajorUpgrade:majorUpgrade criticalUpdate:criticalUpdate informationalUpdate:informationalUpdate minimumOperatingSystemVersionIsOK:minimumOperatingSystemVersionIsOK maximumOperatingSystemVersionIsOK:maximumOperatingSystemVersionIsOK arm64HardwareRequirementIsOK:arm64HardwareRequirementIsOK];
+    return [[SPUAppcastItemState alloc] initWithMajorUpgrade:majorUpgrade criticalUpdate:criticalUpdate informationalUpdate:informationalUpdate minimumUpdateVersionIsOK:minimumUpdateVersionIsOK minimumOperatingSystemVersionIsOK:minimumOperatingSystemVersionIsOK maximumOperatingSystemVersionIsOK:maximumOperatingSystemVersionIsOK arm64HardwareRequirementIsOK:arm64HardwareRequirementIsOK];
 }
 
 @end

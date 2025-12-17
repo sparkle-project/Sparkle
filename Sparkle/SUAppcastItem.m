@@ -83,6 +83,7 @@ static NSString *SUAppcastItemDeltaFromSparkleLocalesKey = @"SUAppcastItemDeltaF
 @synthesize installationType = _installationType;
 @synthesize minimumAutoupdateVersion = _minimumAutoupdateVersion;
 @synthesize ignoreSkippedUpgradesBelowVersion = _ignoreSkippedUpgradesBelowVersion;
+@synthesize minimumUpdateVersion = _minimumUpdateVersion;
 @synthesize phasedRolloutInterval = _phasedRolloutInterval;
 @synthesize channel = _channel;
 @synthesize deltaFromSparkleExecutableSize = _deltaFromSparkleExecutableSize;
@@ -133,6 +134,7 @@ static NSString *SUAppcastItemDeltaFromSparkleLocalesKey = @"SUAppcastItemDeltaF
         
         _hardwareRequirements = (hardwareRequirements != nil) ? hardwareRequirements : [NSSet set];
         
+        _minimumUpdateVersion = [(NSString *)[decoder decodeObjectOfClass:[NSString class] forKey:SUAppcastElementMinimumUpdateVersion] copy];
         _ignoreSkippedUpgradesBelowVersion = [(NSString *)[decoder decodeObjectOfClass:[NSString class] forKey:SUAppcastElementIgnoreSkippedUpgradesBelowVersion] copy];
         _releaseNotesURL = [decoder decodeObjectOfClass:[NSURL class] forKey:SUAppcastItemReleaseNotesURLKey];
         _fullReleaseNotesURL = [decoder decodeObjectOfClass:[NSURL class] forKey:SUAppcastItemFullReleaseNotesURLKey];
@@ -222,6 +224,10 @@ static NSString *SUAppcastItemDeltaFromSparkleLocalesKey = @"SUAppcastItemDeltaF
         [encoder encodeObject:_ignoreSkippedUpgradesBelowVersion forKey:SUAppcastElementIgnoreSkippedUpgradesBelowVersion];
     }
     
+    if (_minimumUpdateVersion != nil) {
+        [encoder encodeObject:_minimumUpdateVersion forKey:SUAppcastElementMinimumUpdateVersion];
+    }
+    
     if (_state != nil) {
         [encoder encodeObject:_state forKey:SUAppcastItemStateKey];
     }
@@ -300,6 +306,15 @@ static NSString *SUAppcastItemDeltaFromSparkleLocalesKey = @"SUAppcastItemDeltaF
 {
     if (_state != nil) {
         return _state.maximumOperatingSystemVersionIsOK;
+    } else {
+        return YES;
+    }
+}
+
+- (BOOL)minimumUpdateVersionIsOK
+{
+    if (_state != nil) {
+        return _state.minimumUpdateVersionIsOK;
     } else {
         return YES;
     }
@@ -584,6 +599,8 @@ static NSString *SUAppcastItemDeltaFromSparkleLocalesKey = @"SUAppcastItemDeltaF
             }
         }
         
+        _minimumUpdateVersion = [(NSString *)[dict objectForKey:SUAppcastElementMinimumUpdateVersion] copy];
+        
         _ignoreSkippedUpgradesBelowVersion = [(NSString *)[dict objectForKey:SUAppcastElementIgnoreSkippedUpgradesBelowVersion] copy];
         
         NSString *channel = [dict objectForKey:SUAppcastElementChannel];
@@ -622,7 +639,7 @@ static NSString *SUAppcastItemDeltaFromSparkleLocalesKey = @"SUAppcastItemDeltaF
         _hasCriticalInformation = (criticalUpdateDictionary != nil);
         
         if (stateResolver != nil) {
-            _state = [(SPUAppcastItemStateResolver * _Nonnull)stateResolver resolveStateWithInformationalUpdateVersions:_informationalUpdateVersions minimumOperatingSystemVersion:_minimumSystemVersion maximumOperatingSystemVersion:_maximumSystemVersion minimumAutoupdateVersion:_minimumAutoupdateVersion criticalUpdateDictionary:criticalUpdateDictionary hardwareRequirements:_hardwareRequirements];
+            _state = [(SPUAppcastItemStateResolver * _Nonnull)stateResolver resolveStateWithInformationalUpdateVersions:_informationalUpdateVersions minimumUpdateVersion:_minimumUpdateVersion minimumOperatingSystemVersion:_minimumSystemVersion maximumOperatingSystemVersion:_maximumSystemVersion minimumAutoupdateVersion:_minimumAutoupdateVersion criticalUpdateDictionary:criticalUpdateDictionary hardwareRequirements:_hardwareRequirements];
         } else {
             // Note state still may be nil if a deprecated initializer is used
             _state = resolvedState;

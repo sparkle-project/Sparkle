@@ -84,6 +84,7 @@ extern NSString *const SUAppcastElementDeltas;
 extern NSString *const SUAppcastElementMinimumAutoupdateVersion;
 extern NSString *const SUAppcastElementMinimumSystemVersion;
 extern NSString *const SUAppcastElementMaximumSystemVersion;
+extern NSString *const SUAppcastElementMinimumUpdateVersion;
 extern NSString *const SUAppcastElementHardwareRequirements;
 extern NSString *const SUAppcastElementHardwareRequirementARM64;
 extern NSString *const SUAppcastElementReleaseNotesLink;

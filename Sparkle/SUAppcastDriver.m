@@ -365,6 +365,12 @@ SPU_OBJC_DIRECT
             return NO;
         }
         
+        // We should never be interested in the update if it doesn't pass the minimum update version
+        BOOL passesUpdateVersion = item.minimumUpdateVersionIsOK;
+        if (!passesUpdateVersion) {
+            return NO;
+        }
+        
         NSString *channel = item.channel;
         if (channel == nil) {
             // Item is on the default channel

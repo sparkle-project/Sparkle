@@ -23,7 +23,7 @@ struct Appcast {
     let deltaFromVersionsUsed: Set<UpdateVersion>
 }
 
-func makeAppcasts(archivesSourceDir: URL, outputPathURL: URL?, cacheDirectory cacheDir: URL, keys: PrivateKeys, versions: Set<String>?, maxVersionsPerBranchInFeed: Int, newChannel: String?, majorVersion: String?, maximumDeltas: Int, deltaCompressionModeDescription: String, deltaCompressionLevel: UInt8, disableNestedCodeCheck: Bool, downloadURLPrefix: URL?, releaseNotesURLPrefix: URL?, verbose: Bool) throws -> [FeedName: Appcast] {
+func makeAppcasts(archivesSourceDir: URL, outputPathURL: URL?, cacheDirectory cacheDir: URL, keys: PrivateKeys, versions: Set<String>?, maxVersionsPerBranchInFeed: Int, newChannel: String?, newMinimumUpdateVersion: String?, majorVersion: String?, maximumDeltas: Int, deltaCompressionModeDescription: String, deltaCompressionLevel: UInt8, disableNestedCodeCheck: Bool, downloadURLPrefix: URL?, releaseNotesURLPrefix: URL?, verbose: Bool) throws -> [FeedName: Appcast] {
     let standardComparator = SUStandardVersionComparator()
     let descendingVersionComparator: (String, String) -> Bool = {
         return standardComparator.compareVersion($0, toVersion: $1) == .orderedDescending
@@ -114,7 +114,7 @@ func makeAppcasts(archivesSourceDir: URL, outputPathURL: URL?, cacheDirectory ca
         do {
             for update in updates {
                 if !ignoredOldVersions.contains(update.version) && !ignoredVersionsToInsert.contains(update.version) && feedUpdateBranches[update.version] == nil {
-                    newUpdateBranches[update.version] = UpdateBranch(minimumSystemVersion: update.minimumSystemVersion, maximumSystemVersion: nil, minimumAutoupdateVersion: majorVersion, hardwareRequirements: update.hardwareRequirements, channel: newChannel)
+                    newUpdateBranches[update.version] = UpdateBranch(minimumUpdateVersion: newMinimumUpdateVersion, minimumSystemVersion: update.minimumSystemVersion, maximumSystemVersion: nil, minimumAutoupdateVersion: majorVersion, hardwareRequirements: update.hardwareRequirements, channel: newChannel)
                 }
             }
         }
@@ -147,7 +147,7 @@ func makeAppcasts(archivesSourceDir: URL, outputPathURL: URL?, cacheDirectory ca
                         continue
                     }
                     
-                    let defaultChannelBranch = UpdateBranch(minimumSystemVersion: branch.minimumSystemVersion, maximumSystemVersion: branch.maximumSystemVersion, minimumAutoupdateVersion: branch.minimumAutoupdateVersion, hardwareRequirements: branch.hardwareRequirements, channel: nil)
+                    let defaultChannelBranch = UpdateBranch(minimumUpdateVersion: branch.minimumUpdateVersion, minimumSystemVersion: branch.minimumSystemVersion, maximumSystemVersion: branch.maximumSystemVersion, minimumAutoupdateVersion: branch.minimumAutoupdateVersion, hardwareRequirements: branch.hardwareRequirements, channel: nil)
                     
                     guard let defaultChannelVersions = updatesGroupedByBranch[defaultChannelBranch] else {
                         continue

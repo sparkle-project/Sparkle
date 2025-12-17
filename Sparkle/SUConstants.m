@@ -73,6 +73,7 @@ NSString *const SUAppcastElementDeltas = @"sparkle:deltas";
 NSString *const SUAppcastElementMinimumAutoupdateVersion = @"sparkle:minimumAutoupdateVersion";
 NSString *const SUAppcastElementMinimumSystemVersion = @"sparkle:minimumSystemVersion";
 NSString *const SUAppcastElementMaximumSystemVersion = @"sparkle:maximumSystemVersion";
+NSString *const SUAppcastElementMinimumUpdateVersion = @"sparkle:minimumUpdateVersion";
 NSString *const SUAppcastElementHardwareRequirements = @"sparkle:hardwareRequirements";
 NSString *const SUAppcastElementHardwareRequirementARM64 = @"arm64";
 NSString *const SUAppcastElementReleaseNotesLink = @"sparkle:releaseNotesLink";

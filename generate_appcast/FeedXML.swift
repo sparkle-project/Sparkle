@@ -98,6 +98,13 @@ func readAppcast(archives: [String: ArchiveItem], appcastURL: URL) throws -> [St
             continue
         }
         
+        let minimumUpdateVersion: String?
+        if let minUpdateVer = findElement(name: SUAppcastElementMinimumUpdateVersion, parent: item) {
+            minimumUpdateVersion = minUpdateVer.stringValue
+        } else {
+            minimumUpdateVersion = nil
+        }
+        
         let minimumSystemVersion: String?
         if let minVer = findElement(name: SUAppcastElementMinimumSystemVersion, parent: item) {
             minimumSystemVersion = minVer.stringValue
@@ -135,7 +142,7 @@ func readAppcast(archives: [String: ArchiveItem], appcastURL: URL) throws -> [St
             sparkleChannel = nil
         }
         
-        let updateBranch = UpdateBranch(minimumSystemVersion: minimumSystemVersion, maximumSystemVersion: maximumSystemVersion, minimumAutoupdateVersion: minimumAutoupdateVersion, hardwareRequirements: hardwareRequirements, channel: sparkleChannel)
+        let updateBranch = UpdateBranch(minimumUpdateVersion: minimumUpdateVersion, minimumSystemVersion: minimumSystemVersion, maximumSystemVersion: maximumSystemVersion, minimumAutoupdateVersion: minimumAutoupdateVersion, hardwareRequirements: hardwareRequirements, channel: sparkleChannel)
         
         updateBranches[version] = updateBranch
     }
@@ -143,7 +150,7 @@ func readAppcast(archives: [String: ArchiveItem], appcastURL: URL) throws -> [St
     return updateBranches
 }
 
-func writeAppcast(appcastDestPath: URL, appcast: Appcast, fullReleaseNotesLink: String?, preferToEmbedReleaseNotes: Bool, link: String?, newChannel: String?, majorVersion: String?, ignoreSkippedUpgradesBelowVersion: String?, phasedRolloutInterval: Int?, criticalUpdateVersion: String?, informationalUpdateVersions: [String]?) throws -> (numNewUpdates: Int, numExistingUpdates: Int, numUpdatesRemoved: Int) {
+func writeAppcast(appcastDestPath: URL, appcast: Appcast, fullReleaseNotesLink: String?, preferToEmbedReleaseNotes: Bool, link: String?, newChannel: String?, newMinimumUpdateVersion: String?, majorVersion: String?, ignoreSkippedUpgradesBelowVersion: String?, phasedRolloutInterval: Int?, criticalUpdateVersion: String?, informationalUpdateVersions: [String]?) throws -> (numNewUpdates: Int, numExistingUpdates: Int, numUpdatesRemoved: Int) {
     let appBaseName = appcast.inferredAppName
 
     let sparkleNS = "http://www.andymatuschak.org/xml-namespaces/sparkle"
@@ -291,6 +298,7 @@ func writeAppcast(appcastDestPath: URL, appcast: Appcast, fullReleaseNotesLink: 
                 item.addChild(linkElement)
             }
             
+            // Set full release notes
             if let fullReleaseNotesLink = fullReleaseNotesLink,
                let fullReleaseNotesElement = XMLElement.element(withName: SUAppcastElementFullReleaseNotesLink, uri: sparkleNS) as? XMLElement {
                 fullReleaseNotesElement.setChildren([text(fullReleaseNotesLink)])
@@ -302,6 +310,13 @@ func writeAppcast(appcastDestPath: URL, appcast: Appcast, fullReleaseNotesLink: 
                let channelNameElement = XMLElement.element(withName: SUAppcastElementChannel, uri: sparkleNS) as? XMLElement {
                 channelNameElement.setChildren([text(newChannelName)])
                 item.addChild(channelNameElement)
+            }
+            
+            // Set minimum update version
+            if let newMinimumUpdateVersion,
+               let minimumUpdateVersionElement = XMLElement.element(withName: SUAppcastElementMinimumUpdateVersion, uri: sparkleNS) as? XMLElement {
+                minimumUpdateVersionElement.setChildren([text(newMinimumUpdateVersion)])
+                item.addChild(minimumUpdateVersionElement)
             }
             
             // Set last major version
