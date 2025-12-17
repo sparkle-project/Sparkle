@@ -251,6 +251,11 @@ static void processMarkdownFragmentAttributedString(NSAttributedString *fragment
 }
 
 // Note: this function can be called from a background thread and shouldn't use main-thread only APIs
+// More decorative rendering for blockquotes and line breaks (i.e. rendering dividers) was tried out,
+// using a. NSTextAttachmentCell based subclass, or b. NSTextAttachmentViewProvider, or c. adopting custom NSTextViewportLayoutControllerDelegate.
+// This was ultimatily given up on and they all have various tradeoffs. NSCell based text attachments don't work in Catalyst,
+// view based attachments take up additional space, and TextKit2 CALayer decorations are hard to (re)size/position correctly.
+// Also each increases code complexity and risk. In the end, changelogs can can live without these.
 static NSAttributedString *formatMarkdownAttributedString(NSAttributedString *originalAttributedString, CGFloat defaultFontPointSize) API_AVAILABLE(macos(12.0))
 {
     // Create our fonts and cache some common attributed strings up front (list bullets, newline)
