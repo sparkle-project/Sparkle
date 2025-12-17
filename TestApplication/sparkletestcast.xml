@@ -102,9 +102,9 @@ Note though, Sparkle's markdown support does not support tables or images. It ne
 
 ### Version 2.0
 
-* *Redesigned Interface*: Enjoy a refreshed, modern UI that improves navigation and streamlines workflows across the app.
-* *Cloud Sync Support*: Projects and settings can now be synced securely across multiple devices using your account.
-* *Customizable Shortcuts*: Create and manage keyboard shortcuts for almost any action.
+* **Redesigned Interface**: Enjoy a refreshed, modern UI that improves navigation and streamlines workflows across the app.
+* **Cloud Sync Support**: Projects and settings can now be synced securely across multiple devices using your account.
+* **Customizable Shortcuts**: Create and manage keyboard shortcuts for almost any action.
 * Improved launch performance and reduced memory usage during startup.
 * Fixed an issue where notifications could appear twice in some cases.
 * Addressed several minor visual glitches in dark mode.]]>
