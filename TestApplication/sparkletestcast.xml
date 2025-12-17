@@ -84,19 +84,11 @@ From a good friend:
 >> And that is how nested quotes can work. A known limitation is properly styling lists in blockquotes so I'd suggest to avoid that.
 >
 
-After this paragraph, you should see a horizontal thematic line break.
+After this paragraph, you should see extra spacing from using a line break.
 
 ---
 
-> Even quotes can have thematic line breaks
->
-> ---
->
-> There you have it.
-
----
-
-Even code blocks are supported:
+Code blocks from markdown are also supported using a monospace font:
 
 ```sh
 me@Compy ~/D/P/Sparkle> ls

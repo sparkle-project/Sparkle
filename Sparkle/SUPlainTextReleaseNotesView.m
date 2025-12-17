@@ -156,8 +156,8 @@ static void processMarkdownFragmentAttributedString(NSAttributedString *fragment
             break;
         }
         case NSPresentationIntentKindParagraph: {
-            if (parentIntent != nil) {
-                // If the parent intent is a list item or a blockquote we don't want to apply paragraphSpacingBefore,
+            if (parentIntent != nil && parentIntent.intentKind == NSPresentationIntentKindListItem) {
+                // If the parent intent is a list item we don't want to apply paragraphSpacingBefore,
                 // and we'll apply less spacing
                 paragraphStyle.paragraphSpacing += font.pointSize * 0.3;
             } else {
@@ -213,10 +213,8 @@ static void processMarkdownFragmentAttributedString(NSAttributedString *fragment
             // Special rendering via text attachments or decorations is not done because
             // it's complex and may have tradeoffs
             
-            const CGFloat headIndentAdvancement = 10.0;
-            
-            paragraphStyle.firstLineHeadIndent += headIndentAdvancement;
-            paragraphStyle.headIndent += headIndentAdvancement;
+            paragraphStyle.firstLineHeadIndent += paragraphStyle.defaultTabInterval;
+            paragraphStyle.headIndent += paragraphStyle.defaultTabInterval;
 
             break;
         }
