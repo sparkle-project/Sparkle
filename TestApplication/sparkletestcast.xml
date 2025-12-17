@@ -55,7 +55,7 @@
         <sparkle:fullReleaseNotesLink>releasenotes.html</sparkle:fullReleaseNotesLink>
         <sparkle:channel>markdown</sparkle:channel>
         <description sparkle:format="markdown">
-<![CDATA[### Version 2.0.1
+<![CDATA[## Version 2.0.1
 
 * Added `markdown` support to release notes.
 * Upgraded text kit system to use *improved* TextKit 2.
@@ -100,7 +100,7 @@ build/               common_cli/          Downloader/          InstallerConnecti
 
 Note though, Sparkle's markdown support does not support tables or images. It needs to work without loading additional resources and without switching to TextKit 1.
 
-### Version 2.0
+## Version 2.0
 
 * **Redesigned Interface**: Enjoy a refreshed, modern UI that improves navigation and streamlines workflows across the app.
 * **Cloud Sync Support**: Projects and settings can now be synced securely across multiple devices using your account.

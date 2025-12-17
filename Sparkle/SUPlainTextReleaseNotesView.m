@@ -103,16 +103,16 @@ static void processMarkdownFragmentAttributedString(NSAttributedString *fragment
         case NSPresentationIntentKindHeader:
             switch (intent.headerLevel) {
                 case 1:
-                    font = [NSFont boldSystemFontOfSize:(CGFloat)inputParagraphFont.pointSize + 7.0];
+                    font = [NSFont boldSystemFontOfSize:(CGFloat)inputParagraphFont.pointSize * 1.5];
                     break;
                 case 2:
-                    font = [NSFont boldSystemFontOfSize:(CGFloat)inputParagraphFont.pointSize + 4.0];
+                    font = [NSFont boldSystemFontOfSize:(CGFloat)inputParagraphFont.pointSize * 1.3];
                     break;
                 case 3:
-                    font = [NSFont boldSystemFontOfSize:(CGFloat)inputParagraphFont.pointSize + 2.0];
+                    font = [NSFont boldSystemFontOfSize:(CGFloat)inputParagraphFont.pointSize * 1.2];
                     break;
                 default:
-                    font = [NSFont boldSystemFontOfSize:(CGFloat)inputParagraphFont.pointSize + 1.0];
+                    font = [NSFont boldSystemFontOfSize:(CGFloat)inputParagraphFont.pointSize * 1.1];
                     break;
             }
             break;
