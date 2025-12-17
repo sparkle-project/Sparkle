@@ -17,89 +17,6 @@
 
 #import <AppKit/AppKit.h>
 
-// Divider attachment cell used for markdown horizontal line breaks
-// Note: this does not work in Catalyst apps as it's NSTextAttachmentCell based
-API_AVAILABLE(macos(10.14))
-@interface SPUMarkdownHorizontalDividerAttachmentCell : NSTextAttachmentCell
-@end
-
-@implementation SPUMarkdownHorizontalDividerAttachmentCell
-{
-    NSTextView *_textView;
-    
-    CGFloat _headIndent;
-}
-
-- (instancetype)initWithTextView:(NSTextView *)textView headIndent:(CGFloat)headIndent
-{
-    self = [super init];
-    if (self != nil) {
-        _textView = textView;
-        _headIndent = headIndent;
-    }
-    return self;
-}
-
-- (NSSize)cellSize
-{
-    return NSMakeSize(CGFLOAT_MAX, 10.0);
-}
-
-- (void)drawWithFrame:(NSRect)cellFrame inView:(NSView *)view
-{
-    CGFloat yPosition = NSMidY(cellFrame);
-    
-    NSSize containerInset = _textView.textContainerInset;
-    CGFloat lineFragmentPadding = _textView.textContainer.lineFragmentPadding;
-    CGFloat totalWidthPadding = containerInset.width + lineFragmentPadding + _headIndent;
-    
-    NSBezierPath *path = [NSBezierPath bezierPath];
-    [path moveToPoint:NSMakePoint(view.bounds.origin.x + totalWidthPadding, yPosition)];
-    [path lineToPoint:NSMakePoint(view.bounds.origin.x + view.bounds.size.width - totalWidthPadding, yPosition)];
-
-    [NSColor.separatorColor setStroke];
-    [path setLineWidth:1.0];
-    [path stroke];
-}
-
-@end
-
-// Divider attachment cell used for markdown block quotes
-// Note: this does not work in Catalyst apps as it's NSTextAttachmentCell based
-API_AVAILABLE(macos(12.0))
-@interface SPUMarkdownVerticalAttachmentCell : NSTextAttachmentCell
-@end
-
-@implementation SPUMarkdownVerticalAttachmentCell
-
-- (NSSize)cellSize
-{
-    // Minimum height needs to be at least 1
-    return NSMakeSize(10.0, 1.0);
-}
-
-- (void)drawWithFrame:(NSRect)cellFrame inView:(NSView *)view
-{
-    const CGFloat lineWidth = 3.0;
-    CGFloat xPosition = cellFrame.origin.x + lineWidth / 2.0;
-    
-    NSBezierPath *path = [NSBezierPath bezierPath];
-    path.lineCapStyle = NSLineCapStyleButt;
-    
-    // In TextKit 2 we can render the entire view bounds and it will be appropriately clamped
-    NSPoint beginPoint = NSMakePoint(xPosition, view.bounds.origin.y);
-    NSPoint endPoint = NSMakePoint(beginPoint.x, beginPoint.y + view.bounds.size.height);
-    
-    [path moveToPoint:NSMakePoint(beginPoint.x, beginPoint.y)];
-    [path lineToPoint:NSMakePoint(endPoint.x, endPoint.y)];
-
-    [NSColor.lightGrayColor setStroke];
-    [path setLineWidth:lineWidth];
-    [path stroke];
-}
-
-@end
-
 @interface SUPlainTextReleaseNotesView () <NSTextViewDelegate>
 @end
 
@@ -176,7 +93,7 @@ API_AVAILABLE(macos(12.0))
     return _scrollView;
 }
 
-static void processMarkdownFragmentAttributedString(NSAttributedString *fragmentAttributedString, NSMutableAttributedString *outputAttributedSubString, NSMutableParagraphStyle *paragraphStyle, NSTextView *textView, BOOL canProcessListItem, NSMutableSet<NSNumber *> *previousVisitedListItemIntents, NSPresentationIntent *intent, NSFont *inputParagraphFont, NSFont *monospacedParagraphFont, NSAttributedString *tabAttributedString, NSAttributedString *newlineAttributedString, NSAttributedString *listBulletAttributedString) API_AVAILABLE(macos(12.0))
+static void processMarkdownFragmentAttributedString(NSAttributedString *fragmentAttributedString, NSMutableAttributedString *outputAttributedSubString, NSMutableParagraphStyle *paragraphStyle, BOOL canProcessListItem, NSMutableSet<NSNumber *> *previousVisitedListItemIntents, NSPresentationIntent *intent, NSFont *inputParagraphFont, NSFont *monospacedParagraphFont, NSAttributedString *tabAttributedString, NSAttributedString *newlineAttributedString, NSAttributedString *listBulletAttributedString) API_AVAILABLE(macos(12.0))
 {
     // Pre-pass processing of intent
     // This info must be computed before processing parent intent
@@ -220,7 +137,7 @@ static void processMarkdownFragmentAttributedString(NSAttributedString *fragment
     // In these cases, we may pre-append attributed string to the output before processing current intent.
     NSPresentationIntent *parentIntent = intent.parentIntent;
     if (parentIntent != nil) {
-        processMarkdownFragmentAttributedString(fragmentAttributedString, outputAttributedSubString, paragraphStyle, textView, canProcessListItem && !isListItem, previousVisitedListItemIntents, parentIntent, font, monospacedParagraphFont, tabAttributedString, newlineAttributedString, listBulletAttributedString);
+        processMarkdownFragmentAttributedString(fragmentAttributedString, outputAttributedSubString, paragraphStyle, canProcessListItem && !isListItem, previousVisitedListItemIntents, parentIntent, font, monospacedParagraphFont, tabAttributedString, newlineAttributedString, listBulletAttributedString);
     }
     
     // Process the current intent
@@ -290,32 +207,16 @@ static void processMarkdownFragmentAttributedString(NSAttributedString *fragment
             
             break;
         }
-        case NSPresentationIntentKindThematicBreak: {
-            NSTextAttachment *attachment = [[NSTextAttachment alloc] init];
-            // Account for headIndent if thematic break is inside a blockquote
-            // This may not work well if thematic break is in a list element, oh well
-            attachment.attachmentCell = [[SPUMarkdownHorizontalDividerAttachmentCell alloc] initWithTextView:textView headIndent:paragraphStyle.headIndent];
-
-            NSAttributedString *dividerAttributedString =
-                [NSAttributedString attributedStringWithAttachment:attachment];
-            
-            [outputAttributedSubString appendAttributedString:dividerAttributedString];
-            
-            break;
-        }
         case NSPresentationIntentKindBlockQuote: {
-            // Multiple levels of block quotes are handled (e.g. parent intent could be another block quote).
-            
-            NSTextAttachment *attachment = [[NSTextAttachment alloc] init];
-            attachment.attachmentCell = [[SPUMarkdownVerticalAttachmentCell alloc] init];
-
-            NSAttributedString *dividerAttributedString =
-                [NSAttributedString attributedStringWithAttachment:attachment];
-            
             // Advance text that wraps to next line by this divider width
-            paragraphStyle.headIndent += dividerAttributedString.size.width;
+            // Multiple levels of block quotes will be advanced mulitiple times
+            // Special rendering via text attachments or decorations is not done because
+            // it's complex and may have tradeoffs
             
-            [outputAttributedSubString appendAttributedString:dividerAttributedString];
+            const CGFloat headIndentAdvancement = 10.0;
+            
+            paragraphStyle.firstLineHeadIndent += headIndentAdvancement;
+            paragraphStyle.headIndent += headIndentAdvancement;
 
             break;
         }
@@ -338,6 +239,9 @@ static void processMarkdownFragmentAttributedString(NSAttributedString *fragment
         
         case NSPresentationIntentKindOrderedList:
         case NSPresentationIntentKindUnorderedList:
+        // Nothing special is rendered for thematic breaks
+        // Rendering them via text attachments or decorations is complex and has tradeoffs
+        case NSPresentationIntentKindThematicBreak:
         // Note: TextKit 2 doesn't support NSTextTable
         // Tables don't show up in release notes often, so they're not that worthwhile supporting
         case NSPresentationIntentKindTable:
@@ -348,8 +252,8 @@ static void processMarkdownFragmentAttributedString(NSAttributedString *fragment
     }
 }
 
-// Note: this must be called on main thread
-static NSAttributedString *formatMarkdownAttributedString(NSAttributedString *originalAttributedString, CGFloat defaultFontPointSize, NSTextView *textView) API_AVAILABLE(macos(12.0))
+// Note: this function can be called from a background thread and shouldn't use main-thread only APIs
+static NSAttributedString *formatMarkdownAttributedString(NSAttributedString *originalAttributedString, CGFloat defaultFontPointSize) API_AVAILABLE(macos(12.0))
 {
     // Create our fonts and cache some common attributed strings up front (list bullets, newline)
     
@@ -403,7 +307,7 @@ static NSAttributedString *formatMarkdownAttributedString(NSAttributedString *or
             NSUInteger previousOutputLength = outputAttributedString.length;
             
             BOOL canProcessListItem = YES;
-            processMarkdownFragmentAttributedString(fragmentAttributedString, outputAttributedString, paragraphStyle, textView, canProcessListItem, previousVisitedListItemIntents, intent, paragraphFont, monospacedParagraphFont, tabAttributedString, newlineAttributedString, listBulletAttributedString);
+            processMarkdownFragmentAttributedString(fragmentAttributedString, outputAttributedString, paragraphStyle, canProcessListItem, previousVisitedListItemIntents, intent, paragraphFont, monospacedParagraphFont, tabAttributedString, newlineAttributedString, listBulletAttributedString);
             
             [outputAttributedString addAttributes:@{NSParagraphStyleAttributeName: paragraphStyle} range:NSMakeRange(previousOutputLength, outputAttributedString.length - previousOutputLength)];
         }];
@@ -479,9 +383,9 @@ static NSAttributedString *formatMarkdownAttributedString(NSAttributedString *or
                         [self _loadAttributedString:attributedString completionHandler:completionHandler];
                     });
                 } else {
+                    NSAttributedString *formattedAttributedString = formatMarkdownAttributedString(originalMarkdownAttributedString, (CGFloat)self->_fontPointSize);
+                    
                     dispatch_async(dispatch_get_main_queue(), ^{
-                        NSAttributedString *formattedAttributedString = formatMarkdownAttributedString(originalMarkdownAttributedString, (CGFloat)self->_fontPointSize, self->_textView);
-                        
                         [self _loadAttributedString:formattedAttributedString completionHandler:completionHandler];
                     });
                 }
