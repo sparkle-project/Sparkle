@@ -243,6 +243,13 @@ func makeAppcasts(archivesSourceDir: URL, outputPathURL: URL?, cacheDirectory ca
                 if !item.supportsDSA && item.publicEdKey == nil {
                     continue
                 }
+                
+                // No need to generate delta updates that don't match minimumUpdateVersion
+                if let latestUpdateBranch = feedUpdateBranches[latestItem.version] ?? newUpdateBranches[latestItem.version],
+                   let latestMinimumUpdateVersion = latestUpdateBranch.minimumUpdateVersion,
+                   standardComparator.compareVersion(item.version, toVersion: latestMinimumUpdateVersion) == .orderedAscending {
+                    continue
+                }
 
                 let deltaBaseName = appBaseName + latestItem.version + "-" + item.version
                 let deltaPath = archivesSourceDir.appendingPathComponent(deltaBaseName).appendingPathExtension("delta")
