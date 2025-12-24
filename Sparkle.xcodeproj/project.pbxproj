@@ -1393,6 +1393,8 @@
 		A5BF4F1B1BC7668B007A052A /* SUTestWebServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUTestWebServer.h; sourceTree = "<group>"; };
 		A5BF4F1C1BC7668B007A052A /* SUTestWebServer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUTestWebServer.m; sourceTree = "<group>"; };
 		C23E88591BE7AF890050BB73 /* SparkleTestCodeSignApp.enc.dmg */ = {isa = PBXFileReference; lastKnownFileType = file; path = SparkleTestCodeSignApp.enc.dmg; sourceTree = "<group>"; };
+		E0949FCF2EFC4CFC0039C748 /* vi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = vi; path = vi.lproj/MainMenu.strings; sourceTree = "<group>"; };
+		E0949FD02EFC4CFD0039C748 /* vi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = vi; path = vi.lproj/Sparkle.strings; sourceTree = "<group>"; };
 		EA1E280F22B64522004AA304 /* libbsdiff.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libbsdiff.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		EA1E281422B64548004AA304 /* bsdiff-Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "bsdiff-Debug.xcconfig"; sourceTree = "<group>"; };
 		EA1E281522B64549004AA304 /* bsdiff-Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "bsdiff-Release.xcconfig"; sourceTree = "<group>"; };
@@ -3071,6 +3073,7 @@
 				fa,
 				zh_HK,
 				nn,
+				vi,
 			);
 			mainGroup = 0867D691FE84028FC02AAC07 /* Sparkle */;
 			packageReferences = (
@@ -3925,6 +3928,7 @@
 				F6E11510281410D10003736C /* ar */,
 				37A5F28528E9219000891504 /* zh_HK */,
 				728FBA1C2BB5013300651EDF /* nn */,
+				E0949FD02EFC4CFD0039C748 /* vi */,
 			);
 			name = Sparkle.strings;
 			sourceTree = "<group>";
@@ -3976,6 +3980,7 @@
 				726FD2CB25F4BE5F00123BC6 /* fa */,
 				37A5F28828E9219000891504 /* zh_HK */,
 				728FBA1B2BB5013300651EDF /* nn */,
+				E0949FCF2EFC4CFC0039C748 /* vi */,
 			);
 			name = MainMenu.xib;
 			sourceTree = "<group>";
