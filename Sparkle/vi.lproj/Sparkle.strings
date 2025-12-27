@@ -11,19 +11,19 @@
 "%1$@ %2$@ is available but your macOS version is too old to install it. At least macOS %3$@ is required." = "%1$@ %2$@ khả dụng nhưng phiên bản macOS của bạn quá cũ để cài đặt. Yêu cầu tối thiểu macOS %3$@.";
 
 /* Mac is too old and update requires Apple silicon Mac */
-"%1$@ %2$@ is available but this update requires a new Apple silicon Mac." = "%1$@ %2$@ khả dụng nhưng bản cập nhật này yêu cầu máy Mac Apple silicon mới.";
+"%1$@ %2$@ is available but this update requires a new Apple silicon Mac." = "%1$@ %2$@ khả dụng nhưng bản cập nhật này yêu cầu máy Mac chạy chip Apple silicon mới.";
 
 /* No comment provided by engineer. */
-"%1$@ can’t be updated if it’s running from the location it was downloaded to." = "%1$@ không thể được cập nhật nếu đang chạy từ vị trí tải xuống.";
+"%1$@ can’t be updated if it’s running from the location it was downloaded to." = "Không thể cập nhật %1$@ nếu ứng dụng đang chạy từ vị trí mà nó đã được tải xuống.";
 
 /* No comment provided by engineer. */
-"%1$@ can’t be updated because it was opened from a read-only or a temporary location." = "%1$@ không thể được cập nhật vì được mở từ vị trí chỉ đọc hoặc tạm thời.";
+"%1$@ can’t be updated because it was opened from a read-only or a temporary location." = "Không thể cập nhật %1$@ vì ứng dụng đã được mở từ một vị trí chỉ đọc hoặc vị trí tạm thời.";
 
 /* No comment provided by engineer. */
-"%@ %@ is currently the newest version available." = "%1$@ %2$@ hiện là phiên bản mới nhất hiện có.";
+"%@ %@ is currently the newest version available." = "%1$@ %2$@ hiện là phiên bản mới nhất.";
 
 /* No comment provided by engineer. */
-"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%1$@ %2$@ hiện là phiên bản mới nhất hiện có.\n(Bạn hiện đang chạy phiên bản %3$@.)";
+"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%1$@ %2$@ hiện là phiên bản mới nhất.\n(Bạn đang chạy phiên bản %3$@.)";
 
 /* Description text for SUUpdateAlert when the critical update is downloadable. */
 "%@ %@ is now available—you have %@. This is an important update; would you like to download it now?" = "%1$@ %2$@ hiện đã có—bạn đang dùng %@. Đây là bản cập nhật quan trọng; bạn có muốn tải xuống ngay bây giờ không?";
