@@ -504,6 +504,8 @@ class ArchiveItem: CustomStringConvertible {
             
             let htmlLocalizedReleaseNoteURL = baseLocalizedReleaseNoteURL.appendingPathExtension("html")
             let plainTextLocalizedReleaseNoteURL = baseLocalizedReleaseNoteURL.appendingPathExtension("txt")
+            let markdownLocalizedReleaseNoteURL = baseLocalizedReleaseNoteURL.appendingPathExtension("md")
+            let markdownSecondaryLocalizedReleaseNoteURL = baseLocalizedReleaseNoteURL.appendingPathExtension("markdown")
             
             let localizedReleaseNoteURL: URL?
             
@@ -511,6 +513,10 @@ class ArchiveItem: CustomStringConvertible {
                 localizedReleaseNoteURL = htmlLocalizedReleaseNoteURL
             } else if (try? plainTextLocalizedReleaseNoteURL.checkResourceIsReachable()) ?? false {
                 localizedReleaseNoteURL = plainTextLocalizedReleaseNoteURL
+            } else if (try? markdownLocalizedReleaseNoteURL.checkResourceIsReachable()) ?? false {
+                localizedReleaseNoteURL = markdownLocalizedReleaseNoteURL
+            } else if (try? markdownSecondaryLocalizedReleaseNoteURL.checkResourceIsReachable()) ?? false {
+                localizedReleaseNoteURL = markdownSecondaryLocalizedReleaseNoteURL
             } else {
                 localizedReleaseNoteURL = nil
             }
