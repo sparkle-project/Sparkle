@@ -24,9 +24,11 @@
 static NSString *SUAppcastItemDeltaUpdatesKey = @"deltaUpdates";
 static NSString *SUAppcastItemDisplayVersionStringKey = @"displayVersionString";
 static NSString *SUAppcastItemSignaturesKey = @"signatures";
+static NSString *SUAppcastItemReleaseNotesSignaturesKey = @"releaseNotesSignatures";
 static NSString *SUAppcastItemFileURLKey = @"fileURL";
 static NSString *SUAppcastItemInfoURLKey = @"infoURL";
 static NSString *SUAppcastItemContentLengthKey = @"contentLength";
+static NSString *SUAppcastItemLinkLengthKey = @"linkLength";
 static NSString *SUAppcastItemDescriptionKey = @"itemDescription";
 static NSString *SUAppcastItemDescriptionFormatKey = @"itemDescriptionFormat";
 static NSString *SUAppcastItemMaximumSystemVersionKey = @"maximumSystemVersion";
@@ -41,10 +43,13 @@ static NSString *SUAppcastItemInstallationTypeKey = @"SUAppcastItemInstallationT
 static NSString *SUAppcastItemStateKey = @"SUAppcastItemState";
 static NSString *SUAppcastItemDeltaFromSparkleExecutableSizeKey = @"SUAppcastItemDeltaFromSparkleExecutableSize";
 static NSString *SUAppcastItemDeltaFromSparkleLocalesKey = @"SUAppcastItemDeltaFromSparkleLocales";
+static NSString *SUAppcastItemSigningValidationStatusKey = @"SUAppcastItemSigningValidationStatus";
 
 @interface SUAppcastItem ()
 
 @property (readonly, nonatomic, nullable) SUSignatures *signatures;
+@property (readonly, nonatomic, nullable) SUSignatures *releaseNotesSignatures;
+@property (readonly, nonatomic) uint64_t releaseNotesContentLength;
 
 @end
 
@@ -66,6 +71,8 @@ static NSString *SUAppcastItemDeltaFromSparkleLocalesKey = @"SUAppcastItemDeltaF
 @synthesize deltaUpdates = _deltaUpdates;
 @synthesize displayVersionString = _displayVersionString;
 @synthesize signatures = _signatures;
+@synthesize releaseNotesSignatures = _releaseNotesSignatures;
+@synthesize releaseNotesContentLength = _releaseNotesContentLength;
 @synthesize fileURL = _fileURL;
 @synthesize contentLength = _contentLength;
 @synthesize infoURL = _infoURL;
@@ -88,6 +95,7 @@ static NSString *SUAppcastItemDeltaFromSparkleLocalesKey = @"SUAppcastItemDeltaF
 @synthesize channel = _channel;
 @synthesize deltaFromSparkleExecutableSize = _deltaFromSparkleExecutableSize;
 @synthesize deltaFromSparkleLocales = _deltaFromSparkleLocales;
+@synthesize signingValidationStatus = _signingValidationStatus;
 
 + (BOOL)supportsSecureCoding
 {
@@ -105,6 +113,7 @@ static NSString *SUAppcastItemDeltaFromSparkleLocalesKey = @"SUAppcastItemDeltaF
         
         _displayVersionString = [(NSString *)[decoder decodeObjectOfClass:[NSString class] forKey:SUAppcastItemDisplayVersionStringKey] copy];
         _signatures = (SUSignatures *)[decoder decodeObjectOfClass:[SUSignatures class] forKey:SUAppcastItemSignaturesKey];
+        _releaseNotesSignatures = (SUSignatures *)[decoder decodeObjectOfClass:[SUSignatures class] forKey:SUAppcastItemReleaseNotesSignaturesKey];
         _fileURL = [decoder decodeObjectOfClass:[NSURL class] forKey:SUAppcastItemFileURLKey];
         _infoURL = [decoder decodeObjectOfClass:[NSURL class] forKey:SUAppcastItemInfoURLKey];
         
@@ -113,6 +122,7 @@ static NSString *SUAppcastItemDeltaFromSparkleLocalesKey = @"SUAppcastItemDeltaF
         }
         
         _contentLength = (uint64_t)[decoder decodeInt64ForKey:SUAppcastItemContentLengthKey];
+        _releaseNotesContentLength = (uint64_t)[decoder decodeInt64ForKey:SUAppcastItemLinkLengthKey];
         
         NSString *installationType = [decoder decodeObjectOfClass:[NSString class] forKey:SUAppcastItemInstallationTypeKey];
         if (!SPUValidInstallationType(installationType)) {
@@ -159,6 +169,19 @@ static NSString *SUAppcastItemDeltaFromSparkleLocalesKey = @"SUAppcastItemDeltaF
         _phasedRolloutInterval = [decoder decodeObjectOfClass:[NSNumber class] forKey:SUAppcastElementPhasedRolloutInterval];
         
         _channel = [(NSString *)[decoder decodeObjectOfClass:[NSString class] forKey:SUAppcastElementChannel] copy];
+        
+        NSInteger decodedSigningValidationStatus = [decoder decodeIntegerForKey:SUAppcastItemSigningValidationStatusKey];
+        
+        switch (decodedSigningValidationStatus) {
+            case SPUAppcastSigningValidationStatusSkipped:
+            case SPUAppcastSigningValidationStatusSucceeded:
+            case SPUAppcastSigningValidationStatusFailed:
+                _signingValidationStatus = decodedSigningValidationStatus;
+                break;
+            default:
+                // This shouldn't be reached, skipped == 0 matches an old encoder that doesn't encode this enum.
+                return nil;
+        }
     }
     
     return self;
@@ -186,6 +209,10 @@ static NSString *SUAppcastItemDeltaFromSparkleLocalesKey = @"SUAppcastItemDeltaF
         [encoder encodeObject:_signatures forKey:SUAppcastItemSignaturesKey];
     }
     
+    if (_releaseNotesSignatures != nil) {
+        [encoder encodeObject:_releaseNotesSignatures forKey:SUAppcastItemReleaseNotesSignaturesKey];
+    }
+    
     if (_fileURL != nil) {
         [encoder encodeObject:_fileURL forKey:SUAppcastItemFileURLKey];
     }
@@ -195,6 +222,7 @@ static NSString *SUAppcastItemDeltaFromSparkleLocalesKey = @"SUAppcastItemDeltaF
     }
     
     [encoder encodeInt64:(int64_t)_contentLength forKey:SUAppcastItemContentLengthKey];
+    [encoder encodeInt64:(int64_t)_releaseNotesContentLength forKey:SUAppcastItemLinkLengthKey];
     
     if (_itemDescription != nil) {
         [encoder encodeObject:_itemDescription forKey:SUAppcastItemDescriptionKey];
@@ -267,6 +295,8 @@ static NSString *SUAppcastItemDeltaFromSparkleLocalesKey = @"SUAppcastItemDeltaF
     if (_channel != nil) {
         [encoder encodeObject:_channel forKey:SUAppcastElementChannel];
     }
+    
+    [encoder encodeInteger:_signingValidationStatus forKey:SUAppcastItemSigningValidationStatusKey];
 }
 
 - (BOOL)isDeltaUpdate
@@ -368,39 +398,65 @@ static NSString *SUAppcastItemDeltaFromSparkleLocalesKey = @"SUAppcastItemDeltaF
 }
 
 // Initializer used for making delta items
-- (nullable instancetype)initWithDictionary:(NSDictionary *)dict relativeToURL:(NSURL * _Nullable)appcastURL state:(SPUAppcastItemState * _Nullable)state SPU_OBJC_DIRECT
+- (nullable instancetype)initWithDictionary:(NSDictionary *)dict relativeToURL:(NSURL * _Nullable)appcastURL state:(SPUAppcastItemState * _Nullable)state signingValidationStatus:(SPUAppcastSigningValidationStatus)signingValidationStatus SPU_OBJC_DIRECT
 {
-    return [self initWithDictionary:dict relativeToURL:appcastURL stateResolver:nil resolvedState:state failureReason:nil];
+    return [self initWithDictionary:dict relativeToURL:appcastURL stateResolver:nil resolvedState:state signingValidationStatus:signingValidationStatus failureReason:nil];
 }
 
 // Exported public initializer
-- (nullable instancetype)initWithDictionary:(NSDictionary *)dict relativeToURL:(NSURL * _Nullable)appcastURL stateResolver:(SPUAppcastItemStateResolver *)stateResolver failureReason:(NSString *__autoreleasing *)error
+- (nullable instancetype)initWithDictionary:(NSDictionary *)dict relativeToURL:(NSURL * _Nullable)appcastURL stateResolver:(SPUAppcastItemStateResolver *)stateResolver signingValidationStatus:(SPUAppcastSigningValidationStatus)signingValidationStatus failureReason:(NSString *__autoreleasing *)error
 {
-    return [self initWithDictionary:dict relativeToURL:appcastURL stateResolver:stateResolver resolvedState:nil failureReason:error];
+    return [self initWithDictionary:dict relativeToURL:appcastURL stateResolver:stateResolver resolvedState:nil signingValidationStatus:signingValidationStatus failureReason:error];
 }
 
 // Deprecated
 - (nullable instancetype)initWithDictionary:(NSDictionary *)dict
 {
-    return [self initWithDictionary:dict relativeToURL:nil stateResolver:nil resolvedState:nil failureReason:nil];
+    return [self initWithDictionary:dict relativeToURL:nil stateResolver:nil resolvedState:nil signingValidationStatus:SPUAppcastSigningValidationStatusSkipped failureReason:nil];
 }
 
 // Deprecated
 - (nullable instancetype)initWithDictionary:(NSDictionary *)dict failureReason:(NSString *__autoreleasing *)error
 {
-    return [self initWithDictionary:dict relativeToURL:nil stateResolver:nil resolvedState:nil failureReason:error];
+    return [self initWithDictionary:dict relativeToURL:nil stateResolver:nil resolvedState:nil signingValidationStatus:SPUAppcastSigningValidationStatusSkipped failureReason:error];
 }
 
 // Deprecated
 - (nullable instancetype)initWithDictionary:(NSDictionary *)dict relativeToURL:(NSURL * _Nullable)appcastURL failureReason:(NSString *__autoreleasing *)error
 {
-    return [self initWithDictionary:dict relativeToURL:appcastURL stateResolver:nil resolvedState:nil failureReason:error];
+    return [self initWithDictionary:dict relativeToURL:appcastURL stateResolver:nil resolvedState:nil signingValidationStatus:SPUAppcastSigningValidationStatusSkipped failureReason:error];
 }
 
-- (nullable instancetype)initWithDictionary:(NSDictionary *)dict relativeToURL:(NSURL * _Nullable)appcastURL stateResolver:(SPUAppcastItemStateResolver * _Nullable)stateResolver resolvedState:(SPUAppcastItemState * _Nullable)resolvedState failureReason:(NSString *__autoreleasing *)error
+// When the feed fails signing validation as fallback, sanitize the version strings
+// so they don't easily contain long believable messages telling the user to do something
+#define MAX_NUMBER_OF_CHARACTERS_IN_UNTRUSTED_VERSION_STRING_AFTER_FIRST_LETTER 10
+static NSString *SPUSanitizeUntrustedVersionString(NSString *versionString, NSString *versionStringElement)
+{
+    NSCharacterSet *lettersCharacterSet = [NSCharacterSet letterCharacterSet];
+    
+    NSRange firstLetterRange = [versionString rangeOfCharacterFromSet:lettersCharacterSet];
+    if (firstLetterRange.location == NSNotFound) {
+        // No alphabetic characters
+        return versionString;
+    }
+    
+    NSUInteger maxVersionStringLength = MIN(firstLetterRange.location + MAX_NUMBER_OF_CHARACTERS_IN_UNTRUSTED_VERSION_STRING_AFTER_FIRST_LETTER, versionString.length);
+    
+    NSRange allowedRange = NSMakeRange(0, maxVersionStringLength);
+    NSString *allowedVersionString = [versionString substringWithRange:allowedRange];
+    
+    if (![versionString isEqualToString:allowedVersionString]) {
+        SULog(SULogLevelError, @"Error: Sanitized appcast item %@ from '%@' to '%@' because appcast signing validation failed and version could be untrusted", versionStringElement, versionString, allowedVersionString);
+    }
+    
+    return allowedVersionString;
+}
+
+- (nullable instancetype)initWithDictionary:(NSDictionary *)dict relativeToURL:(NSURL * _Nullable)appcastURL stateResolver:(SPUAppcastItemStateResolver * _Nullable)stateResolver resolvedState:(SPUAppcastItemState * _Nullable)resolvedState signingValidationStatus:(SPUAppcastSigningValidationStatus)signingValidationStatus failureReason:(NSString *__autoreleasing *)error
 {
     self = [super init];
     if (self) {
+        _signingValidationStatus = signingValidationStatus;
         _title = [(NSString *)[dict objectForKey:SURSSElementTitle] copy];
         
         NSDictionary *enclosure = [dict objectForKey:SURSSElementEnclosure];
@@ -424,26 +480,35 @@ static NSString *SUAppcastItemDeltaFromSparkleLocalesKey = @"SUAppcastItemDeltaF
             // No sparkle:version element/attribute anywhere?
             SULog(SULogLevelError, @"warning: Item '%@' is missing '<%@>' element. Version comparison may be unreliable. Please always specify %@", _title, SUAppcastElementVersion, SUAppcastElementVersion);
 
-            // Separate the url by underscores and take the last component, as that'll be closest to the end,
-            // then we remove the extension. Hopefully, this will be the version.
-            NSArray<NSString *> *fileComponents = [(NSString *)[enclosure objectForKey:SURSSAttributeURL] componentsSeparatedByString:@"_"];
-            if ([fileComponents count] > 1) {
-                newVersion = [[fileComponents lastObject] stringByDeletingPathExtension];
+            // Grabbing the version from the URL is not properly documented or encouraged.
+            // Not supporting it for appcast signing
+            if (signingValidationStatus == SPUAppcastSigningValidationStatusSkipped) {
+                // Separate the url by underscores and take the last component, as that'll be closest to the end,
+                // then we remove the extension. Hopefully, this will be the version.
+                NSArray<NSString *> *fileComponents = [(NSString *)[enclosure objectForKey:SURSSAttributeURL] componentsSeparatedByString:@"_"];
+                if ([fileComponents count] > 1) {
+                    newVersion = [[fileComponents lastObject] stringByDeletingPathExtension];
+                }
             }
         }
 
-        if (!newVersion) {
+        if (newVersion == nil) {
             if (error) {
-                *error = [NSString stringWithFormat:@"Feed item lacks %@ element, and version couldn't be deduced from file name (would have used last component of a file name like AppName_1.3.4.zip)", SUAppcastElementVersion];
+                *error = [NSString stringWithFormat:@"Feed item lacks %@ element, and version couldn't be deduced.", SUAppcastElementVersion];
             }
             return nil;
+        }
+        
+        if (signingValidationStatus == SPUAppcastSigningValidationStatusFailed) {
+            newVersion = SPUSanitizeUntrustedVersionString(newVersion, SUAppcastElementVersion);
         }
 
         _propertiesDictionary = [[NSDictionary alloc] initWithDictionary:dict];
         _dateString = [(NSString *)[dict objectForKey:SURSSElementPubDate] copy];
         
+        // Description is not to be trusted if appcast wasn't signed correctly
         id itemDescription = [dict objectForKey:SURSSElementDescription];
-        if (itemDescription != nil) {
+        if (signingValidationStatus != SPUAppcastSigningValidationStatusFailed && itemDescription != nil) {
             if ([(NSObject *)itemDescription isKindOfClass:[NSDictionary class]]) {
                 NSString *descriptionContent = itemDescription[@"content"];
                 NSString *itemDescriptionString;
@@ -489,20 +554,21 @@ static NSString *SUAppcastItemDeltaFromSparkleLocalesKey = @"SUAppcastItemDeltaF
             _itemDescriptionFormat = nil;
         }
 
-        NSString *theInfoURL = [dict objectForKey:SURSSElementLink];
-        if (theInfoURL) {
-            if (![theInfoURL isKindOfClass:[NSString class]]) {
+        NSURL *infoURL = nil;
+        NSString *infoLinkURLString = [dict objectForKey:SURSSElementLink];
+        if (infoLinkURLString != nil) {
+            if (![infoLinkURLString isKindOfClass:[NSString class]]) {
                 SULog(SULogLevelError, @"%@ -%@ Info URL is not of valid type.", NSStringFromClass([self class]), NSStringFromSelector(_cmd));
             } else {
-                NSURL *infoURL;
+                NSURL *processedInfoURL;
                 if (appcastURL != nil) {
-                    infoURL = [NSURL URLWithString:theInfoURL relativeToURL:appcastURL];
+                    processedInfoURL = [NSURL URLWithString:infoLinkURLString relativeToURL:appcastURL];
                 } else {
-                    infoURL = [NSURL URLWithString:theInfoURL];
+                    processedInfoURL = [NSURL URLWithString:infoLinkURLString];
                 }
                 
-                if ([infoURL.scheme caseInsensitiveCompare:@"http"] == NSOrderedSame || [infoURL.scheme caseInsensitiveCompare:@"https"] == NSOrderedSame) {
-                    _infoURL = infoURL;
+                if ([processedInfoURL.scheme caseInsensitiveCompare:@"http"] == NSOrderedSame || [processedInfoURL.scheme caseInsensitiveCompare:@"https"] == NSOrderedSame) {
+                    infoURL = processedInfoURL;
                 } else {
                     SULog(SULogLevelError, @"%@ -%@ Info URL must have a http or https URL scheme.", NSStringFromClass([self class]), NSStringFromSelector(_cmd));
                 }
@@ -511,14 +577,15 @@ static NSString *SUAppcastItemDeltaFromSparkleLocalesKey = @"SUAppcastItemDeltaF
 
         // Need an info URL or an enclosure URL. Former to show "More Info"
         //	page, latter to download & install:
-        if (!enclosure && !_infoURL) {
+        if (enclosure == nil && infoURL == nil) {
             if (error) {
                 *error = @"No enclosure in feed item";
             }
             return nil;
         }
         
-        if (_infoURL != nil) {
+        // Further below in this method validation is done for info-only updates if appcast signing validation failed
+        if (infoURL != nil) {
             // If enclosure doesn't exist, the update must be an informational update
             // Otherwise check presence of informational update element
             _informationalUpdateVersions = (enclosure != nil) ? [dict objectForKey:SUAppcastElementInformationalUpdate] : [NSSet set];
@@ -528,7 +595,7 @@ static NSString *SUAppcastItemDeltaFromSparkleLocalesKey = @"SUAppcastItemDeltaF
         }
 
         NSString *enclosureURLString = [enclosure objectForKey:SURSSAttributeURL];
-        if (!enclosureURLString && !_infoURL) {
+        if (enclosureURLString == nil && infoURL == nil) {
             if (error) {
                 *error = @"Feed item's enclosure lacks URL";
             }
@@ -622,18 +689,23 @@ static NSString *SUAppcastItemDeltaFromSparkleLocalesKey = @"SUAppcastItemDeltaF
         }
         
         // Grab critical update information
-        NSDictionary * _Nullable criticalUpdateDictionaryFromAppcast = (NSDictionary *)[dict objectForKey:SUAppcastElementCriticalUpdate];
-        NSArray *tags = [dict objectForKey:SUAppcastElementTags];
-        
+        // Critical update information is not to be trusted if appcast wasn't signed correctly
         NSDictionary * _Nullable criticalUpdateDictionary;
-        if (criticalUpdateDictionaryFromAppcast != nil) {
-            criticalUpdateDictionary = criticalUpdateDictionaryFromAppcast;
-        } else if ([tags isKindOfClass:[NSArray class]] && [tags containsObject:SUAppcastElementCriticalUpdate]) {
-            // Legacy path where critical update used to be a tag without a specified version
-            criticalUpdateDictionary = @{};
-        } else {
-            // No critical info present
+        if (signingValidationStatus == SPUAppcastSigningValidationStatusFailed) {
             criticalUpdateDictionary = nil;
+        } else {
+            NSDictionary * _Nullable criticalUpdateDictionaryFromAppcast = (NSDictionary *)[dict objectForKey:SUAppcastElementCriticalUpdate];
+            NSArray *tags = [dict objectForKey:SUAppcastElementTags];
+            
+            if (criticalUpdateDictionaryFromAppcast != nil) {
+                criticalUpdateDictionary = criticalUpdateDictionaryFromAppcast;
+            } else if ([tags isKindOfClass:[NSArray class]] && [tags containsObject:SUAppcastElementCriticalUpdate]) {
+                // Legacy path where critical update used to be a tag without a specified version
+                criticalUpdateDictionary = @{};
+            } else {
+                // No critical info present
+                criticalUpdateDictionary = nil;
+            }
         }
         
         _hasCriticalInformation = (criticalUpdateDictionary != nil);
@@ -645,6 +717,18 @@ static NSString *SUAppcastItemDeltaFromSparkleLocalesKey = @"SUAppcastItemDeltaF
             _state = resolvedState;
         }
         
+        // Note this needs to be checked after creating _state and _informationalUpdateVersions
+        if (signingValidationStatus == SPUAppcastSigningValidationStatusFailed && [self isInformationOnlyUpdate]) {
+            if (error != nil) {
+                *error = @"Informational update is rejected because signing validation on feed failed";
+            }
+            return nil;
+        }
+        
+        // Even when the update is not an informational only update, the link may be referenced elsewhere
+        // If signing validation on appcast failed, the link is not to be trusted anywhere
+        _infoURL = (signingValidationStatus != SPUAppcastSigningValidationStatusFailed) ? infoURL : nil;
+        
         NSString* rolloutIntervalString = [(NSString *)[dict objectForKey:SUAppcastElementPhasedRolloutInterval] copy];
         if (rolloutIntervalString != nil) {
             _phasedRolloutInterval = @(rolloutIntervalString.integerValue);
@@ -652,7 +736,11 @@ static NSString *SUAppcastItemDeltaFromSparkleLocalesKey = @"SUAppcastItemDeltaF
 
         NSString *shortVersionString = [enclosure objectForKey:SUAppcastAttributeShortVersionString];
         if (nil == shortVersionString) {
-            shortVersionString = [dict objectForKey:SUAppcastAttributeShortVersionString]; // fall back on the <item>
+            shortVersionString = [dict objectForKey:SUAppcastElementShortVersionString]; // fall back on the <item>
+        }
+        
+        if (shortVersionString != nil && signingValidationStatus == SPUAppcastSigningValidationStatusFailed) {
+            shortVersionString = SPUSanitizeUntrustedVersionString(shortVersionString, SUAppcastElementShortVersionString);
         }
 
         if (shortVersionString) {
@@ -719,29 +807,43 @@ static NSString *SUAppcastItemDeltaFromSparkleLocalesKey = @"SUAppcastItemDeltaF
         }
 
         // Find the appropriate release notes URL.
-        NSString *releaseNotesString = [dict objectForKey:SUAppcastElementReleaseNotesLink];
-        if (releaseNotesString) {
-            NSURL *url;
-            if (appcastURL != nil) {
-                url = [NSURL URLWithString:releaseNotesString relativeToURL:appcastURL];
+        // Release notes is not to be trusted if signing validation on appcast failed
+        NSDictionary *releaseNotesLinkDictionary = [dict objectForKey:SUAppcastElementReleaseNotesLink];
+        if (signingValidationStatus != SPUAppcastSigningValidationStatusFailed && releaseNotesLinkDictionary != nil) {
+            NSString *releaseNotesString = [releaseNotesLinkDictionary objectForKey:@"content"];
+            if (releaseNotesString != nil) {
+                NSURL *url;
+                if (appcastURL != nil) {
+                    url = [NSURL URLWithString:releaseNotesString relativeToURL:appcastURL];
+                } else {
+                    url = [NSURL URLWithString:releaseNotesString];
+                }
+                if ([url.scheme caseInsensitiveCompare:@"http"] == NSOrderedSame || [url.scheme caseInsensitiveCompare:@"https"] == NSOrderedSame) {
+                    _releaseNotesURL = url;
+                } else {
+                    SULog(SULogLevelError, @"Release notes must have a http or https URL scheme.");
+                    _releaseNotesURL = nil;
+                }
+            } else if ([_itemDescription hasPrefix:@"http://"] || [_itemDescription hasPrefix:@"https://"]) { // if the description starts with http:// or https:// use that.
+                _releaseNotesURL = [NSURL URLWithString:(NSString * _Nonnull)_itemDescription];
             } else {
-                url = [NSURL URLWithString:releaseNotesString];
-            }
-            if ([url.scheme caseInsensitiveCompare:@"http"] == NSOrderedSame || [url.scheme caseInsensitiveCompare:@"https"] == NSOrderedSame) {
-                _releaseNotesURL = url;
-            } else {
-                SULog(SULogLevelError, @"Release notes must have a http or https URL scheme.");
                 _releaseNotesURL = nil;
             }
-        } else if ([_itemDescription hasPrefix:@"http://"] || [_itemDescription hasPrefix:@"https://"]) { // if the description starts with http:// or https:// use that.
-            _releaseNotesURL = [NSURL URLWithString:(NSString * _Nonnull)_itemDescription];
-        } else {
-            _releaseNotesURL = nil;
+            
+            _releaseNotesSignatures = [[SUSignatures alloc] initWithEd:[releaseNotesLinkDictionary objectForKey:SUAppcastAttributeEDSignature]
+    #if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
+                                                       dsa:nil
+    #endif
+            ];
+            
+            long long releaseNotesLength = [(NSString *)[releaseNotesLinkDictionary objectForKey:@"length"] longLongValue];
+            _releaseNotesContentLength = (releaseNotesLength > 0) ? (uint64_t)releaseNotesLength : 0;
         }
         
         // Get full release notes URL if informed.
+        // Full release notes is not to be trusted if signing validation on appcast failed
         NSString *fullReleaseNotesString = [dict objectForKey:SUAppcastElementFullReleaseNotesLink];
-        if (fullReleaseNotesString) {
+        if (signingValidationStatus != SPUAppcastSigningValidationStatusFailed && fullReleaseNotesString != nil) {
             NSURL *url;
             if (appcastURL != nil) {
                 url = [NSURL URLWithString:fullReleaseNotesString relativeToURL:appcastURL];
@@ -768,7 +870,7 @@ static NSString *SUAppcastItemDeltaFromSparkleLocalesKey = @"SUAppcastItemDeltaF
                 NSMutableDictionary *fakeAppCastDict = [dict mutableCopy];
                 [fakeAppCastDict removeObjectForKey:SUAppcastElementDeltas];
                 [fakeAppCastDict setObject:deltaDictionary forKey:SURSSElementEnclosure];
-                SUAppcastItem *deltaItem = [[SUAppcastItem alloc] initWithDictionary:fakeAppCastDict relativeToURL:appcastURL state:_state];
+                SUAppcastItem *deltaItem = [[SUAppcastItem alloc] initWithDictionary:fakeAppCastDict relativeToURL:appcastURL state:_state signingValidationStatus:_signingValidationStatus];
 
                 if (deltaItem != nil) {
                     [deltas setObject:deltaItem forKey:deltaFrom];

@@ -78,6 +78,8 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  *
  *  @c appcastItem.criticalUpdate indicates if the update is a critical update.
  *
+ *  @c appcastItem.signingValidationStatus indicates the signing validation status of the appcast, which may be applicable if appcast signing is required.
+ *
  * A reply of `SPUUserUpdateChoiceInstall` begins or resumes downloading, extracting, or installing the update.
  * If the state.stage is `SPUUserUpdateStateInstalling`, this may send a quit event to the application and relaunch it immediately (in this state, this behaves as a fast "install and Relaunch").
  * If the state.stage is `SPUUpdateStateNotDownloaded` or `SPUUpdateStateDownloaded` the user may be presented an authorization prompt to install the update after `-showDownloadDidStartExtractingUpdate` is called if authorization is required for installation. For example, this may occur if the update on disk is owned by a different user (e.g. root or admin for non-admin users), or if the update is a package install.

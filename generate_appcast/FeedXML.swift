@@ -150,11 +150,72 @@ func readAppcast(archives: [String: ArchiveItem], appcastURL: URL) throws -> [St
     return updateBranches
 }
 
-func writeAppcast(appcastDestPath: URL, appcast: Appcast, fullReleaseNotesLink: String?, preferToEmbedReleaseNotes: Bool, link: String?, newChannel: String?, newMinimumUpdateVersion: String?, majorVersion: String?, ignoreSkippedUpgradesBelowVersion: String?, phasedRolloutInterval: Int?, criticalUpdateVersion: String?, informationalUpdateVersions: [String]?) throws -> (numNewUpdates: Int, numExistingUpdates: Int, numUpdatesRemoved: Int) {
+private func signReleaseNotesIfNeeded(element releaseNotesElement: XMLElement, filePath unresolvedReleaseNotesPath: URL, signedReleaseNoteFiles: inout [String: (String, UInt)], requiresSignedAppcast: Bool, disableEmbeddedSignWarning: Bool, keys: PrivateKeys) throws {
+    guard let publicEdKey = keys.publicEdKey, let privateEdKey = keys.privateEdKey else {
+        return
+    }
+    
+    let existingEdSignatureAttribute = releaseNotesElement.attribute(forName: SUAppcastAttributeEDSignature)
+    guard requiresSignedAppcast || existingEdSignatureAttribute != nil else {
+        return
+    }
+    
+    let resolvedReleaseNotesPath = unresolvedReleaseNotesPath.resolvingSymlinksInPath()
+    
+    let releaseNotesBase64Signature: String
+    let releaseNotesLength: UInt
+    if let (existingReleaseNotesBase64Signature, existingReleaseNotesLength) = signedReleaseNoteFiles[resolvedReleaseNotesPath.path] {
+        releaseNotesBase64Signature = existingReleaseNotesBase64Signature
+        releaseNotesLength = existingReleaseNotesLength
+    } else {
+        var releaseNotesData = try Data(contentsOf: resolvedReleaseNotesPath)
+        
+        if !disableEmbeddedSignWarning {
+            // Update release notes file (except for plain-text ones) to include warning about making
+            // future modifications in the file
+            let pathExtension = resolvedReleaseNotesPath.pathExtension
+            if pathExtension == "html" || pathExtension == "md" || pathExtension == "markdown" {
+                do {
+                    if let updatedReleaseNotesData = updateHTMLCommentSigningWarningInReleaseNotes(data: releaseNotesData) {
+                        try updatedReleaseNotesData.write(to: resolvedReleaseNotesPath, options: .atomic)
+                        print("Updated \(resolvedReleaseNotesPath.lastPathComponent) to include signing warning for making further modifications.")
+                        
+                        releaseNotesData = updatedReleaseNotesData
+                    }
+                } catch {
+                    // Fallback to using original release notes
+                    print("Warning: failed to update release notes to include signing warning for making further modifications. Skipping updating \(resolvedReleaseNotesPath.path)")
+                }
+            }
+        }
+        
+        releaseNotesBase64Signature = try edSignature(path: resolvedReleaseNotesPath, publicEdKey: publicEdKey, privateEdKey: privateEdKey)
+        releaseNotesLength = UInt(releaseNotesData.count)
+        
+        signedReleaseNoteFiles[resolvedReleaseNotesPath.path] = (releaseNotesBase64Signature, releaseNotesLength)
+    }
+    
+    if let existingEdSignatureAttribute {
+        existingEdSignatureAttribute.stringValue = releaseNotesBase64Signature
+    } else {
+        let signatureAttribute = XMLNode.attribute(withName: SUAppcastAttributeEDSignature, stringValue: releaseNotesBase64Signature) as! XMLNode
+        releaseNotesElement.addAttribute(signatureAttribute)
+    }
+    
+    if let existingLengthAttribute = releaseNotesElement.attribute(forName: SUAppcastAttributeLength) {
+        existingLengthAttribute.stringValue = "\(releaseNotesLength)"
+    } else {
+        let lengthAttribute = XMLNode.attribute(withName: SUAppcastAttributeLength, stringValue: "\(releaseNotesLength)") as! XMLNode
+        releaseNotesElement.addAttribute(lengthAttribute)
+    }
+}
+
+func writeAppcast(appcastDestPath: URL, keys: PrivateKeys, disableEmbeddedSignWarning: Bool, appcast: Appcast, fullReleaseNotesLink: String?, preferToEmbedReleaseNotes: Bool, link: String?, newChannel: String?, newMinimumUpdateVersion: String?, majorVersion: String?, ignoreSkippedUpgradesBelowVersion: String?, phasedRolloutInterval: Int?, criticalUpdateVersion: String?, informationalUpdateVersions: [String]?) throws -> (numNewUpdates: Int, numExistingUpdates: Int, numUpdatesRemoved: Int) {
     let appBaseName = appcast.inferredAppName
 
     let sparkleNS = "http://www.andymatuschak.org/xml-namespaces/sparkle"
 
+    let appcastWasPreviouslySigned: Bool
     var doc: XMLDocument
     do {
         let options: XMLNode.Options = [
@@ -162,13 +223,20 @@ func writeAppcast(appcastDestPath: URL, appcast: Appcast, fullReleaseNotesLink: 
             XMLNode.Options.nodePreserveCDATA,
             XMLNode.Options.nodePreserveWhitespace,
         ]
-        doc = try XMLDocument(contentsOf: appcastDestPath, options: options)
+        
+        let xmlData = try Data(contentsOf: appcastDestPath)
+        doc = try XMLDocument(data: xmlData, options: options)
+        
+        let contentData = SPUExtractAppcastContent(xmlData, nil, nil)
+        appcastWasPreviouslySigned = contentData.count != xmlData.count
     } catch {
         let root = XMLElement(name: "rss")
         root.addAttribute(XMLNode.attribute(withName: "xmlns:sparkle", stringValue: sparkleNS) as! XMLNode)
         root.addAttribute(XMLNode.attribute(withName: "version", stringValue: "2.0") as! XMLNode)
         doc = XMLDocument(rootElement: root)
         doc.isStandalone = true
+        
+        appcastWasPreviouslySigned = false
     }
 
     var channel: XMLElement
@@ -224,11 +292,36 @@ func writeAppcast(appcastDestPath: URL, appcast: Appcast, fullReleaseNotesLink: 
         root.addChild(channel)
     }
     
+    // If appcast has not already been signed, see if any of its update archives require signing
+    let requiresSignedAppcast: Bool
+    if appcastWasPreviouslySigned {
+        requiresSignedAppcast = true
+    } else {
+        var requiresSignedAppcastFromArchives = false
+        for version in appcast.versionsInFeed {
+            guard let update = appcast.archives[version] else {
+                continue
+            }
+            
+            if update.requiresSignedAppcast {
+                requiresSignedAppcastFromArchives = true
+                break
+            }
+        }
+        
+        requiresSignedAppcast = requiresSignedAppcastFromArchives
+    }
+    
+    // Keep track of already signed release note files so we avoid
+    // re-signing the same file in case the developer is using symlinks
+    // Path -> [(EdSignature, Length)]
+    var signedReleaseNoteFiles: [String: (String, UInt)] = [:]
+    
     var numNewUpdates = 0
     var numExistingUpdates = 0
     
     let versionComparator = SUStandardVersionComparator()
-
+    
     var numItems = 0
     for version in appcast.versionsInFeed {
         guard let update = appcast.archives[version] else {
@@ -432,35 +525,57 @@ func writeAppcast(appcastDestPath: URL, appcast: Appcast, fullReleaseNotesLink: 
             item.removeChild(at: existingDescriptionElement.index)
         }
         
-        if let url = update.releaseNotesURL(embedReleaseNotesAlways: embedReleaseNotesAlways) {
+        if let releaseNotesFilePath = update.releaseNotesPath,
+           let url = update.releaseNotesURL(releaseNotesPath: releaseNotesFilePath, embedReleaseNotesAlways: embedReleaseNotesAlways) {
             // The update includes a valid release notes URL
+            let releaseNotesElement: XMLElement
             if let existingReleaseNotesElement = relElement {
-                // The existing item includes a release notes element. Update it.
-                existingReleaseNotesElement.stringValue = url.absoluteString
+                releaseNotesElement = existingReleaseNotesElement
             } else {
-                // The existing item doesn't have a release notes element. Add one.
-                item.addChild(XMLElement.element(withName: SUAppcastElementReleaseNotesLink, stringValue: url.absoluteString) as! XMLElement)
+                releaseNotesElement = XMLElement.element(withName: SUAppcastElementReleaseNotesLink) as! XMLElement
+                item.addChild(releaseNotesElement)
             }
+            
+            // Update release notes
+            releaseNotesElement.stringValue = url.absoluteString
+            
+            // Sign the release notes
+            try signReleaseNotesIfNeeded(element: releaseNotesElement, filePath: releaseNotesFilePath, signedReleaseNoteFiles: &signedReleaseNoteFiles, requiresSignedAppcast: requiresSignedAppcast, disableEmbeddedSignWarning: disableEmbeddedSignWarning, keys: keys)
         } else if let childIndex = relElement?.index {
             // The update doesn't include a release notes URL. Remove it.
             item.removeChild(at: childIndex)
         }
 
+        // Retrieve all existing language nodes for release notes
         let languageNotesNodes = ((try? item.nodes(forXPath: releaseNotesXpath)) as? [XMLElement])?
             .map { ($0, $0.attribute(forName: SUXMLLanguage)?.stringValue )}
             .filter { $0.1 != nil } ?? []
+        
+        // Remove all language nodes that don't have corresponding release notes file
+        let localizedReleaseNotes = update.localizedReleaseNotes()
         for (node, language) in languageNotesNodes.reversed()
-            where !update.localizedReleaseNotes().contains(where: { $0.0 == language }) {
+            where !localizedReleaseNotes.contains(where: { $0.0 == language }) {
             item.removeChild(at: node.index)
         }
-        for (language, url) in update.localizedReleaseNotes() {
-            if !languageNotesNodes.contains(where: { $0.1 == language }) {
+        // Update all existing and insert missing localized release notes nodes
+        for (language, url, releaseNotesFilePath) in localizedReleaseNotes {
+            let localizedReleaseNotesElement: XMLElement
+            if let foundNodeIndex = languageNotesNodes.firstIndex(where: { $0.1 == language }) {
+                localizedReleaseNotesElement = languageNotesNodes[foundNodeIndex].0
+                localizedReleaseNotesElement.stringValue = url.absoluteString
+            } else {
                 let localizedNode = XMLNode.element(
                     withName: SUAppcastElementReleaseNotesLink,
                     children: [XMLNode.text(withStringValue: url.absoluteString) as! XMLNode],
-                    attributes: [XMLNode.attribute(withName: SUXMLLanguage, stringValue: language) as! XMLNode])
-                item.addChild(localizedNode as! XMLNode)
+                    attributes: [XMLNode.attribute(withName: SUXMLLanguage, stringValue: language) as! XMLNode]) as! XMLElement
+                
+                item.addChild(localizedNode)
+                
+                localizedReleaseNotesElement = localizedNode
             }
+            
+            // Sign the localized release notes
+            try signReleaseNotesIfNeeded(element: localizedReleaseNotesElement, filePath: releaseNotesFilePath, signedReleaseNoteFiles: &signedReleaseNoteFiles, requiresSignedAppcast: requiresSignedAppcast, disableEmbeddedSignWarning: disableEmbeddedSignWarning, keys: keys)
         }
 
         var enclosure = findElement(name: "enclosure", parent: item)
@@ -525,9 +640,20 @@ func writeAppcast(appcastDestPath: URL, appcast: Appcast, fullReleaseNotesLink: 
     }
 
     let options: XMLNode.Options = [.nodeCompactEmptyElement, .nodePrettyPrint]
-    let docData = doc.xmlData(options: options)
-    _ = try XMLDocument(data: docData, options: XMLNode.Options()); // Verify that it was generated correctly, which does not always happen!
-    try docData.write(to: appcastDestPath)
+    let unsignedDocData = doc.xmlData(options: options)
+    
+    // Sign the appcast if needed
+    let finalDocData: Data
+    if requiresSignedAppcast, let publicKey = keys.publicEdKey, let privateKey = keys.privateEdKey {
+        let contentData = SPUExtractAppcastContent(unsignedDocData, nil, nil)
+        let dataToSign = disableEmbeddedSignWarning ? contentData : addSignWarningToAppcast(data: contentData)
+        finalDocData = try signAppcast(data: dataToSign, publicEdKey: publicKey, privateEdKey: privateKey)
+    } else {
+        finalDocData = unsignedDocData
+    }
+    
+    _ = try XMLDocument(data: finalDocData, options: XMLNode.Options()); // Verify that it was generated correctly, which does not always happen!
+    try finalDocData.write(to: appcastDestPath)
     
     return (numNewUpdates, numExistingUpdates, numUpdatesRemoved)
 }

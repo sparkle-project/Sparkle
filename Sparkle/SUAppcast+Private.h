@@ -13,9 +13,11 @@
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wquoted-include-in-framework-header"
 #import "SUAppcast.h"
+#import "SPUAppcastSigningValidationStatus.h"
 #pragma clang diagnostic pop
 #else
 #import <Sparkle/SUAppcast.h>
+#import <Sparkle/SPUAppcastSigningValidationStatus.h>
 #endif
 
 NS_ASSUME_NONNULL_BEGIN
@@ -24,7 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface SUAppcast (Private)
 
-- (nullable instancetype)initWithXMLData:(NSData *)xmlData relativeToURL:(NSURL * _Nullable)relativeURL stateResolver:(SPUAppcastItemStateResolver *)stateResolver error:(NSError * __autoreleasing *)error;
+- (nullable instancetype)initWithXMLData:(NSData *)xmlData relativeToURL:(NSURL * _Nullable)relativeURL stateResolver:(SPUAppcastItemStateResolver *)stateResolver signingValidationStatus:(SPUAppcastSigningValidationStatus)signingValidationStatus error:(NSError * __autoreleasing *)error;
 
 - (SUAppcast *)copyByFilteringItems:(BOOL (^)(SUAppcastItem *))filterBlock;
 

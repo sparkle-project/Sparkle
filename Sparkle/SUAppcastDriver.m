@@ -26,9 +26,17 @@
 #import "SPUAppcastItemStateResolver.h"
 #import "SPUAppcastItemStateResolver+Private.h"
 #import "SPUAppcastItemState.h"
+#import "SUSignatureVerifier.h"
+#import "SPUExtractAppcast.h"
+#import "SUSignatures.h"
+#import "SPUVerifierInformation.h"
 
 
 #include "AppKitPrevention.h"
+
+#define SUInitialFailedFeedSigningValidationDateKey @"SUInitialFailedFeedSigningValidationDate"
+
+#define DEFAULT_APPCAST_FAILURE_EXPIRATION_INTERVAL 1728000 // 20 days
 
 @interface SUAppcastDriver () <SPUDownloadDriverDelegate>
 @end
@@ -73,21 +81,203 @@
 - (void)downloadDriverDidDownloadData:(SPUDownloadData *)downloadData
 {
     SPUAppcastItemStateResolver *stateResolver = [[SPUAppcastItemStateResolver alloc] initWithHostVersion:_host.version applicationVersionComparator:[self versionComparator] standardVersionComparator:[SUStandardVersionComparator defaultComparator]];
+    
+    NSData *downloadedAppcastData = downloadData.data;
+    
+    id<SUAppcastDriverDelegate> delegate = _delegate;
+    
+    NSDate *currentDate = [NSDate date];
+    
+    // Verify feed if appcast signing is required
+    SPUAppcastSigningValidationStatus appcastSigningValidationStatus;
+    NSData *verifiedAppcastData;
+    NSError *verifyAppcastDataFailureError = nil;
+    if (_host.requiresSignedAppcast) {
+        // Extract appcast content without signing information and prepare verification information
+        SUSignatureVerifier *signatureVerifier = [[SUSignatureVerifier alloc] initWithPublicKeys:_host.publicKeys];
+        
+        NSString *edSignatureBase64 = nil;
+        uint64_t contentLength = 0;
+        verifiedAppcastData = SPUExtractAppcastContent(downloadedAppcastData, &edSignatureBase64, &contentLength);
+        
+        SUSignatures *signatures = [[SUSignatures alloc] initWithEd:edSignatureBase64
+#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
+                                                               dsa:nil
+#endif
+                    ];
+        
+        SPUVerifierInformation *verifierInformation = [[SPUVerifierInformation alloc] initWithExpectedVersion:nil expectedContentLength:contentLength];
+        verifierInformation.actualContentLength = verifiedAppcastData.length;
+        
+        // If signature verification fails, we will record the initial date it failed
+        // If a significant period of time passes with verification still failing, we may operate in a 'safe' mode as fallback
+        // and allow an app to be updated through key rotation
+        
+        // If main bundle and host bundle differ, use the main bundle (updater) with a host bundle identifier to record the validation failure date
+        // This ensures external updaters record this date separately from an app updating itself.
+        SUHost *hostForFailedSigningValidationDate;
+        
+        NSString *initialFailedFeedSigningValidationDateKey;
+        NSBundle *mainBundle = NSBundle.mainBundle;
+        if ([mainBundle isEqual:_host.bundle]) {
+            hostForFailedSigningValidationDate = _host;
+            initialFailedFeedSigningValidationDateKey = SUInitialFailedFeedSigningValidationDateKey;
+        } else {
+            hostForFailedSigningValidationDate = [[SUHost alloc] initWithBundle:mainBundle];
+            
+            NSString *hostBundleIdentifier = _host.bundle.bundleIdentifier;
+            initialFailedFeedSigningValidationDateKey = (hostBundleIdentifier != nil) ? [SUInitialFailedFeedSigningValidationDateKey"_" stringByAppendingString:hostBundleIdentifier] : nil;
+        }
+        
+        NSError *verifyAppcastDataInnerError = nil;
+        if (![signatureVerifier verifyData:verifiedAppcastData signatures:signatures fileKind:@"appcast" verifierInformation:verifierInformation error:&verifyAppcastDataInnerError]) {
+            // Feed validation failed. Proceed to check if we can operate in safe mode if feed failure expiration interval has passed.
+            
+            NSNumber *failureExpirationIntervalSetting = [_host doubleNumberForInfoDictionaryKey:SUSignedFeedFailureExpirationIntervalKey];
+            
+            NSTimeInterval failureExpirationInterval = (failureExpirationIntervalSetting == nil) ? DEFAULT_APPCAST_FAILURE_EXPIRATION_INTERVAL : failureExpirationIntervalSetting.doubleValue;
+            
+            BOOL canRecoverFromSigningValidationFailure;
+            if (initialFailedFeedSigningValidationDateKey == nil || fpclassify(failureExpirationInterval) == FP_ZERO) {
+                canRecoverFromSigningValidationFailure = NO;
+            } else {
+                NSDate *firstFailedSigningValidationDate = [hostForFailedSigningValidationDate objectForUserDefaultsKey:initialFailedFeedSigningValidationDateKey ofClass:NSDate.class];
+                
+                if (firstFailedSigningValidationDate == nil) {
+                    // Record first signing validation date
+                    [hostForFailedSigningValidationDate setObject:currentDate forUserDefaultsKey:initialFailedFeedSigningValidationDateKey];
+                    canRecoverFromSigningValidationFailure = NO;
+                } else {
+                    canRecoverFromSigningValidationFailure = ([currentDate timeIntervalSinceDate:firstFailedSigningValidationDate] >= failureExpirationInterval);
+                }
+            }
+            
+            NSMutableDictionary *userInfo = [NSMutableDictionary dictionaryWithObject:SULocalizedStringFromTableInBundle(@"The update feed is improperly signed and could not be validated. Please try again later or contact the app developer.", SPARKLE_TABLE, SUSparkleBundle(), nil) forKey:NSLocalizedDescriptionKey];
+            
+            if (verifyAppcastDataInnerError != nil) {
+                [userInfo setObject:verifyAppcastDataInnerError forKey:NSUnderlyingErrorKey];
+            }
+            
+            verifyAppcastDataFailureError = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAppcastParseError userInfo:userInfo];
+            
+            // If we can recover from signing validation failure for now, still hold onto failureVerifyAppcastDataError
+            // because we will use it later on if there's no actual new update to report
+            if (!canRecoverFromSigningValidationFailure) {
+                [delegate didFailToFetchAppcastWithError:verifyAppcastDataFailureError];
+                return;
+            }
+            
+            appcastSigningValidationStatus = SPUAppcastSigningValidationStatusFailed;
+        } else {
+            // Feed validation passes
+            if (initialFailedFeedSigningValidationDateKey != nil) {
+                [hostForFailedSigningValidationDate setObject:nil forUserDefaultsKey:initialFailedFeedSigningValidationDateKey];
+            }
+            
+            appcastSigningValidationStatus = SPUAppcastSigningValidationStatusSucceeded;
+        }
+    } else {
+        verifiedAppcastData = downloadedAppcastData;
+        appcastSigningValidationStatus = SPUAppcastSigningValidationStatusSkipped;
+    }
  
     NSError *appcastError = nil;
-    SUAppcast *appcast = [[SUAppcast alloc] initWithXMLData:downloadData.data relativeToURL:downloadData.URL stateResolver:stateResolver error:&appcastError];
+    SUAppcast *loadedAppcast = [[SUAppcast alloc] initWithXMLData:verifiedAppcastData relativeToURL:downloadData.URL stateResolver:stateResolver signingValidationStatus:appcastSigningValidationStatus error:&appcastError];
     
-    if (appcast == nil) {
+    if (loadedAppcast == nil) {
         NSMutableDictionary *userInfo = [NSMutableDictionary dictionaryWithObject:SULocalizedStringFromTableInBundle(@"An error occurred while parsing the update feed.", SPARKLE_TABLE, SUSparkleBundle(), nil) forKey:NSLocalizedDescriptionKey];
         
         if (appcastError != nil) {
             [userInfo setObject:appcastError forKey:NSUnderlyingErrorKey];
         }
         
-        [_delegate didFailToFetchAppcastWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUAppcastParseError userInfo:userInfo]];
-    } else {
-        [self appcastDidFinishLoading:appcast inBackground:_downloadDriver.inBackground];
+        [delegate didFailToFetchAppcastWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUAppcastParseError userInfo:userInfo]];
+        
+        return;
     }
+    
+    // Now process the loaded appcast and find a suitable update item
+    
+    [delegate didFinishLoadingAppcast:loadedAppcast];
+    
+    id updater = _updater;
+    if (updater != nil) {
+        NSDictionary *userInfo = @{ SUUpdaterAppcastNotificationKey: loadedAppcast };
+        [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidFinishLoadingAppCastNotification object:updater userInfo:userInfo];
+    }
+    
+    NSSet<NSString *> *allowedChannels;
+    id<SPUUpdaterDelegate> updaterDelegate = _updaterDelegate;
+    if (updater != nil && [updaterDelegate respondsToSelector:@selector(allowedChannelsForUpdater:)]) {
+        allowedChannels = [updaterDelegate allowedChannelsForUpdater:updater];
+        if (allowedChannels == nil) {
+            SULog(SULogLevelError, @"Error: -allowedChannelsForUpdater: cannot return nil. Treating this as an empty set.");
+            allowedChannels = [NSSet set];
+        }
+    } else {
+        allowedChannels = [NSSet set];
+    }
+    
+    SUAppcast *macOSAppcast = [SUAppcastDriver filterAppcast:loadedAppcast forMacOSAndAllowedChannels:allowedChannels];
+    
+    id<SUVersionComparison> applicationVersionComparator = [self versionComparator];
+    
+    BOOL background = _downloadDriver.inBackground;
+    NSNumber *phasedUpdateGroup = background ? @([SUPhasedUpdateGroupInfo updateGroupForHost:_host]) : nil;
+    
+    SPUSkippedUpdate *skippedUpdate = background ? [SPUSkippedUpdate skippedUpdateForHost:_host] : nil;
+    
+    // First filter out min/max OS version and see if there's an update that passes
+    // the minimum autoupdate version. We filter out updates that fail the minimum
+    // autoupdate version test because we have a preference over minor updates that can be
+    // downloaded and installed with less disturbance
+    SUAppcast *passesMinimumAutoupdateAppcast = [SUAppcastDriver filterSupportedAppcast:macOSAppcast phasedUpdateGroup:phasedUpdateGroup skippedUpdate:skippedUpdate currentDate:currentDate hostVersion:_host.version versionComparator:applicationVersionComparator testMinimumSystemRequirements:YES testMinimumAutoupdateVersion:YES];
+    
+    SUAppcastItem *secondaryItemPassesMinimumAutoupdate = nil;
+    SUAppcastItem *primaryItemPassesMinimumAutoupdate = [self retrieveBestAppcastItemFromAppcast:passesMinimumAutoupdateAppcast versionComparator:applicationVersionComparator secondaryUpdate:&secondaryItemPassesMinimumAutoupdate];
+    
+    // If we weren't able to find a valid update, try to find an update that
+    // doesn't pass the minimum autoupdate version
+    SUAppcastItem *finalPrimaryItem;
+    SUAppcastItem *finalSecondaryItem = nil;
+    if (![self isItemNewer:primaryItemPassesMinimumAutoupdate]) {
+        SUAppcast *failsMinimumAutoupdateAppcast = [SUAppcastDriver filterSupportedAppcast:macOSAppcast phasedUpdateGroup:phasedUpdateGroup skippedUpdate:skippedUpdate currentDate:currentDate hostVersion:_host.version versionComparator:applicationVersionComparator testMinimumSystemRequirements:YES testMinimumAutoupdateVersion:NO];
+        
+        finalPrimaryItem = [self retrieveBestAppcastItemFromAppcast:failsMinimumAutoupdateAppcast versionComparator:applicationVersionComparator secondaryUpdate:&finalSecondaryItem];
+    } else {
+        finalPrimaryItem = primaryItemPassesMinimumAutoupdate;
+        finalSecondaryItem = secondaryItemPassesMinimumAutoupdate;
+    }
+    
+    // Check if we found a new suitable update
+    if ([self isItemNewer:finalPrimaryItem]) {
+        [delegate didFindValidUpdateWithAppcastItem:finalPrimaryItem secondaryAppcastItem:finalSecondaryItem];
+        return;
+    }
+    
+    // If we're trying to recover from a failed signing validation of the feed, show an error rather than
+    // showing why there isn't a new update, which we should be cautious about
+    if (appcastSigningValidationStatus == SPUAppcastSigningValidationStatusFailed && verifyAppcastDataFailureError != nil) {
+        [delegate didFailToFetchAppcastWithError:verifyAppcastDataFailureError];
+        return;
+    }
+    
+    // Find the latest appcast item that we can report to the user and updater delegates
+    // This may include updates that fail due to OS version requirements.
+    // This excludes newer backgrounded updates that fail because they are skipped or not in current phased rollout group
+    
+    SUAppcast *notFoundAppcast = [SUAppcastDriver filterSupportedAppcast:macOSAppcast phasedUpdateGroup:phasedUpdateGroup skippedUpdate:skippedUpdate currentDate:currentDate hostVersion:_host.version versionComparator:applicationVersionComparator testMinimumSystemRequirements:NO testMinimumAutoupdateVersion:NO];
+    
+    SUAppcastItem *notFoundPrimaryItem = [self retrieveBestAppcastItemFromAppcast:notFoundAppcast versionComparator:applicationVersionComparator secondaryUpdate:nil];
+    
+    NSComparisonResult hostToLatestAppcastItemComparisonResult;
+    if (notFoundPrimaryItem != nil) {
+        hostToLatestAppcastItemComparisonResult = [applicationVersionComparator compareVersion:_host.version toVersion:notFoundPrimaryItem.versionString];
+    } else {
+        hostToLatestAppcastItemComparisonResult = 0;
+    }
+    
+    [delegate didNotFindUpdateWithLatestAppcastItem:notFoundPrimaryItem hostToLatestAppcastItemComparisonResult:hostToLatestAppcastItemComparisonResult background:background];
 }
 
 - (void)downloadDriverDidFailToDownloadFileWithError:(nonnull NSError *)error
@@ -267,83 +457,6 @@
     // In the case of a delta update, the preferred primary item will be the delta update,
     // and the secondary item will be the regular update.
     return [self preferredUpdateForRegularAppcastItem:regularItem secondaryUpdate:secondaryAppcastItem];
-}
-
-- (void)appcastDidFinishLoading:(SUAppcast *)loadedAppcast inBackground:(BOOL)background SPU_OBJC_DIRECT
-{
-    id<SUAppcastDriverDelegate> delegate = _delegate;
-    [delegate didFinishLoadingAppcast:loadedAppcast];
-    
-    id updater = _updater;
-    if (updater != nil) {
-        NSDictionary *userInfo = @{ SUUpdaterAppcastNotificationKey: loadedAppcast };
-        [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidFinishLoadingAppCastNotification object:updater userInfo:userInfo];
-    }
-    
-    NSSet<NSString *> *allowedChannels;
-    id<SPUUpdaterDelegate> updaterDelegate = _updaterDelegate;
-    if (updater != nil && [updaterDelegate respondsToSelector:@selector(allowedChannelsForUpdater:)]) {
-        allowedChannels = [updaterDelegate allowedChannelsForUpdater:updater];
-        if (allowedChannels == nil) {
-            SULog(SULogLevelError, @"Error: -allowedChannelsForUpdater: cannot return nil. Treating this as an empty set.");
-            allowedChannels = [NSSet set];
-        }
-    } else {
-        allowedChannels = [NSSet set];
-    }
-    
-    SUAppcast *macOSAppcast = [SUAppcastDriver filterAppcast:loadedAppcast forMacOSAndAllowedChannels:allowedChannels];
-    
-    id<SUVersionComparison> applicationVersionComparator = [self versionComparator];
-    
-    NSNumber *phasedUpdateGroup = background ? @([SUPhasedUpdateGroupInfo updateGroupForHost:_host]) : nil;
-    
-    SPUSkippedUpdate *skippedUpdate = background ? [SPUSkippedUpdate skippedUpdateForHost:_host] : nil;
-    
-    NSDate *currentDate = [NSDate date];
-    
-    // First filter out min/max OS version and see if there's an update that passes
-    // the minimum autoupdate version. We filter out updates that fail the minimum
-    // autoupdate version test because we have a preference over minor updates that can be
-    // downloaded and installed with less disturbance
-    SUAppcast *passesMinimumAutoupdateAppcast = [SUAppcastDriver filterSupportedAppcast:macOSAppcast phasedUpdateGroup:phasedUpdateGroup skippedUpdate:skippedUpdate currentDate:currentDate hostVersion:_host.version versionComparator:applicationVersionComparator testMinimumSystemRequirements:YES testMinimumAutoupdateVersion:YES];
-    
-    SUAppcastItem *secondaryItemPassesMinimumAutoupdate = nil;
-    SUAppcastItem *primaryItemPassesMinimumAutoupdate = [self retrieveBestAppcastItemFromAppcast:passesMinimumAutoupdateAppcast versionComparator:applicationVersionComparator secondaryUpdate:&secondaryItemPassesMinimumAutoupdate];
-    
-    // If we weren't able to find a valid update, try to find an update that
-    // doesn't pass the minimum autoupdate version
-    SUAppcastItem *finalPrimaryItem;
-    SUAppcastItem *finalSecondaryItem = nil;
-    if (![self isItemNewer:primaryItemPassesMinimumAutoupdate]) {
-        SUAppcast *failsMinimumAutoupdateAppcast = [SUAppcastDriver filterSupportedAppcast:macOSAppcast phasedUpdateGroup:phasedUpdateGroup skippedUpdate:skippedUpdate currentDate:currentDate hostVersion:_host.version versionComparator:applicationVersionComparator testMinimumSystemRequirements:YES testMinimumAutoupdateVersion:NO];
-        
-        finalPrimaryItem = [self retrieveBestAppcastItemFromAppcast:failsMinimumAutoupdateAppcast versionComparator:applicationVersionComparator secondaryUpdate:&finalSecondaryItem];
-    } else {
-        finalPrimaryItem = primaryItemPassesMinimumAutoupdate;
-        finalSecondaryItem = secondaryItemPassesMinimumAutoupdate;
-    }
-    
-    if ([self isItemNewer:finalPrimaryItem]) {
-        // We found a suitable update
-        [delegate didFindValidUpdateWithAppcastItem:finalPrimaryItem secondaryAppcastItem:finalSecondaryItem];
-    } else {
-        // Find the latest appcast item that we can report to the user and updater delegates
-        // This may include updates that fail due to OS version requirements.
-        // This excludes newer backgrounded updates that fail because they are skipped or not in current phased rollout group
-        SUAppcast *notFoundAppcast = [SUAppcastDriver filterSupportedAppcast:macOSAppcast phasedUpdateGroup:phasedUpdateGroup skippedUpdate:skippedUpdate currentDate:currentDate hostVersion:_host.version versionComparator:applicationVersionComparator testMinimumSystemRequirements:NO testMinimumAutoupdateVersion:NO];
-        
-        SUAppcastItem *notFoundPrimaryItem = [self retrieveBestAppcastItemFromAppcast:notFoundAppcast versionComparator:applicationVersionComparator secondaryUpdate:nil];
-        
-        NSComparisonResult hostToLatestAppcastItemComparisonResult;
-        if (notFoundPrimaryItem != nil) {
-            hostToLatestAppcastItemComparisonResult = [applicationVersionComparator compareVersion:_host.version toVersion:notFoundPrimaryItem.versionString];
-        } else {
-            hostToLatestAppcastItemComparisonResult = 0;
-        }
-        
-        [delegate didNotFindUpdateWithLatestAppcastItem:notFoundPrimaryItem hostToLatestAppcastItemComparisonResult:hostToLatestAppcastItemComparisonResult background:background];
-    }
 }
 
 // Note: This method is used by unit tests

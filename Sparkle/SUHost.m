@@ -226,6 +226,11 @@ static void *SUHostObservableContext = &SUHostObservableContext;
     return (updateSecurityPolicy != nil);
 }
 
+- (BOOL)requiresSignedAppcast
+{
+    return [self boolForInfoDictionaryKey:SURequireSignedFeedKey];
+}
+
 - (SUPublicKeys *)publicKeys
 {
     return [[SUPublicKeys alloc] initWithEd:[self publicEDKey]

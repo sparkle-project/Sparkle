@@ -38,6 +38,7 @@ SUHostDefinitionAttribute
 @property (readonly, nonatomic, copy, nullable) NSString *publicDSAKeyFileKey;
 
 @property (nonatomic, readonly) BOOL hasUpdateSecurityPolicy;
+@property (nonatomic, readonly) BOOL requiresSignedAppcast;
 
 - (nullable id)objectForInfoDictionaryKey:(NSString *)key ofClass:(Class)aClass;
 - (nullable NSNumber *)boolNumberForInfoDictionaryKey:(NSString *)key;

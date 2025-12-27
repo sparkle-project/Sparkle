@@ -165,6 +165,10 @@ struct GenerateAppcast: ParsableCommand {
     @Argument(help: "The path to the directory containing the update archives and delta files.", transform: { URL(fileURLWithPath: $0, isDirectory: true) })
     var archivesSourceDir: URL
     
+    // Disables embedding sign warning when signing appcast XML feeds or HTML/markdown release note files
+    @Flag(name: .long, help: .hidden)
+    var disableEmbeddedSignWarning: Bool = false
+    
     @Flag(help: .hidden)
     var verbose: Bool = false
     
@@ -190,20 +194,22 @@ struct GenerateAppcast: ParsableCommand {
         For HTML release notes, if the contents of these files do not include a DOCTYPE or body tags, they will be treated as embedded CDATA release notes.
         Release notes for new items can be forced to be embedded by passing --embed-release-notes
         
-        For new update entries, Sparkle infers the minimum system OS and hardware requirements based on your update's bundle.
+        If appcast signing is required by any of the updates, the appcast and release note files may be updated for signing. If you make any manual modifications to the appcast or release note files, please re-run \(programName) to ensure all signatures are updated.
+        
+        For new update entries, Sparkle infers the minimum system OS and hardware requirements based on your update's bundle (e.g. via inspecting LSMinimumSystemVersion or detecting which architecture slices are available).
         
         An example of an archives directory may look like:
             ./my-app-release-zipfiles/
                 MyApp 1.0.zip
                 MyApp 1.0.html
-                MyApp 1.1.zip
-                MyApp 1.1.html
+                MyApp 1.1.dmg
+                MyApp 1.1.md
                 appcast.xml
                 \(oldFilesDirectoryName)/
                 
         EXAMPLES:
-            \(programNamePath) ./my-app-release-zipfiles/
-            \(programNamePath) -o appcast-name.xml ./my-app-release-zipfiles/
+            \(programNamePath) ./my-app-release-dmg-files/
+            \(programNamePath) -o appcast-name.xml ./my-app-release-dmg-files/
         
         For more advanced options that can be used for publishing updates, see https://sparkle-project.org/documentation/publishing/ for further documentation.
         
@@ -331,7 +337,7 @@ struct GenerateAppcast: ParsableCommand {
                                                                 relativeTo: archivesSourceDir)
 
                 // Write the appcast
-                let (numNewUpdates, numExistingUpdates, numUpdatesRemoved) = try writeAppcast(appcastDestPath: appcastDestPath, appcast: appcast, fullReleaseNotesLink: fullReleaseNotesURL, preferToEmbedReleaseNotes: embedReleaseNotes, link: link, newChannel: channel, newMinimumUpdateVersion: minimumUpdateVersion, majorVersion: majorVersion, ignoreSkippedUpgradesBelowVersion: ignoreSkippedUpgradesBelowVersion, phasedRolloutInterval: phasedRolloutInterval, criticalUpdateVersion: criticalUpdateVersion, informationalUpdateVersions: informationalUpdateVersions)
+                let (numNewUpdates, numExistingUpdates, numUpdatesRemoved) = try writeAppcast(appcastDestPath: appcastDestPath, keys: keys, disableEmbeddedSignWarning: disableEmbeddedSignWarning, appcast: appcast, fullReleaseNotesLink: fullReleaseNotesURL, preferToEmbedReleaseNotes: embedReleaseNotes, link: link, newChannel: channel, newMinimumUpdateVersion: minimumUpdateVersion, majorVersion: majorVersion, ignoreSkippedUpgradesBelowVersion: ignoreSkippedUpgradesBelowVersion, phasedRolloutInterval: phasedRolloutInterval, criticalUpdateVersion: criticalUpdateVersion, informationalUpdateVersions: informationalUpdateVersions)
 
                 // Inform the user, pluralizing "update" if necessary
                 let pluralizeUpdates = { pluralizeWord($0, "update") }

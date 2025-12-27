@@ -216,6 +216,19 @@
                 NSUInteger numberOfFromVersionReplacements = [appcastContents replaceOccurrencesOfString:@"$INSERT_DELTA_FROM_VERSION" withString:mainBundleVersion options:NSLiteralSearch range:NSMakeRange(0, appcastContents.length)];
                 assert(numberOfFromVersionReplacements == 1);
                 
+                NSRange feedSignaturesPrefixRange = [appcastContents rangeOfString:@"<!-- sparkle-signatures:\n" options:(NSLiteralSearch | NSBackwardsSearch)];
+                assert(feedSignaturesPrefixRange.location != NSNotFound);
+                
+                ed25519_sign(signature, (const unsigned char *)appcastContents.UTF8String, feedSignaturesPrefixRange.location, public_key, self_sign_demo_only_insecure_hack);
+                
+                NSString *feedSignatureString = [[NSData dataWithBytes:signature length:64] base64EncodedStringWithOptions:0];
+                
+                NSUInteger numberOfFeedSignatureReplacements = [appcastContents replaceOccurrencesOfString:@"$INSERT_EDDSA_FEED_SIGNATURE" withString:feedSignatureString options:NSLiteralSearch range:NSMakeRange(0, appcastContents.length)];
+                assert(numberOfFeedSignatureReplacements == 1);
+                
+                NSUInteger numberOfFeedLengthReplacements = [appcastContents replaceOccurrencesOfString:@"$INSERT_FEED_LENGTH" withString:@(feedSignaturesPrefixRange.location).stringValue options:NSLiteralSearch range:NSMakeRange(0, appcastContents.length)];
+                assert(numberOfFeedLengthReplacements == 1);
+                
                 NSError *writeAppcastError = nil;
                 if (![appcastContents writeToURL:appcastDestinationURL atomically:NO encoding:NSUTF8StringEncoding error:&writeAppcastError]) {
                     NSLog(@"Failed to write updated appcast with error %@", writeAppcastError);
@@ -256,6 +269,19 @@
                 
                 NSUInteger numberOfSignatureReplacements = [appcastContents replaceOccurrencesOfString:@"$INSERT_EDDSA_SIGNATURE" withString:signatureString options:NSLiteralSearch range:NSMakeRange(0, appcastContents.length)];
                 assert(numberOfSignatureReplacements == 3);
+                
+                NSRange feedSignaturesPrefixRange = [appcastContents rangeOfString:@"<!-- sparkle-signatures:\n" options:(NSLiteralSearch | NSBackwardsSearch)];
+                assert(feedSignaturesPrefixRange.location != NSNotFound);
+                
+                ed25519_sign(signature, (const unsigned char *)appcastContents.UTF8String, feedSignaturesPrefixRange.location, public_key, self_sign_demo_only_insecure_hack);
+                
+                NSString *feedSignatureString = [[NSData dataWithBytes:signature length:64] base64EncodedStringWithOptions:0];
+                
+                NSUInteger numberOfFeedSignatureReplacements = [appcastContents replaceOccurrencesOfString:@"$INSERT_EDDSA_FEED_SIGNATURE" withString:feedSignatureString options:NSLiteralSearch range:NSMakeRange(0, appcastContents.length)];
+                assert(numberOfFeedSignatureReplacements == 1);
+                
+                NSUInteger numberOfFeedLengthReplacements = [appcastContents replaceOccurrencesOfString:@"$INSERT_FEED_LENGTH" withString:@(feedSignaturesPrefixRange.location).stringValue options:NSLiteralSearch range:NSMakeRange(0, appcastContents.length)];
+                assert(numberOfFeedLengthReplacements == 1);
                 
                 NSError *writeAppcastError = nil;
                 if (![appcastContents writeToURL:appcastDestinationURL atomically:NO encoding:NSUTF8StringEncoding error:&writeAppcastError]) {

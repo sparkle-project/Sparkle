@@ -1,5 +1,6 @@
 #import <Foundation/Foundation.h>
 
+#import "SPUExtractAppcast.h"
 #import "SUStandardVersionComparator.h"
 #import "SUConstants.h"
 #import "SUErrors.h"

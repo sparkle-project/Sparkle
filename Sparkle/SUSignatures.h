@@ -64,7 +64,9 @@ SUPublicKeysDefinitionAttribute
 @property (nonatomic, readonly) BOOL hasAnyKeys;
 
 - (instancetype)initWithEd:(NSString * _Nullable)ed
+#if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
                        dsa:(NSString * _Nullable)dsa
+#endif
 ;
 
 @end

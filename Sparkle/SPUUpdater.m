@@ -367,6 +367,21 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         }
     }
     
+    // This is a policy decision
+    // If developers want greater security by signing appcasts, we can also enforce greater security
+    // in validating updates before extracting them.
+    BOOL requiresSignedFeed = [_host boolForInfoDictionaryKey:SURequireSignedFeedKey];
+    if (requiresSignedFeed) {
+        BOOL verifyBeforeExtraction = [_host boolForInfoDictionaryKey:SUVerifyUpdateBeforeExtractionKey];
+        if (!verifyBeforeExtraction) {
+            if (error != NULL) {
+                *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInvalidUpdaterError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"For security reasons, %@ needs to also be enabled if %@ is enabled for %@. Visit Sparkle's documentation for more information: https://sparkle-project.org/documentation/customization/", SUVerifyUpdateBeforeExtractionKey, SURequireSignedFeedKey, hostName] }];
+            }
+            
+            return NO;
+        }
+    }
+    
     if (_updatingMainBundle) {
         if (!_loggedUpdateSecurityPolicyWarning && mainBundleHost.hasUpdateSecurityPolicy) {
             SULog(SULogLevelDefault, @"Warning: %@ has a custom NSUpdateSecurityPolicy in its Info.plist. This may cause issues when installing updates. Please consider removing this key for your builds using Sparkle if you do not really require a custom update security policy.", hostName);

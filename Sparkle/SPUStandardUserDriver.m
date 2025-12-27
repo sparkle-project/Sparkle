@@ -461,7 +461,7 @@
     // I don't want to expose SULog here because it's more of a user driver facing error
     // For our purposes we just ignore it and continue on..
     NSLog(@"Failed to download release notes with error: %@", error);
-    [_activeUpdateAlert showReleaseNotesFailedToDownload];
+    [_activeUpdateAlert showReleaseNotesFailedToDownloadWithError:error];
 }
 
 - (void)showUpdateInFocus

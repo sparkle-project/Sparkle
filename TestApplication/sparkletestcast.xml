@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- sparkle-sign-warning:
+IMPORTANT: This file must be re-signed if modifications are made to this file! The updated signature will be at the end of the file.
+-->
 <rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle"  xmlns:dc="http://purl.org/dc/elements/1.1/">
   <channel>
     <title>Sparkle Test App Changelog</title>
@@ -144,3 +147,7 @@ Note though, Sparkle's markdown support does not support tables or images. It ne
         </item>
   </channel>
 </rss>
+<!-- sparkle-signatures:
+edSignature: $INSERT_EDDSA_FEED_SIGNATURE
+length: $INSERT_FEED_LENGTH
+-->

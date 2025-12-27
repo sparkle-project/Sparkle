@@ -62,6 +62,9 @@
 "An error occurred while downloading the update. Please try again later." = "An error occurred while downloading the update. Please try again later.";
 
 /* No comment provided by engineer. */
+"An error occurred while downloading the release notes." = "An error occurred while downloading the release notes.";
+
+/* No comment provided by engineer. */
 "An error occurred while extracting the archive. Please try again later." = "An error occurred while extracting the archive. Please try again later.";
 
 /* No comment provided by engineer. */
@@ -165,6 +168,12 @@
 
 /* No comment provided by engineer. */
 "The update is improperly signed and could not be validated. Please try again later or contact the app developer." = "The update is improperly signed and could not be validated. Please try again later or contact the app developer.";
+
+/* No comment provided by engineer. */
+"The update feed is improperly signed and could not be validated. Please try again later or contact the app developer." = "The update feed is improperly signed and could not be validated. Please try again later or contact the app developer.";
+
+/* No comment provided by engineer. */
+"The release notes is improperly signed and could not be validated. Please contact the app developer for more information." = "The release notes is improperly signed and could not be validated. Please contact the app developer for more information.";
 
 /* No comment provided by engineer. */
 "Unable to Check For Updates" = "Unable to Check For Updates";

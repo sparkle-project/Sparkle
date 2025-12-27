@@ -34,6 +34,10 @@
 	<string>eRFPLZuNM6m8bltmtpPX4fzKbufI1z6rKJHtgIIsllk=</string>
 	<key>SUEnableInstallerLauncherService</key>
 	<true/>
+	<key>SURequireSignedFeed</key>
+	<true/>
+	<key>SUVerifyUpdateBeforeExtraction</key>
+	<true/>
 	<key>_SUEnableDebugUpdateCheckIntervals</key>
 	<true/>
 </dict>

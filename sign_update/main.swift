@@ -85,52 +85,82 @@ func findKeys(inString secretBase64String: String, allowNewFormat: Bool) throws 
     return (privateKey, publicKey)
 }
 
-func edSignature(data: Data, publicEdKey: Data, privateEdKey: Data) -> String {
-    assert(publicEdKey.count == 32)
-    assert(privateEdKey.count == 64)
-    let data = Array(data)
-    var output = Array<UInt8>(repeating: 0, count: 64)
-    let pubkey = Array(publicEdKey), privkey = Array(privateEdKey)
-    
-    ed25519_sign(&output, data, data.count, pubkey, privkey)
-    return Data(output).base64EncodedString()
-}
-
 struct SignUpdate: ParsableCommand {
     static let programName = "sign_update"
     
-    @Option(help: ArgumentHelp("The account name in your keychain associated with your private EdDSA (ed25519) key to use for signing the update."))
+    @Option(help: ArgumentHelp("The account name in your keychain associated with your private keys to use for signing."))
     var account: String = "ed25519"
     
-    @Flag(help: ArgumentHelp("Verify that the update is signed correctly. If this is set, a second argument <verify-signature> denoting the signature must be passed after the <update-path>.", valueName: "verify"))
+    @Flag(help: ArgumentHelp("Verify that the file is signed correctly. If this is set, a second argument <verify-signature> denoting the signature must be passed after the <update-path>.", valueName: "verify"))
     var verify: Bool = false
     
     @Option(name: [.customShort("f"), .customLong("ed-key-file")], help: ArgumentHelp("Path to the file containing the private EdDSA (ed25519) key. '-' can be used to echo the EdDSA key from a 'secret' environment variable to the standard input stream. For example: echo \"$PRIVATE_KEY_SECRET\" | ./\(programName) --ed-key-file -", valueName: "private-key-file"))
     var privateKeyFile: String?
     
-    @Flag(name: .customShort("p"), help: ArgumentHelp("Only prints the signature when signing an update."))
+    @Flag(name: .customShort("p"), help: ArgumentHelp("Only prints the signature when signing a file without extra metadata. For signing XML files, nothing will be printed because the signature is embedded inside the file."))
     var printOnlySignature: Bool = false
     
-    @Argument(help: "The update archive, delta update, or package (pkg) to sign or verify.")
-    var updatePath: String
+    @Argument(help: "The update archive, delta update, package (pkg), release notes file, or update feed (xml) to sign or verify. If the file is a update feed (xml), the file will be modified to include the generated signature. If the file is a release notes file, the file may also be updated to include a warning that it is signed.")
+    var filePath: String
     
-    @Argument(help: "The signature to verify when --verify is passed.")
+    @Argument(help: "The signature to verify when --verify is passed. Don't pass this option for verifying appcast XML feeds, which already have a signature embedded.")
     var verifySignature: String?
     
     @Option(name: .customShort("s"), help: ArgumentHelp("(DEPRECATED): The private EdDSA (ed25519) key. Please use the Keychain, or pass the key as standard input when using --ed-key-file - instead. This option is no longer supported for newly generated keys. ", valueName: "private-key"))
     var privateKey: String?
     
+    // Disables embedding sign warning when signing appcast XML feeds or HTML/markdown release note files
+    @Flag(name: .long, help: .hidden)
+    var disableEmbeddedSignWarning: Bool = false
+    
     static var configuration: CommandConfiguration = CommandConfiguration(
-        abstract: "Sign or verify an update using your EdDSA (ed25519) keys.",
-        discussion: "The EdDSA keys are automatically read from the Keychain if no <private-key-file> is specified.\n\nWhen signing, this tool will output an EdDSA signature and length attributes to use for your update's appcast item enclosure. You can use -p to only print the EdDSA signature for automation.")
+        abstract: "Sign or verify an update file using your signing keys.",
+        discussion:
+            """
+            sign_update can be used to sign or verify update archives, delta updates, pkg updates, appcast feeds, and release note files.
+            
+            The signing keys are automatically read from the Keychain if no <private-key-file> is specified.
+            
+            For signing update archives, sign_update will output an EdDSA signature and length attributes to use for your update's appcast item enclosure.
+            
+            For signing release note files, sign_update will output an EdDSA signature and length attributes to use for your update's appcast releaseNotesLink. Additionally, the release notes file may be modified to include a warning about making future modifications to the file.
+            
+            For signing appcast feeds, sign_update will embed the signature inside the XML file and include a warning about making future modifications to the file.
+            
+            For signing files, you can use -p to only print the EdDSA signature for automation.
+            """)
+    
+    private var filePathIsFeed: Bool {
+        return filePath.hasSuffix(".xml") || filePath.hasSuffix(".XML")
+    }
+    
+    private var filePathIsHTMLReleaseNotes: Bool {
+        return filePath.hasSuffix(".html") ||
+               filePath.hasSuffix(".htm")
+    }
+    
+    private var filePathIsMarkdownReleaseNotes: Bool {
+        return filePath.hasSuffix(".md") ||
+               filePath.hasSuffix(".markdown")
+    }
+    
+    private var filePathIsReleaseNotes: Bool {
+        return filePath.hasSuffix(".txt") ||
+               self.filePathIsMarkdownReleaseNotes ||
+               self.filePathIsHTMLReleaseNotes
+    }
     
     func validate() throws {
         guard privateKey == nil || privateKeyFile == nil else {
             throw ValidationError("Both --ed-key-file <private-key-file> and -s <private-key> options cannot be provided.")
         }
         
-        guard !verify || verifySignature != nil else {
-            throw ValidationError("<verify-signature> must be passed as a second argument after <update-path> if --verify is passed.")
+        guard !verify || verifySignature != nil || self.filePathIsFeed else {
+            throw ValidationError("<verify-signature> must be passed as a second argument after <file-path> if --verify is passed.")
+        }
+        
+        guard !self.filePathIsFeed || verifySignature == nil else {
+            throw ValidationError("<verify-signature> must not be passed for signing appcast feeds, which already have the signature embedded.")
         }
         
         guard !verify || !printOnlySignature else {
@@ -150,17 +180,39 @@ struct SignUpdate: ParsableCommand {
         } else {
             (priv, pub) = try findKeysInKeychain(account: account)
         }
+        
+        let fileURL = URL(fileURLWithPath: filePath, isDirectory: false).resolvingSymlinksInPath()
     
-        let data = try Data.init(contentsOf: URL.init(fileURLWithPath: updatePath), options: .mappedIfSafe)
+        let data = try Data.init(contentsOf: fileURL, options: .mappedIfSafe)
         if verify {
             // Verify the signature
-            guard let verifySignature = verifySignature else {
-                print("Error: failed to unwrap verifySignature, which is unexpected")
-                throw ExitCode.failure
+            
+            let dataToVerify: Data
+            let base64Signature: String
+            let expectedContentLength: UInt64
+            if let verifySignature {
+                base64Signature = verifySignature
+                dataToVerify = data
+                expectedContentLength = UInt64(data.count)
+            } else {
+                assert(self.filePathIsFeed)
+                
+                var processedBase64Signature: NSString? = nil
+                var processedExpectedContentLength: UInt64 = 0
+                dataToVerify = SPUExtractAppcastContent(data, &processedBase64Signature, &processedExpectedContentLength)
+                
+                expectedContentLength = processedExpectedContentLength
+                
+                guard let processedBase64Signature else {
+                    print("Error: failed to extract signature from appcast. Is the appcast signed?")
+                    throw ExitCode.failure
+                }
+                
+                base64Signature = processedBase64Signature as String
             }
             
-            guard let signatureData = Data(base64Encoded: verifySignature, options: .ignoreUnknownCharacters) else {
-                print("Error: failed to decode base64 signature: \(verifySignature)")
+            guard let signatureData = Data(base64Encoded: base64Signature, options: .ignoreUnknownCharacters) else {
+                print("Error: failed to decode base64 signature: \(base64Signature)")
                 throw ExitCode.failure
             }
             
@@ -170,21 +222,72 @@ struct SignUpdate: ParsableCommand {
                 throw ExitCode.failure
             }
             
-            let dataBytes = Array(data)
+            let dataBytesToVerify = Array(dataToVerify)
             let publicKeyBytes = Array(pub)
             
-            if ed25519_verify(signatureBytes, dataBytes, data.count, publicKeyBytes) == 0 {
+            if ed25519_verify(signatureBytes, dataBytesToVerify, dataBytesToVerify.count, publicKeyBytes) == 0 {
                 print("Error: failed to pass signing verification.")
+                let dataBytesCount = UInt64(dataBytesToVerify.count)
+                if expectedContentLength != dataBytesCount {
+                    print("\(expectedContentLength) bytes were expected to be signed, but actually read \(dataBytesCount) bytes.")
+                }
                 throw ExitCode.failure
             }
         } else {
             // Sign the update
-            let sig = edSignature(data: data, publicEdKey: pub, privateEdKey: priv)
-            
-            if printOnlySignature {
-                print(sig)
+            if self.filePathIsFeed {
+                let contentData = SPUExtractAppcastContent(data, nil, nil)
+                
+                let dataToSign: Data = disableEmbeddedSignWarning ? contentData : addSignWarningToAppcast(data: contentData)
+                let addedSignWarningToAppcast = (contentData.count != dataToSign.count)
+                let signedData = try signAppcast(data: dataToSign, publicEdKey: pub, privateEdKey: priv)
+                try signedData.write(to: fileURL, options: .atomic)
+                
+                if !printOnlySignature {
+                    if !addedSignWarningToAppcast {
+                        print("<!-- Updated signature inside \(fileURL.lastPathComponent) -->")
+                    } else {
+                        print("<!-- Updated signature inside \(fileURL.lastPathComponent) and added warning for making further modifications. -->")
+                    }
+                }
             } else {
-                print("sparkle:edSignature=\"\(sig)\" length=\"\(data.count)\"")
+                let signedData: Data
+                let updatedSigningWarningInReleaseNotes: Bool
+                
+                if disableEmbeddedSignWarning || (!self.filePathIsHTMLReleaseNotes && !self.filePathIsMarkdownReleaseNotes) {
+                    signedData = data
+                    updatedSigningWarningInReleaseNotes = false
+                } else {
+                    if let updatedDataForSigning = updateHTMLCommentSigningWarningInReleaseNotes(data: data) {
+                        do {
+                            try updatedDataForSigning.write(to: fileURL, options: .atomic)
+                            signedData = updatedDataForSigning
+                            updatedSigningWarningInReleaseNotes = true
+                        } catch {
+                            // Fallback to original data if the release notes is not updatable
+                            signedData = data
+                            updatedSigningWarningInReleaseNotes = false
+                        }
+                    } else {
+                        signedData = data
+                        updatedSigningWarningInReleaseNotes = false
+                    }
+                }
+                
+                let sig = edSignature(data: signedData, publicEdKey: pub, privateEdKey: priv)
+                
+                if printOnlySignature {
+                    print(sig)
+                } else {
+                    if self.filePathIsReleaseNotes {
+                        if updatedSigningWarningInReleaseNotes {
+                            print("<!-- Updated \(fileURL.lastPathComponent) by adding warning for making further modifications. -->")
+                        }
+                        print("sparkle:edSignature=\"\(sig)\" sparkle:length=\"\(signedData.count)\"")
+                    } else {
+                        print("sparkle:edSignature=\"\(sig)\" length=\"\(signedData.count)\"")
+                    }
+                }
             }
         }
     }

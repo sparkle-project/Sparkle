@@ -78,11 +78,17 @@
     SULog(SULogLevelError, @"Error: resumeDownloadedUpdate: called on SPUAutomaticUpdateDriver");
 }
 
+// Note: critical updates can be downloaded automatically first before needing user attention
+static BOOL SPUUpdateRequiresUserAttentionBeforeDownloading(SUAppcastItem *updateItem)
+{
+    return (updateItem.isInformationOnlyUpdate || updateItem.majorUpgrade || updateItem.signingValidationStatus == SPUAppcastSigningValidationStatusFailed);
+}
+
 - (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)updateItem secondaryAppcastItem:(SUAppcastItem * _Nullable)secondaryUpdateItem
 {
     _updateItem = updateItem;
     
-    if (updateItem.isInformationOnlyUpdate || updateItem.majorUpgrade) {
+    if (SPUUpdateRequiresUserAttentionBeforeDownloading(updateItem)) {
         [_coreDriver deferInformationalUpdate:updateItem secondaryUpdate:secondaryUpdateItem];
         [self abortUpdate];
     } else {
@@ -139,7 +145,9 @@
 
 - (void)abortUpdateWithError:(NSError *)error
 {
-    BOOL showNextUpdateImmediately = (error == nil || error.code == SUInstallationAuthorizeLaterError) && (!_installerDidFinishPreparation || _updateItem.criticalUpdate || _updateItem.isInformationOnlyUpdate);
+    // It should not be necessary to include properties from SPUUpdateRequiresUserAttentionBeforeDownloading() because _installerDidFinishPreparation should be NO in those cases,
+    // but we'll include the check anyway
+    BOOL showNextUpdateImmediately = (error == nil || error.code == SUInstallationAuthorizeLaterError) && (!_installerDidFinishPreparation || _updateItem.criticalUpdate || SPUUpdateRequiresUserAttentionBeforeDownloading(_updateItem));
     
     [_coreDriver abortUpdateAndShowNextUpdateImmediately:showNextUpdateImmediately error:error];
 }

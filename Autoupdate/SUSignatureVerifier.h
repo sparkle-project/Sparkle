@@ -24,13 +24,18 @@ NS_ASSUME_NONNULL_BEGIN
 
 SPU_OBJC_DIRECT_MEMBERS @interface SUSignatureVerifier : NSObject
 
+// Helper for verifying downloaded updates
 + (BOOL)validatePath:(NSString *)path withSignatures:(SUSignatures *)signatures withPublicKeys:(SUPublicKeys *)pkeys verifierInformation:(SPUVerifierInformation * _Nullable)verifierInformation error:(NSError * __autoreleasing *)error;
 
 - (instancetype)init NS_UNAVAILABLE;
 
 - (instancetype)initWithPublicKeys:(SUPublicKeys *)pkeys;
 
+// Used for verifying downloaded updates
 - (BOOL)verifyFileAtPath:(NSString *)path signatures:(SUSignatures *)signatures verifierInformation:(SPUVerifierInformation * _Nullable)verifierInformation error:(NSError * __autoreleasing *)error;
+
+// Used for verifying non-update data (like release notes)
+- (BOOL)verifyData:(NSData *)data signatures:(SUSignatures *)signatures fileKind:(NSString *)fileKind verifierInformation:(SPUVerifierInformation * _Nullable)verifierInformation error:(NSError * __autoreleasing *)error;
 
 @end
 

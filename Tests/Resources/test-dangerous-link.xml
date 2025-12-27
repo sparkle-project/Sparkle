@@ -3,12 +3,22 @@
   <channel>
     <title>For unit test only</title>
     <item>
+        <title>Version 4.0</title>
+        <pubDate>Sat, 26 Jul 2014 15:20:12 +0000</pubDate>
+        <sparkle:releaseNotesLink>https://sparkle-project.org/notes/relnote-4.0.txt</sparkle:releaseNotesLink>
+        <sparkle:fullReleaseNotesLink>https://sparkle-project.org/fullnotes.txt</sparkle:fullReleaseNotesLink>
+        <enclosure url="https://sparkle-project.org/release-4.0.zip" sparkle:version="4.0" length="1346234" />
+        <link>https://sparkle-project.org</link>
+        <sparkle:informationalUpdate></sparkle:informationalUpdate>
+    </item>
+    <item>
         <title>Version 3.0</title>
         <pubDate>Sat, 26 Jul 2014 15:20:12 +0000</pubDate>
         <sparkle:releaseNotesLink>https://sparkle-project.org/notes/relnote-3.0.txt</sparkle:releaseNotesLink>
         <sparkle:fullReleaseNotesLink>https://sparkle-project.org/fullnotes.txt</sparkle:fullReleaseNotesLink>
+        <sparkle:criticalUpdate></sparkle:criticalUpdate>
         <link>https://sparkle-project.org</link>
-        <enclosure url="https://sparkle-project.org/release-3.0.zip" sparkle:version="3.0" length="1346234" />
+        <enclosure url="https://sparkle-project.org/release-3.0.zip" sparkle:version="3.0 (Visit abc.com for updates)" length="1346234" />
     </item>
     <item>
         <title>Version 2.0</title>
@@ -16,7 +26,9 @@
         <sparkle:releaseNotesLink>http://sparkle-project.org/notes/relnote-2.0.txt</sparkle:releaseNotesLink>
         <sparkle:fullReleaseNotesLink>http://sparkle-project.org/fullnotes.txt</sparkle:fullReleaseNotesLink>
         <link>http://sparkle-project.org</link>
-        <enclosure url="http://sparkle-project.org/release-2.0.zip" sparkle:version="2.0" length="1346234" />
+        <sparkle:version>2.0</sparkle:version>
+        <sparkle:shortVersionString>2.0 (Visit abc.com for updates)</sparkle:shortVersionString>
+        <enclosure url="http://sparkle-project.org/release-2.0.zip" length="1346234" />
     </item>
     <item>
         <title>Version 1.0</title>

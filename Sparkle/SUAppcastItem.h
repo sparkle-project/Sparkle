@@ -16,9 +16,11 @@
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wquoted-include-in-framework-header"
 #import "SUExport.h"
+#import "SPUAppcastSigningValidationStatus.h"
 #pragma clang diagnostic pop
 #else
 #import <Sparkle/SUExport.h>
+#import <Sparkle/SPUAppcastSigningValidationStatus.h>
 #endif
 
 NS_ASSUME_NONNULL_BEGIN
@@ -282,6 +284,13 @@ SU_EXPORT @interface SUAppcastItem : NSObject<NSSecureCoding>
  Old applications must be using Sparkle 1.26 or later to support downloading bare package updates (`pkg` or `mpkg`) that are not additionally archived inside of a @c zip or other archive format.
  */
 @property (nonatomic, copy, readonly) NSString *installationType;
+
+/**
+ The appcast signing validation status that this appcast item came from.
+ 
+ Please see documentation of @c SPUAppcastSigningValidationStatus values for more information.
+ */
+@property (readonly, nonatomic) SPUAppcastSigningValidationStatus signingValidationStatus;
 
 /**
  The phased rollout interval of the update item in seconds if provided.

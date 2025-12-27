@@ -24,12 +24,14 @@
 @implementation SUAppcast
 
 @synthesize items = _items;
+@synthesize signingValidationStatus = _signingValidationStatus;
 
-- (nullable instancetype)initWithXMLData:(NSData *)xmlData relativeToURL:(NSURL * _Nullable)relativeURL stateResolver:(SPUAppcastItemStateResolver *)stateResolver error:(NSError * __autoreleasing *)error
+- (nullable instancetype)initWithXMLData:(NSData *)xmlData relativeToURL:(NSURL * _Nullable)relativeURL stateResolver:(SPUAppcastItemStateResolver *)stateResolver signingValidationStatus:(SPUAppcastSigningValidationStatus)signingValidationStatus error:(NSError * __autoreleasing *)error
 {
     self = [super init];
     if (self != nil) {
-        _items = [self parseAppcastItemsFromXMLData:xmlData relativeToURL:relativeURL stateResolver:stateResolver error:error];
+        _signingValidationStatus = signingValidationStatus;
+        _items = [self parseAppcastItemsFromXMLData:xmlData relativeToURL:relativeURL stateResolver:stateResolver signingValidationStatus:signingValidationStatus error:error];
         if (_items == nil) {
             return nil;
         }
@@ -68,7 +70,7 @@
     }
 }
 
--(NSArray *)parseAppcastItemsFromXMLData:(NSData *)appcastData relativeToURL:(NSURL * _Nullable)appcastURL stateResolver:(SPUAppcastItemStateResolver *)stateResolver error:(NSError *__autoreleasing*)errorp SPU_OBJC_DIRECT
+-(NSArray *)parseAppcastItemsFromXMLData:(NSData *)appcastData relativeToURL:(NSURL * _Nullable)appcastURL stateResolver:(SPUAppcastItemStateResolver *)stateResolver signingValidationStatus:(SPUAppcastSigningValidationStatus)signingValidationStatus error:(NSError *__autoreleasing*)errorp SPU_OBJC_DIRECT
 {
     if (errorp) {
         *errorp = nil;
@@ -142,6 +144,26 @@
                     
                     [dict setObject:descriptionDict forKey:SURSSElementDescription];
                 }
+            } else if ([name isEqualToString:SUAppcastElementReleaseNotesLink]) {
+                NSString *releaseNotesLink = node.stringValue;
+                if (releaseNotesLink != nil) {
+                    NSDictionary *attributes = [self attributesOfNode:(NSXMLElement *)node];
+                    
+                    NSMutableDictionary *linkDict = [NSMutableDictionary dictionary];
+                    [linkDict setObject:releaseNotesLink forKey:@"content"];
+                    
+                    NSString *edSignature = attributes[SUAppcastAttributeEDSignature];
+                    if (edSignature != nil) {
+                        [linkDict setObject:edSignature forKey:SUAppcastAttributeEDSignature];
+                    }
+                    
+                    NSString *length = attributes[SUAppcastAttributeLength];
+                    if (length != nil) {
+                        [linkDict setObject:length forKey:SUAppcastAttributeLength];
+                    }
+                    
+                    [dict setObject:linkDict forKey:SUAppcastElementReleaseNotesLink];
+                }
             } else if ([name isEqualToString:SUAppcastElementDeltas]) {
                 NSMutableArray *deltas = [NSMutableArray array];
                 NSEnumerator *childEnum = [[node children] objectEnumerator];
@@ -189,16 +211,21 @@
         }
 
         NSString *errString;
-        SUAppcastItem *anItem = [[SUAppcastItem alloc] initWithDictionary:dict relativeToURL:appcastURL stateResolver:stateResolver failureReason:&errString];
+        SUAppcastItem *anItem = [[SUAppcastItem alloc] initWithDictionary:dict relativeToURL:appcastURL stateResolver:stateResolver signingValidationStatus:signingValidationStatus failureReason:&errString];
         
-        if (anItem) {
+        if (anItem != nil) {
             [appcastItems addObject:anItem];
         } else {
-            SULog(SULogLevelError, @"Sparkle Updater: Failed to parse appcast item: %@.\nAppcast dictionary was: %@", errString, dict);
-            if (errorp) *errorp = [NSError errorWithDomain:SUSparkleErrorDomain
-                                                      code:SUAppcastParseError
-                                                  userInfo:@{NSLocalizedDescriptionKey: errString}];
-            return nil;
+            // An info-only update item could fail to be created when signing validation fails
+            // Let's just resume creating the other appcast items in that case.
+            if (signingValidationStatus != SPUAppcastSigningValidationStatusFailed) {
+                SULog(SULogLevelError, @"Sparkle Updater: Failed to parse appcast item: %@.\nAppcast dictionary was: %@", errString, dict);
+                if (errorp) *errorp = [NSError errorWithDomain:SUSparkleErrorDomain
+                                                          code:SUAppcastParseError
+                                                      userInfo:@{NSLocalizedDescriptionKey: errString}];
+                
+                return nil;
+            }
         }
     }
 
@@ -258,6 +285,7 @@
     }
     
     other->_items = newItems;
+    other->_signingValidationStatus = _signingValidationStatus;
     return other;
 }
 

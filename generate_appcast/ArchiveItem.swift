@@ -77,6 +77,7 @@ class ArchiveItem: CustomStringConvertible {
     let feedURL: URL?
     let publicEdKey: Data?
     let supportsDSA: Bool
+    let requiresSignedAppcast: Bool
     let archiveFileAttributes: [FileAttributeKey: Any]
     var deltas: [DeltaUpdate]
 
@@ -174,10 +175,11 @@ class ArchiveItem: CustomStringConvertible {
         }
     }
 
-    init(version: String, shortVersion: String?, feedURL: URL?, minimumSystemVersion: String?, hardwareRequirements: String?, frameworkVersion: String?, sparkleExecutableFileSize: Int?, sparkleLocales: String?, publicEdKey: String?, supportsDSA: Bool, appPath: URL, archivePath: URL) throws {
+    init(version: String, shortVersion: String?, feedURL: URL?, requiresSignedAppcast: Bool, minimumSystemVersion: String?, hardwareRequirements: String?, frameworkVersion: String?, sparkleExecutableFileSize: Int?, sparkleLocales: String?, publicEdKey: String?, supportsDSA: Bool, appPath: URL, archivePath: URL) throws {
         self.version = version
         self._shortVersion = shortVersion
         self.feedURL = feedURL
+        self.requiresSignedAppcast = requiresSignedAppcast
         self.minimumSystemVersion = minimumSystemVersion ?? "10.13"
         self.hardwareRequirements = hardwareRequirements
         self.frameworkVersion = frameworkVersion
@@ -249,6 +251,13 @@ class ArchiveItem: CustomStringConvertible {
                     feedURL = feedURL!.deletingLastPathComponent()
                     feedURL = feedURL!.appendingPathComponent("appcast.xml")
                 }
+            }
+            
+            let requiresSignedAppcast: Bool
+            if let requiresSignedAppcastValue = infoPlist[SURequireSignedFeedKey] as? Bool {
+                requiresSignedAppcast = requiresSignedAppcastValue
+            } else {
+                requiresSignedAppcast = false
             }
             
             // Intel Macs shouldn't be supported on macOS 27+ and
@@ -358,6 +367,7 @@ class ArchiveItem: CustomStringConvertible {
             try self.init(version: version,
                           shortVersion: shortVersion,
                           feedURL: feedURL,
+                          requiresSignedAppcast: requiresSignedAppcast,
                           minimumSystemVersion: minimumSystemVersion,
                           hardwareRequirements: hardwareRequirements,
                           frameworkVersion: frameworkVersion,
@@ -405,7 +415,7 @@ class ArchiveItem: CustomStringConvertible {
         return (self.archiveFileAttributes[.size] as! NSNumber).int64Value
     }
 
-    private var releaseNotesPath: URL? {
+    var releaseNotesPath: URL? {
         var basename = self.archivePath.deletingPathExtension()
         if basename.pathExtension == "tar" { // tar.gz
             basename = basename.deletingPathExtension()
@@ -467,15 +477,12 @@ class ArchiveItem: CustomStringConvertible {
         return nil
     }
     
-    func releaseNotesURL(embedReleaseNotesAlways: Bool) -> URL? {
-        guard let path = self.releaseNotesPath else {
-            return nil
-        }
+    func releaseNotesURL(releaseNotesPath: URL, embedReleaseNotesAlways: Bool) -> URL? {
         // The file is already used as inline description
-        if self.getReleaseNotesAsFragment(path, embedReleaseNotesAlways) != nil {
+        if self.getReleaseNotesAsFragment(releaseNotesPath, embedReleaseNotesAlways) != nil {
             return nil
         }
-        return self.releaseNoteURL(for: path.lastPathComponent)
+        return self.releaseNoteURL(for: releaseNotesPath.lastPathComponent)
     }
     
     func releaseNoteURL(for unescapedFilename: String) -> URL? {
@@ -492,12 +499,12 @@ class ArchiveItem: CustomStringConvertible {
         }
     }
 
-    func localizedReleaseNotes() -> [(String, URL)] {
+    func localizedReleaseNotes() -> [(String, URL, URL)] {
         var basename = archivePath.deletingPathExtension()
         if basename.pathExtension == "tar" {
             basename = basename.deletingPathExtension()
         }
-        var localizedReleaseNotes = [(String, URL)]()
+        var localizedReleaseNotes = [(String, URL, URL)]()
         for languageCode in Locale.isoLanguageCodes {
             let baseLocalizedReleaseNoteURL = basename
                 .appendingPathExtension(languageCode)
@@ -524,7 +531,7 @@ class ArchiveItem: CustomStringConvertible {
             if let localizedReleaseNoteURL = localizedReleaseNoteURL,
                let localizedReleaseNoteRemoteURL = self.releaseNoteURL(for: localizedReleaseNoteURL.lastPathComponent)
             {
-                localizedReleaseNotes.append((languageCode, localizedReleaseNoteRemoteURL))
+                localizedReleaseNotes.append((languageCode, localizedReleaseNoteRemoteURL, localizedReleaseNoteURL))
             }
         }
         return localizedReleaseNotes

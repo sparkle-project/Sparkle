@@ -324,6 +324,25 @@ static NSAttributedString *formatMarkdownAttributedString(NSAttributedString *or
     return outputAttributedString;
 }
 
+// Foundation's markdown parser doesn't handle HTML comments,
+// but the document may begin with a comment for describing a warning for signing
+// Preprocess and skip the document beginning comment
+static NSString *preprocessMarkdownContent(NSString *markdownContent)
+{
+    if (![markdownContent hasPrefix:@"<!--"]) {
+        return markdownContent;
+    }
+    
+    // Our signing tools will insert an extra newline after the HTML comment ends
+    // Try to skip ahead of that newline if present too
+    NSRange endCommentRangeWithNewline = [markdownContent rangeOfString:@"-->\n" options:NSLiteralSearch];
+    NSRange finalEndCommentRange = (endCommentRangeWithNewline.location != NSNotFound ? endCommentRangeWithNewline : [markdownContent rangeOfString:@"-->" options:NSLiteralSearch]);
+    if (finalEndCommentRange.location == NSNotFound) {
+        return markdownContent;
+    }
+    
+    return [markdownContent substringFromIndex:NSMaxRange(finalEndCommentRange)];
+}
 
 - (void)_loadAttributedString:(NSAttributedString * _Nullable)attributedString completionHandler:(void (^)(NSError * _Nullable))completionHandler SPU_OBJC_DIRECT
 {
@@ -372,7 +391,10 @@ static NSAttributedString *formatMarkdownAttributedString(NSAttributedString *or
     [_scrollView setHasVerticalScroller:YES];
     [_scrollView setHasHorizontalScroller:NO];
     
+    NSString *preprocessedContents;
     if (_prefersMarkdown) {
+        preprocessedContents = preprocessMarkdownContent(contents);
+        
         if (@available(macOS 12, *)) {
             dispatch_queue_attr_t queuePriority = dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL, QOS_CLASS_USER_INITIATED, 0);
             
@@ -380,12 +402,12 @@ static NSAttributedString *formatMarkdownAttributedString(NSAttributedString *or
             
             dispatch_async(markdownDispatchQueue, ^{
                 NSError *loadMarkdownError = nil;
-                NSAttributedString *originalMarkdownAttributedString = [[NSAttributedString alloc] initWithMarkdownString:contents options:nil baseURL:baseURL error:&loadMarkdownError];
+                NSAttributedString *originalMarkdownAttributedString = [[NSAttributedString alloc] initWithMarkdownString:preprocessedContents options:nil baseURL:baseURL error:&loadMarkdownError];
                 
                 if (originalMarkdownAttributedString == nil) {
                     // Fallback to plain-text
                     
-                    NSAttributedString *attributedString = [[NSAttributedString alloc] initWithString:contents attributes:@{ NSFontAttributeName : [NSFont systemFontOfSize:(CGFloat)self->_fontPointSize] }];
+                    NSAttributedString *attributedString = [[NSAttributedString alloc] initWithString:preprocessedContents attributes:@{ NSFontAttributeName : [NSFont systemFontOfSize:(CGFloat)self->_fontPointSize] }];
                     
                     dispatch_async(dispatch_get_main_queue(), ^{
                         [self _loadAttributedString:attributedString completionHandler:completionHandler];
@@ -403,9 +425,11 @@ static NSAttributedString *formatMarkdownAttributedString(NSAttributedString *or
         } else {
             SULog(SULogLevelDefault, @"Warning: falling back to plain text because markdown support requires macOS 12 or newer");
         }
+    } else {
+        preprocessedContents = contents;
     }
     
-    NSAttributedString *attributedString = [[NSAttributedString alloc] initWithString:contents attributes:@{ NSFontAttributeName : [NSFont systemFontOfSize:(CGFloat)_fontPointSize] }];
+    NSAttributedString *attributedString = [[NSAttributedString alloc] initWithString:preprocessedContents attributes:@{ NSFontAttributeName : [NSFont systemFontOfSize:(CGFloat)_fontPointSize] }];
     
     [self _loadAttributedString:attributedString completionHandler:completionHandler];
 }

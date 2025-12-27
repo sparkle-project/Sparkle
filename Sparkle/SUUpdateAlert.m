@@ -160,7 +160,7 @@ typedef NS_ENUM(NSInteger, SUReleaseNotesFormat)
 
 - (void)displayReleaseNotesSpinner SPU_OBJC_DIRECT
 {
-    // Stick a nice big spinner in the middle of the web view until the page is loaded.
+    // Stick a nice big spinner in the middle of the release notes view until the page is loaded.
     _releaseNotesSpinner = [[NSProgressIndicator alloc] init];
     _releaseNotesSpinner.controlSize = NSControlSizeRegular;
     [_releaseNotesSpinner setStyle:NSProgressIndicatorStyleSpinning];
@@ -176,7 +176,7 @@ typedef NS_ENUM(NSInteger, SUReleaseNotesFormat)
     _releaseNotesSpinner.displayedWhenStopped = NO;
     [_releaseNotesSpinner startAnimation:self];
     
-    // If there's no release notes URL, just stick the contents of the description into the web view
+    // If there's no release notes URL, just stick the contents of the description into the release notes view
     // Otherwise we'll wait until the client wants us to show release notes
     if (_updateItem.releaseNotesURL == nil) {
         NSString *itemDescription = _updateItem.itemDescription;
@@ -197,7 +197,7 @@ typedef NS_ENUM(NSInteger, SUReleaseNotesFormat)
             __weak __typeof__(self) weakSelf = self;
             [_releaseNotesView loadString:itemDescription baseURL:nil completionHandler:^(NSError * _Nullable error) {
                 if (error != nil) {
-                    SULog(SULogLevelError, @"Failed to load HTML string from web view: %@", error);
+                    SULog(SULogLevelError, @"Failed to load HTML string from release notes view: %@", error);
                 }
                 [weakSelf stopReleaseNotesSpinner];
             }];
@@ -247,15 +247,24 @@ typedef NS_ENUM(NSInteger, SUReleaseNotesFormat)
     __weak __typeof__(self) weakSelf = self;
     [_releaseNotesView loadData:downloadData.data MIMEType:chosenMIMEType textEncodingName:chosenTextEncodingName baseURL:baseURL completionHandler:^(NSError * _Nullable error) {
         if (error != nil) {
-            SULog(SULogLevelError, @"Failed to load data from web view: %@", error);
+            SULog(SULogLevelError, @"Failed to load data from release notes view: %@", error);
         }
         [weakSelf stopReleaseNotesSpinner];
     }];
 }
 
-- (void)showReleaseNotesFailedToDownload
+- (void)showReleaseNotesFailedToDownloadWithError:(NSError *)error
 {
-    [self stopReleaseNotesSpinner];
+    [self _createReleaseNotesViewPreferringFormat:SUReleaseNotesFormatPlainText];
+    
+    __weak __typeof__(self) weakSelf = self;
+    [_releaseNotesView loadString:error.localizedDescription baseURL:nil completionHandler:^(NSError * _Nullable loadCompletionError) {
+        if (loadCompletionError != nil) {
+            SULog(SULogLevelError, @"Failed to load HTML error string from release notes view: %@", loadCompletionError);
+        }
+        
+        [weakSelf stopReleaseNotesSpinner];
+    }];
 }
 
 - (void)stopReleaseNotesSpinner SPU_OBJC_DIRECT
@@ -343,14 +352,19 @@ typedef NS_ENUM(NSInteger, SUReleaseNotesFormat)
             // FB6993802: https://twitter.com/sindresorhus/status/1160577243929878528 | https://github.com/feedback-assistant/reports/issues/1
             // If the developer is using the downloader XPC service, they are very most likely are a) sandboxed b) do not use outgoing network entitlement.
             // In this case, fall back to legacy WebKit view.
-            // (In theory it is possible for a non-sandboxed app or sandboxed app with outgoing network entitlement to use the XPC service, it's just pretty unlikely. And falling back to a legacy web view would not be too harmful in those cases).
+            // (In theory it is possible for a non-sandboxed app or sandboxed app with outgoing network entitlement to use the XPC service, it's just unlikely and unsupported).
+            // Note: because legacy web view is only supported with using downloader XPC Service, and the app
+            // should not have an outgoing network client, there's no need to be concerned about the
+            // appcast signing validation status for loading external resources, which shouldn't be possible.
             BOOL useWKWebView = !SPUXPCServiceIsEnabled(SUEnableDownloaderServiceKey);
             if (!useWKWebView) {
                 _releaseNotesView = [[SULegacyWebView alloc] initWithColorStyleSheetLocation:colorStyleURL fontFamily:defaultFontFamily fontPointSize:defaultFontSize javaScriptEnabled:javaScriptEnabled customAllowedURLSchemes:customAllowedURLSchemes];
             } else
 #endif
             {
-                _releaseNotesView = [[SUWKWebView alloc] initWithColorStyleSheetLocation:colorStyleURL fontFamily:defaultFontFamily fontPointSize:defaultFontSize javaScriptEnabled:javaScriptEnabled customAllowedURLSchemes:customAllowedURLSchemes installedVersion: _host.version];
+                BOOL allowsLoadingExternalReferences = (_updateItem.signingValidationStatus == SPUAppcastSigningValidationStatusSkipped);
+                
+                _releaseNotesView = [[SUWKWebView alloc] initWithColorStyleSheetLocation:colorStyleURL fontFamily:defaultFontFamily fontPointSize:defaultFontSize javaScriptEnabled:javaScriptEnabled customAllowedURLSchemes:customAllowedURLSchemes allowsLoadingExternalReferences:allowsLoadingExternalReferences installedVersion:_host.version];
             }
             
             break;

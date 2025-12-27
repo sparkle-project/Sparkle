@@ -33,6 +33,7 @@
     void (^_completionHandler)(NSError * _Nullable);
     
     BOOL _drawsWebViewBackground;
+    BOOL _allowsLoadingExternalReferences;
 }
 
 static WKUserScript *makeUserScriptWithInjectedStyleSource(NSString *styleSource)
@@ -73,12 +74,14 @@ static WKUserScript *makeUserScriptForExposingCurrentRelease(NSString *releaseSt
     return [[WKUserScript alloc] initWithSource:scriptSource injectionTime:WKUserScriptInjectionTimeAtDocumentEnd forMainFrameOnly:YES];
 }
 
-- (instancetype)initWithColorStyleSheetLocation:(NSURL *)colorStyleSheetLocation fontFamily:(NSString *)fontFamily fontPointSize:(int)fontPointSize javaScriptEnabled:(BOOL)javaScriptEnabled customAllowedURLSchemes:(NSArray<NSString *> *)customAllowedURLSchemes installedVersion:(NSString *)installedVersion
+- (instancetype)initWithColorStyleSheetLocation:(NSURL *)colorStyleSheetLocation fontFamily:(NSString *)fontFamily fontPointSize:(int)fontPointSize javaScriptEnabled:(BOOL)javaScriptEnabled customAllowedURLSchemes:(NSArray<NSString *> *)customAllowedURLSchemes allowsLoadingExternalReferences:(BOOL)allowsLoadingExternalReferences installedVersion:(NSString *)installedVersion
 {
     self = [super init];
     if (self != nil) {
         // Synchronize with web view defaulting to drawing background to avoid unnecessary invocations in -setDrawsBackground:
         _drawsWebViewBackground = YES;
+        
+        _allowsLoadingExternalReferences = allowsLoadingExternalReferences;
         
         WKWebViewConfiguration *configuration = [[WKWebViewConfiguration alloc] init];
         
@@ -141,18 +144,46 @@ static WKUserScript *makeUserScriptForExposingCurrentRelease(NSString *releaseSt
     return _webView;
 }
 
+static void SPULoadWebContent(BOOL allowsExternalReferences, WKUserContentController *userContentController, void (^loadHTMLContent)(void))
+{
+    if (allowsExternalReferences) {
+        loadHTMLContent();
+        return;
+    }
+    
+    // Block loading all external resources for signed appcasts & signed release notes
+    NSString *encodedContentRuleList =
+        @"[{\"trigger\": { \"url-filter\": \".*\" }, \"action\": { \"type\": \"block\" } }]";
+    
+    [WKContentRuleListStore.defaultStore compileContentRuleListForIdentifier:@"sparkle-updater" encodedContentRuleList:encodedContentRuleList completionHandler:^(WKContentRuleList *contentRuleList, NSError *contentRuleListError) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (contentRuleList == nil) {
+                SULog(SULogLevelError, @"Error: failed to load content rule list for WKWebView with error: %@", contentRuleListError);
+            } else {
+                [userContentController addContentRuleList:contentRuleList];
+            }
+            
+            loadHTMLContent();
+        });
+    }];
+}
+
 - (void)loadString:(NSString *)htmlString baseURL:(NSURL * _Nullable)baseURL completionHandler:(void (^)(NSError * _Nullable))completionHandler
 {
     _completionHandler = [completionHandler copy];
     
-    _currentNavigation = [_webView loadHTMLString:htmlString baseURL:baseURL];
+    SPULoadWebContent(_allowsLoadingExternalReferences, _webView.configuration.userContentController, ^{
+        self->_currentNavigation = [self->_webView loadHTMLString:htmlString baseURL:baseURL];
+    });
 }
 
 - (void)loadData:(NSData *)data MIMEType:(NSString *)MIMEType textEncodingName:(NSString *)textEncodingName baseURL:(NSURL *)baseURL completionHandler:(void (^)(NSError * _Nullable))completionHandler
 {
     _completionHandler = [completionHandler copy];
 
-    _currentNavigation = [_webView loadData:data MIMEType:MIMEType characterEncodingName:textEncodingName baseURL:baseURL];
+    SPULoadWebContent(_allowsLoadingExternalReferences, _webView.configuration.userContentController, ^{
+        self->_currentNavigation = [self->_webView loadData:data MIMEType:MIMEType characterEncodingName:textEncodingName baseURL:baseURL];
+    });
 }
 
 - (void)setDrawsBackground:(BOOL)drawsBackground
