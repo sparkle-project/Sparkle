@@ -51,7 +51,11 @@
         
         _delegate = delegate;
         
-        if (@available(macOS 12, *)) {
+        // On macOS 12.7, TextKit 2 is very buggy in handling our simple text with NSParagraphStyle attributes.
+        // So even though macOS 12 supports TextKit 2 we do not use it there.
+        // My development machines are currently on macOS 26 so I know TextKit 2 works well there.
+        // macOS 13 - 15 requires more testing if we care to make the switch there.
+        if (@available(macOS 16, *)) {
             // Create NSTextView using TextKit 2
             // https://developer.apple.com/documentation/appkit/nstextview/1449347-initwithframe
             
@@ -256,6 +260,7 @@ static void processMarkdownFragmentAttributedString(NSAttributedString *fragment
 // This was ultimatily given up on and they all have various tradeoffs. NSCell based text attachments don't work in Catalyst,
 // view based attachments take up additional space, and TextKit2 CALayer decorations are hard to (re)size/position correctly.
 // Also each increases code complexity and risk. In the end, changelogs can can live without these.
+// Furthermore we currently support TextKit 1 (on older systems) and TextKit 2 so this function needs to handle both paths.
 static NSAttributedString *formatMarkdownAttributedString(NSAttributedString *originalAttributedString, CGFloat defaultFontPointSize) API_AVAILABLE(macos(12.0))
 {
     // Create our fonts and cache some common attributed strings up front (list bullets, newline)
