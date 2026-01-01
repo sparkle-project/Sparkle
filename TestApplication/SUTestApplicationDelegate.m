@@ -43,7 +43,7 @@
     // Check if we are already up to date
     NSString *mainBundleVersion = (NSString *)[mainBundle objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey];
     
-    if (([mainBundleVersion hasPrefix:@"2."] && [testMode isEqualToString:@"REGULAR"]) || (([mainBundleVersion isEqualToString:@"2.1"] || [mainBundleVersion isEqualToString:@"2.2"]) && [testMode isEqualToString:@"DELTA"]) || ([mainBundleVersion isEqualToString:@"2.2"] && [testMode isEqualToString:@"AUTOMATIC"])) {
+    if (([mainBundleVersion hasPrefix:@"2."] && [testMode isEqualToString:@"REGULAR"]) || (([mainBundleVersion isEqualToString:@"2.1"] || [mainBundleVersion isEqualToString:@"2.2"]) && [testMode isEqualToString:@"DELTA_AND_MARKDOWN"]) || ([mainBundleVersion isEqualToString:@"2.2"] && [testMode isEqualToString:@"AUTOMATIC"])) {
         NSAlert *alreadyUpdatedAlert = [[NSAlert alloc] init];
         alreadyUpdatedAlert.messageText = @"Update succeeded!";
         alreadyUpdatedAlert.informativeText = @"This is the updated version of Sparkle Test App.\n\nDelete and rebuild the app to test updates again.";
@@ -110,9 +110,7 @@
     NSString *finalUpdatedVersion;
     if ([testMode isEqualToString:@"REGULAR"]) {
         finalUpdatedVersion = @"2.0";
-    } else if ([testMode isEqualToString:@"MARKDOWN"]) {
-        finalUpdatedVersion = @"2.0.1";
-    } else if ([testMode isEqualToString:@"DELTA"]) {
+    } else if ([testMode isEqualToString:@"DELTA_AND_MARKDOWN"]) {
         finalUpdatedVersion = @"2.1";
     } else if ([testMode isEqualToString:@"AUTOMATIC"]) {
         finalUpdatedVersion = @"2.2";
@@ -182,7 +180,7 @@
             const unsigned char public_key[32] = {121, 17, 79, 45, 155, 141, 51, 169, 188, 110, 91, 102, 182, 147, 215, 225, 252, 202, 110, 231, 200, 215, 62, 171, 40, 145, 237, 128, 130, 44, 150, 89};
             unsigned char signature[64];
             
-            if ([testMode isEqualToString:@"DELTA"]) {
+            if ([testMode isEqualToString:@"DELTA_AND_MARKDOWN"]) {
                 NSError *deltaCreationError = nil;
                 NSURL *patchURL = [serverDirectoryURL URLByAppendingPathComponent:@"patch.delta"];
                 if (!createBinaryDelta(bundleURL.path, destinationBundleURL.path, patchURL.path, SUBinaryDeltaMajorVersionDefault, SPUDeltaCompressionModeDefault, 0, NO, &deltaCreationError)) {
@@ -265,10 +263,10 @@
                 }
                 
                 NSUInteger numberOfLengthReplacements = [appcastContents replaceOccurrencesOfString:@"$INSERT_ARCHIVE_LENGTH" withString:[NSString stringWithFormat:@"%llu", archiveFileAttributes.fileSize] options:NSLiteralSearch range:NSMakeRange(0, appcastContents.length)];
-                assert(numberOfLengthReplacements == 3);
+                assert(numberOfLengthReplacements == 2);
                 
                 NSUInteger numberOfSignatureReplacements = [appcastContents replaceOccurrencesOfString:@"$INSERT_EDDSA_SIGNATURE" withString:signatureString options:NSLiteralSearch range:NSMakeRange(0, appcastContents.length)];
-                assert(numberOfSignatureReplacements == 3);
+                assert(numberOfSignatureReplacements == 2);
                 
                 NSRange feedSignaturesPrefixRange = [appcastContents rangeOfString:@"<!-- sparkle-signatures:\n" options:(NSLiteralSearch | NSBackwardsSearch)];
                 assert(feedSignaturesPrefixRange.location != NSNotFound);
@@ -344,12 +342,10 @@
 
 - (NSSet<NSString *> *)allowedChannelsForUpdater:(SPUUpdater *)updater
 {
-    if ([_testMode isEqualToString:@"DELTA"]) {
+    if ([_testMode isEqualToString:@"DELTA_AND_MARKDOWN"]) {
         return [NSSet setWithObject:@"delta"];
     } else if ([_testMode isEqualToString:@"AUTOMATIC"]) {
         return [NSSet setWithObject:@"automatic"];
-    } else if ([_testMode isEqualToString:@"MARKDOWN"]) {
-        return [NSSet setWithObject:@"markdown"];
     } else {
         return [NSSet set];
     }

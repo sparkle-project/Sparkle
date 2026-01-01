@@ -55,12 +55,7 @@
       <EnvironmentVariables>
          <EnvironmentVariable
             key = "TEST_MODE"
-            value = "DELTA"
-            isEnabled = "NO">
-         </EnvironmentVariable>
-         <EnvironmentVariable
-            key = "TEST_MODE"
-            value = "MARKDOWN"
+            value = "DELTA_AND_MARKDOWN"
             isEnabled = "NO">
          </EnvironmentVariable>
       </EnvironmentVariables>

@@ -30,44 +30,17 @@ IMPORTANT: This file must be re-signed if modifications are made to this file! T
           <link>https://sparkle-project.org</link>
           <sparkle:channel>delta</sparkle:channel>
           <sparkle:fullReleaseNotesLink>releasenotes.html</sparkle:fullReleaseNotesLink>
-          <description>
-            <![CDATA[
-              <ul>
-                <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</li>
-                <li>Suspendisse sed felis ac ante ultrices rhoncus. Etiam quis elit vel nibh placerat facilisis in id leo.</li>
-              </ul>
-            ]]>
-          </description>
-          <pubDate>Sat, 26 Jul 2014 15:20:11 +0000</pubDate>
-          <!-- Note: this file won't actually exist to ensure delta update works -->
-          <enclosure url="http://localhost:1337/Sparkle_Test_App.zip" length="100000" type="application/octet-stream" sparkle:edSignature="ootgYIwmnS1wa7Q/5SXDXnOVdKnjkjrFhm/D7ukW77k=" />
-          
-          <sparkle:deltas>
-              <enclosure url="http://localhost:1337/patch.delta"
-                            sparkle:deltaFrom="$INSERT_DELTA_FROM_VERSION"
-                            length="$INSERT_DELTA_ARCHIVE_LENGTH"
-                            type="application/octet-stream"
-                            sparkle:edSignature="$INSERT_DELTA_EDDSA_SIGNATURE" />
-          </sparkle:deltas>
-        </item>
-        
-        <item>
-        <title>Version 2.0.1</title>
-        <sparkle:version>2.0.1</sparkle:version>
-        <link>https://sparkle-project.org</link>
-        <sparkle:fullReleaseNotesLink>releasenotes.html</sparkle:fullReleaseNotesLink>
-        <sparkle:channel>markdown</sparkle:channel>
-        <description sparkle:format="markdown">
+          <description sparkle:format="markdown">
 <![CDATA[## Version 2.0.1
 
 * Added `markdown` support to release notes.
 * Upgraded text kit system to use *improved* TextKit 2.
 * Lists in markdown can contain multiple paragraphs
-  
-  These paragraphs can even span multiple lines if they are long and wide enough to pass over the next line. These paragraphs can also contain useful information.
 
-  * Multiple levels of lists can also exist in Markdown
-  * Indented list items can contain information that are related to a parent list point. For example this could contain information about writing long paragraphs.
+These paragraphs can even span multiple lines if they are long and wide enough to pass over the next line. These paragraphs can also contain useful information.
+
+* Multiple levels of lists can also exist in Markdown
+* Indented list items can contain information that are related to a parent list point. For example this could contain information about writing long paragraphs.
 
 1. Markdown also supports numbered lists.
 2. This is an example of a numbered list.
@@ -111,9 +84,18 @@ Note though, Sparkle's markdown support does not support tables or images. It ne
 * Improved launch performance and reduced memory usage during startup.
 * Fixed an issue where notifications could appear twice in some cases.
 * Addressed several minor visual glitches in dark mode.]]>
-        </description>
-        <pubDate>Sat, 26 Jul 2014 15:20:11 +0000</pubDate>
-        <enclosure url="http://localhost:1337/Sparkle_Test_App.zip" length="$INSERT_ARCHIVE_LENGTH" type="application/octet-stream" sparkle:edSignature="$INSERT_EDDSA_SIGNATURE" />
+          </description>
+          <pubDate>Sat, 26 Jul 2014 15:20:11 +0000</pubDate>
+          <!-- Note: this file won't actually exist to ensure delta update works -->
+          <enclosure url="http://localhost:1337/Sparkle_Test_App.zip" length="100000" type="application/octet-stream" sparkle:edSignature="ootgYIwmnS1wa7Q/5SXDXnOVdKnjkjrFhm/D7ukW77k=" />
+          
+          <sparkle:deltas>
+              <enclosure url="http://localhost:1337/patch.delta"
+                            sparkle:deltaFrom="$INSERT_DELTA_FROM_VERSION"
+                            length="$INSERT_DELTA_ARCHIVE_LENGTH"
+                            type="application/octet-stream"
+                            sparkle:edSignature="$INSERT_DELTA_EDDSA_SIGNATURE" />
+          </sparkle:deltas>
         </item>
         
         <item>

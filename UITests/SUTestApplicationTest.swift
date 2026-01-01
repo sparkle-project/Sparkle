@@ -108,7 +108,7 @@ class SUTestApplicationTest: XCTestCase
     }
     
     func test2DeltaUpdate() {
-        runTestApplication(testMode: "DELTA", automatic: false, expectedFinalVersion: "2.1", launchSleep: 75, extractSleep: 45)
+        runTestApplication(testMode: "DELTA_AND_MARKDOWN", automatic: false, expectedFinalVersion: "2.1", launchSleep: 75, extractSleep: 45)
     }
     
     func test3AutomaticUpdate() {
