@@ -122,6 +122,10 @@
         _inBackground = background;
         
         NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:requestURL];
+        // Note the cachePolicy has no effect on persistent downloads on disk (i.e downloading update archives)
+        // It impacts temporary in-memory downloads such as appcast feeds and release notes.
+        // For now we don't use caching, but with more testing/experimenting that could change
+        // (e.g. not downloading same feed unmodified from previous request).
         request.cachePolicy = NSURLRequestReloadIgnoringLocalCacheData;
         
         if (userAgent != nil) {
