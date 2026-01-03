@@ -15,6 +15,8 @@
 #import "SUAppcastItem.h"
 #import "SUErrors.h"
 #import "SPUDownloadData.h"
+#import "SPUDownloadDataPrivate.h"
+#import "SPUExtractSignedFeed.h"
 #import "SPUResumableUpdate.h"
 #import "SPUDownloadDriver.h"
 #import "SPUSkippedUpdate.h"
@@ -63,16 +65,35 @@
     [_downloadDriver downloadFile];
 }
 
-- (void)downloadDriverDidDownloadData:(SPUDownloadData *)downloadData
+- (void)downloadDriverDidDownloadData:(SPUDownloadData *)downloadDataToValidate
 {
     if (_completionHandler != nil) {
+        SPUDownloadData *downloadDataToPassToUserDriver;
+        
+        // Strip out any sign warning comment prefix for markdown data so that user drivers
+        // will not have to deal with parsing them (if their markdown parsers don't handle decoding HTML)
+        NSString *MIMEType = downloadDataToValidate.MIMEType;
+        NSString *pathExtension = _downloadDriver.request.URL.pathExtension;
+        if ([MIMEType isEqualToString:@"text/markdown"] || [MIMEType isEqualToString:@"text/x-markdown"] ||
+            [pathExtension caseInsensitiveCompare:@"md"] == NSOrderedSame || [pathExtension caseInsensitiveCompare:@"markdown"] == NSOrderedSame) {
+            
+            NSData *contentData = SPUExtractReleaseNotesContent(downloadDataToValidate.data);
+            if (contentData.length != downloadDataToValidate.data.length) {
+                downloadDataToPassToUserDriver = [[SPUDownloadData alloc] initWithData:contentData URL:downloadDataToValidate.URL textEncodingName:downloadDataToValidate.textEncodingName MIMEType:downloadDataToValidate.MIMEType];
+            } else {
+                downloadDataToPassToUserDriver = downloadDataToValidate;
+            }
+        } else {
+            downloadDataToPassToUserDriver = downloadDataToValidate;
+        }
+        
         if (_host.requiresSignedAppcast) {
             SUSignatureVerifier *signatureVerifier = [[SUSignatureVerifier alloc] initWithPublicKeys:_host.publicKeys];
             SPUVerifierInformation *verifierInformation = [[SPUVerifierInformation alloc] initWithExpectedVersion:nil expectedContentLength:_contentLength];
-            verifierInformation.actualContentLength = downloadData.data.length;
+            verifierInformation.actualContentLength = downloadDataToValidate.data.length;
             
             NSError *verifierError = nil;
-            if (![signatureVerifier verifyData:downloadData.data signatures:_signatures fileKind:@"release notes" verifierInformation:verifierInformation error:&verifierError]) {
+            if (![signatureVerifier verifyData:downloadDataToValidate.data signatures:_signatures fileKind:@"release notes" verifierInformation:verifierInformation error:&verifierError]) {
                 NSMutableDictionary *userInfo = [NSMutableDictionary dictionaryWithDictionary:@{NSLocalizedDescriptionKey:SULocalizedStringFromTableInBundle(@"The release notes is improperly signed and could not be validated. Please contact the app developer for more information.", SPARKLE_TABLE, SUSparkleBundle(), nil)}];
                 
                 if (verifierError != nil) {
@@ -81,10 +102,10 @@
                 
                 _completionHandler(nil, [NSError errorWithDomain:SUSparkleErrorDomain code:SUDownloadError userInfo:userInfo]);
             } else {
-                _completionHandler(downloadData, nil);
+                _completionHandler(downloadDataToPassToUserDriver, nil);
             }
         } else {
-            _completionHandler(downloadData, nil);
+            _completionHandler(downloadDataToPassToUserDriver, nil);
         }
         
         _completionHandler = nil;

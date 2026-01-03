@@ -18,7 +18,7 @@
 #import "SUReleaseNotesView.h"
 #import "SUWKWebView.h"
 #import "SULegacyWebView.h"
-#import "SUPlainTextReleaseNotesView.h"
+#import "SUTextViewReleaseNotesView.h"
 
 #import "SUConstants.h"
 #import "SULog.h"
@@ -336,10 +336,10 @@ typedef NS_ENUM(NSInteger, SUReleaseNotesFormat)
     id<SPUStandardUserDriverDelegate> delegate = _delegate;
     switch (usedReleaseNotesFormat) {
         case SUReleaseNotesFormatPlainText:
-            _releaseNotesView = [[SUPlainTextReleaseNotesView alloc] initWithFontPointSize:defaultFontSize appcastItem:_updateItem host:_host delegate:delegate prefersMarkdown:NO customAllowedURLSchemes:customAllowedURLSchemes];
+            _releaseNotesView = [[SUTextViewReleaseNotesView alloc] initWithFontPointSize:defaultFontSize appcastItem:_updateItem host:_host delegate:delegate prefersMarkdown:NO customAllowedURLSchemes:customAllowedURLSchemes];
             break;
         case SUReleaseNotesFormatMarkdown:
-            _releaseNotesView = [[SUPlainTextReleaseNotesView alloc] initWithFontPointSize:defaultFontSize appcastItem:_updateItem host:_host delegate:delegate prefersMarkdown:YES customAllowedURLSchemes:customAllowedURLSchemes];
+            _releaseNotesView = [[SUTextViewReleaseNotesView alloc] initWithFontPointSize:defaultFontSize appcastItem:_updateItem host:_host delegate:delegate prefersMarkdown:YES customAllowedURLSchemes:customAllowedURLSchemes];
             break;
         case SUReleaseNotesFormatHTML:
         {

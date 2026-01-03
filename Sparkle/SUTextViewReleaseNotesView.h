@@ -1,5 +1,5 @@
 //
-//  SUPlainTextReleaseNotesView.h
+//  SUTextViewReleaseNotesView.h
 //  Sparkle
 //
 //  Created on 9/11/22.
@@ -18,7 +18,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-SPU_OBJC_DIRECT_MEMBERS @interface SUPlainTextReleaseNotesView : NSObject <SUReleaseNotesView>
+SPU_OBJC_DIRECT_MEMBERS @interface SUTextViewReleaseNotesView : NSObject <SUReleaseNotesView>
 
 - (instancetype)initWithFontPointSize:(int)fontPointSize appcastItem:(SUAppcastItem *)appcastItem host:(SUHost *)host delegate:(id<SPUStandardUserDriverDelegate>)delegate prefersMarkdown:(BOOL)prefersMarkdown customAllowedURLSchemes:(NSArray<NSString *> *)customAllowedURLSchemes;
 

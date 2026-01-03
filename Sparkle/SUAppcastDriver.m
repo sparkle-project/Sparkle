@@ -27,7 +27,7 @@
 #import "SPUAppcastItemStateResolver+Private.h"
 #import "SPUAppcastItemState.h"
 #import "SUSignatureVerifier.h"
-#import "SPUExtractAppcast.h"
+#import "SPUExtractSignedFeed.h"
 #import "SUSignatures.h"
 #import "SPUVerifierInformation.h"
 

@@ -22,7 +22,7 @@
 #import "SUSignatures.h"
 #import "SPUInstallationType.h"
 #import "SPUAppcastItemStateResolver.h"
-#import "SPUExtractAppcast.h"
+#import "SPUExtractSignedFeed.h"
 #import "SUSignatureVerifier.h"
 #import "ed25519.h"
 

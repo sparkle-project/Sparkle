@@ -142,5 +142,43 @@ class SUFeedSignatureVerifierTest: XCTestCase {
             let byteDifference = releaseNotesDataWithSigningWarning.count - releaseNotesData.count
             XCTAssertEqual(releaseNotesDataWithSigningWarning.subdata(in: releaseNotesDataWithSigningWarning.startIndex.advanced(by: byteDifference) ..< releaseNotesDataWithSigningWarning.endIndex), releaseNotesData)
         }
+        
+        // Test the content using SPUExtractReleaseNotesContent()
+        do {
+            let releaseNotesContent = SPUExtractReleaseNotesContent(releaseNotesDataWithSigningWarning)
+            XCTAssertEqual(releaseNotesContent, releaseNotesData)
+            
+            // Extracting content again should return same data
+            let releaseNotesContentAgain = SPUExtractReleaseNotesContent(releaseNotesContent)
+            XCTAssertEqual(releaseNotesContentAgain, releaseNotesData)
+        }
+        
+        // Test signing warning data without newline
+        do {
+            let signWarning = "<!-- sparkle-sign-warning:-->foobar"
+            let signWarningData = Data(signWarning.utf8)
+            
+            let releaseNotesContent = SPUExtractReleaseNotesContent(signWarningData)
+            XCTAssertEqual(releaseNotesContent, Data("foobar".utf8))
+        }
+        
+        // Test minimal signing warning data
+        do {
+            let signWarning = "<!-- sparkle-sign-warning:-->"
+            let signWarningData = Data(signWarning.utf8)
+            
+            let releaseNotesContent = SPUExtractReleaseNotesContent(signWarningData)
+            XCTAssertEqual(releaseNotesContent.count, 0)
+        }
+        
+        // Test minimal signing warning data with just a newline
+        do {
+            let signWarning = "<!-- sparkle-sign-warning:-->\n"
+            let signWarningData = Data(signWarning.utf8)
+            
+            // This should skip over the newline
+            let releaseNotesContent = SPUExtractReleaseNotesContent(signWarningData)
+            XCTAssertEqual(releaseNotesContent.count, 0)
+        }
     }
 }

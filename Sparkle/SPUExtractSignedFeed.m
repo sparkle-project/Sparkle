@@ -1,12 +1,12 @@
 //
-//  SPUExtractAppcast.m
+//  SPUExtractSignedFeed.m
 //  Sparkle
 //
 //  Created on 12/25/25.
 //  Copyright © 2025 Sparkle Project. All rights reserved.
 //
 
-#import "SPUExtractAppcast.h"
+#import "SPUExtractSignedFeed.h"
 
 NSData *SPUExtractAppcastContent(NSData *appcastData, NSString * _Nullable __autoreleasing * _Nullable outEdSignatureBase64, uint64_t * _Nullable outContentLength)
 {
@@ -57,4 +57,39 @@ NSData *SPUExtractAppcastContent(NSData *appcastData, NSString * _Nullable __aut
     }
     
     return contentFeedData;
+}
+
+NSData *SPUExtractReleaseNotesContent(NSData *data)
+{
+    NSData *signWarningCommentPrefix = [@"<!-- sparkle-sign-warning:" dataUsingEncoding:NSUTF8StringEncoding];
+    NSData *signWarningComment = [@"-->" dataUsingEncoding:NSUTF8StringEncoding];
+    
+    if (signWarningCommentPrefix.length == 0 || signWarningComment.length == 0) {
+        return data;
+    }
+    
+    if (data.length < signWarningCommentPrefix.length + signWarningComment.length) {
+        return data;
+    }
+    
+    if (![[data subdataWithRange:NSMakeRange(0, signWarningCommentPrefix.length)] isEqualToData:signWarningCommentPrefix]) {
+        return data;
+    }
+    
+    NSRange commentSuffixRange = [data rangeOfData:signWarningComment options:0 range:NSMakeRange(signWarningCommentPrefix.length, data.length - signWarningCommentPrefix.length)];
+    
+    if (commentSuffixRange.location == NSNotFound) {
+        return data;
+    }
+    
+    // A newline is usually inserted after the signing warning comment
+    // Ignore that character too if present
+    NSUInteger endOfCommentSuffix = NSMaxRange(commentSuffixRange);
+    NSUInteger endOfCommentSuffixAccountingForNewline =
+        (data.length > endOfCommentSuffix && *((const uint8_t *)data.bytes + endOfCommentSuffix) == '\n') ?
+        (endOfCommentSuffix + 1) :
+        endOfCommentSuffix;
+    
+    NSData *contentData = [data subdataWithRange:NSMakeRange(endOfCommentSuffixAccountingForNewline, data.length - endOfCommentSuffixAccountingForNewline)];
+    return contentData;
 }

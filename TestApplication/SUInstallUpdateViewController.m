@@ -42,11 +42,17 @@
         [self displayReleaseNotes:_preloadedReleaseNotes];
         _preloadedReleaseNotes = nil;
     } else if (_appcastItem.releaseNotesURL == nil) {
-        NSString *descriptionHTML = _appcastItem.itemDescription;
-        if (descriptionHTML != nil) {
-            NSData *htmlData = [descriptionHTML dataUsingEncoding:NSUTF8StringEncoding];
-            NSAttributedString *attributedString = [[NSAttributedString alloc] initWithHTML:htmlData documentAttributes:NULL];
-            [self displayReleaseNotes:attributedString];
+        NSString *descriptionString = _appcastItem.itemDescription;
+        if (descriptionString != nil) {
+            NSString *descriptionFormat = _appcastItem.itemDescriptionFormat;
+            if ([descriptionFormat isEqualToString:@"plain-text"] || [descriptionFormat isEqualToString:@"markdown"]) {
+                NSAttributedString *attributedString = [[NSAttributedString alloc] initWithString:descriptionString];
+                [self displayReleaseNotes:attributedString];
+            } else {
+                NSData *htmlData = [descriptionString dataUsingEncoding:NSUTF8StringEncoding];
+                NSAttributedString *attributedString = [[NSAttributedString alloc] initWithHTML:htmlData documentAttributes:NULL];
+                [self displayReleaseNotes:attributedString];
+            }
         }
     }
 }

@@ -445,26 +445,35 @@ class ArchiveItem: CustomStringConvertible {
     }
 
     private func getReleaseNotesAsFragment(_ path: URL, _ embedReleaseNotesAlways: Bool) -> (content: String, format: String)?  {
-        guard let content = try? String(contentsOf: path) else {
+        guard let data = try? Data(contentsOf: path) else {
             return nil
         }
         
+        let contentData: Data
         let format: String
         let pathExtension = path.pathExtension
         switch pathExtension {
-        case "txt":
+        case "txt", "TXT":
             format = "plain-text"
-        case "md", "markdown":
+            contentData = data
+        case "md", "MD", "markdown", "MARKDOWN":
             format = "markdown"
+            contentData = SPUExtractReleaseNotesContent(data)
         default:
             format = "html"
+            contentData = SPUExtractReleaseNotesContent(data)
         }
         
         if embedReleaseNotesAlways {
-            return (content, format)
-        } else if path.pathExtension.caseInsensitiveCompare("html") == .orderedSame && !content.localizedCaseInsensitiveContains("<!DOCTYPE") && !content.localizedCaseInsensitiveContains("<body")  {
+            guard let contentString = String(data: contentData, encoding: .utf8) else {
+                print("Error: failed to read release notes as UTF8 string: \(path.lastPathComponent)")
+                return nil
+            }
+            
+            return (contentString, format)
+        } else if format == "html", let contentString = String(data: contentData, encoding: .utf8), !contentString.localizedCaseInsensitiveContains("<!DOCTYPE") && !contentString.localizedCaseInsensitiveContains("<body")  {
             // HTML fragments should always be embedded
-            return (content, format)
+            return (contentString, format)
         } else {
             return nil
         }
