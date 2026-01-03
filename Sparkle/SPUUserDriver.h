@@ -32,7 +32,7 @@ NS_ASSUME_NONNULL_BEGIN
  
  Every method in this protocol can be assumed to be called from the main thread.
  */
-SU_EXPORT @protocol SPUUserDriver <NSObject>
+SU_EXPORT NS_SWIFT_UI_ACTOR @protocol SPUUserDriver <NSObject>
 
 /**
  * Show an updater permission request to the user
@@ -140,7 +140,7 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  * @param error The error associated with why a new update was not found. See above discussion for more details.
  * @param acknowledgement Acknowledge to the updater that no update found error was shown.
  */
-- (void)showUpdateNotFoundWithError:(NSError *)error acknowledgement:(void (^)(void))acknowledgement;
+- (void)showUpdateNotFoundWithError:(NSError *)error acknowledgement:(void (^)(void))acknowledgement NS_SWIFT_ASYNC(2);
 
 /**
  * Show the user an update error occurred
@@ -153,7 +153,7 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  * @param error The error associated with what update error occurred.
  * @param acknowledgement Acknowledge to the updater that the error was shown.
  */
-- (void)showUpdaterError:(NSError *)error acknowledgement:(void (^)(void))acknowledgement;
+- (void)showUpdaterError:(NSError *)error acknowledgement:(void (^)(void))acknowledgement NS_SWIFT_ASYNC(2);
 
 /**
  * Show the user that downloading the new update initiated
@@ -256,7 +256,7 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  * @param relaunched Indicates if the update was relaunched.
  * @param acknowledgement Acknowledge to the updater that the finished installation was shown.
  */
-- (void)showUpdateInstalledAndRelaunched:(BOOL)relaunched acknowledgement:(void (^)(void))acknowledgement;
+- (void)showUpdateInstalledAndRelaunched:(BOOL)relaunched acknowledgement:(void (^)(void))acknowledgement NS_SWIFT_ASYNC(2);
 
 /**
  * Dismiss the current update installation

@@ -40,7 +40,7 @@ NS_ASSUME_NONNULL_BEGIN
  
  This class must be used on the main thread.
   */
-SU_EXPORT @interface SPUStandardUpdaterController : NSObject
+SU_EXPORT NS_SWIFT_UI_ACTOR @interface SPUStandardUpdaterController : NSObject
 {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wobjc-interface-ivars"

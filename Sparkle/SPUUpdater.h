@@ -45,7 +45,7 @@ NS_ASSUME_NONNULL_BEGIN
  
  This class must be used on the main thread.
  */
-SU_EXPORT @interface SPUUpdater : NSObject
+SU_EXPORT NS_SWIFT_UI_ACTOR @interface SPUUpdater : NSObject
 
 /**
  Initializes a new `SPUUpdater` instance

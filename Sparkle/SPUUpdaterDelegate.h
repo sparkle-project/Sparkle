@@ -66,7 +66,7 @@ SU_EXPORT extern NSString *const SUSystemProfilerPreferredLanguageKey;
 /**
  Provides delegation methods to control the behavior of an `SPUUpdater` object.
  */
-@protocol SPUUpdaterDelegate <NSObject>
+NS_SWIFT_UI_ACTOR @protocol SPUUpdaterDelegate <NSObject>
 @optional
 
 /**

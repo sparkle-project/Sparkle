@@ -17,9 +17,6 @@
 #define SPUUserUpdateStateMajorUpgradeKey @"SPUUserUpdateStateMajorUpgrade"
 #define SPUUserUpdateStateCriticalUpdateKey @"SPUUserUpdateStateCriticalUpdate"
 
-@interface SPUUserUpdateState () <NSSecureCoding>
-@end
-
 @implementation SPUUserUpdateState
 
 @synthesize stage = _stage;

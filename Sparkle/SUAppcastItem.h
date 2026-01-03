@@ -36,7 +36,7 @@ NS_ASSUME_NONNULL_BEGIN
  Extended documentation and examples on using appcast item features are available at:
  https://sparkle-project.org/documentation/publishing/
  */
-SU_EXPORT @interface SUAppcastItem : NSObject<NSSecureCoding>
+SU_EXPORT NS_SWIFT_SENDABLE @interface SUAppcastItem : NSObject<NSSecureCoding>
 
 /**
  The version of the update item.

@@ -28,7 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
  
  For updating updater settings, changes are made in the host's user defaults.
  */
-SU_EXPORT @interface SPUUpdaterSettings : NSObject
+SU_EXPORT NS_SWIFT_UI_ACTOR @interface SPUUpdaterSettings : NSObject
 
 - (instancetype)init NS_UNAVAILABLE;
 

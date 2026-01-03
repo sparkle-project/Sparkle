@@ -29,7 +29,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  The appcast representing a collection of `SUAppcastItem` items in the feed.
  */
-SU_EXPORT @interface SUAppcast : NSObject
+SU_EXPORT NS_SWIFT_SENDABLE @interface SUAppcast : NSObject
 
 - (instancetype)init NS_UNAVAILABLE;
 

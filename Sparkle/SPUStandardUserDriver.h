@@ -27,7 +27,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Sparkle's standard built-in user driver for updater interactions
  */
-SU_EXPORT @interface SPUStandardUserDriver : NSObject <SPUUserDriver>
+SU_EXPORT NS_SWIFT_UI_ACTOR @interface SPUStandardUserDriver : NSObject <SPUUserDriver>
 
 /**
  Initializes a Sparkle's standard user driver for user update interactions
