@@ -287,23 +287,36 @@ class ArchiveItem: CustomStringConvertible {
             let sparkleExecutableFileSize: Int?
             let sparkleLocales: String?
             do {
-                let canonicalFrameworksURL = appPath.appendingPathComponent("Contents/Frameworks/Sparkle.framework")
+                let fileManager = FileManager.default
                 
                 let frameworksURL: URL?
-                let usingLegacySparkleCore: Bool
-                if !FileManager.default.fileExists(atPath: canonicalFrameworksURL.path) {
-                    // Try legacy SparkleCore framework that was shipping in early 2.0 betas
-                    let sparkleCoreFrameworksURL = appPath.appendingPathComponent("Contents/Frameworks/SparkleCore.framework")
-                    if FileManager.default.fileExists(atPath: sparkleCoreFrameworksURL.path) {
-                        frameworksURL = sparkleCoreFrameworksURL
-                        usingLegacySparkleCore = true
+                let canonicalFrameworksURL = appPath.appendingPathComponent("Contents/Frameworks/Sparkle.framework")
+                if fileManager.fileExists(atPath: canonicalFrameworksURL.path) {
+                    frameworksURL = canonicalFrameworksURL
+                } else {
+                    // The framework may be inside another framework or plug-in. Find it.
+                    if let enumerator = fileManager.enumerator(at: appPath, includingPropertiesForKeys: [], options: [.skipsHiddenFiles], errorHandler: nil) {
+                        var foundFrameworksURL: URL?
+                        
+                        for case let fileURL as URL in enumerator {
+                            let name = fileURL.lastPathComponent
+                            
+                            // Skip Contents/Resources entirely because frameworks shouldn't be in there and we don't want to pay the cost of scanning in there
+                            guard name != "Resources" || fileURL.deletingLastPathComponent().lastPathComponent != "Contents" else {
+                                enumerator.skipDescendants()
+                                continue
+                            }
+                            
+                            if name == "Sparkle.framework" {
+                                foundFrameworksURL = fileURL
+                                break
+                            }
+                        }
+                        
+                        frameworksURL = foundFrameworksURL
                     } else {
                         frameworksURL = nil
-                        usingLegacySparkleCore = false
                     }
-                } else {
-                    frameworksURL = canonicalFrameworksURL
-                    usingLegacySparkleCore = false
                 }
                 
                 if let frameworksURL = frameworksURL {
@@ -313,7 +326,7 @@ class ArchiveItem: CustomStringConvertible {
                         frameworkVersion = frameworkInfoPlist[kCFBundleVersionKey as String] as? String
                     }
                     
-                    let frameworkExecutableURL = frameworksURL.appendingPathComponent(!usingLegacySparkleCore ? "Sparkle" : "SparkleCore").resolvingSymlinksInPath()
+                    let frameworkExecutableURL = frameworksURL.appendingPathComponent("Sparkle").resolvingSymlinksInPath()
                     do {
                         let resourceValues = try frameworkExecutableURL.resourceValues(forKeys: [.fileSizeKey])
                         
@@ -323,7 +336,6 @@ class ArchiveItem: CustomStringConvertible {
                     }
                     
                     do {
-                        let fileManager = FileManager.default
                         let resourcesDirectoryContents = try fileManager.contentsOfDirectory(atPath: resourcesURL.path)
                         let localeExtension = ".lproj"
                         let localeExtensionCount = localeExtension.count
