@@ -301,8 +301,8 @@ class ArchiveItem: CustomStringConvertible {
                         for case let fileURL as URL in enumerator {
                             let name = fileURL.lastPathComponent
                             
-                            // Skip Contents/Resources entirely because frameworks shouldn't be in there and we don't want to pay the cost of scanning in there
-                            guard name != "Resources" || fileURL.deletingLastPathComponent().lastPathComponent != "Contents" else {
+                            // Skip Resources in bundles entirely because frameworks shouldn't be in there and we don't want to pay the cost of scanning in there
+                            guard name != "Resources" else {
                                 enumerator.skipDescendants()
                                 continue
                             }
