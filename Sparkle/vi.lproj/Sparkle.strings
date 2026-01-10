@@ -26,13 +26,13 @@
 "%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%1$@ %2$@ hiện là phiên bản mới nhất.\n(Bạn đang chạy phiên bản %3$@.)";
 
 /* Description text for SUUpdateAlert when the critical update is downloadable. */
-"%@ %@ is now available—you have %@. This is an important update; would you like to download it now?" = "%1$@ %2$@ hiện đã có—bạn đang dùng %@. Đây là bản cập nhật quan trọng; bạn có muốn tải xuống ngay bây giờ không?";
+"%@ %@ is now available—you have %@. This is an important update; would you like to download it now?" = "%1$@ %2$@ hiện đã có—bạn đang dùng %3$@. Đây là bản cập nhật quan trọng; bạn có muốn tải xuống ngay bây giờ không?";
 
 /* Description text for SUUpdateAlert when the update is downloadable. */
-"%@ %@ is now available—you have %@. Would you like to download it now?" = "%1$@ %2$@ hiện đã có—bạn đang dùng %@. Bạn có muốn tải xuống ngay bây giờ không?";
+"%@ %@ is now available—you have %@. Would you like to download it now?" = "%1$@ %2$@ hiện đã có—bạn đang dùng %3$@. Bạn có muốn tải xuống ngay bây giờ không?";
 
 /* Description text for SUUpdateAlert when the update informational with no download. */
-"%@ %@ is now available—you have %@. Would you like to learn more about this update on the web?" = "%1$@ %2$@ hiện đã có—bạn đang dùng %@. Bạn có muốn tìm hiểu thêm về bản cập nhật này trên web không?";
+"%@ %@ is now available—you have %@. Would you like to learn more about this update on the web?" = "%1$@ %2$@ hiện đã có—bạn đang dùng %3$@. Bạn có muốn tìm hiểu thêm về bản cập nhật này trên web không?";
 
 /* The download progress in a unit of bytes, e.g. 100 KB */
 "%@ downloaded" = "%@ đã tải xuống";
