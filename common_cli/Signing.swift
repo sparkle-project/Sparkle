@@ -40,14 +40,14 @@ func addSignWarningToAppcast(data inputData: Data) -> Data {
         let signWarningPrefix = " sparkle-sign-warning:"
         let signWarningMessage = "\nIMPORTANT: This file was signed by Sparkle. Any modifications to this file requires re-signing this file with generate_appcast or sign_update! The signed signature will be embedded at the end of this file.\n"
         
-        let readOptions: XMLNode.Options = [
+        let readAndWriteOptions: XMLNode.Options = [
             XMLNode.Options.nodeLoadExternalEntitiesNever,
             XMLNode.Options.nodePreserveCDATA,
             XMLNode.Options.nodePreserveWhitespace,
         ]
         
         do {
-            let document = try XMLDocument(data: inputData, options: readOptions)
+            let document = try XMLDocument(data: inputData, options: readAndWriteOptions)
             
             var foundSignWarningComment: Bool = false
             if let documentChildren = document.children {
@@ -66,8 +66,7 @@ func addSignWarningToAppcast(data inputData: Data) -> Data {
                 newCommentNode.stringValue = newSigningWarningMessage
                 document.insertChild(newCommentNode, at: 0)
                 
-                let writeOptions: XMLNode.Options = [.nodeCompactEmptyElement, .nodePrettyPrint]
-                xmlData = document.xmlData(options: writeOptions)
+                xmlData = document.xmlData(options: readAndWriteOptions)
             } else {
                 xmlData = inputData
             }
