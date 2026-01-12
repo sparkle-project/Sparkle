@@ -83,6 +83,9 @@ struct GenerateAppcast: ParsableCommand {
     @Option(name: .customLong("ed-key-file"), help: ArgumentHelp("Path to the private EdDSA key file. If not specified, the private EdDSA key will be read from the Keychain instead. '-' can be used to echo the EdDSA key from a 'secret' environment variable to the standard input stream. For example: echo \"$PRIVATE_KEY_SECRET\" | ./\(programName) --ed-key-file -", valueName: "private-EdDSA-key-file"))
     var privateEdKeyPath: String?
     
+    @Flag(name: .long, help: ArgumentHelp("Disables adding a warning to signed appcast and release note files explaining that further modifications will require re-signing them. This flag has no effect if the files already have a signing warning embedded."))
+    var disableSigningWarning: Bool = false
+    
 #if GENERATE_APPCAST_BUILD_LEGACY_DSA_SUPPORT
     @Option(name: .customShort("f"), help: ArgumentHelp("Path to the private DSA key file. Only use this option for transitioning to EdDSA from older updates.", valueName: "private-dsa-key-file"), transform: { URL(fileURLWithPath: $0) })
     var privateDSAKeyURL: URL?
@@ -164,10 +167,6 @@ struct GenerateAppcast: ParsableCommand {
     
     @Argument(help: "The path to the directory containing the update archives and delta files.", transform: { URL(fileURLWithPath: $0, isDirectory: true) })
     var archivesSourceDir: URL
-    
-    // Disables embedding sign warning when signing appcast XML feeds or HTML/markdown release note files
-    @Flag(name: .long, help: .hidden)
-    var disableEmbeddedSignWarning: Bool = false
     
     @Flag(help: .hidden)
     var verbose: Bool = false
@@ -337,7 +336,7 @@ struct GenerateAppcast: ParsableCommand {
                                                                 relativeTo: archivesSourceDir)
 
                 // Write the appcast
-                let (numNewUpdates, numExistingUpdates, numUpdatesRemoved) = try writeAppcast(appcastDestPath: appcastDestPath, keys: keys, disableEmbeddedSignWarning: disableEmbeddedSignWarning, appcast: appcast, fullReleaseNotesLink: fullReleaseNotesURL, preferToEmbedReleaseNotes: embedReleaseNotes, link: link, newChannel: channel, newMinimumUpdateVersion: minimumUpdateVersion, majorVersion: majorVersion, ignoreSkippedUpgradesBelowVersion: ignoreSkippedUpgradesBelowVersion, phasedRolloutInterval: phasedRolloutInterval, criticalUpdateVersion: criticalUpdateVersion, informationalUpdateVersions: informationalUpdateVersions)
+                let (numNewUpdates, numExistingUpdates, numUpdatesRemoved) = try writeAppcast(appcastDestPath: appcastDestPath, keys: keys, disableEmbeddedSignWarning: disableSigningWarning, appcast: appcast, fullReleaseNotesLink: fullReleaseNotesURL, preferToEmbedReleaseNotes: embedReleaseNotes, link: link, newChannel: channel, newMinimumUpdateVersion: minimumUpdateVersion, majorVersion: majorVersion, ignoreSkippedUpgradesBelowVersion: ignoreSkippedUpgradesBelowVersion, phasedRolloutInterval: phasedRolloutInterval, criticalUpdateVersion: criticalUpdateVersion, informationalUpdateVersions: informationalUpdateVersions)
 
                 // Inform the user, pluralizing "update" if necessary
                 let pluralizeUpdates = { pluralizeWord($0, "update") }

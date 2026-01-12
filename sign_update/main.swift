@@ -100,18 +100,17 @@ struct SignUpdate: ParsableCommand {
     @Flag(name: .customShort("p"), help: ArgumentHelp("Only prints the signature when signing a file without extra metadata. For signing XML files, nothing will be printed because the signature is embedded inside the file."))
     var printOnlySignature: Bool = false
     
-    @Argument(help: "The update archive, delta update, package (pkg), release notes file, or update feed (xml) to sign or verify. If the file is a update feed (xml), the file will be modified to include the generated signature. If the file is a release notes file, the file may also be updated to include a warning that it is signed.")
+    @Argument(help: "The update archive, delta update, package (pkg), release notes file, or update feed (xml) to sign or verify. If the file is a update feed (xml), the file will be modified to include the generated signature. If the file is a release notes file, the file may also be updated to include a warning that it is signed (unless --disable-signing-warning is specified).")
     var filePath: String
+    
+    @Flag(name: .long, help: ArgumentHelp("Disables adding a warning to signed appcast and release note files explaining that further modifications will require re-signing them. This flag has no effect if the files already have a signing warning embedded."))
+    var disableSigningWarning: Bool = false
     
     @Argument(help: "The signature to verify when --verify is passed. Don't pass this option for verifying appcast XML feeds, which already have a signature embedded.")
     var verifySignature: String?
     
-    @Option(name: .customShort("s"), help: ArgumentHelp("(DEPRECATED): The private EdDSA (ed25519) key. Please use the Keychain, or pass the key as standard input when using --ed-key-file - instead. This option is no longer supported for newly generated keys. ", valueName: "private-key"))
+    @Option(name: .customShort("s"), help: ArgumentHelp("(DEPRECATED): The private EdDSA (ed25519) key. Please use the Keychain, or pass the key as standard input when using --ed-key-file - instead. This option is no longer supported for newly generated keys.", valueName: "private-key"))
     var privateKey: String?
-    
-    // Disables embedding sign warning when signing appcast XML feeds or HTML/markdown release note files
-    @Flag(name: .long, help: .hidden)
-    var disableEmbeddedSignWarning: Bool = false
     
     static var configuration: CommandConfiguration = CommandConfiguration(
         abstract: "Sign or verify an update file using your signing keys.",
@@ -123,9 +122,9 @@ struct SignUpdate: ParsableCommand {
             
             For signing update archives, sign_update will output an EdDSA signature and length attributes to use for your update's appcast item enclosure.
             
-            For signing release note files, sign_update will output an EdDSA signature and length attributes to use for your update's appcast releaseNotesLink. Additionally, the release notes file may be modified to include a warning about making future modifications to the file.
+            For signing release note files, sign_update will output an EdDSA signature and length attributes to use for your update's appcast releaseNotesLink. Additionally, the release notes file may be modified to include a warning about making future modifications to the file (unless --disable-signing-warning is specified).
             
-            For signing appcast feeds, sign_update will embed the signature inside the XML file and include a warning about making future modifications to the file.
+            For signing appcast feeds, sign_update will embed the signature inside the XML file and include a warning about making future modifications to the file (unless --disable-signing-warning is specified).
             
             For signing files, you can use -p to only print the EdDSA signature for automation.
             """)
@@ -238,7 +237,7 @@ struct SignUpdate: ParsableCommand {
             if self.filePathIsFeed {
                 let contentData = SPUExtractAppcastContent(data, nil, nil)
                 
-                let dataToSign: Data = disableEmbeddedSignWarning ? contentData : addSignWarningToAppcast(data: contentData)
+                let dataToSign: Data = disableSigningWarning ? contentData : addSignWarningToAppcast(data: contentData)
                 let addedSignWarningToAppcast = (contentData.count != dataToSign.count)
                 let signedData = try signAppcast(data: dataToSign, publicEdKey: pub, privateEdKey: priv)
                 try signedData.write(to: fileURL, options: .atomic)
@@ -254,7 +253,7 @@ struct SignUpdate: ParsableCommand {
                 let signedData: Data
                 let updatedSigningWarningInReleaseNotes: Bool
                 
-                if disableEmbeddedSignWarning || (!self.filePathIsHTMLReleaseNotes && !self.filePathIsMarkdownReleaseNotes) {
+                if disableSigningWarning || (!self.filePathIsHTMLReleaseNotes && !self.filePathIsMarkdownReleaseNotes) {
                     signedData = data
                     updatedSigningWarningInReleaseNotes = false
                 } else {
