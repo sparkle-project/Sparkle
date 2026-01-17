@@ -92,7 +92,7 @@ SU_EXPORT NS_SWIFT_UI_ACTOR @interface SPUUpdater : NSObject
 - (BOOL)startUpdater:(NSError * __autoreleasing *)error;
 
 /**
- Checks for updates, and displays progress while doing so if needed.
+ Checks for new updates, and displays progress while doing so if needed.
  
  This is meant for users initiating a new update check or checking the current update progress.
  
@@ -109,25 +109,23 @@ SU_EXPORT NS_SWIFT_UI_ACTOR @interface SPUUpdater : NSObject
 - (void)checkForUpdates;
 
 /**
- Checks for updates, but does not show any UI unless an update is found.
+ Checks for new updates in the background.
  
- You usually do not need to call this method directly. If `automaticallyChecksForUpdates` is @c YES,
- Sparkle calls this method automatically according to its update schedule using the `updateCheckInterval`
- and the `lastUpdateCheckDate`. Therefore, you should typically only consider calling this method directly if you
- opt out of automatic update checks. Calling this method when updating your own bundle is invalid if Sparkle is configured
- to ask the user's permission to check for updates automatically and `automaticallyChecksForUpdates` is `NO`.
- If you want to reset the updater's cycle after an updater setting change, see `resetUpdateCycle` or `resetUpdateCycleAfterShortDelay` instead.
+ You usually should not call this method directly. By default Sparkle calls this method automatically
+ on a scheduled basis if automatic update checks are enabled. This is done by checking the current state of
+ `automaticallyChecksForUpdates`, `updateCheckInterval`,  `lastUpdateCheckDate`, and
+ `SUScheduledImpatientCheckInterval`.
  
- This is meant for programmatically initiating a check for updates in the background without the user initiating it.
- This check will not show UI if no new updates are found.
+ If you want to additionally force an update check on every app launch though, it's recommended to only call this method immediately after starting the updater,
+ and only when automatic update checks are enabled (by checking `automaticallyChecksForUpdates` is `YES`). Calling this method at later points
+ could interfere with Sparkle's scheduler in unexpected ways.
  
- If a new update is found, the updater's user driver may handle showing it at an appropriate (but not necessarily immediate) time.
- If you want control over when and how a new update is shown, please see https://sparkle-project.org/documentation/gentle-reminders/
+ If you want to reset the updater's cycle after an updater setting change, please use `resetUpdateCycle` or `resetUpdateCycleAfterShortDelay` instead.
  
- Note if automated downloading/installing is turned on, either a new update may be downloaded in the background to be installed silently,
- or an already downloaded update may be shown.
+ Updates that are found may not be presented immediately to the user, either due to automatic downloading/installing of updates being on or
+ due to gentle reminders https://sparkle-project.org/documentation/gentle-reminders/ for example.
  
- This will not find updates that the user has opted into skipping.
+ Updates that have been skipped by the user will not be found.
  
  This method does not do anything if there is a `sessionInProgress`.
 
