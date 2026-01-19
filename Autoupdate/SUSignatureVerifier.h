@@ -22,7 +22,13 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-SPU_OBJC_DIRECT_MEMBERS @interface SUSignatureVerifier : NSObject
+#ifndef BUILDING_SPARKLE_TESTS
+#define SUSignatureVerifierDefinitionAttribute SPU_OBJC_DIRECT_MEMBERS
+#else
+#define SUSignatureVerifierDefinitionAttribute __attribute__((objc_runtime_name("SUTestSignatureVerifier")))
+#endif
+
+SUSignatureVerifierDefinitionAttribute @interface SUSignatureVerifier : NSObject
 
 // Helper for verifying downloaded updates
 + (BOOL)validatePath:(NSString *)path withSignatures:(SUSignatures *)signatures withPublicKeys:(SUPublicKeys *)pkeys verifierInformation:(SPUVerifierInformation * _Nullable)verifierInformation error:(NSError * __autoreleasing *)error;

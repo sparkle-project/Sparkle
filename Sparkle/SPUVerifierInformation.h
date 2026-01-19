@@ -9,7 +9,13 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-SPU_OBJC_DIRECT_MEMBERS @interface SPUVerifierInformation : NSObject
+#ifndef BUILDING_SPARKLE_TESTS
+#define SPUVerifierInformationDefinitionAttribute SPU_OBJC_DIRECT_MEMBERS
+#else
+#define SPUVerifierInformationDefinitionAttribute __attribute__((objc_runtime_name("SPUTestVerifierInformation")))
+#endif
+
+SPUVerifierInformationDefinitionAttribute @interface SPUVerifierInformation : NSObject
 
 - (instancetype)initWithExpectedVersion:(NSString * _Nullable)expectedVersion expectedContentLength:(uint64_t)expectedContentLength;
 
