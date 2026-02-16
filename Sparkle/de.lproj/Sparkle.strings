@@ -17,19 +17,19 @@
 "%@ downloaded" = "%@ geladen";
 
 /* No comment provided by engineer. */
-"%@ is now updated to version %@!" = "%@ ist aktualisiert auf Version %@!";
+"%@ is now updated to version %@!" = "%@ wurde auf Version %@ aktualisiert!";
 
 /* No comment provided by engineer. */
-"%@ is now updated!" = "%@ ist aktualisiert!";
+"%@ is now updated!" = "%@ wurde aktualisiert!";
 
 /* The download progress in units of bytes, e.g. 100 KB of 1,0 MB */
 "%@ of %@" = "%1$@ von %2$@";
 
 /* Description text for SUUpdateAlert when the critical update has already been downloaded and ready to install. */
-"%1$@ %2$@ has been downloaded and is ready to use! This is an important update; would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ wurde geladen und steht zur Installation bereit! Dies ist ein wichtiges Update. Möchtest du %1$@ jetzt durch die neue Version ersetzen und neu starten?";
+"%1$@ %2$@ has been downloaded and is ready to use! This is an important update; would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ wurde geladen und steht zur Installation bereit! Dies ist ein wichtiges Update. Möchtest du %1$@ jetzt aktualisieren?";
 
 /* Description text for SUUpdateAlert when the update has already been downloaded and ready to install. */
-"%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ wurde geladen und steht zur Installation bereit! Möchtest du %1$@ jetzt durch die neue Version ersetzen und neu starten?";
+"%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ wurde geladen und steht zur Installation bereit! Möchtest du %1$@ jetzt aktualisieren?";
 
 /* No comment provided by engineer. */
 "%1$@ %2$@ is available but your macOS version is too new for this update. This update only supports up to macOS %3$@." = "%1$@ %2$@ ist verfügbar, aber deine Version von macOS ist zu neu für dieses Update. Das Update unterstützt nur bis macOS %3$@.";
@@ -41,7 +41,7 @@
 "%1$@ can’t be updated if it’s running from the location it was downloaded to." = "„%1$@“ kann nicht aktualisiert werden, wenn das Programm von dem Ort ausgeführt wird, an den es heruntergeladen wurde.";
 
 /* No comment provided by engineer. */
-"%1$@ can’t be updated because it was opened from a read-only or a temporary location." = "%1$@ kann nicht aktualisiert werden, da es aus dem Downloads-Order, oder von einer DMG-Datei oder einem Laufwerk ohne Schreibzugriff gestartet wurde.";
+"%1$@ can’t be updated because it was opened from a read-only or a temporary location." = "%1$@ kann nicht aktualisiert werden, da es aus dem Downloads-Ordner, oder von einer DMG-Datei oder einem Laufwerk ohne Schreibzugriff gestartet wurde.";
 
 /* No comment provided by engineer. */
 "A new version of %@ is available!" = "Eine neue Version von %@ ist verfügbar!";
@@ -113,7 +113,7 @@
 "Failed to resume installing update." = "Das Fortsetzen der Installation ist fehlgeschlagen.";
 
 /* No comment provided by engineer. */
-"Install and Relaunch" = "Installieren und neu starten";
+"Install and Relaunch" = "Installieren und App neu starten";
 
 /* Alternate title for 'Remind Me Later' button when downloaded updates can be resumed */
 "Install on Quit" = "Installieren beim Beenden";
@@ -122,7 +122,7 @@
 "Installing update…" = "Update installieren …";
 
 /* Alternate title for 'Install Update' button when there's no download in RSS feed. */
-"Learn More…" = "Mehr über …";
+"Learn More…" = "Mehr erfahren …";
 
 /* No comment provided by engineer. */
 "Mac Model" = "Mac-Modell";
@@ -182,7 +182,7 @@
 "Yes" = "Ja";
 
 /* No comment provided by engineer. */
-"You may need to allow modifications from %1$@ in System Settings under Privacy & Security and App Management to install future updates." = "Du musst möglicherweise %1$@ in den Systemeinstellungen unter „Datenschutz & Sicherheit“ und „App-Verwaltung“ hinzufügen, um künftige Updates zu installieren.";
+"You may need to allow modifications from %1$@ in System Settings under Privacy & Security and App Management to install future updates." = "Du musst möglicherweise in den Systemeinstellungen unter „Datenschutz & Sicherheit“ und „App-Verwaltung“ Änderungen von %1$@ erlauben, um künftige Updates zu installieren.";
 
 /* Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates. */
 "You’re up to date!" = "Du bist auf dem neuesten Stand!";
