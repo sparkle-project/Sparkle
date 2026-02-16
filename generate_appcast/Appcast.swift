@@ -406,6 +406,21 @@ func makeAppcasts(archivesSourceDir: URL, outputPathURL: URL?, cacheDirectory ca
             throw signingError
         }
     }
+    
+    for appcast in appcastByFeed.values {
+        for archiveItem in appcast.archives.values {
+            archiveItem.deltas.sort {
+                guard
+                    let leftIntVersion = Int($0.fromVersion),
+                    let rightIntVersion = Int($1.fromVersion)
+                else {
+                    return $0.fromVersion > $1.fromVersion
+                }
+                
+                return leftIntVersion > rightIntVersion
+            }
+        }
+    }
 
     return appcastByFeed
 }
