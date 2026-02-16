@@ -379,13 +379,16 @@ func makeAppcasts(archivesSourceDir: URL, outputPathURL: URL?, cacheDirectory ca
                         hasAnyDSASignature = hasAnyDSASignature || (delta.dsaSignature != nil)
 #endif
                         if hasAnyDSASignature {
-                            latestItem.deltas.append(delta)
+                            DispatchQueue.main.async {
+                                latestItem.deltas.append(delta)
+                                group.leave()
+                            }
                         } else {
                             markDeltaAsIgnored(delta: delta, markerPath: ignoreMarkerPath)
                             print("Delta \(delta.archivePath.path) ignored, because it could not be signed")
+                            group.leave()
                         }
                     }
-                    group.leave()
                 }
             }
         }
