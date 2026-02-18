@@ -349,6 +349,8 @@ func makeAppcasts(archivesSourceDir: URL, outputPathURL: URL?, cacheDirectory ca
                     delta = DeltaUpdate(fromVersion: item.version, archivePath: deltaPath, sparkleExecutableFileSize: item.sparkleExecutableFileSize, sparkleLocales: item.sparkleLocales)
                 }
 
+                latestItem.deltas.insert(delta, at: 0)
+
                 // Require delta to be a bit smaller
                 if delta.fileSize / 7 > latestItem.fileSize / 8 {
                     markDeltaAsIgnored(delta: delta, markerPath: ignoreMarkerPath)
@@ -379,14 +381,15 @@ func makeAppcasts(archivesSourceDir: URL, outputPathURL: URL?, cacheDirectory ca
                         hasAnyDSASignature = hasAnyDSASignature || (delta.dsaSignature != nil)
 #endif
                         if hasAnyDSASignature {
-                            DispatchQueue.main.async {
-                                latestItem.deltas.append(delta)
-                                group.leave()
-                            }
+                            group.leave()
                         } else {
                             markDeltaAsIgnored(delta: delta, markerPath: ignoreMarkerPath)
                             print("Delta \(delta.archivePath.path) ignored, because it could not be signed")
-                            group.leave()
+                            
+                            DispatchQueue.main.async {
+                                latestItem.deltas.removeAll { $0 === delta }
+                                group.leave()
+                            }
                         }
                     }
                 }
@@ -404,21 +407,6 @@ func makeAppcasts(archivesSourceDir: URL, outputPathURL: URL?, cacheDirectory ca
     for update in updateArchivesToSign {
         if let signingError = update.signingError {
             throw signingError
-        }
-    }
-    
-    for appcast in appcastByFeed.values {
-        for archiveItem in appcast.archives.values {
-            archiveItem.deltas.sort {
-                guard
-                    let leftIntVersion = Int($0.fromVersion),
-                    let rightIntVersion = Int($1.fromVersion)
-                else {
-                    return $0.fromVersion > $1.fromVersion
-                }
-                
-                return leftIntVersion > rightIntVersion
-            }
         }
     }
 
