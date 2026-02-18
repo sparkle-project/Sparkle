@@ -349,13 +349,13 @@ func makeAppcasts(archivesSourceDir: URL, outputPathURL: URL?, cacheDirectory ca
                     delta = DeltaUpdate(fromVersion: item.version, archivePath: deltaPath, sparkleExecutableFileSize: item.sparkleExecutableFileSize, sparkleLocales: item.sparkleLocales)
                 }
 
-                latestItem.deltas.insert(delta, at: 0)
-
                 // Require delta to be a bit smaller
                 if delta.fileSize / 7 > latestItem.fileSize / 8 {
                     markDeltaAsIgnored(delta: delta, markerPath: ignoreMarkerPath)
                     continue
                 }
+                
+                latestItem.deltas.append(delta)
 
                 group.enter()
                 DispatchQueue.global().async {
