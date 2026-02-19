@@ -157,7 +157,7 @@ NSString *const SUSystemProfilerPreferredLanguageKey = @"lang";
     unsigned long bytes;
     size_t bytes_size = sizeof(unsigned long);
     if (sysctlbyname("hw.memsize", &bytes, &bytes_size, NULL, 0) == 0) {
-        double megabytes = bytes / (1024. * 1024.);
+        double megabytes = (double)bytes / (1024. * 1024.);
         NSString *stringValue = [NSString stringWithFormat:@"%lu", (unsigned long)megabytes];
         [profileArray addObject:[NSDictionary dictionaryWithObjects:@[SUSystemProfilerMemoryKey, SULocalizedStringFromTableInBundle(@"Memory (MB)", SPARKLE_TABLE, sparkleBundle, nil), stringValue, stringValue] forKeys:profileDictKeys]];
     }

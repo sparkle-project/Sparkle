@@ -171,7 +171,7 @@ typedef NS_ENUM(NSInteger, SUCharacterType) {
 - (void)balanceVersionPartsA:(NSMutableArray<NSString *> *)partsA partsB:(NSMutableArray<NSString *> *)partsB SPU_OBJC_DIRECT
 {
     NSUInteger partANumberAndPeriodPartsCount = [self countOfNumberAndPeriodStartingParts:partsA];
-    NSUInteger partBNumberAndPeriodPartsCount = [self countOfNumberAndPeriodStartingParts:partsB];;
+    NSUInteger partBNumberAndPeriodPartsCount = [self countOfNumberAndPeriodStartingParts:partsB];
     
     if (partANumberAndPeriodPartsCount > partBNumberAndPeriodPartsCount) {
         [self addNumberAndPeriodPartsToParts:partsB toNumberAndPeriodPartsCount:partBNumberAndPeriodPartsCount fromParts:partsA fromNumberAndPeriodPartsCount:partANumberAndPeriodPartsCount];

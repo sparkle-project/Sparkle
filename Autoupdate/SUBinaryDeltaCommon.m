@@ -128,7 +128,7 @@ NSString *temporaryFilename(NSString *base)
     NSMutableData *data = [NSMutableData data];
     [data appendBytes:template.fileSystemRepresentation length:strlen(template.fileSystemRepresentation) + 1];
 
-    char *buffer = data.mutableBytes;
+    char *buffer = (char *)data.mutableBytes;
     int fd = mkstemp(buffer);
     if (fd == -1) {
         perror("mkstemp");
@@ -149,7 +149,7 @@ NSString *temporaryDirectory(NSString *base)
     NSMutableData *data = [NSMutableData data];
     [data appendBytes:template.fileSystemRepresentation length:strlen(template.fileSystemRepresentation) + 1];
 
-    char *buffer = data.mutableBytes;
+    char *buffer = (char *)data.mutableBytes;
     char *templateResult = mkdtemp(buffer);
     if (templateResult == NULL) {
         perror("mkdtemp");
@@ -180,12 +180,12 @@ static BOOL crc32HashOfFileContents(uLong *outChecksum, FTSENT *ent, void *tempB
             return NO;
         }
         
-        checksum = crc32(checksum, (const void *)linkDestination, (unsigned int)linkDestinationLength);
+        checksum = crc32(checksum, (const Bytef *)linkDestination, (unsigned int)linkDestinationLength);
     } else if (ent->fts_info == FTS_F) {
         ssize_t fileSize = ent->fts_statp->st_size;
         
         uint64_t encodedFileSize = (uint64_t)fileSize;
-        checksum = crc32(checksum, (const void *)&encodedFileSize, sizeof(encodedFileSize));
+        checksum = crc32(checksum, (const Bytef *)&encodedFileSize, sizeof(encodedFileSize));
         
         if (fileSize > 0) {
             FILE *file = fopen(ent->fts_path, "rb");
@@ -204,7 +204,7 @@ static BOOL crc32HashOfFileContents(uLong *outChecksum, FTSENT *ent, void *tempB
                     return NO;
                 }
                 
-                checksum = crc32(checksum, tempBuffer, (uInt)bytesToConsume);
+                checksum = crc32(checksum, (const Bytef *)tempBuffer, (uInt)bytesToConsume);
                 
                 bytesLeft -= bytesToConsume;
             }
@@ -337,7 +337,7 @@ BOOL getRawHashOfTreeAndFileTablesWithVersion(void *hashBuffer, NSString *path, 
                 
                 uint64_t encodedFileContentsChecksum = fileContentsChecksum;
                 
-                crc32ChecksumValue = crc32(crc32ChecksumValue, (const void *)&encodedFileContentsChecksum, sizeof(encodedFileContentsChecksum));
+                crc32ChecksumValue = crc32(crc32ChecksumValue, (const Bytef *)&encodedFileContentsChecksum, sizeof(encodedFileContentsChecksum));
                 
                 if (ent->fts_info == FTS_F) {
                     fileHashKey = [NSData dataWithBytes:&encodedFileContentsChecksum length:sizeof(encodedFileContentsChecksum)];
@@ -378,7 +378,7 @@ BOOL getRawHashOfTreeAndFileTablesWithVersion(void *hashBuffer, NSString *path, 
         const char *relativePathBytes = [relativePath fileSystemRepresentation];
         
         if (majorVersion >= SUBinaryDeltaMajorVersion4) {
-            crc32ChecksumValue = crc32(crc32ChecksumValue, (const void *)relativePathBytes, (uInt)strlen(relativePathBytes));
+            crc32ChecksumValue = crc32(crc32ChecksumValue, (const Bytef *)relativePathBytes, (uInt)strlen(relativePathBytes));
         } else {
             CC_SHA1_Update(&hashContext, relativePathBytes, (CC_LONG)strlen(relativePathBytes));
         }
@@ -393,8 +393,8 @@ BOOL getRawHashOfTreeAndFileTablesWithVersion(void *hashBuffer, NSString *path, 
         uint16_t hashedPermissions = (ent->fts_info == FTS_SL) ? VALID_SYMBOLIC_LINK_PERMISSIONS : permissions;
 
         if (majorVersion >= SUBinaryDeltaMajorVersion4) {
-            crc32ChecksumValue = crc32(crc32ChecksumValue, (const void *)&type, sizeof(type));
-            crc32ChecksumValue = crc32(crc32ChecksumValue, (const void *)&hashedPermissions, sizeof(hashedPermissions));
+            crc32ChecksumValue = crc32(crc32ChecksumValue, (const Bytef *)&type, sizeof(type));
+            crc32ChecksumValue = crc32(crc32ChecksumValue, (const Bytef *)&hashedPermissions, sizeof(hashedPermissions));
         } else {
             CC_SHA1_Update(&hashContext, &type, sizeof(type));
             CC_SHA1_Update(&hashContext, &hashedPermissions, sizeof(hashedPermissions));
@@ -410,7 +410,7 @@ BOOL getRawHashOfTreeAndFileTablesWithVersion(void *hashBuffer, NSString *path, 
         memset(hashBuffer, 0, BINARY_DELTA_HASH_LENGTH);
         memcpy(hashBuffer, &encodedCrc32ChecksumValue, sizeof(encodedCrc32ChecksumValue));
     } else {
-        CC_SHA1_Final(hashBuffer, &hashContext);
+        CC_SHA1_Final((unsigned char *)hashBuffer, &hashContext);
     }
     
     return YES;

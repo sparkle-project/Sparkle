@@ -230,7 +230,7 @@
     }
     
     if (_expectedContentLength > 0) {
-        double progress = (double)_contentLengthDownloaded / _expectedContentLength;
+        double progress = (double)_contentLengthDownloaded / (double)_expectedContentLength;
         [self addUpdateButtonWithTitle:[NSString stringWithFormat:@"Downloading (%0.0f%%)", progress * 100] action:nil];
     }
 }

@@ -286,7 +286,7 @@ static bool SPUValidateStatusCodeAndFailIfInvalid(NSURLResponse * _Nullable resp
                 NSURL *downloadURL = [NSURL fileURLWithPath:toPath isDirectory:NO];
                 
                 NSError *bookmarkError = nil;
-                NSData *bookmarkData = [downloadURL bookmarkDataWithOptions:0 includingResourceValuesForKeys:@[] relativeToURL:nil error:&bookmarkError];
+                NSData *bookmarkData = [downloadURL bookmarkDataWithOptions:(NSURLBookmarkCreationOptions)0 includingResourceValuesForKeys:@[] relativeToURL:nil error:&bookmarkError];
                 if (bookmarkData == nil) {
                     [_delegate downloaderDidFailWithError:bookmarkError];
                 } else {

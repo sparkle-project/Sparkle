@@ -41,7 +41,7 @@ BOOL applyBinaryDelta(NSString *source, NSString *finalDestination, NSString *pa
 
     progressCallback(0/7.0);
 
-    SUBinaryDeltaMajorVersion majorDiffVersion = header.majorVersion;
+    SUBinaryDeltaMajorVersion majorDiffVersion = (SUBinaryDeltaMajorVersion)header.majorVersion;
     uint16_t minorDiffVersion = header.minorVersion;
 
     unsigned char *expectedBeforeHash = header.beforeTreeHash;
@@ -444,7 +444,7 @@ BOOL applyBinaryDelta(NSString *source, NSString *finalDestination, NSString *pa
         
         if (failedToApplyFileSystemCompression) {
             // Try to replace bundle normally
-            if (![fileManager replaceItemAtURL:[NSURL fileURLWithPath:finalDestination] withItemAtURL:[NSURL fileURLWithPath:destination isDirectory:YES] backupItemName:nil options:0 resultingItemURL:NULL error:error]) {
+            if (![fileManager replaceItemAtURL:[NSURL fileURLWithPath:finalDestination] withItemAtURL:[NSURL fileURLWithPath:destination isDirectory:YES] backupItemName:nil options:(NSFileManagerItemReplacementOptions)0 resultingItemURL:NULL error:error]) {
                 removeTree(destination);
                 return NO;
             }

@@ -375,7 +375,7 @@ typedef NS_ENUM(NSInteger, SUReleaseNotesFormat)
     [_releaseNotesContentView addSubview:_releaseNotesView.view positioned:NSWindowBelow relativeTo:_releaseNotesSpinner];
     
     _releaseNotesView.view.frame = _releaseNotesContentView.bounds;
-    _releaseNotesView.view.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
+    _releaseNotesView.view.autoresizingMask = (NSAutoresizingMaskOptions)(NSViewWidthSizable | NSViewHeightSizable);
     
     if (@available(macOS 10.14, *)) {
         // We need a transparent background
@@ -443,7 +443,7 @@ typedef NS_ENUM(NSInteger, SUReleaseNotesFormat)
         window.frameAutosaveName = @"SUUpdateAlert2";
     } else {
         // Update alert should not be resizable when no release notes are available
-        window.styleMask &= ~NSWindowStyleMaskResizable;
+        window.styleMask = (NSWindowStyleMask)(window.styleMask & ~NSWindowStyleMaskResizable);
     }
     _windowLoadedAndShowsReleaseNotes = showReleaseNotes;
 
@@ -463,7 +463,7 @@ typedef NS_ENUM(NSInteger, SUReleaseNotesFormat)
     
     // NOTE: The code below for deciding what buttons to hide is complex! Due to array of feature configurations :)
     
-    [_updaterSettings addObserver:self forKeyPath:SUAllowsAutomaticUpdatesKeyPath options:(NSKeyValueObservingOptionInitial | NSKeyValueObservingOptionNew) context:NULL];
+    [_updaterSettings addObserver:self forKeyPath:SUAllowsAutomaticUpdatesKeyPath options:(NSKeyValueObservingOptions)(NSKeyValueObservingOptionInitial | NSKeyValueObservingOptionNew) context:NULL];
     
     if (_state.stage == SPUUserUpdateStageInstalling) {
         // We're going to be relaunching pretty instantaneously

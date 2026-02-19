@@ -133,6 +133,8 @@ static NSUInteger fileCountForDirectory(NSFileManager *fileManager, NSString *it
         NSMutableArray<NSString *> *itemsToExtract = [NSMutableArray array];
         NSUInteger totalFileExtractionCount = 0;
         
+        BOOL success = YES;
+        
         {
             NSTask *task = [[NSTask alloc] init];
             task.launchPath = @"/usr/bin/hdiutil";
@@ -269,7 +271,7 @@ static NSUInteger fileCountForDirectory(NSFileManager *fileManager, NSString *it
             [itemsToExtract addObject:item];
         }
         
-        _fileProgressIncrement = (0.99 - _currentExtractionProgress) / totalFileExtractionCount;
+        _fileProgressIncrement = (0.99 - _currentExtractionProgress) / (double)totalFileExtractionCount;
         _notifier = notifier;
         
         // Copy all items we want to extract and notify of progress
@@ -286,7 +288,6 @@ static NSUInteger fileCountForDirectory(NSFileManager *fileManager, NSString *it
         
         [notifier notifyProgress:1.0];
         
-        BOOL success = YES;
         goto finally;
         
     reportError:

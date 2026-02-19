@@ -23,7 +23,7 @@ NSData *SPUExtractAppcastContent(NSData *appcastData, NSString * _Nullable __aut
     
     NSData *contentFeedData = [appcastData subdataWithRange:NSMakeRange(0, prefixRange.location)];
     
-    NSRange suffixRange = [appcastData rangeOfData:[NSData dataWithBytesNoCopy:feedSigningSuffix length:sizeof(feedSigningSuffix) - 1 freeWhenDone:NO] options:0 range:NSMakeRange(NSMaxRange(prefixRange), appcastDataLength - NSMaxRange(prefixRange))];
+    NSRange suffixRange = [appcastData rangeOfData:[NSData dataWithBytesNoCopy:feedSigningSuffix length:sizeof(feedSigningSuffix) - 1 freeWhenDone:NO] options:(NSDataSearchOptions)0 range:NSMakeRange(NSMaxRange(prefixRange), appcastDataLength - NSMaxRange(prefixRange))];
     
     if (suffixRange.location == NSNotFound) {
         return appcastData;
@@ -76,7 +76,7 @@ NSData *SPUExtractReleaseNotesContent(NSData *data)
         return data;
     }
     
-    NSRange commentSuffixRange = [data rangeOfData:signWarningComment options:0 range:NSMakeRange(signWarningCommentPrefix.length, data.length - signWarningCommentPrefix.length)];
+    NSRange commentSuffixRange = [data rangeOfData:signWarningComment options:(NSDataSearchOptions)0 range:NSMakeRange(signWarningCommentPrefix.length, data.length - signWarningCommentPrefix.length)];
     
     if (commentSuffixRange.location == NSNotFound) {
         return data;

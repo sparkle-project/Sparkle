@@ -102,7 +102,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
         // This difference is significant. We shouldn't have a model where the 'server' tries to connect to a 'client',
         // nor have a model where a process that runs at the highest level (the installer can run as root) tries to connect to a user level agent or process
         BOOL systemDomain = arguments[2].boolValue;
-        NSXPCConnectionOptions connectionOptions = systemDomain ? NSXPCConnectionPrivileged : 0;
+        NSXPCConnectionOptions connectionOptions = systemDomain ? NSXPCConnectionPrivileged : (NSXPCConnectionOptions)0;
         
         _systemDomain = systemDomain;
         _connection = [[NSXPCConnection alloc] initWithMachServiceName:SPUProgressAgentServiceNameForBundleIdentifier(hostBundleIdentifier) options:connectionOptions];

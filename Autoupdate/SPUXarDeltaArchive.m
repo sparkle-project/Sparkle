@@ -252,7 +252,7 @@ static xar_file_t xarAddFile(NSMutableDictionary<NSString *, NSValue *> *fileTab
         NSArray<NSString *> *subpathComponents = [relativePathComponents subarrayWithRange:NSMakeRange(0, componentIndex + 1)];
         NSString *subpathKey = [subpathComponents componentsJoinedByString:@"/"];
         
-        xar_file_t cachedFile = [fileTable[subpathKey] pointerValue];
+        xar_file_t cachedFile = (xar_file_t)[fileTable[subpathKey] pointerValue];
         if (cachedFile != NULL) {
             lastParent = cachedFile;
         } else {
@@ -349,7 +349,7 @@ static xar_file_t xarAddFile(NSMutableDictionary<NSString *, NSValue *> *fileTab
             continue;
         }
         
-        SPUDeltaItemCommands commands = 0;
+        SPUDeltaItemCommands commands = (SPUDeltaItemCommands)0;
         {
             const char *value = NULL;
             if (xar_prop_get(file, DELETE_KEY, &value) == 0) {
@@ -399,7 +399,7 @@ static xar_file_t xarAddFile(NSMutableDictionary<NSString *, NSValue *> *fileTab
     assert(item.itemFilePath != nil);
     assert(item.xarContext != NULL);
     
-    xar_file_t file = item.xarContext;
+    xar_file_t file = (xar_file_t)item.xarContext;
     if (xar_extract_tofile(_x, file, item.itemFilePath.fileSystemRepresentation) != 0) {
         _error = [NSError errorWithDomain:SPARKLE_DELTA_XAR_ARCHIVE_ERROR_DOMAIN code:SPARKLE_DELTA_XAR_ARCHIVE_ERROR_CODE_EXTRACT_FAILURE userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to extract xar file entry to %@", item.itemFilePath] }];
         return NO;

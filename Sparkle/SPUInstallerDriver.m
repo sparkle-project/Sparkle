@@ -296,7 +296,7 @@
 
 - (void)_handleMessageWithIdentifier:(int32_t)identifier data:(NSData *)data SPU_OBJC_DIRECT
 {
-    if (!SPUInstallerMessageTypeIsLegal(_currentStage, identifier)) {
+    if (!SPUInstallerMessageTypeIsLegal(_currentStage, (SPUInstallerMessageType)identifier)) {
         SULog(SULogLevelError, @"Error: received out of order message with current stage: %d, requested stage: %d", _currentStage, identifier);
         return;
     }
@@ -305,14 +305,14 @@
     
     if (identifier == SPUExtractionStarted) {
         _extractionAttempts++;
-        _currentStage = identifier;
+        _currentStage = (SPUInstallerMessageType)identifier;
         [delegate installerDidStartExtracting];
     } else if (identifier == SPUExtractedArchiveWithProgress) {
         if (data.length == sizeof(double) && sizeof(double) == sizeof(uint64_t)) {
             uint64_t progressValue = CFSwapInt64LittleToHost(*(const uint64_t *)data.bytes);
             double progress = *(double *)&progressValue;
             [delegate installerDidExtractUpdateWithProgress:progress];
-            _currentStage = identifier;
+            _currentStage = (SPUInstallerMessageType)identifier;
         }
     } else if (identifier == SPUArchiveExtractionFailed) {
         // If this is a delta update, there must be a regular update we can fall back to
@@ -326,11 +326,11 @@
             [self _reportInstallerError:unarchivedError genericErrorCode:SUUnarchivingError genericUserInfo:genericUserInfo];
         }
     } else if (identifier == SPUValidationStarted) {
-        _currentStage = identifier;
+        _currentStage = (SPUInstallerMessageType)identifier;
     } else if (identifier == SPUInstallationStartedStage1) {
-        _currentStage = identifier;
+        _currentStage = (SPUInstallerMessageType)identifier;
     } else if (identifier == SPUInstallationFinishedStage1) {
-        _currentStage = identifier;
+        _currentStage = (SPUInstallerMessageType)identifier;
         
         // Let the installer keep a copy of the appcast item data
         // We may want to ask for it later (note the updater can relaunch without the app necessarily having relaunched)
@@ -349,7 +349,7 @@
         
         [delegate installerDidFinishPreparationAndWillInstallImmediately:hasTargetTerminated];
     } else if (identifier == SPUInstallationFinishedStage2) {
-        _currentStage = identifier;
+        _currentStage = (SPUInstallerMessageType)identifier;
         
         BOOL hasTargetTerminated = NO;
         if (data.length >= sizeof(uint8_t)) {
@@ -366,7 +366,7 @@
         
         [delegate installerDidStartInstallingWithApplicationTerminated:hasTargetTerminated];
     } else if (identifier == SPUInstallationFinishedStage3) {
-        _currentStage = identifier;
+        _currentStage = (SPUInstallerMessageType)identifier;
         
         [_installerConnection invalidate];
         _installerConnection = nil;

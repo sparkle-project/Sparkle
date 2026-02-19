@@ -274,7 +274,7 @@
     if (notFoundPrimaryItem != nil) {
         hostToLatestAppcastItemComparisonResult = [applicationVersionComparator compareVersion:_host.version toVersion:notFoundPrimaryItem.versionString];
     } else {
-        hostToLatestAppcastItemComparisonResult = 0;
+        hostToLatestAppcastItemComparisonResult = NSOrderedSame;
     }
     
     [delegate didNotFindUpdateWithLatestAppcastItem:notFoundPrimaryItem hostToLatestAppcastItemComparisonResult:hostToLatestAppcastItemComparisonResult background:background];
@@ -619,7 +619,7 @@ SPU_OBJC_DIRECT
     NSTimeInterval timeSinceRelease = [currentDate timeIntervalSinceDate:itemReleaseDate];
     
     NSTimeInterval phasedRolloutInterval = [phasedRolloutIntervalObject doubleValue];
-    NSTimeInterval timeToWaitForGroup = phasedRolloutInterval * phasedUpdateGroup.unsignedIntegerValue;
+    NSTimeInterval timeToWaitForGroup = phasedRolloutInterval * (NSTimeInterval)(phasedUpdateGroup.unsignedIntegerValue);
     
     if (timeSinceRelease >= timeToWaitForGroup) {
         return YES;

@@ -176,7 +176,7 @@ static NSString *SUAppcastItemSigningValidationStatusKey = @"SUAppcastItemSignin
             case SPUAppcastSigningValidationStatusSkipped:
             case SPUAppcastSigningValidationStatusSucceeded:
             case SPUAppcastSigningValidationStatusFailed:
-                _signingValidationStatus = decodedSigningValidationStatus;
+                _signingValidationStatus = (SPUAppcastSigningValidationStatus)decodedSigningValidationStatus;
                 break;
             default:
                 // This shouldn't be reached, skipped == 0 matches an old encoder that doesn't encode this enum.

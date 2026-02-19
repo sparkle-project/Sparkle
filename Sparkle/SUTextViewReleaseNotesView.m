@@ -182,7 +182,7 @@ static void processMarkdownFragmentAttributedString(NSAttributedString *fragment
             // to avoid outputting multiple list bullets
             // Also avoid processing list items that were processed from previous passes / fragments
             if (canProcessListItem) {
-                CGFloat firstLineIdentation = intent.indentationLevel * (font.pointSize * 1.5);
+                CGFloat firstLineIdentation = (CGFloat)intent.indentationLevel * (font.pointSize * 1.5);
                 paragraphStyle.firstLineHeadIndent += firstLineIdentation;
                 
                 // Advance subsequent lines and text that wraps to next line by next tab interval past the firstLineIdentation
@@ -288,7 +288,7 @@ static NSAttributedString *formatMarkdownAttributedString(NSAttributedString *or
     // Enumerate through every presentation intent fragment and create a new attributed string that we append to the output
     // Foundation handles formatting some things for us already in the attributed string such as bold/itatlics and hyperlinks,
     // but we need to handle formatting paragraphs, headers, lists, block quotes, etc in the attributed string.
-    [originalAttributedString enumerateAttribute:NSPresentationIntentAttributeName inRange:NSMakeRange(0, originalAttributedString.length) options:0 usingBlock:^(NSPresentationIntent *intent, NSRange presentationIntentRange, BOOL * _Nonnull __unused stopPresentationIntentEnumeration) {
+    [originalAttributedString enumerateAttribute:NSPresentationIntentAttributeName inRange:NSMakeRange(0, originalAttributedString.length) options:(NSAttributedStringEnumerationOptions)0 usingBlock:^(NSPresentationIntent *intent, NSRange presentationIntentRange, BOOL * _Nonnull __unused stopPresentationIntentEnumeration) {
         
         // Split the presentation intent by lines so we treat every line as a separate paragraph so we present them properly (with correct indentation / tabs)
         // Normally multiple lines aren't in the same paragraph, but this can happen in some cases like code blocks

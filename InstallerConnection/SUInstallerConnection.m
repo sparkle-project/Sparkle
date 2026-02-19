@@ -73,7 +73,7 @@ static NSString *SUInstallerConnectionKeepAliveReason = @"Installer Connection K
 
 - (void)_setServiceName:(NSString *)serviceName systemDomain:(BOOL)systemDomain SPU_OBJC_DIRECT
 {
-    NSXPCConnectionOptions options = systemDomain ? NSXPCConnectionPrivileged : 0;
+    NSXPCConnectionOptions options = systemDomain ? NSXPCConnectionPrivileged : (NSXPCConnectionOptions)0;
     NSXPCConnection *connection = [[NSXPCConnection alloc] initWithMachServiceName:serviceName options:options];
     
     connection.exportedInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SUInstallerCommunicationProtocol)];

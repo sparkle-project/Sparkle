@@ -37,7 +37,7 @@ static SUSigningInputStatus decode(NSString *str, NSData * __strong *outData) {
     }
 
     NSString *stripped = [str stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
-    NSData *result = [[NSData alloc] initWithBase64EncodedString:stripped options:0];
+    NSData *result = [[NSData alloc] initWithBase64EncodedString:stripped options:(NSDataBase64DecodingOptions)0];
     if (!result) {
         return SUSigningInputStatusInvalid;
     }

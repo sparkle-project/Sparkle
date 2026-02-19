@@ -191,9 +191,9 @@
                 NSData *archive = [NSData dataWithContentsOfURL:patchURL];
                 assert(archive != nil);
                 
-                ed25519_sign(signature, archive.bytes, archive.length, public_key, self_sign_demo_only_insecure_hack);
+                ed25519_sign(signature, (const unsigned char *)archive.bytes, archive.length, public_key, self_sign_demo_only_insecure_hack);
                 
-                NSString *signatureString = [[NSData dataWithBytes:signature length:64] base64EncodedStringWithOptions:0];
+                NSString *signatureString = [[NSData dataWithBytes:signature length:64] base64EncodedStringWithOptions:(NSDataBase64EncodingOptions)0];
                 
                 // Obtain the file attributes to get the file size of our update later
                 NSError *fileAttributesError = nil;
@@ -214,12 +214,12 @@
                 NSUInteger numberOfFromVersionReplacements = [appcastContents replaceOccurrencesOfString:@"$INSERT_DELTA_FROM_VERSION" withString:mainBundleVersion options:NSLiteralSearch range:NSMakeRange(0, appcastContents.length)];
                 assert(numberOfFromVersionReplacements == 1);
                 
-                NSRange feedSignaturesPrefixRange = [appcastContents rangeOfString:@"<!-- sparkle-signatures:\n" options:(NSLiteralSearch | NSBackwardsSearch)];
+                NSRange feedSignaturesPrefixRange = [appcastContents rangeOfString:@"<!-- sparkle-signatures:\n" options:(NSStringCompareOptions)(NSLiteralSearch | NSBackwardsSearch)];
                 assert(feedSignaturesPrefixRange.location != NSNotFound);
                 
                 ed25519_sign(signature, (const unsigned char *)appcastContents.UTF8String, feedSignaturesPrefixRange.location, public_key, self_sign_demo_only_insecure_hack);
                 
-                NSString *feedSignatureString = [[NSData dataWithBytes:signature length:64] base64EncodedStringWithOptions:0];
+                NSString *feedSignatureString = [[NSData dataWithBytes:signature length:64] base64EncodedStringWithOptions:(NSDataBase64EncodingOptions)0];
                 
                 NSUInteger numberOfFeedSignatureReplacements = [appcastContents replaceOccurrencesOfString:@"$INSERT_EDDSA_FEED_SIGNATURE" withString:feedSignatureString options:NSLiteralSearch range:NSMakeRange(0, appcastContents.length)];
                 assert(numberOfFeedSignatureReplacements == 1);
@@ -248,9 +248,9 @@
                 NSData *archive = [NSData dataWithContentsOfURL:archiveURL];
                 assert(archive != nil);
 
-                ed25519_sign(signature, archive.bytes, archive.length, public_key, self_sign_demo_only_insecure_hack);
+                ed25519_sign(signature, (const unsigned char *)archive.bytes, archive.length, public_key, self_sign_demo_only_insecure_hack);
 
-                NSString *signatureString = [[NSData dataWithBytes:signature length:64] base64EncodedStringWithOptions:0];
+                NSString *signatureString = [[NSData dataWithBytes:signature length:64] base64EncodedStringWithOptions:(NSDataBase64EncodingOptions)0];
                 
                 // Obtain the file attributes to get the file size of our update later
                 NSError *fileAttributesError = nil;
@@ -268,12 +268,12 @@
                 NSUInteger numberOfSignatureReplacements = [appcastContents replaceOccurrencesOfString:@"$INSERT_EDDSA_SIGNATURE" withString:signatureString options:NSLiteralSearch range:NSMakeRange(0, appcastContents.length)];
                 assert(numberOfSignatureReplacements == 2);
                 
-                NSRange feedSignaturesPrefixRange = [appcastContents rangeOfString:@"<!-- sparkle-signatures:\n" options:(NSLiteralSearch | NSBackwardsSearch)];
+                NSRange feedSignaturesPrefixRange = [appcastContents rangeOfString:@"<!-- sparkle-signatures:\n" options:(NSStringCompareOptions)(NSLiteralSearch | NSBackwardsSearch)];
                 assert(feedSignaturesPrefixRange.location != NSNotFound);
                 
                 ed25519_sign(signature, (const unsigned char *)appcastContents.UTF8String, feedSignaturesPrefixRange.location, public_key, self_sign_demo_only_insecure_hack);
                 
-                NSString *feedSignatureString = [[NSData dataWithBytes:signature length:64] base64EncodedStringWithOptions:0];
+                NSString *feedSignatureString = [[NSData dataWithBytes:signature length:64] base64EncodedStringWithOptions:(NSDataBase64EncodingOptions)0];
                 
                 NSUInteger numberOfFeedSignatureReplacements = [appcastContents replaceOccurrencesOfString:@"$INSERT_EDDSA_FEED_SIGNATURE" withString:feedSignatureString options:NSLiteralSearch range:NSMakeRange(0, appcastContents.length)];
                 assert(numberOfFeedSignatureReplacements == 1);

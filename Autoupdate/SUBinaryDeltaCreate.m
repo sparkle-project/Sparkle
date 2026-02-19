@@ -133,7 +133,7 @@ static bool codeSignatureExtendedAttributeExists(const FTSENT *ent)
         return false;
     }
 
-    char *buffer = malloc((size_t)listSize);
+    char *buffer = (char *)malloc((size_t)listSize);
     assert(buffer != NULL);
 
     ssize_t sizeBack = listxattr(ent->fts_path, buffer, (size_t)listSize, options);

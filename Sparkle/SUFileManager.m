@@ -415,7 +415,7 @@ SPU_OBJC_DIRECT
 
     // Preserve the modification time
     struct timeval modTime;
-    TIMESPEC_TO_TIMEVAL(&modTime, &statInfo.st_mtimespec);
+    TIMESPEC_TO_TIMEVAL(&modTime, &statInfo.st_mtimespec)
     
     const struct timeval timeInputs[] = {accessTime, modTime};
     

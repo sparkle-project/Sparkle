@@ -112,7 +112,7 @@
 - (double)currentTime SPU_OBJC_DIRECT
 {
     if (_timebaseInfo.denom > 0) {
-        return (1.0 * mach_absolute_time() * _timebaseInfo.numer / _timebaseInfo.denom);
+        return (double)(mach_absolute_time() * _timebaseInfo.numer) / (double)_timebaseInfo.denom;
     } else {
         return 0.0;
     }
@@ -826,7 +826,7 @@
     NSBundle *sparkleBundle = SUSparkleBundle();
 #endif
 
-    if (_expectedContentLength > 0.0) {
+    if (_expectedContentLength > 0) {
         double newProgressValue = (double)_bytesDownloaded / (double)_expectedContentLength;
         
         [_statusController setProgressValue:MIN(newProgressValue, 1.0)];

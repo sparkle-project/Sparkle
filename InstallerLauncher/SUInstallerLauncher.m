@@ -206,7 +206,7 @@
             [NSGraphicsContext saveGraphicsState];
             
             NSGraphicsContext.currentContext = [NSGraphicsContext graphicsContextWithBitmapImageRep:iconBitmapRep];
-            [icon drawInRect:NSMakeRect(0, 0, imageDimensions, imageDimensions)];
+            [icon drawInRect:NSMakeRect(0.0, 0.0, (CGFloat)imageDimensions, (CGFloat)imageDimensions)];
             
             [NSGraphicsContext restoreGraphicsState];
             

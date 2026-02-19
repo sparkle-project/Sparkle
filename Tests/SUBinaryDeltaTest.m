@@ -388,7 +388,7 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
 - (NSData *)bigData1
 {
     const size_t bufferSize = 4096*32;
-    uint8_t *buffer = calloc(1, bufferSize);
+    uint8_t *buffer = (uint8_t *)calloc(1, bufferSize);
     XCTAssertTrue(buffer != NULL);
     
     return [NSData dataWithBytesNoCopy:buffer length:bufferSize];
@@ -397,7 +397,7 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
 - (NSData *)bigData2
 {
     const size_t bufferSize = 4096*32;
-    uint8_t *buffer = calloc(1, bufferSize);
+    uint8_t *buffer = (uint8_t *)calloc(1, bufferSize);
     XCTAssertTrue(buffer != NULL);
     
     for (size_t bufferIndex = 0; bufferIndex < bufferSize; ++bufferIndex) {
@@ -2172,7 +2172,7 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
         NSImage *iconImage = [NSImage imageNamed:NSImageNameAdvanced];
         XCTAssertNotNil(iconImage);
         
-        BOOL setIcon = [[NSWorkspace sharedWorkspace] setIcon:iconImage forFile:sourceDirectory options:0];
+        BOOL setIcon = [[NSWorkspace sharedWorkspace] setIcon:iconImage forFile:sourceDirectory options:(NSWorkspaceIconCreationOptions)0];
         XCTAssertTrue(setIcon);
     } afterDiffHandler:nil afterPatchHandler:nil];
     XCTAssertFalse(success);
@@ -2190,7 +2190,7 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
         NSImage *iconImage = [NSImage imageNamed:NSImageNameAdvanced];
         XCTAssertNotNil(iconImage);
         
-        BOOL setIcon = [[NSWorkspace sharedWorkspace] setIcon:iconImage forFile:destinationDirectory options:0];
+        BOOL setIcon = [[NSWorkspace sharedWorkspace] setIcon:iconImage forFile:destinationDirectory options:(NSWorkspaceIconCreationOptions)0];
         XCTAssertTrue(setIcon);
     } afterDiffHandler:nil afterPatchHandler:nil];
     XCTAssertFalse(success);
@@ -2208,7 +2208,7 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
         NSImage *iconImage = [NSImage imageNamed:NSImageNameAdvanced];
         XCTAssertNotNil(iconImage);
         
-        BOOL setIcon = [[NSWorkspace sharedWorkspace] setIcon:iconImage forFile:sourceDirectory options:0];
+        BOOL setIcon = [[NSWorkspace sharedWorkspace] setIcon:iconImage forFile:sourceDirectory options:(NSWorkspaceIconCreationOptions)0];
         XCTAssertTrue(setIcon);
     } afterPatchHandler:nil];
     XCTAssertTrue(success);

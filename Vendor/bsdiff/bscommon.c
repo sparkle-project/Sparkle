@@ -12,6 +12,8 @@ u_char *readfile(const char *filename, off_t *outSize)
 {
     int success = -1;
     u_char *buffer = NULL;
+    long offset = 0;
+    size_t size = 0;
     
     FILE *file = fopen(filename, "r");
     if (file == NULL) {
@@ -22,12 +24,12 @@ u_char *readfile(const char *filename, off_t *outSize)
         goto cleanup;
     }
     
-    long offset = ftell(file);
+    offset = ftell(file);
     if (offset == -1) {
         goto cleanup;
     }
     
-    size_t size = (size_t)offset;
+    size = (size_t)offset;
     
     if (outSize != NULL) {
         *outSize = (off_t)size;
@@ -35,7 +37,7 @@ u_char *readfile(const char *filename, off_t *outSize)
     
     /* Allocate size + 1 bytes instead of newsize bytes to ensure
      that we never try to malloc(0) and get a NULL pointer */
-    buffer = malloc(size + 1);
+    buffer = (u_char *)malloc(size + 1);
     if (buffer == NULL) {
         goto cleanup;
     }

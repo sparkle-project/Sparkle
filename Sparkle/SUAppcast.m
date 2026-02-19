@@ -80,7 +80,7 @@
         return nil;
     }
 
-    NSUInteger options = NSXMLNodeLoadExternalEntitiesNever; // Prevent inclusion from file://
+    NSXMLNodeOptions options = NSXMLNodeLoadExternalEntitiesNever; // Prevent inclusion from file://
     NSXMLDocument *document = [[NSXMLDocument alloc] initWithData:appcastData options:options error:errorp];
     if (nil == document) {
         return nil;

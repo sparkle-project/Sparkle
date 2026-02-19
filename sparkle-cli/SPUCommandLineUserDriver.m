@@ -189,7 +189,7 @@
     }
     
     if (_bytesToDownload > 0 && _verbose) {
-        NSString *currentProgressPercentage = [NSString stringWithFormat:@"%.0f%%", (_bytesDownloaded * 100.0 / _bytesToDownload)];
+        NSString *currentProgressPercentage = [NSString stringWithFormat:@"%.0f%%", ((double)_bytesDownloaded * 100.0 / (double)_bytesToDownload)];
         
         // Only report progress advancement when percentage significantly advances
         if (_lastProgressReported == nil || ![_lastProgressReported isEqualToString:currentProgressPercentage]) {

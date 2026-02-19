@@ -172,7 +172,7 @@
         }
         case SUSigningInputStatusPresent: {
             assert(data != nil);
-            if (ed25519_verify(signatures.ed25519Signature, data.bytes, data.length, _pubKeys.ed25519PubKey)) {
+            if (ed25519_verify(signatures.ed25519Signature, (const unsigned char *)data.bytes, data.length, _pubKeys.ed25519PubKey)) {
                 SULog(SULogLevelDefault, @"OK: EdDSA signature is correct for %@", fileKind);
 #if SPARKLE_BUILD_LEGACY_DSA_SUPPORT
                 // No need to check DSA when EdDSA verification succeeded, unless a DSA signature is provided and it's

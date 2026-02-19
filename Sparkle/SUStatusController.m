@@ -80,10 +80,10 @@ static NSString *const SUStatusControllerTouchBarIdentifier = @"" SPARKLE_BUNDLE
     }
     
     if (_minimizable) {
-        window.styleMask |= NSWindowStyleMaskMiniaturizable;
+        window.styleMask = (NSWindowStyleMask)(window.styleMask | NSWindowStyleMaskMiniaturizable);
     }
     if (_closable) {
-        window.styleMask |= NSWindowStyleMaskClosable;
+        window.styleMask = (NSWindowStyleMask)(window.styleMask | NSWindowStyleMaskClosable);
     }
     [_progressBar setUsesThreadedAnimation:YES];
     [_statusTextField setFont:[NSFont monospacedDigitSystemFontOfSize:0 weight:NSFontWeightRegular]];
