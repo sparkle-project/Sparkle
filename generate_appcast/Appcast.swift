@@ -356,7 +356,9 @@ func makeAppcasts(archivesSourceDir: URL, outputPathURL: URL?, cacheDirectory ca
                     continue
                 }
                 
+                itemDeltasLock.lock()
                 latestItem.deltas.append(delta)
+                itemDeltasLock.unlock()
 
                 group.enter()
                 DispatchQueue.global().async {
@@ -381,18 +383,16 @@ func makeAppcasts(archivesSourceDir: URL, outputPathURL: URL?, cacheDirectory ca
 #if GENERATE_APPCAST_BUILD_LEGACY_DSA_SUPPORT
                         hasAnyDSASignature = hasAnyDSASignature || (delta.dsaSignature != nil)
 #endif
-                        if hasAnyDSASignature {
-                            group.leave()
-                        } else {
+                        if !hasAnyDSASignature {
                             markDeltaAsIgnored(delta: delta, markerPath: ignoreMarkerPath)
                             print("Delta \(delta.archivePath.path) ignored, because it could not be signed")
                             
                             itemDeltasLock.lock()
                             latestItem.deltas.removeAll { $0 === delta }
-                            group.leave()
                             itemDeltasLock.unlock()
                         }
                     }
+                    group.leave()
                 }
             }
         }
