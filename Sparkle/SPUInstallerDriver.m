@@ -26,6 +26,7 @@
 #import "SPUDownloadedUpdate.h"
 #import "SPUInstallationType.h"
 #import "SUConstants.h"
+#import "SPUProbeInstallStatus.h"
 
 
 #include "AppKitPrevention.h"
@@ -459,6 +460,8 @@
     NSString *hostBundlePath = _host.bundle.bundlePath;
     assert(hostBundlePath != nil);
     
+    NSString *hostBundleIdentifier = _host.bundle.bundleIdentifier;
+    
     NSString *installationType = _updateItem.installationType;
     assert(installationType != nil);
     
@@ -484,7 +487,20 @@
                     self->_systemDomain = systemDomain;
                     [self setUpConnection];
                     [self sendInstallationData];
-                    completionHandler(nil);
+                    
+                    // Send a probe/ping to the status service, which should boost/prioritize its startup
+                    if (hostBundleIdentifier != nil) {
+                        [SPUProbeInstallStatus probeInstallerInProgressForHostBundleIdentifier:hostBundleIdentifier completion:^(BOOL stausServiceIsRunning) {
+                            if (!stausServiceIsRunning) {
+                                SULog(SULogLevelError, @"Error: failed to probe status service for %@ from the framework", hostBundleIdentifier);
+                            }
+                            
+                            completionHandler(nil);
+                        }];
+                    } else {
+                        completionHandler(nil);
+                    }
+                    
                     break;
             }
         });
