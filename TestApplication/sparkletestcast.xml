@@ -37,10 +37,10 @@ IMPORTANT: This file must be re-signed if modifications are made to this file! T
 * Upgraded text kit system to use *improved* TextKit 2.
 * Lists in markdown can contain multiple paragraphs
 
-These paragraphs can even span multiple lines if they are long and wide enough to pass over the next line. These paragraphs can also contain useful information.
+    These paragraphs can even span multiple lines if they are long and wide enough to pass over the next line. These paragraphs can also contain useful information.
 
-* Multiple levels of lists can also exist in Markdown
-* Indented list items can contain information that are related to a parent list point. For example this could contain information about writing long paragraphs.
+    * Multiple levels of lists can also exist in Markdown
+    * Indented list items can contain information that are related to a parent list point. For example this could contain information about writing long paragraphs.
 
 1. Markdown also supports numbered lists.
 2. This is an example of a numbered list.
