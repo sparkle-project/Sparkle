@@ -13,6 +13,8 @@ WRAPPER_EXTENSION = framework
 // so as a better workaround we have changed the FRAMEWORK_VERSION from A to B
 FRAMEWORK_VERSION = B
 
+ARCHS = $(ARCHS_STANDARD) $(EXTENDED_ARCHS)
+
 INFOPLIST_FILE = Sparkle/Sparkle-Info.plist
 GCC_PREPROCESSOR_DEFINITIONS = $(inherited) BUILDING_SPARKLE=1
 SKIP_INSTALL = YES

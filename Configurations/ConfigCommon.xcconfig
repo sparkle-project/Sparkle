@@ -48,8 +48,8 @@ OTHER_SWIFT_FLAGS_COMMON = -DSPARKLE_BUILD_LEGACY_DSA_SUPPORT -DGENERATE_APPCAST
 // Minimum supported macOS version
 MACOSX_DEPLOYMENT_TARGET = 10.13
 
-// Supported architectures
-ARCHS = $(ARCHS_STANDARD)
+// Set to arm64e to also build Sparkle framework as arm64e (requires Xcode 26 or later)
+EXTENDED_ARCHS =
 
 // Default Sparkle names
 SPARKLE_BUNDLE_IDENTIFIER = org.sparkle-project.Sparkle
