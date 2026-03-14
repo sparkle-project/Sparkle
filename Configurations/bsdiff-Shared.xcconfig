@@ -12,3 +12,6 @@ ALWAYS_SEARCH_USER_PATHS = NO
 
 // Disable Warnings - this is a third-party project, and we'll trust that the maintainers know what they're doing.
 WARNING_CFLAGS = $(inherited) -Wno-comma
+
+// bsdiff is used by command line tools too
+ARCHS = $(inherited) $(ARCHS_COMMAND_LINE_TOOLS)
