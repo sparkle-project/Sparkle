@@ -45,7 +45,13 @@ func makeAppcasts(archivesSourceDir: URL, outputPathURL: URL?, cacheDirectory ca
     // Group updates by appcast feed
     var updatesByAppcast: [FeedName: [ArchiveItem]] = [:]
     for update in allUpdates {
-        let appcastFile = update.feedURL?.lastPathComponent ?? "appcast.xml"
+        let appcastFile: String
+        if let lastComponent = update.feedURL?.lastPathComponent, !lastComponent.isEmpty {
+            appcastFile = lastComponent
+        } else {
+            appcastFile = "appcast.xml"
+        }
+        
         updatesByAppcast[appcastFile, default: []].append(update)
     }
     
