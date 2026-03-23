@@ -487,18 +487,22 @@
                     self->_systemDomain = systemDomain;
                     [self setUpConnection];
                     [self sendInstallationData];
-                    
+
+                    // Complete immediately so the caller can set up state (e.g., _downloadedUpdateForRemoval)
+                    // before installer messages arrive on the main queue.
+                    // Previously, completionHandler was called inside the probe callback, which meant
+                    // installer messages (SPUExtractionStarted, SPUArchiveExtractionFailed) could be
+                    // processed before the completion handler fired, leaving _downloadedUpdateForRemoval
+                    // unset and causing an assertion crash in clearDownloadedUpdate.
+                    completionHandler(nil);
+
                     // Send a probe/ping to the status service, which should boost/prioritize its startup
                     if (hostBundleIdentifier != nil) {
                         [SPUProbeInstallStatus probeInstallerInProgressForHostBundleIdentifier:hostBundleIdentifier completion:^(BOOL stausServiceIsRunning) {
                             if (!stausServiceIsRunning) {
                                 SULog(SULogLevelError, @"Error: failed to probe status service for %@ from the framework", hostBundleIdentifier);
                             }
-                            
-                            completionHandler(nil);
                         }];
-                    } else {
-                        completionHandler(nil);
                     }
                     
                     break;
