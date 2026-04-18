@@ -471,7 +471,9 @@ finally:
         SecCodeRef code = NULL;
         OSStatus result = SecCodeCopyGuestWithAttributes(NULL, (__bridge CFDictionaryRef _Nullable)(attributes), kSecCSDefaultFlags, &code);
         if (result != errSecSuccess) {
-            CFRelease(code);
+            if (code != NULL) {
+                CFRelease(code);
+            }
             
             if (error != NULL) {
                 *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInsufficientSigningError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"The client connection could not be validated because SecCodeCopyGuestWithAttributes() failed with error %d", result] }];
