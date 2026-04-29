@@ -45,6 +45,12 @@ See [getting started guide](https://sparkle-project.org/documentation/). No code
 
   * Make sure the URL specified in [`SUFeedURL`](https://sparkle-project.org/documentation/customization/) is valid (typos/404s are a common error!), and that it uses modern TLS ([test it](https://www.ssllabs.com/ssltest/)).
 
+### Validate your appcast
+
+Before shipping, sanity-check your appcast for the small mistakes that otherwise reach users — malformed XML, missing or mismatched signatures, invalid version comparisons, broken enclosure URLs, and namespace typos.
+
+The official `generate_appcast` tool catches most issues when it builds the feed for you. If you author the feed by hand or want a second opinion, the community-maintained [sparkle-validator](https://sparklevalidator.com) checks 60+ rules grounded in the Sparkle source and runs as a CLI, a GitHub Action, or a browser-only web app — useful for wiring into CI.
+
 ### API symbols
 
 Sparkle is built with `-fvisibility=hidden -fvisibility-inlines-hidden` which means no symbols are exported by default.
