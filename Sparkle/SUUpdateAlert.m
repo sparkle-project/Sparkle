@@ -427,6 +427,10 @@ typedef NS_ENUM(NSInteger, SUReleaseNotesFormat)
         _releaseNotesBoxView.contentView.layer.cornerRadius = boxCornerRadius - boxBorderWidth;
     }
     
+    // Keep hidden window title for accessibility
+    window.title = SULocalizedStringFromTableInBundle(@"Software Update", SPARKLE_TABLE, sparkleBundle, nil);
+    window.titleVisibility = NSWindowTitleHidden;
+    
     _laterButton.title = SULocalizedStringFromTableInBundle(@"Remind Me Later", SPARKLE_TABLE, sparkleBundle, @"");
     _skipButton.title = SULocalizedStringFromTableInBundle(@"Skip This Version", SPARKLE_TABLE, sparkleBundle, @"");
     _installButton.title = SULocalizedStringFromTableInBundle(@"Install Update", SPARKLE_TABLE, sparkleBundle, @"");
