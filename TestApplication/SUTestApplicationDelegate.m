@@ -297,45 +297,47 @@
                 abort();
             }
             self->_webServer = webServer;
-            
-            // Set up updater and the updater settings window
-            {
-                self->_updateSettingsWindowController = [[SUUpdateSettingsWindowController alloc] init];
-                
-                NSWindow *settingsWindow = self->_updateSettingsWindowController.window;
-                
-                NSBundle *hostBundle = [NSBundle mainBundle];
-                NSBundle *applicationBundle = hostBundle;
-                
-                id<SPUUserDriver> userDriver;
+
+            [webServer startWithReadyHandler:^{
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    // Set up updater and the updater settings window
+                    self->_updateSettingsWindowController = [[SUUpdateSettingsWindowController alloc] init];
+
+                    NSWindow *settingsWindow = self->_updateSettingsWindowController.window;
+
+                    NSBundle *hostBundle = [NSBundle mainBundle];
+                    NSBundle *applicationBundle = hostBundle;
+
+                    id<SPUUserDriver> userDriver;
 #if SPARKLE_BUILD_UI_BITS
-                if (shiftKeyHeldDown) {
-                    userDriver = [[SUPopUpTitlebarUserDriver alloc] initWithWindow:settingsWindow];
-                } else {
-                    userDriver = [[SPUStandardUserDriver alloc] initWithHostBundle:hostBundle delegate:nil];
-                }
+                    if (shiftKeyHeldDown) {
+                        userDriver = [[SUPopUpTitlebarUserDriver alloc] initWithWindow:settingsWindow];
+                    } else {
+                        userDriver = [[SPUStandardUserDriver alloc] initWithHostBundle:hostBundle delegate:nil];
+                    }
 #else
-                userDriver = [[SUPopUpTitlebarUserDriver alloc] initWithWindow:settingsWindow];
+                    userDriver = [[SUPopUpTitlebarUserDriver alloc] initWithWindow:settingsWindow];
 #endif
-                
-                SPUUpdater *updater = [[SPUUpdater alloc] initWithHostBundle:hostBundle applicationBundle:applicationBundle userDriver:userDriver delegate:self];
-                
-                self->_updater = updater;
-                self->_updateSettingsWindowController.updater = updater;
-                
-                NSError *updaterError = nil;
-                if (![updater startUpdater:&updaterError]) {
-                    NSLog(@"Failed to start updater with error: %@", updaterError);
-                    
-                    NSAlert *alert = [[NSAlert alloc] init];
-                    alert.messageText = @"Updater Error";
-                    alert.informativeText = @"The Updater failed to start. For detailed error information, check the Console.app log.";
-                    [alert addButtonWithTitle:@"OK"];
-                    [alert runModal];
-                }
-                
-                [self->_updateSettingsWindowController showWindow:nil];
-            }
+
+                    SPUUpdater *updater = [[SPUUpdater alloc] initWithHostBundle:hostBundle applicationBundle:applicationBundle userDriver:userDriver delegate:self];
+
+                    self->_updater = updater;
+                    self->_updateSettingsWindowController.updater = updater;
+
+                    NSError *updaterError = nil;
+                    if (![updater startUpdater:&updaterError]) {
+                        NSLog(@"Failed to start updater with error: %@", updaterError);
+
+                        NSAlert *alert = [[NSAlert alloc] init];
+                        alert.messageText = @"Updater Error";
+                        alert.informativeText = @"The Updater failed to start. For detailed error information, check the Console.app log.";
+                        [alert addButtonWithTitle:@"OK"];
+                        [alert runModal];
+                    }
+
+                    [self->_updateSettingsWindowController showWindow:nil];
+                });
+            }];
         });
     }];
 }
@@ -364,11 +366,6 @@
         
         completionBlock();
     }];
-}
-
-- (void)applicationWillTerminate:(NSNotification * __unused)notification
-{
-    [_webServer close];
 }
 
 - (IBAction)checkForUpdates:(id __unused)sender

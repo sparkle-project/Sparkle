@@ -12,6 +12,6 @@ SPU_OBJC_DIRECT_MEMBERS @interface SUTestWebServer : NSObject
 
 - (instancetype)initWithPort:(int)port workingDirectory:(NSString*)workingDirectory;
 
-- (void)close;
+- (void)startWithReadyHandler:(dispatch_block_t)readyHandler;
 
 @end

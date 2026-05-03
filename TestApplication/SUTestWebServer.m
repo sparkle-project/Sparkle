@@ -174,6 +174,7 @@
 
 SPU_OBJC_DIRECT_MEMBERS @interface SUTestWebServer () <SUTestWebServerConnectionDelegate> {
     CFSocketRef _socket;
+    NSThread *_serverThread;
 }
 
 @property (nonatomic) NSMutableArray *connections;
@@ -227,12 +228,21 @@ static void connectCallback(CFSocketRef __unused s, CFSocketCallBackType type, C
     _connections = [[NSMutableArray alloc] init];
     _workingDirectory = workingDirectory;
 
-    CFRunLoopSourceRef source = CFSocketCreateRunLoopSource(NULL, _socket, 0);
-    assert(source != NULL);
-    CFRunLoopAddSource(CFRunLoopGetCurrent(), source, kCFRunLoopDefaultMode);
-    CFRelease(source);
-    
     return self;
+}
+
+- (void)startWithReadyHandler:(dispatch_block_t)readyHandler
+{
+    _serverThread = [[NSThread alloc] initWithBlock:^{
+        CFRunLoopSourceRef source = CFSocketCreateRunLoopSource(NULL, self->_socket, 0);
+        assert(source != NULL);
+        CFRunLoopAddSource(CFRunLoopGetCurrent(), source, kCFRunLoopDefaultMode);
+        CFRelease(source);
+        readyHandler();
+        [[NSRunLoop currentRunLoop] run];
+    }];
+    
+    [_serverThread start];
 }
 
 - (void)connectionDidClose:(SUTestWebServerConnection *)sender
@@ -249,18 +259,6 @@ static void connectCallback(CFSocketRef __unused s, CFSocketCallBackType type, C
     if (conn) {
         assert(_connections != nil);
         [_connections addObject:conn];
-    }
-}
-
-- (void)close
-{
-    for (SUTestWebServerConnection *conn in _connections) {
-        [conn close];
-    }
-    if (_socket) {
-        CFSocketInvalidate(_socket);
-        CFRelease(_socket);
-        _socket = NULL;
     }
 }
 
