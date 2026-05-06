@@ -97,6 +97,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     
     // Setting _performedStage1Installation on main thread must be synchronzied with reading it from new connection handler
     BOOL _performedStage1Installation;
+    BOOL _receivedAppcastItemData;
     
     BOOL _performedStage2Installation;
     BOOL _performedStage3Installation;
@@ -142,9 +143,9 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
         BOOL connectionCodeSigningValidationSkipped = NO;
     #endif
         
-        // It's safe to allow any connections once stage 1 installation is complete
+        // It's safe to allow any connections once stage 1 installation is complete and appcast data has been received.
         // This is to allow general updaters to resume the installation.
-        if (!_performedStage1Installation) {
+        if (!_performedStage1Installation || !_receivedAppcastItemData) {
             BOOL passesValidation;
             NSError *validationError = nil;
             SUValidateConnectionStatus status = [SUCodeSigningVerifier validateConnection:newConnection error:&validationError];
@@ -597,6 +598,10 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
             [self extractAndInstallUpdate];
         });
     } else if (identifier == SPUSentUpdateAppcastItemData) {
+        os_unfair_lock_lock(&_newConnectionLock);
+        _receivedAppcastItemData = YES;
+        os_unfair_lock_unlock(&_newConnectionLock);
+        
         SUAppcastItem *updateItem = (data != nil) ? (SUAppcastItem *)SPUUnarchiveRootObjectSecurely(data, [SUAppcastItem class]) : nil;
         if (updateItem != nil) {
             SPUInstallationInfo *installationInfo = [[SPUInstallationInfo alloc] initWithAppcastItem:updateItem];
