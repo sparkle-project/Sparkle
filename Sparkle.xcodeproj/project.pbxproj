@@ -53,10 +53,11 @@
 		14958C6F19AEBC980061B14F /* test-pubkey.pem in Resources */ = {isa = PBXBuildFile; fileRef = 14958C6C19AEBC610061B14F /* test-pubkey.pem */; };
 		1EAA4C8B2132C7BF00604473 /* ReleaseNotesColorStyle.css in Resources */ = {isa = PBXBuildFile; fileRef = 1EAA4C8A2132C7BF00604473 /* ReleaseNotesColorStyle.css */; };
 		3772FEA913DE0B6B00F79537 /* SUVersionDisplayProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 3772FEA813DE0B6B00F79537 /* SUVersionDisplayProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		55C14BEF136EF21700649790 /* SUStatus.xib in Resources */ = {isa = PBXBuildFile; fileRef = 55C14BD8136EF00C00649790 /* SUStatus.xib */; };
+		55C14BEF136EF21700649790 /* SUStatus_legacy.xib in Resources */ = {isa = PBXBuildFile; fileRef = 55C14BD8136EF00C00649790 /* SUStatus_legacy.xib */; };
 		55C14F06136EF6DB00649790 /* SULog.h in Headers */ = {isa = PBXBuildFile; fileRef = 55C14F04136EF6DB00649790 /* SULog.h */; };
 		55C14F07136EF6DB00649790 /* SULog.m in Sources */ = {isa = PBXBuildFile; fileRef = 55C14F05136EF6DB00649790 /* SULog.m */; };
 		55E6F33319EC9F6C00005E76 /* SUErrors.h in Headers */ = {isa = PBXBuildFile; fileRef = 55E6F33219EC9F6C00005E76 /* SUErrors.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		566A90D72FA138EA00D80C62 /* SUStatus.xib in Resources */ = {isa = PBXBuildFile; fileRef = 566A90D62FA138EA00D80C62 /* SUStatus.xib */; };
 		5A06357023FE332300478A72 /* libed25519.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EA1E282D22B660BE004AA304 /* libed25519.a */; };
 		5A06357323FE333600478A72 /* libed25519.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EA1E282D22B660BE004AA304 /* libed25519.a */; };
 		5A06357423FE33A400478A72 /* libed25519.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EA1E282D22B660BE004AA304 /* libed25519.a */; };
@@ -433,7 +434,7 @@
 		72EB736129BEB36100FBCEE7 /* DevSignedAppVersion2.zip in Resources */ = {isa = PBXBuildFile; fileRef = 72EB736029BEB36100FBCEE7 /* DevSignedAppVersion2.zip */; };
 		72EB87EA1CB8798800C37F42 /* ShowInstallerProgress.m in Sources */ = {isa = PBXBuildFile; fileRef = 72EB87E91CB8798800C37F42 /* ShowInstallerProgress.m */; };
 		72EB87EB1CB8859100C37F42 /* Updater.app in Copy Tools */ = {isa = PBXBuildFile; fileRef = 721C24451CB753E6005440CB /* Updater.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		72EB87EC1CB8887E00C37F42 /* SUStatus.xib in Resources */ = {isa = PBXBuildFile; fileRef = 55C14BD8136EF00C00649790 /* SUStatus.xib */; };
+		72EB87EC1CB8887E00C37F42 /* SUStatus_legacy.xib in Resources */ = {isa = PBXBuildFile; fileRef = 55C14BD8136EF00C00649790 /* SUStatus_legacy.xib */; };
 		72EE17FB26D1CC8800C58B19 /* SUInstallerLauncher+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 72EE17FA26D1CBC000C58B19 /* SUInstallerLauncher+Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		72EE17FC26D1CC9D00C58B19 /* SPUInstallationType.h in Headers */ = {isa = PBXBuildFile; fileRef = 7214B8851D45AD9A00CB5CED /* SPUInstallationType.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		72EE181926DAE70900C58B19 /* SPUUpdateCheck.h in Headers */ = {isa = PBXBuildFile; fileRef = 72EE181826DAE6E100C58B19 /* SPUUpdateCheck.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -957,11 +958,12 @@
 		4607BEA21948443800EF8DA4 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/Sparkle.strings; sourceTree = "<group>"; };
 		525A278F133D6AE900FD8D70 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		555CF29A196C52330000B31E /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/Sparkle.strings; sourceTree = "<group>"; };
-		55C14BD8136EF00C00649790 /* SUStatus.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SUStatus.xib; sourceTree = "<group>"; };
+		55C14BD8136EF00C00649790 /* SUStatus_legacy.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SUStatus_legacy.xib; sourceTree = "<group>"; };
 		55C14F04136EF6DB00649790 /* SULog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SULog.h; sourceTree = "<group>"; };
 		55C14F05136EF6DB00649790 /* SULog.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SULog.m; sourceTree = "<group>"; };
 		55C14F31136EFC2400649790 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		55E6F33219EC9F6C00005E76 /* SUErrors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUErrors.h; sourceTree = "<group>"; };
+		566A90D62FA138EA00D80C62 /* SUStatus.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SUStatus.xib; sourceTree = "<group>"; };
 		5A5DD400249585E70045EB3E /* SUUpdateValidatorTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SUUpdateValidatorTest.swift; sourceTree = "<group>"; };
 		5A5DD40324958AFF0045EB3E /* SUUpdateValidatorTest */ = {isa = PBXFileReference; lastKnownFileType = folder; path = SUUpdateValidatorTest; sourceTree = "<group>"; };
 		5A5DD41B249F0F4B0045EB3E /* test-relative-urls.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "test-relative-urls.xml"; sourceTree = "<group>"; };
@@ -1726,7 +1728,8 @@
 			children = (
 				8DC2EF5A0486A6940098B216 /* Sparkle-Info.plist */,
 				61AAE8220A321A7F00D8810D /* Sparkle.strings */,
-				55C14BD8136EF00C00649790 /* SUStatus.xib */,
+				55C14BD8136EF00C00649790 /* SUStatus_legacy.xib */,
+				566A90D62FA138EA00D80C62 /* SUStatus.xib */,
 				729C51272E58015600D7365A /* SUUpdatePermissionPrompt.xib */,
 				72FE54412E56A14100227A91 /* SUUpdateAlert.xib */,
 			);
@@ -3195,7 +3198,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				72EB87EC1CB8887E00C37F42 /* SUStatus.xib in Resources */,
+				72EB87EC1CB8887E00C37F42 /* SUStatus_legacy.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3248,7 +3251,8 @@
 				61AAE8280A321A7F00D8810D /* Sparkle.strings in Resources */,
 				1EAA4C8B2132C7BF00604473 /* ReleaseNotesColorStyle.css in Resources */,
 				72FE54422E56A14100227A91 /* SUUpdateAlert.xib in Resources */,
-				55C14BEF136EF21700649790 /* SUStatus.xib in Resources */,
+				566A90D72FA138EA00D80C62 /* SUStatus.xib in Resources */,
+				55C14BEF136EF21700649790 /* SUStatus_legacy.xib in Resources */,
 				729C51282E58015600D7365A /* SUUpdatePermissionPrompt.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

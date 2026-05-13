@@ -35,6 +35,7 @@ static NSString *const SUStatusControllerTouchBarIdentifier = @"" SPARKLE_BUNDLE
     
     IBOutlet NSButton *_actionButton;
     IBOutlet NSTextField *_statusTextField;
+    IBOutlet NSTextField *_titleTextField;
     IBOutlet NSProgressIndicator *_progressBar;
     
     BOOL _minimizable;
@@ -49,9 +50,16 @@ static NSString *const SUStatusControllerTouchBarIdentifier = @"" SPARKLE_BUNDLE
 
 - (instancetype)initWithHost:(SUHost *)aHost windowTitle:(NSString *)windowTitle centerPointValue:(NSValue *)centerPointValue minimizable:(BOOL)minimizable closable:(BOOL)closable
 {
-    self = [super initWithWindowNibName:@"SUStatus" owner:self];
-	if (self)
-	{
+    NSString *nibName;
+    if (@available(macOS 11, *)) {
+        nibName = @"SUStatus";
+    }
+    else {
+        nibName = @"SUStatus_legacy";
+    }
+    self = [super initWithWindowNibName:nibName owner:self];
+    if (self)
+    {
         _host = aHost;
         _centerPointValue = centerPointValue;
         _minimizable = minimizable;
@@ -86,8 +94,13 @@ static NSString *const SUStatusControllerTouchBarIdentifier = @"" SPARKLE_BUNDLE
         window.styleMask = (NSWindowStyleMask)(window.styleMask | NSWindowStyleMaskClosable);
     }
     [_progressBar setUsesThreadedAnimation:YES];
-    [_statusTextField setFont:[NSFont monospacedDigitSystemFontOfSize:0 weight:NSFontWeightRegular]];
-    
+
+    if (@available(macOS 11, *)) {
+        [_titleTextField setFont:[NSFont monospacedDigitSystemFontOfSize:0 weight:NSFontWeightSemibold]];
+    } else {
+        [_statusTextField setFont:[NSFont monospacedDigitSystemFontOfSize:0 weight:NSFontWeightRegular]];
+    }
+
     if (@available(macOS 26, *)) {
         _actionButton.controlSize = NSControlSizeLarge;
     }
