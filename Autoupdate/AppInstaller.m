@@ -599,18 +599,20 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
         });
     } else if (identifier == SPUSentUpdateAppcastItemData) {
         os_unfair_lock_lock(&_newConnectionLock);
-        _receivedAppcastItemData = YES;
-        os_unfair_lock_unlock(&_newConnectionLock);
-        
-        SUAppcastItem *updateItem = (data != nil) ? (SUAppcastItem *)SPUUnarchiveRootObjectSecurely(data, [SUAppcastItem class]) : nil;
-        if (updateItem != nil) {
-            SPUInstallationInfo *installationInfo = [[SPUInstallationInfo alloc] initWithAppcastItem:updateItem];
+        if (!_receivedAppcastItemData) {
+            _receivedAppcastItemData = YES;
             
-            NSData *archivedData = SPUArchiveRootObjectSecurely(installationInfo);
-            if (archivedData != nil) {
-                [_agentConnection.agent registerInstallationInfoData:archivedData];
+            SUAppcastItem *updateItem = (data != nil) ? (SUAppcastItem *)SPUUnarchiveRootObjectSecurely(data, [SUAppcastItem class]) : nil;
+            if (updateItem != nil) {
+                SPUInstallationInfo *installationInfo = [[SPUInstallationInfo alloc] initWithAppcastItem:updateItem];
+                
+                NSData *archivedData = SPUArchiveRootObjectSecurely(installationInfo);
+                if (archivedData != nil) {
+                    [_agentConnection.agent registerInstallationInfoData:archivedData];
+                }
             }
         }
+        os_unfair_lock_unlock(&_newConnectionLock);
     } else if (identifier == SPUResumeInstallationToStage2 && data.length == sizeof(uint8_t) * 2) {
         // Because anyone can ask us to resume the installation, it may be wise to think about backwards compatibility here if IPC changes
         uint8_t relaunch = *((const uint8_t *)data.bytes);

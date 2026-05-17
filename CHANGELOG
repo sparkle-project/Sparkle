@@ -4,7 +4,7 @@
 * Polish and update Spanish translations to be gender neutral (#2874, #2875) (Emilio P Egido)
 * Guard against NULL CFRelease() on failure condition in fallback path (#2867) (Zorg)
 * Guard against symlinks when applying delta update files (fe7b718) (Zorg, fg0x0)
-* Enforce connection to installer to be validated before receiving appcast item data (#2876) (Zorg, fg0x0)
+* Enforce connection to installer to be validated before receiving appcast item data (#2876, #2877) (Zorg, fg0x0)
 
 # 2.9.1
 
