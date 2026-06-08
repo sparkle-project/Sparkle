@@ -1,3 +1,7 @@
+# 2.9.3
+
+* Fix updating not working the first time if the app's bundle ID ends with ".app" (#2882) (Zorg)
+
 # 2.9.2
 
 * Show hidden window title in update window for accessibility (#2871) (Zorg)
