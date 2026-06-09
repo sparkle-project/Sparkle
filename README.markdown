@@ -29,7 +29,7 @@ Please visit [Sparkle's website](http://sparkle-project.org) for up to date docu
 
 ## Requirements
 
-* Runtime: macOS 10.13 or later.
+* Runtime: macOS 12.0 or later on `2.x`, macOS 10.13 or later on `2.9.3`.
 * Build: Latest major Xcode (stable or beta, whichever is latest) and one major version less.
 * HTTPS server for serving updates (see [App Transport Security](http://sparkle-project.org/documentation/app-transport-security/))
 

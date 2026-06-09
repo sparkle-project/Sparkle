@@ -18,7 +18,7 @@ Pod::Spec.new do |s|
     'Andy Matuschak' => 'andy@andymatuschak.org',
   }
 
-  s.platform = :osx, '10.13'
+  s.platform = :osx, '12.0'
   s.source   = { :http => "https://github.com/sparkle-project/Sparkle/releases/download/#{s.version}/Sparkle-#{s.version}.tar.xz" }
   s.source_files = 'Sparkle.framework/Versions/B/Headers/*.h'
 

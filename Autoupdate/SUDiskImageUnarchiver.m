@@ -165,21 +165,9 @@ static NSUInteger fileCountForDirectory(NSFileManager *fileManager, NSString *it
                 goto reportError;
             }
             
-            if (@available(macOS 10.15, *)) {
-                if (![inputPipe.fileHandleForWriting writeData:inputData error:&error]) {
-                    goto reportError;
-                }
+            if (![inputPipe.fileHandleForWriting writeData:inputData error:&error]) {
+                goto reportError;
             }
-#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_15
-            else
-            {
-                @try {
-                    [inputPipe.fileHandleForWriting writeData:inputData];
-                } @catch (NSException *) {
-                    goto reportError;
-                }
-            }
-#endif
             
             [inputPipe.fileHandleForWriting closeFile];
             

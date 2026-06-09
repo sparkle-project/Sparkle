@@ -231,7 +231,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
         NSMutableArray<NSRunningApplication *> *potentialMatchingTranslocatedRunningApplications = [[NSMutableArray alloc] init];
         
         BOOL needsToHandleImproperBundles;
-        if (@available(macOS 16, *)) {
+        if (@available(macOS 26, *)) {
             needsToHandleImproperBundles = NO;
         } else {
             needsToHandleImproperBundles = YES;

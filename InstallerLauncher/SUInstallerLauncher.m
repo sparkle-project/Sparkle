@@ -192,15 +192,7 @@
             NSImage *icon = [[NSWorkspace sharedWorkspace] iconForFile:iconBundlePath];
             
             // Creating a bitmap representation at a specific size is much cheaper than asking for icon's TIFFRepresentation
-            // On older OS's we must create a 32x32 image otherwise it won't be scaled correctly in the dialog
-            // On newer OS's we can use a slightly higher resolution image
-            NSInteger imageDimensions;
-            if (@available(macOS 10.15, *)) {
-                imageDimensions = 64;
-            } else {
-                imageDimensions = 32;
-            }
-            
+            const NSInteger imageDimensions = 64;
             NSBitmapImageRep *iconBitmapRep = [[NSBitmapImageRep alloc] initWithBitmapDataPlanes:NULL pixelsWide:imageDimensions pixelsHigh:imageDimensions bitsPerSample:8 samplesPerPixel:4 hasAlpha:YES isPlanar:NO colorSpaceName:NSCalibratedRGBColorSpace bytesPerRow:0 bitsPerPixel:0];
             
             [NSGraphicsContext saveGraphicsState];
