@@ -55,7 +55,7 @@
         // So even though macOS 12 supports TextKit 2 we do not use it there.
         // My development machines are currently on macOS 26 so I know TextKit 2 works well there.
         // macOS 13 - 15 requires more testing if we care to make the switch there.
-        if (@available(macOS 16, *)) {
+        if (@available(macOS 26, *)) {
             // Create NSTextView using TextKit 2
             // https://developer.apple.com/documentation/appkit/nstextview/1449347-initwithframe
             
@@ -363,45 +363,38 @@ static NSAttributedString *formatMarkdownAttributedString(NSAttributedString *or
     [_textView setContinuousSpellCheckingEnabled:NO];
     _textView.usesFontPanel = NO;
     _textView.editable = NO;
-    
-    if (@available(macOS 10.14, *)) {
-        _textView.usesAdaptiveColorMappingForDarkAppearance = YES;
-    }
+    _textView.usesAdaptiveColorMappingForDarkAppearance = YES;
     
     [_scrollView setHasVerticalScroller:YES];
     [_scrollView setHasHorizontalScroller:NO];
     
     if (_prefersMarkdown) {
-        if (@available(macOS 12, *)) {
-            dispatch_queue_attr_t queuePriority = dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL, QOS_CLASS_USER_INITIATED, 0);
+        dispatch_queue_attr_t queuePriority = dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL, QOS_CLASS_USER_INITIATED, 0);
+        
+        dispatch_queue_t markdownDispatchQueue = dispatch_queue_create("org.sparkle-project.markdown-loader", queuePriority);
+        
+        dispatch_async(markdownDispatchQueue, ^{
+            NSError *loadMarkdownError = nil;
+            NSAttributedString *originalMarkdownAttributedString = [[NSAttributedString alloc] initWithMarkdownString:contents options:nil baseURL:baseURL error:&loadMarkdownError];
             
-            dispatch_queue_t markdownDispatchQueue = dispatch_queue_create("org.sparkle-project.markdown-loader", queuePriority);
-            
-            dispatch_async(markdownDispatchQueue, ^{
-                NSError *loadMarkdownError = nil;
-                NSAttributedString *originalMarkdownAttributedString = [[NSAttributedString alloc] initWithMarkdownString:contents options:nil baseURL:baseURL error:&loadMarkdownError];
+            if (originalMarkdownAttributedString == nil) {
+                // Fallback to plain-text
                 
-                if (originalMarkdownAttributedString == nil) {
-                    // Fallback to plain-text
-                    
-                    NSAttributedString *attributedString = [[NSAttributedString alloc] initWithString:contents attributes:@{ NSFontAttributeName : [NSFont systemFontOfSize:(CGFloat)self->_fontPointSize] }];
-                    
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        [self _loadAttributedString:attributedString completionHandler:completionHandler];
-                    });
-                } else {
-                    NSAttributedString *formattedAttributedString = formatMarkdownAttributedString(originalMarkdownAttributedString, (CGFloat)self->_fontPointSize);
-                    
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        [self _loadAttributedString:formattedAttributedString completionHandler:completionHandler];
-                    });
-                }
-            });
-            
-            return;
-        } else {
-            SULog(SULogLevelDefault, @"Warning: falling back to plain text because markdown support requires macOS 12 or newer");
-        }
+                NSAttributedString *attributedString = [[NSAttributedString alloc] initWithString:contents attributes:@{ NSFontAttributeName : [NSFont systemFontOfSize:(CGFloat)self->_fontPointSize] }];
+                
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [self _loadAttributedString:attributedString completionHandler:completionHandler];
+                });
+            } else {
+                NSAttributedString *formattedAttributedString = formatMarkdownAttributedString(originalMarkdownAttributedString, (CGFloat)self->_fontPointSize);
+                
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [self _loadAttributedString:formattedAttributedString completionHandler:completionHandler];
+                });
+            }
+        });
+        
+        return;
     }
     
     NSAttributedString *attributedString = [[NSAttributedString alloc] initWithString:contents attributes:@{ NSFontAttributeName : [NSFont systemFontOfSize:(CGFloat)_fontPointSize] }];

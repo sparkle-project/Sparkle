@@ -104,9 +104,7 @@
         }
         
         if (underlyingErrors.count > 1) {
-            if (@available(macOS 11.3, *)) {
-                userInfo[NSMultipleUnderlyingErrorsKey] = [underlyingErrors copy];
-            }
+            userInfo[NSMultipleUnderlyingErrorsKey] = [underlyingErrors copy];
         }
         
         *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:[userInfo copy]];

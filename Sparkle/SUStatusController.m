@@ -88,7 +88,7 @@ static NSString *const SUStatusControllerTouchBarIdentifier = @"" SPARKLE_BUNDLE
     [_progressBar setUsesThreadedAnimation:YES];
     [_statusTextField setFont:[NSFont monospacedDigitSystemFontOfSize:0 weight:NSFontWeightRegular]];
     
-    if (@available(macOS 16, *)) {
+    if (@available(macOS 26, *)) {
         _actionButton.controlSize = NSControlSizeLarge;
     }
     

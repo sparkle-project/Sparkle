@@ -41,25 +41,12 @@ static NSArray<NSString *> * _Nullable argumentsConformingToTypeOfPath(NSString 
       @".tar.lzma" : extractTXZ,
     } mutableCopy];
     
-    // At least the latest versions of 10.15 understand how to extract aar files
-    // Versions before 10.15 do not understand extracting newly created aar files
-    // Note encrypted aea files are supported in macOS 12 onwards, if we ever want to support those one day
-    if (@available(macOS 10.15.7, *)) {
-        NSString *appleArchiveCommand;
-        if (@available(macOS 11, *)) {
-            appleArchiveCommand = @"/usr/bin/aa";
-        } else {
-            // In 10.15 the utility was named yaa, which was later renamed to aar
-            appleArchiveCommand = @"/usr/bin/yaa";
-        }
-        
-        NSArray <NSString *> *extractAppleArchive = @[appleArchiveCommand, @"extract", @"-d"];
-        
-        [extractCommandDictionary addEntriesFromDictionary:@{
-            @".aar" : extractAppleArchive,
-            @".yaa" : extractAppleArchive,
-        }];
-    }
+    NSArray <NSString *> *extractAppleArchive = @[@"/usr/bin/aa", @"extract", @"-d"];
+    
+    [extractCommandDictionary addEntriesFromDictionary:@{
+        @".aar" : extractAppleArchive,
+        @".yaa" : extractAppleArchive,
+    }];
     
     NSString *lastPathComponent = [path lastPathComponent];
     for (NSString *currentType in extractCommandDictionary)
@@ -234,38 +221,12 @@ static NSArray<NSString *> * _Nullable argumentsConformingToTypeOfPath(NSString 
         
         NSFileHandle *archiveOutput = [pipe fileHandleForWriting];
         
-#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_15
-        BOOL hasIOErrorMethods;
-        if (@available(macOS 10.15, *)) {
-            hasIOErrorMethods = YES;
-        } else {
-            hasIOErrorMethods = NO;
-        }
-#endif
-        
         do {
-            NSData *data;
-#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_15
-            if (!hasIOErrorMethods) {
-                @try {
-                    data = [archiveInput readDataOfLength:256*1024];
-                } @catch (NSException *exception) {
-                    SULog(SULogLevelError, @"Failed to read data from archive with exception reason %@", exception.reason);
-                    data = nil;
-                }
-            }
-            else
-#endif
-            {
-                NSError *readError = nil;
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wpartial-availability"
-                data = [archiveInput readDataUpToLength:256*1024 error:&readError];
-#pragma clang diagnostic pop
-                if (data == nil) {
-                    SULog(SULogLevelError, @"Failed to read data from archive with error %@", readError);
-                    underlyingOutError = readError;
-                }
+            NSError *readError = nil;
+            NSData *data = [archiveInput readDataUpToLength:256*1024 error:&readError];
+            if (data == nil) {
+                SULog(SULogLevelError, @"Failed to read data from archive with error %@", readError);
+                underlyingOutError = readError;
             }
             
             NSUInteger len = [data length];
@@ -274,37 +235,13 @@ static NSArray<NSString *> * _Nullable argumentsConformingToTypeOfPath(NSString 
             }
             
             NSError *writeError = nil;
-#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_15
-            if (!hasIOErrorMethods) {
-                @try {
-                    [archiveOutput writeData:data];
-                } @catch (NSException *exception) {
-                    SULog(SULogLevelError, @"Failed to write data to pipe with exception reason %@", exception.reason);
-                    
-                    if ([exception.name isEqualToString:NSFileHandleOperationException]) {
-                        NSError *underlyingFileHandleError = exception.userInfo[@"NSFileHandleOperationExceptionUnderlyingError"];
-                        NSError *underlyingPOSIXError = underlyingFileHandleError.userInfo[NSUnderlyingErrorKey];
-                        
-                        underlyingOutError = underlyingPOSIXError;
-                    }
-                    
-                    break;
-                }
-            }
-            else
-#endif
-            {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wpartial-availability"
-                if (![archiveOutput writeData:data error:&writeError]) {
-#pragma clang diagnostic pop
-                    SULog(SULogLevelError, @"Failed to write data to pipe with error %@", writeError);
-                    
-                    NSError *underlyingPOSIXError = writeError.userInfo[NSUnderlyingErrorKey];
-                    
-                    underlyingOutError = underlyingPOSIXError;
-                    break;
-                }
+            if (![archiveOutput writeData:data error:&writeError]) {
+                SULog(SULogLevelError, @"Failed to write data to pipe with error %@", writeError);
+                
+                NSError *underlyingPOSIXError = writeError.userInfo[NSUnderlyingErrorKey];
+                
+                underlyingOutError = underlyingPOSIXError;
+                break;
             }
             
             bytesWritten += len;
@@ -313,31 +250,15 @@ static NSArray<NSString *> * _Nullable argumentsConformingToTypeOfPath(NSString 
         }
         while(bytesWritten < expectedLength);
         
-        if (@available(macOS 10.15, *)) {
-            NSError *archiveOutputCloseError = nil;
-            if (![archiveOutput closeAndReturnError:&archiveOutputCloseError]) {
-                SULog(SULogLevelError, @"Failed to close pipe with error %@", archiveOutputCloseError);
-            }
+        NSError *archiveOutputCloseError = nil;
+        if (![archiveOutput closeAndReturnError:&archiveOutputCloseError]) {
+            SULog(SULogLevelError, @"Failed to close pipe with error %@", archiveOutputCloseError);
         }
-#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_15
-        else
-        {
-            [archiveOutput closeFile];
-        }
-#endif
         
-        if (@available(macOS 10.15, *)) {
-            NSError *archiveInputCloseError = nil;
-            if (![archiveInput closeAndReturnError:&archiveInputCloseError]) {
-                SULog(SULogLevelError, @"Failed to close archive input with error %@", archiveInputCloseError);
-            }
+        NSError *archiveInputCloseError = nil;
+        if (![archiveInput closeAndReturnError:&archiveInputCloseError]) {
+            SULog(SULogLevelError, @"Failed to close archive input with error %@", archiveInputCloseError);
         }
-#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_15
-        else
-        {
-            [archiveInput closeFile];
-        }
-#endif
     }
     
     [task waitUntilExit];
