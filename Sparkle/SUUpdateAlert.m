@@ -158,6 +158,11 @@ typedef NS_ENUM(NSInteger, SUReleaseNotesFormat)
     [self endWithSelection:SPUUserUpdateChoiceDismiss];
 }
 
+- (void)finishWithUserUpdateChoice:(SPUUserUpdateChoice)choice
+{
+    [self endWithSelection:choice];
+}
+
 - (void)displayReleaseNotesSpinner SPU_OBJC_DIRECT
 {
     // Stick a nice big spinner in the middle of the release notes view until the page is loaded.

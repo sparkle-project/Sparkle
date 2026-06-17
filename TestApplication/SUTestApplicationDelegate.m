@@ -55,6 +55,7 @@
 #if SPARKLE_BUILD_UI_BITS
     // Detect as early as possible if the shift key is held down
     BOOL shiftKeyHeldDown = ([NSEvent modifierFlags] & NSEventModifierFlagShift) != 0;
+    BOOL titlebarRemindersEnabled = [[[[NSProcessInfo processInfo] environment] objectForKey:@"TITLEBAR_REMINDERS"] boolValue];
 #endif
 
     NSFileManager *fileManager = [NSFileManager defaultManager];
@@ -310,7 +311,12 @@
 
                     id<SPUUserDriver> userDriver;
 #if SPARKLE_BUILD_UI_BITS
-                    if (shiftKeyHeldDown) {
+                    if (titlebarRemindersEnabled) {
+                        SPUStandardUserDriver *standardUserDriver = [[SPUStandardUserDriver alloc] initWithHostBundle:hostBundle delegate:nil];
+                        standardUserDriver.showsScheduledUpdateRemindersInTitlebar = YES;
+                        standardUserDriver.scheduledUpdateReminderWindow = settingsWindow;
+                        userDriver = standardUserDriver;
+                    } else if (shiftKeyHeldDown) {
                         userDriver = [[SUPopUpTitlebarUserDriver alloc] initWithWindow:settingsWindow];
                     } else {
                         userDriver = [[SPUStandardUserDriver alloc] initWithHostBundle:hostBundle delegate:nil];

@@ -23,6 +23,7 @@ NS_ASSUME_NONNULL_BEGIN
 @class SPUUpdater;
 @class SPUStandardUserDriver;
 @class NSMenuItem;
+@class NSWindow;
 @protocol SPUUserDriver, SPUUpdaterDelegate, SPUStandardUserDriverDelegate;
 
 /**
@@ -67,6 +68,20 @@ SU_EXPORT NS_SWIFT_UI_ACTOR @interface SPUStandardUpdaterController : NSObject
  Accessible property for the updater's user driver.
  */
 @property (nonatomic, readonly) SPUStandardUserDriver *userDriver;
+
+/**
+ Shows scheduled update reminders as a titlebar item on `scheduledUpdateReminderWindow` instead of immediately showing Sparkle's update alert.
+
+ This forwards to the receiver's `userDriver`. This only affects update checks Sparkle performs automatically in the background. User-initiated update checks continue to show Sparkle's regular update UI immediately.
+ */
+@property (nonatomic) BOOL showsScheduledUpdateRemindersInTitlebar;
+
+/**
+ The window where Sparkle should attach its titlebar reminder when `showsScheduledUpdateRemindersInTitlebar` is enabled.
+
+ Sparkle keeps a weak reference to this window. The application is responsible for keeping it alive and for selecting the window that best represents where update reminders should appear.
+ */
+@property (nonatomic, weak, nullable) IBOutlet NSWindow *scheduledUpdateReminderWindow;
 
 /**
  Create a new `SPUStandardUpdaterController` from a nib.

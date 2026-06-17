@@ -32,6 +32,8 @@
 
 @synthesize updater = _updater;
 @synthesize userDriver = _userDriver;
+@synthesize scheduledUpdateReminderWindow = _scheduledUpdateReminderWindow;
+@synthesize showsScheduledUpdateRemindersInTitlebar = _showsScheduledUpdateRemindersInTitlebar;
 
 - (void)awakeFromNib
 {
@@ -48,6 +50,8 @@
 {
     NSBundle *hostBundle = [NSBundle mainBundle];
     SPUStandardUserDriver *userDriver = [[SPUStandardUserDriver alloc] initWithHostBundle:hostBundle delegate:self->userDriverDelegate];
+    userDriver.showsScheduledUpdateRemindersInTitlebar = _showsScheduledUpdateRemindersInTitlebar;
+    userDriver.scheduledUpdateReminderWindow = _scheduledUpdateReminderWindow;
     
     SPUUpdater *updater = [[SPUUpdater alloc] initWithHostBundle:hostBundle applicationBundle:hostBundle userDriver:userDriver delegate:self->updaterDelegate];
     [self setUpdater:updater];
@@ -73,6 +77,18 @@
         }
     }
     return self;
+}
+
+- (void)setShowsScheduledUpdateRemindersInTitlebar:(BOOL)showsScheduledUpdateRemindersInTitlebar
+{
+    _showsScheduledUpdateRemindersInTitlebar = showsScheduledUpdateRemindersInTitlebar;
+    _userDriver.showsScheduledUpdateRemindersInTitlebar = showsScheduledUpdateRemindersInTitlebar;
+}
+
+- (void)setScheduledUpdateReminderWindow:(NSWindow *)scheduledUpdateReminderWindow
+{
+    _scheduledUpdateReminderWindow = scheduledUpdateReminderWindow;
+    _userDriver.scheduledUpdateReminderWindow = scheduledUpdateReminderWindow;
 }
 
 - (void)startUpdater

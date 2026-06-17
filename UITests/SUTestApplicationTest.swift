@@ -103,6 +103,43 @@ class SUTestApplicationTest: XCTestCase
         sleep(10)
     }
     
+    func test0TitlebarScheduledReminder() {
+        let app = XCUIApplication()
+        app.launchArguments = [
+            "-SUHasLaunchedBefore",
+            "YES",
+            "-SUEnableAutomaticChecks",
+            "YES",
+            "-SUAutomaticallyUpdate",
+            "NO",
+            "-SUScheduledCheckInterval",
+            "60"
+        ]
+        app.launchEnvironment = [
+            "TEST_MODE": "REGULAR",
+            "TITLEBAR_REMINDERS": "1"
+        ]
+        app.launch()
+
+        XCTAssertFalse(app.dialogs["alert"].staticTexts["Update succeeded!"].exists, "Update is already installed; please do a clean build")
+
+        let reminderButton = app.buttons["SPUTitlebarUpdateReminder"]
+        XCTAssertTrue(reminderButton.waitForExistence(timeout: 120), "Expected scheduled update to appear as a titlebar reminder")
+        XCTAssertFalse(app.windows["SUUpdateAlert"].exists, "Scheduled update should not immediately show the modal update alert")
+
+        reminderButton.click()
+
+        let showUpdateMenuItem = app.menuItems["Show Update…"]
+        XCTAssertTrue(showUpdateMenuItem.waitForExistence(timeout: 5), "Expected titlebar reminder menu to offer showing the update")
+        showUpdateMenuItem.click()
+
+        XCTAssertTrue(app.windows["SUUpdateAlert"].waitForExistence(timeout: 5), "Expected titlebar reminder to open the regular update alert")
+        app.windows["SUUpdateAlert"].buttons["SPUUserUpdateChoiceDismiss"].click()
+
+        app.terminate()
+        sleep(5)
+    }
+
     func test1RegularUpdate() {
         runTestApplication(testMode: "REGULAR", automatic: false, expectedFinalVersion: "2.0", launchSleep: 60, extractSleep: 30)
     }

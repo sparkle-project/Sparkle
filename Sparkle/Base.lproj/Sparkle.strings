@@ -182,7 +182,13 @@
 "Update Error!" = "Update Error!";
 
 /* No comment provided by engineer. */
+"Update Available" = "Update Available";
+
+/* No comment provided by engineer. */
 "Update Installed" = "Update Installed";
+
+/* No comment provided by engineer. */
+"Update Ready" = "Update Ready";
 
 /* No comment provided by engineer. */
 "Updating %@" = "Updating %@";
@@ -219,6 +225,12 @@
 
 /* Skip This Version choice for update alert */
 "Skip This Version" = "Skip This Version";
+
+/* Skip for Now choice for titlebar update reminder */
+"Skip for Now" = "Skip for Now";
+
+/* Show Update choice for titlebar update reminder */
+"Show Update…" = "Show Update…";
 
 /* Install Update choice for update alert */
 "Install Update" = "Install Update";

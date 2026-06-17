@@ -41,10 +41,175 @@
 @end
 #endif
 
+static NSString *const SPUTitlebarUpdateReminderAccessibilityIdentifier = @"SPUTitlebarUpdateReminder";
+
+@interface SPUTitlebarUpdateReminderController : NSObject
+
+- (instancetype)initWithWindow:(NSWindow *)window hostName:(NSString *)hostName updateDownloaded:(BOOL)updateDownloaded showUpdate:(void (^)(void))showUpdate dismissUpdate:(void (^)(void))dismissUpdate;
+- (void)showReminder;
+- (void)dismissReminder;
+
+@end
+
+@implementation SPUTitlebarUpdateReminderController
+{
+    __weak NSWindow *_window;
+    NSTitlebarAccessoryViewController *_accessoryViewController;
+    NSButton *_button;
+    NSString *_hostName;
+    void (^_showUpdate)(void);
+    void (^_dismissUpdate)(void);
+    id<NSObject> _windowWillCloseObserver;
+    BOOL _updateDownloaded;
+    BOOL _showingReminder;
+}
+
+- (instancetype)initWithWindow:(NSWindow *)window hostName:(NSString *)hostName updateDownloaded:(BOOL)updateDownloaded showUpdate:(void (^)(void))showUpdate dismissUpdate:(void (^)(void))dismissUpdate
+{
+    self = [super init];
+    if (self != nil) {
+        _window = window;
+        _hostName = [hostName copy];
+        _updateDownloaded = updateDownloaded;
+        _showUpdate = [showUpdate copy];
+        _dismissUpdate = [dismissUpdate copy];
+    }
+    return self;
+}
+
+- (NSString *)buttonTitle SPU_OBJC_DIRECT
+{
+#if SPARKLE_COPY_LOCALIZATIONS
+    NSBundle *sparkleBundle = SUSparkleBundle();
+#endif
+
+    if (_updateDownloaded) {
+        return SULocalizedStringFromTableInBundle(@"Update Ready", SPARKLE_TABLE, sparkleBundle, nil);
+    } else {
+        return SULocalizedStringFromTableInBundle(@"Update Available", SPARKLE_TABLE, sparkleBundle, nil);
+    }
+}
+
+- (NSString *)toolTip SPU_OBJC_DIRECT
+{
+#if SPARKLE_COPY_LOCALIZATIONS
+    NSBundle *sparkleBundle = SUSparkleBundle();
+#endif
+
+    if (_updateDownloaded) {
+        return [NSString stringWithFormat:SULocalizedStringFromTableInBundle(@"A new version of %@ is ready to install!", SPARKLE_TABLE, sparkleBundle, nil), _hostName];
+    } else {
+        return [NSString stringWithFormat:SULocalizedStringFromTableInBundle(@"A new version of %@ is available!", SPARKLE_TABLE, sparkleBundle, nil), _hostName];
+    }
+}
+
+- (NSButton *)makeButton SPU_OBJC_DIRECT
+{
+    NSButton *button = [NSButton buttonWithTitle:[self buttonTitle] target:self action:@selector(showMenu:)];
+    button.bezelStyle = NSBezelStyleTexturedRounded;
+    button.controlSize = NSControlSizeSmall;
+    button.font = [NSFont systemFontOfSize:NSFont.smallSystemFontSize];
+    button.toolTip = [self toolTip];
+    button.accessibilityIdentifier = SPUTitlebarUpdateReminderAccessibilityIdentifier;
+    button.accessibilityLabel = [self buttonTitle];
+
+    [button sizeToFit];
+
+    NSRect buttonFrame = button.frame;
+    buttonFrame.size.width = MIN(MAX(ceil(buttonFrame.size.width) + 14.0, 118.0), 180.0);
+    buttonFrame.size.height = 22.0;
+    button.frame = buttonFrame;
+
+    return button;
+}
+
+- (void)showReminder
+{
+    if (_showingReminder) {
+        return;
+    }
+
+    NSWindow *window = _window;
+    if (window == nil) {
+        return;
+    }
+
+    _button = [self makeButton];
+
+    _accessoryViewController = [[NSTitlebarAccessoryViewController alloc] init];
+    _accessoryViewController.layoutAttribute = NSLayoutAttributeTrailing;
+    _accessoryViewController.view = _button;
+
+    [window addTitlebarAccessoryViewController:_accessoryViewController];
+
+    __weak __typeof__(self) weakSelf = self;
+    _windowWillCloseObserver = [[NSNotificationCenter defaultCenter] addObserverForName:NSWindowWillCloseNotification object:window queue:NSOperationQueue.mainQueue usingBlock:^(NSNotification * __unused notification) {
+        __typeof__(self) strongSelf = weakSelf;
+        [strongSelf dismissReminder];
+    }];
+
+    _showingReminder = YES;
+}
+
+- (void)dismissReminder
+{
+    if (!_showingReminder) {
+        return;
+    }
+
+    if (_windowWillCloseObserver != nil) {
+        [[NSNotificationCenter defaultCenter] removeObserver:_windowWillCloseObserver];
+        _windowWillCloseObserver = nil;
+    }
+
+    [_accessoryViewController removeFromParentViewController];
+    _accessoryViewController = nil;
+    _button = nil;
+    _showingReminder = NO;
+}
+
+- (void)showMenu:(NSButton *)sender
+{
+#if SPARKLE_COPY_LOCALIZATIONS
+    NSBundle *sparkleBundle = SUSparkleBundle();
+#endif
+
+    NSMenu *menu = [[NSMenu alloc] initWithTitle:@""];
+
+    NSMenuItem *showUpdateItem = [[NSMenuItem alloc] initWithTitle:SULocalizedStringFromTableInBundle(@"Show Update…", SPARKLE_TABLE, sparkleBundle, nil) action:@selector(showUpdate:) keyEquivalent:@""];
+    showUpdateItem.target = self;
+    [menu addItem:showUpdateItem];
+
+    NSMenuItem *skipForNowItem = [[NSMenuItem alloc] initWithTitle:SULocalizedStringFromTableInBundle(@"Skip for Now", SPARKLE_TABLE, sparkleBundle, nil) action:@selector(skipForNow:) keyEquivalent:@""];
+    skipForNowItem.target = self;
+    [menu addItem:skipForNowItem];
+
+    [menu popUpMenuPositioningItem:nil atLocation:NSMakePoint(0.0, NSHeight(sender.bounds) + 2.0) inView:sender];
+}
+
+- (void)showUpdate:(id)__unused sender
+{
+    if (_showUpdate != nil) {
+        _showUpdate();
+    }
+}
+
+- (void)skipForNow:(id)__unused sender
+{
+    if (_dismissUpdate != nil) {
+        _dismissUpdate();
+    }
+}
+
+@end
+
 @interface SPUStandardUserDriver () <SPUGentleUserDriverReminders>
 
 // Note: we expose a private interface for activeUpdateAlert property in SPUStandardUserDriver+Private.h as NSWindowController
 @property (nonatomic, readonly, nullable) NSWindowController *activeUpdateAlert;
+
+- (void)setUpActiveUpdateAlertForScheduledUpdate:(SUAppcastItem * _Nullable)updateItem state:(SPUUserUpdateState * _Nullable)state SPU_OBJC_DIRECT;
+- (void)dismissTitlebarUpdateReminder SPU_OBJC_DIRECT;
 
 @end
 
@@ -66,9 +231,11 @@
     
     SUUpdateAlert *_activeUpdateAlert;
     SPUUpdaterSettings *_updaterSettings;
+    SPUTitlebarUpdateReminderController *_titlebarUpdateReminderController;
     
     SUStatusController *_statusController;
     SUUpdatePermissionPrompt *_permissionPrompt;
+    __weak NSWindow *_scheduledUpdateReminderWindow;
     
     __weak id <SPUStandardUserDriverDelegate> _delegate;
     
@@ -82,9 +249,12 @@
     BOOL _loggedGentleUpdateReminderWarning;
     BOOL _regularApplicationUpdate;
     BOOL _updateReceivedUserAttention;
+    BOOL _showsScheduledUpdateRemindersInTitlebar;
 }
 
 @synthesize activeUpdateAlert = _activeUpdateAlert;
+@synthesize scheduledUpdateReminderWindow = _scheduledUpdateReminderWindow;
+@synthesize showsScheduledUpdateRemindersInTitlebar = _showsScheduledUpdateRemindersInTitlebar;
 
 #pragma mark Birth
 
@@ -107,6 +277,25 @@
         }
     }
     return self;
+}
+
+- (void)setShowsScheduledUpdateRemindersInTitlebar:(BOOL)showsScheduledUpdateRemindersInTitlebar
+{
+    _showsScheduledUpdateRemindersInTitlebar = showsScheduledUpdateRemindersInTitlebar;
+
+    if (!showsScheduledUpdateRemindersInTitlebar) {
+        [self dismissTitlebarUpdateReminder];
+    }
+}
+
+- (void)setScheduledUpdateReminderWindow:(NSWindow *)scheduledUpdateReminderWindow
+{
+    if (_scheduledUpdateReminderWindow == scheduledUpdateReminderWindow) {
+        return;
+    }
+
+    [self dismissTitlebarUpdateReminder];
+    _scheduledUpdateReminderWindow = scheduledUpdateReminderWindow;
 }
 
 - (double)currentTime SPU_OBJC_DIRECT
@@ -172,6 +361,46 @@
     }
 }
 
+- (void)dismissTitlebarUpdateReminder SPU_OBJC_DIRECT
+{
+    [_titlebarUpdateReminderController dismissReminder];
+    _titlebarUpdateReminderController = nil;
+}
+
+- (BOOL)shouldShowTitlebarReminderForScheduledUpdate:(SUAppcastItem *)updateItem SPU_OBJC_DIRECT
+{
+    if (!_showsScheduledUpdateRemindersInTitlebar || _scheduledUpdateReminderWindow == nil) {
+        return NO;
+    }
+
+    // Critical updates should continue to use Sparkle's immediate standard UI.
+    return !updateItem.criticalUpdate;
+}
+
+- (void)showTitlebarReminderForScheduledUpdate:(SUAppcastItem *)updateItem state:(SPUUserUpdateState *)state SPU_OBJC_DIRECT
+{
+    assert(!state.userInitiated);
+
+    [self dismissTitlebarUpdateReminder];
+
+    __weak __typeof__(self) weakSelf = self;
+    _titlebarUpdateReminderController = [[SPUTitlebarUpdateReminderController alloc] initWithWindow:(NSWindow * _Nonnull)_scheduledUpdateReminderWindow hostName:_host.name updateDownloaded:(state.stage != SPUUserUpdateStageNotDownloaded) showUpdate:^{
+        __typeof__(self) strongSelf = weakSelf;
+        if (strongSelf != nil) {
+            [strongSelf dismissTitlebarUpdateReminder];
+            [strongSelf setUpActiveUpdateAlertForScheduledUpdate:nil state:nil];
+        }
+    } dismissUpdate:^{
+        __typeof__(self) strongSelf = weakSelf;
+        if (strongSelf != nil) {
+            [strongSelf dismissTitlebarUpdateReminder];
+            [strongSelf->_activeUpdateAlert finishWithUserUpdateChoice:SPUUserUpdateChoiceDismiss];
+        }
+    }];
+
+    [_titlebarUpdateReminderController showReminder];
+}
+
 // updateItem should be non-nil when showing an update for first time for scheduled updates
 // If appcastItem is != nil, then state must be != nil
 - (void)setUpActiveUpdateAlertForScheduledUpdate:(SUAppcastItem * _Nullable)updateItem state:(SPUUserUpdateState * _Nullable)state SPU_OBJC_DIRECT
@@ -183,6 +412,8 @@
     
     if (updateItem == nil) {
         // This is a user initiated check or a check to bring the already shown update back in focus
+        [self dismissTitlebarUpdateReminder];
+
         if (![NSApp isActive]) {
             // If the user initiated an update check, we should make the app active,
             // regardless if it's a background running app or not
@@ -316,6 +547,11 @@
                 [delegate standardUserDriverWillHandleShowingUpdate:handleShowingUpdates forUpdate:(SUAppcastItem * _Nonnull)updateItem state:(SPUUserUpdateState * _Nonnull)state];
             }
             
+            if ([self shouldShowTitlebarReminderForScheduledUpdate:(SUAppcastItem * _Nonnull)updateItem]) {
+                [self showTitlebarReminderForScheduledUpdate:(SUAppcastItem * _Nonnull)updateItem state:(SPUUserUpdateState * _Nonnull)state];
+                return;
+            }
+
             if (!driverShowingUpdateNow) {
                 [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:NSApplicationDidBecomeActiveNotification object:NSApp];
             } else {
@@ -392,6 +628,7 @@
             strongSelf->_updateAlertWindowFrameValue = [NSValue valueWithRect:windowFrame];
             strongSelf->_updateAlertWindowWasInactive = !wasKeyWindow;
             
+            [strongSelf dismissTitlebarUpdateReminder];
             strongSelf->_activeUpdateAlert = nil;
         }
     } didBecomeKeyBlock:^{
@@ -780,6 +1017,8 @@
 {
     assert(NSThread.isMainThread);
     
+    [self dismissTitlebarUpdateReminder];
+
     _cancellation = [cancellation copy];
     
     [self createAndShowStatusControllerWithClosable:NO];
@@ -930,6 +1169,8 @@
 {
     assert(NSThread.isMainThread);
     
+    [self dismissTitlebarUpdateReminder];
+
     id<SPUStandardUserDriverDelegate> delegate = _delegate;
     if ([delegate respondsToSelector:@selector(standardUserDriverWillFinishUpdateSession)]) {
         [delegate standardUserDriverWillFinishUpdateSession];

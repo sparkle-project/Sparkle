@@ -27,6 +27,7 @@ SPU_OBJC_DIRECT_MEMBERS @interface SUUpdateAlert : NSWindowController
 - (void)showReleaseNotesFailedToDownloadWithError:(NSError *)error;
 
 - (void)setInstallButtonFocus:(BOOL)focus;
+- (void)finishWithUserUpdateChoice:(SPUUserUpdateChoice)choice;
 
 @end
 
