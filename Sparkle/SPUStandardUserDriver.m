@@ -128,11 +128,10 @@
 
 - (void)_activateApplication SPU_OBJC_DIRECT
 {
-    if (@available(macOS 14, *)) {
-        [NSApp activate];
-    } else {
-        [NSApp activateIgnoringOtherApps:YES];
-    }
+    // -[NSApp activate] does not always work reliably from backgrounded apps when the user initiates checks for updates
+    // from e.g. a menu bar. The OS should grant active focus to the appliation, but it is inconsistent (last tested on 26.5.1).
+    // For now we will prefer the deprecated more reliant API
+    [NSApp activateIgnoringOtherApps:YES];
 }
 
 - (void)showUpdatePermissionRequest:(SPUUpdatePermissionRequest *)request reply:(void (^)(SUUpdatePermissionResponse *))reply
