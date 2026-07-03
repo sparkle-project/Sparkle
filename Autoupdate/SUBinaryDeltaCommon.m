@@ -453,14 +453,20 @@ extern NSString *hashOfTree(NSString *path)
     return hashOfTreeWithVersion(path, SUBinaryDeltaMajorVersionLatest);
 }
 
+BOOL fileExists(NSString *path)
+{
+    // Don't use fileExistsForPath: because it will try to follow symbolic links
+    struct stat fileInfo;
+    return lstat(path.fileSystemRepresentation, &fileInfo) == 0;
+}
+
 BOOL removeTree(NSString *path)
 {
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-    // Don't use fileExistsForPath: because it will try to follow symbolic links
-    if (![fileManager attributesOfItemAtPath:path error:nil]) {
+    if (!fileExists(path)) {
         return YES;
     }
-    return [fileManager removeItemAtPath:path error:nil];
+    
+    return [NSFileManager.defaultManager removeItemAtPath:path error:nil];
 }
 
 BOOL copyTree(NSFileManager *fileManager, NSString *source, NSString *dest)

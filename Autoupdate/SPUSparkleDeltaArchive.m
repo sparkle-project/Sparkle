@@ -458,7 +458,12 @@ static compression_algorithm compressionAlgorithmForMode(SPUDeltaCompressionMode
             if (commands == SPUDeltaItemCommandEndMarker) {
                 break;
             }
-            
+
+            if (currentItemIndex >= relativeFilePaths.count) {
+                _error = [NSError errorWithDomain:SPARKLE_DELTA_ARCHIVE_ERROR_DOMAIN code:SPARKLE_DELTA_ARCHIVE_ERROR_CODE_BAD_ITEM_INDEX userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Item index %llu is past relative path table bounds of length %lu", currentItemIndex, (unsigned long)relativeFilePaths.count] }];
+                break;
+            }
+
             // Check if we need to decode additional data
             uint16_t decodedMode = 0;
             uint64_t decodedDataLength = 0;
