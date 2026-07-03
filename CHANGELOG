@@ -1,3 +1,7 @@
+# 2.9.5
+
+* Harden patching delta file against symbolic link at destination path (#2891) (Zorg, Arpit Jain)
+
 # 2.9.4
 
 * Fix backgrounded apps sometimes not bringing windows from user initiated actions in active focus (#2890) (Zorg, wojciech-kulik)
