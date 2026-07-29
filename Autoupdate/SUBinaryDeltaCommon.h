@@ -70,6 +70,7 @@ NSString *displayHashFromRawHash(const unsigned char *hash);
 void getRawHashFromDisplayHash(unsigned char *hash, NSString *hexHash);
 extern NSString *hashOfTreeWithVersion(NSString *path, uint16_t majorVersion);
 extern NSString *hashOfTree(NSString *path);
+BOOL fileExists(NSString *path);
 extern BOOL removeTree(NSString *path);
 extern BOOL copyTree(NSFileManager *fileManager, NSString *source, NSString *dest);
 extern BOOL modifyPermissions(NSString *path, mode_t desiredPermissions);

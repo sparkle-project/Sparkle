@@ -343,11 +343,19 @@ int bspatch(int argc,const char * const argv[])
     }
     epf = NULL;
 
-    /* Write the new file */
-    f = fopen(argv[2], "w");
-    if (f == NULL) {
-        warn("failed to write new file: %s", argv[2]);
-        goto cleanup;
+    /* Write the new file without following symlinks at the destination path */
+    {
+        int newfd = open(argv[2], O_WRONLY | O_CREAT | O_TRUNC | O_NOFOLLOW, 0644);
+        if (newfd < 0) {
+            warn("failed to open new file: %s", argv[2]);
+            goto cleanup;
+        }
+        f = fdopen(newfd, "w");
+        if (f == NULL) {
+            warn("failed to write new file: %s", argv[2]);
+            close(newfd);
+            goto cleanup;
+        }
     }
     
     if (fwrite(newp, 1, (size_t)newsize, f) < (size_t)newsize) {
