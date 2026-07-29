@@ -16,6 +16,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #import <sys/stat.h>
+#include <unistd.h>
 
 
 #include "AppKitPrevention.h"
@@ -229,8 +230,7 @@ BOOL applyBinaryDelta(NSString *source, NSString *finalDestination, NSString *pa
             }
         }
 
-        // Don't use -[NSFileManager fileExistsAtPath:] because it will follow symbolic links
-        BOOL fileExisted = verbose && [fileManager attributesOfItemAtPath:destinationFilePath error:nil];
+        BOOL fileExisted = verbose && fileExists(destinationFilePath);
         BOOL removedFile = NO;
         
         // Files that have no property set that we check for will get ignored
@@ -320,8 +320,18 @@ BOOL applyBinaryDelta(NSString *source, NSString *finalDestination, NSString *pa
             // applyBinaryDeltaToFile() normally preserves file permissions on the file it's replacing.
             // However this is not possible if the destination file we're patching is not writable.
             // We also need to preserve permissions for clones except when we'll be changing permissions later anyway.
+            BOOL destinationFileIsWritable;
+            {
+                const char *destinationFileSystemRepresentation = destinationFilePath.fileSystemRepresentation;
+                struct stat destinationFileInfo;
+                destinationFileIsWritable =
+                    (lstat(destinationFileSystemRepresentation, &destinationFileInfo) == 0 &&
+                    !S_ISLNK(destinationFileInfo.st_mode) &&
+                    access(destinationFileSystemRepresentation, W_OK) == 0);
+                    
+            }
             BOOL needsToCopyFilePermissions;
-            if (![fileManager isWritableFileAtPath:destinationFilePath]) {
+            if (!destinationFileIsWritable) {
                 // Remove the file non-writable we're patching that may cause issues
                 [fileManager removeItemAtPath:destinationFilePath error:NULL];
                 
