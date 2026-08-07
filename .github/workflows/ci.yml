@@ -10,21 +10,21 @@ jobs:
   build:
     strategy:
       matrix:
-        xcode: ['xcode26.2', 'xcode16.4']
+        xcode: ['xcode26.6', 'xcode27.0']
         include:
-            - xcode: 'xcode16.4'
-              xcode-path: '/Applications/Xcode_16.4.app/Contents/Developer'
+            - xcode: 'xcode27.0'
+              xcode-path: '/Applications/Xcode_27.0.app/Contents/Developer'
               upload-dist: false
               run-analyzer: false
-              macos: 'macos-15'
-            - xcode: 'xcode26.2'
-              xcode-path: '/Applications/Xcode_26.2.app/Contents/Developer'
+              image: 'xcode-27-arm64'
+            - xcode: 'xcode26.6'
+              xcode-path: '/Applications/Xcode_26.6.app/Contents/Developer'
               upload-dist: true
               run-analyzer: true
-              macos: 'macos-26'
+              image: 'macos-26'
             
     name: Build and Test Sparkle
-    runs-on: ${{ matrix.macos }}
+    runs-on: ${{ matrix.image }}
 
     permissions:
       pull-requests: write
