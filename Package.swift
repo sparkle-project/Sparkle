@@ -10,7 +10,7 @@ let url = "https://github.com/sparkle-project/Sparkle/releases/download/\(tag)/S
 
 let package = Package(
     name: "Sparkle",
-    platforms: [.macOS(.v12)], // leaving "12.0" as a breadcrumb for searching
+    platforms: [.macOS(.v12)], // leaving "12.0" as a breadcrumb for searching; aligned with swift-tools-version at top of file (see https://developer.apple.com/documentation/packagedescription/supportedplatform/macosversion)
     products: [
         .library(
             name: "Sparkle",
