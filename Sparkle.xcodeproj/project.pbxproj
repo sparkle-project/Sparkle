@@ -230,6 +230,7 @@
 		725CB9571C7120410064365A /* SPUUserDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 725CB9561C7120410064365A /* SPUUserDriver.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		725CB95A1C7121830064365A /* SPUStandardUserDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 725CB9581C7121830064365A /* SPUStandardUserDriver.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		725CB95B1C7121830064365A /* SPUStandardUserDriver.m in Sources */ = {isa = PBXBuildFile; fileRef = 725CB9591C7121830064365A /* SPUStandardUserDriver.m */; };
+		725EA4B23027D2AF0041BFA6 /* test-package-update.xml in Resources */ = {isa = PBXBuildFile; fileRef = 725EA4B13027D2AF0041BFA6 /* test-package-update.xml */; };
 		725EE480277BF13B00D820CE /* SPUXarDeltaArchive.m in Sources */ = {isa = PBXBuildFile; fileRef = 725EE47F277BF13B00D820CE /* SPUXarDeltaArchive.m */; };
 		725EE482277BF44A00D820CE /* SPUXarDeltaArchive.m in Sources */ = {isa = PBXBuildFile; fileRef = 725EE47F277BF13B00D820CE /* SPUXarDeltaArchive.m */; };
 		725EE483277C767A00D820CE /* SPUXarDeltaArchive.m in Sources */ = {isa = PBXBuildFile; fileRef = 725EE47F277BF13B00D820CE /* SPUXarDeltaArchive.m */; };
@@ -1189,6 +1190,7 @@
 		725CB9581C7121830064365A /* SPUStandardUserDriver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPUStandardUserDriver.h; sourceTree = "<group>"; };
 		725CB9591C7121830064365A /* SPUStandardUserDriver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SPUStandardUserDriver.m; sourceTree = "<group>"; };
 		725DED72263D10C400E7FA8F /* SUAppcast+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SUAppcast+Private.h"; sourceTree = "<group>"; };
+		725EA4B13027D2AF0041BFA6 /* test-package-update.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "test-package-update.xml"; sourceTree = "<group>"; };
 		725EE47E277BF13A00D820CE /* SPUXarDeltaArchive.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SPUXarDeltaArchive.h; path = Autoupdate/SPUXarDeltaArchive.h; sourceTree = SOURCE_ROOT; };
 		725EE47F277BF13B00D820CE /* SPUXarDeltaArchive.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SPUXarDeltaArchive.m; path = Autoupdate/SPUXarDeltaArchive.m; sourceTree = SOURCE_ROOT; };
 		725EE481277BF17A00D820CE /* SPUDeltaArchiveProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SPUDeltaArchiveProtocol.h; path = Autoupdate/SPUDeltaArchiveProtocol.h; sourceTree = SOURCE_ROOT; };
@@ -1847,6 +1849,7 @@
 				5A5DD41B249F0F4B0045EB3E /* test-relative-urls.xml */,
 				729F7EAB27366353004592DC /* test-links.xml */,
 				723AD12E29922B5F006BB02F /* test-dangerous-link.xml */,
+				725EA4B13027D2AF0041BFA6 /* test-package-update.xml */,
 				72C56E212F04C28B0005A484 /* testreleasenotes.html */,
 				5A5DD40324958AFF0045EB3E /* SUUpdateValidatorTest */,
 			);
@@ -3141,6 +3144,7 @@
 				72C56E262F04C28B0005A484 /* testreleasenotes.html in Resources */,
 				723AD12F29922B5F006BB02F /* test-dangerous-link.xml in Resources */,
 				72EB736129BEB36100FBCEE7 /* DevSignedAppVersion2.zip in Resources */,
+				725EA4B23027D2AF0041BFA6 /* test-package-update.xml in Resources */,
 				723EDC3F26885A8E000BCBA4 /* testappcast_channels.xml in Resources */,
 				720DC50427A51A6500DFF3EC /* testappcast_minimumAutoupdateVersionSkipping.xml in Resources */,
 				72E6D9712C04DE1A005496E4 /* SparkleTestCodeSign_pkg.dmg in Resources */,
