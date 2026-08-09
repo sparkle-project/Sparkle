@@ -481,9 +481,21 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
                 return;
             }
             
+            // Try to resolve the download URL from symlinks
+            SUFileManager *fileManager = [[SUFileManager alloc] init];
+            NSError *resolveError = nil;
+            NSURL *resolvedDownloadURL = [fileManager resolveSymlinksInURL:downloadURL isDirectory:NO error:&resolveError];
+            if (resolvedDownloadURL == nil) {
+                SULogError(resolveError);
+                
+                // Try to fallback onto regular downloadURL if resolving fails
+                // Later file operations are performed safely even if the URL doesn't have symlinks resolved.
+                resolvedDownloadURL = downloadURL;
+            }
+            
             // Validate the download URL before moving it
             {
-                NSArray<NSString *> *downloadURLPathComponents = downloadURL.URLByResolvingSymlinksInPath.pathComponents;
+                NSArray<NSString *> *downloadURLPathComponents = resolvedDownloadURL.pathComponents;
                 if (downloadURLPathComponents == nil) {
                     [self cleanupAndExitWithStatus:EXIT_FAILURE error:[NSError errorWithDomain:SUSparkleErrorDomain code:SPUInstallerError userInfo:@{ NSLocalizedDescriptionKey: @"Error: Failed to retrieve path components from download URL" }]];
                     
@@ -546,12 +558,42 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
             // This prevents eg: if a bug exists in the updater that removes files we are trying to install
             // When this tool is ran as root, we are moving it into a directory that only root will have access to
             
-            NSURL *downloadDestinationURL = [[NSURL fileURLWithPath:cacheInstallationPath] URLByAppendingPathComponent:downloadName];
+            NSURL *cacheInstallationURL = [NSURL fileURLWithPath:cacheInstallationPath isDirectory:YES];
             
-            NSError *moveError = nil;
-            if (![[[SUFileManager alloc] init] moveItemAtURL:downloadURL toURL:downloadDestinationURL error:&moveError]) {
-                [self cleanupAndExitWithStatus:EXIT_FAILURE error:[NSError errorWithDomain:SUSparkleErrorDomain code:SPUInstallerError userInfo:@{ NSLocalizedDescriptionKey: @"Error: Failed to move download archive to new location", NSUnderlyingErrorKey: moveError }]];
-                return;
+            NSError *resolvedCacheInstallationError = nil;
+            NSURL *resolvedCacheInstallationURL = [fileManager resolveSymlinksInURL:cacheInstallationURL isDirectory:YES error:&resolvedCacheInstallationError];
+            if (resolvedCacheInstallationURL == nil) {
+                // Fallback to original cache installation URL if resolving fails
+                SULogError(resolvedCacheInstallationError);
+                resolvedCacheInstallationURL = cacheInstallationURL;
+            }
+            
+            NSURL *downloadDestinationURL = [resolvedCacheInstallationURL URLByAppendingPathComponent:downloadName isDirectory:NO];
+            
+            BOOL fallbackToFileCopy;
+            if (@available(macOS 11, *)) {
+                NSError *renameError = nil;
+                if (![fileManager renameItemAtResolvedSymlinkURL:resolvedDownloadURL toResolvedSymlinkURL:downloadDestinationURL error:&renameError]) {
+                    SULog(SULogLevelError, @"Error: failed to rename '%@' to '%@'. Falling back to copy operation.", resolvedDownloadURL.path, downloadDestinationURL.path);
+                    
+                    SULogError(renameError);
+                    
+                    fallbackToFileCopy = YES;
+                } else {
+                    fallbackToFileCopy = NO;
+                }
+            } else {
+                fallbackToFileCopy = YES;
+            }
+            
+            if (fallbackToFileCopy) {
+                // The client will be responsible for cleaning up the download.
+                // We will not risk removing it here if rename failed. Copying the file is safer.
+                NSError *copyError = nil;
+                if (![fileManager copyItemAtURL:resolvedDownloadURL toURL:downloadDestinationURL error:&copyError]) {
+                    [self cleanupAndExitWithStatus:EXIT_FAILURE error:[NSError errorWithDomain:SUSparkleErrorDomain code:SPUInstallerError userInfo:@{ NSLocalizedDescriptionKey: @"Error: Failed to copy download archive to new location", NSUnderlyingErrorKey: copyError }]];
+                    return;
+                }
             }
             
             // Make sure the downloaded archive we moved over is a regular file and not a symbolic link placed by an attacker

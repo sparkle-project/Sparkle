@@ -59,6 +59,30 @@ SUFileManagerDefinitionAttribute
 - (BOOL)moveItemAtURL:(NSURL *)sourceURL toURL:(NSURL *)destinationURL error:(NSError **)error;
 
 /**
+ * Renames an item from a source to a destination assuming source and destination URLs have symbolic links resolved.
+ * @param sourceURL A URL pointing to the item to rename. The item at this URL must exist.
+ * @param destinationURL A URL pointing to the destination the item will be moved at.
+ * @param error if an error occurs, upon returns contains an NSError object that describes the problem. If you are not interested in possible errors, you may pass in NULL.
+ * @return YES if the time was renamed successfully, otherwise NO along with a pouplated error object.
+ *
+ * sourceURL and destinationURL must reside on the same volume otherwise this operation will fail.
+ * If any symbolic links are encountered in these paths during path resolution, this operation will fail.
+ */
+- (BOOL)renameItemAtResolvedSymlinkURL:(NSURL *)sourceURL toResolvedSymlinkURL:(NSURL *)destinationURL error:(NSError *__autoreleasing *)error API_AVAILABLE(macosx(11.0));
+
+/**
+ * Returns a URL by resolving links in path.
+ * @param url A URL pointing to a real file to resolve symlinks in path.
+ * @param isDirectory Indicates if the URL is a directory.
+ * @param error if an error occurs, upon returns contains an NSError object that describes the problem. If you are not interested in possible errors, you may pass in NULL.
+ * @return A URL that is resolved and has no symlinks in its path.
+ *
+ * This method is suitable to resolving a URL before passing it to -renameItemAtResolvedSymlinkURL:toResolvedSymlinkURL:error:
+ * -[NSURL URLByResolvingSymlinksInPath] does not resolve symlinks for file paths starting with /private/ hence the need for this method.
+ */
+- (NSURL * _Nullable)resolveSymlinksInURL:(NSURL *)url isDirectory:(BOOL)isDirectory error:(NSError * __autoreleasing *)error;
+
+/**
  * Swaps an original item with a new item atomically.
  * @param originalItemURL A URL pointing to the original item to replace. The item at this URL must exist.
  * @param newItemURL A URL pointing to the new item that will replace the original item.
