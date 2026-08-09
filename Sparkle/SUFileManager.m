@@ -225,7 +225,28 @@ SPU_OBJC_DIRECT
     return [_fileManager moveItemAtURL:sourceURL toURL:destinationURL error:error];
 }
 
-- (BOOL)swapItemAtURL:(NSURL *)originalItemURL withItemAtURL:(NSURL *)newItemURL error:(NSError * __autoreleasing *)error
+- (NSURL * _Nullable)resolveSymlinksInURL:(NSURL *)url isDirectory:(BOOL)isDirectory error:(NSError * __autoreleasing *)error
+{
+    char path[PATH_MAX] = {0};
+    if (![url.path getFileSystemRepresentation:path maxLength:sizeof(path)]) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to retrieve file system representation before resolving symlinks in %@", url.path] }];
+        }
+        return nil;
+    }
+    
+    char resolvedPath[PATH_MAX] = {0};
+    if (realpath(path, resolvedPath) == NULL) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to resolve symlinks in %@", url.path] }];
+        }
+        return nil;
+    }
+    
+    return [[NSURL alloc] initFileURLWithFileSystemRepresentation:resolvedPath isDirectory:isDirectory relativeToURL:nil];
+}
+
+static BOOL renameFile(NSURL *originalItemURL, NSURL *newItemURL, unsigned int renameFlags, NSError * __autoreleasing *error)
 {
     char originalPath[PATH_MAX] = {0};
     if (![originalItemURL.path getFileSystemRepresentation:originalPath maxLength:sizeof(originalPath)]) {
@@ -243,15 +264,102 @@ SPU_OBJC_DIRECT
         return NO;
     }
     
-    int status = renamex_np(newPath, originalPath, RENAME_SWAP);
+    int status = renamex_np(originalPath, newPath, renameFlags);
     if (status != 0) {
         if (error != NULL) {
-            *error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to replace %@ with %@.", originalItemURL.lastPathComponent, newItemURL.lastPathComponent] }];
+            *error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to renamex_np %@ with %@.", originalItemURL.lastPathComponent, newItemURL.lastPathComponent] }];
         }
         return NO;
     }
     
     return YES;
+}
+
+- (BOOL)renameItemAtResolvedSymlinkURL:(NSURL *)sourceURL toResolvedSymlinkURL:(NSURL *)destinationURL error:(NSError *__autoreleasing *)error
+{
+    if (@available(macOS 13, *)) {
+        // RENAME_NOFOLLOW_ANY option requires macOS 13+
+        return renameFile(sourceURL, destinationURL, RENAME_NOFOLLOW_ANY, error);
+    }
+    
+    // The old path for renaming the file will involve opening file descriptors to parent directories
+    // and using renameat() without following any symlinks
+    
+    NSURL *sourceParentDirectoryURL = sourceURL.URLByDeletingLastPathComponent;
+    
+    char sourceParentDirectoryPath[PATH_MAX] = {0};
+    if (![sourceParentDirectoryURL getFileSystemRepresentation:sourceParentDirectoryPath maxLength:sizeof(sourceParentDirectoryPath)]) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Source item parent directory %@ to rename cannot be represented as a valid file name", sourceParentDirectoryURL.lastPathComponent] }];
+        }
+        return NO;
+    }
+    
+    char sourceLastPathComponentPath[PATH_MAX] = {0};
+    if (![sourceURL.lastPathComponent getFileSystemRepresentation:sourceLastPathComponentPath maxLength:sizeof(sourceLastPathComponentPath)]) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Source item last path component %@ to rename cannot be represented as a valid file name", sourceURL.lastPathComponent] }];
+        }
+        return NO;
+    }
+    
+    char destinationParentDirectoryPath[PATH_MAX] = {0};
+    NSURL *destinationParentDirectoryURL = destinationURL.URLByDeletingLastPathComponent;
+    if (![destinationParentDirectoryURL getFileSystemRepresentation:destinationParentDirectoryPath maxLength:sizeof(destinationParentDirectoryPath)]) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Destination item parent directory %@ to rename cannot be represented as a valid file name", destinationParentDirectoryURL.lastPathComponent] }];
+        }
+        return NO;
+    }
+    
+    char destinationLastPathComponentPath[PATH_MAX] = {0};
+    if (![destinationURL.lastPathComponent getFileSystemRepresentation:destinationLastPathComponentPath maxLength:sizeof(destinationLastPathComponentPath)]) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Destination item last path component %@ to rename cannot be represented as a valid file name", destinationURL.lastPathComponent] }];
+        }
+        return NO;
+    }
+    
+    // sourceURL and destinationURL is required to have symlinks already resolved so we will use O_NOFOLLOW_ANY to open the parent directories without following symlinks in any of intermediate directories
+    
+    int sourceParentDirectoryFileDescriptor = open(sourceParentDirectoryPath, O_RDONLY | O_DIRECTORY | O_CLOEXEC | O_NOFOLLOW_ANY);
+    if (sourceParentDirectoryFileDescriptor == -1) {
+        if (error != nil) {
+            *error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to open file descriptor to %@", sourceParentDirectoryURL.path.lastPathComponent] }];
+        }
+        return NO;
+    }
+    
+    int destinationParentDirectoryFileDescriptor = open(destinationParentDirectoryPath, O_RDONLY | O_DIRECTORY | O_CLOEXEC | O_NOFOLLOW_ANY);
+    if (destinationParentDirectoryFileDescriptor == -1) {
+        if (error != nil) {
+            *error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to open file descriptor to %@", destinationParentDirectoryURL.path.lastPathComponent] }];
+        }
+        close(sourceParentDirectoryFileDescriptor);
+        return NO;
+    }
+    
+    BOOL success = (renameat(sourceParentDirectoryFileDescriptor, sourceLastPathComponentPath, destinationParentDirectoryFileDescriptor, destinationLastPathComponentPath) == 0);
+    if (!success) {
+        if (error != nil) {
+            *error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to rename '%@' to '%@'", sourceURL.path, destinationURL.path] }];
+        }
+    }
+    
+    if (sourceParentDirectoryFileDescriptor != -1) {
+        close(sourceParentDirectoryFileDescriptor);
+    }
+    
+    if (destinationParentDirectoryFileDescriptor != -1) {
+        close(destinationParentDirectoryFileDescriptor);
+    }
+    
+    return success;
+}
+
+- (BOOL)swapItemAtURL:(NSURL *)originalItemURL withItemAtURL:(NSURL *)newItemURL error:(NSError * __autoreleasing *)error
+{
+    return renameFile(originalItemURL, newItemURL, RENAME_SWAP, error);
 }
 
 - (BOOL)changeOwnerAndGroupOfItemAtURL:(NSURL *)targetURL ownerID:(uid_t)ownerID groupID:(gid_t)groupID error:(NSError * __autoreleasing *)error
