@@ -44,19 +44,6 @@ static NSTimeInterval OLD_ITEM_DELETION_INTERVAL = 86400 * 10; // 10 days
     return [self _cachePathForCacheDirectory:cacheURL bundleIdentifier:bundleIdentifier];
 }
 
-+ (NSString *)cachePathForBundleIdentifier:(NSString *)bundleIdentifier userName:(NSString *)userName
-{
-    NSString *homeDirectory = NSHomeDirectoryForUser(userName);
-    assert(homeDirectory != nil);
-    
-    NSURL *homeDirectoryURL = [NSURL fileURLWithPath:homeDirectory isDirectory:YES];
-    
-    NSURL *cacheURL = [[homeDirectoryURL URLByAppendingPathComponent:@"Library" isDirectory:YES] URLByAppendingPathComponent:@"Caches" isDirectory:YES];
-    assert(cacheURL != nil);
-    
-    return [self _cachePathForCacheDirectory:cacheURL bundleIdentifier:bundleIdentifier];
-}
-
 + (void)removeOldItemsInDirectory:(NSString *)directory
 {
     NSMutableArray<NSString *> *filePathsToRemove = [NSMutableArray array];
@@ -86,11 +73,11 @@ static NSTimeInterval OLD_ITEM_DELETION_INTERVAL = 86400 * 10; // 10 days
     }
 }
 
-+ (NSString * _Nullable)createUniqueDirectoryInDirectory:(NSString *)directory intermediateDirectoryFileAttributes:(NSDictionary<NSFileAttributeKey, id> *)intermediateDirectoryFileAttributes
++ (NSString * _Nullable)createUniqueDirectoryInDirectory:(NSString *)directory
 {
     NSFileManager *fileManager = [NSFileManager defaultManager];
     NSError *createError = nil;
-    if (![fileManager createDirectoryAtPath:directory withIntermediateDirectories:YES attributes:intermediateDirectoryFileAttributes error:&createError]) {
+    if (![fileManager createDirectoryAtPath:directory withIntermediateDirectories:YES attributes:nil error:&createError]) {
         SULog(SULogLevelError, @"Failed to create directory with intermediate components at %@ with error %@", directory, createError);
         return nil;
     }
@@ -105,11 +92,6 @@ static NSTimeInterval OLD_ITEM_DELETION_INTERVAL = 86400 * 10; // 10 days
         }
     }
     return nil;
-}
-
-+ (NSString * _Nullable)createUniqueDirectoryInDirectory:(NSString *)directory
-{
-    return [self createUniqueDirectoryInDirectory:directory intermediateDirectoryFileAttributes:nil];
 }
 
 @end

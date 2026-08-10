@@ -20,7 +20,12 @@
     NSString *_installingUpdateTitle;
 }
 
-- (void)loadLocalizationStringsFromHost:(SUHost *)host
+- (void)createStatusControllerWithHost:(SUHost *)host SPU_OBJC_DIRECT
+{
+    _statusController = [[SUStatusController alloc] initWithHost:host windowTitle:_updatingString centerPointValue:nil minimizable:NO closable:NO];
+}
+
+- (void)loadLocalizationStringsFromHost:(SUHost *)host copiedApplication:(BOOL)copiedApplication
 {
     // Try to retrieve localization strings from the old bundle if possible
     // We won't display these strings until installerProgressShouldDisplayWithHost:
@@ -90,11 +95,19 @@
 #endif
     
     _installingUpdateTitle = installingUpdateTitle;
+    
+    // Initialize status controller immediately if app isn't copied, before the app may be swapped/removed
+    // This gaurantees we will be able to load the nib
+    if (!copiedApplication) {
+        [self createStatusControllerWithHost:host];
+    }
 }
 
 - (void)installerProgressShouldDisplayWithHost:(SUHost *)host
 {
-    _statusController = [[SUStatusController alloc] initWithHost:host windowTitle:_updatingString centerPointValue:nil minimizable:NO closable:NO];
+    if (_statusController == nil) {
+        [self createStatusControllerWithHost:host];
+    }
     
     [_statusController setButtonTitle:_cancelUpdateTitle target:nil action:nil isDefault:NO accessibilityIdentifier:@"SUStatusCancel"];
     
