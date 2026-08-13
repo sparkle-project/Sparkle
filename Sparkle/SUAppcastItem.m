@@ -773,6 +773,13 @@ static NSString *SPUSanitizeUntrustedVersionString(NSString *versionString, NSSt
         chosenInstallationType = SPUInstallationTypeApplication;
 #endif
         
+        if (signingValidationStatus == SPUAppcastSigningValidationStatusFailed && ![chosenInstallationType isEqualToString:SPUInstallationTypeApplication]) {
+            if (error != NULL) {
+                *error = @"Package based install update is rejected because signing validation on feed failed";
+            }
+            return nil;
+        }
+        
         _installationType = [chosenInstallationType copy];
         
         NSString *enclosureDeltaSparkleExecutableSize = [enclosure objectForKey:SUAppcastAttributeDeltaFromSparkleExecutableSize];

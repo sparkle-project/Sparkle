@@ -8,6 +8,25 @@
 
 import XCTest
 
+private let packageInstallationAppcastXML = """
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
+  <channel>
+    <title>For unit test only</title>
+    <item>
+        <title>Version 2.0</title>
+        <pubDate>Sat, 26 Jul 2014 15:20:12 +0000</pubDate>
+        <enclosure url="https://sparkle-project.org/release-2.0.pkg" sparkle:version="2.0" sparkle:installationType="package" length="1346234" />
+    </item>
+    <item>
+        <title>Version 1.0</title>
+        <pubDate>Sat, 26 Jul 2014 15:20:12 +0000</pubDate>
+        <enclosure url="https://sparkle-project.org/release-1.0.zip" sparkle:version="1.0" length="1346234" />
+    </item>
+  </channel>
+</rss>
+"""
+
 class SUAppcastTest: XCTestCase {
 
     func testParseAppcast() {
@@ -1161,6 +1180,44 @@ class SUAppcastTest: XCTestCase {
         } catch let err as NSError {
             NSLog("Expected error: %@", err)
             XCTFail("Appcast creation should have passed when encountering dangerous link of one item")
+        }
+    }
+
+    func testPackageInstallAllowedWithSkippedSigningValidation() {
+        let testFile = Bundle(for: SUAppcastTest.self).path(forResource: "test-package-update", ofType: "xml")!
+        let testData = NSData(contentsOfFile: testFile)!
+
+        do {
+            let stateResolver = SPUAppcastItemStateResolver(hostVersion: "1.0", applicationVersionComparator: SUStandardVersionComparator.default, standardVersionComparator: SUStandardVersionComparator.default)
+
+            let appcast = try SUAppcast(xmlData: testData as Data, relativeTo: nil, stateResolver: stateResolver, signingValidationStatus: .skipped)
+
+            XCTAssertEqual(appcast.items.count, 2)
+            XCTAssertEqual(appcast.items[0].installationType, SPUInstallationTypeGuidedPackage)
+            XCTAssertEqual(appcast.items[1].installationType, SPUInstallationTypeApplication)
+        } catch let err as NSError {
+            NSLog("Unexpected error: %@", err)
+            XCTFail("Appcast creation should have passed when signing validation is skipped")
+        }
+    }
+
+    func testPackageInstallRejectedWithFailedSigningValidation() {
+        let testFile = Bundle(for: SUAppcastTest.self).path(forResource: "test-package-update", ofType: "xml")!
+        let testData = NSData(contentsOfFile: testFile)!
+
+        do {
+            let stateResolver = SPUAppcastItemStateResolver(hostVersion: "1.0", applicationVersionComparator: SUStandardVersionComparator.default, standardVersionComparator: SUStandardVersionComparator.default)
+
+            let appcast = try SUAppcast(xmlData: testData as Data, relativeTo: nil, stateResolver: stateResolver, signingValidationStatus: .failed)
+
+            // The package-based item should be rejected because signing validation on the feed failed;
+            // only the application-based item should remain
+            XCTAssertEqual(appcast.items.count, 1)
+            XCTAssertEqual(appcast.items[0].installationType, SPUInstallationTypeApplication)
+            XCTAssertEqual(appcast.items[0].versionString, "1.0")
+        } catch let err as NSError {
+            NSLog("Unexpected error: %@", err)
+            XCTFail("Appcast creation should have passed, dropping only the rejected package item")
         }
     }
 }
