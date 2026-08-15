@@ -122,10 +122,9 @@ if [ "$ACTION" = "" ] ; then
             exit 1
         fi
         
-            # Generate new Package manifest, podspec, and carthage files
+            # Generate new Package manifest and carthage files
         cd "$CONFIGURATION_BUILD_DIR"
         cp "$PROJECT_DIR/Package.swift" "$CONFIGURATION_BUILD_DIR"
-        cp "$PROJECT_DIR/Sparkle.podspec" "$CONFIGURATION_BUILD_DIR"
         cp "$PROJECT_DIR/Carthage-dev.json" "$CONFIGURATION_BUILD_DIR"
     fi
     
@@ -141,14 +140,11 @@ if [ "$ACTION" = "" ] ; then
         echo "Version: $MARKETING_VERSION"
         echo "Tag: $latest_git_tag"
         echo "Checksum: $spm_checksum"
-
-        sed -E -i '' -e "/s\.version.+=/ s/\".+\"/\"$MARKETING_VERSION\"/" "Sparkle.podspec"
         
         "$PROJECT_DIR/Configurations/update-carthage.py" "Carthage-dev.json" "$MARKETING_VERSION"
-        cp "Sparkle.podspec" "$PROJECT_DIR"
         # Note the Carthage-dev.json file will finally be copied to the website repo in Carthage/Sparkle.json in the end
         cp "Carthage-dev.json" "$PROJECT_DIR"
-        echo "Sparkle.podspec and Carthage-dev.json updated with following values:"
+        echo "Carthage-dev.json is updated with following values:"
         echo "Version: $MARKETING_VERSION"
     else
         echo "warning: Xcode version $XCODE_VERSION_ACTUAL does not support computing checksums for Swift Packages. Please update the Package manifest manually."
