@@ -35,6 +35,15 @@ jobs:
         with:
           submodules: true
           fetch-depth: 0
+      - name: Check Installer Progress localizations are up to date
+        if: ${{ matrix.upload-dist }}
+        run: |
+          python3 Configurations/generate_progress_tool_localizations.py
+          if [ -n "$(git status --porcelain -- Sparkle/InstallerProgress/SPUInstallerProgressLocalizedStrings.h Sparkle/InstallerProgress/InstallerProgress-Info.plist)" ]; then
+            echo "::error::Sparkle/InstallerProgress/SPUInstallerProgressLocalizedStrings.h or InstallerProgress-Info.plist is out of date. Run Configurations/generate_progress_tool_localizations.py and commit the result."
+            git diff -- Sparkle/InstallerProgress/SPUInstallerProgressLocalizedStrings.h Sparkle/InstallerProgress/InstallerProgress-Info.plist
+            exit 1
+          fi
       - name: Build Unit Tests
         env:
           DEVELOPER_DIR: ${{ matrix.xcode-path }}

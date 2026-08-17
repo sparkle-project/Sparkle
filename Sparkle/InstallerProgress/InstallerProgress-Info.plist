@@ -30,13 +30,13 @@
 	<string>1</string>
 	<key>CFBundleLocalizations</key>
 	<array>
-		<string>en</string>
-		<string>ca</string>
 		<string>ar</string>
+		<string>ca</string>
 		<string>cs</string>
 		<string>da</string>
 		<string>de</string>
 		<string>el</string>
+		<string>en</string>
 		<string>es</string>
 		<string>fa</string>
 		<string>fi</string>

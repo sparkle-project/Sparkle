@@ -32,7 +32,7 @@
 
 @implementation SUInstallerLauncher
 
-- (BOOL)submitProgressToolAtPath:(NSString *)progressToolPath withHostBundle:(NSBundle *)hostBundle inSystemDomainForInstaller:(BOOL)inSystemDomainForInstaller copiedApplication:(BOOL)copiedApplication SPU_OBJC_DIRECT
+- (BOOL)submitProgressToolAtPath:(NSString *)progressToolPath withHostBundle:(NSBundle *)hostBundle inSystemDomainForInstaller:(BOOL)inSystemDomainForInstaller SPU_OBJC_DIRECT
 {
     SUFileManager *fileManager = [[SUFileManager alloc] init];
     
@@ -53,7 +53,7 @@
     NSString *hostBundleIdentifier = hostBundle.bundleIdentifier;
     assert(hostBundleIdentifier != nil);
     
-    NSArray<NSString *> *arguments = @[executablePath, hostBundlePath, @(inSystemDomainForInstaller).stringValue, @(copiedApplication).stringValue];
+    NSArray<NSString *> *arguments = @[executablePath, hostBundlePath, @(inSystemDomainForInstaller).stringValue];
     
     // The progress tool can only be ran as the logged in user, not as root
     CFStringRef domain = kSMDomainUserLaunchd;
@@ -525,52 +525,11 @@ static BOOL SPUUsesSystemDomainForBundlePath(NSString *path, BOOL rootUser
             }
         }
         
-        // It may be tempting here to validate/match the signature of the installer and progress tool, however this is not very reliable
-        // We can't compare the signature of this framework/XPC service (depending how it's run) to the host bundle because
-        // they could be different (eg: take a look at sparkle-cli). We also can't easily tell if the signature of the service/framework is the same as the bundle it's inside.
-        // The service/framework also need not even be signed in the first place. We'll just assume for now the original bundle hasn't been tampered with
-        
-        // Don't create cache directories or copy the progress tool app outside of the bundle for root user,
-        // because the app will not start if it's contained inside directories owned by root,
-        // and un-doing that opens up potential security issues.
-        // Eventually we will also want to not copy the tool app in the !rootUser case, minimizing risk
-        // by not making that change yet.
-        BOOL copyProgressTool = !rootUser;
-        NSString *progressToolPath;
-        if (copyProgressTool) {
-            NSString *cachePath = [SPULocalCacheDirectory cachePathForBundleIdentifier:hostBundleIdentifier];
-            
-            NSString *rootLauncherCachePath = [cachePath stringByAppendingPathComponent:@"Launcher"];
-            
-            [SPULocalCacheDirectory removeOldItemsInDirectory:rootLauncherCachePath];
-            
-            NSString *launcherCachePath = [SPULocalCacheDirectory createUniqueDirectoryInDirectory:rootLauncherCachePath];
-            
-            if (launcherCachePath == nil) {
-                SULog(SULogLevelError, @"Failed to create cache directory for progress tool in %@", rootLauncherCachePath);
-                completionHandler(SUInstallerLauncherFailure, inSystemDomain);
-                return;
-            }
-            
-            progressToolPath = [launcherCachePath stringByAppendingPathComponent:@""SPARKLE_INSTALLER_PROGRESS_TOOL_NAME@".app"];
-            
-            NSError *copyError = nil;
-            // SUFileManager is more reliable for copying files around
-            SUFileManager *fileManager = [[SUFileManager alloc] init];
-            if (![fileManager copyItemAtURL:[NSURL fileURLWithPath:progressToolResourcePath] toURL:[NSURL fileURLWithPath:progressToolPath] error:&copyError]) {
-                SULog(SULogLevelError, @"Failed to copy progress tool to cache: %@", copyError);
-                completionHandler(SUInstallerLauncherFailure, inSystemDomain);
-                return;
-            }
-        } else {
-            progressToolPath = progressToolResourcePath;
-        }
-        
         SUInstallerLauncherStatus installerStatus = [self submitInstallerAtPath:installerPath withHostBundle:hostBundle iconBundlePath:mainBundle.bundlePath updaterIdentifier:updaterIdentifier userName:userName homeDirectory:homeDirectory mainBundleName:mainBundleName inSystemDomain:inSystemDomain rootUser:rootUser];
         
         BOOL submittedProgressTool = NO;
         if (installerStatus == SUInstallerLauncherSuccess) {
-            submittedProgressTool = [self submitProgressToolAtPath:progressToolPath withHostBundle:hostBundle inSystemDomainForInstaller:inSystemDomain copiedApplication:copyProgressTool];
+            submittedProgressTool = [self submitProgressToolAtPath:progressToolResourcePath withHostBundle:hostBundle inSystemDomainForInstaller:inSystemDomain];
             
             if (!submittedProgressTool) {
                 SULog(SULogLevelError, @"Failed to submit progress tool job");
