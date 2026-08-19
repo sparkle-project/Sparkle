@@ -932,7 +932,6 @@
 		142E0E0819A83AAC00E4312B /* SUBinaryDeltaTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUBinaryDeltaTest.m; sourceTree = "<group>"; };
 		14652F7919A93E5F00959E44 /* set-git-version-info.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "set-git-version-info.sh"; sourceTree = "<group>"; };
 		14652F8319A9759F00959E44 /* SUExport.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SUExport.h; sourceTree = "<group>"; };
-		146EC84E19A68CF8004A50C5 /* Sparkle.podspec */ = {isa = PBXFileReference; lastKnownFileType = text; path = Sparkle.podspec; sourceTree = SOURCE_ROOT; };
 		14732BB1195FF6B700593899 /* .clang-format */ = {isa = PBXFileReference; lastKnownFileType = text; path = ".clang-format"; sourceTree = SOURCE_ROOT; };
 		14732BB91960EEEE00593899 /* SampleAppcast.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = SampleAppcast.xml; sourceTree = "<group>"; };
 		14732BBA1960EF7100593899 /* CHANGELOG */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CHANGELOG; sourceTree = SOURCE_ROOT; };
@@ -2493,7 +2492,6 @@
 				72045CE426FEE708004F96E5 /* strip-framework.sh */,
 				720C192827127A3800740C8E /* release-move-tag.sh */,
 				720B4C2325EBFAFD005A0592 /* link-tools.sh */,
-				146EC84E19A68CF8004A50C5 /* Sparkle.podspec */,
 			);
 			path = Configurations;
 			sourceTree = "<group>";
