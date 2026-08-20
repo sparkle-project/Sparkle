@@ -571,19 +571,15 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
             NSURL *downloadDestinationURL = [resolvedCacheInstallationURL URLByAppendingPathComponent:downloadName isDirectory:NO];
             
             BOOL fallbackToFileCopy;
-            if (@available(macOS 11, *)) {
-                NSError *renameError = nil;
-                if (![fileManager renameItemAtResolvedSymlinkURL:resolvedDownloadURL toResolvedSymlinkURL:downloadDestinationURL error:&renameError]) {
-                    SULog(SULogLevelError, @"Error: failed to rename '%@' to '%@'. Falling back to copy operation.", resolvedDownloadURL.path, downloadDestinationURL.path);
-                    
-                    SULogError(renameError);
-                    
-                    fallbackToFileCopy = YES;
-                } else {
-                    fallbackToFileCopy = NO;
-                }
-            } else {
+            NSError *renameError = nil;
+            if (![fileManager renameItemAtResolvedSymlinkURL:resolvedDownloadURL toResolvedSymlinkURL:downloadDestinationURL error:&renameError]) {
+                SULog(SULogLevelError, @"Error: failed to rename '%@' to '%@'. Falling back to copy operation.", resolvedDownloadURL.path, downloadDestinationURL.path);
+                
+                SULogError(renameError);
+                
                 fallbackToFileCopy = YES;
+            } else {
+                fallbackToFileCopy = NO;
             }
             
             if (fallbackToFileCopy) {

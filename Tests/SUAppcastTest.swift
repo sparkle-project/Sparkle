@@ -8,25 +8,6 @@
 
 import XCTest
 
-private let packageInstallationAppcastXML = """
-<?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
-  <channel>
-    <title>For unit test only</title>
-    <item>
-        <title>Version 2.0</title>
-        <pubDate>Sat, 26 Jul 2014 15:20:12 +0000</pubDate>
-        <enclosure url="https://sparkle-project.org/release-2.0.pkg" sparkle:version="2.0" sparkle:installationType="package" length="1346234" />
-    </item>
-    <item>
-        <title>Version 1.0</title>
-        <pubDate>Sat, 26 Jul 2014 15:20:12 +0000</pubDate>
-        <enclosure url="https://sparkle-project.org/release-1.0.zip" sparkle:version="1.0" length="1346234" />
-    </item>
-  </channel>
-</rss>
-"""
-
 class SUAppcastTest: XCTestCase {
 
     func testParseAppcast() {
