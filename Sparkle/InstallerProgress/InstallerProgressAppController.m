@@ -11,7 +11,6 @@
 #import "SPUMessageTypes.h"
 #import "SULog.h"
 #import "SULog+NSError.h"
-#import "SUApplicationInfo.h"
 #import "SPUInstallerAgentProtocol.h"
 #import "SUInstallerAgentInitiationProtocol.h"
 #import "StatusInfo.h"
@@ -190,7 +189,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
     
     [_statusInfo invalidate];
     [_connection invalidate];
-    
+
     exit(status);
 }
 
@@ -422,13 +421,6 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         if (!self->_willTerminate) {
-            // Show app icon in the dock
-            ProcessSerialNumber psn = { 0, kCurrentProcess };
-            TransformProcessType(&psn, kProcessTransformToForegroundApplication);
-            
-            // Note: the application icon needs to be set after showing the icon in the dock
-            self->_application.applicationIconImage = [SUApplicationInfo bestIconForHost:self->_oldHost];
-            
             // Activate ourselves otherwise we will probably be in the background
             // See comments in -[SPUStandardUserDriver _activateApplication] for why -activate is not used
             [self->_application activateIgnoringOtherApps:YES];
