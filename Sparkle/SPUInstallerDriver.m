@@ -41,17 +41,6 @@
 @end
 #endif
 
-// Note: we don't want to directly pull in AppKit here especially if the main application does not need it
-@interface NSObject (ActivationAPIs)
-// NSApplication
-+ (id)sharedApplication;
-- (void)yieldActivationToApplication:(id)application;
-
-// NSRunningApplication
-+ (NSArray *)runningApplicationsWithBundleIdentifier:(NSString *)bundleIdentifier;
-- (NSURL *)bundleURL;
-@end
-
 @interface SPUInstallerDriver () <SUInstallerCommunicationProtocol>
 @end
 
@@ -556,46 +545,6 @@
     _currentStage = SPUInstallationFinishedStage1;
     
     _relaunch = relaunch;
-    
-    // If AppKit is loaded, we will yield to our Sparkle progress app
-    // This will let the system know it should be okay for the progress agent to activate itself (if necessary)
-    // Note we don't want to directly pull in AppKit here especially if the main application does not need it
-    if (showUI) {
-        if (@available(macOS 14, *)) {
-            // Make sure we are not root before using AppKit API
-            if (geteuid() != 0) {
-                Class applicationClass = NSClassFromString(@"NSApplication");
-                if ([applicationClass respondsToSelector:@selector(sharedApplication)]) {
-                    NSObject *application = [applicationClass sharedApplication];
-                    
-                    if ([application respondsToSelector:@selector(yieldActivationToApplication:)]) {
-                        Class runningApplicationClass = NSClassFromString(@"NSRunningApplication");
-                        if ([runningApplicationClass respondsToSelector:@selector(runningApplicationsWithBundleIdentifier:)]) {
-                            NSArray *runningApplications = [runningApplicationClass runningApplicationsWithBundleIdentifier:@SPARKLE_INSTALLER_PROGRESS_TOOL_BUNDLE_ID];
-                            
-                            NSString *hostBundleIdentifier = _host.bundle.bundleIdentifier;
-                            
-                            id targetRunningApplication = nil;
-                            for (id runningApplication in runningApplications) {
-                                if ([(NSObject *)runningApplication respondsToSelector:@selector(bundleURL)]) {
-                                    NSURL *bundleURL = [(NSObject *)runningApplication bundleURL];
-                                    
-                                    if (hostBundleIdentifier != nil && [bundleURL.pathComponents containsObject:hostBundleIdentifier]) {
-                                        targetRunningApplication = runningApplication;
-                                        break;
-                                    }
-                                }
-                            }
-                            
-                            if (targetRunningApplication != nil) {
-                                [application yieldActivationToApplication:targetRunningApplication];
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
     
     // The user can request trying to relaunch/quit the app multiple times
     // Avoid re-notifying the delegate twice

@@ -430,11 +430,8 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
             self->_application.applicationIconImage = [SUApplicationInfo bestIconForHost:self->_oldHost];
             
             // Activate ourselves otherwise we will probably be in the background
-            if (@available(macOS 14, *)) {
-                [self->_application activate];
-            } else {
-                [self->_application activateIgnoringOtherApps:YES];
-            }
+            // See comments in -[SPUStandardUserDriver _activateApplication] for why -activate is not used
+            [self->_application activateIgnoringOtherApps:YES];
             
             [self->_delegate installerProgressShouldDisplayWithHost:self->_oldHost];
         }
