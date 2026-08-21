@@ -68,7 +68,7 @@ SUFileManagerDefinitionAttribute
  * sourceURL and destinationURL must reside on the same volume otherwise this operation will fail.
  * If any symbolic links are encountered in these paths during path resolution, this operation will fail.
  */
-- (BOOL)renameItemAtResolvedSymlinkURL:(NSURL *)sourceURL toResolvedSymlinkURL:(NSURL *)destinationURL error:(NSError *__autoreleasing *)error API_AVAILABLE(macosx(11.0));
+- (BOOL)renameItemAtResolvedSymlinkURL:(NSURL *)sourceURL toResolvedSymlinkURL:(NSURL *)destinationURL error:(NSError *__autoreleasing *)error;
 
 /**
  * Returns a URL by resolving links in path.
