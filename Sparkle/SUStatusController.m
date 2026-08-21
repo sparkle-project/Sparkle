@@ -16,6 +16,13 @@
 
 static NSString *const SUStatusControllerTouchBarIdentifier = @"" SPARKLE_BUNDLE_IDENTIFIER ".SUStatusController";
 
+// Buffering parameters for -showWindow: and -closeWithCompletionBlock:. We hide
+// the window entirely if a close arrives within SUStatusDisplayDelay,
+// and we enforce a minimum visible duration of SUStatusMinimumDisplayTime
+// once the window has actually appeared on screen.
+static const NSTimeInterval SUStatusDisplayDelay = 0.3;
+static const NSTimeInterval SUStatusMinimumDisplayTime = 0.7;
+
 @interface SUStatusController () <NSTouchBarDelegate>
 
 // These properties are used for bindings
@@ -36,6 +43,10 @@ static NSString *const SUStatusControllerTouchBarIdentifier = @"" SPARKLE_BUNDLE
     IBOutlet NSButton *_actionButton;
     IBOutlet NSTextField *_statusTextField;
     IBOutlet NSProgressIndicator *_progressBar;
+
+    BOOL _waitingToShowWindow;
+    NSTimeInterval _windowShownTime;
+    void (^_pendingCloseCompletion)(BOOL userCancelled);
     
     BOOL _minimizable;
     BOOL _closable;
@@ -151,6 +162,102 @@ static NSString *const SUStatusControllerTouchBarIdentifier = @"" SPARKLE_BUNDLE
 - (BOOL)isButtonEnabled
 {
     return [_actionButton isEnabled];
+}
+
+- (void)showWindow:(id)sender
+{
+    // If the window is already visible just call through for default handling
+    if (self.window.visible) {
+        [super showWindow:sender];
+        return;
+    }
+
+    // Already scheduled - just keep waiting
+    if (_waitingToShowWindow) {
+        return;
+    }
+
+    _waitingToShowWindow = YES;
+
+    __weak __typeof__(self) weakSelf = self;
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(SUStatusDisplayDelay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        __typeof__(self) strongSelf = weakSelf;
+        if (strongSelf != nil && strongSelf->_waitingToShowWindow) {
+            [strongSelf _reallyShowWindow:sender];
+        }
+    });
+}
+
+- (void)_reallyShowWindow:(id)sender SPU_OBJC_DIRECT
+{
+    _waitingToShowWindow = NO;
+    _windowShownTime = [NSDate timeIntervalSinceReferenceDate];
+    [super showWindow:sender];
+}
+
+- (void)closeWithCompletionBlock:(void (^)(BOOL userCancelled))completion
+{
+    // If the window isn't on screen, close silently and complete immediately.
+    if (_waitingToShowWindow || !self.window.visible) {
+        [self close];
+        if (completion != nil) {
+            completion(NO);
+        }
+        return;
+    }
+
+    NSTimeInterval elapsed = [NSDate timeIntervalSinceReferenceDate] - _windowShownTime;
+    if (elapsed >= SUStatusMinimumDisplayTime) {
+        [self close];
+        if (completion != nil) {
+            completion(NO);
+        }
+        return;
+    }
+
+    // Replace any previously pending close. (Not expected, but safe.)
+    _pendingCloseCompletion = [completion copy];
+
+    NSTimeInterval remaining = SUStatusMinimumDisplayTime - elapsed;
+    __weak __typeof__(self) weakSelf = self;
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(remaining * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        __typeof__(self) strongSelf = weakSelf;
+        if (strongSelf == nil) {
+            return;
+        }
+        void (^pendingCompletion)(BOOL) = strongSelf->_pendingCloseCompletion;
+        if (pendingCompletion == nil) {
+            // -close was called externally; pending state was discarded.
+            return;
+        }
+        strongSelf->_pendingCloseCompletion = nil;
+        [strongSelf close];
+        pendingCompletion(NO);
+    });
+}
+
+- (BOOL)closeImmediately
+{
+    void (^pending)(BOOL) = _pendingCloseCompletion;
+    _pendingCloseCompletion = nil;
+    [self close];
+    if (pending == nil) {
+        return NO;
+    }
+    pending(YES);
+    return YES;
+}
+
+- (void)close
+{
+    // -close is the abort path: silently discard any pending buffered
+    // presentation or deferred close. Callers driving the buffered API use
+    // -closeWithCompletionBlock: instead, which gates the
+    // window's actual disappearance behind the minimum display time.
+    _waitingToShowWindow = NO;
+    _windowShownTime = 0;
+    _pendingCloseCompletion = nil;
+    [super close];
 }
 
 - (void)setMaxProgressValue:(double)value

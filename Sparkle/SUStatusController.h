@@ -32,6 +32,28 @@
 // If isDefault is YES, the button's key equivalent will be \r.
 - (void)setButtonTitle:(NSString *)buttonTitle target:(id)target action:(SEL)action isDefault:(BOOL)isDefault accessibilityIdentifier:(NSString *)accessibilityIdentifier SPU_OBJC_DIRECT;
 
+// -showWindow: is internally buffered so that the window appears only after a short
+// delay so a fast-completing operation never causes a flicker. If -close is
+// called before the delay elapses, the window never appears at all. Calling
+// -showWindow: on an already-visible window brings it to front normally.
+- (void)showWindow:(id)sender;
+
+// Close the window, observing an internal minimum display time. completion
+// runs once the window has actually closed — immediately if the window isn't
+// on screen (or has been visible long enough), or after the remaining time
+// otherwise. The userCancelled flag is YES if the close was expedited by
+// -closeImmediately (i.e., the user explicitly cancelled); NO if the
+// minimum-display timer elapsed normally.
+- (void)closeWithCompletionBlock:(void (^)(BOOL userCancelled))completion SPU_OBJC_DIRECT;
+
+// Close the window now. If a deferred close scheduled by
+// -closeWithCompletionBlock: is still waiting out the minimum-display time,
+// fire its completion now with userCancelled=YES. Returns YES if a pending
+// completion fired (so the caller knows the completion's cleanup ran);
+// returns NO if there was no pending completion (caller is responsible for
+// any state cleanup that would have happened in the completion).
+- (BOOL)closeImmediately SPU_OBJC_DIRECT;
+
 @end
 
 #endif
