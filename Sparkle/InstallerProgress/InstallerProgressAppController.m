@@ -11,7 +11,6 @@
 #import "SPUMessageTypes.h"
 #import "SULog.h"
 #import "SULog+NSError.h"
-#import "SUApplicationInfo.h"
 #import "SPUInstallerAgentProtocol.h"
 #import "SUInstallerAgentInitiationProtocol.h"
 #import "StatusInfo.h"
@@ -62,14 +61,13 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
     BOOL _submittedLauncherJob;
     BOOL _willTerminate;
     BOOL _applicationInitiallyAlive;
-    BOOL _copiedApplication;
 }
 
 - (instancetype)initWithApplication:(NSApplication *)application arguments:(NSArray<NSString *> *)arguments delegate:(id<InstallerProgressDelegate>)delegate
 {
     self = [super init];
     if (self != nil) {
-        if (arguments.count != 4) {
+        if (arguments.count != 3) {
             SULog(SULogLevelError, @"Error: Invalid number of arguments supplied: %@", arguments);
             [self cleanupAndExitWithStatus:EXIT_FAILURE error:nil];
         }
@@ -114,10 +112,6 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
         
         _application = application;
         _delegate = delegate;
-        
-        BOOL copiedApplication = arguments[3].boolValue;
-        [delegate loadLocalizationStringsFromHost:host copiedApplication:copiedApplication];
-        _copiedApplication = copiedApplication;
         
         _connection.exportedInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SPUInstallerAgentProtocol)];
         _connection.exportedObject = self;
@@ -195,28 +189,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
     
     [_statusInfo invalidate];
     [_connection invalidate];
-    
-    if (_copiedApplication) {
-        // Remove the agent bundle; it is assumed this bundle is in a temporary/cache/support directory
-        NSError *theError = nil;
-        NSString *bundlePath = [[NSBundle mainBundle] bundlePath];
-        
-        if (![[NSFileManager defaultManager] removeItemAtPath:bundlePath error:&theError]) {
-            SULog(SULogLevelError, @"Couldn't remove agent bundle: %@.", theError);
-        } else {
-            // There should be nothing else in the parent temporary directory given to us,
-            // so let us try to remove it. Note rmdir() will fail if there are unexpectably other
-            // items present
-            NSString *parentDirectory = bundlePath.stringByDeletingLastPathComponent;
-            const char *fileSystemRepresentation = parentDirectory.fileSystemRepresentation;
-            if (fileSystemRepresentation != NULL) {
-                if (rmdir(fileSystemRepresentation) != 0) {
-                    SULog(SULogLevelError, @"Failed to remove parent agent bundle directory: %@: %d", parentDirectory, errno);
-                }
-            }
-        }
-    }
-    
+
     exit(status);
 }
 
@@ -448,19 +421,9 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         if (!self->_willTerminate) {
-            // Show app icon in the dock
-            ProcessSerialNumber psn = { 0, kCurrentProcess };
-            TransformProcessType(&psn, kProcessTransformToForegroundApplication);
-            
-            // Note: the application icon needs to be set after showing the icon in the dock
-            self->_application.applicationIconImage = [SUApplicationInfo bestIconForHost:self->_oldHost];
-            
             // Activate ourselves otherwise we will probably be in the background
-            if (@available(macOS 14, *)) {
-                [self->_application activate];
-            } else {
-                [self->_application activateIgnoringOtherApps:YES];
-            }
+            // See comments in -[SPUStandardUserDriver _activateApplication] for why -activate is not used
+            [self->_application activateIgnoringOtherApps:YES];
             
             [self->_delegate installerProgressShouldDisplayWithHost:self->_oldHost];
         }

@@ -53,7 +53,6 @@
 		14958C6F19AEBC980061B14F /* test-pubkey.pem in Resources */ = {isa = PBXBuildFile; fileRef = 14958C6C19AEBC610061B14F /* test-pubkey.pem */; };
 		1EAA4C8B2132C7BF00604473 /* ReleaseNotesColorStyle.css in Resources */ = {isa = PBXBuildFile; fileRef = 1EAA4C8A2132C7BF00604473 /* ReleaseNotesColorStyle.css */; };
 		3772FEA913DE0B6B00F79537 /* SUVersionDisplayProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 3772FEA813DE0B6B00F79537 /* SUVersionDisplayProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		55C14BEF136EF21700649790 /* SUStatus.xib in Resources */ = {isa = PBXBuildFile; fileRef = 55C14BD8136EF00C00649790 /* SUStatus.xib */; };
 		55C14F06136EF6DB00649790 /* SULog.h in Headers */ = {isa = PBXBuildFile; fileRef = 55C14F04136EF6DB00649790 /* SULog.h */; };
 		55C14F07136EF6DB00649790 /* SULog.m in Sources */ = {isa = PBXBuildFile; fileRef = 55C14F05136EF6DB00649790 /* SULog.m */; };
 		55E6F33319EC9F6C00005E76 /* SUErrors.h in Headers */ = {isa = PBXBuildFile; fileRef = 55E6F33219EC9F6C00005E76 /* SUErrors.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -434,7 +433,6 @@
 		72EB736129BEB36100FBCEE7 /* DevSignedAppVersion2.zip in Resources */ = {isa = PBXBuildFile; fileRef = 72EB736029BEB36100FBCEE7 /* DevSignedAppVersion2.zip */; };
 		72EB87EA1CB8798800C37F42 /* ShowInstallerProgress.m in Sources */ = {isa = PBXBuildFile; fileRef = 72EB87E91CB8798800C37F42 /* ShowInstallerProgress.m */; };
 		72EB87EB1CB8859100C37F42 /* Updater.app in Copy Tools */ = {isa = PBXBuildFile; fileRef = 721C24451CB753E6005440CB /* Updater.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		72EB87EC1CB8887E00C37F42 /* SUStatus.xib in Resources */ = {isa = PBXBuildFile; fileRef = 55C14BD8136EF00C00649790 /* SUStatus.xib */; };
 		72EE17FB26D1CC8800C58B19 /* SUInstallerLauncher+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 72EE17FA26D1CBC000C58B19 /* SUInstallerLauncher+Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		72EE17FC26D1CC9D00C58B19 /* SPUInstallationType.h in Headers */ = {isa = PBXBuildFile; fileRef = 7214B8851D45AD9A00CB5CED /* SPUInstallationType.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		72EE181926DAE70900C58B19 /* SPUUpdateCheck.h in Headers */ = {isa = PBXBuildFile; fileRef = 72EE181826DAE6E100C58B19 /* SPUUpdateCheck.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -957,7 +955,6 @@
 		4607BEA21948443800EF8DA4 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/Sparkle.strings; sourceTree = "<group>"; };
 		525A278F133D6AE900FD8D70 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		555CF29A196C52330000B31E /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/Sparkle.strings; sourceTree = "<group>"; };
-		55C14BD8136EF00C00649790 /* SUStatus.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SUStatus.xib; sourceTree = "<group>"; };
 		55C14F04136EF6DB00649790 /* SULog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SULog.h; sourceTree = "<group>"; };
 		55C14F05136EF6DB00649790 /* SULog.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SULog.m; sourceTree = "<group>"; };
 		55C14F31136EFC2400649790 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
@@ -1344,6 +1341,8 @@
 		72B767E51C9CFD7200A07552 /* SPUAutomaticUpdateDriver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SPUAutomaticUpdateDriver.m; sourceTree = "<group>"; };
 		72BC6C3C275027BF0083F14B /* SparkleTestCodeSign_apfs.dmg */ = {isa = PBXFileReference; lastKnownFileType = file; path = SparkleTestCodeSign_apfs.dmg; sourceTree = "<group>"; };
 		72BEBFEE1D7287560019146B /* SUSpotlightImporterTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SUSpotlightImporterTest.swift; sourceTree = "<group>"; };
+		72C4E01F30340BE400DAF61C /* SPUInstallerProgressLocalizedStrings.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SPUInstallerProgressLocalizedStrings.h; sourceTree = "<group>"; };
+		72C4E02030340C2B00DAF61C /* generate_progress_tool_localizations.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = generate_progress_tool_localizations.py; sourceTree = "<group>"; };
 		72C56E072EFDFB850005A484 /* SPUExtractSignedFeed.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SPUExtractSignedFeed.h; sourceTree = "<group>"; };
 		72C56E082EFDFB850005A484 /* SPUExtractSignedFeed.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SPUExtractSignedFeed.m; sourceTree = "<group>"; };
 		72C56E0F2EFEF10B0005A484 /* Signing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Signing.swift; sourceTree = "<group>"; };
@@ -1727,7 +1726,6 @@
 			children = (
 				8DC2EF5A0486A6940098B216 /* Sparkle-Info.plist */,
 				61AAE8220A321A7F00D8810D /* Sparkle.strings */,
-				55C14BD8136EF00C00649790 /* SUStatus.xib */,
 				729C51272E58015600D7365A /* SUUpdatePermissionPrompt.xib */,
 				72FE54412E56A14100227A91 /* SUUpdateAlert.xib */,
 			);
@@ -2161,6 +2159,7 @@
 				72D954801CBACC35006F28BD /* InstallerProgressAppController.m */,
 				72D954851CBAD4AE006F28BD /* InstallerProgressDelegate.h */,
 				72D954821CBAD34F006F28BD /* main.m */,
+				72C4E01F30340BE400DAF61C /* SPUInstallerProgressLocalizedStrings.h */,
 				72D954841CBAD418006F28BD /* ShowInstallerProgress.h */,
 				72EB87E91CB8798800C37F42 /* ShowInstallerProgress.m */,
 				722194511D3BF987004C34FF /* SPUInstallerAgentProtocol.h */,
@@ -2492,6 +2491,7 @@
 				72045CE426FEE708004F96E5 /* strip-framework.sh */,
 				720C192827127A3800740C8E /* release-move-tag.sh */,
 				720B4C2325EBFAFD005A0592 /* link-tools.sh */,
+				72C4E02030340C2B00DAF61C /* generate_progress_tool_localizations.py */,
 			);
 			path = Configurations;
 			sourceTree = "<group>";
@@ -3197,7 +3197,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				72EB87EC1CB8887E00C37F42 /* SUStatus.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3250,7 +3249,6 @@
 				61AAE8280A321A7F00D8810D /* Sparkle.strings in Resources */,
 				1EAA4C8B2132C7BF00604473 /* ReleaseNotesColorStyle.css in Resources */,
 				72FE54422E56A14100227A91 /* SUUpdateAlert.xib in Resources */,
-				55C14BEF136EF21700649790 /* SUStatus.xib in Resources */,
 				729C51282E58015600D7365A /* SUUpdatePermissionPrompt.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

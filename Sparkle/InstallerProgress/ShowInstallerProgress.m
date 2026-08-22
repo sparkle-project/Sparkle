@@ -10,108 +10,50 @@
 #import "ShowInstallerProgress.h"
 #import "SUStatusController.h"
 #import "SUHost.h"
-#import "SULocalizations.h"
+
+#if SPARKLE_COPY_LOCALIZATIONS
+#import "SPUInstallerProgressLocalizedStrings.h"
+#endif
 
 @implementation ShowInstallerProgress
 {
     SUStatusController *_statusController;
-    NSString *_updatingString;
-    NSString *_cancelUpdateTitle;
-    NSString *_installingUpdateTitle;
 }
 
-- (void)createStatusControllerWithHost:(SUHost *)host SPU_OBJC_DIRECT
+#if SPARKLE_COPY_LOCALIZATIONS
+// SPUInstallerProgressLocalizedStringsTable is generated at development time (by Configurations/generate_progress_tool_localizations.py)
+static NSDictionary<NSString *, NSString *> *SUBestMatchingInstallerProgressLocalizedStrings(void)
 {
-    _statusController = [[SUStatusController alloc] initWithHost:host windowTitle:_updatingString centerPointValue:nil minimizable:NO closable:NO];
+    NSArray<NSString *> *availableLocalizations = SPUInstallerProgressLocalizedStringsTable.allKeys;
+    NSArray<NSString *> *preferredLocalizations = [NSBundle preferredLocalizationsFromArray:availableLocalizations];
+    NSString *bestLocalization = preferredLocalizations.firstObject ?: @"en";
+    return SPUInstallerProgressLocalizedStringsTable[bestLocalization] ?: SPUInstallerProgressLocalizedStringsTable[@"en"];
 }
-
-- (void)loadLocalizationStringsFromHost:(SUHost *)host copiedApplication:(BOOL)copiedApplication
-{
-    // Try to retrieve localization strings from the old bundle if possible
-    // We won't display these strings until installerProgressShouldDisplayWithHost:
-    // (which will be after the update is trusted)
-    // If we fail to load localizations in any way, we default to English
-    
-#if SPARKLE_COPY_LOCALIZATIONS
-    NSBundle *hostSparkleBundle;
-    {
-        NSURL *hostSparkleURL = [host.bundle.privateFrameworksURL URLByAppendingPathComponent:@"Sparkle.framework" isDirectory:YES];
-        if (hostSparkleURL == nil) {
-            hostSparkleBundle = nil;
-        } else {
-            hostSparkleBundle = [NSBundle bundleWithURL:hostSparkleURL];
-        }
-    }
 #endif
-    
-    NSString *updatingString;
-    {
-        NSString *hostNameFromBundle = host.name;
-        NSString *hostName = (hostNameFromBundle != nil) ? hostNameFromBundle : @"";
-        
-#if SPARKLE_COPY_LOCALIZATIONS
-        {
-            NSString *updatingFormatStringFromBundle = (hostSparkleBundle != nil) ? SULocalizedStringFromTableInBundle(@"Updating %@", @"Sparkle", hostSparkleBundle, nil) : nil;
-            
-            if (updatingFormatStringFromBundle != nil) {
-                // Replacing the %@ will be a bit safer than using +[NSString stringWithFormat:]
-                updatingString = [updatingFormatStringFromBundle stringByReplacingOccurrencesOfString:@"%@" withString:hostName];
-            } else {
-                updatingString = [@"Updating " stringByAppendingString:hostName];
-            }
-        }
-#else
-        {
-            updatingString = [@"Updating " stringByAppendingString:hostName];
-        }
-#endif
-    }
-    
-    _updatingString = updatingString;
-    
-    NSString *cancelUpdateTitle;
-#if SPARKLE_COPY_LOCALIZATIONS
-    {
-        NSString *cancelUpdateTitleFromBundle = (hostSparkleBundle != nil) ?  SULocalizedStringFromTableInBundle(@"Cancel Update", @"Sparkle", hostSparkleBundle, @"") : nil;
-        cancelUpdateTitle = (cancelUpdateTitleFromBundle != nil) ? cancelUpdateTitleFromBundle : @"Cancel Update";
-    }
-#else
-    {
-        cancelUpdateTitle = @"Cancel Update";
-    }
-#endif
-    _cancelUpdateTitle = cancelUpdateTitle;
-    
-    NSString *installingUpdateTitle;
-#if SPARKLE_COPY_LOCALIZATIONS
-    {
-        NSString *installingUpdateTitleFromBundle = (hostSparkleBundle != nil) ?  SULocalizedStringFromTableInBundle(@"Installing update…", @"Sparkle", hostSparkleBundle, @"") : nil;
-        installingUpdateTitle = (installingUpdateTitleFromBundle != nil) ? installingUpdateTitleFromBundle : @"Installing update…";
-    }
-#else
-    {
-        installingUpdateTitle = @"Installing update…";
-    }
-#endif
-    
-    _installingUpdateTitle = installingUpdateTitle;
-    
-    // Initialize status controller immediately if app isn't copied, before the app may be swapped/removed
-    // This gaurantees we will be able to load the nib
-    if (!copiedApplication) {
-        [self createStatusControllerWithHost:host];
-    }
-}
 
 - (void)installerProgressShouldDisplayWithHost:(SUHost *)host
 {
-    if (_statusController == nil) {
-        [self createStatusControllerWithHost:host];
-    }
+#if SPARKLE_COPY_LOCALIZATIONS
+    NSDictionary<NSString *, NSString *> *localizedStrings = SUBestMatchingInstallerProgressLocalizedStrings();
+#else
+    NSDictionary<NSString *, NSString *> *localizedStrings = @{};
+#endif
+
+    NSString *hostNameFromBundle = host.name;
+    NSString *hostName = (hostNameFromBundle != nil) ? hostNameFromBundle : @"";
+
+    NSString *updatingFormatString = localizedStrings[@"Updating %@"] ?: @"Updating %@";
+    NSString *updatingString = [updatingFormatString stringByReplacingOccurrencesOfString:@"%@" withString:hostName];
+
+    NSString *cancelUpdateTitle = localizedStrings[@"Cancel Update"] ?: @"Cancel Update";
+
+    NSString *installingUpdateTitle = localizedStrings[@"Installing update…"] ?: @"Installing update…";
     
-    [_statusController setButtonTitle:_cancelUpdateTitle target:nil action:nil isDefault:NO accessibilityIdentifier:@"SUStatusCancel"];
+    _statusController = [[SUStatusController alloc] initWithHost:host windowTitle:updatingString centerPointValue:nil minimizable:NO closable:NO];
     
-    [_statusController beginActionWithTitle:_installingUpdateTitle maxProgressValue:0 statusText:@""];
+    [_statusController setButtonTitle:cancelUpdateTitle target:nil action:nil isDefault:NO accessibilityIdentifier:@"SUStatusCancel"];
+    
+    [_statusController beginActionWithTitle:installingUpdateTitle maxProgressValue:0 statusText:@""];
     
     [_statusController showWindow:self];
 }
