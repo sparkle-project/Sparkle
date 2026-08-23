@@ -14,7 +14,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 SPU_OBJC_DIRECT_MEMBERS @interface SUUnarchiver : NSObject
 
-+ (nullable id <SUUnarchiverProtocol>)unarchiverForPath:(NSString *)path extractionDirectory:(NSString *)extractionDirectory updatingHostBundlePath:(nullable NSString *)hostPath decryptionPassword:(nullable NSString *)decryptionPassword expectingInstallationType:(NSString *)installationType;
++ (nullable id <SUUnarchiverProtocol>)unarchiverForPath:(NSString *)path extractionDirectory:(NSString *)extractionDirectory extractionMountDirectory:(nullable NSString *)extractionMountDirectory updatingHostBundlePath:(nullable NSString *)hostPath decryptionPassword:(nullable NSString *)decryptionPassword expectingInstallationType:(NSString *)installationType;
+
+// Returns YES if unarchiving path can take advantage of an extraction mount directory being provided to -unarchiverForPath:extractionDirectory:extractionMountDirectory:updatingHostBundlePath:decryptionPassword:expectingInstallationType:
+// Callers should provide an extraction mount directory when this returns YES
++ (BOOL)canUseExtractionMountDirectory:(NSString *)path;
 
 @end
 

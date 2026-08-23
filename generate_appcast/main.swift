@@ -259,6 +259,10 @@ struct GenerateAppcast: ParsableCommand {
         // terminate the process, when extracting archives
         signal(SIGPIPE, SIG_IGN)
         
+        // This satisfies unarchiving disk images in interactive sessions without diskutil (macOS 27.2+)
+        // making it require the user to enter a response for images that have license agreements
+        setenv("PAGER", "true", 1)
+        
         // Extract the keys
         let privateDSAKey : SecKey?
     #if GENERATE_APPCAST_BUILD_LEGACY_DSA_SUPPORT
