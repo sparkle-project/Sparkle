@@ -7,12 +7,15 @@ import Foundation
 
 func unarchive(itemPath: URL, archiveDestDir: URL, callback: @escaping (Error?) -> Void) {
     let fileManager = FileManager.default
-    let tempDir = archiveDestDir.appendingPathExtension("tmp")
+    let tempExtractionDir = archiveDestDir.appendingPathExtension("tmp")
 
-    _ = try? fileManager.removeItem(at: tempDir)
-    _ = try? fileManager.createDirectory(at: tempDir, withIntermediateDirectories: true, attributes: [:])
+    _ = try? fileManager.removeItem(at: tempExtractionDir)
+    _ = try? fileManager.createDirectory(at: tempExtractionDir, withIntermediateDirectories: true, attributes: [:])
+    
+    // The disk image unarchiver will create and remove this directory automatically
+    let extractionMountDirectory: String? = SUUnarchiver.requiresExtractionMountDirectory(itemPath.path) ? URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true).appendingPathComponent(ProcessInfo.processInfo.globallyUniqueString).path : nil
 
-    if let unarchiver = SUUnarchiver.unarchiver(forPath: itemPath.path, extractionDirectory: tempDir.path, updatingHostBundlePath: nil, decryptionPassword: nil, expectingInstallationType: SPUInstallationTypeApplication) {
+    if let unarchiver = SUUnarchiver.unarchiver(forPath: itemPath.path, extractionDirectory: tempExtractionDir.path, extractionMountDirectory: extractionMountDirectory, updatingHostBundlePath: nil, decryptionPassword: nil, expectingInstallationType: SPUInstallationTypeApplication) {
         unarchiver.unarchive(completionBlock: { (error: Error?) in
             if error != nil {
                 callback(error)
@@ -20,7 +23,7 @@ func unarchive(itemPath: URL, archiveDestDir: URL, callback: @escaping (Error?) 
             }
 
             do {
-                try fileManager.moveItem(at: tempDir, to: archiveDestDir)
+                try fileManager.moveItem(at: tempExtractionDir, to: archiveDestDir)
                 callback(nil)
             } catch {
                 callback(error)
