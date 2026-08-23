@@ -1377,7 +1377,7 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
         NSTask *dittoTask = [[NSTask alloc] init];
         dittoTask.executableURL = [NSURL fileURLWithPath:@"/usr/bin/ditto" isDirectory:NO];
         
-        dittoTask.arguments = @[@"--hfsCompression", destinationFile, destinationFile2];
+        dittoTask.arguments = @[@"--hfsCompression", @"--noclone", destinationFile, destinationFile2];
         
         NSError *launchError = nil;
         BOOL launched = [dittoTask launchAndReturnError:&launchError];
