@@ -18,28 +18,13 @@
 
 @implementation SUUnarchiver
 
-+ (BOOL)requiresExtractionMountDirectory:(NSString *)path
-{
-    if (![SUDiskImageUnarchiver canUnarchivePath:path]) {
-        return NO;
-    }
-
-    // By providing a directory for mounting, this lets the disk image unarchiver use diskutil over hdiutil
-    // diskutil extraction works well across all dmgs only on macOS 27+
-    if (@available(macOS 27, *)) {
-        return YES;
-    } else {
-        return NO;
-    }
-}
-
-+ (nullable id <SUUnarchiverProtocol>)unarchiverForPath:(NSString *)path extractionDirectory:(NSString *)extractionDirectory extractionMountDirectory:(nullable NSString *)extractionMountDirectory updatingHostBundlePath:(nullable NSString *)hostPath decryptionPassword:(nullable NSString *)decryptionPassword expectingInstallationType:(NSString *)installationType
++ (nullable id <SUUnarchiverProtocol>)unarchiverForPath:(NSString *)path extractionDirectory:(NSString *)extractionDirectory updatingHostBundlePath:(nullable NSString *)hostPath decryptionPassword:(nullable NSString *)decryptionPassword expectingInstallationType:(NSString *)installationType
 {
     if ([SUPipedUnarchiver canUnarchivePath:path]) {
         return [[SUPipedUnarchiver alloc] initWithArchivePath:path extractionDirectory:extractionDirectory];
     }
     else if ([SUDiskImageUnarchiver canUnarchivePath:path]) {
-        return [[SUDiskImageUnarchiver alloc] initWithArchivePath:path extractionDirectory:extractionDirectory extractionMountDirectory:extractionMountDirectory decryptionPassword:decryptionPassword];
+        return [[SUDiskImageUnarchiver alloc] initWithArchivePath:path extractionDirectory:extractionDirectory decryptionPassword:decryptionPassword];
     }
     else if ([SUBinaryDeltaUnarchiver canUnarchivePath:path]) {
         assert(hostPath != nil);

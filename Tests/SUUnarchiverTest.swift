@@ -45,11 +45,8 @@ class SUUnarchiverTest: XCTestCase
 
     func unarchiveNonExistentFileTestFailureAppWithExtension(_ archiveExtension: String, tempDirectoryURL: URL, password: String?, expectingInstallationType installationType: String, testExpectation: XCTestExpectation) {
         let tempArchiveURL = tempDirectoryURL.deletingLastPathComponent().appendingPathComponent("error-invalid").appendingPathExtension(archiveExtension)
-
-        // The disk image unarchiver will create and remove this directory automatically
-        let extractionMountDirectory: String? = SUUnarchiver.requiresExtractionMountDirectory(tempArchiveURL.path) ? URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true).appendingPathComponent(ProcessInfo.processInfo.globallyUniqueString).path : nil
-
-        let unarchiver = SUUnarchiver.unarchiver(forPath: tempArchiveURL.path, extractionDirectory: tempDirectoryURL.path, extractionMountDirectory: extractionMountDirectory, updatingHostBundlePath: nil, decryptionPassword: password, expectingInstallationType: installationType)!
+        
+        let unarchiver = SUUnarchiver.unarchiver(forPath: tempArchiveURL.path, extractionDirectory: tempDirectoryURL.path, updatingHostBundlePath: nil, decryptionPassword: password, expectingInstallationType: installationType)!
 
         unarchiver.unarchive(completionBlock: {(error: Error?) -> Void in
             XCTAssertNotNil(error)
@@ -59,11 +56,8 @@ class SUUnarchiverTest: XCTestCase
 
     // swiftlint:disable function_parameter_count
     func unarchiveTestAppWithExtension(_ archiveExtension: String, appName: String, tempDirectoryURL: URL, archiveResourceURL: URL, password: String?, expectingInstallationType installationType: String, expectingSuccess: Bool, testExpectation: XCTestExpectation) {
-
-        // The disk image unarchiver will create and remove this directory automatically
-        let extractionMountDirectory: String? = SUUnarchiver.requiresExtractionMountDirectory(archiveResourceURL.path) ? URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true).appendingPathComponent(ProcessInfo.processInfo.globallyUniqueString).path : nil
-
-        let unarchiver = SUUnarchiver.unarchiver(forPath: archiveResourceURL.path, extractionDirectory: tempDirectoryURL.path, extractionMountDirectory: extractionMountDirectory, updatingHostBundlePath: nil, decryptionPassword: password, expectingInstallationType: installationType)!
+        
+        let unarchiver = SUUnarchiver.unarchiver(forPath: archiveResourceURL.path, extractionDirectory: tempDirectoryURL.path, updatingHostBundlePath: nil, decryptionPassword: password, expectingInstallationType: installationType)!
 
         unarchiver.unarchive(completionBlock: {(error: Error?) -> Void in
             if expectingSuccess {

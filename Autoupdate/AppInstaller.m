@@ -247,15 +247,8 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     [_communicator handleMessageWithIdentifier:SPUExtractionStarted data:[NSData data]];
     
     NSString *archivePath = [_updateDirectoryPath stringByAppendingPathComponent:_downloadName];
-
-    NSString *extractionMountDirectory;
-    if ([SUUnarchiver requiresExtractionMountDirectory:archivePath]) {
-        extractionMountDirectory = [SPULocalCacheDirectory createUniqueDirectoryInDirectory:_updateDirectoryPath];
-    } else {
-        extractionMountDirectory = nil;
-    }
-
-    id<SUUnarchiverProtocol> unarchiver = [SUUnarchiver unarchiverForPath:archivePath extractionDirectory:_extractionDirectory extractionMountDirectory:extractionMountDirectory updatingHostBundlePath:_host.bundlePath decryptionPassword:_decryptionPassword expectingInstallationType:_installationType];
+    
+    id<SUUnarchiverProtocol> unarchiver = [SUUnarchiver unarchiverForPath:archivePath extractionDirectory:_extractionDirectory updatingHostBundlePath:_host.bundlePath decryptionPassword:_decryptionPassword expectingInstallationType:_installationType];
     
     NSError *prevalidationError = nil;
     BOOL success = NO;
