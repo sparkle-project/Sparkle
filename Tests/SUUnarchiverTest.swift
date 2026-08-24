@@ -178,6 +178,16 @@ class SUUnarchiverTest: XCTestCase
         self.unarchiveTestAppWithExtension("dmg", resourceName: "SparkleTestCodeSign_pkg", expectingInstallationType: SPUInstallationTypeGuidedPackage)
     }
     
+    func testUnarchivingLicensedDMGWithNoText()
+    {
+        self.unarchiveTestAppWithExtension("license.no-text.dmg")
+    }
+    
+    func testUnarchivingLicensedDMGWithMultipleLanaguesAndLotsOfFormattedText()
+    {
+        self.unarchiveTestAppWithExtension("license.large-formatted-multi-lang-text.dmg")
+    }
+    
 #if SPARKLE_BUILD_PACKAGE_SUPPORT
     func testUnarchivingBarePackage()
     {
