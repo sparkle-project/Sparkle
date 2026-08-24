@@ -22,10 +22,8 @@
     NSString *_archivePath;
     NSString *_decryptionPassword;
     NSString *_extractionDirectory;
-    NSString *_extractionMountDirectory;
     
     SUUnarchiverNotifier *_notifier;
-
     double _currentExtractionProgress;
     double _fileProgressIncrement;
 }
@@ -40,14 +38,13 @@
     return NO;
 }
 
-- (instancetype)initWithArchivePath:(NSString *)archivePath extractionDirectory:(NSString *)extractionDirectory extractionMountDirectory:(nullable NSString *)extractionMountDirectory decryptionPassword:(nullable NSString *)decryptionPassword
+- (instancetype)initWithArchivePath:(NSString *)archivePath extractionDirectory:(NSString *)extractionDirectory decryptionPassword:(nullable NSString *)decryptionPassword
 {
     self = [super init];
     if (self != nil) {
         _archivePath = [archivePath copy];
         _decryptionPassword = [decryptionPassword copy];
         _extractionDirectory = [extractionDirectory copy];
-        _extractionMountDirectory = [extractionMountDirectory copy];
     }
     return self;
 }
@@ -89,30 +86,18 @@ static NSUInteger fileCountForDirectory(NSFileManager *fileManager, NSString *it
 {
 	@autoreleasepool {
         BOOL mountedSuccessfully = NO;
-
-        // Only use modern diskutil extraction over hdiutil if extraction mount directory has been specified
-        BOOL useModernDiskUtilImplementation = (_extractionMountDirectory != nil);
         
         // get a unique mount point path
-        NSString *mountPoint;
+        NSString *mountPoint = nil;
+        NSFileManager *manager;
         NSError *error = nil;
-        if (useModernDiskUtilImplementation) {
-            mountPoint = _extractionMountDirectory;
-        } else {
-            do {
-                NSString *uuidString = [[NSUUID UUID] UUIDString];
-                mountPoint = [@"/Volumes" stringByAppendingPathComponent:uuidString];
-            }
-            // Note: this check does not follow symbolic links, which is what we want
-            while ([[NSURL fileURLWithPath:mountPoint] checkResourceIsReachableAndReturnError:NULL]);
+        NSArray *contents = nil;
+        do {
+            NSString *uuidString = [[NSUUID UUID] UUIDString];
+            mountPoint = [@"/Volumes" stringByAppendingPathComponent:uuidString];
         }
-        
-        if (mountPoint == nil) {
-            error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUUnarchivingError userInfo:@{ NSLocalizedDescriptionKey:@"Extraction failed because mountPoint failed to be created"}];
-            
-            [notifier notifyFailureWithError:error];
-            return;
-        }
+        // Note: this check does not follow symbolic links, which is what we want
+        while ([[NSURL fileURLWithPath:mountPoint] checkResourceIsReachableAndReturnError:NULL]);
         
         NSMutableData *inputData = [NSMutableData data];
         
@@ -125,31 +110,20 @@ static NSUInteger fileCountForDirectory(NSFileManager *fileManager, NSString *it
                 [inputData appendData:decryptionPasswordData];
             }
             
-            if (useModernDiskUtilImplementation) {
-                // Unlike hdiutil, diskutil's --stdinpassphrase expects the passphrase to be
-                // newline-terminated rather than null-terminated
-                [inputData appendBytes:"\n" length:1];
-            } else {
-                // From the hdiutil docs:
-                // read a null-terminated passphrase from standard input
-                //
-                // Add the null terminator
-                [inputData appendBytes:"\0" length:1];
-            }
-
+            // From the hdiutil docs:
+            // read a null-terminated passphrase from standard input
+            //
+            // Add the null terminator
+            [inputData appendBytes:"\0" length:1];
+            
             // Append prompt data for license agreements
             [inputData appendBytes:"yes\n" length:4];
         }
         
-        // Always pass -stdinpass / --stdinpassphrase so we gracefully handle password protected disk images even if we aren't expecting them
-        NSArray<NSString *> *arguments;
-        if (useModernDiskUtilImplementation) {
-            arguments = @[@"image", @"attach", _archivePath, @"--mountPoint", mountPoint, @"--nobrowse", @"--stdinpassphrase"];
-        } else {
-            // Finder doesn't verify disk images anymore beyond the code signing signature (if available)
-            // Opt out of the old CRC checksum checks
-            arguments = @[@"attach", _archivePath, @"-mountpoint", mountPoint, @"-noverify", @"-nobrowse", @"-noautoopen", @"-stdinpass"];
-        }
+        // Finder doesn't verify disk images anymore beyond the code signing signature (if available)
+        // Opt out of the old CRC checksum checks
+        // Also always pass -stdinpass so we gracefully handle password protected disk images even if we aren't expecting them
+        NSArray *arguments = @[@"attach", _archivePath, @"-mountpoint", mountPoint, @"-noverify", @"-nobrowse", @"-noautoopen", @"-stdinpass"];
         
         NSData *output = nil;
         NSInteger taskResult = -1;
@@ -159,20 +133,12 @@ static NSUInteger fileCountForDirectory(NSFileManager *fileManager, NSString *it
         NSMutableArray<NSString *> *itemsToExtract = [NSMutableArray array];
         NSUInteger totalFileExtractionCount = 0;
         
-        NSFileManager *manager = nil;
-        NSArray *contents = nil;
-        
         BOOL success = YES;
         
         {
             NSTask *task = [[NSTask alloc] init];
-            if (useModernDiskUtilImplementation) {
-                task.executableURL = [NSURL fileURLWithPath:@"/usr/sbin/diskutil" isDirectory:NO];
-            } else {
-                task.executableURL = [NSURL fileURLWithPath:@"/usr/bin/hdiutil" isDirectory:NO];
-                task.currentDirectoryPath = @"/";
-            }
-            
+            task.launchPath = @"/usr/bin/hdiutil";
+            task.currentDirectoryPath = @"/";
             task.arguments = arguments;
             
             NSPipe *inputPipe = [NSPipe pipe];
@@ -213,9 +179,9 @@ static NSUInteger fileCountForDirectory(NSFileManager *fileManager, NSString *it
         
         if (taskResult != 0) {
             NSString *resultStr = output ? [[NSString alloc] initWithData:output encoding:NSUTF8StringEncoding] : nil;
-            SULog(SULogLevelError, @"%@ failed with code: %ld data: <<%@>>", (useModernDiskUtilImplementation ? @"diskutil" : @"hdiutil"), (long)taskResult, resultStr);
+            SULog(SULogLevelError, @"hdiutil failed with code: %ld data: <<%@>>", (long)taskResult, resultStr);
             
-            error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUUnarchivingError userInfo:@{NSLocalizedDescriptionKey:[NSString stringWithFormat:@"Extraction failed due to %@ returning %ld status: %@", useModernDiskUtilImplementation ? @"diskutil" : @"hdiutil", (long)taskResult, resultStr]}];
+            error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUUnarchivingError userInfo:@{NSLocalizedDescriptionKey:[NSString stringWithFormat:@"Extraction failed due to hdiutil returning %ld status: %@", (long)taskResult, resultStr]}];
             
             goto reportError;
         }
@@ -318,20 +284,14 @@ static NSUInteger fileCountForDirectory(NSFileManager *fileManager, NSString *it
     finally:
         if (mountedSuccessfully) {
             NSTask *task = [[NSTask alloc] init];
-            
-            if (useModernDiskUtilImplementation) {
-                task.launchPath = @"/usr/sbin/diskutil";
-                task.arguments = @[@"eject", mountPoint];
-            } else {
-                task.launchPath = @"/usr/bin/hdiutil";
-                task.arguments = @[@"detach", mountPoint, @"-force"];
-            }
+            task.launchPath = @"/usr/bin/hdiutil";
+            task.arguments = @[@"detach", mountPoint, @"-force"];
             task.standardOutput = [NSPipe pipe];
             task.standardError = [NSPipe pipe];
             
             NSError *launchCleanupError = nil;
             if (![task launchAndReturnError:&launchCleanupError]) {
-                SULog(SULogLevelError, @"%@ failed to unmount %@", (useModernDiskUtilImplementation ? @"diskutil" : @"hdiutil"), mountPoint);
+                SULog(SULogLevelError, @"Failed to unmount %@", mountPoint);
                 SULog(SULogLevelError, @"Error: %@", launchCleanupError);
             } else if (waitForCleanup) {
                 [task waitUntilExit];
