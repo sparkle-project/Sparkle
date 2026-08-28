@@ -16,6 +16,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #import <sys/stat.h>
+#include <sys/time.h>
 #include <unistd.h>
 
 
@@ -174,7 +175,7 @@ BOOL applyBinaryDelta(NSString *source, NSString *finalDestination, NSString *pa
     if (error != NULL) {
         *error = nil;
     }
-    
+
     [archive enumerateItems:^(SPUDeltaArchiveItem *item, BOOL *stop) {
         NSString *relativePath = item.relativeFilePath;
         
@@ -490,6 +491,31 @@ BOOL applyBinaryDelta(NSString *source, NSString *finalDestination, NSString *pa
         } else {
             // Remove original copy
             [fileManager removeItemAtURL:[NSURL fileURLWithPath:destination isDirectory:YES] error:NULL];
+        }
+    }
+    
+    // According to https://developer.apple.com/library/mac/documentation/Carbon/Conceptual/MDImporters/Concepts/Troubleshooting.html
+    // we should make sure mdimporter bundles have an up to date modification time in case they were delta updated.
+    // We used to invoke mdimport on the bundle but this is not a very good approach.
+    // Updating the timestamp on the mdimporter bundles is what developers have to do anyway when shipping their new update outside of Sparkle.
+    NSString *spotlightDirectory = [finalDestination stringByAppendingPathComponent:@"Contents/Library/Spotlight"];
+    for (NSString *spotlightItem in [fileManager contentsOfDirectoryAtPath:spotlightDirectory error:NULL]) {
+        if ([spotlightItem.pathExtension isEqualToString:@"mdimporter"]) {
+            const char *mdimporterPath = [spotlightDirectory stringByAppendingPathComponent:spotlightItem].fileSystemRepresentation;
+
+            // Using O_SYMLINK so we touch the item itself rather than what it may point to
+            int mdimporterFileDescriptor = open(mdimporterPath, O_RDONLY | O_SYMLINK);
+            if (mdimporterFileDescriptor == -1) {
+                fprintf(stderr, "\nWarning: failed to open file descriptor to touch %s: %s", mdimporterPath, strerror(errno));
+                continue;
+            }
+
+            // Using futimes() because utimes() follows symbolic links
+            if (futimes(mdimporterFileDescriptor, NULL) != 0) {
+                fprintf(stderr, "\nWarning: failed to touch %s: %s", mdimporterPath, strerror(errno));
+            }
+
+            close(mdimporterFileDescriptor);
         }
     }
     

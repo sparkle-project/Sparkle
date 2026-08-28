@@ -2345,4 +2345,32 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
     XCTAssertTrue(success);
 }
 
+- (void)testSpotlightImporterModificationDate
+{
+    NSString *importerRelativePath = @"Contents/Library/Spotlight/Foo.mdimporter";
+
+    __block NSDate *modificationDateBeforePatch = nil;
+
+    BOOL success = [self createAndApplyPatchWithBeforeDiffHandler:^(NSFileManager *fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
+        NSString *sourceImporterPath = [sourceDirectory stringByAppendingPathComponent:importerRelativePath];
+        NSString *destinationImporterPath = [destinationDirectory stringByAppendingPathComponent:importerRelativePath];
+
+        XCTAssertTrue([fileManager createDirectoryAtPath:sourceImporterPath withIntermediateDirectories:YES attributes:nil error:nil]);
+        XCTAssertTrue([fileManager createDirectoryAtPath:destinationImporterPath withIntermediateDirectories:YES attributes:nil error:nil]);
+
+        modificationDateBeforePatch = [fileManager attributesOfItemAtPath:sourceImporterPath error:nil][NSFileModificationDate];
+        XCTAssertNotNil(modificationDateBeforePatch);
+
+        sleep(1); // wait for clock to advance
+    } afterDiffHandler:nil afterPatchHandler:^(NSFileManager *fileManager, NSString * __unused sourceDirectory, NSString *destinationDirectory) {
+        NSString *patchedImporterPath = [destinationDirectory stringByAppendingPathComponent:importerRelativePath];
+
+        NSDate *modificationDateAfterPatch = [fileManager attributesOfItemAtPath:patchedImporterPath error:nil][NSFileModificationDate];
+        XCTAssertNotNil(modificationDateAfterPatch);
+
+        XCTAssertGreaterThan([modificationDateAfterPatch timeIntervalSinceDate:modificationDateBeforePatch], 0);
+    }];
+    XCTAssertTrue(success);
+}
+
 @end
