@@ -76,7 +76,6 @@ extern BOOL copyTree(NSFileManager *fileManager, NSString *source, NSString *des
 extern BOOL modifyPermissions(NSString *path, mode_t desiredPermissions);
 extern NSString *pathRelativeToDirectory(NSString *directory, NSString *path);
 NSString *temporaryFilename(NSString *base);
-NSString *temporaryDirectory(NSString *base);
 NSString *stringWithFileSystemRepresentation(const char*);
 uint16_t latestMinorVersionForMajorVersion(SUBinaryDeltaMajorVersion majorVersion);
 #endif

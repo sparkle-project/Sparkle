@@ -143,22 +143,6 @@ NSString *temporaryFilename(NSString *base)
     return stringWithFileSystemRepresentation(buffer);
 }
 
-NSString *temporaryDirectory(NSString *base)
-{
-    NSString *template = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.XXXXXXXXXX", base]];
-    NSMutableData *data = [NSMutableData data];
-    [data appendBytes:template.fileSystemRepresentation length:strlen(template.fileSystemRepresentation) + 1];
-
-    char *buffer = (char *)data.mutableBytes;
-    char *templateResult = mkdtemp(buffer);
-    if (templateResult == NULL) {
-        perror("mkdtemp");
-        return nil;
-    }
-
-    return stringWithFileSystemRepresentation(templateResult);
-}
-
 static void sha1HashOfBuffer(unsigned char *hash, const char *buffer, ssize_t bufferLength)
 {
     assert(bufferLength >= 0 && bufferLength <= UINT32_MAX);

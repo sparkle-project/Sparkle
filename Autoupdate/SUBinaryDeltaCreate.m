@@ -81,6 +81,8 @@ extern int bsdiff(int argc, const char **argv);
     int result = bsdiff(4, argv);
     if (result == 0) {
         _resultPath = temporaryFile;
+    } else {
+        unlink(temporaryFile.fileSystemRepresentation);
     }
 }
 
