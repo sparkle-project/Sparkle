@@ -450,10 +450,16 @@ BOOL applyBinaryDelta(NSString *source, NSString *finalDestination, NSString *pa
             fprintf(stderr, "\nApplying file system compression...");
         }
         
-        NSTask *dittoTask = [[NSTask alloc] init];
+        NSMutableArray<NSString *> *dittoArguments = [@[@"--hfsCompression"] mutableCopy];
+        if (@available(macOS 27, *)) {
+            // Compression won't be applied on macOS 27 without passing --noclone
+            [dittoArguments addObject:@"--noclone"];
+        }
+        [dittoArguments addObjectsFromArray:@[destination, finalDestination]];
         
+        NSTask *dittoTask = [[NSTask alloc] init];
         dittoTask.executableURL = [NSURL fileURLWithPath:@"/usr/bin/ditto" isDirectory:NO];
-        dittoTask.arguments = @[@"--hfsCompression", destination, finalDestination];
+        dittoTask.arguments = [dittoArguments copy];
         
         // If we fail to apply file system compression, we will try falling back to not doing this
         BOOL failedToApplyFileSystemCompression = NO;
