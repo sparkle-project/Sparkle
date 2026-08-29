@@ -13,12 +13,12 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class SUHost, SUAppcastItem;
+@class SUHost, SUAppcastItem, SPUInstallationInfo;
 @protocol SPUUpdaterDelegate;
 
 @protocol SPUCoreBasedUpdateDriverDelegate <NSObject>
 
-- (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)updateItem secondaryAppcastItem:(SUAppcastItem * _Nullable)secondaryAppcastItem;
+- (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)updateItem secondaryAppcastItem:(SUAppcastItem * _Nullable)secondaryAppcastItem resuming:(BOOL)resuming;
 
 - (void)installerDidFinishPreparationAndWillInstallImmediately:(BOOL)willInstallImmediately;
 
@@ -27,8 +27,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)basicDriverIsRequestingAbortUpdateWithError:(nullable NSError *)error;
 
 @optional
-
-- (void)basicDriverDidFinishLoadingAppcast;
 
 - (void)downloadDriverWillBeginDownload;
 
@@ -56,9 +54,9 @@ SPU_OBJC_DIRECT_MEMBERS @interface SPUCoreBasedUpdateDriver : NSObject
 
 - (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background requiresSilentInstall:(BOOL)silentInstall;
 
-- (void)resumeInstallingUpdate;
+- (void)resumeInstallingUpdateOrCheckForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background requiresSilentInstall:(BOOL)silentInstall;
 
-- (void)resumeUpdate:(id<SPUResumableUpdate>)resumableUpdate;
+- (void)resumeUpdate:(id<SPUResumableUpdate>)resumableUpdate orCheckForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background requiresSilentInstall:(BOOL)silentInstall;
 
 - (void)downloadUpdateFromAppcastItem:(SUAppcastItem *)updateItem secondaryAppcastItem:(SUAppcastItem * _Nullable)secondaryUpdateItem inBackground:(BOOL)background;
 

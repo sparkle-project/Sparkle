@@ -57,14 +57,14 @@
     [_uiDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders inBackground:YES];
 }
 
-- (void)resumeInstallingUpdate
+- (void)resumeInstallingUpdateOrCheckForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders
 {
-    [_uiDriver resumeInstallingUpdate];
+    [_uiDriver resumeInstallingUpdateOrCheckForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders inBackground:YES];
 }
 
-- (void)resumeUpdate:(id<SPUResumableUpdate>)resumableUpdate
+- (void)resumeUpdate:(id<SPUResumableUpdate>)resumableUpdate orCheckForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders
 {
-    [_uiDriver resumeUpdate:resumableUpdate];
+    [_uiDriver resumeUpdate:resumableUpdate orCheckForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders inBackground:YES];
 }
 
 - (void)uiDriverDidShowUpdate

@@ -56,7 +56,7 @@
     [_uiDriver setUpdateWillInstallHandler:updateWillInstallHandler];
 }
 
-- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders
+- (void)_showUserInitiatedProgress
 {
     _showingUserInitiatedProgress = YES;
     
@@ -72,18 +72,27 @@
             }
         });
     }];
-    
+}
+
+- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders
+{
+    [self _showUserInitiatedProgress];
+
     [_uiDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders inBackground:NO];
 }
 
-- (void)resumeInstallingUpdate
+- (void)resumeInstallingUpdateOrCheckForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders
 {
-    [_uiDriver resumeInstallingUpdate];
+    [self _showUserInitiatedProgress];
+
+    [_uiDriver resumeInstallingUpdateOrCheckForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders inBackground:NO];
 }
 
-- (void)resumeUpdate:(id<SPUResumableUpdate>)resumableUpdate
+- (void)resumeUpdate:(id<SPUResumableUpdate>)resumableUpdate orCheckForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders
 {
-    [_uiDriver resumeUpdate:resumableUpdate];
+    [self _showUserInitiatedProgress];
+
+    [_uiDriver resumeUpdate:resumableUpdate orCheckForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders inBackground:NO];
 }
 
 - (void)uiDriverDidShowUpdate
@@ -113,19 +122,6 @@
     [self abortUpdateWithError:error];
 }
 
-- (void)basicDriverDidFinishLoadingAppcast
-{
-    if (_showingUserInitiatedProgress) {
-        _showingUserInitiatedProgress = NO;
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-        if ([_userDriver respondsToSelector:@selector(dismissUserInitiatedUpdateCheck)]) {
-            [_userDriver dismissUserInitiatedUpdateCheck];
-        }
-#pragma clang diagnostic pop
-    }
-}
-
 - (void)abortUpdate
 {
     [self abortUpdateWithError:nil];
@@ -133,15 +129,7 @@
 
 - (void)abortUpdateWithError:(nullable NSError *)error
 {
-    if (_showingUserInitiatedProgress) {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-        if ([_userDriver respondsToSelector:@selector(dismissUserInitiatedUpdateCheck)]) {
-            [_userDriver dismissUserInitiatedUpdateCheck];
-        }
-#pragma clang diagnostic pop
-        _showingUserInitiatedProgress = NO;
-    }
+    _showingUserInitiatedProgress = NO;
     _aborted = YES;
     [_uiDriver abortUpdateWithError:error showErrorToUser:YES];
 }
