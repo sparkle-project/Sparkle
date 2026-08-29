@@ -22,6 +22,22 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
 
 @implementation SUBinaryDeltaTest
 
+static NSString *temporaryDirectory(NSString *base)
+{
+    NSString *template = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.XXXXXXXXXX", base]];
+    NSMutableData *data = [NSMutableData data];
+    [data appendBytes:template.fileSystemRepresentation length:strlen(template.fileSystemRepresentation) + 1];
+
+    char *buffer = (char *)data.mutableBytes;
+    char *templateResult = mkdtemp(buffer);
+    if (templateResult == NULL) {
+        perror("mkdtemp");
+        return nil;
+    }
+
+    return stringWithFileSystemRepresentation(templateResult);
+}
+
 - (void)testTemporaryDirectory
 {
     NSString *tmp1 = temporaryDirectory(@"Sparklęエンジン");

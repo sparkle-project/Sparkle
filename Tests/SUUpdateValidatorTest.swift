@@ -146,13 +146,14 @@ class SUUpdateValidatorTest: XCTestCase {
         let signatures = self.signatures(signatureConfig)
 
         let validator = SUUpdateValidator(downloadPath: self.signedTestFilePath, signatures: signatures, host: host, verifierInformation: nil)
+        
+        let updateDirectory = try! FileManager.default.url(for: .itemReplacementDirectory, in: .userDomainMask, appropriateFor: URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true), create: true)
 
-        let updateDirectory = temporaryDirectory("SUUpdateValidatorTest")!
-        defer { try! FileManager.default.removeItem(atPath: updateDirectory) }
+        defer { try! FileManager.default.removeItem(at: updateDirectory) }
         let newBundle = self.bundle(newBundleConfig)
-        try! FileManager.default.copyItem(at: newBundle.bundleURL, to: URL(fileURLWithPath: updateDirectory).appendingPathComponent(oldBundle.bundleURL.lastPathComponent))
+        try! FileManager.default.copyItem(at: newBundle.bundleURL, to: updateDirectory.appendingPathComponent(oldBundle.bundleURL.lastPathComponent))
 
-        let result = (try? validator.validate(withUpdateDirectory: updateDirectory)) != nil
+        let result = (try? validator.validate(withUpdateDirectory: updateDirectory.path)) != nil
         XCTAssertEqual(result, expectedResult, "oldBundle: \(oldBundleConfig), newBundle: \(newBundleConfig), signatures: \(signatureConfig)", line: line)
     }
 

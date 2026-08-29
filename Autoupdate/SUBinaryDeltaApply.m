@@ -294,7 +294,9 @@ BOOL applyBinaryDelta(NSString *source, NSString *finalDestination, NSString *pa
                 if (error != NULL) {
                     *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Unable to extract diffed file to %@", tempDiffFile], NSUnderlyingErrorKey: (NSError * _Nonnull)archive.error }];
                 }
-                
+
+                unlink(tempDiffFile.fileSystemRepresentation);
+
                 *stop = YES;
                 return;
             }
@@ -307,6 +309,9 @@ BOOL applyBinaryDelta(NSString *source, NSString *finalDestination, NSString *pa
                     if (error != NULL) {
                         *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Relative path for clone '%@' contains '..' path component", clonedRelativePath] }];
                     }
+
+                    unlink(tempDiffFile.fileSystemRepresentation);
+
                     *stop = YES;
                     return;
                 }
