@@ -13,8 +13,6 @@
 
 @implementation SPUDownloadedUpdate
 
-// If we ever enable auto-synthesize in the future, we'll still need this synthesize
-// because the property is declared in a protocol
 @synthesize updateItem = _updateItem;
 @synthesize secondaryUpdateItem = _secondaryUpdateItem;
 
