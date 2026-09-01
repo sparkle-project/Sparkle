@@ -10,6 +10,18 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+// If an app's bundle identifier ends with a package extension recognized by macOS,
+// append ".sparkle" so the cache directory is not treated as an app or service bundle.
+// https://github.com/sparkle-project/Sparkle/discussions/2881
+static inline NSString *SPUCacheIdentifierForBundleIdentifier(NSString *bundleIdentifier)
+{
+    NSString *bundleIdentifierExtension = bundleIdentifier.pathExtension.lowercaseString;
+    if ([bundleIdentifierExtension isEqualToString:@"app"] || [bundleIdentifierExtension isEqualToString:@"service"]) {
+        return [bundleIdentifier stringByAppendingString:@".sparkle"];
+    }
+    return bundleIdentifier;
+}
+
 SPU_OBJC_DIRECT_MEMBERS @interface SPULocalCacheDirectory : NSObject
 
 // Returns a path to a suitable cache directory to create specifically for Sparkle

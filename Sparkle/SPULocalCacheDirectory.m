@@ -18,15 +18,7 @@ static NSTimeInterval OLD_ITEM_DELETION_INTERVAL = 86400 * 10; // 10 days
 
 + (NSString *)_cachePathForCacheDirectory:(NSURL *)cacheURL bundleIdentifier:(NSString *)bundleIdentifier SPU_OBJC_DIRECT
 {
-    // If an app has an ill-formed bundle identifier that ends with ".app" we will append ".sparkle" to it
-    // so that the cache directory doesn't look like an app bundle directory, which can cause other systematic issues
-    // https://github.com/sparkle-project/Sparkle/discussions/2881
-    NSString *appCacheIdentifier;
-    if ([bundleIdentifier hasSuffix:@".app"] || [bundleIdentifier hasSuffix:@".APP"]) {
-        appCacheIdentifier = [bundleIdentifier stringByAppendingString:@".sparkle"];
-    } else {
-        appCacheIdentifier = bundleIdentifier;
-    }
+    NSString *appCacheIdentifier = SPUCacheIdentifierForBundleIdentifier(bundleIdentifier);
     
     NSString *resultPath = [[[cacheURL URLByAppendingPathComponent:appCacheIdentifier isDirectory:YES] URLByAppendingPathComponent:@SPARKLE_BUNDLE_IDENTIFIER isDirectory:YES] path];
     assert(resultPath != nil);
