@@ -18,14 +18,24 @@ static NSTimeInterval OLD_ITEM_DELETION_INTERVAL = 86400 * 10; // 10 days
 
 + (NSString *)_cachePathForCacheDirectory:(NSURL *)cacheURL bundleIdentifier:(NSString *)bundleIdentifier SPU_OBJC_DIRECT
 {
-    // If an app has an ill-formed bundle identifier that ends with ".app" we will append ".sparkle" to it
-    // so that the cache directory doesn't look like an app bundle directory, which can cause other systematic issues
-    // https://github.com/sparkle-project/Sparkle/discussions/2881
-    NSString *appCacheIdentifier;
-    if ([bundleIdentifier hasSuffix:@".app"] || [bundleIdentifier hasSuffix:@".APP"]) {
-        appCacheIdentifier = [bundleIdentifier stringByAppendingString:@".sparkle"];
-    } else {
-        appCacheIdentifier = bundleIdentifier;
+    NSString *appCacheIdentifier = bundleIdentifier;
+    {
+        // If an app has an ill-formed bundle identifier that ends with ".app" or ".service"
+        // or anything similarly problematic, we will append ".sparkle" to it
+        // so that the cache directory doesn't look like a protected bundle directory,
+        // which can cause other systematic issues
+        // https://github.com/sparkle-project/Sparkle/discussions/2881
+        NSArray<NSString *> *problematicBundleIdentifierExtensions = @[@".app", @".service", @".xpc", @".appex", @".bundle", @".plugin", @".saver", @".kext"];
+        
+        // Transforming the bundle identifier into a lowercased variant for suffix comparison
+        // rather than case-insensitive comparing the pathExtension (which may return "" for ".app")
+        NSString *lowercasedBundleIdentifier = bundleIdentifier.lowercaseString;
+        for (NSString *badExtension in problematicBundleIdentifierExtensions) {
+            if ([lowercasedBundleIdentifier hasSuffix:badExtension]) {
+                appCacheIdentifier = [bundleIdentifier stringByAppendingString:@".sparkle"];
+                break;
+            }
+        }
     }
     
     NSString *resultPath = [[[cacheURL URLByAppendingPathComponent:appCacheIdentifier isDirectory:YES] URLByAppendingPathComponent:@SPARKLE_BUNDLE_IDENTIFIER isDirectory:YES] path];
