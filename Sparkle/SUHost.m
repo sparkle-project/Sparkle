@@ -38,6 +38,28 @@ static void *SUHostObservableContext = &SUHostObservableContext;
 
 @synthesize bundle = _bundle;
 
++ (NSString *)mainBundleUserDefaultsKey:(NSString *)key forHost:(SUHost * _Nonnull __autoreleasing * _Nonnull)outHost
+{
+    SUHost *host = *outHost;
+    SUHost *storageHost;
+    
+    NSString *userDefaultsKey;
+    if (host->_isMainBundle) {
+        storageHost = host;
+        userDefaultsKey = key;
+    } else {
+        NSBundle *mainBundle = NSBundle.mainBundle;
+        storageHost = [[SUHost alloc] initWithBundle:mainBundle];
+        
+        NSString *hostBundleIdentifier = host.bundle.bundleIdentifier;
+        userDefaultsKey = (hostBundleIdentifier != nil) ? [NSString stringWithFormat:@"%@_%@", key, hostBundleIdentifier] : key;
+    }
+    
+    *outHost = storageHost;
+    
+    return userDefaultsKey;
+}
+
 - (instancetype)initWithBundle:(NSBundle *)aBundle
 {
 	if ((self = [super init]))

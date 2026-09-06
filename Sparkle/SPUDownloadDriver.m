@@ -114,7 +114,7 @@
     return self;
 }
 
-- (instancetype)initWithRequestURL:(NSURL *)requestURL host:(SUHost *)host userAgent:(NSString * _Nullable)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background delegate:(id<SPUDownloadDriverDelegate>)delegate
+- (instancetype)initWithRequestURL:(NSURL *)requestURL host:(SUHost *)host userAgent:(NSString * _Nullable)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background cachePolicy:(NSURLRequestCachePolicy)cachePolicy delegate:(id<SPUDownloadDriverDelegate>)delegate
 {
     self = [self initWithHost:host];
     if (self != nil) {
@@ -122,11 +122,7 @@
         _inBackground = background;
         
         NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:requestURL];
-        // Note the cachePolicy has no effect on persistent downloads on disk (i.e downloading update archives)
-        // It impacts temporary in-memory downloads such as appcast feeds and release notes.
-        // For now we don't use caching, but with more testing/experimenting that could change
-        // (e.g. not downloading same feed unmodified from previous request).
-        request.cachePolicy = NSURLRequestReloadIgnoringLocalCacheData;
+        request.cachePolicy = cachePolicy;
         
         if (userAgent != nil) {
             [request setValue:(NSString * _Nonnull)userAgent forHTTPHeaderField:@"User-Agent"];
@@ -151,7 +147,7 @@
     NSURL *updateFileURL = updateItem.fileURL;
     assert(updateFileURL != nil);
     
-    self = [self initWithRequestURL:updateFileURL host:host userAgent:userAgent httpHeaders:httpHeaders inBackground:background delegate:delegate];
+    self = [self initWithRequestURL:updateFileURL host:host userAgent:userAgent httpHeaders:httpHeaders inBackground:background cachePolicy:NSURLRequestReloadIgnoringLocalCacheData delegate:delegate];
     if (self != nil) {
         _updateItem = updateItem;
         _secondaryUpdateItem = secondaryUpdateItem;

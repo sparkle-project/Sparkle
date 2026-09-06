@@ -52,7 +52,7 @@
         _host = host;
         _signatures = signatures;
         _contentLength = contentLength;
-        _downloadDriver = [[SPUDownloadDriver alloc] initWithRequestURL:releaseNotesURL host:host userAgent:userAgent httpHeaders:httpHeaders inBackground:NO delegate:self];
+        _downloadDriver = [[SPUDownloadDriver alloc] initWithRequestURL:releaseNotesURL host:host userAgent:userAgent httpHeaders:httpHeaders inBackground:NO cachePolicy:NSURLRequestReloadIgnoringLocalCacheData delegate:self];
         _completionHandler = [completionHandler copy];
     } else {
         assert(false);

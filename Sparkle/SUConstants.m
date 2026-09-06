@@ -35,6 +35,7 @@ NSString *const SUPublicDSAKeyFileKey = @"SUPublicDSAKeyFile";
 NSString *const SUPublicEDKeyKey = @"SUPublicEDKey";
 NSString *const SURequireSignedFeedKey = @"SURequireSignedFeed";
 NSString *const SUVerifyUpdateBeforeExtractionKey = @"SUVerifyUpdateBeforeExtraction";
+NSString *const SUDisableFeedCacheValidationKey = @"SUDisableFeedCacheValidation";
 NSString *const SUAutomaticallyUpdateKey = @"SUAutomaticallyUpdate";
 NSString *const SUAllowsAutomaticUpdatesKey = @"SUAllowsAutomaticUpdates";
 NSString *const SUEnableSystemProfilingKey = @"SUEnableSystemProfiling";
