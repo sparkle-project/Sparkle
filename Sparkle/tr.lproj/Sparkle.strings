@@ -43,7 +43,7 @@
 /* No comment provided by engineer. */
 "Cancel" = "Vazgeç";
 
-/* No comment provided by engineer. */
+/* Run generate_progress_tool_localizations.py after updating. */
 "Cancel Update" = "Güncellemeden Vazgeç";
 
 /* No comment provided by engineer. */
@@ -58,7 +58,7 @@
 /* No comment provided by engineer. */
 "Install and Relaunch" = "Yükle ve Yeniden Başlat";
 
-/* Take care not to overflow the status window. */
+/* Run generate_progress_tool_localizations.py after updating. */
 "Installing update…" = "Güncelleme kuruluyor…";
 
 /* No comment provided by engineer. */
@@ -73,7 +73,7 @@
 /* No comment provided by engineer. */
 "Update Error!" = "Güncelleme Hatası!";
 
-/* No comment provided by engineer. */
+/* Run generate_progress_tool_localizations.py after updating. */
 "Updating %@" = "%@ güncelleniyor";
 
 /* No comment provided by engineer. */

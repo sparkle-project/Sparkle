@@ -43,7 +43,7 @@
 /* No comment provided by engineer. */
 "Cancel" = "Annuller";
 
-/* No comment provided by engineer. */
+/* Run generate_progress_tool_localizations.py after updating. */
 "Cancel Update" = "Annuller opdatering";
 
 /* No comment provided by engineer. */
@@ -58,7 +58,7 @@
 /* No comment provided by engineer. */
 "Install and Relaunch" = "Installer og genstart";
 
-/* Take care not to overflow the status window. */
+/* Run generate_progress_tool_localizations.py after updating. */
 "Installing update…" = "Installerer opdatering…";
 
 /* Alternate title for 'Install Update' button when there's no download in RSS feed. */
@@ -76,7 +76,7 @@
 /* No comment provided by engineer. */
 "Update Error!" = "Der opstod en fejl!";
 
-/* No comment provided by engineer. */
+/* Run generate_progress_tool_localizations.py after updating. */
 "Updating %@" = "Opdaterer %@";
 
 /* No comment provided by engineer. */

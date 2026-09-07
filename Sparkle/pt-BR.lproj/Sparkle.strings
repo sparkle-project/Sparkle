@@ -76,7 +76,7 @@
 /* No comment provided by engineer. */
 "Cancel" = "Cancelar";
 
-/* No comment provided by engineer. */
+/* Run generate_progress_tool_localizations.py after updating. */
 "Cancel Update" = "Cancelar Atualização";
 
 /* No comment provided by engineer. */
@@ -97,7 +97,7 @@
 /* Alternate title for 'Remind Me Later' button when downloaded updates can be resumed */
 "Install on Quit" = "Instalar ao Encerrar";
 
-/* Take care not to overflow the status window. */
+/* Run generate_progress_tool_localizations.py after updating. */
 "Installing update…" = "Instalando atualização…";
 
 /* Alternate title for 'Install Update' button when there's no download in RSS feed. */
@@ -127,7 +127,7 @@
 /* No comment provided by engineer. */
 "Update Installed" = "Atualização Instalada";
 
-/* No comment provided by engineer. */
+/* Run generate_progress_tool_localizations.py after updating. */
 "Updating %@" = "Atualizando o app %@";
 
 /* No comment provided by engineer. */

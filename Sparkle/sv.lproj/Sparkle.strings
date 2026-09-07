@@ -37,7 +37,7 @@
 /* No comment provided by engineer. */
 "Cancel" = "Avbryt";
 
-/* No comment provided by engineer. */
+/* Run generate_progress_tool_localizations.py after updating. */
 "Cancel Update" = "Avbryt uppdatering";
 
 /* No comment provided by engineer. */
@@ -52,7 +52,7 @@
 /* No comment provided by engineer. */
 "Install and Relaunch" = "Installera och starta om";
 
-/* Take care not to overflow the status window. */
+/* Run generate_progress_tool_localizations.py after updating. */
 "Installing update…" = "Installerar uppdatering…";
 
 /* Alternate title for 'Install Update' button when there's no download in RSS feed. */
@@ -70,7 +70,7 @@
 /* No comment provided by engineer. */
 "Update Error!" = "Uppdateringsfel!";
 
-/* No comment provided by engineer. */
+/* Run generate_progress_tool_localizations.py after updating. */
 "Updating %@" = "Uppdaterar %@";
 
 /* No comment provided by engineer. */

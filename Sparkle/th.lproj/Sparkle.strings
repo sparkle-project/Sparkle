@@ -40,7 +40,7 @@
 /* No comment provided by engineer. */
 "Cancel" = "ยกเลิก";
 
-/* No comment provided by engineer. */
+/* Run generate_progress_tool_localizations.py after updating. */
 "Cancel Update" = "ยกเลิกอัพเดท";
 
 /* No comment provided by engineer. */
@@ -55,7 +55,7 @@
 /* No comment provided by engineer. */
 "Install and Relaunch" = "ติดตั้งและเริ่มแอปพลิเคชันใหม่";
 
-/* Take care not to overflow the status window. */
+/* Run generate_progress_tool_localizations.py after updating. */
 "Installing update…" = "กำลังติดตั้งอัพเดท…";
 
 /* Alternate title for 'Install Update' button when there's no download in RSS feed. */
@@ -73,7 +73,7 @@
 /* No comment provided by engineer. */
 "Update Error!" = "อัพเดทผิดพลาด!";
 
-/* No comment provided by engineer. */
+/* Run generate_progress_tool_localizations.py after updating. */
 "Updating %@" = "กำลังอัพเดท %@";
 
 /* No comment provided by engineer. */

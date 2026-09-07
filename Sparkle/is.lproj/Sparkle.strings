@@ -31,7 +31,7 @@
 /* No comment provided by engineer. */
 "Install and Relaunch" = "Setja upp og ræsa aftur";
 
-/* Take care not to overflow the status window. */
+/* Run generate_progress_tool_localizations.py after updating. */
 "Installing update…" = "Set inn uppfærslu…";
 
 /* No comment provided by engineer. */
@@ -46,7 +46,7 @@
 /* No comment provided by engineer. */
 "Update Error!" = "Villa við uppfærslu!";
 
-/* No comment provided by engineer. */
+/* Run generate_progress_tool_localizations.py after updating. */
 "Updating %@" = "Uppfæri %@";
 
 /* Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates. */

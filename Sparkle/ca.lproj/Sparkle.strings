@@ -37,7 +37,7 @@
 /* Alternate title for 'Remind Me Later' button when downloaded updates can be resumed */
 "Install on Quit" = "Reinicia el programa més tard";
 
-/* Take care not to overflow the status window. */
+/* Run generate_progress_tool_localizations.py after updating. */
 "Installing update…" = "Instal·lant l'actualització…";
 
 /* No comment provided by engineer. */
@@ -52,7 +52,7 @@
 /* No comment provided by engineer. */
 "Update Error!" = "Error d'actualització!";
 
-/* No comment provided by engineer. */
+/* Run generate_progress_tool_localizations.py after updating. */
 "Updating %@" = "Actualitzant %@";
 
 /* No comment provided by engineer. */

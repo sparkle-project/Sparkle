@@ -40,7 +40,7 @@
 /* No comment provided by engineer. */
 "Cancel" = "Zrušiť";
 
-/* No comment provided by engineer. */
+/* Run generate_progress_tool_localizations.py after updating. */
 "Cancel Update" = "Zrušiť aktualizáciu";
 
 /* No comment provided by engineer. */
@@ -55,7 +55,7 @@
 /* No comment provided by engineer. */
 "Install and Relaunch" = "Inštalovať a znovu spustiť";
 
-/* Take care not to overflow the status window. */
+/* Run generate_progress_tool_localizations.py after updating. */
 "Installing update…" = "Inštaluje sa aktualizácia…";
 
 /* No comment provided by engineer. */
@@ -70,7 +70,7 @@
 /* No comment provided by engineer. */
 "Update Error!" = "Chyba aktualizácie!";
 
-/* No comment provided by engineer. */
+/* Run generate_progress_tool_localizations.py after updating. */
 "Updating %@" = "Aktualizuje sa %@";
 
 /* No comment provided by engineer. */

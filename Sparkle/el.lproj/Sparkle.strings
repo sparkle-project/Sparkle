@@ -40,7 +40,7 @@
 /* No comment provided by engineer. */
 "Cancel" = "Ακύρωση";
 
-/* No comment provided by engineer. */
+/* Run generate_progress_tool_localizations.py after updating. */
 "Cancel Update" = "Ακύρωση Ενημέρωσης";
 
 /* No comment provided by engineer. */
@@ -55,7 +55,7 @@
 /* No comment provided by engineer. */
 "Install and Relaunch" = "Εγκατάσταση και Επανεκκίνηση";
 
-/* Take care not to overflow the status window. */
+/* Run generate_progress_tool_localizations.py after updating. */
 "Installing update…" = "Εγκατάσταση ενημέρωσης…";
 
 /* No comment provided by engineer. */
@@ -70,7 +70,7 @@
 /* No comment provided by engineer. */
 "Update Error!" = "Σφάλμα Ενημέρωσης!";
 
-/* No comment provided by engineer. */
+/* Run generate_progress_tool_localizations.py after updating. */
 "Updating %@" = "Ενημέρωση %@";
 
 /* No comment provided by engineer. */

@@ -79,7 +79,7 @@
 /* No comment provided by engineer. */
 "Cancel" = "취소";
 
-/* No comment provided by engineer. */
+/* Run generate_progress_tool_localizations.py after updating. */
 "Cancel Update" = "업데이트 취소";
 
 /* No comment provided by engineer. */
@@ -100,7 +100,7 @@
 /* Alternate title for 'Remind Me Later' button when downloaded updates can be resumed */
 "Install on Quit" = "종료 시 설치";
 
-/* Take care not to overflow the status window. */
+/* Run generate_progress_tool_localizations.py after updating. */
 "Installing update…" = "설치 중…";
 
 /* Alternate title for 'Install Update' button when there's no download in RSS feed. */
@@ -130,7 +130,7 @@
 /* No comment provided by engineer. */
 "Update Installed" = "업데이트가 설치되었습니다.";
 
-/* No comment provided by engineer. */
+/* Run generate_progress_tool_localizations.py after updating. */
 "Updating %@" = "%@ 업데이트 중";
 
 /* No comment provided by engineer. */

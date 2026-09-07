@@ -43,7 +43,7 @@
 /* No comment provided by engineer. */
 "Cancel" = "Anuluj";
 
-/* No comment provided by engineer. */
+/* Run generate_progress_tool_localizations.py after updating. */
 "Cancel Update" = "Anuluj uaktualnianie";
 
 /* No comment provided by engineer. */
@@ -58,7 +58,7 @@
 /* No comment provided by engineer. */
 "Install and Relaunch" = "Zainstaluj i uruchom ponownie";
 
-/* Take care not to overflow the status window. */
+/* Run generate_progress_tool_localizations.py after updating. */
 "Installing update…" = "Instalowanie uaktualnienia…";
 
 /* No comment provided by engineer. */
@@ -73,7 +73,7 @@
 /* No comment provided by engineer. */
 "Update Error!" = "Błąd uaktualniania!";
 
-/* No comment provided by engineer. */
+/* Run generate_progress_tool_localizations.py after updating. */
 "Updating %@" = "Uaktualniam %@";
 
 /* No comment provided by engineer. */
