@@ -1249,14 +1249,21 @@ static NSString *escapeURLComponent(NSString *str) {
     BOOL sendingSystemProfile = [self sendsSystemProfile];
 
     // Let's only send the system profiling information once per week at most, so we normalize daily-checkers vs. biweekly-checkers and the such.
+    NSDate *currentDate = [NSDate date];
     if (sendingSystemProfile) {
         NSDate *lastSubmitDate = [_host objectForUserDefaultsKey:SULastProfileSubmitDateKey ofClass:NSDate.class];
         if (!lastSubmitDate) {
             lastSubmitDate = [NSDate distantPast];
         }
         const NSTimeInterval oneWeek = 60 * 60 * 24 * 7;
-        NSTimeInterval timeSinceLastSubmission = [lastSubmitDate timeIntervalSinceNow] * -1;
-        if (timeSinceLastSubmission < oneWeek) {
+        
+        NSTimeInterval timeSinceLastSubmission = [currentDate timeIntervalSinceDate:lastSubmitDate];
+        
+        if (timeSinceLastSubmission < 0) {
+            // Ignore dates far out in the future
+            sendingSystemProfile = NO;
+            [_host setObject:currentDate forUserDefaultsKey:SULastProfileSubmitDateKey];
+        } else if (timeSinceLastSubmission < oneWeek) {
             sendingSystemProfile = NO;
         }
     }
@@ -1272,7 +1279,7 @@ static NSString *escapeURLComponent(NSString *str) {
 	if (sendingSystemProfile)
 	{
         parameters = [parameters arrayByAddingObjectsFromArray:[self systemProfileArray]];
-        [_host setObject:[NSDate date] forUserDefaultsKey:SULastProfileSubmitDateKey];
+        [_host setObject:currentDate forUserDefaultsKey:SULastProfileSubmitDateKey];
     }
 	if ([parameters count] == 0) { return baseFeedURL; }
 
