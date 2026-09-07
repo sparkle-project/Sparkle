@@ -14,49 +14,49 @@
 "%@ of %@" = "%1$@ de %2$@";
 
 /* Description text for SUUpdateAlert when the update has already been downloaded and ready to install. */
-"%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "O %1$@ %2$@ foi transferido e está pronto a instalar! Gostaria de o fazer agora e reiniciar o %1$@ posteriormente?";
+"%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "O %1$@ %2$@ foi transferido e está pronto a instalar! Gostaria de o fazer agora e reiniciar o %1$@?";
 
 /* No comment provided by engineer. */
-"%1$@ can’t be updated because it was opened from a read-only or a temporary location." = "O %1$@ não pode ser actualizado quando estiver a ser executado a partir de um volume apenas de leitura como uma imagem de disco ou disco óptico.";
+"%1$@ can’t be updated because it was opened from a read-only or a temporary location." = "O %1$@ não pode ser atualizado porque foi aberto a partir de uma localização só de leitura ou temporária.";
 
 /* No comment provided by engineer. */
-"A new version of %@ is available!" = "Uma nova versão do %@ está dísponível!";
+"A new version of %@ is available!" = "Uma nova versão do %@ está disponível!";
 
 /* No comment provided by engineer. */
 "A new version of %@ is ready to install!" = "Uma nova versão do %@ está pronta a instalar!";
 
 /* No comment provided by engineer. */
-"An error occurred in retrieving update information. Please try again later." = "Ocorreu um erro ao recolher informação sobre as actualizações disponíveis. Por favor tente novamente mais tarde.";
+"An error occurred in retrieving update information. Please try again later." = "Ocorreu um erro ao recolher informação sobre as atualizações disponíveis. Por favor tente novamente mais tarde.";
 
 /* No comment provided by engineer. */
-"An error occurred while downloading the update. Please try again later." = "Ocorreu um erro ao transferir a actualização. Por favor novamente tente mais tarde.";
+"An error occurred while downloading the update. Please try again later." = "Ocorreu um erro ao transferir a atualização. Por favor tente novamente mais tarde.";
 
 /* No comment provided by engineer. */
-"An error occurred while extracting the archive. Please try again later." = "Ocorreu um erro ao extrair o arquivo. Por favor novamente tente mais tarde.";
+"An error occurred while extracting the archive. Please try again later." = "Ocorreu um erro ao extrair o arquivo. Por favor tente novamente mais tarde.";
 
 /* No comment provided by engineer. */
-"An error occurred while parsing the update feed." = "Ocorrer um erro ao processar o feed de actualização.";
+"An error occurred while parsing the update feed." = "Ocorreu um erro ao processar o feed de atualização.";
 
 /* No comment provided by engineer. */
 "Cancel" = "Cancelar";
 
 /* No comment provided by engineer. */
-"Cancel Update" = "Cancelar actualização";
+"Cancel Update" = "Cancelar atualização";
 
 /* No comment provided by engineer. */
-"Checking for updates…" = "A procurar actualizações…";
+"Checking for updates…" = "A procurar atualizações…";
 
 /* Take care not to overflow the status window. */
-"Downloading update…" = "A transferir actualização…";
+"Downloading update…" = "A transferir atualização…";
 
 /* Take care not to overflow the status window. */
-"Extracting update…" = "A extrair actualização…";
+"Extracting update…" = "A extrair atualização…";
 
 /* No comment provided by engineer. */
 "Install and Relaunch" = "Instalar e reiniciar";
 
 /* Take care not to overflow the status window. */
-"Installing update…" = "A instalar actualização…";
+"Installing update…" = "A instalar atualização…";
 
 /* No comment provided by engineer. */
 "OK" = "OK";
@@ -65,22 +65,22 @@
 "Ready to Install" = "Pronto para instalar";
 
 /* No comment provided by engineer. */
-"Should %1$@ automatically check for updates? You can always check for updates manually from the %1$@ menu." = "Deverá o %1$@ procurar por actualizações automaticamente? Pode sempre procurar actualizações manualmente a partir do menu do %1$@.";
+"Should %1$@ automatically check for updates? You can always check for updates manually from the %1$@ menu." = "Deverá o %1$@ procurar atualizações automaticamente? Pode sempre procurar atualizações manualmente a partir do menu do %1$@.";
 
 /* No comment provided by engineer. */
-"Update Error!" = "Erro na actualização!";
+"Update Error!" = "Erro na atualização!";
 
 /* No comment provided by engineer. */
-"Updating %@" = "A actualizar o %@";
+"Updating %@" = "A atualizar o %@";
 
 /* No comment provided by engineer. */
 "Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "Use o Finder para copiar o %1$@ para a sua pasta Aplicações, reinicie-o aí e tente novamente.";
 
 /* Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates. */
-"You’re up to date!" = "Está actualizado!";
+"You’re up to date!" = "Está atualizado!";
 
 /* Software Update title/label */
-"Software Update" = "Actualização de Software";
+"Software Update" = "Atualização de Software";
 
 /* Remind Me Later choice for update alert */
 "Remind Me Later" = "Lembrar mais tarde";
@@ -89,10 +89,10 @@
 "Skip This Version" = "Saltar esta versão";
 
 /* Install Update choice for update alert */
-"Install Update" = "Instalar actualização";
+"Install Update" = "Instalar atualização";
 
 /* Automatically download and install updates in the future option for update alert */
-"Automatically download and install updates in the future" = "No futuro, transferir e instalar actualizações automaticamente";
+"Automatically download and install updates in the future" = "No futuro, transferir e instalar atualizações automaticamente";
 
 /* Check for updates automatically response for update permission dialog */
 "Check Automatically" = "Procurar automaticamente";
@@ -101,13 +101,13 @@
 "Don’t Check" = "Não procurar";
 
 /* Title question for update permission dialog */
-"Check for updates automatically?" = "Procurar actualizações automaticamente?";
+"Check for updates automatically?" = "Procurar atualizações automaticamente?";
 
 /* Include anonymous system profile choice for update permission dialog */
 "Include anonymous system profile" = "Incluir perfil de sistema anónimo";
 
 /* Automatically download and install updates choice for update permission dialog */
-"Automatically download and install updates" = "Transferir e instalar actualizações automaticamente";
+"Automatically download and install updates" = "Transferir e instalar atualizações automaticamente";
 
 /* Anonymous system profile information disclosure for update permission dialog */
-"Anonymous system profile information is used to help us plan future development work. Please contact us if you have any questions about this.\n\nThis is the information that would be sent:" = "A informação anónima do perfil de sistema é usada para no futuro nos ajudar a planear o trabalho de desenvolvimento. Por favor contacte-nos se tiver alguma questão acerca deste assunto.\n\nEsta é a informação que seria enviada:";
+"Anonymous system profile information is used to help us plan future development work. Please contact us if you have any questions about this.\n\nThis is the information that would be sent:" = "A informação anónima do perfil de sistema é usada para nos ajudar a planear o trabalho de desenvolvimento futuro. Por favor contacte-nos se tiver alguma questão acerca deste assunto.\n\nEsta é a informação que seria enviada:";
