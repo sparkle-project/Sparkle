@@ -85,7 +85,7 @@
 /* No comment provided by engineer. */
 "Cancel" = "キャンセル";
 
-/* No comment provided by engineer. */
+/* Run generate_progress_tool_localizations.py after updating. */
 "Cancel Update" = "アップデートを中止";
 
 /* No comment provided by engineer. */
@@ -118,7 +118,7 @@
 /* Alternate title for 'Remind Me Later' button when downloaded updates can be resumed */
 "Install on Quit" = "終了時にインストール";
 
-/* Take care not to overflow the status window. */
+/* Run generate_progress_tool_localizations.py after updating. */
 "Installing update…" = "アップデートをインストールしています…";
 
 /* Alternate title for 'Install Update' button when there's no download in RSS feed. */
@@ -169,7 +169,7 @@
 /* No comment provided by engineer. */
 "Update Installed" = "アップデートがインストールされました";
 
-/* No comment provided by engineer. */
+/* Run generate_progress_tool_localizations.py after updating. */
 "Updating %@" = "%@をアップデート中";
 
 /* No comment provided by engineer. */

@@ -37,7 +37,7 @@
 /* No comment provided by engineer. */
 "Cancel" = "Mégsem";
 
-/* No comment provided by engineer. */
+/* Run generate_progress_tool_localizations.py after updating. */
 "Cancel Update" = "Frissítés megszakítása";
 
 /* No comment provided by engineer. */
@@ -55,7 +55,7 @@
 /* No comment provided by engineer. */
 "Update Error!" = "Frissítési hiba!";
 
-/* No comment provided by engineer. */
+/* Run generate_progress_tool_localizations.py after updating. */
 "Updating %@" = "%@ frissítése";
 
 /* No comment provided by engineer. */

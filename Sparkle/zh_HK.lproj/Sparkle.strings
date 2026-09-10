@@ -79,7 +79,7 @@
 /* No comment provided by engineer. */
 "Cancel" = "取消";
 
-/* No comment provided by engineer. */
+/* Run generate_progress_tool_localizations.py after updating. */
 "Cancel Update" = "取消更新";
 
 /* No comment provided by engineer. */
@@ -100,7 +100,7 @@
 /* Alternate title for 'Remind Me Later' button when downloaded updates can be resumed */
 "Install on Quit" = "結束時安裝";
 
-/* Take care not to overflow the status window. */
+/* Run generate_progress_tool_localizations.py after updating. */
 "Installing update…" = "安裝緊更新⋯";
 
 /* Alternate title for 'Install Update' button when there's no download in RSS feed. */
@@ -130,7 +130,7 @@
 /* No comment provided by engineer. */
 "Update Installed" = "已安裝更新";
 
-/* No comment provided by engineer. */
+/* Run generate_progress_tool_localizations.py after updating. */
 "Updating %@" = "更新緊 %@";
 
 /* No comment provided by engineer. */

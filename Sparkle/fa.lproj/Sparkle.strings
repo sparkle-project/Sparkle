@@ -52,7 +52,7 @@
 /* No comment provided by engineer. */
 "Cancel" = "لغو";
 
-/* No comment provided by engineer. */
+/* Run generate_progress_tool_localizations.py after updating. */
 "Cancel Update" = "لغو به‌روزرسانی";
 
 /* No comment provided by engineer. */
@@ -67,7 +67,7 @@
 /* No comment provided by engineer. */
 "Install and Relaunch" = "نصب و بازکردن دوباره";
 
-/* Take care not to overflow the status window. */
+/* Run generate_progress_tool_localizations.py after updating. */
 "Installing update…" = "در حال نصب به‌روزرسانی";
 
 /* Alternate title for 'Install Update' button when there's no download in RSS feed. */
@@ -88,7 +88,7 @@
 /* No comment provided by engineer. */
 "Update Error!" = "خطای به‌روزرسانی!";
 
-/* No comment provided by engineer. */
+/* Run generate_progress_tool_localizations.py after updating. */
 "Updating %@" = "%@ در حال به‌روزرسانی";
 
 /* No comment provided by engineer. */

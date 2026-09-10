@@ -40,7 +40,7 @@
 /* No comment provided by engineer. */
 "Cancel" = "Prekliči";
 
-/* No comment provided by engineer. */
+/* Run generate_progress_tool_localizations.py after updating. */
 "Cancel Update" = "Prekliči posodabljanje";
 
 /* No comment provided by engineer. */
@@ -55,7 +55,7 @@
 /* No comment provided by engineer. */
 "Install and Relaunch" = "Namesti in ponovno zaženi";
 
-/* Take care not to overflow the status window. */
+/* Run generate_progress_tool_localizations.py after updating. */
 "Installing update…" = "Nameščanje posodobitve …";
 
 /* No comment provided by engineer. */
@@ -70,7 +70,7 @@
 /* No comment provided by engineer. */
 "Update Error!" = "Napaka pri posodabljanju";
 
-/* No comment provided by engineer. */
+/* Run generate_progress_tool_localizations.py after updating. */
 "Updating %@" = "Posodabljam %@";
 
 /* No comment provided by engineer. */

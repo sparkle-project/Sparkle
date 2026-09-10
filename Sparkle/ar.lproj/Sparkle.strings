@@ -31,7 +31,7 @@
 /* No comment provided by engineer. */
 "Cancel" = "إلغاء";
 
-/* No comment provided by engineer. */
+/* Run generate_progress_tool_localizations.py after updating. */
 "Cancel Update" = "إلغاء التحديث";
 
 /* No comment provided by engineer. */
@@ -49,7 +49,7 @@
 /* No comment provided by engineer. */
 "Update Error!" = "حدث خطأ أثناء التحديث";
 
-/* No comment provided by engineer. */
+/* Run generate_progress_tool_localizations.py after updating. */
 "Updating %@" = "تحديث %@";
 
 /* No comment provided by engineer. */

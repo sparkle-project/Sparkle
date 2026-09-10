@@ -88,7 +88,7 @@
 /* No comment provided by engineer. */
 "Cancel" = "Hủy";
 
-/* No comment provided by engineer. */
+/* Run generate_progress_tool_localizations.py after updating. */
 "Cancel Update" = "Hủy cập nhật";
 
 /* No comment provided by engineer. */
@@ -121,7 +121,7 @@
 /* Alternate title for 'Remind Me Later' button when downloaded updates can be resumed */
 "Install on Quit" = "Cài đặt khi thoát";
 
-/* Take care not to overflow the status window. */
+/* Run generate_progress_tool_localizations.py after updating. */
 "Installing update…" = "Đang cài đặt bản cập nhật…";
 
 /* Alternate title for 'Install Update' button when there's no download in RSS feed. */
@@ -175,7 +175,7 @@
 /* No comment provided by engineer. */
 "Update Installed" = "Đã cài đặt cập nhật";
 
-/* No comment provided by engineer. */
+/* Run generate_progress_tool_localizations.py after updating. */
 "Updating %@" = "Đang cập nhật %@";
 
 /* No comment provided by engineer. */

@@ -40,7 +40,7 @@
 /* No comment provided by engineer. */
 "Cancel" = "Отменить";
 
-/* No comment provided by engineer. */
+/* Run generate_progress_tool_localizations.py after updating. */
 "Cancel Update" = "Отменить обновление";
 
 /* No comment provided by engineer. */
@@ -55,7 +55,7 @@
 /* No comment provided by engineer. */
 "Install and Relaunch" = "Установить и перезапустить";
 
-/* Take care not to overflow the status window. */
+/* Run generate_progress_tool_localizations.py after updating. */
 "Installing update…" = "Устанавливаю обновление…";
 
 /* Alternate title for 'Install Update' button when there's no download in RSS feed. */
@@ -73,7 +73,7 @@
 /* No comment provided by engineer. */
 "Update Error!" = "Ошибка при обновлении!";
 
-/* No comment provided by engineer. */
+/* Run generate_progress_tool_localizations.py after updating. */
 "Updating %@" = "Обновляю %@";
 
 /* No comment provided by engineer. */
