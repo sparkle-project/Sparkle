@@ -22,6 +22,10 @@ SUHostDefinitionAttribute
 
 @property (nonatomic, readonly) NSBundle *bundle;
 
+// Returns the user defaults key and host used for storing a user default that is keyed based on the
+// main bundle updating the host (which may differ if an external updater is updating another bundle)
++ (NSString *)mainBundleUserDefaultsKey:(NSString *)key forHost:(SUHost * _Nonnull __autoreleasing * _Nonnull)outHost;
+
 - (instancetype)initWithBundle:(NSBundle *)aBundle;
 
 - (instancetype)init NS_UNAVAILABLE;
