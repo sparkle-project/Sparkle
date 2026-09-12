@@ -7,6 +7,7 @@
 * Optimize and move updating mdimporter bundles to BinaryDelta applying code (#2905) (Zorg)
 * Fix temporary file leaks when applying binary delta file fails (#2906) (Zorg)
 * Fix updating not working the first time if bundle ID ends with ".service" or other irregular bundle-like extensions (#2909) (Zorg, youngjunning)
+* Update European Portuguese localization (#2912) (Andrei)
 
 macOS 12.0 or later is now required (due to Xcode 27 dropping support for deploying to older OS versions). CocoaPods support is also now dropped.
 
