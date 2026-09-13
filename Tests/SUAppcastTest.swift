@@ -1037,12 +1037,14 @@ class SUAppcastTest: XCTestCase {
             
             // Test https
             XCTAssertEqual("https://sparkle-project.org/notes/relnote-3.0.txt", items[0].releaseNotesURL?.absoluteString)
+            XCTAssertEqual(1234, items[0].releaseNotesContentLength)
             XCTAssertEqual("https://sparkle-project.org/fullnotes.txt", items[0].fullReleaseNotesURL?.absoluteString)
             XCTAssertEqual("https://sparkle-project.org", items[0].infoURL?.absoluteString)
             XCTAssertEqual("https://sparkle-project.org/release-3.0.zip", items[0].fileURL?.absoluteString)
             
             // Test http
             XCTAssertEqual("http://sparkle-project.org/notes/relnote-2.0.txt", items[1].releaseNotesURL?.absoluteString)
+            XCTAssertEqual(0, items[1].releaseNotesContentLength)
             XCTAssertEqual("http://sparkle-project.org/fullnotes.txt", items[1].fullReleaseNotesURL?.absoluteString)
             XCTAssertEqual("http://sparkle-project.org", items[1].infoURL?.absoluteString)
             XCTAssertEqual("http://sparkle-project.org/release-2.0.zip", items[1].fileURL?.absoluteString)
