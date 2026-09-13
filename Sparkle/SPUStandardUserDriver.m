@@ -41,6 +41,9 @@
 @end
 #endif
 
+// Delay before we need to show the checking for updates progress window when user initiates an update check
+static const NSTimeInterval SUShowCheckingForUpdatesTimeDelay = 0.3;
+
 @interface SPUStandardUserDriver () <SPUGentleUserDriverReminders>
 
 // Note: we expose a private interface for activeUpdateAlert property in SPUStandardUserDriver+Private.h as NSWindowController
@@ -63,6 +66,7 @@
     id<NSObject> _applicationBecameActiveAfterUpdateAlertBecameKeyObserver;
     NSValue *_updateAlertWindowFrameValue;
     SUStatusController *_checkingController;
+    dispatch_block_t _showCheckingControllerWindowDelayBlock;
     
     SUUpdateAlert *_activeUpdateAlert;
     SPUUpdaterSettings *_updaterSettings;
@@ -476,6 +480,7 @@
         [_statusController showWindow:nil];
         mayNeedToActivateApp = YES;
     } else if (_checkingController != nil) {
+        [self cancelShowCheckingControllerWindowDelayBlock];
         [_checkingController showWindow:nil];
         mayNeedToActivateApp = YES;
     } else if (_retryTerminatingApplication != nil) {
@@ -555,13 +560,34 @@
         [self _activateApplication];
     }
     
-    [_checkingController showWindow:self];
+    // Don't show checking for updates window immediately
+    // Only show it if the check is taking a noticable amount of time.
+    // This reduces the chance of a very sudden/quick transition between
+    // checking for updates and showing the next UI.
+    __weak __typeof__(self) weakSelf = self;
+    _showCheckingControllerWindowDelayBlock = dispatch_block_create_with_qos_class((dispatch_block_flags_t)0, QOS_CLASS_USER_INITIATED, 0, ^{
+        __typeof__(self) strongSelf = weakSelf;
+        if (strongSelf != nil) {
+            [strongSelf->_checkingController showWindow:strongSelf];
+        }
+    });
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(SUShowCheckingForUpdatesTimeDelay * NSEC_PER_SEC)), dispatch_get_main_queue(), _showCheckingControllerWindowDelayBlock);
+}
+
+- (void)cancelShowCheckingControllerWindowDelayBlock SPU_OBJC_DIRECT
+{
+    if (_showCheckingControllerWindowDelayBlock != nil) {
+        dispatch_cancel(_showCheckingControllerWindowDelayBlock);
+        _showCheckingControllerWindowDelayBlock = nil;
+    }
 }
 
 - (void)closeCheckingWindow SPU_OBJC_DIRECT
 {
     if (_checkingController != nil)
     {
+        [self cancelShowCheckingControllerWindowDelayBlock];
+
         [_checkingController close];
         _checkingController = nil;
         _cancellation = nil;

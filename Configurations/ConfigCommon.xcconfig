@@ -169,7 +169,7 @@ GCC_WARN_UNUSED_PARAMETER = YES
 GCC_WARN_UNUSED_VARIABLE = YES
 
 // Turn on all warnings, then disable a few which are almost impossible to avoid
-WARNING_CFLAGS = -Wall -Weverything -Wno-unused-macros -Wno-gnu-statement-expression -Wno-auto-import -Wno-gnu-zero-variadic-macro-arguments -Wno-format-non-iso -Wno-direct-ivar-access -Wno-declaration-after-statement -Wno-gnu-conditional-omitted-operand -Wno-switch-default -Wno-missing-include-dirs -Werror=undef
+WARNING_CFLAGS = -Wall -Weverything -Wno-unused-macros -Wno-gnu-statement-expression -Wno-auto-import -Wno-gnu-zero-variadic-macro-arguments -Wno-format-non-iso -Wno-pre-c11-compat -Wno-direct-ivar-access -Wno-declaration-after-statement -Wno-gnu-conditional-omitted-operand -Wno-switch-default -Wno-missing-include-dirs -Werror=undef
 
 // Prevents spurious warnings based on dependency scan considering Sparkle itself a dependency
 DIAGNOSE_MISSING_TARGET_DEPENDENCIES = NO
