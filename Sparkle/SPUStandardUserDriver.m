@@ -35,12 +35,6 @@
 
 #import <AppKit/AppKit.h>
 
-#if __MAC_OS_X_VERSION_MAX_ALLOWED < 140000
-@interface NSApplication (ActivationAPIs)
-- (void)activate;
-@end
-#endif
-
 // Delay before we need to show the checking for updates progress window when user initiates an update check
 static const NSTimeInterval SUShowCheckingForUpdatesTimeDelay = 0.3;
 

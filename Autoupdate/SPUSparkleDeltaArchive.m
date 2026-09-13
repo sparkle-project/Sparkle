@@ -52,11 +52,6 @@ typedef struct
 
 @synthesize error = _error;
 
-+ (BOOL)maySupportSafeExtraction
-{
-    return YES;
-}
-
 - (instancetype)initWithPatchFileForWriting:(NSString *)patchFile
 {
     self = [super init];
