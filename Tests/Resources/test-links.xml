@@ -5,7 +5,7 @@
     <item>
         <title>Version 3.0</title>
         <pubDate>Sat, 26 Jul 2014 15:20:12 +0000</pubDate>
-        <sparkle:releaseNotesLink>https://sparkle-project.org/notes/relnote-3.0.txt</sparkle:releaseNotesLink>
+        <sparkle:releaseNotesLink sparkle:length="1234">https://sparkle-project.org/notes/relnote-3.0.txt</sparkle:releaseNotesLink>
         <sparkle:fullReleaseNotesLink>https://sparkle-project.org/fullnotes.txt</sparkle:fullReleaseNotesLink>
         <link>https://sparkle-project.org</link>
         <enclosure url="https://sparkle-project.org/release-3.0.zip" sparkle:version="3.0" length="1346234" />
