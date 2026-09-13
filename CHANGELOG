@@ -1,13 +1,15 @@
 # 2.10.0
 
 * Bump minimum deployment target to macOS 12.0 (#2883, #2892) (Zorg, F1248)
-* Remove CocoaPods support (#2899) (Zorg)
 * Don't copy updater progress tool app outside of its bundle (#2900) (Zorg)
-* Fix re-applying file system compression for delta updates on macOS 27 (#2904) (Zorg)
-* Optimize and move updating mdimporter bundles to BinaryDelta applying code (#2905) (Zorg)
-* Fix temporary file leaks when applying binary delta file fails (#2906) (Zorg)
 * Fix updating not working the first time if bundle ID ends with ".service" or other irregular bundle-like extensions (#2909) (Zorg, youngjunning)
+* Fix using appcast length fallback if server reports no content size (resulting in indeterminate progress) (#2922) (Zorg)
+* Fix reading release notes content length from appcast for signed feed diagnostics (#2921) (Leo Camus)
 * Update European Portuguese localization (#2912) (Andrei)
+* Fix temporary file leaks when applying binary delta file fails (#2906) (Zorg)
+* Optimize and move updating mdimporter bundles to BinaryDelta applying code (#2905) (Zorg)
+* Fix re-applying file system compression for delta updates on macOS 27 (#2904) (Zorg)
+* Remove CocoaPods support (#2899) (Zorg)
 
 macOS 12.0 or later is now required (due to Xcode 27 dropping support for deploying to older OS versions). CocoaPods support is also now dropped.
 
