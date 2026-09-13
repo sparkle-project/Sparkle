@@ -17,17 +17,9 @@
 
 #include "AppKitPrevention.h"
 
-#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 120000
-    #define HAS_XAR_GET_SAFE_PATH 1
-#else
-    #define HAS_XAR_GET_SAFE_PATH 0
-#endif
-
-#if HAS_XAR_GET_SAFE_PATH
 // This is preferred over xar_get_path (which is deprecated) when it's available
 // Don't use OS availability for this API
 extern char *xar_get_safe_path(xar_file_t f) __attribute__((weak_import));
-#endif
 
 // Xar attribute keys
 #define BINARY_DELTA_ATTRIBUTES_KEY "binary-delta-attributes"
@@ -90,12 +82,6 @@ extern char *xar_get_safe_path(xar_file_t f) __attribute__((weak_import));
         xar_close(_x);
         _x = NULL;
     }
-}
-
-// This indicates if safe extraction is available at compile time (SDK), but not if it's available at runtime.
-+ (BOOL)maySupportSafeExtraction
-{
-    return HAS_XAR_GET_SAFE_PATH;
 }
 
 - (nullable SPUDeltaArchiveHeader *)readHeader
@@ -323,7 +309,6 @@ static xar_file_t xarAddFile(NSMutableDictionary<NSString *, NSValue *> *fileTab
     xar_iter_t iter = xar_iter_new();
     for (xar_file_t file = xar_file_first(_x, iter); file; file = xar_file_next(iter)) {
         char *pathCString;
-#if HAS_XAR_GET_SAFE_PATH
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunguarded-availability-new"
         if (xar_get_safe_path != NULL) {
@@ -331,7 +316,6 @@ static xar_file_t xarAddFile(NSMutableDictionary<NSString *, NSValue *> *fileTab
         }
 #pragma clang diagnostic pop
         else
-#endif
         {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"

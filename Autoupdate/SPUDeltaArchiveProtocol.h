@@ -73,8 +73,6 @@ SPU_OBJC_DIRECT_MEMBERS @interface SPUDeltaArchiveItem : NSObject
 // For reading, file items cannot be extracted out of order.
 @protocol SPUDeltaArchiveProtocol <NSObject>
 
-@property (nonatomic, readonly, class) BOOL maySupportSafeExtraction;
-
 // If non-nil, there was an error with reading or writing data from the archive
 @property (nonatomic, readonly, nullable) NSError *error;
 

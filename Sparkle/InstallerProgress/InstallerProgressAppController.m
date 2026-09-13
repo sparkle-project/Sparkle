@@ -28,12 +28,6 @@
  */
 static const NSTimeInterval SUTerminationTimeDelay = 0.3;
 
-#if __MAC_OS_X_VERSION_MAX_ALLOWED < 140000
-@interface NSApplication (ActivationAPIs)
-- (void)activate;
-@end
-#endif
-
 @interface InstallerProgressAppController () <NSApplicationDelegate, SPUInstallerAgentProtocol>
 @end
 
