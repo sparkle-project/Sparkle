@@ -843,7 +843,7 @@ static NSString *SPUSanitizeUntrustedVersionString(NSString *versionString, NSSt
     #endif
             ];
             
-            long long releaseNotesLength = [(NSString *)[releaseNotesLinkDictionary objectForKey:@"length"] longLongValue];
+            long long releaseNotesLength = [(NSString *)[releaseNotesLinkDictionary objectForKey:SUAppcastAttributeLength] longLongValue];
             _releaseNotesContentLength = (releaseNotesLength > 0) ? (uint64_t)releaseNotesLength : 0;
         }
         
