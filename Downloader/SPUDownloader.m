@@ -312,7 +312,7 @@ static bool SPUValidateStatusCodeAndFailIfInvalid(NSURLResponse * _Nullable resp
         return;
     }
     
-    if (totalBytesExpectedToWrite > 0 && !_receivedExpectedBytes) {
+    if (!_receivedExpectedBytes) {
         _receivedExpectedBytes = YES;
         [_delegate downloaderDidReceiveExpectedContentLength:totalBytesExpectedToWrite];
     }
