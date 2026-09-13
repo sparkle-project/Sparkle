@@ -151,8 +151,8 @@
     __weak id<SPUUIBasedUpdateDriverDelegate> _delegate;
     
     BOOL _userInitiated;
-    BOOL _resumingInstallingUpdate;
-    BOOL _resumingDownloadedInfoOrUpdate;
+    BOOL _startedResumingInstallingUpdate;
+    BOOL _startedResumingDownloadedInfoOrUpdate;
 }
 
 - (instancetype)initWithHost:(SUHost *)host applicationBundle:(NSBundle *)applicationBundle updater:(id)updater userDriver:(id <SPUUserDriver>)userDriver userInitiated:(BOOL)userInitiated updaterDelegate:(nullable id <SPUUpdaterDelegate>)updaterDelegate delegate:(id<SPUUIBasedUpdateDriverDelegate>)delegate
@@ -200,40 +200,38 @@
     [_coreDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders inBackground:background requiresSilentInstall:NO];
 }
 
-- (void)resumeInstallingUpdate
+- (void)resumeInstallingUpdateOrCheckForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background
 {
+    _httpHeaders = httpHeaders;
+    _userAgent = userAgent;
+    
     [self _clearSkippedUpdatesIfUserInitiated];
     
-    _resumingInstallingUpdate = YES;
-    [_coreDriver resumeInstallingUpdate];
+    _startedResumingInstallingUpdate = YES;
+    [_coreDriver resumeInstallingUpdateOrCheckForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders inBackground:background requiresSilentInstall:NO];
 }
 
-- (void)resumeUpdate:(id<SPUResumableUpdate>)resumableUpdate
+- (void)resumeUpdate:(id<SPUResumableUpdate>)resumableUpdate orCheckForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background
 {
+    _httpHeaders = httpHeaders;
+    _userAgent = userAgent;
+    
     [self _clearSkippedUpdatesIfUserInitiated];
     
-    _resumingDownloadedInfoOrUpdate = YES;
-    [_coreDriver resumeUpdate:resumableUpdate];
+    _startedResumingDownloadedInfoOrUpdate = YES;
+    [_coreDriver resumeUpdate:resumableUpdate orCheckForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders inBackground:background requiresSilentInstall:NO];
 }
 
-- (void)basicDriverDidFinishLoadingAppcast
-{
-    id<SPUUIBasedUpdateDriverDelegate> delegate = _delegate;
-    if ([delegate respondsToSelector:@selector(basicDriverDidFinishLoadingAppcast)]) {
-        [delegate basicDriverDidFinishLoadingAppcast];
-    }
-}
-
-- (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)updateItem secondaryAppcastItem:(SUAppcastItem * _Nullable)secondaryUpdateItem
+- (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)updateItem secondaryAppcastItem:(SUAppcastItem * _Nullable)secondaryUpdateItem resuming:(BOOL)resuming
 {
     id <SPUUpdaterDelegate> updaterDelegate = _updaterDelegate;
     id<SPUUIBasedUpdateDriverDelegate> delegate = _delegate;
     
     SPUUserUpdateStage stage;
     // Major upgrades and information only updates are not downloaded automatically, as well as feeds that failed signing validation
-    if (_resumingDownloadedInfoOrUpdate && !updateItem.majorUpgrade && !updateItem.informationOnlyUpdate && updateItem.signingValidationStatus != SPUAppcastSigningValidationStatusFailed) {
+    if (resuming && _startedResumingDownloadedInfoOrUpdate && !updateItem.majorUpgrade && !updateItem.informationOnlyUpdate && updateItem.signingValidationStatus != SPUAppcastSigningValidationStatusFailed) {
         stage = SPUUserUpdateStageDownloaded;
-    } else if (_resumingInstallingUpdate) {
+    } else if (resuming && _startedResumingInstallingUpdate) {
         stage = SPUUserUpdateStageInstalling;
     } else {
         stage = SPUUserUpdateStageNotDownloaded;
@@ -286,8 +284,8 @@
                         case SPUUserUpdateStageDownloaded:
                         case SPUUserUpdateStageNotDownloaded:
                             // Informational and major updates can be resumed too, so make sure we check
-                            // self->_resumingDownloadedInfoOrUpdate instead of the stage we pass to user driver
-                            if (self->_resumingDownloadedInfoOrUpdate) {
+                            // resume conditions instead of the stage we pass to user driver
+                            if (resuming && self->_startedResumingDownloadedInfoOrUpdate) {
                                 [self->_coreDriver clearDownloadedUpdate];
                             }
                             

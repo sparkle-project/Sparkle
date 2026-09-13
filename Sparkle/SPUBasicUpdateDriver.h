@@ -12,18 +12,16 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class SUHost, SUAppcastItem;
+@class SUHost, SUAppcastItem, SPUInstallationInfo;
 @protocol SPUUpdaterDelegate;
 
 @protocol SPUBasicUpdateDriverDelegate <NSObject>
 
-- (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)appcastItem secondaryAppcastItem:(SUAppcastItem * _Nullable)secondaryAppcastItem systemDomain:(NSNumber * _Nullable)systemDomain;
+- (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)appcastItem secondaryAppcastItem:(SUAppcastItem * _Nullable)secondaryAppcastItem systemDomain:(NSNumber * _Nullable)systemDomain resuming:(BOOL)resuming;
+
+- (void)basicDriverWillDiscardStaleResumableUpdate:(id<SPUResumableUpdate>)resumableUpdate;
 
 - (void)basicDriverIsRequestingAbortUpdateWithError:(nullable NSError *)error;
-
-@optional
-
-- (void)basicDriverDidFinishLoadingAppcast;
 
 @end
 
@@ -35,9 +33,11 @@ SPU_OBJC_DIRECT_MEMBERS @interface SPUBasicUpdateDriver : NSObject
 
 - (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background;
 
-- (void)resumeInstallingUpdate;
+- (void)queryResumableInstallingUpdate:(void (^)(SPUInstallationInfo * _Nullable))completionHandler;
 
-- (void)resumeUpdate:(id<SPUResumableUpdate>)resumableUpdate;
+- (void)resumeInstallingUpdateOrCheckForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background;
+
+- (void)resumeUpdate:(id<SPUResumableUpdate>)resumableUpdate orCheckForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background;
 
 - (void)abortUpdateAndShowNextUpdateImmediately:(BOOL)shouldSignalShowingUpdate resumableUpdate:(id<SPUResumableUpdate> _Nullable)resumableUpdate error:(nullable NSError *)error;
 

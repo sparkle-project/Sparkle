@@ -22,6 +22,7 @@
 #import "SUVersionDisplayProtocol.h"
 #import "SPUStandardVersionDisplay.h"
 #import "SPUNoUpdateFoundInfo.h"
+#import "SUStandardVersionComparator.h"
 
 
 #include "AppKitPrevention.h"
@@ -35,6 +36,9 @@
     SUAppcastDriver *_appcastDriver;
     SUHost *_host;
     
+    SPUInstallationInfo *_pendingResumeInstallationInfo;
+    id<SPUResumableUpdate> _pendingResumableUpdate;
+    
     SPUUpdateDriverCompletion _completionBlock;
     
     SPUUpdateCheck _updateCheck;
@@ -44,6 +48,7 @@
     __weak id<SPUBasicUpdateDriverDelegate> _delegate;
     
     BOOL _aborted;
+    BOOL _resumedExistingUpdate;
 }
 
 - (instancetype)initWithHost:(SUHost *)host updateCheck:(SPUUpdateCheck)updateCheck updater:(id)updater updaterDelegate:(id <SPUUpdaterDelegate>)updaterDelegate delegate:(id <SPUBasicUpdateDriverDelegate>)delegate
@@ -68,6 +73,11 @@
 
 - (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background
 {
+    [self checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders inBackground:background resumingUpdate:NO];
+}
+
+- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background resumingUpdate:(BOOL)resumingUpdate SPU_OBJC_DIRECT
+{
     if ([_host isRunningOnReadOnlyVolume]) {
         NSString *hostName = _host.name;
         id<SPUBasicUpdateDriverDelegate> delegate = _delegate;
@@ -80,51 +90,70 @@
             [delegate basicDriverIsRequestingAbortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SURunningFromDiskImageError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:SULocalizedStringFromTableInBundle(@"%1$@ can’t be updated because it was opened from a read-only or a temporary location.", SPARKLE_TABLE, sparkleBundle, nil), hostName], NSLocalizedRecoverySuggestionErrorKey: [NSString stringWithFormat:SULocalizedStringFromTableInBundle(@"Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again.", SPARKLE_TABLE, sparkleBundle, nil), hostName] }]];
         }
     } else {
-        [_appcastDriver loadAppcastFromURL:appcastURL userAgent:userAgent httpHeaders:httpHeaders inBackground:background];
+        [_appcastDriver loadAppcastFromURL:appcastURL userAgent:userAgent httpHeaders:httpHeaders inBackground:background resumingUpdate:resumingUpdate];
     }
 }
 
-- (void)notifyResumableUpdateItem:(SUAppcastItem *)updateItem secondaryUpdateItem:(SUAppcastItem * _Nullable)secondaryUpdateItem systemDomain:(NSNumber * _Nullable)systemDomain SPU_OBJC_DIRECT
-{
-    if (updateItem == nil) {
-        [_delegate basicDriverIsRequestingAbortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUResumeAppcastError userInfo:@{ NSLocalizedDescriptionKey: SULocalizedStringFromTableInBundle(@"Failed to resume installing update.", SPARKLE_TABLE, SUSparkleBundle(), nil) }]];
-    } else {
-        // Kind of lying, but triggering the notification so drivers can know when to stop showing initial fetching progress
-        [self notifyFinishLoadingAppcast];
-        
-        SUAppcastItem *nonNullUpdateItem = updateItem;
-        [self notifyFoundValidUpdateWithAppcastItem:nonNullUpdateItem secondaryAppcastItem:secondaryUpdateItem systemDomain:systemDomain resuming:YES];
-    }
-}
-
-- (void)resumeInstallingUpdate
+- (void)queryResumableInstallingUpdate:(void (^)(SPUInstallationInfo * _Nullable))completionHandler
 {
     NSString *hostBundleIdentifier = _host.bundle.bundleIdentifier;
     assert(hostBundleIdentifier != nil);
     [SPUProbeInstallStatus probeInstallerUpdateItemForHostBundleIdentifier:hostBundleIdentifier completion:^(SPUInstallationInfo * _Nullable installationInfo) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            [self notifyResumableUpdateItem:installationInfo.appcastItem secondaryUpdateItem:nil systemDomain:@(installationInfo.systemDomain)];
+            completionHandler(installationInfo);
         });
     }];
 }
 
-- (void)resumeUpdate:(id<SPUResumableUpdate>)resumableUpdate
+- (void)resumeInstallingUpdateOrCheckForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background
 {
-    [self notifyResumableUpdateItem:resumableUpdate.updateItem secondaryUpdateItem:resumableUpdate.secondaryUpdateItem systemDomain:nil];
+    __weak __typeof__(self) weakSelf = self;
+    [self queryResumableInstallingUpdate:^(SPUInstallationInfo * _Nullable installationInfo) {
+        __typeof__(self) strongSelf = weakSelf;
+        if (strongSelf != nil) {
+            if (installationInfo != nil) {
+                if (installationInfo.systemDomain || ![strongSelf->_host.bundle isEqual:NSBundle.mainBundle]) {
+                    // When an update required auth or when updating another bundle that may
+                    // have been started by another updater, don't risk canceling it
+                    [strongSelf notifyFoundValidUpdateWithAppcastItem:installationInfo.appcastItem secondaryAppcastItem:nil systemDomain:@(installationInfo.systemDomain) resuming:YES];
+                    return;
+                }
+                
+                strongSelf->_pendingResumeInstallationInfo = installationInfo;
+            }
+
+            [strongSelf checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders inBackground:background resumingUpdate:YES];
+        }
+    }];
+}
+
+- (void)resumeUpdate:(id<SPUResumableUpdate>)resumableUpdate orCheckForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background
+{
+    _pendingResumableUpdate = resumableUpdate;
+
+    [self checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders inBackground:background resumingUpdate:YES];
 }
 
 - (void)didFailToFetchAppcastWithError:(NSError *)error
 {
     if (!_aborted) {
-        [_delegate basicDriverIsRequestingAbortUpdateWithError:error];
-    }
-}
+        if (_pendingResumeInstallationInfo != nil) {
+            SUAppcastItem *pendingItem = _pendingResumeInstallationInfo.appcastItem;
+            BOOL pendingSystemDomain = _pendingResumeInstallationInfo.systemDomain;
+            _pendingResumeInstallationInfo = nil;
 
-- (void)notifyFinishLoadingAppcast SPU_OBJC_DIRECT
-{
-    id<SPUBasicUpdateDriverDelegate> delegate = _delegate;
-    if ([delegate respondsToSelector:@selector(basicDriverDidFinishLoadingAppcast)]) {
-        [delegate basicDriverDidFinishLoadingAppcast];
+            // The appcast check itself failed, so pretend it finished loading so drivers stop showing fetching progress
+            [self notifyFoundValidUpdateWithAppcastItem:pendingItem secondaryAppcastItem:nil systemDomain:@(pendingSystemDomain) resuming:YES];
+            return;
+        } else if (_pendingResumableUpdate != nil) {
+            id<SPUResumableUpdate> pendingResumableUpdate = _pendingResumableUpdate;
+            _pendingResumableUpdate = nil;
+
+            [self notifyFoundValidUpdateWithAppcastItem:pendingResumableUpdate.updateItem secondaryAppcastItem:pendingResumableUpdate.secondaryUpdateItem systemDomain:nil resuming:YES];
+            return;
+        }
+
+        [_delegate basicDriverIsRequestingAbortUpdateWithError:error];
     }
 }
 
@@ -135,13 +164,13 @@
         if ([updaterDelegate respondsToSelector:@selector((updater:didFinishLoadingAppcast:))]) {
             [updaterDelegate updater:_updater didFinishLoadingAppcast:appcast];
         }
-        
-        [self notifyFinishLoadingAppcast];
     }
 }
 
 - (void)notifyFoundValidUpdateWithAppcastItem:(SUAppcastItem *)updateItem secondaryAppcastItem:(SUAppcastItem * _Nullable)secondaryUpdateItem systemDomain:(NSNumber * _Nullable)systemDomain resuming:(BOOL)resuming SPU_OBJC_DIRECT
 {
+    _resumedExistingUpdate = resuming;
+
     if (!_aborted) {
         id<SPUBasicUpdateDriverDelegate> delegate = _delegate;
         id <SPUUpdaterDelegate> updaterDelegate = _updaterDelegate;
@@ -165,18 +194,77 @@
             [updaterDelegate updater:updater didFindValidUpdate:updateItem];
         }
         
-        [delegate basicDriverDidFindUpdateWithAppcastItem:updateItem secondaryAppcastItem:secondaryUpdateItem systemDomain:systemDomain];
+        [delegate basicDriverDidFindUpdateWithAppcastItem:updateItem secondaryAppcastItem:secondaryUpdateItem systemDomain:systemDomain resuming:resuming];
     }
+}
+
+- (BOOL)pendingUpdateItem:(SUAppcastItem *)pendingUpdateItem isSupersededByUpdateItem:(SUAppcastItem *)newUpdateItem SPU_OBJC_DIRECT
+{
+    id<SUVersionComparison> versionComparator = nil;
+    id<SPUUpdaterDelegate> updaterDelegate = _updaterDelegate;
+    id updater = _updater;
+    if (updater != nil && [updaterDelegate respondsToSelector:@selector(versionComparatorForUpdater:)]) {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+        versionComparator = [updaterDelegate versionComparatorForUpdater:updater];
+#pragma clang diagnostic pop
+    }
+    if (versionComparator == nil) {
+        versionComparator = [SUStandardVersionComparator defaultComparator];
+    }
+    
+    return ([versionComparator compareVersion:pendingUpdateItem.versionString toVersion:newUpdateItem.versionString] == NSOrderedAscending);
 }
 
 - (void)didFindValidUpdateWithAppcastItem:(SUAppcastItem *)updateItem secondaryAppcastItem:(SUAppcastItem * _Nullable)secondaryAppcastItem
 {
+    id<SPUBasicUpdateDriverDelegate> delegate = _delegate;
+
+    if (_pendingResumeInstallationInfo != nil) {
+        SUAppcastItem *pendingItem = _pendingResumeInstallationInfo.appcastItem;
+        BOOL pendingSystemDomain = _pendingResumeInstallationInfo.systemDomain;
+        _pendingResumeInstallationInfo = nil;
+
+        if (![self pendingUpdateItem:pendingItem isSupersededByUpdateItem:updateItem]) {
+            [self notifyFoundValidUpdateWithAppcastItem:pendingItem secondaryAppcastItem:nil systemDomain:@(pendingSystemDomain) resuming:YES];
+            return;
+        }
+        
+        // No need to discard the prior resumable installed update.
+        // The update will be discarded when we submit new installer job
+    } else if (_pendingResumableUpdate != nil) {
+        id<SPUResumableUpdate> pendingResumableUpdate = _pendingResumableUpdate;
+        _pendingResumableUpdate = nil;
+
+        if (![self pendingUpdateItem:pendingResumableUpdate.updateItem isSupersededByUpdateItem:updateItem]) {
+            [self notifyFoundValidUpdateWithAppcastItem:pendingResumableUpdate.updateItem secondaryAppcastItem:pendingResumableUpdate.secondaryUpdateItem systemDomain:nil resuming:YES];
+            return;
+        } else {
+            [delegate basicDriverWillDiscardStaleResumableUpdate:pendingResumableUpdate];
+        }
+    }
+
     [self notifyFoundValidUpdateWithAppcastItem:updateItem secondaryAppcastItem:secondaryAppcastItem systemDomain:nil resuming:NO];
 }
 
 - (void)didNotFindUpdateWithLatestAppcastItem:(nullable SUAppcastItem *)latestAppcastItem hostToLatestAppcastItemComparisonResult:(NSComparisonResult)hostToLatestAppcastItemComparisonResult background:(BOOL)background
 {
     if (!_aborted) {
+        if (_pendingResumeInstallationInfo != nil) {
+            SUAppcastItem *pendingItem = _pendingResumeInstallationInfo.appcastItem;
+            BOOL pendingSystemDomain = _pendingResumeInstallationInfo.systemDomain;
+            _pendingResumeInstallationInfo = nil;
+
+            [self notifyFoundValidUpdateWithAppcastItem:pendingItem secondaryAppcastItem:nil systemDomain:@(pendingSystemDomain) resuming:YES];
+            return;
+        } else if (_pendingResumableUpdate != nil) {
+            id<SPUResumableUpdate> pendingResumableUpdate = _pendingResumableUpdate;
+            _pendingResumableUpdate = nil;
+
+            [self notifyFoundValidUpdateWithAppcastItem:pendingResumableUpdate.updateItem secondaryAppcastItem:pendingResumableUpdate.secondaryUpdateItem systemDomain:nil resuming:YES];
+            return;
+        }
+
         NSString *localizedDescription;
         
 #if SPARKLE_COPY_LOCALIZATIONS
@@ -283,7 +371,7 @@
     
     [_appcastDriver cleanup:^{
         if (self->_completionBlock != nil) {
-            self->_completionBlock(shouldShowUpdateImmediately, resumableUpdate, error);
+            self->_completionBlock(shouldShowUpdateImmediately, self->_resumedExistingUpdate, resumableUpdate, error);
             self->_completionBlock = nil;
         }
     }];

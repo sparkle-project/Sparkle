@@ -291,7 +291,7 @@ SU_EXPORT NS_SWIFT_UI_ACTOR @protocol SPUUserDriver <NSObject>
 
 - (void)showUpdateInstallationDidFinishWithAcknowledgement:(void (^)(void))acknowledgement __deprecated_msg("Implement -showUpdateInstalledAndRelaunched:acknowledgement: instead");
 
-- (void)dismissUserInitiatedUpdateCheck __deprecated_msg("Transition to new UI appropriately when a new update is shown, when no update is found, or when an update error occurs.");
+- (void)dismissUserInitiatedUpdateCheck __deprecated_msg("Transition to new UI appropriately when a new update is shown, when no update is found, or when an update error occurs. This method is no longer called.");
 
 - (void)showInstallingUpdate __deprecated_msg("Implement -showInstallingUpdateWithApplicationTerminated:retryTerminatingApplication: instead.");
 

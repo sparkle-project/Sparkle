@@ -46,7 +46,7 @@
     __weak id <SPUUpdaterDelegate> _updaterDelegate;
     __weak id<SPUCoreBasedUpdateDriverDelegate> _delegate;
     
-    BOOL _resumingInstallingUpdate;
+    BOOL _startedResumingInstallingUpdate;
     BOOL _silentInstall;
 }
 
@@ -88,41 +88,37 @@
     [_basicDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders inBackground:background];
 }
 
-- (void)resumeInstallingUpdate
+- (void)resumeInstallingUpdateOrCheckForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background requiresSilentInstall:(BOOL)silentInstall
 {
-    _resumingInstallingUpdate = YES;
-    _silentInstall = NO;
+    _userAgent = [userAgent copy];
+    _httpHeaders = httpHeaders;
+    _silentInstall = silentInstall;
+    _startedResumingInstallingUpdate = YES;
     
-    [_basicDriver resumeInstallingUpdate];
+    [_basicDriver resumeInstallingUpdateOrCheckForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders inBackground:background];
 }
 
-- (void)resumeUpdate:(id<SPUResumableUpdate>)resumableUpdate
+- (void)resumeUpdate:(id<SPUResumableUpdate>)resumableUpdate orCheckForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background requiresSilentInstall:(BOOL)silentInstall
 {
+    _userAgent = [userAgent copy];
+    _httpHeaders = httpHeaders;
+    _silentInstall = silentInstall;
     _resumableUpdate = resumableUpdate;
-    _silentInstall = NO;
-    
-    [_basicDriver resumeUpdate:resumableUpdate];
+
+    [_basicDriver resumeUpdate:resumableUpdate orCheckForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders inBackground:background];
 }
 
-- (void)basicDriverDidFinishLoadingAppcast
-{
-    id<SPUCoreBasedUpdateDriverDelegate> delegate = _delegate;
-    if ([delegate respondsToSelector:@selector(basicDriverDidFinishLoadingAppcast)]) {
-        [delegate basicDriverDidFinishLoadingAppcast];
-    }
-}
-
-- (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)updateItem secondaryAppcastItem:(SUAppcastItem * _Nullable)secondaryUpdateItem systemDomain:(NSNumber * _Nullable)systemDomain
+- (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)updateItem secondaryAppcastItem:(SUAppcastItem * _Nullable)secondaryUpdateItem systemDomain:(NSNumber * _Nullable)systemDomain resuming:(BOOL)resuming
 {
     _updateItem = updateItem;
     _secondaryUpdateItem = secondaryUpdateItem;
-    
-    if (_resumingInstallingUpdate) {
+
+    if (resuming && _startedResumingInstallingUpdate) {
         assert(systemDomain != nil);
         [_installerDriver resumeInstallingUpdateWithUpdateItem:updateItem systemDomain:systemDomain.boolValue];
     }
-    
-    [_delegate basicDriverDidFindUpdateWithAppcastItem:updateItem secondaryAppcastItem:secondaryUpdateItem];
+
+    [_delegate basicDriverDidFindUpdateWithAppcastItem:updateItem secondaryAppcastItem:secondaryUpdateItem resuming:resuming];
 }
 
 - (void)downloadUpdateFromAppcastItem:(SUAppcastItem *)updateItem secondaryAppcastItem:(SUAppcastItem * _Nullable)secondaryUpdateItem inBackground:(BOOL)background SPU_OBJC_DIRECT
@@ -183,6 +179,12 @@
     [self extractUpdate:downloadedUpdate];
 }
 
+- (void)basicDriverWillDiscardStaleResumableUpdate:(id<SPUResumableUpdate>)resumableUpdate
+{
+    _resumableUpdate = resumableUpdate;
+    [self clearDownloadedUpdate];
+}
+
 - (void)deferInformationalUpdate:(SUAppcastItem *)updateItem secondaryUpdate:(SUAppcastItem * _Nullable)secondaryUpdateItem
 {
     _resumableUpdate = [[SPUInformationalUpdate alloc] initWithAppcastItem:updateItem secondaryAppcastItem:secondaryUpdateItem];
@@ -238,7 +240,7 @@
                 [self clearDownloadedUpdate];
             }
             
-            [self->_delegate coreDriverIsRequestingAbortUpdateWithError:error];
+            [delegate coreDriverIsRequestingAbortUpdateWithError:error];
         } else {
             // If the installer started properly, we can't use the downloaded update archive anymore
             // Especially if the installer fails later and we try resuming the update with a missing archive file

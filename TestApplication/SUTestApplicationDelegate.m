@@ -24,6 +24,8 @@
     SUUpdateSettingsWindowController *_updateSettingsWindowController;
     SUTestWebServer *_webServer;
     NSString *_testMode;
+    
+    BOOL _supersedeFoundInitialUpdate;
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification * __unused)notification
@@ -43,7 +45,7 @@
     // Check if we are already up to date
     NSString *mainBundleVersion = (NSString *)[mainBundle objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey];
     
-    if (([mainBundleVersion hasPrefix:@"2."] && [testMode isEqualToString:@"REGULAR"]) || (([mainBundleVersion isEqualToString:@"2.1"] || [mainBundleVersion isEqualToString:@"2.2"]) && [testMode isEqualToString:@"DELTA_AND_MARKDOWN"]) || ([mainBundleVersion isEqualToString:@"2.2"] && [testMode isEqualToString:@"AUTOMATIC"])) {
+    if (([mainBundleVersion hasPrefix:@"2."] && [testMode isEqualToString:@"REGULAR"]) || (([mainBundleVersion isEqualToString:@"2.1"] || [mainBundleVersion isEqualToString:@"2.2"]) && [testMode isEqualToString:@"DELTA_AND_MARKDOWN"]) || ([mainBundleVersion isEqualToString:@"2.2"] && [testMode isEqualToString:@"AUTOMATIC"]) || ([mainBundleVersion isEqualToString:@"3.1"] && [testMode isEqualToString:@"SUPERSEDE"])) {
         NSAlert *alreadyUpdatedAlert = [[NSAlert alloc] init];
         alreadyUpdatedAlert.messageText = @"Update succeeded!";
         alreadyUpdatedAlert.informativeText = @"This is the updated version of Sparkle Test App.\n\nDelete and rebuild the app to test updates again.";
@@ -52,9 +54,12 @@
         [[NSApplication sharedApplication] terminate:nil];
     }
     
-#if SPARKLE_BUILD_UI_BITS
     // Detect as early as possible if the shift key is held down
-    BOOL shiftKeyHeldDown = ([NSEvent modifierFlags] & NSEventModifierFlagShift) != 0;
+    BOOL shiftKeyHeldDown;
+#if SPARKLE_BUILD_UI_BITS
+    shiftKeyHeldDown = ([NSEvent modifierFlags] & NSEventModifierFlagShift) != 0;
+#else
+    shiftKeyHeldDown = NO;
 #endif
 
     NSFileManager *fileManager = [NSFileManager defaultManager];
@@ -70,7 +75,7 @@
     
     NSString *bundleIdentifier = mainBundle.bundleIdentifier;
     assert(bundleIdentifier != nil);
-    
+
     // Create a directory that'll be used for our web server listing
     NSURL *serverDirectoryURL = [[cacheDirectoryURL URLByAppendingPathComponent:bundleIdentifier] URLByAppendingPathComponent:@"ServerData"];
     if ([serverDirectoryURL checkResourceIsReachableAndReturnError:nil]) {
@@ -114,6 +119,9 @@
         finalUpdatedVersion = @"2.1";
     } else if ([testMode isEqualToString:@"AUTOMATIC"]) {
         finalUpdatedVersion = @"2.2";
+    } else if ([testMode isEqualToString:@"SUPERSEDE"]) {
+        // This is the initial version which will later be superseded by 3.1
+        finalUpdatedVersion = @"3.0";
     } else {
         assert(false);
     }
@@ -175,10 +183,10 @@
             
             // Don't ever do this at home, kids (seriously)
             // (that is, including the private key inside of your application)
-            const unsigned char self_sign_demo_only_insecure_hack[64] = {200, 238, 135, 84, 10, 189, 3, 193, 61, 208, 203, 30, 133, 47, 12, 22, 19, 52, 252, 99, 110, 205, 209, 94, 215, 144, 201, 70, 27, 162, 163, 108, 0, 164, 68, 184, 226, 93, 121, 199, 172, 17, 26, 64, 89, 68, 232, 41, 2, 26, 245, 175, 158, 165, 42, 55, 5, 97, 8, 243, 251, 164, 93, 9};
+            static const unsigned char self_sign_demo_only_insecure_hack[64] = {200, 238, 135, 84, 10, 189, 3, 193, 61, 208, 203, 30, 133, 47, 12, 22, 19, 52, 252, 99, 110, 205, 209, 94, 215, 144, 201, 70, 27, 162, 163, 108, 0, 164, 68, 184, 226, 93, 121, 199, 172, 17, 26, 64, 89, 68, 232, 41, 2, 26, 245, 175, 158, 165, 42, 55, 5, 97, 8, 243, 251, 164, 93, 9};
             // in normal app this goes to Info.plist
-            const unsigned char public_key[32] = {121, 17, 79, 45, 155, 141, 51, 169, 188, 110, 91, 102, 182, 147, 215, 225, 252, 202, 110, 231, 200, 215, 62, 171, 40, 145, 237, 128, 130, 44, 150, 89};
-            unsigned char signature[64];
+            static const unsigned char public_key[32] = {121, 17, 79, 45, 155, 141, 51, 169, 188, 110, 91, 102, 182, 147, 215, 225, 252, 202, 110, 231, 200, 215, 62, 171, 40, 145, 237, 128, 130, 44, 150, 89};
+            unsigned char signature[64] = {0};
             
             if ([testMode isEqualToString:@"DELTA_AND_MARKDOWN"]) {
                 NSError *deltaCreationError = nil;
@@ -232,6 +240,121 @@
                     NSLog(@"Failed to write updated appcast with error %@", writeAppcastError);
                     abort();
                 }
+            } else if ([testMode isEqualToString:@"SUPERSEDE"]) {
+                // Create the archive for the initial ("3.0") update from the bundle we already copied
+                // and signed above
+                NSString *zipName = @"Sparkle_Test_App.zip";
+                NSTask *dittoTask = [[NSTask alloc] init];
+                dittoTask.launchPath = @"/usr/bin/ditto";
+                dittoTask.arguments = @[@"-c", @"-k", @"--sequesterRsrc", @"--keepParent", (NSString *)destinationBundleURL.lastPathComponent, zipName];
+                dittoTask.currentDirectoryPath = serverDirectoryPath;
+                [dittoTask launch];
+                [dittoTask waitUntilExit];
+
+                assert(dittoTask.terminationStatus == 0);
+
+                [fileManager removeItemAtURL:destinationBundleURL error:NULL];
+
+                NSURL *archiveURL = [serverDirectoryURL URLByAppendingPathComponent:zipName];
+                NSData *archive = [NSData dataWithContentsOfURL:archiveURL];
+                assert(archive != nil);
+
+                ed25519_sign(signature, (const unsigned char *)archive.bytes, archive.length, public_key, self_sign_demo_only_insecure_hack);
+
+                NSString *signatureString = [[NSData dataWithBytes:signature length:64] base64EncodedStringWithOptions:(NSDataBase64EncodingOptions)0];
+
+                NSError *fileAttributesError = nil;
+                NSString *archiveURLPath = archiveURL.path;
+                assert(archiveURLPath != nil);
+                NSDictionary *archiveFileAttributes = [[NSFileManager defaultManager] attributesOfItemAtPath:archiveURLPath error:&fileAttributesError];
+                if (archiveFileAttributes == nil) {
+                    NSLog(@"Failed to retrieve file attributes from archive with error %@", fileAttributesError);
+                    abort();
+                }
+
+                NSUInteger numberOfSupercede1LengthReplacements = [appcastContents replaceOccurrencesOfString:@"$INSERT_SUPERCEDE1_ARCHIVE_LENGTH" withString:[NSString stringWithFormat:@"%llu", archiveFileAttributes.fileSize] options:NSLiteralSearch range:NSMakeRange(0, appcastContents.length)];
+                assert(numberOfSupercede1LengthReplacements == 1);
+
+                NSUInteger numberOfSupercede1SignatureReplacements = [appcastContents replaceOccurrencesOfString:@"$INSERT_SUPERCEDE1_EDDSA_SIGNATURE" withString:signatureString options:NSLiteralSearch range:NSMakeRange(0, appcastContents.length)];
+                assert(numberOfSupercede1SignatureReplacements == 1);
+
+                // Build a second copy of the bundle for the superseding ("3.1") update
+                NSURL *supersedingDestinationBundleURL = [serverDirectoryURL URLByAppendingPathComponent:@"Superseding.app"];
+                NSError *copySupersedingBundleError = nil;
+                if (![fileManager copyItemAtURL:bundleURL toURL:supersedingDestinationBundleURL error:&copySupersedingBundleError]) {
+                    NSLog(@"Failed to copy bundle for superseding update with error %@", copySupersedingBundleError);
+                    abort();
+                }
+
+                NSURL *supersedingInfoURL = [[supersedingDestinationBundleURL URLByAppendingPathComponent:@"Contents"] URLByAppendingPathComponent:@"Info.plist"];
+                NSMutableDictionary *supersedingInfoDictionary = [[NSMutableDictionary alloc] initWithContentsOfURL:supersedingInfoURL];
+                [supersedingInfoDictionary setObject:@"3.1" forKey:(__bridge NSString *)kCFBundleVersionKey];
+                [supersedingInfoDictionary setObject:@"3.1" forKey:@"CFBundleShortVersionString"];
+                BOOL wroteSupersedingInfoFile = [supersedingInfoDictionary writeToURL:supersedingInfoURL atomically:NO];
+                assert(wroteSupersedingInfoFile);
+
+                [self signApplicationIfRequiredAtPath:supersedingDestinationBundleURL.path completion:^{
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        NSString *supersedingZipName = @"Sparkle_Test_App_Superseding.zip";
+                        NSTask *supersedingDittoTask = [[NSTask alloc] init];
+                        supersedingDittoTask.launchPath = @"/usr/bin/ditto";
+                        supersedingDittoTask.arguments = @[@"-c", @"-k", @"--sequesterRsrc", @"--keepParent", (NSString *)supersedingDestinationBundleURL.lastPathComponent, supersedingZipName];
+                        supersedingDittoTask.currentDirectoryPath = serverDirectoryPath;
+                        [supersedingDittoTask launch];
+                        [supersedingDittoTask waitUntilExit];
+
+                        assert(supersedingDittoTask.terminationStatus == 0);
+
+                        [fileManager removeItemAtURL:supersedingDestinationBundleURL error:NULL];
+
+                        NSURL *supersedingArchiveURL = [serverDirectoryURL URLByAppendingPathComponent:supersedingZipName];
+                        NSData *supersedingArchive = [NSData dataWithContentsOfURL:supersedingArchiveURL];
+                        assert(supersedingArchive != nil);
+
+                        unsigned char supersedingSignature[64] = {0};
+                        ed25519_sign(supersedingSignature, (const unsigned char *)supersedingArchive.bytes, supersedingArchive.length, public_key, self_sign_demo_only_insecure_hack);
+                        NSString *supersedingSignatureString = [[NSData dataWithBytes:supersedingSignature length:64] base64EncodedStringWithOptions:(NSDataBase64EncodingOptions)0];
+
+                        NSError *supersedingFileAttributesError = nil;
+                        NSString *supersedingArchiveURLPath = supersedingArchiveURL.path;
+                        assert(supersedingArchiveURLPath != nil);
+                        NSDictionary *supersedingArchiveFileAttributes = [[NSFileManager defaultManager] attributesOfItemAtPath:supersedingArchiveURLPath error:&supersedingFileAttributesError];
+                        if (supersedingArchiveFileAttributes == nil) {
+                            NSLog(@"Failed to retrieve file attributes from superseding archive with error %@", supersedingFileAttributesError);
+                            abort();
+                        }
+
+                        NSUInteger numberOfSupercede2LengthReplacements = [appcastContents replaceOccurrencesOfString:@"$INSERT_SUPERCEDE2_ARCHIVE_LENGTH" withString:[NSString stringWithFormat:@"%llu", supersedingArchiveFileAttributes.fileSize] options:NSLiteralSearch range:NSMakeRange(0, appcastContents.length)];
+                        assert(numberOfSupercede2LengthReplacements == 1);
+
+                        NSUInteger numberOfSupercede2SignatureReplacements = [appcastContents replaceOccurrencesOfString:@"$INSERT_SUPERCEDE2_EDDSA_SIGNATURE" withString:supersedingSignatureString options:NSLiteralSearch range:NSMakeRange(0, appcastContents.length)];
+                        assert(numberOfSupercede2SignatureReplacements == 1);
+
+                        NSRange feedSignaturesPrefixRange = [appcastContents rangeOfString:@"<!-- sparkle-signatures:\n" options:(NSStringCompareOptions)(NSLiteralSearch | NSBackwardsSearch)];
+                        assert(feedSignaturesPrefixRange.location != NSNotFound);
+
+                        unsigned char feedSignature[64] = {0};
+                        ed25519_sign(feedSignature, (const unsigned char *)appcastContents.UTF8String, feedSignaturesPrefixRange.location, public_key, self_sign_demo_only_insecure_hack);
+
+                        NSString *feedSignatureString = [[NSData dataWithBytes:feedSignature length:64] base64EncodedStringWithOptions:(NSDataBase64EncodingOptions)0];
+
+                        NSUInteger numberOfFeedSignatureReplacements = [appcastContents replaceOccurrencesOfString:@"$INSERT_EDDSA_FEED_SIGNATURE" withString:feedSignatureString options:NSLiteralSearch range:NSMakeRange(0, appcastContents.length)];
+                        assert(numberOfFeedSignatureReplacements == 1);
+
+                        NSUInteger numberOfFeedLengthReplacements = [appcastContents replaceOccurrencesOfString:@"$INSERT_FEED_LENGTH" withString:@(feedSignaturesPrefixRange.location).stringValue options:NSLiteralSearch range:NSMakeRange(0, appcastContents.length)];
+                        assert(numberOfFeedLengthReplacements == 1);
+
+                        NSError *writeAppcastError = nil;
+                        if (![appcastContents writeToURL:appcastDestinationURL atomically:NO encoding:NSUTF8StringEncoding error:&writeAppcastError]) {
+                            NSLog(@"Failed to write updated appcast with error %@", writeAppcastError);
+                            abort();
+                        }
+
+                        [self startServerAndUpdaterAtDirectoryPath:serverDirectoryPath shiftKeyHeldDown:shiftKeyHeldDown];
+                    });
+                }];
+
+                return;
             } else {
                 // Create the archive for our update
                 NSString *zipName = @"Sparkle_Test_App.zip";
@@ -289,55 +412,60 @@
             }
             
             [fileManager removeItemAtURL:destinationBundleURL error:NULL];
-            
-            // Finally start the server
-            SUTestWebServer *webServer = [[SUTestWebServer alloc] initWithPort:1337 workingDirectory:serverDirectoryPath];
-            if (!webServer) {
-                NSLog(@"Failed to create the web server");
-                abort();
-            }
-            self->_webServer = webServer;
 
-            [webServer startWithReadyHandler:^{
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    // Set up updater and the updater settings window
-                    self->_updateSettingsWindowController = [[SUUpdateSettingsWindowController alloc] init];
+            [self startServerAndUpdaterAtDirectoryPath:serverDirectoryPath shiftKeyHeldDown:shiftKeyHeldDown];
+        });
+    }];
+}
 
-                    NSWindow *settingsWindow = self->_updateSettingsWindowController.window;
+- (void)startServerAndUpdaterAtDirectoryPath:(NSString *)serverDirectoryPath shiftKeyHeldDown:(BOOL)shiftKeyHeldDown SPU_OBJC_DIRECT
+{
+    // Finally start the server
+    SUTestWebServer *webServer = [[SUTestWebServer alloc] initWithPort:1337 workingDirectory:serverDirectoryPath];
+    if (!webServer) {
+        NSLog(@"Failed to create the web server");
+        abort();
+    }
+    _webServer = webServer;
 
-                    NSBundle *hostBundle = [NSBundle mainBundle];
-                    NSBundle *applicationBundle = hostBundle;
+    [webServer startWithReadyHandler:^{
+        dispatch_async(dispatch_get_main_queue(), ^{
+            // Set up updater and the updater settings window
+            self->_updateSettingsWindowController = [[SUUpdateSettingsWindowController alloc] init];
 
-                    id<SPUUserDriver> userDriver;
+            NSWindow *settingsWindow = self->_updateSettingsWindowController.window;
+
+            NSBundle *hostBundle = [NSBundle mainBundle];
+            NSBundle *applicationBundle = hostBundle;
+
+            id<SPUUserDriver> userDriver;
 #if SPARKLE_BUILD_UI_BITS
-                    if (shiftKeyHeldDown) {
-                        userDriver = [[SUPopUpTitlebarUserDriver alloc] initWithWindow:settingsWindow];
-                    } else {
-                        userDriver = [[SPUStandardUserDriver alloc] initWithHostBundle:hostBundle delegate:nil];
-                    }
+            if (shiftKeyHeldDown) {
+                userDriver = [[SUPopUpTitlebarUserDriver alloc] initWithWindow:settingsWindow];
+            } else {
+                userDriver = [[SPUStandardUserDriver alloc] initWithHostBundle:hostBundle delegate:nil];
+            }
 #else
-                    userDriver = [[SUPopUpTitlebarUserDriver alloc] initWithWindow:settingsWindow];
+            userDriver = [[SUPopUpTitlebarUserDriver alloc] initWithWindow:settingsWindow];
 #endif
 
-                    SPUUpdater *updater = [[SPUUpdater alloc] initWithHostBundle:hostBundle applicationBundle:applicationBundle userDriver:userDriver delegate:self];
+            SPUUpdater *updater = [[SPUUpdater alloc] initWithHostBundle:hostBundle applicationBundle:applicationBundle userDriver:userDriver delegate:self];
 
-                    self->_updater = updater;
-                    self->_updateSettingsWindowController.updater = updater;
+            self->_updater = updater;
+            self->_updateSettingsWindowController.updater = updater;
 
-                    NSError *updaterError = nil;
-                    if (![updater startUpdater:&updaterError]) {
-                        NSLog(@"Failed to start updater with error: %@", updaterError);
+            NSError *updaterError = nil;
+            if (![updater startUpdater:&updaterError]) {
+                NSLog(@"Failed to start updater with error: %@", updaterError);
 
-                        NSAlert *alert = [[NSAlert alloc] init];
-                        alert.messageText = @"Updater Error";
-                        alert.informativeText = @"The Updater failed to start. For detailed error information, check the Console.app log.";
-                        [alert addButtonWithTitle:@"OK"];
-                        [alert runModal];
-                    }
+                NSAlert *alert = [[NSAlert alloc] init];
+                alert.messageText = @"Updater Error";
+                alert.informativeText = @"The Updater failed to start. For detailed error information, check the Console.app log.";
+                [alert addButtonWithTitle:@"OK"];
+                [alert runModal];
+            }
 
-                    [self->_updateSettingsWindowController showWindow:nil];
-                });
-            }];
+            [self->_updateSettingsWindowController showWindow:nil];
         });
     }];
 }
@@ -348,8 +476,17 @@
         return [NSSet setWithObject:@"delta"];
     } else if ([_testMode isEqualToString:@"AUTOMATIC"]) {
         return [NSSet setWithObject:@"automatic"];
+    } else if ([_testMode isEqualToString:@"SUPERSEDE"]) {
+        return [NSSet setWithObject:(_supersedeFoundInitialUpdate ? @"supercede2" : @"supercede1")];
     } else {
         return [NSSet set];
+    }
+}
+
+- (void)updater:(SPUUpdater *)updater didFindValidUpdate:(SUAppcastItem *)item
+{
+    if ([_testMode isEqualToString:@"SUPERSEDE"] && [item.versionString isEqualToString:@"3.0"]) {
+        _supersedeFoundInitialUpdate = YES;
     }
 }
 

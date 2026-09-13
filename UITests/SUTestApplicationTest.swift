@@ -114,4 +114,49 @@ class SUTestApplicationTest: XCTestCase
     func test3AutomaticUpdate() {
         runTestApplication(testMode: "AUTOMATIC", automatic: true, expectedFinalVersion: "2.2", launchSleep: 75, extractSleep: 30)
     }
+
+    // Tests that "3.0" will be downloaded in first automatic update downloading check,
+    // then it will be superceded by "3.1" in the next update automatic downloading check
+    func test4UpdateSuperseded() {
+        let app = XCUIApplication()
+        app.launchArguments = [
+            "-SUHasLaunchedBefore",
+            "YES",
+            "-SUEnableAutomaticChecks",
+            "YES",
+            "-SUAutomaticallyUpdate",
+            "YES",
+            "-SUScheduledCheckInterval",
+            "60"
+        ]
+        app.launchEnvironment = ["TEST_MODE": "SUPERSEDE"]
+        app.launch()
+
+        XCTAssertFalse(app.dialogs["alert"].staticTexts["Update succeeded!"].exists, "Update is already installed; please do a clean build")
+
+        let initialRunningApplication = runningTestApplication()
+        let bundleURL = initialRunningApplication.bundleURL!
+
+        // Give enough time to set up the web server and install both 3.0 and 3.1 updates
+        sleep(150)
+
+        // Quit without ever checking manually. The superseding "3.1" update should already be prepared
+        // and ready to install on quit
+        app.terminate()
+
+        // Wait for the new updated app to be installed
+        sleep(5)
+
+        // Validate update has been installed
+
+        XCTAssertTrue(initialRunningApplication.isTerminated)
+
+        let infoCFDictionary = CFBundleCopyInfoDictionaryInDirectory(bundleURL as CFURL)
+        let infoDictionary = infoCFDictionary! as Dictionary
+
+        let updatedVersion = infoDictionary[kCFBundleVersionKey] as! String
+        XCTAssertEqual(updatedVersion, "3.1", "Should have installed the superseding update, not the one abandoned mid-install")
+
+        sleep(10)
+    }
 }
