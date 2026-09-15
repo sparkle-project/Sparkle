@@ -171,7 +171,15 @@
                     [hostForFailedSigningValidationDate setObject:currentDate forUserDefaultsKey:initialFailedFeedSigningValidationDateKey];
                     canRecoverFromSigningValidationFailure = NO;
                 } else {
-                    canRecoverFromSigningValidationFailure = ([currentDate timeIntervalSinceDate:firstFailedSigningValidationDate] >= failureExpirationInterval);
+                    NSTimeInterval timeIntervalSinceFirstFailedValidationDate = [currentDate timeIntervalSinceDate:firstFailedSigningValidationDate];
+                    
+                    if (timeIntervalSinceFirstFailedValidationDate < 0) {
+                        // Record first signing validation date if stored date is far out in future
+                        [hostForFailedSigningValidationDate setObject:currentDate forUserDefaultsKey:initialFailedFeedSigningValidationDateKey];
+                        canRecoverFromSigningValidationFailure = NO;
+                    } else {
+                        canRecoverFromSigningValidationFailure = (timeIntervalSinceFirstFailedValidationDate >= failureExpirationInterval);
+                    }
                 }
             }
             

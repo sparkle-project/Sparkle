@@ -58,28 +58,31 @@ static NSTimeInterval OLD_ITEM_DELETION_INTERVAL = 86400 * 10; // 10 days
 {
     NSMutableArray<NSString *> *filePathsToRemove = [NSMutableArray array];
     NSFileManager *fileManager = [NSFileManager defaultManager];
-    if ([fileManager fileExistsAtPath:directory]) {
-        NSDirectoryEnumerator *directoryEnumerator = [fileManager enumeratorAtPath:directory];
-        NSDate *currentDate = [NSDate date];
-        for (NSString *filename in directoryEnumerator)
-        {
-            NSDictionary<NSString *, id> *fileAttributes = [fileManager attributesOfItemAtPath:[directory stringByAppendingPathComponent:filename] error:NULL];
-            if (fileAttributes != nil)
-            {
-                NSDate *lastModificationDate = [fileAttributes objectForKey:NSFileModificationDate];
-                if ([currentDate timeIntervalSinceDate:lastModificationDate] >= OLD_ITEM_DELETION_INTERVAL)
-                {
-                    [filePathsToRemove addObject:[directory stringByAppendingPathComponent:filename]];
+    
+    NSDirectoryEnumerator *directoryEnumerator = [fileManager enumeratorAtPath:directory];
+    NSDate *currentDate = [NSDate date];
+    for (NSString *filename in directoryEnumerator) {
+        NSString *filePath = [directory stringByAppendingPathComponent:filename];
+        NSDictionary<NSString *, id> *fileAttributes = [fileManager attributesOfItemAtPath:filePath error:NULL];
+        if (fileAttributes != nil) {
+            NSDate *lastModificationDate = [fileAttributes objectForKey:NSFileModificationDate];
+            NSTimeInterval timeIntervalSinceLastModificationDate = [currentDate timeIntervalSinceDate:lastModificationDate];
+            if (timeIntervalSinceLastModificationDate >= OLD_ITEM_DELETION_INTERVAL) {
+                [filePathsToRemove addObject:[directory stringByAppendingPathComponent:filename]];
+            } else if (timeIntervalSinceLastModificationDate < 0) {
+                // Reset the modification date if it's far out in the future
+                NSError *resetModificationDateError = nil;
+                if (![fileManager setAttributes:@{NSFileModificationDate: currentDate} ofItemAtPath:filePath error:&resetModificationDateError]) {
+                    SULog(SULogLevelError, @"Failed to reset modification date of file modified in future: %@", resetModificationDateError.localizedDescription);
                 }
             }
-            
-            [directoryEnumerator skipDescendants];
         }
         
-        for (NSString *filename in filePathsToRemove)
-        {
-            [fileManager removeItemAtPath:filename error:NULL];
-        }
+        [directoryEnumerator skipDescendants];
+    }
+    
+    for (NSString *filename in filePathsToRemove) {
+        [fileManager removeItemAtPath:filename error:NULL];
     }
 }
 
