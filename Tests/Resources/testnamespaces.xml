@@ -14,5 +14,22 @@
         <pubDate>Sat, 26 Jul 2014 15:20:11 +0000</pubDate>
         <enclosure url="http://localhost:1337/Sparkle_Test_App.zip" customNS:version="2.0" length="1346234" />
     </item>
+    <item>
+        <title>Version 4.0</title>
+        <pubDate>Sat, 26 Jul 2014 15:20:13 +0000</pubDate>
+        <customNS:informationalUpdate>
+            <customNS:version>2.5</customNS:version>
+        </customNS:informationalUpdate>
+        <link>https://sparkle-project.org</link>
+        <enclosure url="http://localhost:1337/Sparkle_Test_App.zip" customNS:version="4.0" length="1346234" />
+    </item>
+    <item>
+        <title>Version 5.0</title>
+        <pubDate>Sat, 26 Jul 2014 15:20:14 +0000</pubDate>
+        <customNS:tags>
+            <customNS:criticalUpdate/>
+        </customNS:tags>
+        <enclosure url="http://localhost:1337/Sparkle_Test_App.zip" customNS:version="5.0" length="1346234" />
+    </item>
   </channel>
 </rss>

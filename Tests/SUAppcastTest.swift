@@ -1009,12 +1009,17 @@ class SUAppcastTest: XCTestCase {
             let appcast = try SUAppcast(xmlData: testData as Data, relativeTo: nil, stateResolver: stateResolver, signingValidationStatus: .skipped)
             let items = appcast.items
 
-            XCTAssertEqual(2, items.count)
+            XCTAssertEqual(4, items.count)
 
             XCTAssertEqual("Version 2.0", items[1].title)
             XCTAssertEqual("desc", items[1].itemDescription)
             XCTAssertNotNil(items[0].releaseNotesURL)
             XCTAssertEqual("https://sparkle-project.org/#works", items[0].releaseNotesURL!.absoluteString)
+
+            // Child elements of <sparkle:informationalUpdate> and <sparkle:tags> must be
+            // resolved through the namespace URI too, not through their qualified name
+            XCTAssertFalse(items[2].isInformationOnlyUpdate)
+            XCTAssertTrue(items[3].isCriticalUpdate)
         } catch let err as NSError {
             NSLog("%@", err)
             XCTFail(err.localizedDescription)
