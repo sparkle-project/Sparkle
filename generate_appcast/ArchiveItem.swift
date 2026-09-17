@@ -334,14 +334,15 @@ class ArchiveItem: CustomStringConvertible {
                             guard filename.hasSuffix(localeExtension) else {
                                 continue
                             }
-                            
+
+                            let locale = String(filename.dropLast(localeExtensionCount))
+
                             // English and Base directories are the least likely to be stripped,
                             // so let's not bother recording them.
-                            guard filename != "en" && filename != "Base" else {
+                            guard locale != "en" && locale != "Base" else {
                                 continue
                             }
-                            
-                            let locale = String(filename.dropLast(localeExtensionCount))
+
                             localesPresent.append(locale)
                             localeIndex += 1
                             
