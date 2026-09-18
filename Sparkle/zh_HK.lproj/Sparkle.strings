@@ -1,8 +1,8 @@
 /* No comment provided by engineer. */
-"%@ %@ is currently the newest version available." = "%1$@ %2$@ 已為現時最新的版本。";
+"%@ %@ is currently the newest version available." = "%1$@ %2$@ 已為現時最新可用的版本。";
 
 /* No comment provided by engineer. */
-"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%1$@ %2$@ 已為現時最新的版本。\n（你現時執行的版本是 %3$@。）";
+"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%1$@ %2$@ 已為現時最新可用的版本。\n（你現時執行的版本是 %3$@。）";
 
 /* Description text for SUUpdateAlert when the critical update is downloadable. */
 "%@ %@ is now available—you have %@. This is an important update; would you like to download it now?" = "%1$@ %2$@ 現已可供下載，而你的版本是 %3$@。此為重要更新，是否立即下載？";
@@ -11,7 +11,7 @@
 "%@ %@ is now available—you have %@. Would you like to download it now?" = "%1$@ %2$@ 現已可供下載，而你的版本是 %3$@。是否立即下載？";
 
 /* Description text for SUUpdateAlert when the update informational with no download. */
-"%@ %@ is now available—you have %@. Would you like to learn more about this update on the web?" = "%1$@ %2$@ 現已可供下載，而你的版本是 %3$@。你要在網頁上了解更多關於此更新的資料嗎？";
+"%@ %@ is now available—you have %@. Would you like to learn more about this update on the web?" = "%1$@ %2$@ 現已可供下載，而你的版本是 %3$@。你要在網頁上進一步了解關於此更新的資料嗎？";
 
 /* The download progress in a unit of bytes, e.g. 100 KB */
 "%@ downloaded" = "已下載 %@";
@@ -152,7 +152,7 @@
 "Installing update…" = "正在安裝更新⋯";
 
 /* Alternate title for 'Install Update' button when there's no download in RSS feed. */
-"Learn More…" = "了解更多⋯";
+"Learn More…" = "進一步了解⋯";
 
 /* No comment provided by engineer. */
 "Mac Model" = "Mac 型號";
@@ -221,7 +221,7 @@
 "Updating %@" = "正在更新 %@";
 
 /* No comment provided by engineer. */
-"Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "使用 Finder 將 %1$@ 複製至「應用程式」資料夾，從此位置重新啟󠄁動，然後再試。";
+"Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "使用 Finder 將 %1$@ 複製至「應用程式」資料夾，在該處重新啟󠄁動，然後再試。";
 
 /* No comment provided by engineer. */
 "Version History" = "版本記錄";
