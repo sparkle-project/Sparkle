@@ -16,7 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 SPU_OBJC_DIRECT_MEMBERS @interface SPUAutomaticUpdateDriver : NSObject <SPUUpdateDriver>
 
-- (instancetype)initWithHost:(SUHost *)host applicationBundle:(NSBundle *)applicationBundle updater:(id)updater userDriver:(id <SPUUserDriver>)userDriver updaterDelegate:(nullable id <SPUUpdaterDelegate>)updaterDelegate;
+- (instancetype)initWithHost:(SUHost *)host applicationBundle:(NSBundle *)applicationBundle updater:(id)updater userDriver:(id <SPUUserDriver>)userDriver updaterDelegate:(nullable id <SPUUpdaterDelegate>)updaterDelegate impatientUpdateCheckInterval:(NSTimeInterval)impatientUpdateCheckInterval lastImpatientCheckedDate:(NSDate *)lastImpatientCheckedDate;
 
 @end
 

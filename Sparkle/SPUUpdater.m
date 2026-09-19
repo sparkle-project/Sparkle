@@ -66,6 +66,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     SPUUpdaterTimer *_updaterTimer;
     id<SPUResumableUpdate> _resumableUpdate;
     NSDate *_updateLastCheckedDate;
+    NSDate *_updateLastImpatientCheckedDate;
     NSURL *_lastCheckedFeedURL;
     NSSet<NSString *> * _lastAllowedChannels;
     
@@ -104,6 +105,10 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         _userDriver = userDriver;
         
         _delegate = delegate;
+        
+        // Initialized to the current date instead of nil so the first update check runs
+        // correctly if there's a installation in progress by another external updater
+        _updateLastImpatientCheckedDate = [NSDate date];
         
         NSBundle *mainBundle = [NSBundle mainBundle];
         _updatingMainBundle = [hostBundle isEqualTo:mainBundle];
@@ -461,7 +466,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         // We start the update checks and register as observer for changes after the prompt finishes
     } else {
         // We check if the user's said they want updates, or they haven't said anything, and the default is set to checking.
-        [self scheduleNextUpdateCheckFiringImmediately:NO usingCurrentDate:YES];
+        [self scheduleNextUpdateCheckFiringImmediately:NO usingCurrentDate:YES forcingUIUpdateDriver:NO];
     }
 }
 
@@ -500,7 +505,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 }
 
 // Note this method is never called when sessionInProgress is YES
-- (void)scheduleNextUpdateCheckFiringImmediately:(BOOL)firingImmediately usingCurrentDate:(BOOL)usingCurrentDate SPU_OBJC_DIRECT
+- (void)scheduleNextUpdateCheckFiringImmediately:(BOOL)firingImmediately usingCurrentDate:(BOOL)usingCurrentDate forcingUIUpdateDriver:(BOOL)forcesUIUpdateDriver SPU_OBJC_DIRECT
 {
     [_updaterTimer invalidate];
     
@@ -513,94 +518,65 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     }
     
     if (firingImmediately) {
-        [self _checkForUpdatesInBackground];
+        [self _checkForUpdatesInBackgroundForcingUIUpdateDriver:forcesUIUpdateDriver];
     } else {
-        // This may not return the same update check interval as the developer has configured
-        // Notably it may differ when we have an update that has been already downloaded and needs to resume,
-        // as well as if that update is marked critical or not
-        void (^retrieveNextUpdateCheckInterval)(void (^)(NSTimeInterval)) = ^(void (^completionHandler)(NSTimeInterval)) {
-            NSString *hostBundleIdentifier = self->_host.bundle.bundleIdentifier;
-            assert(hostBundleIdentifier != nil);
-            [SPUProbeInstallStatus probeInstallerUpdateItemForHostBundleIdentifier:hostBundleIdentifier completion:^(SPUInstallationInfo * _Nullable installationInfo) {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    NSTimeInterval regularCheckInterval = [self updateCheckInterval];
-                    NSTimeInterval impatientCheckInterval = [self->_updaterSettings impatientUpdateCheckInterval];
-                    if (installationInfo == nil) {
-                        // Proceed as normal if there's no resumable updates
-                        completionHandler(regularCheckInterval);
-                    } else {
-                        if ([installationInfo.appcastItem isCriticalUpdate] || [installationInfo.appcastItem isInformationOnlyUpdate]) {
-                            completionHandler(MIN(regularCheckInterval, impatientCheckInterval));
-                        } else {
-                            completionHandler(MAX(regularCheckInterval, impatientCheckInterval));
-                        }
-                    }
-                });
-            }];
-        };
-        
-        self.canCheckForUpdates = NO;
-        self.sessionInProgress = YES;
-        
-        retrieveNextUpdateCheckInterval(^(NSTimeInterval updateCheckInterval) {
-            [self setCanCheckForUpdates:YES];
-            [self setSessionInProgress:NO];
-            
-            // This callback is asynchronous, so the timer may be set. Invalidate to make sure it isn't.
-            [self->_updaterTimer invalidate];
-            
-            NSTimeInterval intervalSinceCheck;
-            if (usingCurrentDate) {
-                // How long has it been since last we checked for an update?
-                NSDate *lastCheckDate = [self lastUpdateCheckDate];
-                if (!lastCheckDate) { lastCheckDate = [NSDate distantPast]; }
-                intervalSinceCheck = [[NSDate date] timeIntervalSinceDate:lastCheckDate];
-                if (intervalSinceCheck < 0) {
-                    // Last update check date is in the future and bogus, so reset it to current date
-                    [self updateLastUpdateCheckDate];
-                    
-                    intervalSinceCheck = 0;
-                }
-            } else {
+        NSTimeInterval checkInterval = [self updateCheckInterval];
+
+        // This callback is asynchronous, so the timer may be set. Invalidate to make sure it isn't.
+        [_updaterTimer invalidate];
+
+        NSTimeInterval intervalSinceCheck;
+        if (usingCurrentDate) {
+            // How long has it been since last we checked for an update?
+            NSDate *lastCheckDate = [self lastUpdateCheckDate];
+            if (!lastCheckDate) {
+                lastCheckDate = [NSDate distantPast];
+            }
+            intervalSinceCheck = [[NSDate date] timeIntervalSinceDate:lastCheckDate];
+            if (intervalSinceCheck < 0) {
+                // Last update check date is in the future and bogus, so reset it to current date
+                [self updateLastUpdateCheckDate];
+                
                 intervalSinceCheck = 0;
             }
-            
-            NSTimeInterval minimumUpdateCheckInterval = self->_updaterSettings.minimumUpdateCheckInterval;
-            
-            // Now we want to figure out how long until we check again.
-            if (updateCheckInterval < minimumUpdateCheckInterval)
-                updateCheckInterval = minimumUpdateCheckInterval;
-            if (intervalSinceCheck < updateCheckInterval) {
-                NSTimeInterval delayUntilCheck = (updateCheckInterval - intervalSinceCheck); // It hasn't been long enough.
-                if ([delegate respondsToSelector:@selector(updater:willScheduleUpdateCheckAfterDelay:)]) {
-                    [delegate updater:self willScheduleUpdateCheckAfterDelay:delayUntilCheck];
-                }
-                
-                if ([self->_userDriver respondsToSelector:@selector(logGentleScheduledUpdateReminderWarningIfNeeded)]) {
-                    [(id<SPUGentleUserDriverReminders>)self->_userDriver logGentleScheduledUpdateReminderWarningIfNeeded];
-                }
-                
-                uint64_t leewayUpdateCheckInterval = self->_updaterSettings.leewayUpdateCheckInterval;
-                
-                [self->_updaterTimer startAndFireAfterDelay:delayUntilCheck leewayUpdateCheckInterval:leewayUpdateCheckInterval];
-            } else {
-                // We're overdue! Run one now.
-                [self _checkForUpdatesInBackground];
+        } else {
+            intervalSinceCheck = 0;
+        }
+
+        NSTimeInterval minimumUpdateCheckInterval = self->_updaterSettings.minimumUpdateCheckInterval;
+
+        // Now we want to figure out how long until we check again.
+        if (checkInterval < minimumUpdateCheckInterval)
+            checkInterval = minimumUpdateCheckInterval;
+        if (intervalSinceCheck < checkInterval) {
+            NSTimeInterval delayUntilCheck = (checkInterval - intervalSinceCheck); // It hasn't been long enough.
+            if ([delegate respondsToSelector:@selector(updater:willScheduleUpdateCheckAfterDelay:)]) {
+                [delegate updater:self willScheduleUpdateCheckAfterDelay:delayUntilCheck];
             }
-        });
+            
+            if ([_userDriver respondsToSelector:@selector(logGentleScheduledUpdateReminderWarningIfNeeded)]) {
+                [(id<SPUGentleUserDriverReminders>)_userDriver logGentleScheduledUpdateReminderWarningIfNeeded];
+            }
+            
+            uint64_t leewayUpdateCheckInterval = _updaterSettings.leewayUpdateCheckInterval;
+            
+            [_updaterTimer startAndFireAfterDelay:delayUntilCheck leewayUpdateCheckInterval:leewayUpdateCheckInterval];
+        } else {
+            // We're overdue! Run one now.
+            [self _checkForUpdatesInBackgroundForcingUIUpdateDriver:forcesUIUpdateDriver];
+        }
     }
 }
 
 - (void)updaterTimerDidFire
 {
     // User can perform a checkForUpdates check around the same time the timer is ready to fire
-    if (!_sessionInProgress)
-    {
-        [self _checkForUpdatesInBackground];
+    if (!_sessionInProgress) {
+        [self _checkForUpdatesInBackgroundForcingUIUpdateDriver:NO];
     }
 }
 
-- (void)_checkForUpdatesInBackground SPU_OBJC_DIRECT
+- (void)_checkForUpdatesInBackgroundForcingUIUpdateDriver:(BOOL)forcesUIUpdateDriver SPU_OBJC_DIRECT
 {
     [self setSessionInProgress:YES];
     [self setCanCheckForUpdates:NO];
@@ -618,15 +594,29 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
             }
             
             id<SPUUpdaterDelegate> delegate = strongSelf->_delegate;
-            id <SPUUpdateDriver> updateDriver;
-            if (!installerIsRunning && [strongSelf automaticallyDownloadsUpdates] && strongSelf->_resumableUpdate == nil) {
+            id <SPUUpdateDriver> updateDriver = nil;
+            BOOL usesAutomaticUpdateDriver;
+            if (forcesUIUpdateDriver) {
+                usesAutomaticUpdateDriver = NO;
+            } else {
+                usesAutomaticUpdateDriver = [strongSelf automaticallyDownloadsUpdates];
+            }
+            
+            if (usesAutomaticUpdateDriver) {
+                if ([strongSelf->_updateLastImpatientCheckedDate timeIntervalSinceNow] > 0) {
+                    // Last impatient checked date is bogus (in the future), reset it
+                    strongSelf->_updateLastImpatientCheckedDate = [NSDate date];
+                }
+                
                 updateDriver =
                 [[SPUAutomaticUpdateDriver alloc]
                  initWithHost:strongSelf->_host
                  applicationBundle:strongSelf->_applicationBundle
                  updater:strongSelf
                  userDriver:strongSelf->_userDriver
-                 updaterDelegate:delegate];
+                 updaterDelegate:delegate
+                 impatientUpdateCheckInterval:strongSelf->_updaterSettings.impatientUpdateCheckInterval
+                 lastImpatientCheckedDate:strongSelf->_updateLastImpatientCheckedDate];
             } else {
                 updateDriver =
                 [[SPUScheduledUpdateDriver alloc]
@@ -637,7 +627,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
                  updaterDelegate:delegate];
             }
             
-            [strongSelf checkForUpdatesWithDriver:updateDriver updateCheck:SPUUpdateCheckUpdatesInBackground installerInProgress:installerIsRunning];
+            [strongSelf checkForUpdatesWithDriver:updateDriver updateCheck:SPUUpdateCheckUpdatesInBackground installerInProgress:installerIsRunning usesAutomaticUpdateDriver:usesAutomaticUpdateDriver];
         });
     }];
 }
@@ -678,7 +668,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         }
     }
     
-    [self _checkForUpdatesInBackground];
+    [self _checkForUpdatesInBackgroundForcingUIUpdateDriver:NO];
 }
 
 - (void)checkForUpdates
@@ -732,7 +722,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         dispatch_async(dispatch_get_main_queue(), ^{
             __typeof__(self) strongSelf = weakSelf;
             if (strongSelf != nil) {
-                [strongSelf checkForUpdatesWithDriver:theUpdateDriver updateCheck:SPUUpdateCheckUpdates installerInProgress:installerInProgress];
+                [strongSelf checkForUpdatesWithDriver:theUpdateDriver updateCheck:SPUUpdateCheckUpdates installerInProgress:installerInProgress usesAutomaticUpdateDriver:NO];
             }
         });
     }];
@@ -771,16 +761,16 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         dispatch_async(dispatch_get_main_queue(), ^{
             __typeof__(self) strongSelf = weakSelf;
             if (strongSelf != nil) {
-                [strongSelf checkForUpdatesWithDriver:[[SPUProbingUpdateDriver alloc] initWithHost:strongSelf->_host updater:strongSelf updaterDelegate:strongSelf->_delegate] updateCheck:SPUUpdateCheckUpdateInformation installerInProgress:installerInProgress];
+                [strongSelf checkForUpdatesWithDriver:[[SPUProbingUpdateDriver alloc] initWithHost:strongSelf->_host updater:strongSelf updaterDelegate:strongSelf->_delegate] updateCheck:SPUUpdateCheckUpdateInformation installerInProgress:installerInProgress usesAutomaticUpdateDriver:NO];
             }
         });
     }];
 }
 
-- (void)checkForUpdatesWithDriver:(id <SPUUpdateDriver> )d updateCheck:(SPUUpdateCheck)updateCheck installerInProgress:(BOOL)installerInProgress SPU_OBJC_DIRECT
+- (void)checkForUpdatesWithDriver:(id <SPUUpdateDriver> )d updateCheck:(SPUUpdateCheck)updateCheck installerInProgress:(BOOL)installerInProgress usesAutomaticUpdateDriver:(BOOL)usesAutomaticUpdateDriver SPU_OBJC_DIRECT
 {
     if (_driver != nil) {
-        SULog(SULogLevelError, @"Error: checkForUpdatesWithDriver:updateCheck:installerInProgress: called when _driver != nil");
+        SULog(SULogLevelError, @"Error: checkForUpdatesWithDriver:updateCheck:installerInProgress:usesAutomaticUpdateDriver: called when _driver != nil");
         return;
     }
     
@@ -814,7 +804,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     
     void (^abortUpdateDriver)(NSError  * _Nullable , BOOL) = ^(NSError * _Nullable abortError, BOOL shouldScheduleNextUpdateCheck) {
         __weak __typeof__(self) weakSelf = self;
-        [self->_driver setCompletionHandler:^(BOOL __unused shouldShowUpdateImmediately, id<SPUResumableUpdate>  _Nullable __unused resumableUpdate, NSError * _Nullable error) {
+        [self->_driver setCompletionHandler:^(BOOL __unused shouldShowUpdateImmediately, BOOL __unused resumedExistingUpdate, id<SPUResumableUpdate>  _Nullable __unused resumableUpdate, NSError * _Nullable error) {
             __typeof__(self) strongSelf = weakSelf;
             if (strongSelf != nil) {
                 strongSelf->_driver = nil;
@@ -829,7 +819,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
                 // Ensure the delegate doesn't start a new session when being notified of the previous one ending
                 if (!strongSelf->_sessionInProgress) {
                     if (shouldScheduleNextUpdateCheck) {
-                        [strongSelf scheduleNextUpdateCheckFiringImmediately:NO usingCurrentDate:NO];
+                        [strongSelf scheduleNextUpdateCheckFiringImmediately:NO usingCurrentDate:NO forcingUIUpdateDriver:NO];
                     } else {
                         SULog(SULogLevelDefault, @"Disabling scheduled updates..");
                     }
@@ -866,13 +856,20 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     
     // Run our update driver and schedule next update check on its completion
     __weak __typeof__(self) weakSelf = self;
-    [_driver setCompletionHandler:^(BOOL shouldShowUpdateImmediately, id<SPUResumableUpdate>  _Nullable resumableUpdate, NSError * _Nullable error) {
+    [_driver setCompletionHandler:^(BOOL shouldShowUpdateImmediately, BOOL resumedExistingUpdate, id<SPUResumableUpdate> _Nullable resumableUpdate, NSError * _Nullable error) {
         __typeof__(self) strongSelf = weakSelf;
         if (strongSelf != nil) {
             strongSelf->_resumableUpdate = resumableUpdate;
-            strongSelf->_driver = nil;
-            
+
             [strongSelf updateLastUpdateCheckDate];
+            
+            // Track the last downloaded date locally the first time the automatic update driver
+            // downloads an update in the background. This is later used for the impatient update check.
+            if (!shouldShowUpdateImmediately && error == nil && usesAutomaticUpdateDriver && !resumedExistingUpdate) {
+                strongSelf->_updateLastImpatientCheckedDate = [strongSelf lastUpdateCheckDate];
+            }
+            
+            strongSelf->_driver = nil;
             
             [strongSelf setSessionInProgress:NO];
             [strongSelf setCanCheckForUpdates:YES];
@@ -886,7 +883,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
             
             // Ensure the delegate doesn't start a new session when being notified of the previous one ending
             if (!strongSelf->_sessionInProgress) {
-                [strongSelf scheduleNextUpdateCheckFiringImmediately:shouldShowUpdateImmediately usingCurrentDate:NO];
+                [strongSelf scheduleNextUpdateCheckFiringImmediately:shouldShowUpdateImmediately usingCurrentDate:NO forcingUIUpdateDriver:shouldShowUpdateImmediately];
             }
         }
     }];
@@ -901,21 +898,21 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         [weakSelf updateLastUpdateCheckDate];
     }];
     
-    if (installerInProgress) {
-        // Resume an update that has already begun installing in the background
-        [_driver resumeInstallingUpdate];
-    } else if (_resumableUpdate != nil) {
-        // Resume an update or info that has already been downloaded
-        [_driver resumeUpdate:(id<SPUResumableUpdate> _Nonnull)_resumableUpdate];
+    // Check that the parameterized feed URL is valid
+    NSURL *theFeedURL = [self parameterizedFeedURL];
+    if (theFeedURL == nil) {
+        // I think this is really unlikely to occur but better be safe
+        // We will not schedule a next update check if the feed URL cannot be formed
+        SULog(SULogLevelError, @"Error: failed to retrieve feed URL for bundle");
+        
+        abortUpdateDriver([NSError errorWithDomain:SUSparkleErrorDomain code:SUInvalidFeedURLError userInfo:@{ NSLocalizedDescriptionKey: @"Sparkle cannot form a valid feed URL." }], NO);
     } else {
-        // Check that the parameterized feed URL is valid
-        NSURL *theFeedURL = [self parameterizedFeedURL];
-        if (theFeedURL == nil) {
-            // I think this is really unlikely to occur but better be safe
-            // We will not schedule a next update check if the feed URL cannot be formed
-            SULog(SULogLevelError, @"Error: failed to retrieve feed URL for bundle");
-            
-            abortUpdateDriver([NSError errorWithDomain:SUSparkleErrorDomain code:SUInvalidFeedURLError userInfo:@{ NSLocalizedDescriptionKey: @"Sparkle cannot form a valid feed URL." }], NO);
+        if (installerInProgress) {
+            // Resume an update that has already begun installing in the background
+            [_driver resumeInstallingUpdateOrCheckForUpdatesAtAppcastURL:theFeedURL withUserAgent:_userAgentString httpHeaders:_httpHeaders];
+        } else if (_resumableUpdate != nil) {
+            // Resume an update or info that has already been downloaded
+            [_driver resumeUpdate:(id<SPUResumableUpdate> _Nonnull)_resumableUpdate orCheckForUpdatesAtAppcastURL:theFeedURL withUserAgent:_userAgentString httpHeaders:_httpHeaders];
         } else {
             // Check for new updates
             [_driver checkForUpdatesAtAppcastURL:theFeedURL withUserAgent:_userAgentString httpHeaders:_httpHeaders];
@@ -982,7 +979,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
             }
         }
         
-        [self scheduleNextUpdateCheckFiringImmediately:fireUpdateCheckImmediately usingCurrentDate:YES];
+        [self scheduleNextUpdateCheckFiringImmediately:fireUpdateCheckImmediately usingCurrentDate:YES forcingUIUpdateDriver:NO];
     }
 }
 

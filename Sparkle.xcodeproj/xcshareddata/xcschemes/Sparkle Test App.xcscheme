@@ -58,6 +58,11 @@
             value = "DELTA_AND_MARKDOWN"
             isEnabled = "NO">
          </EnvironmentVariable>
+         <EnvironmentVariable
+            key = "TEST_MODE"
+            value = "SUPERSEDE"
+            isEnabled = "NO">
+         </EnvironmentVariable>
       </EnvironmentVariables>
       <MetalAPIValidationSettings
          isEnabled = "No">

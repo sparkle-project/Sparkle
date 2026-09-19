@@ -26,15 +26,20 @@
 {
     SPUCoreBasedUpdateDriver *_coreDriver;
     SUAppcastItem* _updateItem;
+    NSDate *_lastImpatientCheckedDate;
     
     __weak id _updater;
     __weak id<SPUUserDriver> _userDriver;
     __weak id _updaterDelegate;
     
+    NSTimeInterval _impatientUpdateCheckInterval;
+    
     BOOL _installerDidFinishPreparation;
+    BOOL _startedResumingInstallingUpdate;
+    BOOL _impatientIntervalElapsedForResumingInstall;
 }
 
-- (instancetype)initWithHost:(SUHost *)host applicationBundle:(NSBundle *)applicationBundle updater:(id)updater userDriver:(id <SPUUserDriver>)userDriver updaterDelegate:(nullable id <SPUUpdaterDelegate>)updaterDelegate
+- (instancetype)initWithHost:(SUHost *)host applicationBundle:(NSBundle *)applicationBundle updater:(id)updater userDriver:(id <SPUUserDriver>)userDriver updaterDelegate:(nullable id <SPUUpdaterDelegate>)updaterDelegate impatientUpdateCheckInterval:(NSTimeInterval)impatientUpdateCheckInterval lastImpatientCheckedDate:(NSDate *)lastImpatientCheckedDate
 {
     self = [super init];
     if (self != nil) {
@@ -42,6 +47,8 @@
         // The user driver is only used for a termination callback
         _userDriver = userDriver;
         _updaterDelegate = updaterDelegate;
+        _impatientUpdateCheckInterval = impatientUpdateCheckInterval;
+        _lastImpatientCheckedDate = lastImpatientCheckedDate;
         _coreDriver = [[SPUCoreBasedUpdateDriver alloc] initWithHost:host applicationBundle:applicationBundle updateCheck:SPUUpdateCheckUpdatesInBackground updater:updater updaterDelegate:updaterDelegate delegate:self];
     }
     return self;
@@ -66,16 +73,16 @@
     [_coreDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders inBackground:YES requiresSilentInstall:YES];
 }
 
-- (void)resumeInstallingUpdate
+- (void)resumeInstallingUpdateOrCheckForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders
 {
-    // Nothing really to do here.. this shouldn't be called.
-    SULog(SULogLevelError, @"Error: resumeInstallingUpdate: called on SPUAutomaticUpdateDriver");
+    _startedResumingInstallingUpdate = YES;
+    
+    [_coreDriver resumeInstallingUpdateOrCheckForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders inBackground:YES requiresSilentInstall:YES];
 }
 
-- (void)resumeUpdate:(id<SPUResumableUpdate>)__unused resumableUpdate
+- (void)resumeUpdate:(id<SPUResumableUpdate>)resumableUpdate orCheckForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders
 {
-    // Nothing really to do here.. this shouldn't be called.
-    SULog(SULogLevelError, @"Error: resumeDownloadedUpdate: called on SPUAutomaticUpdateDriver");
+    [_coreDriver resumeUpdate:resumableUpdate orCheckForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders inBackground:YES requiresSilentInstall:YES];
 }
 
 // Note: critical updates can be downloaded automatically first before needing user attention
@@ -84,15 +91,29 @@ static BOOL SPUUpdateRequiresUserAttentionBeforeDownloading(SUAppcastItem *updat
     return (updateItem.isInformationOnlyUpdate || updateItem.majorUpgrade || updateItem.signingValidationStatus == SPUAppcastSigningValidationStatusFailed);
 }
 
-- (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)updateItem secondaryAppcastItem:(SUAppcastItem * _Nullable)secondaryUpdateItem
+- (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)updateItem secondaryAppcastItem:(SUAppcastItem * _Nullable)secondaryUpdateItem resuming:(BOOL)resuming
 {
     _updateItem = updateItem;
     
-    if (SPUUpdateRequiresUserAttentionBeforeDownloading(updateItem)) {
-        [_coreDriver deferInformationalUpdate:updateItem secondaryUpdate:secondaryUpdateItem];
+    if (resuming) {
+        if (_startedResumingInstallingUpdate) {
+            // The update has already finished preparation from a previous cycle
+            _installerDidFinishPreparation = YES;
+            
+            // SPUUpdater before the automatic update driver is invoked tests that the
+            // _lastImpatientCheckedDate is not in the future. Although there is still a small race
+            // between then, it's not worth worrying about.
+            NSTimeInterval intervalSinceImpatientDate = [[NSDate date] timeIntervalSinceDate:_lastImpatientCheckedDate];
+            _impatientIntervalElapsedForResumingInstall = (intervalSinceImpatientDate >= _impatientUpdateCheckInterval);
+        }
         [self abortUpdate];
     } else {
-        [_coreDriver downloadUpdateFromAppcastItem:updateItem secondaryAppcastItem:secondaryUpdateItem inBackground:YES];
+        if (SPUUpdateRequiresUserAttentionBeforeDownloading(updateItem)) {
+            [_coreDriver deferInformationalUpdate:updateItem secondaryUpdate:secondaryUpdateItem];
+            [self abortUpdate];
+        } else {
+            [_coreDriver downloadUpdateFromAppcastItem:updateItem secondaryAppcastItem:secondaryUpdateItem inBackground:YES];
+        }
     }
 }
 
@@ -147,7 +168,7 @@ static BOOL SPUUpdateRequiresUserAttentionBeforeDownloading(SUAppcastItem *updat
 {
     // It should not be necessary to include properties from SPUUpdateRequiresUserAttentionBeforeDownloading() because _installerDidFinishPreparation should be NO in those cases,
     // but we'll include the check anyway
-    BOOL showNextUpdateImmediately = (error == nil || error.code == SUInstallationAuthorizeLaterError) && (!_installerDidFinishPreparation || _updateItem.criticalUpdate || SPUUpdateRequiresUserAttentionBeforeDownloading(_updateItem));
+    BOOL showNextUpdateImmediately = (error == nil || error.code == SUInstallationAuthorizeLaterError) && (!_installerDidFinishPreparation || _updateItem.criticalUpdate || SPUUpdateRequiresUserAttentionBeforeDownloading(_updateItem) || _impatientIntervalElapsedForResumingInstall);
     
     [_coreDriver abortUpdateAndShowNextUpdateImmediately:showNextUpdateImmediately error:error];
 }

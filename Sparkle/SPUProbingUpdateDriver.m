@@ -49,22 +49,27 @@
     [_basicDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders inBackground:YES];
 }
 
-- (void)resumeInstallingUpdate
+- (void)resumeInstallingUpdateOrCheckForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders
 {
-    [_basicDriver resumeInstallingUpdate];
+    [_basicDriver resumeInstallingUpdateOrCheckForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders inBackground:YES];
 }
 
-- (void)resumeUpdate:(id<SPUResumableUpdate>)resumableUpdate
+- (void)resumeUpdate:(id<SPUResumableUpdate>)resumableUpdate orCheckForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders
 {
     _resumableUpdate = resumableUpdate;
     
-    [_basicDriver resumeUpdate:resumableUpdate];
+    [_basicDriver resumeUpdate:resumableUpdate orCheckForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders inBackground:YES];
 }
 
-- (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)__unused appcastItem secondaryAppcastItem:(SUAppcastItem * _Nullable)__unused secondaryAppcastItem systemDomain:(NSNumber * _Nullable)__unused systemDomain
+- (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)__unused appcastItem secondaryAppcastItem:(SUAppcastItem * _Nullable)__unused secondaryAppcastItem systemDomain:(NSNumber * _Nullable)__unused systemDomain resuming:(BOOL)__unused resuming
 {
     // Stop as soon as we have an answer
     [self abortUpdate];
+}
+
+- (void)basicDriverWillDiscardStaleResumableUpdate:(id<SPUResumableUpdate>)__unused resumableUpdate
+{
+    _resumableUpdate = nil;
 }
 
 - (BOOL)showingUpdate

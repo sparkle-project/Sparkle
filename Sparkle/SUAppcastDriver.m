@@ -65,7 +65,7 @@
     return self;
 }
 
-- (void)loadAppcastFromURL:(NSURL *)appcastURL userAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background
+- (void)loadAppcastFromURL:(NSURL *)appcastURL userAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background resumingUpdate:(BOOL)resumingUpdate
 {
     assert(NSThread.isMainThread);
     
@@ -76,12 +76,18 @@
     requestHTTPHeaders[@"Accept"] = @"application/rss+xml,*/*;q=0.1";
     
     NSURLRequestCachePolicy cachePolicy;
-    if (!background || [_host boolForInfoDictionaryKey:SUDisableFeedCacheValidationKey]) {
-        // Always fetch the freshest feed when the user explicitly asks us to check,
-        // or if the developer disabled feed cache validation
+    if ([_host boolForInfoDictionaryKey:SUDisableFeedCacheValidationKey]) {
+        // The developer disabled feed cache validation
+        cachePolicy = NSURLRequestReloadIgnoringLocalCacheData;
+    } else if (resumingUpdate) {
+        // We already have an update downloaded or installing that we can fall back to resuming,
+        // so we will risk always respecting the cache
+        cachePolicy = NSURLRequestReloadRevalidatingCacheData;
+    } else if (!background) {
+        // Always fetch the freshest feed when the user explicitly asks us to check
         cachePolicy = NSURLRequestReloadIgnoringLocalCacheData;
     } else {
-        // With NSURLRequestReloadRevalidatingCacheData ETag / If-Modified-Since can be used so that
+        // With NSURLRequestReloadRevalidatingCacheData, ETag / If-Modified-Since can be used so that
         // a previously cached file can be used if it hasn't changed on the server.
         // However we have a bypass check interval periodically to force ignoring the cache data if
         // something happens to go wrong.

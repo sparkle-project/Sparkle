@@ -8,6 +8,34 @@ IMPORTANT: This file must be re-signed if modifications are made to this file! T
     <description>Most recent changes with links to updates.</description>
     <language>en</language>
         <item>
+        <title>Version 3.1</title>
+        <sparkle:version>3.1</sparkle:version>
+        <link>https://sparkle-project.org</link>
+        <sparkle:channel>supercede2</sparkle:channel>
+        <description>
+          <![CDATA[
+            <p>Superseding update.</p>
+          ]]>
+        </description>
+        <pubDate>Sat, 26 Jul 2014 15:20:11 +0000</pubDate>
+        <enclosure url="http://localhost:1337/Sparkle_Test_App_Superseding.zip" length="$INSERT_SUPERCEDE2_ARCHIVE_LENGTH" type="application/octet-stream" sparkle:edSignature="$INSERT_SUPERCEDE2_EDDSA_SIGNATURE" />
+        </item>
+
+        <item>
+        <title>Version 3.0</title>
+        <sparkle:version>3.0</sparkle:version>
+        <link>https://sparkle-project.org</link>
+        <sparkle:channel>supercede1</sparkle:channel>
+        <description>
+          <![CDATA[
+            <p>Initial update, expected to be superseded before it's installed.</p>
+          ]]>
+        </description>
+        <pubDate>Sat, 26 Jul 2014 15:20:11 +0000</pubDate>
+        <enclosure url="http://localhost:1337/Sparkle_Test_App.zip" length="$INSERT_SUPERCEDE1_ARCHIVE_LENGTH" type="application/octet-stream" sparkle:edSignature="$INSERT_SUPERCEDE1_EDDSA_SIGNATURE" />
+        </item>
+
+        <item>
         <title>Version 2.2</title>
         <sparkle:version>2.2</sparkle:version>
         <link>https://sparkle-project.org</link>

@@ -20,7 +20,6 @@ NS_ASSUME_NONNULL_BEGIN
 @optional
 
 - (void)uiDriverDidShowUpdate;
-- (void)basicDriverDidFinishLoadingAppcast;
 
 @end
 
@@ -37,9 +36,9 @@ SPU_OBJC_DIRECT_MEMBERS @interface SPUUIBasedUpdateDriver : NSObject
 
 - (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background;
 
-- (void)resumeInstallingUpdate;
+- (void)resumeInstallingUpdateOrCheckForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background;
 
-- (void)resumeUpdate:(id<SPUResumableUpdate>)resumableUpdate;
+- (void)resumeUpdate:(id<SPUResumableUpdate>)resumableUpdate orCheckForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background;
 
 - (void)abortUpdateWithError:(nullable NSError *)error showErrorToUser:(BOOL)showedUserProgress;
 

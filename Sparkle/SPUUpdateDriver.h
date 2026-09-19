@@ -10,7 +10,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol SPUResumableUpdate;
 
-typedef void (^SPUUpdateDriverCompletion)(BOOL shouldShowUpdateImmediately, id<SPUResumableUpdate> _Nullable resumableUpdate, NSError * _Nullable error);
+// There are two types of 'resumable' updates. One type is passing a SPUResumableUpdate (a downloaded-only update).
+// The other type is querying the SPUInstallationInfo from the status service, which is an update that has been staged to install already
+// resumedExistingUpdate denotes if the update cycle completed resuming either of these two types
+typedef void (^SPUUpdateDriverCompletion)(BOOL shouldShowUpdateImmediately, BOOL resumedExistingUpdate, id<SPUResumableUpdate> _Nullable resumableUpdate, NSError * _Nullable error);
 
 // This protocol describes an update driver that drives updates
 // An update driver may have multiple levels of other controller components (eg: basic update driver, core based update driver, ui based update driver, appcast driver, etc)
@@ -27,9 +30,9 @@ typedef void (^SPUUpdateDriverCompletion)(BOOL shouldShowUpdateImmediately, id<S
 
 - (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders;
 
-- (void)resumeInstallingUpdate;
+- (void)resumeInstallingUpdateOrCheckForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders;
 
-- (void)resumeUpdate:(id<SPUResumableUpdate>)resumableUpdate;
+- (void)resumeUpdate:(id<SPUResumableUpdate>)resumableUpdate orCheckForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders;
 
 @property (nonatomic, readonly) BOOL showingUpdate;
 
