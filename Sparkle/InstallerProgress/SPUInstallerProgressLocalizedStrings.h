@@ -178,8 +178,8 @@ static NSDictionary<NSString *, NSDictionary<NSString *, NSString *> *> *const S
     },
     @"zh_HK": @{
         @"Cancel Update": @"取消更新",
-        @"Installing update…": @"安裝緊更新⋯",
-        @"Updating %@": @"更新緊 %@",
+        @"Installing update…": @"正在安裝更新⋯",
+        @"Updating %@": @"正在更新 %@",
     },
     @"zh_TW": @{
         @"Cancel Update": @"取消更新",
