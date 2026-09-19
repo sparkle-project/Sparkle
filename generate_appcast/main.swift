@@ -9,7 +9,7 @@
 import Foundation
 import ArgumentParser
 
-func loadPrivateKeys(_ account: String, _ privateDSAKey: SecKey?, _ privateEdString: String?, allowNewPrivateKey: Bool) -> PrivateKeys? {
+func loadPrivateKeys(_ account: String, _ privateDSAKey: SecKey?, _ privateEdString: String?, allowNewPrivateKey: Bool, verbose: Bool) -> PrivateKeys? {
     var privateEdKey: Data?
     var publicEdKey: Data?
     var item: CFTypeRef?
@@ -36,6 +36,10 @@ func loadPrivateKeys(_ account: String, _ privateDSAKey: SecKey?, _ privateEdStr
     }
     // get keys from kechain instead
     else {
+        if verbose {
+            // This is where a Keychain permission prompt may be waiting for input, which looks like a stall in a CI log
+            print("Looking up EdDSA private key in the Keychain for account '\(account)'")
+        }
         let res = SecItemCopyMatching([
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: "https://sparkle-project.org",
@@ -45,6 +49,9 @@ func loadPrivateKeys(_ account: String, _ privateDSAKey: SecKey?, _ privateEdStr
         ] as CFDictionary, &item)
         if res == errSecSuccess, let encoded = item as? Data {
             if let data = Data(base64Encoded: encoded) {
+                if verbose {
+                    print("Loaded EdDSA private key from the Keychain")
+                }
                 secret = data
             } else {
                 print("Error: Failed to base64 decode secret data from keychain")
@@ -67,6 +74,23 @@ func loadPrivateKeys(_ account: String, _ privateDSAKey: SecKey?, _ privateEdStr
 }
 
 let DEFAULT_MAX_CDATA_THRESHOLD = 1000
+
+// Lists what an appcast depends on, so a newly created delta file doesn't go unnoticed
+func printFilesReferenced(by appcast: Appcast, appcastFile: String) {
+    print("Files referenced by \(appcastFile):")
+    for version in appcast.versionsInFeed {
+        guard let update = appcast.archives[version] else {
+            continue
+        }
+        print("  \(update.archivePath.lastPathComponent) (version \(update.version))")
+        if let releaseNotesPath = update.releaseNotesPath {
+            print("  \(releaseNotesPath.lastPathComponent) (release notes for version \(update.version))")
+        }
+        for delta in update.deltas {
+            print("  \(delta.archivePath.lastPathComponent) (delta from version \(delta.fromVersion) to \(update.version))")
+        }
+    }
+}
 
 struct GenerateAppcast: ParsableCommand {
     static let programName = "generate_appcast"
@@ -168,7 +192,7 @@ struct GenerateAppcast: ParsableCommand {
     @Argument(help: "The path to the directory containing the update archives and delta files.", transform: { URL(fileURLWithPath: $0, isDirectory: true) })
     var archivesSourceDir: URL
     
-    @Flag(help: .hidden)
+    @Flag(help: ArgumentHelp("Print detailed progress information: where the signing keys are loaded from, which archives are unarchived or reused from the cache, which updates and delta files are signed, and which files each generated appcast references. Useful for diagnosing where generate_appcast is spending time or waiting, such as on a Keychain prompt in a CI environment."))
     var verbose: Bool = false
     
     @Flag(name: .customLong("disable-nested-code-check"), help: .hidden)
@@ -265,6 +289,9 @@ struct GenerateAppcast: ParsableCommand {
         if let privateDSAKeyURL = privateDSAKeyURL {
             do {
                 privateDSAKey = try loadPrivateDSAKey(at: privateDSAKeyURL)
+                if verbose {
+                    print("Loaded DSA private key from", privateDSAKeyURL.path)
+                }
             } catch {
                 print("Unable to load DSA private key from", privateDSAKeyURL.path, "\n", error)
                 throw ExitCode(1)
@@ -272,6 +299,9 @@ struct GenerateAppcast: ParsableCommand {
         } else if let keychainURL = keychainURL, let privateDSAKeyName = privateDSAKeyName {
             do {
                 privateDSAKey = try loadPrivateDSAKey(named: privateDSAKeyName, fromKeychainAt: keychainURL)
+                if verbose {
+                    print("Loaded DSA private key '\(privateDSAKeyName)' from keychain at", keychainURL.path)
+                }
             } catch {
                 print("Unable to load DSA private key '\(privateDSAKeyName)' from keychain at", keychainURL.path, "\n", error)
                 throw ExitCode(1)
@@ -294,6 +324,9 @@ struct GenerateAppcast: ParsableCommand {
             do {
                 if privateEdKeyPath == "-" && !FileManager.default.fileExists(atPath: privateEdKeyPath) {
                     if let line = readLine(strippingNewline: true) {
+                        if verbose {
+                            print("Read EdDSA private key from standard input")
+                        }
                         privateEdKeyString = line
                     } else {
                         print("Unable to read EdDSA private key from standard input")
@@ -302,6 +335,9 @@ struct GenerateAppcast: ParsableCommand {
                 } else {
                     do {
                         privateEdKeyString = try decodeSecretString(filePath: privateEdKeyPath)
+                        if verbose {
+                            print("Read EdDSA private key from", privateEdKeyPath)
+                        }
                     } catch {
                         print(error.localizedDescription)
                         throw ExitCode(1)
@@ -318,7 +354,7 @@ struct GenerateAppcast: ParsableCommand {
             allowNewPrivateKey = true
         }
         
-        guard let keys = loadPrivateKeys(account, privateDSAKey, privateEdKeyString, allowNewPrivateKey: allowNewPrivateKey) else {
+        guard let keys = loadPrivateKeys(account, privateDSAKey, privateEdKeyString, allowNewPrivateKey: allowNewPrivateKey, verbose: verbose) else {
             throw ExitCode(1)
         }
         
@@ -345,6 +381,10 @@ struct GenerateAppcast: ParsableCommand {
                 let removedUpdatesString = pluralizeUpdates(numUpdatesRemoved)
                 
                 print("Wrote \(numNewUpdates) new \(newUpdatesString), updated \(numExistingUpdates) existing \(existingUpdatesString), and removed \(numUpdatesRemoved) old \(removedUpdatesString) in \(appcastFile)")
+                
+                if verbose {
+                    printFilesReferenced(by: appcast, appcastFile: appcastFile)
+                }
             }
             
             let (moveCount, prunedCount) = moveOldUpdatesFromAppcasts(archivesSourceDir: archivesSourceDir, oldFilesDirectory: oldFilesDirectory, cacheDirectory: GenerateAppcast.cacheDirectory, appcasts: Array(appcastsByFeed.values), autoPruneUpdates: autoPruneUpdates)
