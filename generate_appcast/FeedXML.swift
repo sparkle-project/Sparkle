@@ -519,6 +519,9 @@ func writeAppcast(appcastDestPath: URL, keys: PrivateKeys, disableEmbeddedSignWa
             descElement.setChildren([cdata])
             if descriptionFormat != "html" {
                 descElement.addAttribute(XMLNode.attribute(withName: SUAppcastAttributeFormat, stringValue: descriptionFormat) as! XMLNode)
+            } else {
+                // html is the default format, so drop a format left over from previously embedded release notes
+                descElement.removeAttribute(forName: SUAppcastAttributeFormat)
             }
         } else if let existingDescriptionElement = findElement(name: "description", parent: item) {
             // The update doesn't include embedded release notes. Remove it.
