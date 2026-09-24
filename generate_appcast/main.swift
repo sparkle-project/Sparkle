@@ -159,7 +159,7 @@ struct GenerateAppcast: ParsableCommand {
     @Option(name: .long, help: ArgumentHelp("A comma delimited list of application sparkle:version's that will see newly generated updates as being informational only. An empty string argument will treat this update as informational coming from any application version. Prefix a version string with '<' to indicate (eg \"<2.5\") to indicate older versions than the one specified should treat the update as informational only. By default, updates are not informational only. --link must also be provided. Old applications need to be using Sparkle 2 to use this feature, and 2.1 or later to use the '<' upper bound feature.", valueName: "informational-update-versions"), transform: { $0.components(separatedBy: ",").filter({$0.count > 0}) })
     var informationalUpdateVersions: [String]?
     
-    @Flag(name: .customLong("auto-prune-update-files"), help: ArgumentHelp("Automatically remove old update files in \(oldFilesDirectoryName) that haven't been touched in 2 weeks"))
+    @Flag(name: .customLong("auto-prune-update-files"), help: ArgumentHelp("Automatically remove old update files in \(oldFilesDirectoryName), and old entries in the extraction cache, that haven't been touched in 2 weeks"))
     var autoPruneUpdates: Bool = false
     
     @Option(name: .customShort("o"), help: ArgumentHelp("Path to filename for the generated appcast (allowed when only one will be created).", valueName: "output-path"), transform: { URL(fileURLWithPath: $0) })
@@ -185,6 +185,8 @@ struct GenerateAppcast: ParsableCommand {
         Old updates are automatically removed from the generated appcast feed and their update files are moved to \(oldFilesDirectoryName)/
         If --auto-prune-update-files is passed, old update files in this directory are deleted after 2 weeks.
         You may want to exclude files from this directory from being uploaded.
+        
+        The same flag also deletes entries in the extraction cache (see below) that haven't been touched in 2 weeks. Without it, this cache grows without bound: every archive processed leaves a full extracted copy behind, and an archive that's later replaced in place (e.g. a release script that overwrites the same output filename on every run) never gets revisited, so its cache entry is never reclaimed on its own.
         
         Use the --versions option if you need to insert an update that is older than the latest update in your feed, or
         if you need to insert only a specific new version with certain parameters.
@@ -212,7 +214,7 @@ struct GenerateAppcast: ParsableCommand {
         
         For more advanced options that can be used for publishing updates, see https://sparkle-project.org/documentation/publishing/ for further documentation.
         
-        Extracted archives that are needed are cached in \((cacheDirectory.path as NSString).abbreviatingWithTildeInPath) to avoid re-computation in subsequent runs.
+        Extracted archives that are needed are cached in \((cacheDirectory.path as NSString).abbreviatingWithTildeInPath) to avoid re-computation in subsequent runs. This cache is shared by every project that runs \(programName) on this machine, and is only pruned by age (see --auto-prune-update-files above), never by whether the current run still needs an entry.
                 
         Note that \(programName) does not support package-based (.pkg) updates.
         """)

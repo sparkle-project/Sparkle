@@ -597,8 +597,46 @@ func moveOldUpdatesFromAppcasts(archivesSourceDir: URL, oldFilesDirectory: URL, 
         } catch {
             // Nothing to log for failing to fetch prunedDirectory
         }
+
+        // Garbage collect the generate_appcast extraction cache. This cache is shared
+        // across all invocations of generate_appcast on the machine (it isn't scoped to
+        // this archivesSourceDir), so entries are only removed by age here, never by
+        // "not referenced by this run" — that would wrongly delete cache still in use by
+        // a different project sharing the same cache directory. An entry only grows old
+        // once its own archive stops being reprocessed (e.g. it was replaced in place by
+        // a newer build with the same filename, which is common in release scripts that
+        // overwrite a single output path each run), which is exactly when it's safe to
+        // reclaim: nothing will ever look it up again.
+        do {
+            let directoryContents = try fileManager.contentsOfDirectory(atPath: cacheDirectory.path)
+
+            let prunedCacheDeletionInterval: TimeInterval = 86400 * 14
+
+            let currentDate = Date()
+            for filename in directoryContents {
+                guard !filename.hasPrefix(".") else {
+                    continue
+                }
+
+                let entryURL = cacheDirectory.appendingPathComponent(filename)
+
+                if let resourceValues = try? entryURL.resourceValues(forKeys: [.contentModificationDateKey]),
+                   let lastModificationDate = resourceValues.contentModificationDate {
+                    if currentDate.timeIntervalSince(lastModificationDate) >= prunedCacheDeletionInterval {
+                        do {
+                            try fileManager.removeItem(at: entryURL)
+                            pruneCount += 1
+                        } catch {
+                            print("Warning: failed to delete old cache entry \(cacheDirectory.lastPathComponent)/\(entryURL.lastPathComponent): \(error)")
+                        }
+                    }
+                }
+            }
+        } catch {
+            // Nothing to log for failing to fetch the cache directory
+        }
     }
-    
+
     return (movedItemsCount, pruneCount)
 }
 
