@@ -64,6 +64,9 @@
 /* No comment provided by engineer. */
 "Install and Relaunch" = "Instalar y volver a abrir";
 
+/* Alternate title for 'Remind Me Later' button when downloaded updates can be resumed */
+"Install on Quit" = "Instalar al salir";
+
 /* Run generate_progress_tool_localizations.py after updating. */
 "Installing update…" = "Instalando actualización…";
 
