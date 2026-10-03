@@ -104,8 +104,14 @@ func unarchiveUpdates(archivesSourceDir: URL, archivesDestDir: URL, disableNeste
         }
 
         if fileManager.fileExists(atPath: archiveDestDir.path) {
+            if verbose {
+                print("Reusing previously unarchived", itemPath.lastPathComponent, "from cache")
+            }
             addItem(false)
         } else {
+            if verbose {
+                print("Unarchiving", itemPath.lastPathComponent)
+            }
             group.enter()
             unarchive(itemPath: itemPath, archiveDestDir: archiveDestDir) { (error: Error?) in
                 if let error = error {
