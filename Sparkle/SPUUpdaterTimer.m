@@ -17,6 +17,8 @@
     dispatch_source_t _source;
     
     __weak id<SPUUpdaterTimerDelegate> _delegate;
+    
+    NSUInteger _timerGeneration;
 }
 
 - (instancetype)initWithDelegate:(id<SPUUpdaterTimerDelegate>)delegate
@@ -37,11 +39,15 @@
     dispatch_time_t timeToFire = dispatch_walltime(NULL, (int64_t)(delay * NSEC_PER_SEC));
     dispatch_source_set_timer(_source, timeToFire, DISPATCH_TIME_FOREVER, leewayUpdateCheckInterval * NSEC_PER_SEC);
     
+    _timerGeneration++;
+    NSUInteger currentTimerGeneration = _timerGeneration;
     __weak __typeof__(self) weakSelf = self;
     dispatch_source_set_event_handler(_source, ^{
         __typeof__(self) strongSelf = weakSelf;
         if (strongSelf != nil) {
-            [strongSelf->_delegate updaterTimerDidFire];
+            if (strongSelf->_timerGeneration == currentTimerGeneration) {
+                [strongSelf->_delegate updaterTimerDidFire];
+            }
         }
     });
     
@@ -53,6 +59,7 @@
     if (_source != nil) {
         dispatch_source_cancel(_source);
         _source = nil;
+        _timerGeneration++;
     }
 }
 

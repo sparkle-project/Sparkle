@@ -6,18 +6,43 @@
 //  Copyright © 2016 Sparkle Project. All rights reserved.
 //
 
+#import <Foundation/Foundation.h>
+
 NS_ASSUME_NONNULL_BEGIN
 
-@protocol SPUResumableUpdate;
+@class SPUDownloadedUpdate;
+@class SUHost;
+@protocol SPUUserDriver, SPUUpdaterDelegate;
 
-typedef void (^SPUUpdateDriverCompletion)(BOOL shouldShowUpdateImmediately, id<SPUResumableUpdate> _Nullable resumableUpdate, NSError * _Nullable error);
+// The driver's cycle has ended. resumableLocalUpdate reflects the local state (a downloaded-but-not-installed
+// update) that should be passed back in on the next cycle, if any.
+typedef void (^SPUUpdateDriverCompletion)(BOOL shouldResetImpatientCheckDate, SPUDownloadedUpdate * _Nullable resumableLocalUpdate, NSError * _Nullable error);
 
-// This protocol describes an update driver that drives updates
-// An update driver may have multiple levels of other controller components (eg: basic update driver, core based update driver, ui based update driver, appcast driver, etc)
-// The update driver and the components the driver has communicates via parameter passing and delegation..
-// The old Sparkle architecture communicated via subclassing and method overriding, but this lead to bugs due to high coupling, and complexity of not being aware of methods being executed.
-// The newer architecture is still complex but should be more reliable to maintain and extend.
-@protocol SPUUpdateDriver <NSObject>
+typedef NS_ENUM(NSUInteger, SPUUpdateDriverInstallMode) {
+    // The driver only probes for update information and never shows anything or downloads/installs
+    // (eg: -checkForUpdateInformation)
+    SPUUpdateDriverInstallModeNone,
+
+    // The driver may silently download and stage/install an update without asking first.
+    // If an update needs the user's attention before proceeding (eg: it's a major upgrade,
+    // informational-only, critical, or requires authorization), the driver escalates to
+    // SPUUpdateDriverInstallModeShowingUI in the same cycle rather than proceeding silently.
+    SPUUpdateDriverInstallModeAutomatic,
+
+    // The driver presents UI via the user driver and asks before downloading/installing.
+    SPUUpdateDriverInstallModeShowingUI,
+};
+
+// This class drives an update check cycle: querying the appcast, downloading, extracting,
+// installing, and presenting UI as needed, according to its install mode.
+SPU_OBJC_DIRECT_MEMBERS @interface SPUUpdateDriver : NSObject
+
+- (instancetype)initWithHost:(SUHost *)host applicationBundle:(NSBundle *)applicationBundle updater:(id)updater userDriver:(nullable id <SPUUserDriver>)userDriver updaterDelegate:(nullable id <SPUUpdaterDelegate>)updaterDelegate userInitiated:(BOOL)userInitiated installMode:(SPUUpdateDriverInstallMode)installMode;
+
+// Only meaningful for a driver constructed with SPUUpdateDriverInstallModeAutomatic.
+// Must be set (along with impatientUpdateCheckInterval) before starting a check.
+@property (nonatomic, copy) NSDate *lastImpatientCheckedDate;
+@property (nonatomic) NSTimeInterval impatientUpdateCheckInterval;
 
 - (void)setCompletionHandler:(SPUUpdateDriverCompletion)completionBlock;
 
@@ -25,19 +50,17 @@ typedef void (^SPUUpdateDriverCompletion)(BOOL shouldShowUpdateImmediately, id<S
 
 - (void)setUpdateWillInstallHandler:(void (^)(void))updateWillInstallHandler;
 
-- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders;
-
-- (void)resumeInstallingUpdate;
-
-- (void)resumeUpdate:(id<SPUResumableUpdate>)resumableUpdate;
+// Checks for updates, resuming resumableLocalUpdate (a downloaded-but-not-installed update) if one
+// was passed back from a prior cycle's completion handler. The driver also probes on its own for an
+// update that an external installer job (eg: from another instance of the updater)
+// may already be staging or installing; if it finds one, that global state
+// takes priority over resumableLocalUpdate.
+- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(nullable NSDictionary *)httpHeaders resumingLocalUpdate:(nullable SPUDownloadedUpdate *)resumableLocalUpdate;
 
 @property (nonatomic, readonly) BOOL showingUpdate;
 
-// A likely implementation of -abortUpdate is invoking -abortUpdateWithError: by passing nil
-- (void)abortUpdate;
-
 // This should be invoked on the update driver to finish the update driver's work
-- (void)abortUpdateWithError:(NSError * _Nullable)error;
+- (void)abortUpdateWithError:(nullable NSError *)error;
 
 @end
 
