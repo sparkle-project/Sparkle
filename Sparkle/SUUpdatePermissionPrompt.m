@@ -41,12 +41,12 @@ static const CGFloat SUUpdatePermissionPromptGroupElementSpacing = 12.0;
     IBOutlet NSLayoutConstraint *_applicationIconLeadingLayoutConstraint;
     IBOutlet NSView *_moreInfoView;
     IBOutlet NSView *_placeholderView;
+    IBOutlet NSView *_responseView;
     IBOutlet NSView *_infoChoiceView;
     IBOutlet NSView *_automaticallyDownloadUpdatesView;
     IBOutlet NSButton *_cancelButton;
     IBOutlet NSButton *_checkButton;
     IBOutlet NSTextField *_checkForUpdatesAutomaticallyTextField;
-    IBOutlet NSTextField *_promptDescriptionTextField;
     IBOutlet NSButton *_includeAnonymousSystemProfileButton;
     IBOutlet NSButton *_anonymousInfoDisclosureButton;
     IBOutlet NSButton *_automaticallyDownloadAndInstallUpdatesButton;
@@ -99,6 +99,16 @@ static const CGFloat SUUpdatePermissionPromptGroupElementSpacing = 12.0;
     _infoChoiceView.hidden = ![self shouldAskAboutProfile];
     _automaticallyDownloadUpdatesView.hidden = ![self allowsAutomaticUpdates];
 
+    // The disclosed profile info is kept outside of the stack view in the nib, otherwise it would
+    // cover the rest of the dialog in Interface Builder. Insert it above the response buttons.
+    NSUInteger disclosureIndex = [_stackView.arrangedSubviews indexOfObject:_responseView];
+    [_stackView insertArrangedSubview:_placeholderView atIndex:disclosureIndex];
+    [_stackView insertArrangedSubview:_moreInfoView atIndex:disclosureIndex + 1];
+
+    for (NSView *disclosedView in @[_placeholderView, _moreInfoView]) {
+        [disclosedView.widthAnchor constraintEqualToAnchor:_stackView.widthAnchor].active = YES;
+    }
+
     // Give the question and the choices below it better grouping
     [_stackView setCustomSpacing:SUUpdatePermissionPromptGroupElementSpacing afterView:_promptView];
 
@@ -123,12 +133,9 @@ static const CGFloat SUUpdatePermissionPromptGroupElementSpacing = 12.0;
         _cancelButton.controlSize = NSControlSizeLarge;
         _checkButton.controlSize = NSControlSizeLarge;
     } else {
-        // Alerts center their icon and text before macOS 26
+        // Alerts center their icon before macOS 26
         _applicationIconLeadingLayoutConstraint.active = NO;
         [_applicationIconImageView.centerXAnchor constraintEqualToAnchor:_promptView.centerXAnchor].active = YES;
-
-        _checkForUpdatesAutomaticallyTextField.alignment = NSTextAlignmentCenter;
-        _promptDescriptionTextField.alignment = NSTextAlignmentCenter;
     }
 
     _checkButton.title = SULocalizedStringFromTableInBundle(@"Check Automatically", SPARKLE_TABLE, sparkleBundle, nil);
@@ -137,16 +144,6 @@ static const CGFloat SUUpdatePermissionPromptGroupElementSpacing = 12.0;
     _includeAnonymousSystemProfileButton.title = SULocalizedStringFromTableInBundle(@"Include anonymous system profile", SPARKLE_TABLE, sparkleBundle, nil);
     _automaticallyDownloadAndInstallUpdatesButton.title = SULocalizedStringFromTableInBundle(@"Automatically download and install updates", SPARKLE_TABLE, sparkleBundle, nil);
     _anonymousSystemProfileDisclosureInformation.stringValue = SULocalizedStringFromTableInBundle(@"Anonymous system profile information is used to help us plan future development work. Please contact us if you have any questions about this.\n\nThis is the information that would be sent:", SPARKLE_TABLE, sparkleBundle, nil);
-
-    // Wrapping labels can only compute the right height once they know their final width. The width
-    // stored in the nib is a design time estimate, so let them adopt the width they ended up with.
-    [window layoutIfNeeded];
-
-    for (NSTextField *label in @[_checkForUpdatesAutomaticallyTextField, _promptDescriptionTextField, _anonymousSystemProfileDisclosureInformation]) {
-        label.preferredMaxLayoutWidth = NSWidth(label.frame);
-    }
-
-    [window layoutIfNeeded];
 
     [self _embedContentInGlassBackgroundForWindow:window];
 
@@ -164,9 +161,9 @@ static const CGFloat SUUpdatePermissionPromptGroupElementSpacing = 12.0;
 - (void)_embedContentInGlassBackgroundForWindow:(NSWindow *)window
 {
     if (@available(macOS 26, *)) {
-        // AppKit does not expose the corner radius of a window, and the layout regions only report
-        // content insets rather than corner geometry. This value is measured off a system prompt:
-        // fitting its edge profile against a circle gives 52 pixels at 2x on every sample point.
+        // AppKit offers no way to set the corner radius of a window, so this matches what an alert
+        // uses: on macOS 27 -[NSView effectiveCornerRadii] reports exactly 26 for an NSAlert, and
+        // measuring the edge profile of a system prompt on macOS 26 gives the same value.
         static const CGFloat glassCornerRadius = 26.0;
 
         NSView *contentView = window.contentView;
