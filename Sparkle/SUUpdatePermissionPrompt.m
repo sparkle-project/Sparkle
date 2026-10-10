@@ -20,6 +20,8 @@
 
 static NSString *const SUUpdatePermissionPromptTouchBarIdentifier = @"" SPARKLE_BUNDLE_IDENTIFIER ".SUUpdatePermissionPrompt";
 
+static const CGFloat SUUpdatePermissionPromptGroupElementSpacing = 12.0;
+
 @interface SUUpdatePermissionPrompt () <NSTouchBarDelegate>
 
 // These properties are used for bindings
@@ -35,6 +37,8 @@ static NSString *const SUUpdatePermissionPromptTouchBarIdentifier = @"" SPARKLE_
     
     IBOutlet NSStackView *_stackView;
     IBOutlet NSView *_promptView;
+    IBOutlet NSImageView *_applicationIconImageView;
+    IBOutlet NSLayoutConstraint *_applicationIconLeadingLayoutConstraint;
     IBOutlet NSView *_moreInfoView;
     IBOutlet NSView *_placeholderView;
     IBOutlet NSView *_responseView;
@@ -88,28 +92,98 @@ static NSString *const SUUpdatePermissionPromptTouchBarIdentifier = @"" SPARKLE_
 
 - (void)windowDidLoad
 {
-    [self.window center];
-    
+    NSWindow *window = self.window;
+
+    window.movableByWindowBackground = YES;
+
     _infoChoiceView.hidden = ![self shouldAskAboutProfile];
     _automaticallyDownloadUpdatesView.hidden = ![self allowsAutomaticUpdates];
-    
-    [_stackView addArrangedSubview:_promptView];
-    [_stackView addArrangedSubview:_automaticallyDownloadUpdatesView];
-    [_stackView addArrangedSubview:_infoChoiceView];
-    [_stackView addArrangedSubview:_placeholderView];
-    [_stackView addArrangedSubview:_moreInfoView];
-    [_stackView addArrangedSubview:_responseView];
-    
+
+    // The disclosed profile info is kept outside of the stack view in the nib, otherwise it would
+    // cover the rest of the dialog in Interface Builder. Insert it above the response buttons.
+    NSUInteger disclosureIndex = [_stackView.arrangedSubviews indexOfObject:_responseView];
+    [_stackView insertArrangedSubview:_placeholderView atIndex:disclosureIndex];
+    [_stackView insertArrangedSubview:_moreInfoView atIndex:disclosureIndex + 1];
+
+    for (NSView *disclosedView in @[_placeholderView, _moreInfoView]) {
+        [disclosedView.widthAnchor constraintEqualToAnchor:_stackView.widthAnchor].active = YES;
+    }
+
+    // Give the question and the choices below it better grouping
+    [_stackView setCustomSpacing:SUUpdatePermissionPromptGroupElementSpacing afterView:_promptView];
+
 #if SPARKLE_COPY_LOCALIZATIONS
     NSBundle *sparkleBundle = SUSparkleBundle();
 #endif
-    
+
+    // Keep hidden window title for accessibility
+    window.title = SULocalizedStringFromTableInBundle(@"Software Update", SPARKLE_TABLE, sparkleBundle, nil);
+    window.titleVisibility = NSWindowTitleHidden;
+
+    // The dialog has a fixed width, so let long localized checkbox titles wrap instead of being
+    // truncated. Note button cells only wrap when their width is constrained, which it is here.
+    for (NSButton *checkbox in @[_automaticallyDownloadAndInstallUpdatesButton, _includeAnonymousSystemProfileButton]) {
+        NSCell *cell = checkbox.cell;
+        cell.usesSingleLineMode = NO;
+        cell.lineBreakMode = NSLineBreakByWordWrapping;
+        cell.wraps = YES;
+    }
+
+    if (@available(macOS 26, *)) {
+        _cancelButton.controlSize = NSControlSizeLarge;
+        _checkButton.controlSize = NSControlSizeLarge;
+    } else {
+        // Alerts center their icon before macOS 26
+        _applicationIconLeadingLayoutConstraint.active = NO;
+        [_applicationIconImageView.centerXAnchor constraintEqualToAnchor:_promptView.centerXAnchor].active = YES;
+    }
+
     _checkButton.title = SULocalizedStringFromTableInBundle(@"Check Automatically", SPARKLE_TABLE, sparkleBundle, nil);
     _cancelButton.title = SULocalizedStringFromTableInBundle(@"Don’t Check", SPARKLE_TABLE, sparkleBundle, nil);
     _checkForUpdatesAutomaticallyTextField.stringValue = SULocalizedStringFromTableInBundle(@"Check for updates automatically?", SPARKLE_TABLE, sparkleBundle, nil);
     _includeAnonymousSystemProfileButton.title = SULocalizedStringFromTableInBundle(@"Include anonymous system profile", SPARKLE_TABLE, sparkleBundle, nil);
     _automaticallyDownloadAndInstallUpdatesButton.title = SULocalizedStringFromTableInBundle(@"Automatically download and install updates", SPARKLE_TABLE, sparkleBundle, nil);
     _anonymousSystemProfileDisclosureInformation.stringValue = SULocalizedStringFromTableInBundle(@"Anonymous system profile information is used to help us plan future development work. Please contact us if you have any questions about this.\n\nThis is the information that would be sent:", SPARKLE_TABLE, sparkleBundle, nil);
+
+    [self _embedContentInGlassBackgroundForWindow:window];
+
+    [window center];
+}
+
+// Draw the dialog on a glass background with the corner radius of a system prompt. AppKit has no
+// API for the corner radius of a window, so the rounded background is drawn by a glass effect view
+// inside the window while the window itself stops drawing.
+//
+// Clipping the glass view is what makes the corners work, without it the content is drawn as a
+// rectangle over the rounded glass. The window keeps its title bar style mask so that it can still
+// become the key window, which also means no window subclass is needed. Before macOS 26 the dialog
+// stays a regular window.
+- (void)_embedContentInGlassBackgroundForWindow:(NSWindow *)window
+{
+    if (@available(macOS 26, *)) {
+        // AppKit offers no way to set the corner radius of a window, so this matches what an alert
+        // uses: on macOS 27 -[NSView effectiveCornerRadii] reports exactly 26 for an NSAlert, and
+        // measuring the edge profile of a system prompt on macOS 26 gives the same value.
+        static const CGFloat glassCornerRadius = 26.0;
+
+        NSView *contentView = window.contentView;
+
+        NSGlassEffectView *glassView = [[NSGlassEffectView alloc] initWithFrame:contentView.frame];
+        glassView.cornerRadius = glassCornerRadius;
+        glassView.style = NSGlassEffectViewStyleRegular;
+        glassView.clipsToBounds = YES;
+
+        window.contentView = glassView;
+
+        contentView.frame = glassView.bounds;
+        contentView.autoresizingMask = (NSAutoresizingMaskOptions)(NSViewWidthSizable | NSViewHeightSizable);
+        glassView.contentView = contentView;
+
+        window.backgroundColor = NSColor.clearColor;
+        window.opaque = NO;
+
+        [window invalidateShadow];
+    }
 }
 
 - (BOOL)tableView:(NSTableView *) __unused tableView shouldSelectRow:(NSInteger) __unused row { return NO; }
