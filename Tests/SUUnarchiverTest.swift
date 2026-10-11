@@ -14,6 +14,17 @@ class SUUnarchiverTest: XCTestCase
         let appName = resourceName
         let archiveResourceURL = Bundle(for: type(of: self)).url(forResource: appName, withExtension: archiveExtension)!
 
+        // When an extraction mount directory is supported, test both providing one and not providing one,
+        // so that the disk image unarchiver's diskutil and hdiutil code paths are both exercised
+        let extractionMountDirectoryOptions = SUUnarchiver.canUseExtractionMountDirectory(archiveResourceURL.path) ? [true, false] : [false]
+
+        for providingExtractionMountDirectory in extractionMountDirectoryOptions {
+            self.unarchiveTestAppWithExtension(archiveExtension, archiveResourceURL: archiveResourceURL, password: password, providingExtractionMountDirectory: providingExtractionMountDirectory, expectingInstallationType: installationType, expectingSuccess: expectingSuccess, extractedAppName: extractedAppName)
+        }
+    }
+
+    // swiftlint:disable function_parameter_count
+    func unarchiveTestAppWithExtension(_ archiveExtension: String, archiveResourceURL: URL, password: String?, providingExtractionMountDirectory: Bool, expectingInstallationType installationType: String, expectingSuccess: Bool, extractedAppName: String) {
         let fileManager = FileManager.default
 
         // Do not remove this temporary directory
@@ -21,11 +32,11 @@ class SUUnarchiverTest: XCTestCase
         // after *both* our unarchive success and failure calls below finish (they both have async completion blocks inside their implementation)
         let tempDirectoryURL = try! fileManager.url(for: .itemReplacementDirectory, in: .userDomainMask, appropriateFor: URL(fileURLWithPath: NSHomeDirectory()), create: true)
 
-        let unarchivedSuccessExpectation = super.expectation(description: "Unarchived Success (format: \(archiveExtension))")
-        let unarchivedFailureExpectation = super.expectation(description: "Unarchived Failure (format: \(archiveExtension))")
+        let unarchivedSuccessExpectation = super.expectation(description: "Unarchived Success (format: \(archiveExtension), mount directory: \(providingExtractionMountDirectory))")
+        let unarchivedFailureExpectation = super.expectation(description: "Unarchived Failure (format: \(archiveExtension), mount directory: \(providingExtractionMountDirectory))")
 
-        self.unarchiveTestAppWithExtension(archiveExtension, appName: appName, tempDirectoryURL: tempDirectoryURL, archiveResourceURL: archiveResourceURL, password: password, expectingInstallationType: installationType, expectingSuccess: expectingSuccess, testExpectation: unarchivedSuccessExpectation)
-        self.unarchiveNonExistentFileTestFailureAppWithExtension(archiveExtension, tempDirectoryURL: tempDirectoryURL, password: password, expectingInstallationType: installationType, testExpectation: unarchivedFailureExpectation)
+        self.unarchiveTestAppWithExtension(archiveExtension, tempDirectoryURL: tempDirectoryURL, archiveResourceURL: archiveResourceURL, password: password, providingExtractionMountDirectory: providingExtractionMountDirectory, expectingInstallationType: installationType, expectingSuccess: expectingSuccess, testExpectation: unarchivedSuccessExpectation)
+        self.unarchiveNonExistentFileTestFailureAppWithExtension(archiveExtension, tempDirectoryURL: tempDirectoryURL, password: password, providingExtractionMountDirectory: providingExtractionMountDirectory, expectingInstallationType: installationType, testExpectation: unarchivedFailureExpectation)
 
         super.waitForExpectations(timeout: 30.0, handler: nil)
 
@@ -43,10 +54,13 @@ class SUUnarchiverTest: XCTestCase
         }
     }
 
-    func unarchiveNonExistentFileTestFailureAppWithExtension(_ archiveExtension: String, tempDirectoryURL: URL, password: String?, expectingInstallationType installationType: String, testExpectation: XCTestExpectation) {
+    func unarchiveNonExistentFileTestFailureAppWithExtension(_ archiveExtension: String, tempDirectoryURL: URL, password: String?, providingExtractionMountDirectory: Bool, expectingInstallationType installationType: String, testExpectation: XCTestExpectation) {
         let tempArchiveURL = tempDirectoryURL.deletingLastPathComponent().appendingPathComponent("error-invalid").appendingPathExtension(archiveExtension)
-        
-        let unarchiver = SUUnarchiver.unarchiver(forPath: tempArchiveURL.path, extractionDirectory: tempDirectoryURL.path, updatingHostBundlePath: nil, decryptionPassword: password, expectingInstallationType: installationType)!
+
+        // The disk image unarchiver will create and remove this directory automatically
+        let extractionMountDirectory: String? = providingExtractionMountDirectory ? URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true).appendingPathComponent(ProcessInfo.processInfo.globallyUniqueString).path : nil
+
+        let unarchiver = SUUnarchiver.unarchiver(forPath: tempArchiveURL.path, extractionDirectory: tempDirectoryURL.path, extractionMountDirectory: extractionMountDirectory, updatingHostBundlePath: nil, decryptionPassword: password, expectingInstallationType: installationType)!
 
         unarchiver.unarchive(completionBlock: {(error: Error?) -> Void in
             XCTAssertNotNil(error)
@@ -54,10 +68,12 @@ class SUUnarchiverTest: XCTestCase
         }, progressBlock: nil, waitForCleanup: true)
     }
 
-    // swiftlint:disable function_parameter_count
-    func unarchiveTestAppWithExtension(_ archiveExtension: String, appName: String, tempDirectoryURL: URL, archiveResourceURL: URL, password: String?, expectingInstallationType installationType: String, expectingSuccess: Bool, testExpectation: XCTestExpectation) {
-        
-        let unarchiver = SUUnarchiver.unarchiver(forPath: archiveResourceURL.path, extractionDirectory: tempDirectoryURL.path, updatingHostBundlePath: nil, decryptionPassword: password, expectingInstallationType: installationType)!
+    func unarchiveTestAppWithExtension(_ archiveExtension: String, tempDirectoryURL: URL, archiveResourceURL: URL, password: String?, providingExtractionMountDirectory: Bool, expectingInstallationType installationType: String, expectingSuccess: Bool, testExpectation: XCTestExpectation) {
+
+        // The disk image unarchiver will create and remove this directory automatically
+        let extractionMountDirectory: String? = providingExtractionMountDirectory ? URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true).appendingPathComponent(ProcessInfo.processInfo.globallyUniqueString).path : nil
+
+        let unarchiver = SUUnarchiver.unarchiver(forPath: archiveResourceURL.path, extractionDirectory: tempDirectoryURL.path, extractionMountDirectory: extractionMountDirectory, updatingHostBundlePath: nil, decryptionPassword: password, expectingInstallationType: installationType)!
 
         unarchiver.unarchive(completionBlock: {(error: Error?) -> Void in
             if expectingSuccess {
