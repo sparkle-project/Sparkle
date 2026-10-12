@@ -122,11 +122,15 @@ static const CGFloat SUUpdatePermissionPromptGroupElementSpacing = 12.0;
 
     // The dialog has a fixed width, so let long localized checkbox titles wrap instead of being
     // truncated. Note button cells only wrap when their width is constrained, which it is here.
+    // The checkbox and its title also need to follow the writing direction, which the left aligned
+    // defaults from the nib do not do.
     for (NSButton *checkbox in @[_automaticallyDownloadAndInstallUpdatesButton, _includeAnonymousSystemProfileButton]) {
-        NSCell *cell = checkbox.cell;
+        NSButtonCell *cell = checkbox.cell;
         cell.usesSingleLineMode = NO;
         cell.lineBreakMode = NSLineBreakByWordWrapping;
         cell.wraps = YES;
+        cell.imagePosition = NSImageLeading;
+        cell.alignment = NSTextAlignmentNatural;
     }
 
     if (@available(macOS 26, *)) {
