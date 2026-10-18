@@ -219,7 +219,14 @@ SPU_OBJC_DIRECT
     // moving a file will try to preserve ownership but copying won't
     
     if (![self itemAtURL:sourceURL isOnSameVolumeItemAsURL:destinationURLParent]) {
-        return ([self copyItemAtURL:sourceURL toURL:destinationURL error:error] && [self removeItemAtURL:sourceURL error:error]);
+        if (![self copyItemAtURL:sourceURL toURL:destinationURL error:error]) {
+            return NO;
+        }
+        if (![self removeItemAtURL:sourceURL error:error]) {
+            [self removeItemAtURL:destinationURL error:NULL];
+            return NO;
+        }
+        return YES;
     }
 
     return [_fileManager moveItemAtURL:sourceURL toURL:destinationURL error:error];

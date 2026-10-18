@@ -325,7 +325,7 @@ static NSUInteger fileCountForDirectory(NSFileManager *fileManager, NSString *it
             [itemsToExtract addObject:item];
         }
         
-        _fileProgressIncrement = (0.99 - _currentExtractionProgress) / (double)totalFileExtractionCount;
+        _fileProgressIncrement = (totalFileExtractionCount > 0) ? ((0.99 - _currentExtractionProgress) / (double)totalFileExtractionCount) : 0.0;
         _notifier = notifier;
         
         // Copy all items we want to extract and notify of progress

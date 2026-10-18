@@ -178,7 +178,7 @@ BOOL applyBinaryDelta(NSString *source, NSString *finalDestination, NSString *pa
 
     [archive enumerateItems:^(SPUDeltaArchiveItem *item, BOOL *stop) {
         NSString *relativePath = item.relativeFilePath;
-        
+
         NSArray<NSString *> *relativePathComponents = relativePath.pathComponents;
         if ([relativePathComponents containsObject:@".."]) {
             if (error != NULL) {
@@ -437,11 +437,11 @@ BOOL applyBinaryDelta(NSString *source, NSString *finalDestination, NSString *pa
     
     // Set error from enumerating items if we have encountered an error and haven't set it yet
     NSError *archiveError = archive.error;
-    if (archiveError != nil) {
+    if (archiveError != nil || (error != NULL && *error != nil)) {
         if (verbose) {
             fprintf(stderr, "\n");
         }
-        if (error != NULL && *error == nil) {
+        if (archiveError != nil && error != NULL && *error == nil) {
             *error = archiveError;
         }
         removeTree(destination);

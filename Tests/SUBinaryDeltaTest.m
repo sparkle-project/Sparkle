@@ -2389,4 +2389,26 @@ static NSString *temporaryDirectory(NSString *base)
     XCTAssertTrue(success);
 }
 
+- (void)testApplyingCorruptPatchFailsSafely
+{
+    NSString *sourceDirectory = temporaryDirectory(@"Sparkle_source");
+    NSString *patchDirectory = temporaryDirectory(@"Sparkle_patch");
+    NSString *diffFile = temporaryFilename(@"Sparkle_diff");
+
+    XCTAssertNotNil(sourceDirectory);
+    XCTAssertNotNil(patchDirectory);
+    XCTAssertNotNil(diffFile);
+
+    // Apply an empty / invalid delta file to verify error handling terminates gracefully without crashing
+    NSError *applyDiffError = nil;
+    BOOL appliedDiff = applyBinaryDelta(sourceDirectory, patchDirectory, diffFile, NO, ^(__unused double progress){}, &applyDiffError);
+    XCTAssertFalse(appliedDiff);
+    XCTAssertNotNil(applyDiffError);
+
+    NSFileManager *fileManager = [[NSFileManager alloc] init];
+    XCTAssertTrue([fileManager removeItemAtPath:sourceDirectory error:nil]);
+    XCTAssertTrue([fileManager removeItemAtPath:patchDirectory error:nil]);
+    XCTAssertTrue([fileManager removeItemAtPath:diffFile error:nil]);
+}
+
 @end
