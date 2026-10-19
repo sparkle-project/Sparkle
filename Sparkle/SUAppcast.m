@@ -145,7 +145,8 @@
                     [dict setObject:descriptionDict forKey:SURSSElementDescription];
                 }
             } else if ([name isEqualToString:SUAppcastElementReleaseNotesLink]) {
-                NSString *releaseNotesLink = node.stringValue;
+                // Trim whitespace to maintain backwards compatibility
+                NSString *releaseNotesLink = [node.stringValue stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
                 if (releaseNotesLink != nil) {
                     NSDictionary *attributes = [self attributesOfNode:(NSXMLElement *)node];
                     
