@@ -20,6 +20,8 @@
 
 static NSString *const SUUpdatePermissionPromptTouchBarIdentifier = @"" SPARKLE_BUNDLE_IDENTIFIER ".SUUpdatePermissionPrompt";
 
+static const CGFloat SUUpdatePermissionPromptGroupElementSpacing = 12.0;
+
 @interface SUUpdatePermissionPrompt () <NSTouchBarDelegate>
 
 // These properties are used for bindings
@@ -35,9 +37,12 @@ static NSString *const SUUpdatePermissionPromptTouchBarIdentifier = @"" SPARKLE_
     
     IBOutlet NSStackView *_stackView;
     IBOutlet NSView *_promptView;
+    IBOutlet NSImageView *_applicationIconImageView;
+    IBOutlet NSLayoutConstraint *_applicationIconLeadingLayoutConstraint;
     IBOutlet NSView *_moreInfoView;
     IBOutlet NSView *_placeholderView;
     IBOutlet NSView *_responseView;
+    IBOutlet NSStackView *_responseButtonsStackView;
     IBOutlet NSView *_infoChoiceView;
     IBOutlet NSView *_automaticallyDownloadUpdatesView;
     IBOutlet NSButton *_cancelButton;
@@ -88,28 +93,63 @@ static NSString *const SUUpdatePermissionPromptTouchBarIdentifier = @"" SPARKLE_
 
 - (void)windowDidLoad
 {
-    [self.window center];
-    
+    NSWindow *window = self.window;
+
+    window.movableByWindowBackground = YES;
+
     _infoChoiceView.hidden = ![self shouldAskAboutProfile];
     _automaticallyDownloadUpdatesView.hidden = ![self allowsAutomaticUpdates];
-    
-    [_stackView addArrangedSubview:_promptView];
-    [_stackView addArrangedSubview:_automaticallyDownloadUpdatesView];
-    [_stackView addArrangedSubview:_infoChoiceView];
-    [_stackView addArrangedSubview:_placeholderView];
-    [_stackView addArrangedSubview:_moreInfoView];
-    [_stackView addArrangedSubview:_responseView];
-    
+
+    // The disclosed profile info is kept outside of the stack view in the nib, otherwise it would
+    // cover the rest of the dialog in Interface Builder. Insert it above the response buttons.
+    NSUInteger disclosureIndex = [_stackView.arrangedSubviews indexOfObject:_responseView];
+    if (disclosureIndex != NSNotFound) {
+        [_stackView insertArrangedSubview:_placeholderView atIndex:(NSInteger)disclosureIndex];
+        [_stackView insertArrangedSubview:_moreInfoView atIndex:(NSInteger)disclosureIndex + 1];
+    }
+
+    for (NSView *disclosedView in @[_placeholderView, _moreInfoView]) {
+        [disclosedView.widthAnchor constraintEqualToAnchor:_stackView.widthAnchor].active = YES;
+    }
+
+    // Give the question and the choices below it better grouping
+    [_stackView setCustomSpacing:SUUpdatePermissionPromptGroupElementSpacing afterView:_promptView];
+
 #if SPARKLE_COPY_LOCALIZATIONS
     NSBundle *sparkleBundle = SUSparkleBundle();
 #endif
+
+    // Keep hidden window title for accessibility
+    window.title = SULocalizedStringFromTableInBundle(@"Software Update", SPARKLE_TABLE, sparkleBundle, nil);
+    window.titleVisibility = NSWindowTitleHidden;
     
+    // Fix to make sure buttons are on right side, aligned correctly, and pointing correct direction
+    // in RTL languages like Hebrew and Arabic
+    for (NSButton *checkbox in @[_automaticallyDownloadAndInstallUpdatesButton, _includeAnonymousSystemProfileButton]) {
+        checkbox.userInterfaceLayoutDirection = _stackView.userInterfaceLayoutDirection;
+        checkbox.imagePosition = NSImageLeading;
+        checkbox.alignment = NSTextAlignmentNatural;
+    }
+    _anonymousInfoDisclosureButton.userInterfaceLayoutDirection = _stackView.userInterfaceLayoutDirection;
+
+    _cancelButton.controlSize = NSControlSizeLarge;
+    _checkButton.controlSize = NSControlSizeLarge;
+
+    if (@available(macOS 26, *)) {
+    } else {
+        // Alerts center their icon before macOS 26
+        _applicationIconLeadingLayoutConstraint.active = NO;
+        [_applicationIconImageView.centerXAnchor constraintEqualToAnchor:_promptView.centerXAnchor].active = YES;
+    }
+
     _checkButton.title = SULocalizedStringFromTableInBundle(@"Check Automatically", SPARKLE_TABLE, sparkleBundle, nil);
     _cancelButton.title = SULocalizedStringFromTableInBundle(@"Don’t Check", SPARKLE_TABLE, sparkleBundle, nil);
     _checkForUpdatesAutomaticallyTextField.stringValue = SULocalizedStringFromTableInBundle(@"Check for updates automatically?", SPARKLE_TABLE, sparkleBundle, nil);
     _includeAnonymousSystemProfileButton.title = SULocalizedStringFromTableInBundle(@"Include anonymous system profile", SPARKLE_TABLE, sparkleBundle, nil);
     _automaticallyDownloadAndInstallUpdatesButton.title = SULocalizedStringFromTableInBundle(@"Automatically download and install updates", SPARKLE_TABLE, sparkleBundle, nil);
     _anonymousSystemProfileDisclosureInformation.stringValue = SULocalizedStringFromTableInBundle(@"Anonymous system profile information is used to help us plan future development work. Please contact us if you have any questions about this.\n\nThis is the information that would be sent:", SPARKLE_TABLE, sparkleBundle, nil);
+
+    [window center];
 }
 
 - (BOOL)tableView:(NSTableView *) __unused tableView shouldSelectRow:(NSInteger) __unused row { return NO; }
