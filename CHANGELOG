@@ -1,3 +1,14 @@
+# 2.10.1
+
+* Fix not trimming whitespace/newline characters from <sparkle:releaseNotesLink> (#2944) (Zorg)
+* Fix update being installed prematurely if it's located in NFC unicode encoded path (#2943) (Zorg)
+* Update Danish translation (#2940) (Sebastian Livoni)
+* Add missing "Install on Quit" localizations for uk, ru, fr, es, pt-PT. (#2931) (Andrii Selivanov)
+* Add and update translations for Chinese (Hong Kong) (zh-HK) (#2926) (Tiffany Fung)
+* Drop stale sparkle:format when generate_appcast embeds HTML release notes (#2927) (Leo Camus)
+* Skip en and Base when recording Sparkle locales in generate_appcast (#2925) (Leo Camus)
+* Fix appcast child elements being ignored when the Sparkle namespace uses a custom prefix (#2923) (Leo Camus)
+
 # 2.10.0
 
 * Bump minimum deployment target to macOS 12.0 (#2883, #2892) (Zorg, F1248)
