@@ -17,6 +17,8 @@ SPU_OBJC_DIRECT_MEMBERS @interface AppInstaller : NSObject
 
 - (void)start;
 
+- (void)handleTerminationRequest;
+
 - (void)cleanupAndExitWithStatus:(int)status error:(NSError * _Nullable)error __attribute__((noreturn));
 
 @end

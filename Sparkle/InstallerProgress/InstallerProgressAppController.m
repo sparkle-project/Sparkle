@@ -28,6 +28,10 @@
  */
 static const NSTimeInterval SUTerminationTimeDelay = 0.3;
 
+// This is slightly shorter than SUTerminationRequestTargetWaitDelay in Autoupdate
+// to give Autoupdate extra time to allow receiving the termination message and finishing installation
+static const NSTimeInterval SUTerminationRequestTargetWaitDelay = 1.5;
+
 @interface InstallerProgressAppController () <NSApplicationDelegate, SPUInstallerAgentProtocol>
 @end
 
@@ -47,6 +51,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
     __weak id<InstallerProgressDelegate> _delegate;
     
     void (^_terminationCompletionHandler)(void);
+    dispatch_source_t _targetProcessExitSource;
     
     BOOL _connected;
     BOOL _repliedToRegistration;
@@ -55,6 +60,8 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
     BOOL _submittedLauncherJob;
     BOOL _willTerminate;
     BOOL _applicationInitiallyAlive;
+    BOOL _receivedTerminationRequest;
+    BOOL _targetProcessExited;
 }
 
 - (instancetype)initWithApplication:(NSApplication *)application arguments:(NSArray<NSString *> *)arguments delegate:(id<InstallerProgressDelegate>)delegate
@@ -170,6 +177,39 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
 - (void)applicationDidFinishLaunching:(NSNotification *)__unused notification
 {
     [self startConnection];
+}
+
+- (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)__unused sender
+{
+    [self handleTerminationRequest];
+    
+    return NSTerminateLater;
+}
+
+- (void)handleTerminationRequest
+{
+    // Check if we're going to terminate anyway
+    if (_receivedTerminationRequest) {
+        return;
+    }
+    
+    // If Autoupdate installer is listening for termination completion,
+    // we will delay termination for a bit to allow us some time to observe
+    // the targetted app's termination, otherwise we will exit immediately
+    
+    if (_terminationCompletionHandler == nil) {
+        [self cleanupAndExitWithStatus:SIGTERM error:nil];
+    }
+    
+    _receivedTerminationRequest = YES;
+    
+    if (_targetProcessExited) {
+        [self notifyTargetTermination];
+    }
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(SUTerminationRequestTargetWaitDelay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [self cleanupAndExitWithStatus:SIGTERM error:nil];
+    });
 }
 
 - (void)cleanupAndExitWithStatus:(int)status error:(NSError * _Nullable)error __attribute__((noreturn))
@@ -315,14 +355,46 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
     NSString *isTerminatedKeyPath = NSStringFromSelector(@selector(isTerminated));
     if ([keyPath isEqualToString:isTerminatedKeyPath]) {
         if (_targetRunningApplication.terminated && _terminationCompletionHandler != nil) {
-            _terminationCompletionHandler();
-            
-            [_targetRunningApplication removeObserver:self forKeyPath:isTerminatedKeyPath];
-            _terminationCompletionHandler = nil;
-            _targetRunningApplication = nil;
+            [self notifyTargetTermination];
         }
     } else {
         [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
+    }
+}
+
+- (void)notifyTargetTermination SPU_OBJC_DIRECT
+{
+    if (_terminationCompletionHandler == nil) {
+        return;
+    }
+    
+    _terminationCompletionHandler();
+    _terminationCompletionHandler = nil;
+    
+    [_targetRunningApplication removeObserver:self forKeyPath:NSStringFromSelector(@selector(isTerminated))];
+    _targetRunningApplication = nil;
+    
+    if (_targetProcessExitSource != nil) {
+        dispatch_source_cancel(_targetProcessExitSource);
+        _targetProcessExitSource = nil;
+    }
+}
+
+- (void)targetProcessDidExit SPU_OBJC_DIRECT
+{
+    if (_targetProcessExited) {
+        return;
+    }
+    
+    _targetProcessExited = YES;
+    
+    if (_targetProcessExitSource != nil) {
+        dispatch_source_cancel(_targetProcessExitSource);
+        _targetProcessExitSource = nil;
+    }
+    
+    if (_receivedTerminationRequest && _terminationCompletionHandler != nil) {
+        [self notifyTargetTermination];
     }
 }
 
@@ -342,6 +414,23 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
                 self->_terminationCompletionHandler = [completionHandler copy];
                 
                 [self->_targetRunningApplication addObserver:self forKeyPath:NSStringFromSelector(@selector(isTerminated)) options:NSKeyValueObservingOptionNew context:NULL];
+                
+                pid_t targetProcessIdentifier = self->_targetRunningApplication.processIdentifier;
+                if (targetProcessIdentifier > 0) {
+                    dispatch_source_t targetProcessExitSource = dispatch_source_create(DISPATCH_SOURCE_TYPE_PROC, (uintptr_t)targetProcessIdentifier, DISPATCH_PROC_EXIT, dispatch_get_main_queue());
+                    if (targetProcessExitSource != nil) {
+                        self->_targetProcessExitSource = targetProcessExitSource;
+                        
+                        dispatch_source_set_event_handler(targetProcessExitSource, ^{
+                            [self targetProcessDidExit];
+                        });
+                        dispatch_resume(targetProcessExitSource);
+                        
+                        if (kill(targetProcessIdentifier, 0) != 0 && errno == ESRCH) {
+                            [self targetProcessDidExit];
+                        }
+                    }
+                }
             }
         } else {
             SULog(SULogLevelError, @"Error: -listenForTerminationWithCompletion: called in unexpected state");
@@ -381,7 +470,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
 - (void)relaunchApplication
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        if (!self->_willTerminate && self->_applicationBundle != nil && self->_applicationInitiallyAlive) {
+        if (!self->_willTerminate && !self->_receivedTerminationRequest && self->_applicationBundle != nil && self->_applicationInitiallyAlive) {
             NSString *pathToRelaunch;
             if (self->_normalizedPath != nil) {
                 pathToRelaunch = self->_normalizedPath;
@@ -417,7 +506,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
 - (void)showProgress
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        if (!self->_willTerminate) {
+        if (!self->_willTerminate && !self->_receivedTerminationRequest) {
             // Activate ourselves otherwise we will probably be in the background
             // See comments in -[SPUStandardUserDriver _activateApplication] for why -activate is not used
             [self->_application activateIgnoringOtherApps:YES];
