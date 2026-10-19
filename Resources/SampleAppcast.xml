@@ -8,12 +8,8 @@
             <title>Version 2.0 (2 bugs fixed; 3 new features)</title>
             <link>https://sparkle-project.org</link>
             <sparkle:version>2.0</sparkle:version>
-            <sparkle:releaseNotesLink>
-                https://you.com/app/2.0.html
-            </sparkle:releaseNotesLink>
-            <sparkle:fullReleaseNotesLink>
-                https://you.com/app/changelog.php
-            </sparkle:fullReleaseNotesLink>
+            <sparkle:releaseNotesLink>https://you.com/app/2.0.html</sparkle:releaseNotesLink>
+            <sparkle:fullReleaseNotesLink>https://you.com/app/changelog.php</sparkle:fullReleaseNotesLink>
             <pubDate>Wed, 09 Jan 2006 19:20:11 +0000</pubDate>
             <enclosure url="https://you.com/app/Your%20Great%20App%202.0.zip" length="1623481" type="application/octet-stream" sparkle:edSignature="WVyVJpOx+a5+vNWJVY79TRjFKveNk+VhGJf2iti4CZtJsJewIUGvh/1AKKEAFbH1qUwx+vro1ECuzOsMmumoBA==" />
             <sparkle:minimumSystemVersion>12.0</sparkle:minimumSystemVersion>
@@ -23,12 +19,8 @@
             <title>Version 1.5 (8 bugs fixed; 2 new features)</title>
             <link>https://sparkle-project.org</link>
             <sparkle:version>1.5</sparkle:version>
-            <sparkle:releaseNotesLink>
-                https://you.com/app/1.5.html
-            </sparkle:releaseNotesLink>
-            <sparkle:fullReleaseNotesLink>
-                https://you.com/app/changelog.php?up-to=1.5
-            </sparkle:fullReleaseNotesLink>
+            <sparkle:releaseNotesLink>https://you.com/app/1.5.html</sparkle:releaseNotesLink>
+            <sparkle:fullReleaseNotesLink>https://you.com/app/changelog.php?up-to=1.5</sparkle:fullReleaseNotesLink>
             <pubDate>Wed, 01 Jan 2006 12:20:11 +0000</pubDate>
             <enclosure url="https://you.com/app/Your%20Great%20App%201.5.zip" length="1472893" type="application/octet-stream" sparkle:edSignature="pNFd7KbcQSu+Mq7UYrbQXTPq82luht2ACXm/r2utp1u/Uv/5hWqctdT2jwQgMejW7DRoeV/hVr6J4VdZYdwWDw==" />
             <sparkle:minimumSystemVersion>12.0</sparkle:minimumSystemVersion>
@@ -38,12 +30,8 @@
         <item>
             <title>Version 1.4 (5 bugs fixed; 2 new features)</title>
             <link>https://sparkle-project.org</link>
-            <sparkle:releaseNotesLink>
-                https://you.com/app/1.4.html
-            </sparkle:releaseNotesLink>
-            <sparkle:fullReleaseNotesLink>
-                https://you.com/app/changelog.php?up-to=1.4
-            </sparkle:fullReleaseNotesLink>
+            <sparkle:releaseNotesLink>https://you.com/app/1.4.html</sparkle:releaseNotesLink>
+            <sparkle:fullReleaseNotesLink>https://you.com/app/changelog.php?up-to=1.4</sparkle:fullReleaseNotesLink>
             <sparkle:version>241</sparkle:version>
             <sparkle:shortVersionString>1.4</sparkle:shortVersionString>
             <pubDate>Wed, 25 Dec 2005 12:20:11 +0000</pubDate>
