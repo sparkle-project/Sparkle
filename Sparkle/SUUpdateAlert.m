@@ -426,6 +426,12 @@ typedef NS_ENUM(NSInteger, SUReleaseNotesFormat)
     _installButton.title = SULocalizedStringFromTableInBundle(@"Install Update", SPARKLE_TABLE, sparkleBundle, @"");
     _automaticallyInstallUpdatesButton.title = SULocalizedStringFromTableInBundle(@"Automatically download and install updates in the future", SPARKLE_TABLE, sparkleBundle, @"");
     
+    // Fix to make sure buttons are on right side in RTL languages like Hebrew and Arabic
+    // We do same modification in SUUpdatePermissionPrompt
+    _automaticallyInstallUpdatesButton.userInterfaceLayoutDirection = _stackView.userInterfaceLayoutDirection;
+    _automaticallyInstallUpdatesButton.imagePosition = NSImageLeading;
+    _automaticallyInstallUpdatesButton.alignment = NSTextAlignmentNatural;
+
     if (@available(macOS 26, *)) {
         _skipButton.controlSize = NSControlSizeLarge;
         _laterButton.controlSize = NSControlSizeLarge;
