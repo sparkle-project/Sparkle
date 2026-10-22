@@ -190,7 +190,9 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
 - (NSArray<NSRunningApplication *> *)runningApplicationsWithBundle:(NSBundle *)bundle SPU_OBJC_DIRECT
 {
     // Resolve symlinks otherwise when we compare file paths, we may not realize two paths that are represented differently are the same
-    NSArray<NSString *> *bundlePathComponents = bundle.bundlePath.stringByResolvingSymlinksInPath.pathComponents;
+    // Also normalize Unicode composition because resolving symlinks returns the name as stored on disk (which may be precomposed),
+    // while NSRunningApplication may report a decomposed path for the same bundle
+    NSArray<NSString *> *bundlePathComponents = bundle.bundlePath.stringByResolvingSymlinksInPath.precomposedStringWithCanonicalMapping.pathComponents;
     NSString *bundleIdentifier = bundle.bundleIdentifier;
     
     NSMutableArray<NSRunningApplication *> *matchedRunningApplications = [[NSMutableArray alloc] init];
@@ -213,7 +215,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
             // Comparing the URLs hasn't worked well for me in practice, so I'm comparing the file paths instead
             NSString *candidatePath = runningApplication.bundleURL.URLByResolvingSymlinksInPath.path;
             if (candidatePath != nil) {
-                NSArray<NSString *> *candidatePathComponents = candidatePath.pathComponents;
+                NSArray<NSString *> *candidatePathComponents = candidatePath.precomposedStringWithCanonicalMapping.pathComponents;
 
                 if (needsToHandleImproperBundles) {
                     // Workaround cases where macOS appends Contents/MacOS/<executable> to the bundle path which can happen in corner cases (eg: mishandled bundles or helper executables).
