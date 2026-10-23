@@ -117,3 +117,111 @@
 
 /* Anonymous system profile information disclosure for update permission dialog */
 "Anonymous system profile information is used to help us plan future development work. Please contact us if you have any questions about this.\n\nThis is the information that would be sent:" = "Anonymous system profile information is used to help us plan future development work. Please contact us if you have any questions about this.\n\nThis is the information that would be sent:";
+
+/* Description text for SUUpdateAlert when the critical update is downloadable. */
+"%@ %@ is now available—you have %@. This is an important update; would you like to download it now?" = "%1$@ %2$@ er tilgængelig – du har %3$@. Dette er en vigtig opdatering. Vil du hente den nu?";
+
+/* No comment provided by engineer. */
+"%@ is now updated to version %@!" = "%1$@ er nu opdateret til version %2$@!";
+
+/* No comment provided by engineer. */
+"%@ is now updated!" = "%@ er nu opdateret!";
+
+/* Description text for SUUpdateAlert when the critical update has already been downloaded and ready to install. */
+"%1$@ %2$@ has been downloaded and is ready to use! This is an important update; would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ er hentet og klar til brug! Dette er en vigtig opdatering. Vil du installere den og genstarte %1$@ nu?";
+
+/* No comment provided by engineer. */
+"%1$@ %2$@ is available but your macOS version is too new for this update. This update only supports up to macOS %3$@." = "%1$@ %2$@ er tilgængelig, men din version af macOS er for ny til denne opdatering. Opdateringen understøtter højst macOS %3$@.";
+
+/* No comment provided by engineer. */
+"%1$@ %2$@ is available but your macOS version is too old to install it. At least macOS %3$@ is required." = "%1$@ %2$@ er tilgængelig, men din version af macOS er for gammel til at installere den. Mindst macOS %3$@ er påkrævet.";
+
+/* No comment provided by engineer. */
+"%1$@ can’t be updated if it’s running from the location it was downloaded to." = "%1$@ kan ikke opdateres, når den køres fra den placering, den blev hentet til.";
+
+/* No comment provided by engineer. */
+"An error occurred while connecting to the installer. Please try again later." = "Der opstod en fejl under oprettelse af forbindelse til installationsprogrammet. Prøv igen senere.";
+
+/* No comment provided by engineer. */
+"An error occurred while launching the installer. Please try again later." = "Der opstod en fejl under åbning af installationsprogrammet. Prøv igen senere.";
+
+/* No comment provided by engineer. */
+"An error occurred while running the updater. Please try again later." = "Der opstod en fejl under kørsel af opdateringsprogrammet. Prøv igen senere.";
+
+/* No comment provided by engineer. */
+"An error occurred while starting the installer. Please try again later." = "Der opstod en fejl under start af installationsprogrammet. Prøv igen senere.";
+
+/* No comment provided by engineer. */
+"An important update to %@ is ready to install" = "En vigtig opdatering til %@ er klar til installering";
+
+/* No comment provided by engineer. */
+"Application Name" = "Appnavn";
+
+/* No comment provided by engineer. */
+"Application Version" = "Appversion";
+
+/* No comment provided by engineer. */
+"CPU is 64-Bit?" = "CPU er 64-bit?";
+
+/* No comment provided by engineer. */
+"CPU Speed (MHz)" = "CPU-hastighed (MHz)";
+
+/* No comment provided by engineer. */
+"CPU Subtype" = "CPU-undertype";
+
+/* No comment provided by engineer. */
+"CPU Type" = "CPU-type";
+
+/* No comment provided by engineer. */
+"Failed to resume installing update." = "Installeringen af opdateringen kunne ikke genoptages.";
+
+/* Alternate title for 'Remind Me Later' button when downloaded updates can be resumed */
+"Install on Quit" = "Installer ved afslutning";
+
+/* No comment provided by engineer. */
+"Mac Model" = "Mac-model";
+
+/* No comment provided by engineer. */
+"Memory (MB)" = "Hukommelse (MB)";
+
+/* No comment provided by engineer. */
+"No" = "Nej";
+
+/* No comment provided by engineer. */
+"Number of CPUs" = "Antal CPU’er";
+
+/* No comment provided by engineer. */
+"OS Version" = "OS-version";
+
+/* No comment provided by engineer. */
+"Preferred Language" = "Foretrukket sprog";
+
+/* No comment provided by engineer. */
+"Quit %1$@, move it into your Applications folder, relaunch it from there and try again." = "Afslut %1$@, flyt den til mappen Apps, åbn det igen derfra og prøv igen.";
+
+/* No comment provided by engineer. */
+"The installation failed due to not having permission to write the new update." = "Installeringen mislykkedes, fordi der ikke var tilladelse til at skrive den nye opdatering.";
+
+/* No comment provided by engineer. */
+"The update is improperly signed and could not be validated. Please try again later or contact the app developer." = "Opdateringen er ikke signeret korrekt og kunne ikke valideres. Prøv igen senere, eller kontakt appens udvikler.";
+
+/* No comment provided by engineer. */
+"Unable to Check For Updates" = "Kan ikke søge efter opdateringer";
+
+/* No comment provided by engineer. */
+"Update Installed" = "Opdatering installeret";
+
+/* No comment provided by engineer. */
+"Version History" = "Versionshistorik";
+
+/* No comment provided by engineer. */
+"Yes" = "Ja";
+
+/* No comment provided by engineer. */
+"You may need to allow modifications from %1$@ in System Settings under Privacy & Security and App Management to install future updates." = "Du skal muligvis give %1$@ tilladelse til at ændre apps i Systemindstillinger under Anonymitet og sikkerhed > Appadministration for at kunne installere fremtidige opdateringer.";
+
+/* No comment provided by engineer. */
+"Your macOS version is too new" = "Din version af macOS er for ny";
+
+/* No comment provided by engineer. */
+"Your macOS version is too old" = "Din version af macOS er for gammel";
