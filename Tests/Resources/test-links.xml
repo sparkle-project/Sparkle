@@ -13,8 +13,13 @@
     <item>
         <title>Version 2.0</title>
         <pubDate>Sat, 26 Jul 2014 15:20:12 +0000</pubDate>
-        <sparkle:releaseNotesLink>http://sparkle-project.org/notes/relnote-2.0.txt</sparkle:releaseNotesLink>
-        <sparkle:fullReleaseNotesLink>http://sparkle-project.org/fullnotes.txt</sparkle:fullReleaseNotesLink>
+        <!-- Test that whitespace/newlines are trimmed too -->
+        <sparkle:releaseNotesLink>
+             http://sparkle-project.org/notes/relnote-2.0.txt
+        </sparkle:releaseNotesLink>
+        <sparkle:fullReleaseNotesLink>
+            http://sparkle-project.org/fullnotes.txt
+        </sparkle:fullReleaseNotesLink>
         <link>http://sparkle-project.org</link>
         <enclosure url="http://sparkle-project.org/release-2.0.zip" sparkle:version="2.0" length="1346234" />
     </item>
