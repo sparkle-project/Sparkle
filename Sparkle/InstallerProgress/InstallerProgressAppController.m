@@ -195,8 +195,11 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
 
 - (NSArray<NSRunningApplication *> *)runningApplicationsWithBundle:(NSBundle *)bundle SPU_OBJC_DIRECT
 {
-    // Resolve symlinks otherwise when we compare file paths, we may not realize two paths that are represented differently are the same
-    NSArray<NSString *> *bundlePathComponents = bundle.bundlePath.stringByResolvingSymlinksInPath.pathComponents;
+    // Resolve symlinks otherwise when we compare file paths, we may not realize two paths that are represented differently are the same.
+    // Make sure to use -[NSURL URLByResolvingSymlinksInPath] rather than -[NSString stringByResolvingSymlinksInPath]
+    // because the former will normalize it to proper file system representation.
+    // This is also done when retrieving NSRunningApplication path further below
+    NSArray<NSString *> *bundlePathComponents = bundle.bundleURL.URLByResolvingSymlinksInPath.pathComponents;
     NSString *bundleIdentifier = bundle.bundleIdentifier;
     
     NSMutableArray<NSRunningApplication *> *matchedRunningApplications = [[NSMutableArray alloc] init];
