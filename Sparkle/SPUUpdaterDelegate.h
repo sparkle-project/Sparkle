@@ -186,7 +186,7 @@ NS_SWIFT_UI_ACTOR @protocol SPUUpdaterDelegate <NSObject>
  - `SPULatestAppcastItemFoundKey`: if available, this may provide the latest `SUAppcastItem` that was found. This will be @c nil if it's unavailable.
  - `SPUNoUpdateFoundReasonKey`: This will provide the `SPUNoUpdateFoundReason`.
  For example the reason could be because the latest version in the feed requires a newer OS version or could be because the user is already on the latest version.
- - `SPUNoUpdateFoundUserInitiatedKey`: A boolean that indicates if a new update was not found when the user intitiated an update check manually.
+ - `SPUNoUpdateFoundUserInitiatedKey`: A boolean that indicates if a new update was not found when the user initiated an update check manually.
  
  @param updater The updater instance.
  @param error An error containing information on why a new valid update was not found
