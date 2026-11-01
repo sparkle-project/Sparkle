@@ -34,6 +34,7 @@ NSString *const SUPublicDSAKeyKey = @"SUPublicDSAKey";
 NSString *const SUPublicDSAKeyFileKey = @"SUPublicDSAKeyFile";
 NSString *const SUPublicEDKeyKey = @"SUPublicEDKey";
 NSString *const SURequireSignedFeedKey = @"SURequireSignedFeed";
+NSString *const SURequireFeedBundleIdentifierKey = @"SURequireFeedBundleIdentifier";
 NSString *const SUVerifyUpdateBeforeExtractionKey = @"SUVerifyUpdateBeforeExtraction";
 NSString *const SUDisableFeedCacheValidationKey = @"SUDisableFeedCacheValidation";
 NSString *const SUAutomaticallyUpdateKey = @"SUAutomaticallyUpdate";
@@ -72,6 +73,7 @@ NSString *const SUAppcastAttributeLength = @"sparkle:length";
 
 NSString *const SUAppcastElementVersion = SUAppcastAttributeVersion;
 NSString *const SUAppcastElementShortVersionString = SUAppcastAttributeShortVersionString;
+NSString *const SUAppcastElementBundleIdentifier = @"sparkle:bundleIdentifier";
 NSString *const SUAppcastElementCriticalUpdate = @"sparkle:criticalUpdate";
 NSString *const SUAppcastElementDeltas = @"sparkle:deltas";
 NSString *const SUAppcastElementMinimumAutoupdateVersion = @"sparkle:minimumAutoupdateVersion";
