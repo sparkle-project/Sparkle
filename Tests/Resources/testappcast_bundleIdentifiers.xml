@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
+    <channel>
+        <title>Test</title>
+        <sparkle:bundleIdentifier>com.example.first</sparkle:bundleIdentifier>
+        <sparkle:bundleIdentifier>
+            com.example.second
+        </sparkle:bundleIdentifier>
+        <sparkle:bundleIdentifier></sparkle:bundleIdentifier>
+        <item>
+            <title>Version 2.0</title>
+            <sparkle:bundleIdentifier>com.example.in-item</sparkle:bundleIdentifier>
+            <enclosure url="http://example.com/test.zip" sparkle:version="2.0" length="1" type="application/octet-stream" sparkle:edSignature="test" />
+        </item>
+    </channel>
+</rss>

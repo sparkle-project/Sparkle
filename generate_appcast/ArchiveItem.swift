@@ -78,6 +78,7 @@ class ArchiveItem: CustomStringConvertible {
     let publicEdKey: Data?
     let supportsDSA: Bool
     let requiresSignedAppcast: Bool
+    let bundleIdentifier: String?
     let archiveFileAttributes: [FileAttributeKey: Any]
     var deltas: [DeltaUpdate]
 
@@ -174,11 +175,12 @@ class ArchiveItem: CustomStringConvertible {
         }
     }
 
-    init(version: String, shortVersion: String?, feedURL: URL?, requiresSignedAppcast: Bool, minimumSystemVersion: String?, hardwareRequirements: String?, frameworkVersion: String?, sparkleExecutableFileSize: Int?, sparkleLocales: String?, publicEdKey: String?, supportsDSA: Bool, appPath: URL, archivePath: URL) throws {
+    init(version: String, shortVersion: String?, feedURL: URL?, requiresSignedAppcast: Bool, bundleIdentifier: String?, minimumSystemVersion: String?, hardwareRequirements: String?, frameworkVersion: String?, sparkleExecutableFileSize: Int?, sparkleLocales: String?, publicEdKey: String?, supportsDSA: Bool, appPath: URL, archivePath: URL) throws {
         self.version = version
         self._shortVersion = shortVersion
         self.feedURL = feedURL
         self.requiresSignedAppcast = requiresSignedAppcast
+        self.bundleIdentifier = bundleIdentifier
         self.minimumSystemVersion = minimumSystemVersion ?? "12.0"
         self.hardwareRequirements = hardwareRequirements
         self.frameworkVersion = frameworkVersion
@@ -369,6 +371,7 @@ class ArchiveItem: CustomStringConvertible {
                           shortVersion: shortVersion,
                           feedURL: feedURL,
                           requiresSignedAppcast: requiresSignedAppcast,
+                          bundleIdentifier: infoPlist[kCFBundleIdentifierKey as String] as? String,
                           minimumSystemVersion: minimumSystemVersion,
                           hardwareRequirements: hardwareRequirements,
                           frameworkVersion: frameworkVersion,

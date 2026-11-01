@@ -141,6 +141,7 @@
 		720E217B1D0D00BF003A311C /* SPUUpdaterCycle.h in Headers */ = {isa = PBXBuildFile; fileRef = 720E21791D0D00BF003A311C /* SPUUpdaterCycle.h */; };
 		720E217C1D0D00BF003A311C /* SPUUpdaterCycle.m in Sources */ = {isa = PBXBuildFile; fileRef = 720E217A1D0D00BF003A311C /* SPUUpdaterCycle.m */; };
 		7210C7681B9A9A1500EB90AC /* SUUnarchiverTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7210C7671B9A9A1500EB90AC /* SUUnarchiverTest.swift */; };
+		7212F16330A0311500BC9C7D /* testappcast_bundleIdentifiers.xml in Resources */ = {isa = PBXBuildFile; fileRef = 7210219630A0311500CA3DBD /* testappcast_bundleIdentifiers.xml */; };
 		72162B081C82C9600013C1C5 /* SULocalizations.h in Headers */ = {isa = PBXBuildFile; fileRef = 72162B071C82C9600013C1C5 /* SULocalizations.h */; };
 		721BC20E1D1CDE55002BC71E /* SPULocalCacheDirectory.h in Headers */ = {isa = PBXBuildFile; fileRef = 721BC20C1D1CDE55002BC71E /* SPULocalCacheDirectory.h */; };
 		721BC20F1D1CDE55002BC71E /* SPULocalCacheDirectory.m in Sources */ = {isa = PBXBuildFile; fileRef = 721BC20D1D1CDE55002BC71E /* SPULocalCacheDirectory.m */; };
@@ -1039,6 +1040,7 @@
 		720DC50527A62CDC00DFF3EC /* testappcast_minimumAutoupdateVersionSkipping2.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = testappcast_minimumAutoupdateVersionSkipping2.xml; sourceTree = "<group>"; };
 		720E21791D0D00BF003A311C /* SPUUpdaterCycle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPUUpdaterCycle.h; sourceTree = "<group>"; };
 		720E217A1D0D00BF003A311C /* SPUUpdaterCycle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SPUUpdaterCycle.m; sourceTree = "<group>"; };
+		7210219630A0311500CA3DBD /* testappcast_bundleIdentifiers.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = testappcast_bundleIdentifiers.xml; sourceTree = "<group>"; };
 		7210C7671B9A9A1500EB90AC /* SUUnarchiverTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SUUnarchiverTest.swift; sourceTree = "<group>"; };
 		7214B8851D45AD9A00CB5CED /* SPUInstallationType.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SPUInstallationType.h; sourceTree = "<group>"; };
 		72162B071C82C9600013C1C5 /* SULocalizations.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SULocalizations.h; sourceTree = "<group>"; };
@@ -1825,6 +1827,7 @@
 				725EA4B13027D2AF0041BFA6 /* test-package-update.xml */,
 				72C56E212F04C28B0005A484 /* testreleasenotes.html */,
 				5A5DD40324958AFF0045EB3E /* SUUpdateValidatorTest */,
+				7210219630A0311500CA3DBD /* testappcast_bundleIdentifiers.xml */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -3117,6 +3120,7 @@
 				72CCDEBE27421FD500B53718 /* SparkleTestCodeSignApp_bad_header.zip in Resources */,
 				726FC0362C1E787A00177986 /* SparkleTestCodeSignApp.aar in Resources */,
 				722545B626805FF80036465C /* testappcast_info_updates.xml in Resources */,
+				7212F16330A0311500BC9C7D /* testappcast_bundleIdentifiers.xml in Resources */,
 				723414172EBFB482009727E0 /* testappcast_arm64HardwareRequirement.xml in Resources */,
 				7202DC9A269ABD3500737EC4 /* testappcast_phasedRollout.xml in Resources */,
 				72C6F2DB303BE56100D39EF2 /* SparkleTestCodeSignApp.license.no-text.dmg in Resources */,

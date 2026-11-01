@@ -30,6 +30,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (SUAppcast *)copyByFilteringItems:(BOOL (^)(SUAppcastItem *))filterBlock;
 
+@property (readonly, nonatomic, copy) NSSet<NSString *> *bundleIdentifiers;
+
 @end
 
 NS_ASSUME_NONNULL_END

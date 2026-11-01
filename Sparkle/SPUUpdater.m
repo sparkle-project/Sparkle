@@ -73,6 +73,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     BOOL _loggedATSWarning;
     BOOL _loggedNoSecureKeyWarning;
     BOOL _loggedUpdateSecurityPolicyWarning;
+    BOOL _loggedFeedBundleIdentifierWarning;
     BOOL _updatingMainBundle;
 }
 
@@ -379,13 +380,25 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
             
             return NO;
         }
+    } else if (_host.requiresFeedBundleIdentifier) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInvalidUpdaterError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"For security reasons, %@ needs to also be enabled if %@ is enabled for %@. Visit Sparkle's documentation for more information: https://sparkle-project.org/documentation/customization/", SURequireSignedFeedKey, SURequireFeedBundleIdentifierKey, hostName] }];
+        }
+
+        return NO;
     }
-    
+
     if (_updatingMainBundle) {
         if (!_loggedUpdateSecurityPolicyWarning && mainBundleHost.hasUpdateSecurityPolicy) {
             SULog(SULogLevelDefault, @"Warning: %@ has a custom NSUpdateSecurityPolicy in its Info.plist. This may cause issues when installing updates. Please consider removing this key for your builds using Sparkle if you do not really require a custom update security policy.", hostName);
             
             _loggedUpdateSecurityPolicyWarning = YES;
+        }
+
+        if (!_loggedFeedBundleIdentifierWarning && requiresSignedFeed && ![_host boolForInfoDictionaryKey:SURequireFeedBundleIdentifierKey]) {
+            SULog(SULogLevelDefault, @"Warning: %@ is enabled but %@ is not enabled for %@. For increased security, please consider enabling %@ and adding a %@ element to your signed feed. Visit Sparkle's documentation for more information: https://sparkle-project.org/documentation/#3-segue-for-security-concerns.", SURequireSignedFeedKey, SURequireFeedBundleIdentifierKey, hostName, SURequireFeedBundleIdentifierKey, SUAppcastElementBundleIdentifier);
+
+            _loggedFeedBundleIdentifierWarning = YES;
         }
     }
     

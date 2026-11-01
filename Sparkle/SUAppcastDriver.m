@@ -232,7 +232,18 @@
         
         return;
     }
-    
+
+    if (appcastSigningValidationStatus == SPUAppcastSigningValidationStatusSucceeded && _host.requiresFeedBundleIdentifier) {
+        NSString *hostBundleIdentifier = _host.bundle.bundleIdentifier;
+        if (hostBundleIdentifier == nil || ![loadedAppcast.bundleIdentifiers containsObject:hostBundleIdentifier]) {
+            NSError *bundleIdentifierError = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAppcastParseError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"The update feed is rejected because %@ is enabled and no %@ element in the feed matches the bundle identifier %@.", SURequireFeedBundleIdentifierKey, SUAppcastElementBundleIdentifier, hostBundleIdentifier] }];
+
+            [delegate didFailToFetchAppcastWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUAppcastParseError userInfo:@{ NSLocalizedDescriptionKey: SULocalizedStringFromTableInBundle(@"An error occurred while parsing the update feed.", SPARKLE_TABLE, SUSparkleBundle(), nil), NSUnderlyingErrorKey: bundleIdentifierError }]];
+
+            return;
+        }
+    }
+
     // Now process the loaded appcast and find a suitable update item
     
     [delegate didFinishLoadingAppcast:loadedAppcast];

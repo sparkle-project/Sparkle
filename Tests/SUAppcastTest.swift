@@ -1208,4 +1208,25 @@ class SUAppcastTest: XCTestCase {
             XCTFail("Appcast creation should have passed, dropping only the rejected package item")
         }
     }
+    
+    func testParseAppcastBundleIdentifiers() throws {
+        let versionComparator = SUStandardVersionComparator.default
+        let stateResolver = SPUAppcastItemStateResolver(hostVersion: "1.0", applicationVersionComparator: versionComparator, standardVersionComparator: versionComparator)
+
+        let testURL = Bundle(for: SUAppcastTest.self).url(forResource: "testappcast_bundleIdentifiers", withExtension: "xml")!
+        let testData = try Data(contentsOf: testURL)
+
+        let appcast = try SUAppcast(xmlData: testData, relativeTo: nil, stateResolver: stateResolver, signingValidationStatus: .succeeded)
+        XCTAssertEqual(appcast.bundleIdentifiers, ["com.example.first", "com.example.second"])
+        XCTAssertEqual(appcast.items.count, 1)
+
+        let filteredAppcast = appcast.copy(byFilteringItems: { _ in false })
+        XCTAssertEqual(filteredAppcast.bundleIdentifiers, ["com.example.first", "com.example.second"])
+
+        let testURLWithoutBundleIdentifiers = Bundle(for: SUAppcastTest.self).url(forResource: "testappcast", withExtension: "xml")!
+        let testDataWithoutBundleIdentifiers = try Data(contentsOf: testURLWithoutBundleIdentifiers)
+
+        let appcastWithoutBundleIdentifiers = try SUAppcast(xmlData: testDataWithoutBundleIdentifiers, relativeTo: nil, stateResolver: stateResolver, signingValidationStatus: .succeeded)
+        XCTAssertEqual(appcastWithoutBundleIdentifiers.bundleIdentifiers, [])
+    }
 }

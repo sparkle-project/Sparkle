@@ -21,10 +21,17 @@
 
 #include "AppKitPrevention.h"
 
+@interface SUAppcast ()
+
+@property (readonly, nonatomic, copy) NSSet<NSString *> *bundleIdentifiers;
+
+@end
+
 @implementation SUAppcast
 
 @synthesize items = _items;
 @synthesize signingValidationStatus = _signingValidationStatus;
+@synthesize bundleIdentifiers = _bundleIdentifiers;
 
 - (nullable instancetype)initWithXMLData:(NSData *)xmlData relativeToURL:(NSURL * _Nullable)relativeURL stateResolver:(SPUAppcastItemStateResolver *)stateResolver signingValidationStatus:(SPUAppcastSigningValidationStatus)signingValidationStatus error:(NSError * __autoreleasing *)error
 {
@@ -85,6 +92,22 @@
     if (nil == document) {
         return nil;
     }
+
+    NSArray *channelNodes = [document nodesForXPath:@"/rss/channel/*" error:errorp];
+    if (nil == channelNodes) {
+        return nil;
+    }
+
+    NSMutableSet<NSString *> *bundleIdentifiers = [NSMutableSet set];
+    for (NSXMLNode *channelNode in channelNodes) {
+        if ([[self sparkleNamespacedNameOfNode:channelNode] isEqualToString:SUAppcastElementBundleIdentifier]) {
+            NSString *bundleIdentifier = [channelNode.stringValue stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
+            if (bundleIdentifier.length > 0) {
+                [bundleIdentifiers addObject:bundleIdentifier];
+            }
+        }
+    }
+    _bundleIdentifiers = [bundleIdentifiers copy];
 
     NSArray *xmlItems = [document nodesForXPath:@"/rss/channel/item" error:errorp];
     if (nil == xmlItems) {
@@ -288,6 +311,7 @@
     
     other->_items = newItems;
     other->_signingValidationStatus = _signingValidationStatus;
+    other->_bundleIdentifiers = _bundleIdentifiers;
     return other;
 }
 
