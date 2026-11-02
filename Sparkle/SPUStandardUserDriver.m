@@ -127,7 +127,7 @@ static const NSTimeInterval SUShowCheckingForUpdatesTimeDelay = 0.3;
 - (void)_activateApplication SPU_OBJC_DIRECT
 {
     // -[NSApp activate] does not always work reliably from backgrounded apps when the user initiates checks for updates
-    // from e.g. a menu bar. The OS should grant active focus to the appliation, but it is inconsistent (last tested on 26.5.1).
+    // from e.g. a menu bar. The OS should grant active focus to the application, but it is inconsistent (last tested on 26.5.1).
     // For now we will prefer the deprecated more reliant API
     [NSApp activateIgnoringOtherApps:YES];
 }
@@ -555,7 +555,7 @@ static const NSTimeInterval SUShowCheckingForUpdatesTimeDelay = 0.3;
     }
     
     // Don't show checking for updates window immediately
-    // Only show it if the check is taking a noticable amount of time.
+    // Only show it if the check is taking a noticeable amount of time.
     // This reduces the chance of a very sudden/quick transition between
     // checking for updates and showing the next UI.
     __weak __typeof__(self) weakSelf = self;
@@ -615,7 +615,7 @@ static const NSTimeInterval SUShowCheckingForUpdatesTimeDelay = 0.3;
     // Ideally we should use -[NSAlert alertWithError:] however
     // unfortunately Sparkle may return error messages with descriptions that contain
     // recovery suggestions. So we will check if an explicit recovery suggestion exists,
-    // and set the mesage and informative text appropriately.
+    // and set the message and informative text appropriately.
     // In the future we should audit potential error messages and make them consistent.
     NSAlert *alert = [[NSAlert alloc] init];
     NSString *recoverySuggestion = [error localizedRecoverySuggestion];

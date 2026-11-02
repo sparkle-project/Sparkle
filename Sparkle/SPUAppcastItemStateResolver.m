@@ -149,7 +149,7 @@
             return NO;
         }
         
-        // An error occured
+        // An error occurred
         SULog(SULogLevelError, @"Error: failed to detect if process is running under rosetta with error: %d", errno);
         return YES;
     }

@@ -17,7 +17,7 @@ typedef NS_ENUM(NSInteger, SPUAppcastSigningValidationStatus)
     SPUAppcastSigningValidationStatusSkipped = 0,
     
     /**
-     The appcast is signed and validation has passed succesfully.
+     The appcast is signed and validation has passed successfully.
      */
     SPUAppcastSigningValidationStatusSucceeded,
     

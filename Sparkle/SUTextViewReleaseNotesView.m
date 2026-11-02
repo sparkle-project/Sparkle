@@ -213,7 +213,7 @@ static void processMarkdownFragmentAttributedString(NSAttributedString *fragment
         }
         case NSPresentationIntentKindBlockQuote: {
             // Advance text that wraps to next line by this divider width
-            // Multiple levels of block quotes will be advanced mulitiple times
+            // Multiple levels of block quotes will be advanced multiple times
             // Special rendering via text attachments or decorations is not done because
             // it's complex and may have tradeoffs
             

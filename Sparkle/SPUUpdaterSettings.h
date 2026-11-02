@@ -79,7 +79,7 @@ SU_EXPORT NS_SWIFT_UI_ACTOR @interface SPUUpdaterSettings : NSObject
  * The impatient update check interval.
  *
  * If an update has already been downloaded automatically in the background, Sparkle may not notify users of the update immediately,
- * and tries to install the update siliently on quit without notifying the user.
+ * and tries to install the update silently on quit without notifying the user.
  *
  * Sparkle uses this long impatient update check interval to decide when to notify the user of the update if they haven't quit the app for a long time.
  * By default this check interval is set to 604800 seconds (which is 1 week). This interval must be bigger than the `updateCheckInterval`.
