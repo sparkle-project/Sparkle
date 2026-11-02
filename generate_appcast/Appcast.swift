@@ -77,8 +77,14 @@ func makeAppcasts(archivesSourceDir: URL, outputPathURL: URL?, cacheDirectory ca
         let feedUpdateBranches: [UpdateVersion: UpdateBranch]
         if let reachable = try? feedURL.checkResourceIsReachable(), reachable {
             feedUpdateBranches = try readAppcast(archives: archivesTable, appcastURL: feedURL)
+            if verbose {
+                print("Found existing appcast", feedURL.path, "with \(feedUpdateBranches.count) known update(s)")
+            }
         } else {
             feedUpdateBranches = [:]
+            if verbose {
+                print("No existing appcast found at", feedURL.path)
+            }
         }
         
         // Find which versions are new and old but aren't in the feed and that we should ignore/skip
@@ -200,6 +206,9 @@ func makeAppcasts(archivesSourceDir: URL, outputPathURL: URL?, cacheDirectory ca
                     if let privateEdKey = keys.privateEdKey, let expectedPublicKey = keys.publicEdKey {
                         if publicEdKey == expectedPublicKey {
                             do {
+                                if verbose {
+                                    print("Signing", update.archivePath.lastPathComponent, "with EdDSA key")
+                                }
                                 update.edSignature = try edSignature(path: update.archivePath, publicEdKey: publicEdKey, privateEdKey: privateEdKey)
                             } catch {
                                 update.signingError = error
@@ -274,9 +283,15 @@ func makeAppcasts(archivesSourceDir: URL, outputPathURL: URL?, cacheDirectory ca
                 let ignoreMarkerPath = cacheDir.appendingPathComponent(deltaPath.lastPathComponent).appendingPathExtension(".ignore")
                 let fm = FileManager.default
                 if fm.fileExists(atPath: ignoreMarkerPath.path) {
+                    if verbose {
+                        print("Skipping delta", deltaPath.lastPathComponent, "because it was previously marked as ignored")
+                    }
                     continue
                 }
                 if !fm.fileExists(atPath: deltaPath.path) {
+                    if verbose {
+                        print("Creating delta", deltaPath.lastPathComponent, "from version \(item.version) to \(latestItem.version)")
+                    }
                     // Test if old and new app have the same code signing signature. If not, omit a warning.
                     // This is a good time to do this check because our delta handling code sets a marker
                     // to avoid this path each time generate_appcast is called.
@@ -353,11 +368,17 @@ func makeAppcasts(archivesSourceDir: URL, outputPathURL: URL?, cacheDirectory ca
                         continue
                     }
                 } else {
+                    if verbose {
+                        print("Reusing existing delta", deltaPath.lastPathComponent)
+                    }
                     delta = DeltaUpdate(fromVersion: item.version, archivePath: deltaPath, sparkleExecutableFileSize: item.sparkleExecutableFileSize, sparkleLocales: item.sparkleLocales)
                 }
 
                 // Require delta to be a bit smaller
                 if delta.fileSize / 7 > latestItem.fileSize / 8 {
+                    if verbose {
+                        print("Ignoring delta", deltaPath.lastPathComponent, "because it is not sufficiently smaller than the full update")
+                    }
                     markDeltaAsIgnored(delta: delta, markerPath: ignoreMarkerPath)
                     continue
                 }
@@ -379,6 +400,9 @@ func makeAppcasts(archivesSourceDir: URL, outputPathURL: URL?, cacheDirectory ca
 #endif
                     if let publicEdKey = item.publicEdKey, let privateEdKey = keys.privateEdKey {
                         do {
+                            if verbose {
+                                print("Signing delta", deltaPath.lastPathComponent, "with EdDSA key")
+                            }
                             delta.edSignature = try edSignature(path: deltaPath, publicEdKey: publicEdKey, privateEdKey: privateEdKey)
                         } catch {
                             print(delta.archivePath.lastPathComponent, error)
