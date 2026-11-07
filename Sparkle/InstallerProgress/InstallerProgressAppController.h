@@ -18,6 +18,8 @@ SPU_OBJC_DIRECT_MEMBERS @interface InstallerProgressAppController : NSObject <NS
 
 - (void)run;
 
+- (void)handleTerminationRequest;
+
 - (void)cleanupAndExitWithStatus:(int)status error:(NSError * _Nullable)error __attribute__((noreturn));
 
 @end

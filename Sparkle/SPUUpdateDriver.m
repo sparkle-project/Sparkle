@@ -361,8 +361,7 @@ static BOOL SPUUpdateRequiresUserAttentionBeforeDownloading(SUAppcastItem *updat
             return;
         }
         
-        // No need to discard the prior resumable installed update.
-        // The update will be discarded when we submit new installer job
+        [_installerDriver cancelSupersededInstallerBeforeLaunching];
     } else if (_resumableLocalUpdate != nil) {
         if (![self pendingUpdateItem:_resumableLocalUpdate.updateItem isSupersededByUpdateItem:updateItem]) {
             [self notifyFoundValidUpdateWithAppcastItem:_resumableLocalUpdate.updateItem secondaryAppcastItem:_resumableLocalUpdate.secondaryUpdateItem systemDomain:nil resumingExistingUpdate:YES];
