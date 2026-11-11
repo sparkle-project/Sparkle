@@ -37,6 +37,9 @@
 /* No comment provided by engineer. */
 "%1$@ %2$@ is available but your macOS version is too old to install it. At least macOS %3$@ is required." = "%1$@ %2$@が入手可能ですが、インストールするにはmacOSのバージョンが古すぎます。macOS %3$@以降が必要です。";
 
+/* Mac is too old and update requires Apple silicon Mac */
+"%1$@ %2$@ is available but this update requires a new Apple silicon Mac." = "%1$@ %2$@が入手可能ですが、このアップデートにはApple silicon搭載の新しいMacが必要です。";
+
 /* No comment provided by engineer. */
 "%1$@ can’t be updated if it’s running from the location it was downloaded to." = "この場所ではダウンロードされたアップデートを%1$@に適用できません。";
 
@@ -50,28 +53,31 @@
 "A new version of %@ is ready to install!" = "新しいバージョンの%@が今すぐインストールできます!";
 
 /* No comment provided by engineer. */
-"An error occurred in retrieving update information. Please try again later." = "アップデート情報の取得中にエラーが発生しました。あとでやり直してください。";
+"An error occurred in retrieving update information. Please try again later." = "アップデート情報の取得中にエラーが起きました。あとでやり直してください。";
 
 /* No comment provided by engineer. */
-"An error occurred while connecting to the installer. Please try again later." = "インストーラに接続中にエラーが発生しました。あとでやり直してください。";
+"An error occurred while connecting to the installer. Please try again later." = "インストーラに接続中にエラーが起きました。あとでやり直してください。";
 
 /* No comment provided by engineer. */
-"An error occurred while downloading the update. Please try again later." = "アップデートをダウンロード中にエラーが発生しました。あとでやり直してください。";
+"An error occurred while downloading the update. Please try again later." = "アップデートをダウンロード中にエラーが起きました。あとでやり直してください。";
 
 /* No comment provided by engineer. */
-"An error occurred while extracting the archive. Please try again later." = "アーカイブの展開中にエラーが発生しました。あとでやり直してください。";
+"An error occurred while downloading the release notes." = "リリースノートのダウンロード中にエラーが起きました。";
 
 /* No comment provided by engineer. */
-"An error occurred while launching the installer. Please try again later." = "インストーラを起動中にエラーが発生しました。あとでやり直してください。";
+"An error occurred while extracting the archive. Please try again later." = "アーカイブの展開中にエラーが起きました。あとでやり直してください。";
 
 /* No comment provided by engineer. */
-"An error occurred while parsing the update feed." = "アップデートフィードを解析中にエラーが発生しました。";
+"An error occurred while launching the installer. Please try again later." = "インストーラを起動中にエラーが起きました。あとでやり直してください。";
 
 /* No comment provided by engineer. */
-"An error occurred while running the updater. Please try again later." = "アップデータを実行中にエラーが発生しました。あとでやり直してください。";
+"An error occurred while parsing the update feed." = "アップデートフィードを解析中にエラーが起きました。";
 
 /* No comment provided by engineer. */
-"An error occurred while starting the installer. Please try again later." = "インストーラを始動中にエラーが発生しました。あとでやり直してください。";
+"An error occurred while running the updater. Please try again later." = "アップデータを実行中にエラーが起きました。あとでやり直してください。";
+
+/* No comment provided by engineer. */
+"An error occurred while starting the installer. Please try again later." = "インストーラを始動中にエラーが起きました。あとでやり直してください。";
 
 /* No comment provided by engineer. */
 "An important update to %@ is ready to install" = "%@の重要なアップデートがインストールできます。";
@@ -86,13 +92,13 @@
 "Cancel" = "キャンセル";
 
 /* Run generate_progress_tool_localizations.py after updating. */
-"Cancel Update" = "アップデートを中止";
+"Cancel Update" = "アップデートをキャンセル";
 
 /* No comment provided by engineer. */
-"Checking for updates…" = "アップデートを確認しています…";
+"Checking for updates…" = "アップデートを確認中…";
 
 /* No comment provided by engineer. */
-"CPU is 64-Bit?" = "CPUは64-Bit?";
+"CPU is 64-Bit?" = "CPUは64ビット?";
 
 /* No comment provided by engineer. */
 "CPU Speed (MHz)" = "CPUスピード (MHz)";
@@ -104,10 +110,10 @@
 "CPU Type" = "CPUタイプ";
 
 /* Take care not to overflow the status window. */
-"Downloading update…" = "アップデートをダウンロードしています…";
+"Downloading update…" = "アップデートをダウンロード中…";
 
 /* Take care not to overflow the status window. */
-"Extracting update…" = "アップデートを展開しています…";
+"Extracting update…" = "アップデートを抽出中…";
 
 /* No comment provided by engineer. */
 "Failed to resume installing update." = "アップデートのインストール再開に失敗しました。";
@@ -146,7 +152,7 @@
 "Preferred Language" = "優先する言語";
 
 /* No comment provided by engineer. */
-"Quit %1$@, move it into your Applications folder, relaunch it from there and try again." = "%1$@を終了させ、アプリケーションフォルダに移動の上再度お試しください。";
+"Quit %1$@, move it into your Applications folder, relaunch it from there and try again." = "%1$@を終了させ、アプリケーションフォルダに移動してからやり直してください。";
 
 /* No comment provided by engineer. */
 "Ready to Install" = "インストールできます";
@@ -158,22 +164,31 @@
 "The installation failed due to not having permission to write the new update." = "新しいアップデートを書き込むアクセス権がないためインストールできませんでした。";
 
 /* No comment provided by engineer. */
-"The update is improperly signed and could not be validated. Please try again later or contact the app developer." = "アップデートの署名が不適切で認証できませんでした。あとでやり直すかアプリケーション開発者に連絡してください。";
+"The updater failed to start. Please verify you have the latest version of %@ and contact the app developer if the issue still persists. Check the Console logs for more information." = "アップデータを起動できませんでした。%@が最新バージョンであることを確認し、それでも問題が解決しない場合はアプリの開発者に連絡してください。詳しくはコンソールログを確認してください。";
 
 /* No comment provided by engineer. */
-"Unable to Check For Updates" = "アップデートを確認できませんでした";
+"The update is improperly signed and could not be validated. Please try again later or contact the app developer." = "アップデートの署名が正しくないため検証できませんでした。あとでやり直すか、アプリの開発者に連絡してください。";
+
+/* No comment provided by engineer. */
+"The update feed is improperly signed and could not be validated. Please try again later or contact the app developer." = "アップデートフィードの署名が正しくないため検証できませんでした。あとでやり直すか、アプリの開発者に連絡してください。";
+
+/* No comment provided by engineer. */
+"The release notes is improperly signed and could not be validated. Please contact the app developer for more information." = "リリースノートの署名が正しくないため検証できませんでした。詳しくはアプリの開発者に連絡してください。";
+
+/* No comment provided by engineer. */
+"Unable to Check For Updates" = "アップデートを確認できません";
 
 /* No comment provided by engineer. */
 "Update Error!" = "アップデートエラー!";
 
 /* No comment provided by engineer. */
-"Update Installed" = "アップデートがインストールされました";
+"Update Installed" = "インストール完了";
 
 /* Run generate_progress_tool_localizations.py after updating. */
 "Updating %@" = "%@をアップデート中";
 
 /* No comment provided by engineer. */
-"Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "%1$@をアプリケーションフォルダに移動し、そこから再起動したあとやり直してください。";
+"Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "Finderで%1$@をアプリケーションフォルダに移動し、そこから再起動したあとやり直してください。";
 
 /* No comment provided by engineer. */
 "Version History" = "バージョン履歴";
@@ -190,23 +205,26 @@
 /* No comment provided by engineer. */
 "Your macOS version is too old" = "このmacOSのバージョンは古すぎます";
 
+/* Mac is too old and update requires newer hardware */
+"Your Mac is too old" = "このMacは古すぎます";
+
 /* Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates. */
 "You’re up to date!" = "最新版を使用しています!";
 
 /* Software Update title/label */
-"Software Update" = "ソフトウェア・アップデート";
+"Software Update" = "ソフトウェアアップデート";
 
 /* Remind Me Later choice for update alert */
 "Remind Me Later" = "あとで通知";
 
 /* Skip This Version choice for update alert */
-"Skip This Version" = "このバージョンはスキップ";
+"Skip This Version" = "このバージョンをスキップ";
 
 /* Install Update choice for update alert */
 "Install Update" = "アップデートをインストール";
 
 /* Automatically download and install updates in the future option for update alert */
-"Automatically download and install updates in the future" = "今後はアップデートのダウンロードとインストールを自動で行う";
+"Automatically download and install updates in the future" = "今後はアップデートを自動でダウンロードしてインストール";
 
 /* Check for updates automatically response for update permission dialog */
 "Check Automatically" = "自動で確認";
