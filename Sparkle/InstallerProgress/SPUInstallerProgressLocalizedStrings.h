@@ -87,7 +87,7 @@ static NSDictionary<NSString *, NSDictionary<NSString *, NSString *> *> *const S
         @"Updating %@": @"Aggiornamento di %@",
     },
     @"ja": @{
-        @"Cancel Update": @"アップデートを中止",
+        @"Cancel Update": @"アップデートをキャンセル",
         @"Installing update…": @"アップデートをインストールしています…",
         @"Updating %@": @"%@をアップデート中",
     },
