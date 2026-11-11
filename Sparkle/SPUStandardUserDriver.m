@@ -548,9 +548,10 @@ static const NSTimeInterval SUShowCheckingForUpdatesTimeDelay = 0.3;
     [_checkingController beginActionWithTitle:SULocalizedStringFromTableInBundle(@"Checking for updates…", SPARKLE_TABLE, sparkleBundle, nil) maxProgressValue:0.0 statusText:nil];
     [_checkingController setButtonTitle:SULocalizedStringFromTableInBundle(@"Cancel", SPARKLE_TABLE, sparkleBundle, nil) target:self action:@selector(cancelCheckForUpdates:) isDefault:NO accessibilityIdentifier:@"SUStatusCancel"];
     
-    // For background applications, obtain focus.
-    // Useful if the update check is requested from another app like System Preferences.
-    if ([SUApplicationInfo isBackgroundApplication:[NSApplication sharedApplication]]) {
+    // Obtain focus. Useful if:
+    // - The update check is requested from another app (e.g. System Preferences)
+    // - The user triggers the update check from an NSStatusItem (which does not activate the app)
+    if (![NSApp isActive]) {
         [self _activateApplication];
     }
     
