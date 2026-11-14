@@ -140,19 +140,34 @@ static void *SUHostObservableContext = &SUHostObservableContext;
     return _bundle.bundlePath;
 }
 
+- (NSOrderedSet<NSString *> *)infoDictionaryNamesStoppingAtFirstMatch:(BOOL)stopAtFirstMatch SPU_OBJC_DIRECT
+{
+    NSMutableOrderedSet<NSString *> *names = [NSMutableOrderedSet orderedSet];
+    // Allow host bundle to provide a custom name
+    for (NSString *key in @[@"SUBundleName", @"CFBundleDisplayName", (__bridge NSString *)kCFBundleNameKey]) {
+        NSString *name = [self objectForInfoDictionaryKey:key ofClass:NSString.class];
+        if (name.length > 0) {
+            [names addObject:name];
+            
+            if (stopAtFirstMatch) {
+                break;
+            }
+        }
+    }
+    return [names copy];
+}
+
+- (NSOrderedSet<NSString *> *)infoDictionaryNames
+{
+    return [self infoDictionaryNamesStoppingAtFirstMatch:NO];
+}
+
 - (NSString * _Nonnull)name
 {
-    NSString *name;
-
-    // Allow host bundle to provide a custom name
-    name = [self objectForInfoDictionaryKey:@"SUBundleName" ofClass:NSString.class];
-    if (name && name.length > 0) return name;
-
-    name = [self objectForInfoDictionaryKey:@"CFBundleDisplayName" ofClass:NSString.class];
-	if (name && name.length > 0) return name;
-
-    name = [self objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleNameKey ofClass:NSString.class];
-	if (name && name.length > 0) return name;
+    NSString *name = [self infoDictionaryNamesStoppingAtFirstMatch:YES].firstObject;
+    if (name != nil) {
+        return name;
+    }
 
     return [[[NSFileManager defaultManager] displayNameAtPath:[self bundlePath]] stringByDeletingPathExtension];
 }

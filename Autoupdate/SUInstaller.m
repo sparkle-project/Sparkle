@@ -21,6 +21,17 @@
 
 @implementation SUInstaller
 
+static BOOL SUFilenameMatchesAnyName(NSString *filename, NSOrderedSet<NSString *> *names)
+{
+    for (NSString *name in names) {
+        // This handles unicode normalization but is still a case sensitive comparison
+        if ([filename compare:name] == NSOrderedSame) {
+            return YES;
+        }
+    }
+    return NO;
+}
+
 + (nullable NSString *)installSourcePathInUpdateFolder:(NSString *)inUpdateFolder forHost:(SUHost *)host
 #if SPARKLE_BUILD_PACKAGE_SUPPORT
                                              isPackage:(BOOL *)isPackagePtr isGuided:(BOOL *)isGuidedPtr
@@ -32,8 +43,15 @@
     // Search subdirectories for the application
     NSString *currentFile,
         *newAppDownloadPath = nil,
-        *bundleFileName = [[host bundlePath] lastPathComponent],
-        *alternateBundleFileName = [[host name] stringByAppendingPathExtension:[[host bundlePath] pathExtension]];
+        *bundleExtension = [[host bundlePath] pathExtension];
+    NSOrderedSet<NSString *> *hostNames = [host infoDictionaryNames];
+    NSMutableOrderedSet<NSString *> *bundleFileNames = [NSMutableOrderedSet orderedSet];
+    for (NSString *hostName in hostNames) {
+        NSString *bundleFileName = [hostName stringByAppendingPathExtension:bundleExtension];
+        if (bundleFileName != nil) {
+            [bundleFileNames addObject:bundleFileName];
+        }
+    }
 #if SPARKLE_BUILD_PACKAGE_SUPPORT
     NSString *fallbackPackagePath = nil;
     
@@ -41,7 +59,6 @@
     BOOL isGuided = YES;
 #endif
     NSDirectoryEnumerator *dirEnum = [[NSFileManager defaultManager] enumeratorAtPath:inUpdateFolder];
-    NSString *bundleFileNameNoExtension = [bundleFileName stringByDeletingPathExtension];
 
     while ((currentFile = [dirEnum nextObject])) {
         NSString *currentPath = [inUpdateFolder stringByAppendingPathComponent:currentFile];
@@ -78,8 +95,7 @@
         NSString *currentExtension = [currentFile pathExtension];
         NSString *currentFilenameNoExtension = [currentFilename stringByDeletingPathExtension];
 #endif
-        if ([currentFilename isEqualToString:bundleFileName] ||
-            [currentFilename isEqualToString:alternateBundleFileName]) // We found one!
+        if (SUFilenameMatchesAnyName(currentFilename, bundleFileNames)) // We found one!
         {
 #if SPARKLE_BUILD_PACKAGE_SUPPORT
             isPackage = NO;
@@ -89,7 +105,7 @@
 #if SPARKLE_BUILD_PACKAGE_SUPPORT
         } else if ([currentExtension isEqualToString:@"pkg"] ||
                    [currentExtension isEqualToString:@"mpkg"]) {
-            if ([currentFilenameNoExtension isEqualToString:bundleFileNameNoExtension]) {
+            if (SUFilenameMatchesAnyName(currentFilenameNoExtension, hostNames)) {
                 isPackage = YES;
                 newAppDownloadPath = currentPath;
                 break;
@@ -138,13 +154,13 @@
 #endif
 
     if (!newAppDownloadPath) {
-        SULog(SULogLevelError, @"Searched %@ for %@.(app%@)", inUpdateFolder, bundleFileNameNoExtension,
+        SULog(SULogLevelError, @"Searched %@ for {%@}.(app%@) or bundle identifier %@", inUpdateFolder, [hostNames.array componentsJoinedByString:@", "],
 #if SPARKLE_BUILD_PACKAGE_SUPPORT
               @"|pkg"
 #else
               @""
 #endif
-              );
+              , host.bundle.bundleIdentifier);
     }
     return newAppDownloadPath;
 }
