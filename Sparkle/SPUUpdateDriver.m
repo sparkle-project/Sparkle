@@ -306,7 +306,7 @@ static BOOL SPUUpdateRequiresUserAttentionBeforeDownloading(SUAppcastItem *updat
 
         // For automatic install mode, if we are resuming an installing update we will
         // check if impatient interval elapsed, otherwise the last impatient update check date
-        // will be refreshed (when downloading a new fresh update or escalating to showing UI)
+        // will be refreshed (when downloading a new fresh update or showing the update through the user driver)
         if (resumingExistingUpdate) {
             if (_startedResumingInstallingUpdate) {
                 // The update has already finished preparation from a previous cycle
@@ -324,7 +324,10 @@ static BOOL SPUUpdateRequiresUserAttentionBeforeDownloading(SUAppcastItem *updat
                 [self escalateToShowingUI];
                 [self presentUpdateFoundWithAppcastItem:updateItem secondaryAppcastItem:secondaryUpdateItem];
             } else {
-                _shouldResetImpatientCheckDate = YES;
+                // If we didn't supersede an existing update, we will want to reset the impatient check date
+                if (!_startedResumingInstallingUpdate && !_startedResumingDownloadedUpdate) {
+                    _shouldResetImpatientCheckDate = YES;
+                }
                 [self downloadUpdateFromAppcastItem:updateItem secondaryAppcastItem:secondaryUpdateItem inBackground:YES];
             }
         }
@@ -583,6 +586,7 @@ static BOOL SPUUpdateRequiresUserAttentionBeforeDownloading(SUAppcastItem *updat
     }];
     
     _showingUpdate = YES;
+    _shouldResetImpatientCheckDate = YES;
     [self fireUpdateShownHandlerIfNeeded];
     
     NSURL *releaseNotesURL = updateItem.releaseNotesURL;
@@ -850,6 +854,8 @@ static BOOL SPUUpdateRequiresUserAttentionBeforeDownloading(SUAppcastItem *updat
         }];
         
         _showingUpdate = YES;
+        // If the user driver dismisses the install & relaunch we will want to reset the impatient check date
+        _shouldResetImpatientCheckDate = YES;
         [self fireUpdateShownHandlerIfNeeded];
     } else {
         // Give the delegate a chance to handle installing on quit itself, bypassing Sparkle's own UI entirely -
