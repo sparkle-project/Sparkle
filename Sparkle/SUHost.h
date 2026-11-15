@@ -40,6 +40,7 @@ SUHostDefinitionAttribute
 
 @property (nonatomic, readonly) BOOL hasUpdateSecurityPolicy;
 @property (nonatomic, readonly) BOOL requiresSignedAppcast;
+@property (nonatomic, readonly) BOOL requiresFeedBundleIdentifier;
 
 - (nullable id)objectForInfoDictionaryKey:(NSString *)key ofClass:(Class)aClass;
 - (nullable NSNumber *)boolNumberForInfoDictionaryKey:(NSString *)key;

@@ -7,6 +7,7 @@ IMPORTANT: This file must be re-signed if modifications are made to this file! T
     <title>Sparkle Test App Changelog</title>
     <description>Most recent changes with links to updates.</description>
     <language>en</language>
+    <sparkle:bundleIdentifier>org.sparkle-project.SparkleTestApp</sparkle:bundleIdentifier>
         <item>
         <title>Version 2.2</title>
         <sparkle:version>2.2</sparkle:version>

@@ -246,6 +246,11 @@ static void *SUHostObservableContext = &SUHostObservableContext;
     return [self boolForInfoDictionaryKey:SURequireSignedFeedKey];
 }
 
+- (BOOL)requiresFeedBundleIdentifier
+{
+    return [self boolForInfoDictionaryKey:SURequireFeedBundleIdentifierKey];
+}
+
 - (SUPublicKeys *)publicKeys
 {
     return [[SUPublicKeys alloc] initWithEd:[self publicEDKey]

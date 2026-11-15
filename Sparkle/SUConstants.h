@@ -47,6 +47,7 @@ extern NSString *const SUPublicDSAKeyKey;
 extern NSString *const SUPublicDSAKeyFileKey;
 extern NSString *const SUPublicEDKeyKey;
 extern NSString *const SURequireSignedFeedKey;
+extern NSString *const SURequireFeedBundleIdentifierKey;
 extern NSString *const SUVerifyUpdateBeforeExtractionKey;
 extern NSString *const SUAutomaticallyUpdateKey;
 extern NSString *const SUAllowsAutomaticUpdatesKey;
@@ -82,6 +83,7 @@ extern NSString *const SUAppcastAttributeLength;
 
 extern NSString *const SUAppcastElementVersion;
 extern NSString *const SUAppcastElementShortVersionString;
+extern NSString *const SUAppcastElementBundleIdentifier;
 extern NSString *const SUAppcastElementCriticalUpdate;
 extern NSString *const SUAppcastElementDeltas;
 extern NSString *const SUAppcastElementMinimumAutoupdateVersion;

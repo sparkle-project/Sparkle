@@ -311,7 +311,20 @@ func writeAppcast(appcastDestPath: URL, keys: PrivateKeys, disableEmbeddedSignWa
         
         requiresSignedAppcast = requiresSignedAppcastFromArchives
     }
-    
+
+    if requiresSignedAppcast && keys.publicEdKey != nil && keys.privateEdKey != nil {
+        let existingBundleIdentifiers = Set(channel.elements(forName: SUAppcastElementBundleIdentifier).compactMap({ $0.stringValue?.trimmingCharacters(in: .whitespacesAndNewlines) }))
+        let archiveBundleIdentifiers = Set(appcast.versionsInFeed.compactMap({ appcast.archives[$0]?.bundleIdentifier }))
+
+        var bundleIdentifierIndex = try channel.nodes(forXPath: "item").first?.index ?? channel.childCount
+        for bundleIdentifier in archiveBundleIdentifiers.subtracting(existingBundleIdentifiers).sorted() {
+            let bundleIdentifierElement = XMLElement.element(withName: SUAppcastElementBundleIdentifier, uri: sparkleNS) as! XMLElement
+            bundleIdentifierElement.setChildren([text(bundleIdentifier)])
+            channel.insertChild(bundleIdentifierElement, at: bundleIdentifierIndex)
+            bundleIdentifierIndex += 1
+        }
+    }
+
     // Keep track of already signed release note files so we avoid
     // re-signing the same file in case the developer is using symlinks
     // Path -> [(EdSignature, Length)]
