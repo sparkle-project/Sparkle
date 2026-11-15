@@ -45,6 +45,10 @@
  */
 static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 
+// This is slightly longer than SUTerminationRequestTargetWaitDelay in the installer progress app
+// to give extra time to allow receiving the termination message and finishing installation
+static const NSTimeInterval SUTerminationRequestTargetWaitDelay = 2.0;
+
 @interface AppInstaller () <NSXPCListenerDelegate, SUInstallerCommunicationProtocol, AgentConnectionDelegate>
 @end
 
@@ -103,6 +107,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     BOOL _performedStage3Installation;
     
     BOOL _targetTerminated;
+    BOOL _receivedTerminationRequest;
 }
 
 - (instancetype)initWithHostBundleIdentifier:(NSString *)hostBundleIdentifier homeDirectory:(NSString *)homeDirectory userName:(NSString *)userName
@@ -379,6 +384,26 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     _agentInitiatedConnection = YES;
     if (_finishedValidation) {
         [self retrieveProcessIdentifierAndStartInstallation];
+    }
+}
+
+- (void)handleTerminationRequest
+{
+    // When we receive a termination quit request do not clean up the update directory
+    // to reduce risk of removing something in the directory while the installer thread tries to install/swap
+    // an update bundle from there
+    if (_performedStage1Installation) {
+        if (!_receivedTerminationRequest) {
+            _receivedTerminationRequest = YES;
+            
+            // Give grace period before doing forceful exit,
+            // which may give some time to finish an app update installation.
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(SUTerminationRequestTargetWaitDelay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                exit(SIGTERM);
+            });
+        }
+    } else {
+        exit(SIGTERM);
     }
 }
 

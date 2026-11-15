@@ -32,6 +32,7 @@
 #include "AppKitPrevention.h"
 
 #define FIRST_INSTALLER_MESSAGE_TIMEOUT 7ull
+#define CANCEL_SUPERSEDED_INSTALLER_TIMEOUT 3ull
 
 #if SPARKLE_BUILD_LEGACY_SUUPDATER
 @interface NSObject (PrivateDelegateMethods)
@@ -66,6 +67,7 @@
     BOOL _systemDomain;
     BOOL _aborted;
     BOOL _notifiedDelegateInstallationWillFinish;
+    BOOL _cancelSupersededInstaller;
 }
 
 - (instancetype)initWithHost:(SUHost *)host applicationBundle:(NSBundle *)applicationBundle updater:(id)updater updaterDelegate:(id<SPUUpdaterDelegate>)updaterDelegate delegate:(nullable id<SPUInstallerDriverDelegate>)delegate
@@ -147,26 +149,38 @@
     [_delegate installerIsRequestingAbortInstallWithError:installerError];
 }
 
+- (id<SUInstallerConnectionProtocol>)createInstallerConnectionAndGetServiceName:(NSString * __autoreleasing *)outServiceName SPU_OBJC_DIRECT
+{
+    NSString *hostBundleIdentifier = _host.bundle.bundleIdentifier;
+    assert(hostBundleIdentifier != nil);
+    
+    id<SUInstallerConnectionProtocol> installerConnection;
+#if INSTALLER_CONNECTION_XPC_SERVICE_EMBEDDED
+    if (SPUXPCServiceIsEnabled(SUEnableInstallerConnectionServiceKey)) {
+        installerConnection = [[SUXPCInstallerConnection alloc] initWithDelegate:self];
+    } else
+#endif
+    {
+        installerConnection = [[SUInstallerConnection alloc] initWithDelegate:self remote:NO];
+    }
+    
+    if (outServiceName != NULL) {
+        *outServiceName = SPUInstallerServiceNameForBundleIdentifier(hostBundleIdentifier);
+    }
+    return installerConnection;
+}
+
 - (void)setUpConnection SPU_OBJC_DIRECT
 {
     if (_installerConnection != nil) {
         return;
     }
     
-    NSString *hostBundleIdentifier = _host.bundle.bundleIdentifier;
-    assert(hostBundleIdentifier != nil);
+    NSString *serviceName = nil;
+    _installerConnection = [self createInstallerConnectionAndGetServiceName:&serviceName];
     
-    BOOL usingInstallerService;
-#if INSTALLER_CONNECTION_XPC_SERVICE_EMBEDDED
-    if (SPUXPCServiceIsEnabled(SUEnableInstallerConnectionServiceKey)) {
-        _installerConnection = [[SUXPCInstallerConnection alloc] initWithDelegate:self];
-        usingInstallerService = YES;
-    } else
-#endif
-    {
-        _installerConnection = [[SUInstallerConnection alloc] initWithDelegate:self remote:NO];
-        usingInstallerService = NO;
-    }
+    // Check if we're using remote SUXPCInstallerConnection for diagnostic purposes
+    BOOL usingInstallerService = ![(id<NSObject>)_installerConnection isKindOfClass:SUInstallerConnection.class];
     
     __weak __typeof__(self) weakSelf = self;
     [_installerConnection setInvalidationHandler:^{
@@ -195,7 +209,6 @@
         });
     }];
     
-    NSString *serviceName = SPUInstallerServiceNameForBundleIdentifier(hostBundleIdentifier);
     NSString *installationType = _updateItem.installationType;
     assert(installationType != nil);
     
@@ -211,7 +224,15 @@
     _currentStage = SPUInstallerNotStarted;
     
     if (_installerConnection == nil) {
-        [self launchAutoUpdateSilently:silently completion:completionHandler];
+        if (_cancelSupersededInstaller) {
+            _cancelSupersededInstaller = NO;
+            
+            [self cancelSupersededInstallerWithCompletion:^{
+                [self launchAutoUpdateSilently:silently completion:completionHandler];
+            }];
+        } else {
+            [self launchAutoUpdateSilently:silently completion:completionHandler];
+        }
     } else {
         // The Install tool is already alive; just send out installation input data again
         [self sendInstallationData];
@@ -223,6 +244,35 @@
 {
     _updateItem = updateItem;
     _systemDomain = systemDomain;
+}
+
+- (void)cancelSupersededInstallerBeforeLaunching
+{
+    _cancelSupersededInstaller = YES;
+}
+
+- (void)cancelSupersededInstallerWithCompletion:(void (^)(void))completionHandler SPU_OBJC_DIRECT
+{
+    NSString *serviceName = nil;
+    id<SUInstallerConnectionProtocol> installerConnection = [self createInstallerConnectionAndGetServiceName:&serviceName];
+    
+    __block BOOL completed = NO;
+    void (^completeCancellation)(void) = ^{
+        if (!completed) {
+            completed = YES;
+            [installerConnection invalidate];
+            completionHandler();
+        }
+    };
+    
+    [installerConnection setInvalidationHandler:^{
+        dispatch_async(dispatch_get_main_queue(), completeCancellation);
+    }];
+    
+    [installerConnection setServiceName:serviceName systemDomain:_systemDomain];
+    [installerConnection handleMessageWithIdentifier:SPUCancelInstallation data:[NSData data]];
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(CANCEL_SUPERSEDED_INSTALLER_TIMEOUT * NSEC_PER_SEC)), dispatch_get_main_queue(), completeCancellation);
 }
 
 - (void)sendInstallationData SPU_OBJC_DIRECT

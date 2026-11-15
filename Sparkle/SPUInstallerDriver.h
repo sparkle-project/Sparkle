@@ -33,6 +33,8 @@ SPU_OBJC_DIRECT_MEMBERS @interface SPUInstallerDriver : NSObject
 
 - (void)resumeInstallingUpdateWithUpdateItem:(SUAppcastItem *)updateItem systemDomain:(BOOL)systemDomain;
 
+- (void)cancelSupersededInstallerBeforeLaunching;
+
 - (void)setUpdateWillInstallHandler:(void (^)(void))updateWillInstallHandler;
 
 - (void)extractDownloadedUpdate:(SPUDownloadedUpdate *)downloadedUpdate silently:(BOOL)silently completion:(void (^)(NSError * _Nullable))completionHandler;
