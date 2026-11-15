@@ -28,6 +28,7 @@ SUHostDefinitionAttribute
 
 @property (readonly, nonatomic, copy) NSString *bundlePath;
 @property (readonly, nonatomic, copy) NSString *name;
+@property (readonly, nonatomic, copy) NSOrderedSet<NSString *> *infoDictionaryNames;
 @property (readonly, nonatomic, copy) NSString *version;
 @property (readonly, nonatomic) BOOL validVersion;
 @property (readonly, nonatomic, copy) NSString *displayVersion;
