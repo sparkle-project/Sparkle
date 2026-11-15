@@ -13,10 +13,6 @@
 	<dict>
 		<key>Resources/test-pubkey.pem</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			pR1EGsp5nhk1vr/xfQPT8es9ZBw=
-			</data>
 			<key>hash2</key>
 			<data>
 			zD/XQJu4ElPWE6sfqtzoR2vEjdfgi98j/hiRoYZqv9w=
