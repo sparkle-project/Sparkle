@@ -1,3 +1,10 @@
+# 2.11.0
+
+* Add sparkle:bundleIdentifier element on appcast for signed feeds (#2954) (Zorg)
+* Avoid using host bundle filename for finding bundle to update (#2953) (Zorg)
+* Activate app if update check is initiated from NSStatusItem (#2950) (Niklas Wenzel)
+* Update Japanese localization (#2948) (1024jp)
+
 # 2.10.1
 
 * Fix not trimming whitespace/newline characters from <sparkle:releaseNotesLink> (#2944) (Zorg)
