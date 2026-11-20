@@ -75,6 +75,7 @@ static NSDictionary<NSString *, NSDictionary<NSString *, NSString *> *> *const S
     },
     @"hu": @{
         @"Cancel Update": @"Frissítés megszakítása",
+        @"Installing update…": @"Frissítés telepítése…",
         @"Updating %@": @"%@ frissítése",
     },
     @"is": @{
