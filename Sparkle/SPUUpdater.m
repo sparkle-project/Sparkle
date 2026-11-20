@@ -818,7 +818,8 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
             [strongSelf updateLastUpdateCheckDate];
 
             // Track the last downloaded date locally the first time the automatic update driver
-            // downloads an update in the background. This is later used for the impatient update check.
+            // downloads an update in the background, or when an update is shown to the user.
+            // This is later used for the impatient update check.
             if (shouldResetImpatientCheckDate) {
                 strongSelf->_updateLastImpatientCheckedDate = [strongSelf lastUpdateCheckDate];
             }
