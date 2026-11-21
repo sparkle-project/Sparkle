@@ -300,6 +300,16 @@ static BOOL SPUUpdateRequiresUserAttentionBeforeDownloading(SUAppcastItem *updat
         }
 
         if (_installMode == SPUUpdateDriverInstallModeShowingUI) {
+            // If we are resuming an update that can be installed silently which was not user initiated, defer showing update until
+            // impatient interval has elapsed.
+            if (resumingExistingUpdate && _startedResumingInstallingUpdate && !_userInitiated && !updateItem.criticalUpdate && !SPUUpdateRequiresUserAttentionBeforeDownloading(updateItem)) {
+                NSTimeInterval intervalSinceImpatientDate = [[NSDate date] timeIntervalSinceDate:_lastImpatientCheckedDate];
+                if (intervalSinceImpatientDate < _impatientUpdateCheckInterval) {
+                    [self finishWithError:nil];
+                    return;
+                }
+            }
+            
             [self presentUpdateFoundWithAppcastItem:updateItem secondaryAppcastItem:secondaryUpdateItem];
             return;
         }

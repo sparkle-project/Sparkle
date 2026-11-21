@@ -594,15 +594,15 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 
     SPUUpdateDriver *updateDriver = [[SPUUpdateDriver alloc] initWithHost:_host applicationBundle:_applicationBundle updater:self userDriver:_userDriver updaterDelegate:delegate userInitiated:NO installMode:installMode];
 
-    if (installMode == SPUUpdateDriverInstallModeAutomatic) {
-        if ([_updateLastImpatientCheckedDate timeIntervalSinceNow] > 0) {
-            // Last impatient checked date is bogus (in the future), reset it
-            _updateLastImpatientCheckedDate = [NSDate date];
-        }
-
-        updateDriver.impatientUpdateCheckInterval = _updaterSettings.impatientUpdateCheckInterval;
-        updateDriver.lastImpatientCheckedDate = _updateLastImpatientCheckedDate;
+    if ([_updateLastImpatientCheckedDate timeIntervalSinceNow] > 0) {
+        // Last impatient checked date is bogus (in the future), reset it
+        _updateLastImpatientCheckedDate = [NSDate date];
     }
+
+    // This may be used even if installMode is not SPUUpdateDriverInstallModeAutomatic
+    // For example, an update that has already started installing prior to this session.
+    updateDriver.impatientUpdateCheckInterval = _updaterSettings.impatientUpdateCheckInterval;
+    updateDriver.lastImpatientCheckedDate = _updateLastImpatientCheckedDate;
 
     [self checkForUpdatesWithDriver:updateDriver updateCheck:SPUUpdateCheckUpdatesInBackground];
 }
