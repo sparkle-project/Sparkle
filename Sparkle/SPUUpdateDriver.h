@@ -39,8 +39,7 @@ SPU_OBJC_DIRECT_MEMBERS @interface SPUUpdateDriver : NSObject
 
 - (instancetype)initWithHost:(SUHost *)host applicationBundle:(NSBundle *)applicationBundle updater:(id)updater userDriver:(nullable id <SPUUserDriver>)userDriver updaterDelegate:(nullable id <SPUUpdaterDelegate>)updaterDelegate userInitiated:(BOOL)userInitiated installMode:(SPUUpdateDriverInstallMode)installMode;
 
-// Only meaningful for a driver constructed with SPUUpdateDriverInstallModeAutomatic.
-// Must be set (along with impatientUpdateCheckInterval) before starting a check.
+// Must be set (along with impatientUpdateCheckInterval) before starting a scheduled (automatic or UI) check.
 @property (nonatomic, copy) NSDate *lastImpatientCheckedDate;
 @property (nonatomic) NSTimeInterval impatientUpdateCheckInterval;
 
