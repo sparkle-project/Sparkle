@@ -29,7 +29,7 @@
 "A new version of %@ is ready to install!" = "Ein ny versjon av %@ er klar for installering!";
 
 /* No comment provided by engineer. */
-"An error occurred in retrieving update information. Please try again later." = "Ein feil oppstod ved henting av oppdateringsinformasjon. Ver greid og prøv igjen seinare.";
+"An error occurred while retrieving update information. Please try again later." = "Ein feil oppstod ved henting av oppdateringsinformasjon. Ver greid og prøv igjen seinare.";
 
 /* No comment provided by engineer. */
 "An error occurred while downloading the update. Please try again later." = "Ein feil oppstod under nedlasting av oppdateringa. Ver greid og prøv igjen seinare.";

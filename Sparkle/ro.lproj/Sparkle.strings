@@ -29,7 +29,7 @@
 "A new version of %@ is ready to install!" = "O nouă versiune pentru %@ este gata de instalare!";
 
 /* No comment provided by engineer. */
-"An error occurred in retrieving update information. Please try again later." = "A apărut o eroare în timpul preluari informaţiilor pentru actualizare. Te rog încercă din nou mai târziu.";
+"An error occurred while retrieving update information. Please try again later." = "A apărut o eroare în timpul preluari informaţiilor pentru actualizare. Te rog încercă din nou mai târziu.";
 
 /* No comment provided by engineer. */
 "An error occurred while downloading the update. Please try again later." = "A apărut o eroare în timp ce se descărca actualizărea. Te rog încercă din nou mai târziu.";

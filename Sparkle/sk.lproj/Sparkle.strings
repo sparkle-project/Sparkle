@@ -26,7 +26,7 @@
 "A new version of %@ is ready to install!" = "Nová verzia aplikácie %@ je pripravená na inštaláciu!";
 
 /* No comment provided by engineer. */
-"An error occurred in retrieving update information. Please try again later." = "Pri získavaní informácie o aktualizácii sa vyskytla chyba. Skúste neskôr.";
+"An error occurred while retrieving update information. Please try again later." = "Pri získavaní informácie o aktualizácii sa vyskytla chyba. Skúste neskôr.";
 
 /* No comment provided by engineer. */
 "An error occurred while downloading the update. Please try again later." = "Pri preberaní aktualizácie sa vyskytla chyba. Skúste neskôr.";

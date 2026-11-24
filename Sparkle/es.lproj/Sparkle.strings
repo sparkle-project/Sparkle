@@ -32,7 +32,7 @@
 "A new version of %@ is ready to install!" = "¡Una nueva versión de %@ está lista para instalarse!";
 
 /* No comment provided by engineer. */
-"An error occurred in retrieving update information. Please try again later." = "Ocurrió un error al recopilar información sobre la actualización. Por favor inténtalo de nuevo más tarde.";
+"An error occurred while retrieving update information. Please try again later." = "Ocurrió un error al recopilar información sobre la actualización. Por favor inténtalo de nuevo más tarde.";
 
 /* No comment provided by engineer. */
 "An error occurred while downloading the update. Please try again later." = "Ocurrió un error al descargar la actualización. Por favor inténtalo de nuevo más tarde.";

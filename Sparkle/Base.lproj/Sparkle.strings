@@ -53,7 +53,7 @@
 "A new version of %@ is ready to install!" = "A new version of %@ is ready to install!";
 
 /* No comment provided by engineer. */
-"An error occurred in retrieving update information. Please try again later." = "An error occurred in retrieving update information. Please try again later.";
+"An error occurred while retrieving update information. Please try again later." = "An error occurred while retrieving update information. Please try again later.";
 
 /* No comment provided by engineer. */
 "An error occurred while connecting to the installer. Please try again later." = "An error occurred while connecting to the installer. Please try again later.";

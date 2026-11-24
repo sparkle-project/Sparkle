@@ -50,7 +50,7 @@
 "A new version of %@ is ready to install!" = "Una nuova versione di %@ è pronta per essere installata!";
 
 /* No comment provided by engineer. */
-"An error occurred in retrieving update information. Please try again later." = "Si è verificato un errore durante il recupero delle informazioni sull’aggiornamento. Riprova in seguito.";
+"An error occurred while retrieving update information. Please try again later." = "Si è verificato un errore durante il recupero delle informazioni sull’aggiornamento. Riprova in seguito.";
 
 /* No comment provided by engineer. */
 "An error occurred while connecting to the installer. Please try again later." = "Si è verificato un errore durante la connessione al programma di installazione. Riprova in seguito.";
