@@ -29,7 +29,7 @@
 "A new version of %@ is ready to install!" = "%@ uygulamasının yeni bir sürümü yüklenmeye hazır!";
 
 /* No comment provided by engineer. */
-"An error occurred in retrieving update information. Please try again later." = "Güncelleme bilgilerini alırken bir hata oluştu. Lütfen daha sonra yeniden deneyin.";
+"An error occurred while retrieving update information. Please try again later." = "Güncelleme bilgilerini alırken bir hata oluştu. Lütfen daha sonra yeniden deneyin.";
 
 /* No comment provided by engineer. */
 "An error occurred while downloading the update. Please try again later." = "Güncelleme indirilirken bir hata oluştu. Lütfen daha sonra yeniden deneyin.";

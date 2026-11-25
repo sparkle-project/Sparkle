@@ -35,7 +35,7 @@
 "A new version of %@ is ready to install!" = "Une nouvelle version de %@ est prête à être installée !";
 
 /* No comment provided by engineer. */
-"An error occurred in retrieving update information. Please try again later." = "Une erreur est survenue en récupérant les informations de mise à jour. Veuillez réessayer plus tard.";
+"An error occurred while retrieving update information. Please try again later." = "Une erreur est survenue en récupérant les informations de mise à jour. Veuillez réessayer plus tard.";
 
 /* No comment provided by engineer. */
 "An error occurred while downloading the update. Please try again later." = "Une erreur est survenue pendant le téléchargement de la mise à jour. Veuillez réessayer plus tard.";

@@ -23,7 +23,7 @@
 "A new version of %@ is ready to install!" = "En ny version av %@ är redo att installeras!";
 
 /* No comment provided by engineer. */
-"An error occurred in retrieving update information. Please try again later." = "Ett fel uppstod vid hämtning av information om uppdateringar. Försök igen senare.";
+"An error occurred while retrieving update information. Please try again later." = "Ett fel uppstod vid hämtning av information om uppdateringar. Försök igen senare.";
 
 /* No comment provided by engineer. */
 "An error occurred while downloading the update. Please try again later." = "Ett fel uppstod vid hämtning av uppdateringen. Försök igen senare.";

@@ -32,7 +32,7 @@
 "A new version of %@ is ready to install!" = "Nova verzija za %@ je spremna za instaliranje!";
 
 /* No comment provided by engineer. */
-"An error occurred in retrieving update information. Please try again later." = "Dogodila se greška u dohvaćanju informacija o nadogradnji. Pokušaj kasnije ponovo.";
+"An error occurred while retrieving update information. Please try again later." = "Dogodila se greška u dohvaćanju informacija o nadogradnji. Pokušaj kasnije ponovo.";
 
 /* No comment provided by engineer. */
 "An error occurred while downloading the update. Please try again later." = "Dogodila se greška prilikom preuzimanja nadogradnje. Pokušaj kasnije ponovo.";

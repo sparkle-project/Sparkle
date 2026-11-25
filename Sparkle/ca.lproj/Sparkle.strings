@@ -17,7 +17,7 @@
 "A new version of %@ is available!" = "Hi ha una nova versió de %@ disponible!";
 
 /* No comment provided by engineer. */
-"An error occurred in retrieving update information. Please try again later." = "Hi ha hagut un error obtenint la informació d'actualització. Torneu a provar-ho més tard.";
+"An error occurred while retrieving update information. Please try again later." = "Hi ha hagut un error obtenint la informació d'actualització. Torneu a provar-ho més tard.";
 
 /* No comment provided by engineer. */
 "An error occurred while extracting the archive. Please try again later." = "Hi ha hagut un error al extreure l'arxiu? Torneu a provar-ho més tard.";

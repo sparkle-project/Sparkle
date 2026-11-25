@@ -50,7 +50,7 @@
 "A new version of %@ is ready to install!" = "新版本的%@可以安装了";
 
 /* No comment provided by engineer. */
-"An error occurred in retrieving update information. Please try again later." = "获取升级信息时出现错误，请稍后再试。";
+"An error occurred while retrieving update information. Please try again later." = "获取升级信息时出现错误，请稍后再试。";
 
 /* No comment provided by engineer. */
 "An error occurred while connecting to the installer. Please try again later." = "连接到安装程序时出现错误，请稍后再试。";

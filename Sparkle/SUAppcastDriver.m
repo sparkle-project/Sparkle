@@ -332,7 +332,7 @@
 {
     SULog(SULogLevelError, @"Encountered download feed error: %@", error);
 
-    NSMutableDictionary *userInfo = [NSMutableDictionary dictionaryWithDictionary:@{NSLocalizedDescriptionKey:SULocalizedStringFromTableInBundle(@"An error occurred in retrieving update information. Please try again later.", SPARKLE_TABLE, SUSparkleBundle(), nil)}];
+    NSMutableDictionary *userInfo = [NSMutableDictionary dictionaryWithDictionary:@{NSLocalizedDescriptionKey:SULocalizedStringFromTableInBundle(@"An error occurred while retrieving update information. Please try again later.", SPARKLE_TABLE, SUSparkleBundle(), nil)}];
     
     if (error != nil) {
         [userInfo setObject:error forKey:NSUnderlyingErrorKey];

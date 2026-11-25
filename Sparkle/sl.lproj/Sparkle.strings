@@ -26,7 +26,7 @@
 "A new version of %@ is ready to install!" = "Najnovejša verzija programa %@ je že nameščena.";
 
 /* No comment provided by engineer. */
-"An error occurred in retrieving update information. Please try again later." = "Med iskanjem posodobitev je prišlo do napake. Prosimo poskusite ponovno čez nekaj časa.";
+"An error occurred while retrieving update information. Please try again later." = "Med iskanjem posodobitev je prišlo do napake. Prosimo poskusite ponovno čez nekaj časa.";
 
 /* No comment provided by engineer. */
 "An error occurred while downloading the update. Please try again later." = "Med prenašanje posodobitve s spleta je prišlo do napake. Prosimo poskusite ponovno čez nekaj časa.";

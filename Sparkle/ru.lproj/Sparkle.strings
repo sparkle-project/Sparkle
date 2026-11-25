@@ -26,7 +26,7 @@
 "A new version of %@ is ready to install!" = "Новая версия %@ готова к установке!";
 
 /* No comment provided by engineer. */
-"An error occurred in retrieving update information. Please try again later." = "Произошла ошибка при извлечении информации обновления. Повторите попытку позже.";
+"An error occurred while retrieving update information. Please try again later." = "Произошла ошибка при извлечении информации обновления. Повторите попытку позже.";
 
 /* No comment provided by engineer. */
 "An error occurred while downloading the update. Please try again later." = "Произошла ошибка при загрузке обновления. Повторите попытку позже.";

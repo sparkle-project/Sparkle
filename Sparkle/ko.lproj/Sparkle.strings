@@ -50,7 +50,7 @@
 "A new version of %@ is ready to install!" = "%@ 새 버전을 설치할 준비가 되었습니다.";
 
 /* No comment provided by engineer. */
-"An error occurred in retrieving update information. Please try again later." = "업데이트 정보를 수집하는 중 오류가 발생하였습니다. 나중에 다시 시도해 주십시오.";
+"An error occurred while retrieving update information. Please try again later." = "업데이트 정보를 수집하는 중 오류가 발생하였습니다. 나중에 다시 시도해 주십시오.";
 
 /* No comment provided by engineer. */
 "An error occurred while connecting to the installer. Please try again later." = "설치 프로그램에 연결하는 중 오류가 발생하였습니다. 나중에 다시 시도해 주십시오.";

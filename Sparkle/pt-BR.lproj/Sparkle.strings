@@ -47,7 +47,7 @@
 "A new version of %@ is ready to install!" = "Uma nova versão do app %@ está pronta para ser instalada!";
 
 /* No comment provided by engineer. */
-"An error occurred in retrieving update information. Please try again later." = "Ocorreu um erro ao obter informações de atualização. Tente novamente mais tarde.";
+"An error occurred while retrieving update information. Please try again later." = "Ocorreu um erro ao obter informações de atualização. Tente novamente mais tarde.";
 
 /* No comment provided by engineer. */
 "An error occurred while connecting to the installer. Please try again later." = "Ocorreu um erro ao conectar-se ao instalador. Tente novamente mais tarde.";

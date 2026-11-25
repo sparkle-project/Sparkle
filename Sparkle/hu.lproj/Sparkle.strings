@@ -53,7 +53,7 @@
 "A new version of %@ is ready to install!" = "%@: egy új verzió készen áll a telepítésre!";
 
 /* No comment provided by engineer. */
-"An error occurred in retrieving update information. Please try again later." = "Hiba történt a frissítési adatok lekérésekor. Próbálja újra később.";
+"An error occurred while retrieving update information. Please try again later." = "Hiba történt a frissítési adatok lekérésekor. Próbálja újra később.";
 
 /* No comment provided by engineer. */
 "An error occurred while connecting to the installer. Please try again later." = "Hiba történt a telepítőhöz való csatlakozáskor. Próbálja újra később.";

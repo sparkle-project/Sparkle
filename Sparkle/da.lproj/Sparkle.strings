@@ -29,7 +29,7 @@
 "A new version of %@ is ready to install!" = "En ny version af %@ er klar til installering!";
 
 /* No comment provided by engineer. */
-"An error occurred in retrieving update information. Please try again later." = "Kunne ikke modtage informationer om opdateringer. Kontroller at du har forbindelse til internettet eller prøv igen senere.";
+"An error occurred while retrieving update information. Please try again later." = "Kunne ikke modtage informationer om opdateringer. Kontroller at du har forbindelse til internettet eller prøv igen senere.";
 
 /* No comment provided by engineer. */
 "An error occurred while downloading the update. Please try again later." = "Opdateringen kunne ikke hentes. Prøv igen senere.";
