@@ -1,122 +1,245 @@
-/* No comment provided by engineer. */
-"%@ %@ is currently the newest version available." = "%1$@ %2$@ este cea ultima versiune disponibilă.";
+/* Description text for SUUpdateAlert when the critical update has already been downloaded and ready to install. */
+"%1$@ %2$@ has been downloaded and is ready to use! This is an important update; would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ a fost descărcată și este gata de utilizare! Aceasta este o actualizare importantă; doriți să o instalați și să relansați %1$@ acum?";
+
+/* Description text for SUUpdateAlert when the update has already been downloaded and ready to install. */
+"%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ a fost descărcată și este gata de utilizare! Doriți să o instalați și să relansați %1$@ acum?";
 
 /* No comment provided by engineer. */
-"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%1$@ %2$@ este cea ultima versiune disponibilă.\n(You are currently running version %3$@.)";
+"%1$@ %2$@ is available but your macOS version is too new for this update. This update only supports up to macOS %3$@." = "%1$@ %2$@ este disponibilă, dar versiunea de macOS pe care o utilizați este prea nouă pentru această actualizare. Actualizarea este compatibilă doar cu macOS %3$@ sau cu versiuni anterioare.";
+
+/* No comment provided by engineer. */
+"%1$@ %2$@ is available but your macOS version is too old to install it. At least macOS %3$@ is required." = "%1$@ %2$@ este disponibilă, dar versiunea de macOS pe care o utilizați este prea veche pentru a instala această actualizare. Este necesar cel puțin macOS %3$@.";
+
+/* Mac is too old and update requires Apple silicon Mac */
+"%1$@ %2$@ is available but this update requires a new Apple silicon Mac." = "%1$@ %2$@ este disponibilă, dar această actualizare necesită un Mac mai nou, cu cip Apple.";
+
+/* No comment provided by engineer. */
+"%1$@ can’t be updated if it’s running from the location it was downloaded to." = "%1$@ nu poate fi actualizată dacă rulează din locația în care a fost descărcată.";
+
+/* No comment provided by engineer. */
+"%1$@ can’t be updated because it was opened from a read-only or a temporary location." = "%1$@ nu poate fi actualizată, deoarece a fost deschisă dintr-o locație temporară sau doar pentru citire.";
+
+/* No comment provided by engineer. */
+"%@ %@ is currently the newest version available." = "%1$@ %2$@ este în prezent cea mai nouă versiune disponibilă.";
+
+/* No comment provided by engineer. */
+"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%1$@ %2$@ este cea mai nouă versiune disponibilă.\n(În prezent utilizați versiunea %3$@.)";
+
+/* Description text for SUUpdateAlert when the critical update is downloadable. */
+"%@ %@ is now available—you have %@. This is an important update; would you like to download it now?" = "%1$@ %2$@ este disponibilă (aveți versiunea %3$@). Aceasta este o actualizare importantă; doriți să o descărcați acum?";
 
 /* Description text for SUUpdateAlert when the update is downloadable. */
-"%@ %@ is now available—you have %@. Would you like to download it now?" = "%1$@ %2$@ este disponibilă—tu ai %3$@. Dorești să o descărcarci acum?";
+"%@ %@ is now available—you have %@. Would you like to download it now?" = "%1$@ %2$@ este disponibilă (aveți versiunea %3$@). Doriți să o descărcați acum?";
+
+/* Description text for SUUpdateAlert when the update informational with no download. */
+"%@ %@ is now available—you have %@. Would you like to learn more about this update on the web?" = "%1$@ %2$@ este disponibilă (aveți versiunea %3$@). Doriți să aflați mai multe despre această actualizare pe web?";
 
 /* The download progress in a unit of bytes, e.g. 100 KB */
-"%@ downloaded" = "%@ descărcat";
+"%@ downloaded" = "Descărcat: %@";
+
+/* No comment provided by engineer. */
+"%@ is now updated to version %@!" = "%1$@ a fost actualizată la versiunea %2$@!";
+
+/* No comment provided by engineer. */
+"%@ is now updated!" = "%@ a fost actualizată!";
 
 /* The download progress in units of bytes, e.g. 100 KB of 1,0 MB */
 "%@ of %@" = "%1$@ din %2$@";
 
-/* Description text for SUUpdateAlert when the critical update has already been downloaded and ready to install. */
-"%1$@ %2$@ has been downloaded and is ready to use! This is an important update; would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ a fost descărcată și este gata de utilizare! Aceasta este o actualizare importantă; dorești să o instalezi și să relansați %1$@ acum?";
-
-/* Description text for SUUpdateAlert when the update has already been downloaded and ready to install. */
-"%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ a fost descărcată și este gata de utilizare! Dorești să o instalezi și să relansați %1$@ acum?";
+/* No comment provided by engineer. */
+"A new version of %@ is available!" = "O nouă versiune de %@ este disponibilă!";
 
 /* No comment provided by engineer. */
-"%1$@ can’t be updated because it was opened from a read-only or a temporary location." = "%1$@ nu poate fi actualizată atunci când a fost pornită de pe un volum read-only ca o imagine disc sau o unitate optică.";
+"A new version of %@ is ready to install!" = "O nouă versiune de %@ este gata de instalare!";
 
 /* No comment provided by engineer. */
-"A new version of %@ is available!" = "O nouă versiune pentru %@ este disponibilă!";
+"An error occurred while retrieving update information. Please try again later." = "A survenit o eroare la obținerea informațiilor despre actualizare. Reîncercați mai târziu.";
 
 /* No comment provided by engineer. */
-"A new version of %@ is ready to install!" = "O nouă versiune pentru %@ este gata de instalare!";
+"An error occurred while connecting to the installer. Please try again later." = "A survenit o eroare în timpul conectării la programul de instalare. Reîncercați mai târziu.";
 
 /* No comment provided by engineer. */
-"An error occurred while retrieving update information. Please try again later." = "A apărut o eroare în timpul preluari informaţiilor pentru actualizare. Te rog încercă din nou mai târziu.";
+"An error occurred while downloading the update. Please try again later." = "A survenit o eroare la descărcarea actualizării. Reîncercați mai târziu.";
 
 /* No comment provided by engineer. */
-"An error occurred while downloading the update. Please try again later." = "A apărut o eroare în timp ce se descărca actualizărea. Te rog încercă din nou mai târziu.";
+"An error occurred while downloading the release notes." = "A survenit o eroare la descărcarea notelor de publicare.";
 
 /* No comment provided by engineer. */
-"An error occurred while extracting the archive. Please try again later." = "A apărut o eroare în timpul dezarhivării. Te rog încercă din nou mai târziu.";
+"An error occurred while extracting the archive. Please try again later." = "A survenit o eroare la extragerea arhivei. Reîncercați mai târziu.";
 
 /* No comment provided by engineer. */
-"An error occurred while parsing the update feed." = "A apărut o eroare în timpul citiri feed-ului de actualizare.";
+"An error occurred while launching the installer. Please try again later." = "A survenit o eroare la lansarea programului de instalare. Reîncercați mai târziu.";
 
 /* No comment provided by engineer. */
-"An important update to %@ is ready to install" = "O actualizare importantă pentru %@ este gata pentru a fi instalată";
+"An error occurred while parsing the update feed." = "A survenit o eroare la analizarea fluxului de actualizări.";
 
 /* No comment provided by engineer. */
-"Cancel" = "Anulează";
+"An error occurred while running the updater. Please try again later." = "A survenit o eroare la rularea programului de actualizare. Reîncercați mai târziu.";
+
+/* No comment provided by engineer. */
+"An error occurred while starting the installer. Please try again later." = "A survenit o eroare la pornirea programului de instalare. Reîncercați mai târziu.";
+
+/* No comment provided by engineer. */
+"An important update to %@ is ready to install" = "O actualizare importantă pentru %@ este gata de instalare";
+
+/* No comment provided by engineer. */
+"Application Name" = "Nume aplicație";
+
+/* No comment provided by engineer. */
+"Application Version" = "Versiune aplicație";
+
+/* No comment provided by engineer. */
+"Cancel" = "Anulați";
 
 /* Run generate_progress_tool_localizations.py after updating. */
-"Cancel Update" = "Anulează actualizarea";
+"Cancel Update" = "Anulați actualizarea";
 
 /* No comment provided by engineer. */
-"Checking for updates…" = "Verifică de actualizări…";
-
-/* Take care not to overflow the status window. */
-"Downloading update…" = "Descarcă actualizarea…";
-
-/* Take care not to overflow the status window. */
-"Extracting update…" = "Dezarhivează actualizarea…";
+"Checking for updates…" = "Căutare actualizări…";
 
 /* No comment provided by engineer. */
-"Install and Relaunch" = "Instalează și Redeschide";
+"CPU is 64-Bit?" = "CPU pe 64 de biți?";
+
+/* No comment provided by engineer. */
+"CPU Speed (MHz)" = "Viteză CPU (MHz)";
+
+/* No comment provided by engineer. */
+"CPU Subtype" = "Subtip CPU";
+
+/* No comment provided by engineer. */
+"CPU Type" = "Tip CPU";
+
+/* Take care not to overflow the status window. */
+"Downloading update…" = "Descărcare actualizare…";
+
+/* Take care not to overflow the status window. */
+"Extracting update…" = "Extragere actualizare…";
+
+/* No comment provided by engineer. */
+"Failed to resume installing update." = "Instalarea actualizării nu a putut fi reluată.";
+
+/* No comment provided by engineer. */
+"Install and Relaunch" = "Instalați și relansați";
+
+/* Alternate title for 'Remind Me Later' button when downloaded updates can be resumed */
+"Install on Quit" = "Instalați la închidere";
 
 /* Run generate_progress_tool_localizations.py after updating. */
-"Installing update…" = "Instalează actualizarea…";
+"Installing update…" = "Instalare actualizare…";
 
 /* Alternate title for 'Install Update' button when there's no download in RSS feed. */
-"Learn More…" = "Află mai multe…";
+"Learn More…" = "Mai multe…";
+
+/* No comment provided by engineer. */
+"Mac Model" = "Model Mac";
+
+/* No comment provided by engineer. */
+"Memory (MB)" = "Memorie (MB)";
+
+/* No comment provided by engineer. */
+"No" = "Nu";
+
+/* No comment provided by engineer. */
+"Number of CPUs" = "Număr de CPU";
 
 /* No comment provided by engineer. */
 "OK" = "OK";
 
 /* No comment provided by engineer. */
-"Ready to Install" = "Pregatit pentru a instala";
+"OS Version" = "Versiune macOS";
 
 /* No comment provided by engineer. */
-"Should %1$@ automatically check for updates? You can always check for updates manually from the %1$@ menu." = "%1$@ ar trebui ca să caute în mod automat pentru actualizări? Puteți verifica mereu pentru actualizări din meniul %1$@.";
+"Preferred Language" = "Limbă preferată";
 
 /* No comment provided by engineer. */
-"Update Error!" = "Eroare Actualizare!";
+"Quit %1$@, move it into your Applications folder, relaunch it from there and try again." = "Închideți aplicația %1$@, mutați-o în dosarul Aplicații, relansați-o de acolo și reîncercați.";
+
+/* No comment provided by engineer. */
+"Ready to Install" = "Gata de instalare";
+
+/* No comment provided by engineer. */
+"Should %1$@ automatically check for updates? You can always check for updates manually from the %1$@ menu." = "Doriți ca %1$@ să verifice automat dacă există actualizări? Puteți verifica oricând manual din meniul %1$@.";
+
+/* No comment provided by engineer. */
+"The installation failed due to not having permission to write the new update." = "Instalarea a eșuat, deoarece nu există permisiunea de scriere pentru noua actualizare.";
+
+/* No comment provided by engineer. */
+"The updater failed to start. Please verify you have the latest version of %@ and contact the app developer if the issue still persists. Check the Console logs for more information." = "Programul de actualizare nu a putut porni. Verificați dacă aveți cea mai recentă versiune de %@ și, dacă problema persistă, contactați dezvoltatorul aplicației. Consultați jurnalele din Consolă pentru mai multe informații.";
+
+/* No comment provided by engineer. */
+"The update is improperly signed and could not be validated. Please try again later or contact the app developer." = "Actualizarea nu este semnată corect și nu a putut fi validată. Reîncercați mai târziu sau contactați dezvoltatorul aplicației.";
+
+/* No comment provided by engineer. */
+"The update feed is improperly signed and could not be validated. Please try again later or contact the app developer." = "Fluxul de actualizări nu este semnat corect și nu a putut fi validat. Reîncercați mai târziu sau contactați dezvoltatorul aplicației.";
+
+/* No comment provided by engineer. */
+"The release notes is improperly signed and could not be validated. Please contact the app developer for more information." = "Notele de publicare nu sunt semnate corect și nu au putut fi validate. Contactați dezvoltatorul aplicației pentru mai multe informații.";
+
+/* No comment provided by engineer. */
+"Unable to Check For Updates" = "Nu pot fi căutate actualizări";
+
+/* No comment provided by engineer. */
+"Update Error!" = "Eroare de actualizare!";
+
+/* No comment provided by engineer. */
+"Update Installed" = "Actualizare instalată";
 
 /* Run generate_progress_tool_localizations.py after updating. */
-"Updating %@" = "Actualizează %@";
+"Updating %@" = "Actualizare %@";
 
 /* No comment provided by engineer. */
-"Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "Mută %1$@ în directorul Aplicații, repornește-o de acolo și încearcă din nou.";
+"Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "Utilizați Finder pentru a copia %1$@ în dosarul Aplicații, relansați-o de acolo și reîncercați.";
+
+/* No comment provided by engineer. */
+"Version History" = "Istoric versiuni";
+
+/* No comment provided by engineer. */
+"Yes" = "Da";
+
+/* No comment provided by engineer. */
+"You may need to allow modifications from %1$@ in System Settings under Privacy & Security and App Management to install future updates." = "Pentru a putea instala actualizările viitoare, poate fi necesar să accesați Configurări sistem > Intimitate și securitate > Gestionare aplicații și să permiteți modificările efectuate de %1$@.";
+
+/* No comment provided by engineer. */
+"Your macOS version is too new" = "Versiunea dvs. de macOS este prea nouă";
+
+/* No comment provided by engineer. */
+"Your macOS version is too old" = "Versiunea dvs. de macOS este prea veche";
+
+/* Mac is too old and update requires newer hardware */
+"Your Mac is too old" = "Mac-ul dvs. este prea vechi";
 
 /* Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates. */
-"You’re up to date!" = "Ai ultima versiune!";
+"You’re up to date!" = "Aveți cea mai recentă versiune!";
 
 /* Software Update title/label */
-"Software Update" = "Actualizarea aplicației";
+"Software Update" = "Actualizare software";
 
 /* Remind Me Later choice for update alert */
-"Remind Me Later" = "Amintește-mi mai târziu";
+"Remind Me Later" = "Reamintire ulterioară";
 
 /* Skip This Version choice for update alert */
-"Skip This Version" = "Sari peste…";
+"Skip This Version" = "Omiteți această versiune";
 
 /* Install Update choice for update alert */
-"Install Update" = "Instalează actualizarea";
+"Install Update" = "Instalați actualizarea";
 
 /* Automatically download and install updates in the future option for update alert */
-"Automatically download and install updates in the future" = "În viitor descarcă și instalează în automat actualizările";
+"Automatically download and install updates in the future" = "Descărcați și instalați automat actualizările pe viitor";
 
 /* Check for updates automatically response for update permission dialog */
-"Check Automatically" = "Verifică în mod automat";
+"Check Automatically" = "Verificați automat";
 
 /* Don't check for updates automatically response for update permission dialog */
-"Don’t Check" = "Nu verifica";
+"Don’t Check" = "Nu verificați";
 
 /* Title question for update permission dialog */
-"Check for updates automatically?" = "Verifică pentru actualizări în mod automat";
+"Check for updates automatically?" = "Verificați automat dacă există actualizări?";
 
 /* Include anonymous system profile choice for update permission dialog */
-"Include anonymous system profile" = "Include profil anomin de sistem";
+"Include anonymous system profile" = "Includeți profilul anonim al sistemului";
 
 /* Automatically download and install updates choice for update permission dialog */
-"Automatically download and install updates" = "Descarcă și instalează în automat actualizările";
+"Automatically download and install updates" = "Descărcați și instalați automat actualizările";
 
 /* Anonymous system profile information disclosure for update permission dialog */
-"Anonymous system profile information is used to help us plan future development work. Please contact us if you have any questions about this.\n\nThis is the information that would be sent:" = "Anonymous system profile information is used to help us plan future development work. Please contact us if you have any questions about this.\n\nThis is the information that would be sent:";
+"Anonymous system profile information is used to help us plan future development work. Please contact us if you have any questions about this.\n\nThis is the information that would be sent:" = "Informațiile anonime din profilul sistemului ne ajută să planificăm activitatea viitoare de dezvoltare. Dacă aveți întrebări despre acest lucru, contactați-ne.\n\nAcestea sunt informațiile care ar fi trimise:";
