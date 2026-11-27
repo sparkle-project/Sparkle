@@ -1,18 +1,18 @@
 
 /* Class = "NSMenuItem"; title = "Bring All to Front"; ObjectID = "5"; */
-"5.title" = "Bring All to Front";
+"5.title" = "Aduceți tot în față";
 
 /* Class = "NSMenuItem"; title = "Window"; ObjectID = "19"; */
-"19.title" = "Window";
+"19.title" = "Fereastră";
 
 /* Class = "NSMenuItem"; title = "Minimize"; ObjectID = "23"; */
-"23.title" = "Minimize";
+"23.title" = "Minimizați";
 
 /* Class = "NSMenu"; title = "Window"; ObjectID = "24"; */
-"24.title" = "Window";
+"24.title" = "Fereastră";
 
 /* Class = "NSMenu"; title = "MainMenu"; ObjectID = "29"; */
-"29.title" = "MainMenu";
+"29.title" = "Meniu principal";
 
 /* Class = "NSMenuItem"; title = "Sparkle Test App"; ObjectID = "56"; */
 "56.title" = "Sparkle Test App";
@@ -21,142 +21,142 @@
 "57.title" = "Sparkle Test App";
 
 /* Class = "NSMenuItem"; title = "About Sparkle Test App"; ObjectID = "58"; */
-"58.title" = "About Sparkle Test App";
+"58.title" = "Despre Sparkle Test App";
 
 /* Class = "NSMenuItem"; title = "Open..."; ObjectID = "72"; */
-"72.title" = "Open...";
+"72.title" = "Deschideți…";
 
 /* Class = "NSMenuItem"; title = "Close"; ObjectID = "73"; */
-"73.title" = "Close";
+"73.title" = "Închideți";
 
 /* Class = "NSMenuItem"; title = "Save"; ObjectID = "75"; */
-"75.title" = "Save";
+"75.title" = "Salvați";
 
 /* Class = "NSMenuItem"; title = "Page Setup…"; ObjectID = "77"; */
-"77.title" = "Page Setup…";
+"77.title" = "Configurare pagină…";
 
 /* Class = "NSMenuItem"; title = "Print…"; ObjectID = "78"; */
-"78.title" = "Print…";
+"78.title" = "Tipăriți…";
 
 /* Class = "NSMenuItem"; title = "Save As…"; ObjectID = "80"; */
-"80.title" = "Save As…";
+"80.title" = "Salvați ca…";
 
 /* Class = "NSMenu"; title = "File"; ObjectID = "81"; */
-"81.title" = "File";
+"81.title" = "Fișier";
 
 /* Class = "NSMenuItem"; title = "New"; ObjectID = "82"; */
-"82.title" = "New";
+"82.title" = "Nou";
 
 /* Class = "NSMenuItem"; title = "File"; ObjectID = "83"; */
-"83.title" = "File";
+"83.title" = "Fișier";
 
 /* Class = "NSMenuItem"; title = "Help"; ObjectID = "103"; */
-"103.title" = "Help";
+"103.title" = "Ajutor";
 
 /* Class = "NSMenu"; title = "Help"; ObjectID = "106"; */
-"106.title" = "Help";
+"106.title" = "Ajutor";
 
 /* Class = "NSMenuItem"; title = "Sparkle Test App Help"; ObjectID = "111"; */
-"111.title" = "Sparkle Test App Help";
+"111.title" = "Ajutor Sparkle Test App";
 
 /* Class = "NSMenuItem"; title = "Revert"; ObjectID = "112"; */
-"112.title" = "Revert";
+"112.title" = "Reveniți";
 
 /* Class = "NSMenuItem"; title = "Open Recent"; ObjectID = "124"; */
-"124.title" = "Open Recent";
+"124.title" = "Deschise recent";
 
 /* Class = "NSMenu"; title = "Open Recent"; ObjectID = "125"; */
-"125.title" = "Open Recent";
+"125.title" = "Deschise recent";
 
 /* Class = "NSMenuItem"; title = "Clear Menu"; ObjectID = "126"; */
-"126.title" = "Clear Menu";
+"126.title" = "Degajați meniul";
 
 /* Class = "NSMenu"; title = "Services"; ObjectID = "130"; */
-"130.title" = "Services";
+"130.title" = "Servicii";
 
 /* Class = "NSMenuItem"; title = "Services"; ObjectID = "131"; */
-"131.title" = "Services";
+"131.title" = "Servicii";
 
 /* Class = "NSMenuItem"; title = "Hide Sparkle Test App"; ObjectID = "134"; */
-"134.title" = "Hide Sparkle Test App";
+"134.title" = "Ascundeți Sparkle Test App";
 
 /* Class = "NSMenuItem"; title = "Quit Sparkle Test App"; ObjectID = "136"; */
-"136.title" = "Quit Sparkle Test App";
+"136.title" = "Închideți aplicația Sparkle Test App";
 
 /* Class = "NSMenuItem"; title = "Hide Others"; ObjectID = "145"; */
-"145.title" = "Hide Others";
+"145.title" = "Ascundeți restul";
 
 /* Class = "NSMenuItem"; title = "Show All"; ObjectID = "150"; */
-"150.title" = "Show All";
+"150.title" = "Afișați tot";
 
 /* Class = "NSMenuItem"; title = "Find…"; ObjectID = "154"; */
-"154.title" = "Find…";
+"154.title" = "Găsiți…";
 
 /* Class = "NSMenuItem"; title = "Jump to Selection"; ObjectID = "155"; */
-"155.title" = "Jump to Selection";
+"155.title" = "Salt la selecție";
 
 /* Class = "NSMenuItem"; title = "Copy"; ObjectID = "157"; */
-"157.title" = "Copy";
+"157.title" = "Copiați";
 
 /* Class = "NSMenuItem"; title = "Undo"; ObjectID = "158"; */
-"158.title" = "Undo";
+"158.title" = "Infirmați";
 
 /* Class = "NSMenu"; title = "Find"; ObjectID = "159"; */
-"159.title" = "Find";
+"159.title" = "Găsiți";
 
 /* Class = "NSMenuItem"; title = "Cut"; ObjectID = "160"; */
-"160.title" = "Cut";
+"160.title" = "Tăiați";
 
 /* Class = "NSMenuItem"; title = "Use Selection for Find"; ObjectID = "161"; */
-"161.title" = "Use Selection for Find";
+"161.title" = "Găsiți selecția";
 
 /* Class = "NSMenuItem"; title = "Find Previous"; ObjectID = "162"; */
-"162.title" = "Find Previous";
+"162.title" = "Găsiți anteriorul";
 
 /* Class = "NSMenuItem"; title = "Edit"; ObjectID = "163"; */
-"163.title" = "Edit";
+"163.title" = "Editare";
 
 /* Class = "NSMenuItem"; title = "Delete"; ObjectID = "164"; */
-"164.title" = "Delete";
+"164.title" = "Ștergeți";
 
 /* Class = "NSMenuItem"; title = "Find Next"; ObjectID = "167"; */
-"167.title" = "Find Next";
+"167.title" = "Găsiți următorul";
 
 /* Class = "NSMenuItem"; title = "Find"; ObjectID = "168"; */
-"168.title" = "Find";
+"168.title" = "Găsiți";
 
 /* Class = "NSMenu"; title = "Edit"; ObjectID = "169"; */
-"169.title" = "Edit";
+"169.title" = "Editare";
 
 /* Class = "NSMenuItem"; title = "Paste"; ObjectID = "171"; */
-"171.title" = "Paste";
+"171.title" = "Lipiți";
 
 /* Class = "NSMenuItem"; title = "Select All"; ObjectID = "172"; */
-"172.title" = "Select All";
+"172.title" = "Selectați tot";
 
 /* Class = "NSMenuItem"; title = "Redo"; ObjectID = "173"; */
-"173.title" = "Redo";
+"173.title" = "Refaceți";
 
 /* Class = "NSMenuItem"; title = "Spelling"; ObjectID = "184"; */
-"184.title" = "Spelling";
+"184.title" = "Ortografie";
 
 /* Class = "NSMenu"; title = "Spelling"; ObjectID = "185"; */
-"185.title" = "Spelling";
+"185.title" = "Ortografie";
 
 /* Class = "NSMenuItem"; title = "Spelling…"; ObjectID = "187"; */
-"187.title" = "Spelling…";
+"187.title" = "Ortografie…";
 
 /* Class = "NSMenuItem"; title = "Check Spelling"; ObjectID = "189"; */
-"189.title" = "Check Spelling";
+"189.title" = "Verificați ortografia";
 
 /* Class = "NSMenuItem"; title = "Check Spelling as You Type"; ObjectID = "191"; */
-"191.title" = "Check Spelling as You Type";
+"191.title" = "Verificați ortografia în timpul scrierii";
 
 /* Class = "NSMenuItem"; title = "Zoom"; ObjectID = "197"; */
 "197.title" = "Zoom";
 
 /* Class = "NSMenuItem"; title = "Paste and Match Style"; ObjectID = "204"; */
-"204.title" = "Paste and Match Style";
+"204.title" = "Lipiți și adaptați stilul";
 
 /* Class = "NSMenuItem"; title = "Check for Updates…"; ObjectID = "207"; */
-"207.title" = "Check for Updates…";
+"207.title" = "Căutați actualizări…";

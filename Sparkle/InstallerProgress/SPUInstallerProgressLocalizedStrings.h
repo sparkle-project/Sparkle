@@ -128,9 +128,9 @@ static NSDictionary<NSString *, NSDictionary<NSString *, NSString *> *> *const S
         @"Updating %@": @"A atualizar o %@",
     },
     @"ro": @{
-        @"Cancel Update": @"Anulează actualizarea",
-        @"Installing update…": @"Instalează actualizarea…",
-        @"Updating %@": @"Actualizează %@",
+        @"Cancel Update": @"Anulați actualizarea",
+        @"Installing update…": @"Instalare actualizare…",
+        @"Updating %@": @"Actualizare %@",
     },
     @"ru": @{
         @"Cancel Update": @"Отменить обновление",
