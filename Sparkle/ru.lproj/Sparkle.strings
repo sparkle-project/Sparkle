@@ -1,3 +1,9 @@
+/* Authorization prompt for an app updating itself. %1$@ is the app name. */
+"%1$@ wants permission to update." = "Приложение %1$@ запрашивает разрешение на обновление.";
+
+/* Authorization prompt for an app updating another app. %1$@ is the updater and %2$@ is the app being updated. */
+"%1$@ wants permission to update %2$@." = "%1$@ запрашивает разрешение на обновление приложения %2$@.";
+
 /* No comment provided by engineer. */
 "%@ %@ is currently the newest version available." = "В настоящий момент %1$@ %2$@ является новейшей версией.";
 

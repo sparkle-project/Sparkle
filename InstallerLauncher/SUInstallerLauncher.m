@@ -13,6 +13,7 @@
 #import "SPUMessageTypes.h"
 #import "SPULocalCacheDirectory.h"
 #import "SPUInstallationType.h"
+#import "SULocalizations.h"
 #import "SUHost.h"
 #import <ServiceManagement/ServiceManagement.h>
 #import <SystemConfiguration/SystemConfiguration.h>
@@ -142,39 +143,63 @@
         // https://developer.apple.com/library/mac/technotes/tn2095/_index.html#//apple_ref/doc/uid/DTS10003110-CH1-SECTION7
         // We can set a custom right name for authenticating as an administrator
         // Using this right rather than using something like kSMRightModifySystemDaemons allows us to present a better worded prompt
-        // Note the right name is cached, so if we want to change the authorization
-        // prompt, we may need to change the right name. I have found no good way around this :|
-        
-        SUHost *host = [[SUHost alloc] initWithBundle:hostBundle];
-        NSString *hostName = host.name;
-        
-        // Figure out the authorization prompt and right name
-        // We create the authorization prompt here so that a bad client cannot pass in a completely arbitrary prompt message
-        // We also forgo localization for this prompt at the moment because with the right name being cached, updating localizations will be undesirable.
-        // Furthermore, we can avoid adding localization files to the Installer XPC Service (if that one is being used).
-        NSString *sparkleAuthTag = @"sparkle2-auth"; // this needs to change if auth wording changes
-        NSString *rightNameString;
-        NSString *authorizationPrompt;
-        if ([hostBundleIdentifier isEqualToString:updaterIdentifier]) {
-            // Application bundle is likely updating itself
-            rightNameString = [NSString stringWithFormat:@"%@.%@", hostBundleIdentifier, sparkleAuthTag];
-            authorizationPrompt = [NSString stringWithFormat:@"%1$@ wants permission to update.", hostName];
-        } else {
-            // Updater is likely updating a bundle that is not itself
-            rightNameString = [NSString stringWithFormat:@"%@.%@.%@", updaterIdentifier, hostBundleIdentifier, sparkleAuthTag];
-            authorizationPrompt = [NSString stringWithFormat:@"%1$@ wants permission to update %2$@.", mainBundleName, hostName];
-        }
-        
+        BOOL selfUpdate = [hostBundleIdentifier isEqualToString:updaterIdentifier];
+        NSString *rightNameString = selfUpdate
+            ? [NSString stringWithFormat:@"%@.sparkle2-auth", hostBundleIdentifier]
+            : [NSString stringWithFormat:@"%@.%@.sparkle2-auth", updaterIdentifier, hostBundleIdentifier];
         const char *rightName = rightNameString.UTF8String;
         assert(rightName != NULL);
-        
+
+#if SPARKLE_COPY_LOCALIZATIONS
+        // Authorization Services caches the formatted prompts at registration.
+        // Use a new name for the default right while preserving administrator-configured rights.
+        CFDictionaryRef legacyDefinition = NULL;
+        OSStatus getRightResult = AuthorizationRightGet(rightName, &legacyDefinition);
+        NSMutableDictionary *legacyPolicy = [(NSDictionary *)CFBridgingRelease(legacyDefinition) mutableCopy];
+        [legacyPolicy removeObjectsForKeys:@[@"created", @"modified", @"identifier", @"requirement", @"version", @"default-prompt"]];
+        if (getRightResult == errAuthorizationDenied || [legacyPolicy isEqualToDictionary:@{@"class": @"rule", @"rule": @[@(kAuthorizationRuleAuthenticateAsAdmin)]}]) {
+            rightNameString = [rightNameString stringByAppendingString:@"-v2"];
+            rightName = rightNameString.UTF8String;
+            assert(rightName != NULL);
+            getRightResult = AuthorizationRightGet(rightName, NULL);
+        }
+#else
         OSStatus getRightResult = AuthorizationRightGet(rightName, NULL);
+#endif
+
         if (getRightResult == errAuthorizationDenied) {
-            if (AuthorizationRightSet(auth, rightName, (__bridge CFTypeRef _Nonnull)(@(kAuthorizationRuleAuthenticateAsAdmin)), (__bridge CFStringRef _Nullable)(authorizationPrompt), NULL, NULL) != errAuthorizationSuccess) {
+            // Compose the prompt here so clients cannot supply arbitrary authorization text.
+            SUHost *host = [[SUHost alloc] initWithBundle:hostBundle];
+            NSString *(^formatPrompt)(NSBundle *) = ^NSString *(NSBundle *bundle) {
+                (void)bundle;
+                return selfUpdate
+                    ? [NSString stringWithFormat:SULocalizedStringFromTableInBundle(@"%1$@ wants permission to update.", SPARKLE_TABLE, bundle, nil), host.name]
+                    : [NSString stringWithFormat:SULocalizedStringFromTableInBundle(@"%1$@ wants permission to update %2$@.", SPARKLE_TABLE, bundle, nil), mainBundleName, host.name];
+            };
+            NSString *defaultPrompt = formatPrompt(nil);
+            NSMutableDictionary<NSString *, NSString *> *prompts = [@{@"": defaultPrompt, @"en": defaultPrompt} mutableCopy];
+#if SPARKLE_COPY_LOCALIZATIONS
+            NSBundle *bundle = [NSBundle bundleForClass:[self class]];
+            if ([bundle.bundleURL.pathExtension isEqualToString:@"xpc"]) {
+                // The enclosing versioned framework contains the localization catalogs.
+                NSURL *frameworkURL = bundle.bundleURL.URLByResolvingSymlinksInPath.URLByDeletingLastPathComponent.URLByDeletingLastPathComponent;
+                bundle = frameworkURL == nil ? nil : [NSBundle bundleWithURL:frameworkURL];
+            }
+            for (NSString *language in bundle.localizations) {
+                NSString *path = [bundle pathForResource:language ofType:@"lproj"];
+                NSString *prompt = formatPrompt(path == nil ? nil : [NSBundle bundleWithPath:path]);
+                if (![prompt isEqualToString:defaultPrompt]) {
+                    prompts[language] = prompt;
+                }
+            }
+#endif
+            // AuthorizationRightSet stores strings verbatim, so insert app names before registration.
+            NSDictionary *definition = @{@(kAuthorizationRightRule): @(kAuthorizationRuleAuthenticateAsAdmin), @"default-prompt": prompts};
+            if (AuthorizationRightSet(auth, rightName, (__bridge CFDictionaryRef)definition, NULL, NULL, NULL) != errAuthorizationSuccess) {
                 SULog(SULogLevelError, @"Failed to make auth right set");
             }
         }
-        
+
         AuthorizationItem right = { .name = rightName, .valueLength = 0, .value = NULL, .flags = 0 };
         AuthorizationRights rights = { .count = 1, .items = &right };
         

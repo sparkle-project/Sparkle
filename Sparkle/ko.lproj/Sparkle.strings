@@ -1,3 +1,9 @@
+/* Authorization prompt for an app updating itself. %1$@ is the app name. */
+"%1$@ wants permission to update." = "%1$@ 앱에서 자체 업데이트 권한을 요청합니다.";
+
+/* Authorization prompt for an app updating another app. %1$@ is the updater and %2$@ is the app being updated. */
+"%1$@ wants permission to update %2$@." = "%1$@ 앱에서 %2$@ 업데이트 권한을 요청합니다.";
+
 /* Description text for SUUpdateAlert when the critical update has already been downloaded and ready to install. */
 "%1$@ %2$@ has been downloaded and is ready to use! This is an important update; would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ 이(가) 다운로드 되었습니다. 프로그램을 업데이트하고 재실행 하시겠습니까?\n이 업데이트는 중요한 업데이트입니다.";
 

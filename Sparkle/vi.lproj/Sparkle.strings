@@ -1,3 +1,9 @@
+/* Authorization prompt for an app updating itself. %1$@ is the app name. */
+"%1$@ wants permission to update." = "%1$@ muốn được cấp quyền để tự cập nhật.";
+
+/* Authorization prompt for an app updating another app. %1$@ is the updater and %2$@ is the app being updated. */
+"%1$@ wants permission to update %2$@." = "%1$@ muốn được cấp quyền để cập nhật %2$@.";
+
 /* Description text for SUUpdateAlert when the critical update has already been downloaded and ready to install. */
 "%1$@ %2$@ has been downloaded and is ready to use! This is an important update; would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ đã được tải xuống và sẵn sàng sử dụng! Đây là bản cập nhật quan trọng; bạn có muốn cài đặt và khởi động lại %1$@ ngay bây giờ không?";
 
