@@ -1,3 +1,9 @@
+/* Authorization prompt for an app updating itself. %1$@ is the app name. */
+"%1$@ wants permission to update." = "%1$@ demana permís per actualitzar-se.";
+
+/* Authorization prompt for an app updating another app. %1$@ is the updater and %2$@ is the app being updated. */
+"%1$@ wants permission to update %2$@." = "%1$@ demana permís per actualitzar %2$@.";
+
 /* No comment provided by engineer. */
 "%@ %@ is currently the newest version available." = "%@ %@ és la versió disponible més actual.";
 

@@ -176,7 +176,7 @@
                     : [NSString stringWithFormat:SULocalizedStringFromTableInBundle(@"%1$@ wants permission to update %2$@.", SPARKLE_TABLE, bundle, nil), mainBundleName, host.name];
             };
             NSString *defaultPrompt = formatPrompt(nil);
-            NSMutableDictionary<NSString *, NSString *> *prompts = [@{@"": defaultPrompt} mutableCopy];
+            NSMutableDictionary<NSString *, NSString *> *prompts = [@{@"": defaultPrompt, @"en": defaultPrompt} mutableCopy];
 #if SPARKLE_COPY_LOCALIZATIONS
             NSBundle *bundle = [NSBundle bundleForClass:[self class]];
             if ([bundle.bundleURL.pathExtension isEqualToString:@"xpc"]) {
