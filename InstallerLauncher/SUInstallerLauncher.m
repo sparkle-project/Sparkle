@@ -151,7 +151,8 @@
         assert(rightName != NULL);
 
 #if SPARKLE_COPY_LOCALIZATIONS
-        // Use a new name for cached default rights and keep administrator-configured rights in use.
+        // Authorization Services caches the formatted prompts at registration.
+        // Use a new name for the default right while preserving administrator-configured rights.
         CFDictionaryRef legacyDefinition = NULL;
         OSStatus getRightResult = AuthorizationRightGet(rightName, &legacyDefinition);
         NSMutableDictionary *legacyPolicy = [(NSDictionary *)CFBridgingRelease(legacyDefinition) mutableCopy];
@@ -180,6 +181,7 @@
 #if SPARKLE_COPY_LOCALIZATIONS
             NSBundle *bundle = [NSBundle bundleForClass:[self class]];
             if ([bundle.bundleURL.pathExtension isEqualToString:@"xpc"]) {
+                // The enclosing versioned framework contains the localization catalogs.
                 NSURL *frameworkURL = bundle.bundleURL.URLByResolvingSymlinksInPath.URLByDeletingLastPathComponent.URLByDeletingLastPathComponent;
                 bundle = frameworkURL == nil ? nil : [NSBundle bundleWithURL:frameworkURL];
             }
@@ -191,6 +193,7 @@
                 }
             }
 #endif
+            // AuthorizationRightSet stores strings verbatim, so insert app names before registration.
             NSDictionary *definition = @{@(kAuthorizationRightRule): @(kAuthorizationRuleAuthenticateAsAdmin), @"default-prompt": prompts};
             if (AuthorizationRightSet(auth, rightName, (__bridge CFDictionaryRef)definition, NULL, NULL, NULL) != errAuthorizationSuccess) {
                 SULog(SULogLevelError, @"Failed to make auth right set");
